@@ -1,0 +1,19 @@
+# Object files
+*.pyc
+
+# IntelliJ files
+.idea/
+*.iml
+
+# Temporary files
+*~
+
+# other stuff
+.DS_Store
+allure/
+venv/
+WhereAmI.py
+build/
+.eggs/
+
+
