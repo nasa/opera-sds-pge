@@ -9,7 +9,8 @@ RunConfig:
 
       InputFilesGroup:
         InputFilePaths:
-          - input/input_file.h5
+          - input/input_file01.h5
+          - input/input_file02.h5
 
       DynamicAncillaryFilesGroup:
         AncillaryFileMap:
