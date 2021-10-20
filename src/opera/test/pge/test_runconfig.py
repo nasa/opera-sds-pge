@@ -59,13 +59,13 @@ class RunconfigTestCase(unittest.TestCase):
         self.assertEqual(runconfig.sas_output_file, "outputs/output_file.h5")
         self.assertEqual(runconfig.product_identifier, "EXAMPLE")
         self.assertEqual(runconfig.sas_program_path, "pybind_opera.workflows.example_workflow")
-        self.assertEqual(runconfig.sas_program_options, "--debug --restart")
+        self.assertListEqual(runconfig.sas_program_options, ["--debug", "--restart"])
         self.assertEqual(runconfig.error_code_base, 100000)
         self.assertEqual(runconfig.sas_schema_path, "sample_sas_schema.yaml")
         self.assertEqual(runconfig.iso_template_path, "sample_iso_template.xml.jinja2")
         self.assertEqual(runconfig.qa_enabled, True)
         self.assertEqual(runconfig.qa_program_path, "/opt/QualityAssurance/sample_qa.py")
-        self.assertEqual(runconfig.qa_program_options, "--debug")
+        self.assertListEqual(runconfig.qa_program_options, ["--debug"])
         self.assertEqual(runconfig.debug_switch, False)
         self.assertListEqual(runconfig.get_ancillary_filenames(), ["input/input_dem.vrt"])
 
@@ -160,6 +160,8 @@ class RunconfigTestCase(unittest.TestCase):
             self.assertIn("RunConfig.Groups.PGE.InputFilesGroup.InputFilePaths: 'None' is not a list.", str(err))
             self.assertIn("RunConfig.Groups.PGE.ProductPathGroup.ProductCounter: -1 is less than 1", str(err))
             self.assertIn("RunConfig.Groups.PGE.PrimaryExecutable.ProgramPath: Required field missing", str(err))
+            self.assertIn("RunConfig.Groups.PGE.PrimaryExecutable.ProgramOptions: '--debug --restart' is not a list.", str(err))
+            self.assertIn("RunConfig.Groups.PGE.QAExecutable.ProgramOptions: '--debug' is not a list.", str(err))
 
 
 if __name__ == "__main__":

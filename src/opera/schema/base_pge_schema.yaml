@@ -37,7 +37,7 @@ RunConfig:
       PrimaryExecutable:
         ProductIdentifier: str(required=False)
         ProgramPath: str(required=True)
-        ProgramOptions: str(required=False)
+        ProgramOptions: list(str(), min=0, required=False)
         ErrorCodeBase: int(required=True)
         SchemaPath: str(required=True)
         IsoTemplatePath: str(required=False)
@@ -45,7 +45,7 @@ RunConfig:
       QAExecutable:
         Enabled: bool(required=True)
         ProgramPath: str(required=False)
-        ProgramOptions: str(required=False)
+        ProgramOptions: list(str(), min=0, required=False)
 
       DebugLevelGroup:
         DebugSwitch: bool(required=False)
