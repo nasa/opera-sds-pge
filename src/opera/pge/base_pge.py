@@ -21,9 +21,10 @@ Module defining the Base PGE interfaces from which all other PGEs are derived.
 
 """
 
+import os
 import yaml
 
-from os.path import basename, join, splitext
+from os.path import abspath, basename, exists, join, splitext
 
 from yamale import YamaleError
 
@@ -116,8 +117,31 @@ class PreProcessorMixin:
         Creates the output/scratch directory locations referenced by the
         RunConfig if they don't exist already.
         """
-        # TODO
-        pass
+        output_product_path = abspath(self.runconfig.output_product_path)
+        scratch_path = abspath(self.runconfig.scratch_path)
+
+        try:
+            if not exists(output_product_path):
+                self.logger.info(self.name, ErrorCode.CREATING_WORKING_DIRECTORY,
+                                 f'Creating output product directory {output_product_path}')
+                os.makedirs(output_product_path, exist_ok=True)
+
+            # TODO: add a cleanup function on the post-processor to remove scratch dir?
+            if not exists(scratch_path):
+                self.logger.info(self.name, ErrorCode.CREATING_WORKING_DIRECTORY,
+                                 f'Creating scratch directory {scratch_path}')
+                os.makedirs(scratch_path, exist_ok=True)
+
+            self.logger.info(self.name, ErrorCode.DIRECTORY_SETUP_COMPLETE,
+                             'Directory setup complete')
+        except OSError as error:
+            error_msg = (f'Could not create one or more working directories. '
+                         f'reason: \n{str(error)}')
+
+            self.logger.critical(self.name, ErrorCode.DIRECTORY_CREATION_FAILED,
+                                 error_msg)
+
+            raise RuntimeError(error_msg)
 
     def run_preprocessor(self, **kwargs):
         """
@@ -312,6 +336,7 @@ class PgeExecutor(PreProcessorMixin, PostProcessorMixin):
         """
         self.run_preprocessor(**kwargs)
 
+        print('Starting SAS execution in PgeExecutor')
         self.run_sas_executable(**kwargs)
 
         self.run_postprocessor(**kwargs)
