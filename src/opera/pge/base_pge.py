@@ -98,20 +98,6 @@ class PreProcessorMixin:
 
             raise RuntimeError(error_msg)
 
-    def _configure_logger(self):
-        """
-        Configures the logger used by the PGE using information from the
-        parsed and validated RunConfig.
-        """
-        self.logger.error_code_base = self.runconfig.error_code_base
-
-        self.logger.workflow = f'{self.runconfig.pge_name::{basename(__file__)}}'
-
-        # TODO: can (or should) the log move/rename step be performed here?
-
-        self.logger.info(self.name, ErrorCode.LOG_FILE_INIT_COMPLETE,
-                         f'Log file configuration complete')
-
     def _setup_directories(self):
         """
         Creates the output/scratch directory locations referenced by the
@@ -138,10 +124,28 @@ class PreProcessorMixin:
             error_msg = (f'Could not create one or more working directories. '
                          f'reason: \n{str(error)}')
 
-            self.logger.critical(self.name, ErrorCode.DIRECTORY_CREATION_FAILED,
-                                 error_msg)
+            self.logger.critical(self.name, ErrorCode.DIRECTORY_CREATION_FAILED, error_msg)
 
             raise RuntimeError(error_msg)
+
+    def _configure_logger(self):
+        """
+        Configures the logger used by the PGE using information from the
+        parsed and validated RunConfig.
+        """
+        self.logger.error_code_base = self.runconfig.error_code_base
+
+        self.logger.workflow = f'{self.runconfig.pge_name::{basename(__file__)}}'
+
+        # TODO: perform the log rename step here (if possible) once file-name convention is defined
+        output_product_path = abspath(self.runconfig.output_product_path)
+        log_file_destination = join(output_product_path, self.logger.get_file_name())
+        self.logger.info(self.name, ErrorCode.MOVING_LOG_FILE,
+                         f'Moving log file to {log_file_destination}')
+        self.logger.move(log_file_destination)
+
+        self.logger.info(self.name, ErrorCode.LOG_FILE_INIT_COMPLETE,
+                         f'Log file configuration complete')
 
     def run_preprocessor(self, **kwargs):
         """
@@ -162,8 +166,8 @@ class PreProcessorMixin:
         self._initialize_logger()
         self._load_runconfig()
         self._validate_runconfig()
-        self._configure_logger()
         self._setup_directories()
+        self._configure_logger()
 
 
 class PostProcessorMixin:

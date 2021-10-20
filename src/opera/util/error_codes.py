@@ -55,6 +55,7 @@ class ErrorCode(IntEnum):
     LOG_FILE_INIT_COMPLETE = auto()
     CREATING_WORKING_DIRECTORY = auto()
     DIRECTORY_SETUP_COMPLETE = auto()
+    MOVING_LOG_FILE = auto()
     MOVING_OUTPUT_FILE = auto()
     SUMMARY_STATS_MESSAGE = auto()
     PGE_NAME = auto()
