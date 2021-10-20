@@ -30,6 +30,7 @@ from yamale import YamaleError
 from .runconfig import RunConfig
 from opera.util.error_codes import ErrorCode
 from opera.util.logger import PgeLogger
+from opera.util.run_utils import create_sas_command_line
 from opera.util.run_utils import time_and_execute
 
 
@@ -278,13 +279,9 @@ class PgeExecutor(PreProcessorMixin, PostProcessorMixin):
         sas_program_options = self.runconfig.sas_program_options
         sas_runconfig_filepath = self._isolate_sas_runconfig()
 
-        # TODO: detect and support absolute paths in addition to python module names
-        command_line = ['python3', '-m', sas_program_path]
-
-        if sas_program_options:
-            command_line.extend(sas_program_options.split())
-
-        command_line.extend(['--', sas_runconfig_filepath])
+        command_line = create_sas_command_line(
+            sas_program_path, sas_runconfig_filepath, sas_program_options
+        )
 
         self.logger.debug(self.name, ErrorCode.SAS_EXE_COMMAND_LINE,
                           f'SAS EXE command line: {" ".join(command_line)}')
