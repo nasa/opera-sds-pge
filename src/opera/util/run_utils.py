@@ -23,10 +23,73 @@ subsystem.
 """
 
 import os
+import shutil
 import subprocess
 import time
 
+from os.path import abspath
+
 from .error_codes import ErrorCode
+
+
+def create_sas_command_line(sas_program_path, sas_runconfig_path,
+                            sas_program_options=None):
+    """
+    Forms the appropriate command line for executing a SAS from the parameters
+    obtained from the RunConfig.
+
+    By default, this function assumes the SAS program path corresponds to an
+    executable file reaching within the current environment's PATH. If this
+    function cannot locate the executable, the SAS program path is assumed to be
+    a Python module path and treated accordingly.
+
+    Parameters
+    ----------
+    sas_program_path : str
+        The path to the SAS executable to be invoked by the returned command line.
+    sas_runconfig_path : str
+        The path to the RunConfig to feed to the SAS executable in the returned
+        command line.
+    sas_program_options : list[str], optional
+        List of options to include in the returned command line.
+
+    Returns
+    -------
+    command_line : list[str]
+        The fully formed command line, returned in list format suitable for use
+        with subprocess.run.
+
+    Raises
+    ------
+    OSError
+        If the SAS executable exists within the current environment, but is not
+        set with execute permissions for the current process.
+
+    """
+    executable_path = shutil.which(sas_program_path)
+
+    if executable_path:
+        command_line = [executable_path]
+    else:
+        executable_path = abspath(sas_program_path)
+
+        # Check if the executable exists, but does not have execute permissions on it
+        if (os.access(executable_path, mode=os.F_OK)
+                and not os.access(executable_path, mode=os.X_OK)):
+            raise OSError(f"Requested SAS program path {sas_program_path} exists, "
+                          f"but does not have execute permissions.")
+        # Otherwise, sas_program_path might be a python module path
+        else:
+            command_line = ['python3', '-m', sas_program_path]
+
+    # Add any provided arguments
+    if sas_program_options:
+        command_line.extend(sas_program_options)
+
+    # Lastly, only explicit input should ever be the path to the runconfig
+    command_line.append(sas_runconfig_path)
+
+    return command_line
 
 
 def time_and_execute(command_line, logger):
