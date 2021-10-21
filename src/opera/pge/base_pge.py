@@ -92,11 +92,8 @@ class PreProcessorMixin:
                          f'failed, reason(s): \n{str(error)}')
 
             self.logger.critical(
-                self.name, ErrorCode.RUN_CONFIG_VALIDATION_FAILED,
-                error_msg
+                self.name, ErrorCode.RUN_CONFIG_VALIDATION_FAILED, error_msg
             )
-
-            raise RuntimeError(error_msg)
 
     def _setup_directories(self):
         """
@@ -124,9 +121,9 @@ class PreProcessorMixin:
             error_msg = (f'Could not create one or more working directories. '
                          f'reason: \n{str(error)}')
 
-            self.logger.critical(self.name, ErrorCode.DIRECTORY_CREATION_FAILED, error_msg)
-
-            raise RuntimeError(error_msg)
+            self.logger.critical(
+                self.name, ErrorCode.DIRECTORY_CREATION_FAILED, error_msg
+            )
 
     def _configure_logger(self):
         """
@@ -135,7 +132,7 @@ class PreProcessorMixin:
         """
         self.logger.error_code_base = self.runconfig.error_code_base
 
-        self.logger.workflow = f'{self.runconfig.pge_name::{basename(__file__)}}'
+        self.logger.workflow = f'{self.runconfig.pge_name}::{basename(__file__)}'
 
         # TODO: perform the log rename step here (if possible) once file-name convention is defined
         output_product_path = abspath(self.runconfig.output_product_path)
@@ -202,6 +199,15 @@ class PostProcessorMixin:
         # TODO
         pass
 
+    def _finalize_log(self):
+        """
+        Finalizes the logger such that the execution summary is logged before
+        the log file is closed. This should typically be one of the last functions
+        invoked by a post-processor, since the log file will be unavailable for
+        writing after this function is called.
+        """
+        self.logger.close_log_file()
+
     def run_postprocessor(self, **kwargs):
         """
         Executes the post-processing steps for PGE job completion.
@@ -221,6 +227,7 @@ class PostProcessorMixin:
         self._create_catalog_metadata()
         self._create_iso_metadata()
         self._stage_output_files()
+        self._finalize_log()
 
 
 class PgeExecutor(PreProcessorMixin, PostProcessorMixin):
@@ -314,13 +321,13 @@ class PgeExecutor(PreProcessorMixin, PostProcessorMixin):
         self.logger.debug(self.name, ErrorCode.SAS_EXE_COMMAND_LINE,
                           f'SAS EXE command line: {" ".join(command_line)}')
 
+        self.logger.info(self.name, ErrorCode.SAS_PROGRAM_STARTING,
+                         'Starting SAS executable')
+
         # Before starting the SAS program, flush the log file to keep the
         # contents properly time ordered, since the SAS program will also write
         # to the same log file.
         self.logger.flush()
-
-        self.logger.info(self.name, ErrorCode.SAS_PROGRAM_STARTING,
-                         'Starting SAS executable')
 
         elapsed_time = time_and_execute(command_line, self.logger)
 

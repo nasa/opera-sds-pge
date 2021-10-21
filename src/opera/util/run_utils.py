@@ -126,8 +126,6 @@ def time_and_execute(command_line, logger):
 
         logger.critical(module_name, ErrorCode.SAS_PROGRAM_FAILED, error_msg)
 
-        raise ChildProcessError(error_msg)
-
     stop_time = time.monotonic()
 
     elapsed_time = stop_time - start_time
