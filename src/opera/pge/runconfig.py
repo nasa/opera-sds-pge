@@ -62,6 +62,12 @@ class RunConfig:
         self._pge_config = self._run_config['Groups']['PGE']
         self._sas_config = self._run_config['Groups']['SAS']
 
+        # print(f'_run_config: {self._run_config}')
+        # print()
+        # print(f'_pge_config: {self._pge_config}')
+        # print()
+        # print(f'_sas_config: {self._sas_config}')
+
     def _parse_run_config_file(self, yaml_filename):
         """
         Loads a run configuration YAML file.

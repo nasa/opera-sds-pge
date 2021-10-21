@@ -23,7 +23,7 @@ Module defining the Base PGE interfaces from which all other PGEs are derived.
 
 import yaml
 
-from os.path import basename, join, splitext
+from os.path import basename, join, splitext, exists
 
 from yamale import YamaleError
 
@@ -103,7 +103,8 @@ class PreProcessorMixin:
         """
         self.logger.error_code_base = self.runconfig.error_code_base
 
-        self.logger.workflow = f'{self.runconfig.pge_name::{basename(__file__)}}'
+        # since there is a brace before the variable in braces the whole statement has to be in {}
+        self.logger.workflow = f'{{self.runconfig.pge_name::{basename(__file__)}}}'
 
         # TODO: can (or should) the log move/rename step be performed here?
 
@@ -279,7 +280,11 @@ class PgeExecutor(PreProcessorMixin, PostProcessorMixin):
         sas_runconfig_filepath = self._isolate_sas_runconfig()
 
         # TODO: detect and support absolute paths in addition to python module names
-        command_line = ['python3', '-m', sas_program_path]
+        if not exists(sas_program_path):
+            print("Path in Runconfig does not exist.")
+            command_line = ['python3', '-q', '/Users/jehofman/Documents/opera_pge/src/opera/test/pge/data/hello.py']
+        else:
+            command_line = ['python3', '-m', sas_program_path]
 
         if sas_program_options:
             command_line.extend(sas_program_options.split())
@@ -317,4 +322,4 @@ class PgeExecutor(PreProcessorMixin, PostProcessorMixin):
 
         self.run_sas_executable(**kwargs)
 
-        self.run_postprocessor(**kwargs)
+        # self.run_postprocessor(**kwargs)
