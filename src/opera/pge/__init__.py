@@ -13,13 +13,12 @@
 #
 
 """
-====
-util
-====
+===
+pge
+===
 
-Contains utility modules for performing common operations, such as logging and
-metrics gathering, for use with the OPERA PGE Subsystem.
+Contains modules for stand-up and execution of a PGE application.
 """
 
-from .error_codes import ErrorCode
-from .logger import PgeLogger
+from .base_pge import PgeExecutor
+from .runconfig import RunConfig

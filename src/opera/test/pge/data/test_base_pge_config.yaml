@@ -1,15 +1,16 @@
 RunConfig:
-  Name: OPERA-SAMPLE-PGE-SAS-CONFIG
+  Name: OPERA-BASE-PGE-TEST-CONFIG
 
   Groups:
 
     PGE:
       PGENameGroup:
-        PGEName: EXAMPLE_PGE
+        PGEName: BASE_PGE_TEST
 
       InputFilesGroup:
         InputFilePaths:
-          - input/input_file.h5
+          - input/input_file01.h5
+          - input/input_file02.h5
 
       DynamicAncillaryFilesGroup:
         AncillaryFileMap:
@@ -17,14 +18,15 @@ RunConfig:
 
       ProductPathGroup:
         ProductCounter: 005
-        OutputProductPath: outputs/
-        ScratchPath: temp/
-        SASOutputFile: outputs/output_file.h5
+        OutputProductPath: base_pge_test/outputs/
+        ScratchPath: base_pge_test/scratch/
+        SASOutputFile: output_file.h5
 
       PrimaryExecutable:
         ProductIdentifier: EXAMPLE
-        ProgramPath: pybind_opera.workflows.example_workflow
-        ProgramOptions: --debug --restart
+        ProgramPath: echo
+        ProgramOptions:
+          - hello world
         ErrorCodeBase: 100000
         SchemaPath: sample_sas_schema.yaml
         IsoTemplatePath: sample_iso_template.xml.jinja2
@@ -32,7 +34,8 @@ RunConfig:
       QAExecutable:
         Enabled: True
         ProgramPath: /opt/QualityAssurance/sample_qa.py
-        ProgramOptions: --debug
+        ProgramOptions:
+         -  --debug
 
       DebugLevelGroup:
         DebugSwitch: False

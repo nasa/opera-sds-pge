@@ -24,6 +24,7 @@ Original Author: David White
 Adapted By: Scott Collins
 
 """
+import os
 
 import yaml
 
@@ -60,9 +61,12 @@ class RunConfig:
 
         self._run_config = self._parse_run_config_file(filename)
         self._pge_config = self._run_config['Groups']['PGE']
-        self._sas_config = self._run_config['Groups']['SAS']
 
-    def _parse_run_config_file(self, yaml_filename):
+        # SAS section may not always be present, during testing for example
+        self._sas_config = self._run_config['Groups'].get('SAS')
+
+    @staticmethod
+    def _parse_run_config_file(yaml_filename):
         """
         Loads a run configuration YAML file.
         Returns the loaded data as a Python object.
@@ -111,6 +115,8 @@ class RunConfig:
 
         Raises
         ------
+        RuntimeError
+            If the SAS schema defined by the parsed RunConfig cannot be located.
         YamaleError
             If the RunConfig does not validate against the combined PGE/SAS
             schema.
@@ -120,17 +126,29 @@ class RunConfig:
         # be fixed across all PGE-SAS combinations
         pge_schema = yamale.make_schema(pge_schema_file)
 
-        # Determine the SAS schema file to load from the provided RunConfig
-        # TODO: better error handling for missing sas schema,
-        #       support for absolute paths as fallback when resource_filename fails?
-        sas_schema_filename = self.sas_schema_path
-        sas_schema_filepath = resource_filename('opera', f'schema/{sas_schema_filename}')
-        sas_schema = yamale.make_schema(sas_schema_filepath)
+        # If there was a SAS section included with the parsed config, pull
+        # in its schema before validating. Otherwise, only the base PGE schema
+        # will be used.
+        if self.sas_config is not None:
+            # Determine the SAS schema file to load from the provided RunConfig
+            sas_schema_filename = self.sas_schema_path
+            sas_schema_filepath = resource_filename('opera', f'schema/{sas_schema_filename}')
 
-        # Link the SAS schema to the PGE as an "include"
-        # Note that the key name "sas_configuration" must match the include
-        # reference in the base PGE schema.
-        pge_schema.includes['sas_configuration'] = sas_schema
+            if os.path.isfile(sas_schema_filepath):
+                # TODO: better error handling for missing sas schema,
+                #       support for absolute paths as fallback when resource_filename fails?
+                sas_schema = yamale.make_schema(sas_schema_filepath)
+
+                # Link the SAS schema to the PGE as an "include"
+                # Note that the key name "sas_configuration" must match the include
+                # reference in the base PGE schema.
+                pge_schema.includes['sas_configuration'] = sas_schema
+            else:
+                raise RuntimeError(
+                    f'Can not validate RunConfig {self.name} as the associated SAS '
+                    f'schema ({sas_schema_filename}) cannot be located within the '
+                    f'schemas directory.'
+                )
 
         # Yamale expects its own formatting of the parsed config, hence the need
         # to call "make_data()" here.
@@ -189,7 +207,7 @@ class RunConfig:
 
     # ProductPathGroup
     @property
-    def get_product_counter(self) -> int:
+    def product_counter(self) -> int:
         return self._pge_config['ProductPathGroup']['ProductCounter']
 
     @property
@@ -232,15 +250,15 @@ class RunConfig:
     # QAExecutable
     @property
     def qa_enabled(self) -> bool:
-        return self._pge_config['QAExecutable']['QAEnabled']
+        return self._pge_config['QAExecutable']['Enabled']
 
     @property
     def qa_program_path(self) -> str:
-        return self._pge_config['QAExecutable']['QAProgramPath']
+        return self._pge_config['QAExecutable']['ProgramPath']
 
     @property
     def qa_program_options(self) -> str:
-        return self._pge_config['QAExecutable']['QAProgramOptions']
+        return self._pge_config['QAExecutable']['ProgramOptions']
 
     @property
     def debug_switch(self) -> bool:

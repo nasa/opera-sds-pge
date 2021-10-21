@@ -15,5 +15,6 @@ venv/
 WhereAmI.py
 build/
 .eggs/
+.pytest_cache
 
 

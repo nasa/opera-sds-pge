@@ -210,13 +210,13 @@ class PgeLogger:
 
         """
         if self.log_file and not self.log_file.closed:
-            self.write_log_summary()
             self.close_log_file()
 
     def close_log_file(self):
         if self.log_file and not self.log_file.closed:
             self.info("PgeLogger", ErrorCode.CLOSING_LOG_FILE,
                       f"Closing log file {self.get_file_name()}")
+            self.write_log_summary()
             self.log_file.flush()
             self.log_file.close()
 
@@ -391,6 +391,11 @@ class PgeLogger:
         """
         Write a critical-level message to the log.
 
+        Since critical messages should be used for unrecoverable errors, any
+        time this log level is invoked a RuntimeError is raised with the
+        description provided to this function. The log file is closed and
+        finalized before the exception is raised.
+
         Parameters
         ----------
         module : str
@@ -405,6 +410,10 @@ class PgeLogger:
         """
         self.write("Critical", module, error_code_offset, description,
                    additional_back_frames=1)
+
+        self.close_log_file()
+
+        raise RuntimeError(description)
 
     def log(self, module, error_code_offset, description, additional_back_frames=0):
         """
