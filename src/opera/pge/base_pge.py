@@ -286,7 +286,7 @@ class PgeExecutor(PreProcessorMixin, PostProcessorMixin):
 
         try:
             with open(sas_runconfig_filepath, 'w') as outfile:
-                yaml.dump(sas_config, outfile)
+                yaml.safe_dump(sas_config, outfile, sort_keys=False)
         except OSError as err:
             self.logger.critical(self.name, ErrorCode.SAS_CONFIG_CREATION_FAILED,
                                  f'Failed to create SAS config file {sas_runconfig_filepath}, '
