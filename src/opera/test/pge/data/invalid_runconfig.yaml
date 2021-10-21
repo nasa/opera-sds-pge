@@ -1,0 +1,37 @@
+RunConfig:
+  Name: OPERA-SAMPLE-PGE-SAS-CONFIG
+
+  Groups:
+
+    PGE:
+      PGENameGroup:
+        PGEName: EXAMPLE_PGE
+
+      InputFilesGroup:
+        InputFilePaths: # missing at least one input path
+
+      DynamicAncillaryFilesGroup:
+        AncillaryFileMap:
+          DEMFile: input/input_dem.vrt
+
+      ProductPathGroup:
+        ProductCounter: -1 # value must be between 1-999
+        OutputProductPath: outputs/
+        ScratchPath: temp/
+        SASOutputFile: outputs/output_file.h5
+
+      PrimaryExecutable:
+        ProductIdentifier: EXAMPLE
+        #ProgramPath: pybind_opera.workflows.example_workflow  # must be defined
+        ProgramOptions: --debug --restart # Not a list
+        ErrorCodeBase: 100000
+        SchemaPath: sample_sas_schema.yaml
+        IsoTemplatePath: sample_iso_template.xml.jinja2
+
+      QAExecutable:
+        Enabled: True
+        ProgramPath: /opt/QualityAssurance/sample_qa.py
+        ProgramOptions: --debug # Not a list
+
+      DebugLevelGroup:
+        DebugSwitch: False

@@ -53,6 +53,9 @@ class ErrorCode(IntEnum):
     LOADING_RUN_CONFIG_FILE = auto()
     VALIDATING_RUN_CONFIG_FILE = auto()
     LOG_FILE_INIT_COMPLETE = auto()
+    CREATING_WORKING_DIRECTORY = auto()
+    DIRECTORY_SETUP_COMPLETE = auto()
+    MOVING_LOG_FILE = auto()
     MOVING_OUTPUT_FILE = auto()
     SUMMARY_STATS_MESSAGE = auto()
     RUN_CONFIG_FILENAME = auto()
@@ -86,6 +89,7 @@ class ErrorCode(IntEnum):
     # Critical - 3000 to 3999
     INPUT_FILE = CRITICAL_RANGE_START
     RUN_CONFIG_VALIDATION_FAILED = auto()
+    DIRECTORY_CREATION_FAILED = auto()
     SAS_CONFIG_CREATION_FAILED = auto()
     BAD_HEADER = auto()
     FILENAME_VIOLATES_NAMING_CONVENTION = auto()

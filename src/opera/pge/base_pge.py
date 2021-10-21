@@ -21,15 +21,17 @@ Module defining the Base PGE interfaces from which all other PGEs are derived.
 
 """
 
+import os
 import yaml
 
-from os.path import basename, join, splitext, exists
+from os.path import abspath, basename, exists, join, splitext
 
 from yamale import YamaleError
 
 from .runconfig import RunConfig
 from opera.util.error_codes import ErrorCode
 from opera.util.logger import PgeLogger
+from opera.util.run_utils import create_sas_command_line
 from opera.util.run_utils import time_and_execute
 
 
@@ -90,11 +92,38 @@ class PreProcessorMixin:
                          f'failed, reason(s): \n{str(error)}')
 
             self.logger.critical(
-                self.name, ErrorCode.RUN_CONFIG_VALIDATION_FAILED,
-                error_msg
+                self.name, ErrorCode.RUN_CONFIG_VALIDATION_FAILED, error_msg
             )
 
-            raise RuntimeError(error_msg)
+    def _setup_directories(self):
+        """
+        Creates the output/scratch directory locations referenced by the
+        RunConfig if they don't exist already.
+        """
+        output_product_path = abspath(self.runconfig.output_product_path)
+        scratch_path = abspath(self.runconfig.scratch_path)
+
+        try:
+            if not exists(output_product_path):
+                self.logger.info(self.name, ErrorCode.CREATING_WORKING_DIRECTORY,
+                                 f'Creating output product directory {output_product_path}')
+                os.makedirs(output_product_path, exist_ok=True)
+
+            # TODO: add a cleanup function on the post-processor to remove scratch dir?
+            if not exists(scratch_path):
+                self.logger.info(self.name, ErrorCode.CREATING_WORKING_DIRECTORY,
+                                 f'Creating scratch directory {scratch_path}')
+                os.makedirs(scratch_path, exist_ok=True)
+
+            self.logger.info(self.name, ErrorCode.DIRECTORY_SETUP_COMPLETE,
+                             'Directory setup complete')
+        except OSError as error:
+            error_msg = (f'Could not create one or more working directories. '
+                         f'reason: \n{str(error)}')
+
+            self.logger.critical(
+                self.name, ErrorCode.DIRECTORY_CREATION_FAILED, error_msg
+            )
 
     def _configure_logger(self):
         """
@@ -103,21 +132,17 @@ class PreProcessorMixin:
         """
         self.logger.error_code_base = self.runconfig.error_code_base
 
-        # since there is a brace before the variable in braces the whole statement has to be in {}
-        self.logger.workflow = f'{{self.runconfig.pge_name::{basename(__file__)}}}'
+        self.logger.workflow = f'{self.runconfig.pge_name}::{basename(__file__)}'
 
-        # TODO: can (or should) the log move/rename step be performed here?
+        # TODO: perform the log rename step here (if possible) once file-name convention is defined
+        output_product_path = abspath(self.runconfig.output_product_path)
+        log_file_destination = join(output_product_path, self.logger.get_file_name())
+        self.logger.info(self.name, ErrorCode.MOVING_LOG_FILE,
+                         f'Moving log file to {log_file_destination}')
+        self.logger.move(log_file_destination)
 
         self.logger.info(self.name, ErrorCode.LOG_FILE_INIT_COMPLETE,
                          f'Log file configuration complete')
-
-    def _setup_directories(self):
-        """
-        Creates the output/scratch directory locations referenced by the
-        RunConfig if they don't exist already.
-        """
-        # TODO
-        pass
 
     def run_preprocessor(self, **kwargs):
         """
@@ -138,8 +163,8 @@ class PreProcessorMixin:
         self._initialize_logger()
         self._load_runconfig()
         self._validate_runconfig()
-        self._configure_logger()
         self._setup_directories()
+        self._configure_logger()
 
 
 class PostProcessorMixin:
@@ -174,6 +199,15 @@ class PostProcessorMixin:
         # TODO
         pass
 
+    def _finalize_log(self):
+        """
+        Finalizes the logger such that the execution summary is logged before
+        the log file is closed. This should typically be one of the last functions
+        invoked by a post-processor, since the log file will be unavailable for
+        writing after this function is called.
+        """
+        self.logger.close_log_file()
+
     def run_postprocessor(self, **kwargs):
         """
         Executes the post-processing steps for PGE job completion.
@@ -193,6 +227,7 @@ class PostProcessorMixin:
         self._create_catalog_metadata()
         self._create_iso_metadata()
         self._stage_output_files()
+        self._finalize_log()
 
 
 class PgeExecutor(PreProcessorMixin, PostProcessorMixin):
@@ -251,7 +286,7 @@ class PgeExecutor(PreProcessorMixin, PostProcessorMixin):
 
         try:
             with open(sas_runconfig_filepath, 'w') as outfile:
-                yaml.dump(sas_config, outfile)
+                yaml.safe_dump(sas_config, outfile, sort_keys=False)
         except OSError as err:
             self.logger.critical(self.name, ErrorCode.SAS_CONFIG_CREATION_FAILED,
                                  f'Failed to create SAS config file {sas_runconfig_filepath}, '
@@ -279,28 +314,20 @@ class PgeExecutor(PreProcessorMixin, PostProcessorMixin):
         sas_program_options = self.runconfig.sas_program_options
         sas_runconfig_filepath = self._isolate_sas_runconfig()
 
-        # TODO: detect and support absolute paths in addition to python module names
-        if not exists(sas_program_path):
-            print("Path in Runconfig does not exist.")
-            command_line = ['python3', '-q', '/Users/jehofman/Documents/opera_pge/src/opera/test/pge/data/hello.py']
-        else:
-            command_line = ['python3', '-m', sas_program_path]
-
-        if sas_program_options:
-            command_line.extend(sas_program_options.split())
-
-        command_line.extend(['--', sas_runconfig_filepath])
+        command_line = create_sas_command_line(
+            sas_program_path, sas_runconfig_filepath, sas_program_options
+        )
 
         self.logger.debug(self.name, ErrorCode.SAS_EXE_COMMAND_LINE,
                           f'SAS EXE command line: {" ".join(command_line)}')
+
+        self.logger.info(self.name, ErrorCode.SAS_PROGRAM_STARTING,
+                         'Starting SAS executable')
 
         # Before starting the SAS program, flush the log file to keep the
         # contents properly time ordered, since the SAS program will also write
         # to the same log file.
         self.logger.flush()
-
-        self.logger.info(self.name, ErrorCode.SAS_PROGRAM_STARTING,
-                         'Starting SAS executable')
 
         elapsed_time = time_and_execute(command_line, self.logger)
 
@@ -320,6 +347,7 @@ class PgeExecutor(PreProcessorMixin, PostProcessorMixin):
         """
         self.run_preprocessor(**kwargs)
 
+        print('Starting SAS execution in PgeExecutor')
         self.run_sas_executable(**kwargs)
 
         # self.run_postprocessor(**kwargs)
