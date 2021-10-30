@@ -60,6 +60,7 @@ class ErrorCode(IntEnum):
     SUMMARY_STATS_MESSAGE = auto()
     RUN_CONFIG_FILENAME = auto()
     PGE_NAME = auto()
+    SCHEMA_FILE = auto()
     PROCESSING_INPUT_FILE = auto()
     USING_CONFIG_FILE = auto()
     CREATED_SAS_CONFIG = auto()

@@ -57,10 +57,14 @@ class PreProcessorMixin:
         The logger is created using a default name, as the proper filename
         cannot be determined until the RunConfig is parsed and validated.
         """
-        self.logger = PgeLogger()
 
-        self.logger.info(self.name, ErrorCode.LOG_FILE_CREATED,
-                         f'Log file initialized to {self.logger.get_file_name()}')
+        if not self.logger:
+            self.logger = PgeLogger()
+            self.logger.info(self.name, ErrorCode.LOG_FILE_CREATED,
+                             f'New Log file initialized to {self.logger.get_file_name()}')
+        else:
+            self.logger.info(self.name, ErrorCode.LOG_FILE_CREATED,
+                             f'Log file passed from pge_main: {self.logger.get_file_name()}')
 
     def _load_runconfig(self):
         """
@@ -158,7 +162,6 @@ class PreProcessorMixin:
 
         """
         # TODO: better way to handle trace statements before logger has been created?
-        print(f'Running preprocessor for PreProcessorMixin')
 
         self._initialize_logger()
         self._load_runconfig()
@@ -205,6 +208,7 @@ class PostProcessorMixin:
         the log file is closed. This should typically be one of the last functions
         invoked by a post-processor, since the log file will be unavailable for
         writing after this function is called.
+
         """
         self.logger.close_log_file()
 
@@ -221,7 +225,6 @@ class PostProcessorMixin:
             Any keyword arguments needed by the pre-processor
 
         """
-        print(f'Running postprocessor for PostProcessorMixin')
 
         self._run_sas_qa_executable()
         self._create_catalog_metadata()
@@ -263,11 +266,17 @@ class PgeExecutor(PreProcessorMixin, PostProcessorMixin):
             Any additional keyword arguments needed by the PGE.
 
         """
+
+        # TODO (Jim) should we raise and exception here?
+        if 'logger' in kwargs:
+            self.logger = kwargs['logger']
+        else:
+            self.logger = None
         self.name = PgeExecutor.NAME
         self.pge_name = pge_name
         self.runconfig_path = runconfig_path
         self.runconfig = None
-        self.logger = None
+        # self.logger = None
 
     def _isolate_sas_runconfig(self):
         """
@@ -347,7 +356,6 @@ class PgeExecutor(PreProcessorMixin, PostProcessorMixin):
         """
         self.run_preprocessor(**kwargs)
 
-        print('Starting SAS execution in PgeExecutor')
         self.run_sas_executable(**kwargs)
 
-        # self.run_postprocessor(**kwargs)
+        self.run_postprocessor(**kwargs)

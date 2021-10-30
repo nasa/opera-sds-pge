@@ -61,22 +61,11 @@ class RunConfig:
 
         self._run_config = self._parse_run_config_file(filename)
         self._pge_config = self._run_config['Groups']['PGE']
-
-<<<<<<< HEAD
-        # print(f'_run_config: {self._run_config}')
-        # print()
-        # print(f'_pge_config: {self._pge_config}')
-        # print()
-        # print(f'_sas_config: {self._sas_config}')
-
-    def _parse_run_config_file(self, yaml_filename):
-=======
         # SAS section may not always be present, during testing for example
         self._sas_config = self._run_config['Groups'].get('SAS')
 
     @staticmethod
     def _parse_run_config_file(yaml_filename):
->>>>>>> 5c102d975f4b517d6824161c334607f2618fb369
         """
         Loads a run configuration YAML file.
         Returns the loaded data as a Python object.
@@ -102,6 +91,7 @@ class RunConfig:
 
         try:
             return dictionary['RunConfig']
+
         except KeyError:
             raise RuntimeError(
                 f'Unable to parse {yaml_filename}, expected top-level RunConfig entry'
