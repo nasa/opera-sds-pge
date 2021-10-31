@@ -1,0 +1,53 @@
+input_subset:
+  list_of_frequencies:
+    A: null
+    B: null
+  fullcovariance: false
+dem_download:
+  source: null
+  top_left:
+    x: null
+    y: null
+  bottom_right:
+    x: null
+    y: null
+pre_process:
+  azimuth_looks: 1
+  range_looks: 1
+rtc:
+  output_type: gamma0
+  algorithm_type: area_projection
+  input_terrain_radiometry: sigma0
+  rtc_min_value_db: -30
+geocode:
+  algorithm_type: area_projection
+  memory_mode: auto
+  geogrid_upsampling: 1
+  save_nlooks: true
+  save_rtc: true
+  abs_rad_cal: 1
+  outputEPSG: null
+  output_posting:
+    A:
+      x_posting: null
+      y_posting: null
+    B:
+      x_posting: null
+      y_posting: null
+  x_snap: 100
+  y_snap: 100
+  top_left:
+    y_abs: null
+    x_abs: null
+  bottom_right:
+    y_abs: null
+    x_abs: null
+noise_correction:
+  apply_correction: false
+  correction_type: None
+worker:
+  internet_access: false
+  gpu_enabled: false
+QA:
+  validate: false
+  quality: false
