@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 #
 # Copyright 2021, by the California Institute of Technology.
 # ALL RIGHTS RESERVED.
@@ -16,9 +17,9 @@
 # Adapted By: Jim Hofman
 
 """
-==============
+============
 pge_main.py
-==============
+============
 
 Instantiates and runs a PGEExecutor instance.
 
@@ -26,9 +27,6 @@ Instantiates and runs a PGEExecutor instance.
 
 import argparse
 import os
-import sys
-
-sys.path.append("/Users/jehofman/Documents/opera_pge/src/")
 
 from opera.pge.base_pge import PgeExecutor
 from opera.pge.runconfig import RunConfig
@@ -43,7 +41,7 @@ def open_log_file():
 
     Returns
     -------
-    logger : PgeLogger()
+    logger : PgeLogger
         PgeLogger object with initialized filename
 
     """
@@ -62,15 +60,15 @@ def load_run_config_file(logger, run_config_filename):
 
     Parameters
     ----------
-    logger : PgeLogger()
+    logger : PgeLogger
         logger recording pge_main.py events
         Will then be passed to the PgeExecutor() instance
-    run_config_filename
+    run_config_filename : str
         Full path to the RunConfig yaml file
 
     Returns
     -------
-    nun_config :  RunConfig()
+    run_config : RunConfig
         The python RunConfig instance
 
     """
@@ -95,7 +93,8 @@ def load_run_config_file(logger, run_config_filename):
 
 def pge_start(run_config_filename):
     """
-    Opens a log file, loads the yaml run config file, then instantiates and runs the PGE.
+    Opens a log file, loads the yaml run config file, then instantiates and runs
+    the PGE.
 
     Parameters
     ----------
@@ -125,19 +124,19 @@ def pge_main():
     """
 
     parser = argparse.ArgumentParser(
-        description='\n'.join(__doc__.split('\n')[0:2]),
-        epilog='\n'.join(__doc__.split('\n')[2:]),
-        formatter_class=argparse.RawDescriptionHelpFormatter)
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter
+    )
 
     parser.add_argument('-f', '--file', required=True, type=str,
-                        help='The run configuration yaml file (full path).')
+                        help='Path to the run configuration yaml file.')
 
     args = parser.parse_args()
 
-    if not os.path.exists(args.file):
-        raise FileNotFoundError(f"Could not find config file: {args.file}")
-
     run_config_filename = os.path.abspath(args.file)
+
+    if not os.path.exists(run_config_filename):
+        raise FileNotFoundError(f"Could not find config file: {run_config_filename}")
 
     pge_start(run_config_filename)
 

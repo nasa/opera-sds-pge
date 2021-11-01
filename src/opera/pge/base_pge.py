@@ -162,6 +162,7 @@ class PreProcessorMixin:
 
         """
         # TODO: better way to handle trace statements before logger has been created?
+        print(f'Running preprocessor for PreProcessorMixin')
 
         self._initialize_logger()
         self._load_runconfig()
@@ -225,6 +226,7 @@ class PostProcessorMixin:
             Any keyword arguments needed by the pre-processor
 
         """
+        print(f'Running postprocessor for PostProcessorMixin')
 
         self._run_sas_qa_executable()
         self._create_catalog_metadata()
@@ -263,20 +265,18 @@ class PgeExecutor(PreProcessorMixin, PostProcessorMixin):
         runconfig_path : str
             Path to the RunConfig to be used with this PGE.
         kwargs : dict
-            Any additional keyword arguments needed by the PGE.
+            Any additional keyword arguments needed by the PGE. Currently
+            supported kwargs include:
+                - logger : An existing instance of PgeLogger for this PgeExecutor
+                           to use, rather than creating its own.
 
         """
 
-        # TODO (Jim) should we raise and exception here?
-        if 'logger' in kwargs:
-            self.logger = kwargs['logger']
-        else:
-            self.logger = None
         self.name = PgeExecutor.NAME
         self.pge_name = pge_name
         self.runconfig_path = runconfig_path
         self.runconfig = None
-        # self.logger = None
+        self.logger = kwargs.get('logger')
 
     def _isolate_sas_runconfig(self):
         """
@@ -356,6 +356,7 @@ class PgeExecutor(PreProcessorMixin, PostProcessorMixin):
         """
         self.run_preprocessor(**kwargs)
 
+        print('Starting SAS execution in PgeExecutor')
         self.run_sas_executable(**kwargs)
 
         self.run_postprocessor(**kwargs)

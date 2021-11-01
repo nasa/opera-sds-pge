@@ -61,6 +61,7 @@ class RunConfig:
 
         self._run_config = self._parse_run_config_file(filename)
         self._pge_config = self._run_config['Groups']['PGE']
+
         # SAS section may not always be present, during testing for example
         self._sas_config = self._run_config['Groups'].get('SAS')
 
@@ -91,7 +92,6 @@ class RunConfig:
 
         try:
             return dictionary['RunConfig']
-
         except KeyError:
             raise RuntimeError(
                 f'Unable to parse {yaml_filename}, expected top-level RunConfig entry'
