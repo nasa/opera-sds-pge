@@ -57,10 +57,14 @@ class PreProcessorMixin:
         The logger is created using a default name, as the proper filename
         cannot be determined until the RunConfig is parsed and validated.
         """
-        self.logger = PgeLogger()
 
-        self.logger.info(self.name, ErrorCode.LOG_FILE_CREATED,
-                         f'Log file initialized to {self.logger.get_file_name()}')
+        if not self.logger:
+            self.logger = PgeLogger()
+            self.logger.info(self.name, ErrorCode.LOG_FILE_CREATED,
+                             f'New Log file initialized to {self.logger.get_file_name()}')
+        else:
+            self.logger.info(self.name, ErrorCode.LOG_FILE_CREATED,
+                             f'Log file passed from pge_main: {self.logger.get_file_name()}')
 
     def _load_runconfig(self):
         """
@@ -205,6 +209,7 @@ class PostProcessorMixin:
         the log file is closed. This should typically be one of the last functions
         invoked by a post-processor, since the log file will be unavailable for
         writing after this function is called.
+
         """
         self.logger.close_log_file()
 
@@ -260,14 +265,18 @@ class PgeExecutor(PreProcessorMixin, PostProcessorMixin):
         runconfig_path : str
             Path to the RunConfig to be used with this PGE.
         kwargs : dict
-            Any additional keyword arguments needed by the PGE.
+            Any additional keyword arguments needed by the PGE. Currently
+            supported kwargs include:
+                - logger : An existing instance of PgeLogger for this PgeExecutor
+                           to use, rather than creating its own.
 
         """
+
         self.name = PgeExecutor.NAME
         self.pge_name = pge_name
         self.runconfig_path = runconfig_path
         self.runconfig = None
-        self.logger = None
+        self.logger = kwargs.get('logger')
 
     def _isolate_sas_runconfig(self):
         """
