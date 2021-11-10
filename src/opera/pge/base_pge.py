@@ -341,7 +341,9 @@ class PgeExecutor(PreProcessorMixin, PostProcessorMixin):
         # to the same log file.
         self.logger.flush()
 
-        elapsed_time = time_and_execute(command_line, self.logger)
+        elapsed_time = time_and_execute(
+            command_line, self.logger, self.runconfig.execute_via_shell
+        )
 
         self.logger.info(self.name, ErrorCode.SAS_PROGRAM_COMPLETED,
                          'SAS executable complete')

@@ -265,6 +265,10 @@ class RunConfig:
         return bool(self._pge_config['DebugLevelGroup']['DebugSwitch'])
 
     @property
+    def execute_via_shell(self) -> bool:
+        return bool(self._pge_config['DebugLevelGroup'].get('ExecuteViaShell', False))
+
+    @property
     def sas_config(self) -> dict:
         return self._sas_config
 

@@ -49,5 +49,6 @@ RunConfig:
 
       DebugLevelGroup:
         DebugSwitch: bool(required=False)
+        ExecuteViaShell: bool(required=False)
 
     SAS: include('sas_configuration', required=False)
