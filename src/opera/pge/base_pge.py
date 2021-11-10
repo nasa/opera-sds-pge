@@ -50,6 +50,8 @@ class PreProcessorMixin:
     steps as necessary.
 
     """
+    _pre_mixin_name = "PreProcessorMixin"
+
     def _initialize_logger(self):
         """
         Creates the logger object used by the PGE.
@@ -162,7 +164,7 @@ class PreProcessorMixin:
 
         """
         # TODO: better way to handle trace statements before logger has been created?
-        print(f'Running preprocessor for PreProcessorMixin')
+        print(f'Running preprocessor for {self._pre_mixin_name}')
 
         self._initialize_logger()
         self._load_runconfig()
@@ -186,6 +188,7 @@ class PostProcessorMixin:
     steps as necessary.
 
     """
+    _post_mixin_name = "PostProcessorMixin"
 
     def _run_sas_qa_executable(self):
         # TODO
@@ -223,10 +226,10 @@ class PostProcessorMixin:
         Parameters
         ----------
         kwargs : dict
-            Any keyword arguments needed by the pre-processor
+            Any keyword arguments needed by the post-processor
 
         """
-        print(f'Running postprocessor for PostProcessorMixin')
+        print(f'Running postprocessor for {self._post_mixin_name}')
 
         self._run_sas_qa_executable()
         self._create_catalog_metadata()
@@ -272,7 +275,7 @@ class PgeExecutor(PreProcessorMixin, PostProcessorMixin):
 
         """
 
-        self.name = PgeExecutor.NAME
+        self.name = self.NAME
         self.pge_name = pge_name
         self.runconfig_path = runconfig_path
         self.runconfig = None
@@ -356,7 +359,7 @@ class PgeExecutor(PreProcessorMixin, PostProcessorMixin):
         """
         self.run_preprocessor(**kwargs)
 
-        print('Starting SAS execution in PgeExecutor')
+        print(f'Starting SAS execution for {self.__class__.__name__}')
         self.run_sas_executable(**kwargs)
 
         self.run_postprocessor(**kwargs)
