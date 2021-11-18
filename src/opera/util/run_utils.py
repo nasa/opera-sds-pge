@@ -83,8 +83,8 @@ def create_sas_command_line(sas_program_path, sas_runconfig_path,
             command_line = ['python3', '-m', sas_program_path]
 
     # Add any provided arguments
-    if sas_program_options:
-        command_line.extend(sas_program_options)
+    for sas_program_option in sas_program_options:
+        command_line.extend(sas_program_option.split())
 
     # Lastly, only explicit input should ever be the path to the runconfig
     command_line.append(sas_runconfig_path)
