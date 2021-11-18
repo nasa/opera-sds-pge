@@ -29,9 +29,46 @@ import argparse
 import os
 
 from opera.pge.base_pge import PgeExecutor
+from opera.pge.dswx_pge import DSWxExecutor
 from opera.pge.runconfig import RunConfig
 from opera.util.logger import PgeLogger
 from opera.util.error_codes import ErrorCode
+
+PGE_NAME_MAP = {
+    'DSWX_HLS_PGE': DSWxExecutor,
+    'default': PgeExecutor
+}
+"""Mapping of PGE names specified by a RunConfig to the PGE class type to instantiate"""
+
+
+def get_pge_class(pge_name, logger):
+    """
+    Returns the PGE class type to be instantiated for the given PGE name.
+    If the name is unknown, the default PGE class type is returned.
+
+    Parameters
+    ----------
+    pge_name : str
+        Name of the PGE to instantiate.
+    logger : PgeLogger
+        Logger instance.
+
+    Returns
+    -------
+    class[PgeExecutor]
+        The flavor of PgeExecutor to be instantiated for the provided name.
+        The caller of this function is responsible for instantiating an object
+        from the returned class according to the signature of PgeExecutor.__init__.
+
+    """
+    # Return either the PGE configured for the name, or the default class
+    # if we don't have a mapping for it.
+    pge_class = PGE_NAME_MAP.get(pge_name, PGE_NAME_MAP['default'])
+
+    logger.info("pge_main", ErrorCode.PGE_NAME,
+                f'Using class {pge_class.__name__} for PGE name {pge_name}')
+
+    return pge_class
 
 
 def open_log_file():
@@ -73,14 +110,14 @@ def load_run_config_file(logger, run_config_filename):
 
     """
 
-    # Log the yaml config file that is  used.
+    # Log the yaml config file that is used.
     run_config = RunConfig(run_config_filename)
-    msg = f'Run config yaml file: {run_config_filename}'
+    msg = f'RunConfig yaml file: {run_config_filename}'
     logger.info("pge_main", ErrorCode.RUN_CONFIG_FILENAME, msg)
 
-    # Log the schema file that is  used.
+    # Log the schema file that is used.
     schema_file = run_config.sas_schema_path
-    msg = f"Schema file: {schema_file}"
+    msg = f"SAS Schema file: {schema_file}"
     logger.info("pge_main", ErrorCode.SCHEMA_FILE, msg)
 
     # Log the PGE name.
@@ -105,11 +142,16 @@ def pge_start(run_config_filename):
 
     logger = open_log_file()
 
-    # load the yaml run config file
+    # Load the yaml run config file
     run_config = load_run_config_file(logger, run_config_filename)
 
-    # Instantiate and run the base pge.
-    pge = PgeExecutor(run_config.pge_name, run_config_filename, logger=logger)
+    # Get the appropriate PGE class type based on the name in the RunConfig
+    pge_class = get_pge_class(run_config.pge_name, logger)
+
+    # Instantiate and run the pge.
+    pge = pge_class(
+        pge_name=run_config.pge_name, runconfig_path=run_config_filename, logger=logger
+    )
 
     pge.run()
 
