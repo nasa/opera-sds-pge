@@ -21,7 +21,8 @@
 pge_main.py
 ============
 
-Instantiates and runs a PGEExecutor instance.
+Instantiates and runs an OPERA Product Generation Executable (PGE) instance.
+The PGE type instantiated is determined from the provided RunConfig.
 
 """
 
