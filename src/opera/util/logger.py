@@ -222,16 +222,7 @@ class PgeLogger:
         self._error_code_base = (error_code_base
                                  if error_code_base else PgeLogger.LOGGER_CODE_BASE)
 
-    # def __del__(self):
-    #     """
-    #     Destructor for PgeLogger.
-    #
-    #     Ensures the internally managed log file is properly closed before this
-    #     object is garbage collected.
-    #
-    #     """
-    #     if self.log_stream and not self.log_stream.closed:
-    #         self.close_log_stream()
+        self.close_log_stream()
 
     def file_to_stream(self, log_file):
         """
