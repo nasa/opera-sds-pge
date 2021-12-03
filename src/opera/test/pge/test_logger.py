@@ -25,7 +25,7 @@ import os
 import tempfile
 import unittest
 import re
-from os.path import abspath, join
+from os.path import abspath, join, exists
 from pkg_resources import resource_filename
 from io import StringIO
 import weakref
@@ -45,14 +45,14 @@ def clean_up(*args):
     The __del__ function in the logger causes an error because the code prematurely finalizes.
     The error is seen when a file is opened and the 'open' keyword is not recognized.
     This is a know problem with the logger module, and our logger causes the same problem.
-    The print statement is temporary, and will be replaced with 'pass'.
+    We
 
     Parameters
     ----------
     args - objects with object to garbage collect (probably will only need to garbage collect the PGELogger object.
 
     """
-    print('Cleaning up: ', args)
+    pass
 
 
 class LoggerTestCase(unittest.TestCase):
@@ -80,15 +80,14 @@ class LoggerTestCase(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls) -> None:
-        # cls.working_dir.cleanup()
-        os.chdir(cls.starting_dir)
+        cls.working_dir.cleanup()
+        # os.chdir(cls.starting_dir)
+        # This will probably be removed, just keeping it for a while
         weakref.finalize(cls.logger, clean_up)
 
     def setUp(self) -> None:
-        # os.chdir(self.working_dir.name)
-        print(self.severity_summary_pre_resync)
-        print(self.severity_summary_post_resync)
-        pass
+        os.chdir(self.working_dir.name)
+        # pass
 
     def tearDown(self) -> None:
         os.chdir(self.test_dir)
@@ -111,13 +110,7 @@ class LoggerTestCase(unittest.TestCase):
         error_location = 'test_file line 28'
         description = 'unittest write() function in logger.py utility'
 
-        # with open("test_write.log", "w") as log_file:
-        #     write(log_file, severity, workflow, module, error_code, error_location, description)
-        #
-        # with open("test_write.log", "r") as file:
-        #     file_text = file.read()
-
-        test_stream = StringIO("unittest of write() function in logger.py utility")
+        test_stream = StringIO("unittest of standalone write() function in logger.py utility")
         write(test_stream, severity, workflow, module, error_code, error_location, description)
 
         file_text = test_stream.getvalue()
@@ -131,7 +124,7 @@ class LoggerTestCase(unittest.TestCase):
         self.assertEqual(line_fields[3].strip(), module)
         self.assertEqual(line_fields[4].strip(), 'ErrorCode.OVERALL_SUCCESS')
         self.assertEqual(line_fields[5].strip(), error_location)
-        self.assertEqual(line_fields[6].strip(), '"' + description + '"')
+        self.assertEqual(line_fields[6].strip(), f'"{description}"')
 
     def test_default_log_file_name(self):
         """
@@ -147,7 +140,6 @@ class LoggerTestCase(unittest.TestCase):
         Test get_severity_from_error_code(error_code)
 
         """
-
         for i in range(999):
             self.assertEqual(get_severity_from_error_code(i), "Info")
         for i in range(1000, 1999):
@@ -173,46 +165,32 @@ class LoggerTestCase(unittest.TestCase):
         The the PgeLogger class.
 
         """
-        # Instantiate with default arguments
-        # self.logger = PgeLogger()
-
         self.assertIsInstance(self.logger, PgeLogger)
-
-        # Check that default arguments that are assigned and other initializations
+        # Verify the default arguments that are assigned, and other initializations
         self.assertEqual(self.logger._workflow, "pge_init::logger.py")
         self.assertEqual(self.logger._error_code_base, 900000)
-        # The log file name contains a datetime so checks the format of the filename with the included datetime
+        # Verify, the log file name contains a datetime, verify the format of the filename with the included datetime
         self.assertEqual(self.logger.log_filename, re.match(self.fn_regex, self.logger.log_filename).group())
-        self.assertEqual(str(self.logger.start_time), re.match(self.monotonic_regex, str(self.logger.start_time)).group())
-
-        # Check the function call to return the newly initialized dictionary
-        self.assertEqual(self.logger.log_count_by_severity, self.logger.get_log_count_by_severity_dict())
-        self.assertEqual(self.logger.log_count_by_severity, {'Debug': 0, 'Info': 3, 'Warning': 0, 'Critical': 0})
+        self.assertEqual(str(self.logger.start_time), re.match(self.monotonic_regex,
+                                                               str(self.logger.start_time)).group())
         # Check that the log file was created
         log_file = self.logger.get_file_name()
         self.assertEqual(log_file, re.match(self.fn_regex, log_file).group())
-        # write a few log messages to the log file
+        # Write a few log messages to the log file
         self.logger.write('info', "opera_pge", 0, 'test string with error code OVERALL_SUCCESS')
         self.logger.write('deBug', "opera_pge", 1, 'test string with error code LOG_FILE_CREATED')
         self.logger.write('Warning', "opera_pge", 2, 'test string with error code LOADING_RUN_CONFIG_FILE')
         self.logger.write('CriticaL', "opera_pge", 3, 'test string with error code VALIDATING_RUN_CONFIG_FILE')
-        # write messages at different levels with different methods
+        # Write messages at different levels with different methods
         self.logger.info('opera_pge', 4, 'Test info() method.')
         self.logger.debug('opera_pge', 5, 'Test debug() method.')
         self.logger.warning('opera_pge', 6, 'Test warning() method.')
         self.logger.log('opera_pge', 7, "Test log() method.")
-        # write a message into the log using log_one_metric() (although it is used by write_log_summary() to
+        # Write a message into the log using log_one_metric() (although it is used by write_log_summary() to
         # ... record summary data at the end of the log file.)
         self.logger.log_one_metric('test_logger.py', 'Test log_one_metric()', 17, 1)
-        # Update log_count_by_severity dict to summarize the number of the various errors
-        # TODO: talk to Scott about removing this method
-        self.assertEqual(self.logger.log_count_by_severity, self.severity_summary_pre_resync)
-
-        self.logger.resync_log_count_by_severity()
-        self.assertEqual(self.logger.log_count_by_severity, self.severity_summary_resync)
-
         self.logger.write_log_summary()
-        # get current dictionary
+        # Get current dictionary
         pre_increment_dict = self.logger.get_log_count_by_severity('info')
         self.logger.increment_log_count_by_severity('info')
         self.assertNotEqual(pre_increment_dict, self.logger.get_log_count_by_severity('info'))
@@ -226,8 +204,10 @@ class LoggerTestCase(unittest.TestCase):
         # Verify the counts no longer match
         self.assertNotEqual(pre_increment_dict, self.logger.get_log_count_by_severity('warning'))
 
-        # TODO check with Scott about getting rid of the backframe stuff
-        self.test_add_backframe()
+        # Test with backframes having being designated as before
+        self.add_backframe(1)
+        # Test with backframes not being designated
+        self.add_backframe(0)
 
         # Test append text from another file
         with open('new_file.txt', 'w') as temp_file:
@@ -236,6 +216,10 @@ class LoggerTestCase(unittest.TestCase):
 
         self.logger.move('test_move.log')
 
+        # Check resync
+        self.logger.resync_log_count_by_severity()
+        self.assertEqual(self.logger.log_count_by_severity, {'Debug': 2, 'Info': 22, 'Warning': 2, 'Critical': 1})
+
         # Verify that when a critical event is logged via the critical() method, that a RunTimeError is raised
         self.assertRaises(RuntimeError, self.logger.critical, 'opera_pge', 8, "Test critical() method.")
 
@@ -243,7 +227,8 @@ class LoggerTestCase(unittest.TestCase):
             log = fn.read()
 
         # Verify that the entries have been made in the log
-        self.assertIn('Moving and saving log file', log)
+
+        self.assertIn('Moving logging to', log)
         self.assertIn('test string with error code OVERALL_SUCCESS', log)
         self.assertIn('test string with error code LOG_FILE_CREATED', log)
         self.assertIn('test string with error code LOADING_RUN_CONFIG_FILE', log)
@@ -259,9 +244,6 @@ class LoggerTestCase(unittest.TestCase):
         self.assertEqual(self.logger.get_log_count_by_severity("warning"), self.logger.get_warning_count())
         self.assertEqual(self.logger.get_log_count_by_severity("critical"), self.logger.get_critical_count())
 
-        # Check that the severity dictionary is updating properly
-        self.assertEqual(self.logger.log_count_by_severity, self.logger.get_log_count_by_severity_dict())
-
         # Verify that critical event was logged before the file was closed.
         self.assertIn('Test critical() method.', log)
         # Verify critical() method close the log file.
@@ -269,26 +251,57 @@ class LoggerTestCase(unittest.TestCase):
         # 2nd test to Verify critical() method closed the log file.  (ValueError: I/O operations on closed file.)
         self.assertRaises(ValueError, self.logger.move, 'test_move_new.log')
 
-        self.assertEqual(self.logger.log_count_by_severity, self.severity_summary_post_resync)
+        # Check that the severity dictionary is updating properly
+        self.assertEqual(self.logger.log_count_by_severity, self.logger.get_log_count_by_severity_dict())
 
-        # Instantiate a logger to test PgeLogger attributes
-        self.arg_test_logger = PgeLogger(workflow='test_pge', error_code_base=100000,
-                                         log_filename='test_move.log', append=True)
+        # Instantiate a logger to test PgeLogger attributes and warning messages
+        self.arg_test_logger = PgeLogger(workflow='test_pge_args', error_code_base=17171717,
+                                         log_filename='test_args.log')
 
-        self.arg_test_logger.log('opera_pge', 17, "Testing adding to a log file.")
+        # Add a new line
+        self.arg_test_logger.log('opera_pge', 7, "Verify arguments in the file.")
 
-    def test_add_backframe(self):
+        # Error Cases
+        self.arg_test_logger.increment_log_count_by_severity("BROKEN")
+        self.arg_test_logger.get_log_count_by_severity("BrokEN")
+
+        self.arg_test_logger.close_log_stream()
+
+        with open('test_args.log', 'r') as fn:
+            args_log = fn.read()
+
+        # Verify warnings
+        self.assertIn("Could not increment severity level: 'Broken' ", args_log)
+        self.assertIn("No messages logged with severity: 'Broken' ", args_log)
+        # Verify the log file was created
+        self.assertTrue(exists('test_args.log'))
+        # Verify workflow and error_code_base arguments
+        with open('test_args.log', 'r') as f:
+            for line in f:
+                self.assertIn("test_pge_args", line)
+                self.assertIn("1717", line)
+
+    def add_backframe(self, back_frames):
+        """
+        Makes a logs one line, then calls another method, that also logs one line
+
+        Parameters
+        ----------
+        back_frames : int
+            Starting number of back frames, typically this is one for a call like this.
+            Allow zero to be entered to simulate not using the 'additional_back_frames'
+            argument in the logging.
+
+        """
+        # This allows testing function calls with zero backframes
+        inc = 0 if not back_frames else 1
         self.logger.log_one_metric('test_logger.py', 'Test log_one_metric(): log from method call (back_frames = 0)',
-                                   18, additional_back_frames=0)
-        self.test_one_deeper()
+                                   18, additional_back_frames=back_frames)
+        self.one_deeper(back_frames + inc)
 
-    def test_one_deeper(self):
+    def one_deeper(self, back_frames):
         self.logger.log_one_metric('test_logger.py', 'Test log_one_metric(): log called from 2 method calls (no bf)',
-                                   19, additional_back_frames=0)
-
-#     def cleanup(self):
-#         os.remove('./new_file.txt')
-#         os.remove('./test_move.log')
+                                   19, additional_back_frames=back_frames)
 
 
 if __name__ == "__main__":

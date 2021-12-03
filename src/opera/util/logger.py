@@ -1,6 +1,5 @@
 #
 
-
 # Copyright 2021, by the California Institute of Technology.
 # ALL RIGHTS RESERVED.
 # United States Government sponsorship acknowledged.
@@ -23,21 +22,19 @@ Logging utilities for use with OPERA PGEs.
 
 This module is adapted for OPERA from the NISAR PGE R2.0.0 util/logger.py
 Original Authors: Alice Stanboli, David White
-Adapted By: Scott Collins
+Adapted By: Scott Collins, Jim Hofman
 
 """
-
-import csv
 import datetime
 import inspect
 import shutil
 import time
 from io import StringIO
+import atexit
 
-from os.path import basename
-from sys import is_finalizing
+from os.path import basename, exists
 
-import opera.util.error_codes as error_codes
+from opera.util import error_codes
 import opera.util.time as time_util
 
 from .error_codes import ErrorCode
@@ -67,17 +64,13 @@ def write(log_stream, severity, workflow, module, error_code, error_location,
         Description of the logged event.
 
     """
+
     time_tag = time_util.get_current_iso_time()
 
-    # TODO: rework into a string constant that this function calls .format on
-    message_str = time_tag + ", " + severity + ", " + workflow + ", " + module + ", " + \
-        str(error_code) + ", " + error_location + ", " + '"' + description + '"' + "\n"
-
-    # print(message_str)
+    message_str = f'{time_tag}, {severity}, {workflow}, {module},' \
+                  f'{str(error_code)}, {error_location}, "{description}"\n'
 
     log_stream.write(message_str)
-
-    return 0
 
 
 # TODO - this can probably go away after we get the in-memory file object
@@ -98,7 +91,7 @@ def default_log_file_name():
 
     """
     log_datetime_str = time_util.get_time_for_filename(datetime.datetime.now())
-    file_path = "pge_{}.log".format(log_datetime_str)
+    file_path = f"pge_{log_datetime_str}.log"
 
     return file_path
 
@@ -152,11 +145,6 @@ def standardize_severity_string(severity):
     return severity.title()  # first char uppercase, rest lowercase.
 
 
-def test_save():
-    with open('text.txt', 'w') as fd:
-        fd.write("hello")
-
-
 class PgeLogger:
     """
     Class to help with the PGE logging.
@@ -169,52 +157,33 @@ class PgeLogger:
     LOGGER_CODE_BASE = 900000
 
     def __init__(self, workflow=None, error_code_base=None,
-                 log_filename=None, existing_logfile_object=None, append=False):
+                 log_filename=None):
         """
-        Constructor opens the log file unless an existing_logfile_object is
-        specified
+        Constructor opens the log file as a stream
 
         Parameters
         ----------
         workflow : str, optional
-            Name of the workflow this logger is associated to. Defaults
-            to "pge".
+            Name of the workflow this logger is associated to. Defaults to "pge".
         error_code_base : int, optional
             The base error code value to associated to the logger. This gives
             the logger a de-facto severity level. Defaults to the Info level
             offset.
         log_filename : str, optional
-            Path to write the log's contents to on disk. Ignored if
-            existing_logfile_object is provided. Defaults to the value
+            Path to write the log's contents to on disk. Defaults to the value
             provided by default_log_file_name().
-        existing_logfile_object : file-like, optional
-            An existing open file-like object to write logged messages to.
-        append : bool, optional
-            If true, messages logged by this object are appended to the associated
-            log file. Otherwise, a new file is created.
 
         """
         self.start_time = time.monotonic()
         self.log_count_by_severity = self._make_blank_log_count_by_severity_dict()
         self.log_filename = log_filename
 
-        # TODO: consolidate existing_logfile_object and log_filename into a single arg
-        # Idea: get rid of this argument and if append is 'True' assume it's an existing_log_file_object
-        if existing_logfile_object:
-            self.log_file = existing_logfile_object
-        else:
-            if not log_filename:
-                self.log_filename = default_log_file_name()
+        if not log_filename:
+            self.log_filename = default_log_file_name()
 
-            if append:
-                # Get existing file and write it into a stream to be kept in memory
-                self.log_stream = self.file_to_stream(log_filename)
-
-            else:
-                # open as an empty stream that will be kept in memory
-                self.log_stream = StringIO()
-                self.log_stream.seek(0)
-                print("TYPE: ", type(self.log_stream))
+        # open as an empty stream that will be kept in memory
+        self.log_stream = StringIO()
+        self.log_stream.seek(0)
 
         self._workflow = (workflow
                           if workflow else f"pge_init::{basename(__file__)}")
@@ -222,64 +191,7 @@ class PgeLogger:
         self._error_code_base = (error_code_base
                                  if error_code_base else PgeLogger.LOGGER_CODE_BASE)
 
-        self.close_log_stream()
-
-    def file_to_stream(self, log_file):
-        """
-        Takes a log file as an input and reads it into a log stream
-
-        Parameters
-        ----------
-        log_file - log file read from disk
-
-        Returns
-        -------
-        TextIOWrapper object that contains the log file data.
-
-        """
-        # Read contents of log file into a log stream
-        print("TYPE - log_file: ", type(log_file))
-        print(log_file)
-        with open(log_file, 'r') as fd:
-            log = fd.read()
-            log_stream = StringIO(log)
-            return log_stream
-
-    def stream_to_file(self, log_stream, log_file_name):
-        """
-        Writes log file in memory to a log file on disk
-        Parameters
-        ----------
-        log_stream
-        log_file_name
-
-        """
-        print("LOG STREAM:")
-        print(log_stream)
-        print("LOG FILENAME: ", log_file_name)
-        # if this is True (which it is right now) 'open' is not available
-        print("IS FINALIZING: ", is_finalizing())
-
-        with open(log_file_name, 'w') as fd:
-            log_stream.seek(0)
-            shutil.copyfileobj(log_stream, fd)
-
-    def close_log_stream(self):
-        print("Closing log stream.", self.log_stream, self.log_stream.closed)
-        if self.log_stream and not self.log_stream.closed:
-            self.info("PgeLogger", ErrorCode.CLOSING_LOG_FILE,
-                      f"Closing log file {self.get_file_name()}")
-            self.write_log_summary()
-
-            # Save and close log stream
-            print(type(self.log_stream))
-            self.stream_to_file(self.log_stream, self.log_filename)
-
-            with open(self.log_filename, 'w') as fd:
-                self.log_stream.seek(0)
-                shutil.copyfileobj(self.log_stream, fd)
-
-            self.log_stream.close()
+        atexit.register(self.close_log_stream)
 
     @property
     def workflow(self):
@@ -296,6 +208,45 @@ class PgeLogger:
     @error_code_base.setter
     def error_code_base(self, error_code_base: int):
         self._error_code_base = error_code_base
+
+    def save_stream_to_file(self, filename):
+        """
+        Opens a file and writes the log in memory to the file, closes file
+
+        Parameters
+        ----------
+        filename : str
+            Name of the file to save.
+
+
+        Returns
+        -------
+
+        """
+        with open(filename, 'w') as fd:
+            self.log_stream.seek(0)
+            shutil.copyfileobj(self.log_stream, fd)
+
+
+    def close_log_stream(self):
+        """
+        Writes the log summary to the log stream
+        Writes the log stream to a log file and saves the file to disk
+        Closes the log stream
+
+        """
+        if self.log_stream and not self.log_stream.closed:
+            self.info("PgeLogger", ErrorCode.CLOSING_LOG_FILE,
+                      f"Closing log file {self.get_file_name()}")
+            self.write_log_summary()
+
+            self.save_stream_to_file(self.log_filename)
+
+            # with open(self.log_filename, 'w') as fd:
+            #     self.log_stream.seek(0)
+            #     shutil.copyfileobj(self.log_stream, fd)
+
+            self.log_stream.close()
 
     def get_log_count_by_severity(self, severity):
         """
@@ -318,6 +269,8 @@ class PgeLogger:
             count = self.log_count_by_severity[severity]
             return count
         except KeyError:
+            self.warning("PgeLogger", ErrorCode.LOGGING_REQUESTED_SEVERITY_NOT_FOUND,
+                         f"No messages logged with severity: '{severity}' ")
             return 0
 
     @staticmethod
@@ -349,8 +302,8 @@ class PgeLogger:
             count = 1 + self.log_count_by_severity[severity]
             self.log_count_by_severity[severity] = count
         except KeyError:
-            # TODO: log this?
-            pass
+            self.warning("PgeLogger", ErrorCode.LOGGING_COULD_NOT_INCREMENT_SEVERITY,
+                         f"Could not increment severity level: '{severity}' ")
 
     def write(self, severity, module, error_code_offset, description,
               additional_back_frames=0):
@@ -510,24 +463,23 @@ class PgeLogger:
         """Returns the number of messages logged at the critical level."""
         return self.get_log_count_by_severity('Critical')
 
-    # def flush(self):
-    #     """Flushes the current contents of the log file to disk."""
-    #     # Todo will probably get rid of this
-    #     self.log_file.flush()
-
     def log_save_and_close(self):
-        with open(self.log_filename, 'w') as fd:
-            self.log_stream.seek(0)
-            shutil.copyfileobj(self.log_stream, fd)
-            # self.log_stream.close()
+        """
+        Write line into the log stream
+        saves and closes the log file
+
+        """
+        msg = f"Writing log stream to {self.log_filename}"
+        self.info("PgeLogger", 900, msg)
+
+        self.save_stream_to_file(self.log_filename)
 
     def move(self, new_filename):
         """
-
         This function is useful when the log file has been given a default name,
         and needs to be assigned a name that meets the PGE file naming conventions.
 
-        We probably don't need this anymore.
+        We probably don't need this anymore. (Jim)
 
         Parameters
         ----------
@@ -535,11 +487,10 @@ class PgeLogger:
             The new filename (including path) to assign to this log file.
 
         """
-        msg = "Moving and saving log file {} as {}".format(self.log_filename, new_filename)
-        # print(msg)
+        msg = f"Moving logging to {new_filename}. {self.log_filename} will be closed and saved."
         self.info("PgeLogger", 900, msg)
-        self.log_filename = new_filename
         self.log_save_and_close()
+        self.log_filename = new_filename
 
     def get_stream_object(self):
         """Return the stingIO object for the current log."""
@@ -559,10 +510,16 @@ class PgeLogger:
             File to read and append text from.
 
         """
-        # TODO: check for file existence
-        with open(source_filename, 'r') as source_file_object:
-            source_contents = source_file_object.read()
-            self.log_stream.write(source_contents)
+
+        if exists(source_filename):
+            with open(source_filename, 'r') as source_file_object:
+                source_contents = source_file_object.read()
+                self.log_stream.write(source_contents)
+        else:
+            self.logger.warning('opera_pge',
+                                ErrorCode.LOGGING_SOURCE_FILE_DOES_NOT_EXIST,
+                                f'Cannot append text from file: {source_filename}'
+                                f'does not exits.')
 
     def log_one_metric(self, module, metric_name, metric_value,
                        additional_back_frames=0):
@@ -620,23 +577,21 @@ class PgeLogger:
         """
         # TODO: is this method really necessary? if the log file was kept in
         #       memory, could these tallies be kept in real-time?
+
         if not self.log_stream:
             return
 
-        # read the file and get a count of log messages for each severity
+        # read the log_stream and get a count of log messages for each severity
         count_by_severity = self._make_blank_log_count_by_severity_dict()
-        # log_filename = self.log_file.name
-
-        # with open(log_filename, 'r', newline='') as in_file:
-        # with open(self.log_filename, 'r', newline='') as in_file:
-        #     csv_reader = csv.reader(in_file)
-        csv_reader = self.log_stream.getvalue()
-        for row in csv_reader:
+        csv_reader = self.log_stream.getvalue().split('\n')
+        for i in csv_reader:
+            row = i.split(',')
             if len(row) >= 2:
                 try:
                     severity = standardize_severity_string(row[1].strip())
                     count_by_severity[severity] += 1
                 except KeyError:
-                    pass
+                    self.warning("PgeLogger", ErrorCode.LOGGING_RESYNC_FAILED,
+                                 f"Unable to resync the 'log_count_by_severity' dict.")
 
         self.log_count_by_severity = count_by_severity
