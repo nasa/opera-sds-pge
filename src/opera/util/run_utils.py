@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 #
 # Copyright 2021, by the California Institute of Technology.
 # ALL RIGHTS RESERVED.
