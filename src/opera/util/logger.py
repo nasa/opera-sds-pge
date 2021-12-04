@@ -66,10 +66,7 @@ def write(log_file, severity, workflow, module, error_code, error_location,
     """
     time_tag = time_util.get_current_iso_time()
 
-    # TODO: rework into a string constant that this function calls .format on
-    message_str = time_tag + ", " + severity + ", " + workflow + ", " + module + ", " + \
-        str(error_code) + ", " + error_location + ", " + '"' + description + '"' + "\n"
-
+    message_str = '{}, {}, {}, {}, {}, {}, "{}"\n'.format(time_tag, severity, workflow, module, error_code, error_location, description)
     log_file.write(message_str)
 
 
