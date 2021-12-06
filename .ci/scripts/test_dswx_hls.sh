@@ -33,7 +33,7 @@ TEST_RESULTS_REL_DIR="test_results/dswx_hls"
 [ -z "${TAG}" ] && TAG="${USER}-dev"
 
 echo "Test results output directory:  ${WORKSPACE}/${TEST_RESULTS_REL_DIR}"
-mkdir --mode=777 --parents ${WORKSPACE}/${TEST_RESULTS_REL_DIR}
+mkdir --mode=775 --parents ${WORKSPACE}/${TEST_RESULTS_REL_DIR}
 
 # Use the environment of the docker image to run linting, tests, etc...
 DOCKER_RUN="docker run --rm \
@@ -70,7 +70,7 @@ ${DOCKER_RUN} bash -c "pytest \
 # Open up permissions on all output reports so the CI system can delete them
 # after they're archived within Jenkins
 ${DOCKER_RUN} bash -c "chmod \
-    -R 777 /workspace/${TEST_RESULTS_REL_DIR}/"
+    -R 775 /workspace/${TEST_RESULTS_REL_DIR}/"
 
 echo "DSWx-HLS PGE Docker image test complete"
 
