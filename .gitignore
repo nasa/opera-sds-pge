@@ -15,6 +15,9 @@ venv/
 WhereAmI.py
 build/
 .eggs/
-.pytest_cache
+.pytest_cache/
+.coverage
+.ipynb_checkpoints/
+test_results/
 
 
