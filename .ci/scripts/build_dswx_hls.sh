@@ -15,6 +15,8 @@
 # Script to build the OPERA DSWx-HLS PGE Docker image
 #
 
+set -e
+
 echo '
 =====================================
 
