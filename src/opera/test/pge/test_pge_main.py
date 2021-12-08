@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-
+#!/usr/bin/env python3
 #
 # Copyright 2021, by the California Institute of Technology.
 # ALL RIGHTS RESERVED.
@@ -43,7 +42,7 @@ class PgeMainTestCase(unittest.TestCase):
         cls.starting_dir = abspath(os.curdir)
         cls.test_dir = resource_filename(__name__, "")
         cls.data_dir = join(cls.test_dir, "data")
-        cls.scripts_dir = abspath('../../scripts')
+        cls.scripts_dir = abspath(join(os.pardir, os.pardir, 'scripts'))
 
         os.chdir(cls.test_dir)
 
@@ -64,7 +63,8 @@ class PgeMainTestCase(unittest.TestCase):
 
     def test_open_log_file(self):
         """
-        This test calls the open_log_file() function and verifies that a logger was created properly
+        This test calls the open_log_file() function and verifies that a logger
+        was created properly
 
         """
 
@@ -100,11 +100,7 @@ class PgeMainTestCase(unittest.TestCase):
         # Verify the instance of a RunConfig object
         self.assertIsInstance(run_config, RunConfig)
 
-        # Check that directories were created according to RunConfig
-        self.assertTrue(os.path.isdir(join(self.scripts_dir, run_config.output_product_path)))
-        self.assertTrue(os.path.isdir(join(self.scripts_dir,run_config.scratch_path)))
-
-    def test_pge_start_fucntionality(self):
+    def test_pge_start_functionality(self):
         """
         Test follows the function calls of pge_start()
         A logger and a config file are created then used in instantiating a PgeExecutor class.
@@ -126,19 +122,20 @@ class PgeMainTestCase(unittest.TestCase):
         self.assertIsInstance(pge.runconfig, RunConfig)
         self.assertIsInstance(pge.logger, PgeLogger)
 
-        # Check that directories were created according to RunConfige
-
+        # Check that directories were created according to RunConfig
         self.assertTrue(os.path.isdir(pge.runconfig.output_product_path))
         self.assertTrue(os.path.isdir(pge.runconfig.scratch_path))
-
-        # Check that the log file was created and moved into the output directory
-        expected_log_file = join(pge.runconfig.output_product_path, pge.logger.get_file_name())
-
-        self.assertTrue(os.path.exists(expected_log_file))
 
         # Check that a RunConfig for the SAS was isolated within the scratch directory
         expected_sas_config_file = join(pge.runconfig.scratch_path, 'test_base_pge_config_sas.yaml')
         self.assertTrue(os.path.exists(expected_sas_config_file))
+
+        # Save the log stream to disk
+        pge.logger.log_save_and_close()
+
+        # Check that the log file was created and moved into the output directory
+        expected_log_file = join(pge.runconfig.output_product_path, pge.logger.get_file_name())
+        self.assertTrue(os.path.exists(expected_log_file))
 
         # Open the log file, and check that "SAS" output was captured
         with open(expected_log_file, 'r') as infile:
@@ -148,7 +145,7 @@ class PgeMainTestCase(unittest.TestCase):
 
     def test_pge_start_args(self):
         """
-        Verifies the pge_start() function call with a proper arguement
+        Verifies the pge_start() function call with a proper argument
         Verifies proper error is seen when a bad file is passed to pge_start()
 
         """
@@ -162,4 +159,3 @@ class PgeMainTestCase(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

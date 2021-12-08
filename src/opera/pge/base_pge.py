@@ -50,6 +50,8 @@ class PreProcessorMixin:
     steps as necessary.
 
     """
+    _pre_mixin_name = "PreProcessorMixin"
+
     def _initialize_logger(self):
         """
         Creates the logger object used by the PGE.
@@ -141,6 +143,7 @@ class PreProcessorMixin:
         # TODO: perform the log rename step here (if possible) once file-name convention is defined
         output_product_path = abspath(self.runconfig.output_product_path)
         log_file_destination = join(output_product_path, self.logger.get_file_name())
+        # TODO the line below can be removed - the logger logs the same message (logger.py line 488)
         self.logger.info(self.name, ErrorCode.MOVING_LOG_FILE,
                          f'Moving log file to {log_file_destination}')
         self.logger.move(log_file_destination)
@@ -162,6 +165,11 @@ class PreProcessorMixin:
 
         """
         # TODO: better way to handle trace statements before logger has been created?
+
+        # TODO: This print statement is causing an error during unit testing (JH)
+        # TODO: error: ValueError: I/O operation on closed file
+        # temporarily commented out
+        # print(f'Running preprocessor for {self._pre_mixin_name}')
 
         self._initialize_logger()
         self._load_runconfig()
@@ -185,6 +193,7 @@ class PostProcessorMixin:
     steps as necessary.
 
     """
+    _post_mixin_name = "PostProcessorMixin"
 
     def _run_sas_qa_executable(self):
         # TODO
@@ -210,7 +219,9 @@ class PostProcessorMixin:
         writing after this function is called.
 
         """
-        self.logger.close_log_file()
+        # TODO: With the new logger we cal let the logger write the file. (JH)
+        #self.logger.close_log_file()
+        pass
 
     def run_postprocessor(self, **kwargs):
         """
@@ -222,9 +233,10 @@ class PostProcessorMixin:
         Parameters
         ----------
         kwargs : dict
-            Any keyword arguments needed by the pre-processor
+            Any keyword arguments needed by the post-processor
 
         """
+        print(f'Running postprocessor for {self._post_mixin_name}')
 
         self._run_sas_qa_executable()
         self._create_catalog_metadata()
@@ -263,20 +275,18 @@ class PgeExecutor(PreProcessorMixin, PostProcessorMixin):
         runconfig_path : str
             Path to the RunConfig to be used with this PGE.
         kwargs : dict
-            Any additional keyword arguments needed by the PGE.
+            Any additional keyword arguments needed by the PGE. Currently
+            supported kwargs include:
+                - logger : An existing instance of PgeLogger for this PgeExecutor
+                           to use, rather than creating its own.
 
         """
 
-        # TODO (Jim) should we raise and exception here?
-        if 'logger' in kwargs:
-            self.logger = kwargs['logger']
-        else:
-            self.logger = None
-        self.name = PgeExecutor.NAME
+        self.name = self.NAME
         self.pge_name = pge_name
         self.runconfig_path = runconfig_path
         self.runconfig = None
-        # self.logger = None
+        self.logger = kwargs.get('logger')
 
     def _isolate_sas_runconfig(self):
         """
@@ -336,9 +346,14 @@ class PgeExecutor(PreProcessorMixin, PostProcessorMixin):
         # Before starting the SAS program, flush the log file to keep the
         # contents properly time ordered, since the SAS program will also write
         # to the same log file.
-        self.logger.flush()
+        # TODO: No longer necessary since the log is in memory (JH)
+        # self.logger.flush()
 
-        elapsed_time = time_and_execute(command_line, self.logger)
+
+
+        elapsed_time = time_and_execute(
+            command_line, self.logger, self.runconfig.execute_via_shell
+        )
 
         self.logger.info(self.name, ErrorCode.SAS_PROGRAM_COMPLETED,
                          'SAS executable complete')
@@ -356,6 +371,11 @@ class PgeExecutor(PreProcessorMixin, PostProcessorMixin):
         """
         self.run_preprocessor(**kwargs)
 
+        # TODO: All the prints below result in ValueError: I/O operation on closed file
+        # TODO:    When run from the test_dswx_pge.py
+        # TODO:    No problem when run from test_base_pge.py
+        # TODO:    Definately a problem with understanding self.__class__.__name__
+        # print(f'Starting SAS execution for {self.__class__.__name__}')
         self.run_sas_executable(**kwargs)
 
         self.run_postprocessor(**kwargs)

@@ -1,4 +1,5 @@
-#
+#!/bin/bash
+
 # Copyright 2021, by the California Institute of Technology.
 # ALL RIGHTS RESERVED.
 # United States Government sponsorship acknowledged.
@@ -10,16 +11,19 @@
 # export licenses, or other export authority as may be required, before
 # exporting such information to foreign countries or providing access to
 # foreign persons.
-#
 
-"""
-===
-pge
-===
+# Script to clean up Docker images from the CI pipeline instance
 
-Contains modules for stand-up and execution of a PGE application.
-"""
+# command line args
+TAG=$1
 
-from .base_pge import PgeExecutor
-from .dswx_pge import DSWxExecutor
-from .runconfig import RunConfig
+# defaults
+[ -z "${TAG}" ] && TAG="${USER}-dev"
+
+# Remove docker images with the specified tag
+echo "Removing all Docker images with tag ${TAG}..."
+for i in {1..2}
+do
+  docker images | grep ${TAG} | awk '{print $3}' | xargs -r docker rmi -f
+  docker images -q --filter "label=org.label-schema.version=${TAG}" | xargs -r docker rmi -f
+done

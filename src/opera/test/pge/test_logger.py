@@ -80,14 +80,14 @@ class LoggerTestCase(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls) -> None:
-        cls.working_dir.cleanup()
-        # os.chdir(cls.starting_dir)
+        # cls.working_dir.cleanup()
+        os.chdir(cls.starting_dir)
         # This will probably be removed, just keeping it for a while
         weakref.finalize(cls.logger, clean_up)
 
     def setUp(self) -> None:
-        os.chdir(self.working_dir.name)
-        # pass
+        # os.chdir(self.working_dir.name)
+        pass
 
     def tearDown(self) -> None:
         os.chdir(self.test_dir)
@@ -173,9 +173,13 @@ class LoggerTestCase(unittest.TestCase):
         self.assertEqual(self.logger.log_filename, re.match(self.fn_regex, self.logger.log_filename).group())
         self.assertEqual(str(self.logger.start_time), re.match(self.monotonic_regex,
                                                                str(self.logger.start_time)).group())
-        # Check that the log file was created
+        # Check that a in-memory log was created
+        stream = self.logger.get_stream_object()
+        self.assertTrue(isinstance(stream, StringIO))
+        # Check that the log file name was created
         log_file = self.logger.get_file_name()
         self.assertEqual(log_file, re.match(self.fn_regex, log_file).group())
+
         # Write a few log messages to the log file
         self.logger.write('info', "opera_pge", 0, 'test string with error code OVERALL_SUCCESS')
         self.logger.write('deBug', "opera_pge", 1, 'test string with error code LOG_FILE_CREATED')
@@ -228,7 +232,7 @@ class LoggerTestCase(unittest.TestCase):
 
         # Verify that the entries have been made in the log
 
-        self.assertIn('Moving logging to', log)
+        self.assertIn('Moving log file to to ', log)
         self.assertIn('test string with error code OVERALL_SUCCESS', log)
         self.assertIn('test string with error code LOG_FILE_CREATED', log)
         self.assertIn('test string with error code LOADING_RUN_CONFIG_FILE', log)

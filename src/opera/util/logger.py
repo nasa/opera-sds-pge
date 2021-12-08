@@ -1,5 +1,4 @@
 #
-
 # Copyright 2021, by the California Institute of Technology.
 # ALL RIGHTS RESERVED.
 # United States Government sponsorship acknowledged.
@@ -226,7 +225,6 @@ class PgeLogger:
         with open(filename, 'w') as fd:
             self.log_stream.seek(0)
             shutil.copyfileobj(self.log_stream, fd)
-
 
     def close_log_stream(self):
         """
@@ -479,7 +477,7 @@ class PgeLogger:
         This function is useful when the log file has been given a default name,
         and needs to be assigned a name that meets the PGE file naming conventions.
 
-        We probably don't need this anymore. (Jim)
+        # TODO: Is this required any more? (Jim)
 
         Parameters
         ----------
@@ -487,7 +485,7 @@ class PgeLogger:
             The new filename (including path) to assign to this log file.
 
         """
-        msg = f"Moving logging to {new_filename}. {self.log_filename} will be closed and saved."
+        msg = f'Moving log file to to {new_filename}.'
         self.info("PgeLogger", 900, msg)
         self.log_save_and_close()
         self.log_filename = new_filename

@@ -25,6 +25,7 @@ import os
 import tempfile
 import unittest
 from os.path import abspath, join
+from io import StringIO
 
 from pkg_resources import resource_filename
 
@@ -88,13 +89,20 @@ class BasePgeTestCase(unittest.TestCase):
         self.assertTrue(os.path.isdir(pge.runconfig.output_product_path))
         self.assertTrue(os.path.isdir(pge.runconfig.scratch_path))
 
-        # Check that the log file was created and moved into the output directory
-        expected_log_file = join(pge.runconfig.output_product_path, pge.logger.get_file_name())
-        self.assertTrue(os.path.exists(expected_log_file))
+        # Check that a in-memory log was created
+        stream_obj = pge.logger.get_stream_object()
+        self.assertTrue(isinstance(stream_obj, StringIO))
 
         # Check that a RunConfig for the SAS was isolated within the scratch directory
         expected_sas_config_file = join(pge.runconfig.scratch_path, 'test_base_pge_config_sas.yaml')
         self.assertTrue(os.path.exists(expected_sas_config_file))
+
+        # Save the log stream to disk
+        pge.logger.log_save_and_close()
+
+        # Check that the log file was created and moved into the output directory
+        expected_log_file = join(pge.runconfig.output_product_path, pge.logger.get_file_name())
+        self.assertTrue(os.path.exists(expected_log_file))
 
         # Open the log file, and check that "SAS" output was captured
         with open(expected_log_file, 'r') as infile:

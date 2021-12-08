@@ -26,6 +26,8 @@ import os
 import shutil
 import subprocess
 import time
+from io import StringIO
+import sys
 
 from os.path import abspath
 
@@ -92,7 +94,7 @@ def create_sas_command_line(sas_program_path, sas_runconfig_path,
     return command_line
 
 
-def time_and_execute(command_line, logger):
+def time_and_execute(command_line, logger, execute_via_shell=False):
     """
     Executes the provided command line via subprocess while collecting the
     runtime of the execution.
@@ -104,6 +106,10 @@ def time_and_execute(command_line, logger):
         Each
     logger : PgeLogger
         A logger object used to capture any error status returned from execution.
+    execute_via_shell : bool, optional
+        If true, instruct subprocess.run to execute the command-line via system
+        shell. Useful for running test commands but should generally not be used
+        for production.
 
     Returns
     -------
@@ -115,10 +121,22 @@ def time_and_execute(command_line, logger):
 
     start_time = time.monotonic()
 
+    # If the command is to be fed to shell, recombine the list into a single
+    # string. Otherwise only the first token (the executable) would be invoked.
+    if execute_via_shell:
+        command_line = " ".join(command_line)
+
     # TODO: support for timeout argument?
+    # run_result = subprocess.run(command_line, env=os.environ.copy(), check=False,
+    #                             stdout=logger.get_stream_object(),
+    #                             stderr=subprocess.STDOUT, shell=execute_via_shell)
+
+    err = StringIO()
+    sys.stdout = logger.get_stream_object()
+    sys.stderr = err
     run_result = subprocess.run(command_line, env=os.environ.copy(), check=False,
-                                stdout=logger.get_file_object(),
-                                stderr=subprocess.STDOUT)
+                                stdout=logger.log("util.py", 900, "execute_via_shell"),
+                                shell=execute_via_shell)
 
     if run_result.returncode:
         error_msg = (f'Command "{" ".join(command_line)}" failed with exit '
