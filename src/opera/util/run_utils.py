@@ -127,16 +127,12 @@ def time_and_execute(command_line, logger, execute_via_shell=False):
         command_line = " ".join(command_line)
 
     # TODO: support for timeout argument?
-    # run_result = subprocess.run(command_line, env=os.environ.copy(), check=False,
-    #                             stdout=logger.get_stream_object(),
-    #                             stderr=subprocess.STDOUT, shell=execute_via_shell)
-
-    err = StringIO()
-    sys.stdout = logger.get_stream_object()
-    sys.stderr = err
     run_result = subprocess.run(command_line, env=os.environ.copy(), check=False,
-                                stdout=logger.log("util.py", 900, "execute_via_shell"),
+                                stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                                 shell=execute_via_shell)
+
+    # Append the stdout/stderr captured by the subprocess to our log
+    logger.append(run_result.stdout.decode())
 
     if run_result.returncode:
         error_msg = (f'Command "{" ".join(command_line)}" failed with exit '

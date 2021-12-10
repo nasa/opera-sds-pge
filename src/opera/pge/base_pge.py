@@ -143,7 +143,7 @@ class PreProcessorMixin:
         # TODO: perform the log rename step here (if possible) once file-name convention is defined
         output_product_path = abspath(self.runconfig.output_product_path)
         log_file_destination = join(output_product_path, self.logger.get_file_name())
-        # TODO the line below can be removed - the logger logs the same message (logger.py line 488)
+
         self.logger.info(self.name, ErrorCode.MOVING_LOG_FILE,
                          f'Moving log file to {log_file_destination}')
         self.logger.move(log_file_destination)
@@ -165,11 +165,7 @@ class PreProcessorMixin:
 
         """
         # TODO: better way to handle trace statements before logger has been created?
-
-        # TODO: This print statement is causing an error during unit testing (JH)
-        # TODO: error: ValueError: I/O operation on closed file
-        # temporarily commented out
-        # print(f'Running preprocessor for {self._pre_mixin_name}')
+        print(f'Running preprocessor for {self._pre_mixin_name}')
 
         self._initialize_logger()
         self._load_runconfig()
@@ -219,9 +215,9 @@ class PostProcessorMixin:
         writing after this function is called.
 
         """
-        # TODO: With the new logger we cal let the logger write the file. (JH)
-        #self.logger.close_log_file()
-        pass
+        self.logger.info(self.name, ErrorCode.CLOSING_LOG_FILE,
+                         f"Closing log file {self.logger.get_file_name()}")
+        self.logger.close_log_stream()
 
     def run_postprocessor(self, **kwargs):
         """
@@ -343,14 +339,6 @@ class PgeExecutor(PreProcessorMixin, PostProcessorMixin):
         self.logger.info(self.name, ErrorCode.SAS_PROGRAM_STARTING,
                          'Starting SAS executable')
 
-        # Before starting the SAS program, flush the log file to keep the
-        # contents properly time ordered, since the SAS program will also write
-        # to the same log file.
-        # TODO: No longer necessary since the log is in memory (JH)
-        # self.logger.flush()
-
-
-
         elapsed_time = time_and_execute(
             command_line, self.logger, self.runconfig.execute_via_shell
         )
@@ -371,11 +359,7 @@ class PgeExecutor(PreProcessorMixin, PostProcessorMixin):
         """
         self.run_preprocessor(**kwargs)
 
-        # TODO: All the prints below result in ValueError: I/O operation on closed file
-        # TODO:    When run from the test_dswx_pge.py
-        # TODO:    No problem when run from test_base_pge.py
-        # TODO:    Definately a problem with understanding self.__class__.__name__
-        # print(f'Starting SAS execution for {self.__class__.__name__}')
+        print(f'Starting SAS execution for {self.__class__.__name__}')
         self.run_sas_executable(**kwargs)
 
         self.run_postprocessor(**kwargs)

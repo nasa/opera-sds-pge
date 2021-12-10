@@ -216,7 +216,7 @@ class LoggerTestCase(unittest.TestCase):
         # Test append text from another file
         with open('new_file.txt', 'w') as temp_file:
             temp_file.write('Text from "new_file.txt" to test append_text_from another file().')
-        self.logger.append_text_from_another_file('new_file.txt')
+        self.logger.append('new_file.txt')
 
         self.logger.move('test_move.log')
 

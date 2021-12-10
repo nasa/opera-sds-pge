@@ -108,9 +108,6 @@ class DSWxPgeTestCase(unittest.TestCase):
         expected_sas_config_file = join(pge.runconfig.scratch_path, 'test_dswx_hls_config_sas.yaml')
         self.assertTrue(os.path.exists(expected_sas_config_file))
 
-        # Save the log stream to disk
-        pge.logger.log_save_and_close()
-
         # Check that the log file was created and moved into the output directory
         expected_log_file = join(pge.runconfig.output_product_path, pge.logger.get_file_name())
         self.assertTrue(os.path.exists(expected_log_file))

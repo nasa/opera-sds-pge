@@ -29,9 +29,8 @@ import inspect
 import shutil
 import time
 from io import StringIO
-import atexit
 
-from os.path import basename, exists
+from os.path import basename, isfile
 
 from opera.util import error_codes
 import opera.util.time as time_util
@@ -72,7 +71,6 @@ def write(log_stream, severity, workflow, module, error_code, error_location,
     log_stream.write(message_str)
 
 
-# TODO - this can probably go away after we get the in-memory file object
 def default_log_file_name():
     """
     Returns a path + filename that can be used for the log file right away.
@@ -190,8 +188,6 @@ class PgeLogger:
         self._error_code_base = (error_code_base
                                  if error_code_base else PgeLogger.LOGGER_CODE_BASE)
 
-        atexit.register(self.close_log_stream)
-
     @property
     def workflow(self):
         return self._workflow
@@ -208,24 +204,6 @@ class PgeLogger:
     def error_code_base(self, error_code_base: int):
         self._error_code_base = error_code_base
 
-    def save_stream_to_file(self, filename):
-        """
-        Opens a file and writes the log in memory to the file, closes file
-
-        Parameters
-        ----------
-        filename : str
-            Name of the file to save.
-
-
-        Returns
-        -------
-
-        """
-        with open(filename, 'w') as fd:
-            self.log_stream.seek(0)
-            shutil.copyfileobj(self.log_stream, fd)
-
     def close_log_stream(self):
         """
         Writes the log summary to the log stream
@@ -234,15 +212,12 @@ class PgeLogger:
 
         """
         if self.log_stream and not self.log_stream.closed:
-            self.info("PgeLogger", ErrorCode.CLOSING_LOG_FILE,
-                      f"Closing log file {self.get_file_name()}")
             self.write_log_summary()
 
-            self.save_stream_to_file(self.log_filename)
+            self.log_stream.seek(0)
 
-            # with open(self.log_filename, 'w') as fd:
-            #     self.log_stream.seek(0)
-            #     shutil.copyfileobj(self.log_stream, fd)
+            with open(self.log_filename, 'w') as outfile:
+                shutil.copyfileobj(self.log_stream, outfile)
 
             self.log_stream.close()
 
@@ -461,23 +436,10 @@ class PgeLogger:
         """Returns the number of messages logged at the critical level."""
         return self.get_log_count_by_severity('Critical')
 
-    def log_save_and_close(self):
-        """
-        Write line into the log stream
-        saves and closes the log file
-
-        """
-        msg = f"Writing log stream to {self.log_filename}"
-        self.info("PgeLogger", 900, msg)
-
-        self.save_stream_to_file(self.log_filename)
-
     def move(self, new_filename):
         """
         This function is useful when the log file has been given a default name,
         and needs to be assigned a name that meets the PGE file naming conventions.
-
-        # TODO: Is this required any more? (Jim)
 
         Parameters
         ----------
@@ -485,9 +447,6 @@ class PgeLogger:
             The new filename (including path) to assign to this log file.
 
         """
-        msg = f'Moving log file to to {new_filename}.'
-        self.info("PgeLogger", 900, msg)
-        self.log_save_and_close()
         self.log_filename = new_filename
 
     def get_stream_object(self):
@@ -498,26 +457,26 @@ class PgeLogger:
         """Return the file name for the current log."""
         return self.log_filename
 
-    def append_text_from_another_file(self, source_filename):
+    def append(self, source):
         """
         Appends text from another file to this log file.
 
         Parameters
         ----------
-        source_filename : str
-            File to read and append text from.
+        source : str
+            The source text to append. If the source refers a file name, the
+            contents of the file will be appended. Otherwise, the provided
+            text is appended as is.
 
         """
 
-        if exists(source_filename):
-            with open(source_filename, 'r') as source_file_object:
+        if isfile(source):
+            with open(source, 'r') as source_file_object:
                 source_contents = source_file_object.read()
-                self.log_stream.write(source_contents)
         else:
-            self.logger.warning('opera_pge',
-                                ErrorCode.LOGGING_SOURCE_FILE_DOES_NOT_EXIST,
-                                f'Cannot append text from file: {source_filename}'
-                                f'does not exits.')
+            source_contents = source
+
+        self.log_stream.write(source_contents)
 
     def log_one_metric(self, module, metric_name, metric_value,
                        additional_back_frames=0):
