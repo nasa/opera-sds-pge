@@ -27,18 +27,23 @@ from os.path import abspath, join
 
 from pkg_resources import resource_filename
 
-from opera.scripts.pge_main import pge_start
-from opera.scripts.pge_main import open_log_file
-from opera.scripts.pge_main import load_run_config_file
-
 from opera.pge import PgeExecutor, RunConfig
+from opera.scripts.pge_main import load_run_config_file
+from opera.scripts.pge_main import open_log_file
+from opera.scripts.pge_main import pge_start
 from opera.util import PgeLogger
 
 
 class PgeMainTestCase(unittest.TestCase):
+    """Base test class using unittest"""
 
     @classmethod
     def setUpClass(cls) -> None:
+        """
+        Set up directories for testing
+        initialize config yamele file
+
+        """
         cls.starting_dir = abspath(os.curdir)
         cls.test_dir = resource_filename(__name__, "")
         cls.data_dir = join(cls.test_dir, "data")
@@ -52,13 +57,25 @@ class PgeMainTestCase(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls) -> None:
+        """
+        At completion re-establish starting directory
+        -------
+        """
         cls.working_dir.cleanup()
         os.chdir(cls.starting_dir)
 
     def setUp(self) -> None:
+        """
+        Use the temporary directory as the working directory
+        -------
+        """
         os.chdir(self.working_dir.name)
 
     def tearDown(self) -> None:
+        """
+        Return to starting directory
+        -------
+        """
         os.chdir(self.test_dir)
 
     def test_open_log_file(self):
@@ -67,7 +84,6 @@ class PgeMainTestCase(unittest.TestCase):
         was created properly
 
         """
-
         logger = None
 
         # check that logger is not instantiated
@@ -86,7 +102,6 @@ class PgeMainTestCase(unittest.TestCase):
         It then checks that the proper directories were created
 
         """
-
         # Verify we start with no run_config file
         run_config = None
         self.assertIsNone(run_config)
@@ -107,7 +122,6 @@ class PgeMainTestCase(unittest.TestCase):
         Instances and paths are checked.
         Finally a 'hello world' string in the log file is verified to be there.
         """
-
         #  New logger to pass to load_run_config_file
         logger = open_log_file()
 
@@ -146,7 +160,6 @@ class PgeMainTestCase(unittest.TestCase):
         Verifies proper error is seen when a bad file is passed to pge_start()
 
         """
-
         # Verify the function call returns None
         self.assertIsNone(pge_start(self.config_file))
 

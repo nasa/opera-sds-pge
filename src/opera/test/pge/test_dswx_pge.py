@@ -24,20 +24,26 @@ Unit tests for the pge/dswx_pge.py module.
 import os
 import tempfile
 import unittest
-import yaml
-from os.path import abspath, join
 from io import StringIO
+from os.path import abspath, join
 
 from pkg_resources import resource_filename
+
+import yaml
 
 from opera.pge import DSWxExecutor, RunConfig
 from opera.util import PgeLogger
 
 
 class DSWxPgeTestCase(unittest.TestCase):
+    """Base test class using unittest"""
 
     @classmethod
     def setUpClass(cls) -> None:
+        """
+        Set up directories and files for testing
+        -------
+        """
         cls.starting_dir = abspath(os.curdir)
         cls.test_dir = resource_filename(__name__, "")
         cls.data_dir = join(cls.test_dir, "data")
@@ -49,7 +55,7 @@ class DSWxPgeTestCase(unittest.TestCase):
         )
 
         # Create the input dir expected by the test RunConfig and add a dummy
-        # input file so they it be validated
+        # input file for validation
         input_dir = join(cls.working_dir.name, "dswx_pge_test/input_dir")
         os.makedirs(input_dir, exist_ok=True)
 
@@ -58,14 +64,26 @@ class DSWxPgeTestCase(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls) -> None:
+        """
+        At completion re-establish starting directory
+        -------
+        """
         cls.input_file.close()
         cls.working_dir.cleanup()
         os.chdir(cls.starting_dir)
 
     def setUp(self) -> None:
+        """
+        Use the temporary directory as the working directory
+        -------
+        """
         os.chdir(self.working_dir.name)
 
     def tearDown(self) -> None:
+        """
+        Return to starting directory
+        -------
+        """
         os.chdir(self.test_dir)
 
     def test_dswx_pge_execution(self):
@@ -75,7 +93,6 @@ class DSWxPgeTestCase(unittest.TestCase):
         message to be captured by PgeLogger.
 
         """
-
         runconfig_path = join(self.data_dir, 'test_dswx_hls_config.yaml')
 
         pge = DSWxExecutor(pge_name="DSWxPgeTest", runconfig_path=runconfig_path)
@@ -122,6 +139,7 @@ class DSWxPgeTestCase(unittest.TestCase):
     def test_dswx_pge_input_validation(self):
         """
         Test the input validation checks made by DSWxPreProcessorMixin.
+        --------
         """
         runconfig_path = join(self.data_dir, 'test_dswx_hls_config.yaml')
         test_runconfig_path = 'invalid_dswx_runconfig.yaml'
@@ -198,6 +216,7 @@ class DSWxPgeTestCase(unittest.TestCase):
     def test_dswx_pge_output_validation(self):
         """
         Test the output validation checks made by DSWxPostProcessorMixin.
+        -------
         """
         runconfig_path = join(self.data_dir, 'test_dswx_hls_config.yaml')
         test_runconfig_path = 'invalid_dswx_runconfig.yaml'

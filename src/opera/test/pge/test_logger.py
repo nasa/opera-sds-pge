@@ -20,23 +20,24 @@ test_logger.py
 =================
 
 Unit tests for the util/logger.py module.
+
 """
 import os
+import re
 import tempfile
 import unittest
-import re
-from os.path import abspath, join, exists
-from pkg_resources import resource_filename
-from io import StringIO
 import weakref
+from io import StringIO
+from os.path import abspath, exists, join
+
+from pkg_resources import resource_filename
 
 from opera.util.error_codes import ErrorCode
-from opera.util.logger import write
+from opera.util.logger import PgeLogger
 from opera.util.logger import default_log_file_name
 from opera.util.logger import get_severity_from_error_code
 from opera.util.logger import standardize_severity_string
-
-from opera.util.logger import PgeLogger
+from opera.util.logger import write
 
 
 def clean_up(*args):
@@ -50,15 +51,23 @@ def clean_up(*args):
     Parameters
     ----------
     args - objects with object to garbage collect (probably will only need to garbage collect the PGELogger object.
-
+    ----------
     """
     pass
 
 
 class LoggerTestCase(unittest.TestCase):
+    """Base test class using unittest"""
 
     @classmethod
     def setUpClass(cls) -> None:
+        """
+        Set up directories for testing
+        Initialize class variables
+        Define regular expression used while checking log files
+        Instantiate PgeLogger
+
+        """
         cls.starting_dir = abspath(os.curdir)
         cls.test_dir = resource_filename(__name__, "")
         cls.data_dir = join(cls.test_dir, "data")
@@ -68,10 +77,10 @@ class LoggerTestCase(unittest.TestCase):
         cls.working_dir = tempfile.TemporaryDirectory(
             prefix="test_usage_metrics_", suffix='temp', dir=os.curdir)
         cls.config_file = join(cls.data_dir, "test_base_pge_config.yaml")
-        cls.fn_regex = '^pge_\d[0-9]{7}T\d{6}.log$'
+        cls.fn_regex = r'^pge_\d[0-9]{7}T\d{6}.log$'
         cls.iso_regex = r'^(-?(?:[0-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):' \
-                    r''r'([0-5][0-9]):([0-5][0-9])(\.[0-9]+)?(Z)$'
-        cls.monotonic_regex = '^\d*.\d*$'
+                        r''r'([0-5][0-9]):([0-5][0-9])(\.[0-9]+)?(Z)$'
+        cls.monotonic_regex = r'^\d*.\d*$'
         cls.reps = 1
         cls.severity_summary_pre_resync = {'Debug': 2, 'Info': 7, 'Warning': 2, 'Critical': 1}
         cls.severity_summary_resync = {'Debug': 0, 'Info': 0, 'Warning': 0, 'Critical': 0}
@@ -80,29 +89,38 @@ class LoggerTestCase(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls) -> None:
-        # cls.working_dir.cleanup()
+        """
+        At completion re-establish starting directory
+        -------
+        """
+        cls.working_dir.cleanup()
         os.chdir(cls.starting_dir)
         # This will probably be removed, just keeping it for a while
         weakref.finalize(cls.logger, clean_up)
 
     def setUp(self) -> None:
-        # os.chdir(self.working_dir.name)
-        pass
+        """
+        Use the temporary directory as the working directory
+        -------
+        """
+        os.chdir(self.working_dir.name)
 
     def tearDown(self) -> None:
+        """
+        Return to starting directory
+        -------
+        """
         os.chdir(self.test_dir)
 
     def test_write(self):
         """
         Low-level logging function. May be called directly in lieu of PgeLogger class.
-
         Write one line to a log file, read it back and verify things were written properly
-
+        -------
         """
-
         match_iso_time = re.compile(self.iso_regex).match
 
-        # set up test arguments for write() call
+        # initialize arguments for write() call
         severity = "Info"
         workflow = "test_workflow"
         module = "test_module"
@@ -129,7 +147,7 @@ class LoggerTestCase(unittest.TestCase):
     def test_default_log_file_name(self):
         """
         Test the formatted string that is returned by the default_log_file_name()
-
+        -------
         """
         file_name = default_log_file_name().split(os.sep)[-1]
 
@@ -138,7 +156,7 @@ class LoggerTestCase(unittest.TestCase):
     def test_get_severity_from_error_code(self):
         """
         Test get_severity_from_error_code(error_code)
-
+        -------
         """
         for i in range(999):
             self.assertEqual(get_severity_from_error_code(i), "Info")
@@ -153,17 +171,16 @@ class LoggerTestCase(unittest.TestCase):
         """
         Test that the string returned has the first character capitalized and the rest are lower case
         -------
-
         """
-        self.assertEqual(standardize_severity_string("info"),  "Info")
+        self.assertEqual(standardize_severity_string("info"), "Info")
         self.assertEqual(standardize_severity_string("DeBuG"), "Debug")
         self.assertEqual(standardize_severity_string("wARNING"), "Warning")
         self.assertEqual(standardize_severity_string("CrItIcAl"), "Critical")
 
     def test_pge_logger(self):
         """
-        The the PgeLogger class.
-
+        The PgeLogger class.
+        -------
         """
         self.assertIsInstance(self.logger, PgeLogger)
         # Verify the default arguments that are assigned, and other initializations
@@ -219,10 +236,11 @@ class LoggerTestCase(unittest.TestCase):
         self.logger.append('new_file.txt')
 
         self.logger.move('test_move.log')
+        self.logger.log('opera_pge', 8, "Moving log file to: test_move.log")
 
         # Check resync
         self.logger.resync_log_count_by_severity()
-        self.assertEqual(self.logger.log_count_by_severity, {'Debug': 2, 'Info': 22, 'Warning': 2, 'Critical': 1})
+        self.assertEqual(self.logger.log_count_by_severity, {'Debug': 2, 'Info': 21, 'Warning': 2, 'Critical': 1})
 
         # Verify that when a critical event is logged via the critical() method, that a RunTimeError is raised
         self.assertRaises(RuntimeError, self.logger.critical, 'opera_pge', 8, "Test critical() method.")
@@ -232,7 +250,7 @@ class LoggerTestCase(unittest.TestCase):
 
         # Verify that the entries have been made in the log
 
-        self.assertIn('Moving log file to to ', log)
+        self.assertIn('Moving log file to: ', log)
         self.assertIn('test string with error code OVERALL_SUCCESS', log)
         self.assertIn('test string with error code LOG_FILE_CREATED', log)
         self.assertIn('test string with error code LOADING_RUN_CONFIG_FILE', log)
@@ -250,10 +268,6 @@ class LoggerTestCase(unittest.TestCase):
 
         # Verify that critical event was logged before the file was closed.
         self.assertIn('Test critical() method.', log)
-        # Verify critical() method close the log file.
-        self.assertIn('Closing log file ', log)
-        # 2nd test to Verify critical() method closed the log file.  (ValueError: I/O operations on closed file.)
-        self.assertRaises(ValueError, self.logger.move, 'test_move_new.log')
 
         # Check that the severity dictionary is updating properly
         self.assertEqual(self.logger.log_count_by_severity, self.logger.get_log_count_by_severity_dict())
@@ -304,6 +318,7 @@ class LoggerTestCase(unittest.TestCase):
         self.one_deeper(back_frames + inc)
 
     def one_deeper(self, back_frames):
+        """Logs a metric from a function call"""
         self.logger.log_one_metric('test_logger.py', 'Test log_one_metric(): log called from 2 method calls (no bf)',
                                    19, additional_back_frames=back_frames)
 

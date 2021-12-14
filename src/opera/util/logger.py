@@ -496,7 +496,8 @@ class PgeLogger:
             the calling function and line number.
 
         """
-        msg = "{}: {}".format(metric_name, metric_value)
+        # msg = "{}: {}".format(metric_name, metric_value)
+        msg = f"{metric_name}: {metric_value}"
         self.log(module, ErrorCode.SUMMARY_STATS_MESSAGE, msg,
                  additional_back_frames=additional_back_frames + 1)
 

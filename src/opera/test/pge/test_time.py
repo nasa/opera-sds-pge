@@ -22,23 +22,31 @@ test_time.py
 Unit tests for the util/time.py module.
 """
 import os
+import re
 import tempfile
 import unittest
-import re
-from os.path import abspath, join
 from datetime import datetime
+from os.path import abspath, join
+
 from pkg_resources import resource_filename
 
+from opera.util.time import get_catalog_metadata_datetime_str
 from opera.util.time import get_current_iso_time
 from opera.util.time import get_iso_time
 from opera.util.time import get_time_for_filename
-from opera.util.time import get_catalog_metadata_datetime_str
 
 
 class TimeTestCase(unittest.TestCase):
+    """Base test class using unittest"""
 
     @classmethod
     def setUpClass(cls) -> None:
+        """
+        Set up directories for testing
+        Initialize regular expression
+        Initialize other class variables
+
+        """
         cls.starting_dir = abspath(os.curdir)
         cls.test_dir = resource_filename(__name__, "")
         cls.data_dir = join(cls.test_dir, "data")
@@ -55,13 +63,25 @@ class TimeTestCase(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls) -> None:
+        """
+        At completion re-establish starting directory
+        -------
+        """
         cls.working_dir.cleanup()
         os.chdir(cls.starting_dir)
 
     def setUp(self) -> None:
+        """
+        Use the temporary directory as the working directory
+        -------
+        """
         os.chdir(self.working_dir.name)
 
     def tearDown(self) -> None:
+        """
+        Return to starting directory
+        -------
+        """
         os.chdir(self.test_dir)
 
     def test_get_current_iso_time(self):
@@ -72,7 +92,6 @@ class TimeTestCase(unittest.TestCase):
         the above pattern
 
         """
-
         for i in range(self.reps):
             # Verify returned value
             time = get_current_iso_time()
@@ -104,7 +123,6 @@ class TimeTestCase(unittest.TestCase):
         Verify that the result of datetime.datetime.now() is successfully changed to ISO time
 
         """
-
         for i in range(self.reps):
             dt = datetime.now()
             time_in_iso = get_iso_time(dt)
@@ -117,13 +135,12 @@ class TimeTestCase(unittest.TestCase):
 
     def test_get_time_for_filename(self):
         """
-         Converts the provided datetime object to a time-tag string suitable for
-         use with output filenames.
-         Verify the proper number of digits separated by 'T' in the string returned
+        Converts the provided datetime object to a time-tag string suitable for
+        use with output filenames.
+        Verify the proper number of digits separated by 'T' in the string returned
         """
-
         # Simple regex to test for YYYYMMDDTHHMMSS format ('Y'ear, 'M'onth, 'D'ay, 'T', 'H'our, 'M'inutes, 'S'econds)
-        filename_regex = '^\d{8}T\d{6}$'
+        filename_regex = r'^\d{8}T\d{6}$'
 
         # Test multiple times
         for i in range(self.reps):
@@ -153,8 +170,7 @@ class TimeTestCase(unittest.TestCase):
         in catalog metadata.
 
         """
-
-        nano_regex = '^\d{10}Z$'
+        nano_regex = r'^\d{10}Z$'
         # Test multiple times
         for i in range(self.reps):
             dt = datetime.now()
@@ -173,4 +189,3 @@ class TimeTestCase(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

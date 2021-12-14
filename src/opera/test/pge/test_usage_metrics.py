@@ -22,19 +22,28 @@ test_usage_metrics.py
 Unit tests for the util/usage_metrics.py module.
 """
 import os
+import re
 import tempfile
 import unittest
-import re
 from os.path import abspath, join
-from datetime import datetime
+
 from pkg_resources import resource_filename
 
 from opera.util.usage_metrics import get_os_metrics
 
+
 class UsageMetricsTestCase(unittest.TestCase):
+    """Base test class using unittest"""
+
+    test_dir = None
 
     @classmethod
     def setUpClass(cls) -> None:
+        """
+        Set up class variables:
+        Initialize the number of times to exercise the module (currently 1000)
+
+        """
         cls.starting_dir = abspath(os.curdir)
         cls.test_dir = resource_filename(__name__, "")
         cls.data_dir = join(cls.test_dir, "data")
@@ -48,13 +57,25 @@ class UsageMetricsTestCase(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls) -> None:
-        # cls.working_dir.cleanup()
+        """
+        At completion re-establish starting directory
+        -------
+        """
+        cls.working_dir.cleanup()
         os.chdir(cls.starting_dir)
 
     def setUp(self) -> None:
+        """
+        Use the temporary directory as the working directory
+        -------
+        """
         os.chdir(self.working_dir.name)
 
     def tearDown(self) -> None:
+        """
+        Return to starting directory
+        -------
+        """
         os.chdir(self.test_dir)
 
     def test_get_os_metrics(self):
@@ -75,9 +96,8 @@ class UsageMetricsTestCase(unittest.TestCase):
 
             os.peak_vm_kb.main_process comes from a call to get_self_peak_vmm_kb().
         """
-
-        cpu_regex = '^\d*\.\d+$'  # match positive real numbers
-        int_regex = '^[0-9]*$'  # match positive integers
+        cpu_regex = r'^\d*\.\d+$'  # match positive real numbers
+        int_regex = r'^[0-9]*$'  # match positive integers
         # Get the results
 
         for i in range(self.reps):
