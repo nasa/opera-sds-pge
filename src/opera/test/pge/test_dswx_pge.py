@@ -38,12 +38,14 @@ from opera.util import PgeLogger
 class DSWxPgeTestCase(unittest.TestCase):
     """Base test class using unittest"""
 
+    starting_dir = None
+    working_dir = None
+    test_dir = None
+    input_file = None
+
     @classmethod
     def setUpClass(cls) -> None:
-        """
-        Set up directories and files for testing
-        -------
-        """
+        """Set up directories and files for testing"""
         cls.starting_dir = abspath(os.curdir)
         cls.test_dir = resource_filename(__name__, "")
         cls.data_dir = join(cls.test_dir, "data")
@@ -64,28 +66,18 @@ class DSWxPgeTestCase(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls) -> None:
-        """
-        At completion re-establish starting directory
-        -------
-        """
+        """At completion re-establish starting directory"""
         cls.input_file.close()
         cls.working_dir.cleanup()
         os.chdir(cls.starting_dir)
 
     def setUp(self) -> None:
-        """
-        Use the temporary directory as the working directory
-        -------
-        """
+        """Use the temporary directory as the working directory"""
         os.chdir(self.working_dir.name)
 
     def tearDown(self) -> None:
-        """
-        Return to starting directory
-        -------
-        """
+        """Return to starting directory"""
         os.chdir(self.test_dir)
-
     def test_dswx_pge_execution(self):
         """
         Test execution of the DSWxExecutor class and its associated mixins using
@@ -129,20 +121,16 @@ class DSWxPgeTestCase(unittest.TestCase):
         expected_log_file = join(pge.runconfig.output_product_path, pge.logger.get_file_name())
         self.assertTrue(os.path.exists(expected_log_file))
 
-        # Open the log file, and check that "SAS" output was captured
+        # Open and read the log
         with open(expected_log_file, 'r') as infile:
             log_contents = infile.read()
 
-        # TODO - I had to add an extra space between 'RunConfig' and {expected_sas_....
-        self.assertIn(f"DSWx-HLS invoked with RunConfig  {expected_sas_config_file}", log_contents)
+        self.assertIn(f"DSWx-HLS invoked with RunConfig {expected_sas_config_file}", log_contents)
 
     def test_dswx_pge_input_validation(self):
-        """
-        Test the input validation checks made by DSWxPreProcessorMixin.
-        --------
-        """
+        """Test the input validation checks made by DSWxPreProcessorMixin."""
         runconfig_path = join(self.data_dir, 'test_dswx_hls_config.yaml')
-        test_runconfig_path = 'invalid_dswx_runconfig.yaml'
+        test_runconfig_path = join(self.data_dir, 'invalid_dswx_runconfig.yaml')
 
         with open(runconfig_path, 'r') as stream:
             runconfig_dict = yaml.safe_load(stream)
@@ -152,8 +140,10 @@ class DSWxPgeTestCase(unittest.TestCase):
         # Test that a non-existent file is detected by pre-processor
         input_files_group['InputFilePaths'] = ['non_existent_file.tif']
 
-        with open(test_runconfig_path, 'w') as outfile:
-            yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+        dir = os.getcwd()
+
+        with open(test_runconfig_path, 'w') as input:
+            yaml.safe_dump(runconfig_dict, input, sort_keys=False)
 
         pge = DSWxExecutor(pge_name="DSWxPgeTest", runconfig_path=test_runconfig_path)
 
@@ -176,8 +166,8 @@ class DSWxPgeTestCase(unittest.TestCase):
         # Test that an input directory with no .tif files is caught
         input_files_group['InputFilePaths'] = ['dswx_pge_test/scratch_dir']
 
-        with open(test_runconfig_path, 'w') as outfile:
-            yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+        with open(test_runconfig_path, 'w') as out_file:
+            yaml.safe_dump(runconfig_dict, out_file, sort_keys=False)
 
         pge = DSWxExecutor(pge_name="DSWxPgeTest", runconfig_path=test_runconfig_path)
 
@@ -196,8 +186,8 @@ class DSWxPgeTestCase(unittest.TestCase):
         # Lastly, check that a file that exists but is not a tif is caught
         input_files_group['InputFilePaths'] = [runconfig_path]
 
-        with open(test_runconfig_path, 'w') as outfile:
-            yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+        with open(test_runconfig_path, 'w') as runconfig_fh:
+            yaml.safe_dump(runconfig_dict, runconfig_fh, sort_keys=False)
 
         pge = DSWxExecutor(pge_name="DSWxPgeTest", runconfig_path=test_runconfig_path)
 
@@ -214,12 +204,9 @@ class DSWxPgeTestCase(unittest.TestCase):
                       f".tif extension", log_contents)
 
     def test_dswx_pge_output_validation(self):
-        """
-        Test the output validation checks made by DSWxPostProcessorMixin.
-        -------
-        """
+        """Test the output validation checks made by DSWxPostProcessorMixin."""
         runconfig_path = join(self.data_dir, 'test_dswx_hls_config.yaml')
-        test_runconfig_path = 'invalid_dswx_runconfig.yaml'
+        test_runconfig_path = join(self.data_dir, 'invalid_dswx_runconfig.yaml')
 
         with open(runconfig_path, 'r') as stream:
             runconfig_dict = yaml.safe_load(stream)
@@ -233,8 +220,8 @@ class DSWxPgeTestCase(unittest.TestCase):
         primary_executable_group['ProgramPath'] = 'echo'
         primary_executable_group['ProgramOptions'] = ['hello world']
 
-        with open(test_runconfig_path, 'w') as outfile:
-            yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+        with open(test_runconfig_path, 'w') as config_fh:
+            yaml.safe_dump(runconfig_dict, config_fh, sort_keys=False)
 
         pge = DSWxExecutor(pge_name="DSWxPgeTest", runconfig_path=test_runconfig_path)
 

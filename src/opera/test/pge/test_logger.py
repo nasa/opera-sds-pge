@@ -26,13 +26,14 @@ import os
 import re
 import tempfile
 import unittest
-import weakref
 from io import StringIO
 from os.path import abspath, exists, join
+from random import randint
 
 from pkg_resources import resource_filename
 
-from opera.util.error_codes import ErrorCode
+from opera.util.error_codes import CODES_PER_RANGE, CRITICAL_RANGE_START, DEBUG_RANGE_START, ErrorCode, \
+    INFO_RANGE_START, WARNING_RANGE_START
 from opera.util.logger import PgeLogger
 from opera.util.logger import default_log_file_name
 from opera.util.logger import get_severity_from_error_code
@@ -40,24 +41,13 @@ from opera.util.logger import standardize_severity_string
 from opera.util.logger import write
 
 
-def clean_up(*args):
-    """
-    It is necessary for the weakref.finalize() method to call this for garbage collection
-    The __del__ function in the logger causes an error because the code prematurely finalizes.
-    The error is seen when a file is opened and the 'open' keyword is not recognized.
-    This is a know problem with the logger module, and our logger causes the same problem.
-    We
-
-    Parameters
-    ----------
-    args - objects with object to garbage collect (probably will only need to garbage collect the PGELogger object.
-    ----------
-    """
-    pass
-
-
 class LoggerTestCase(unittest.TestCase):
     """Base test class using unittest"""
+
+    data_dir = None
+    starting_dir = None
+    test_dir = None
+    working_dir = None
 
     @classmethod
     def setUpClass(cls) -> None:
@@ -89,34 +79,23 @@ class LoggerTestCase(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls) -> None:
-        """
-        At completion re-establish starting directory
-        -------
-        """
+        """At completion re-establish starting directory"""
         cls.working_dir.cleanup()
         os.chdir(cls.starting_dir)
-        # This will probably be removed, just keeping it for a while
-        weakref.finalize(cls.logger, clean_up)
 
     def setUp(self) -> None:
-        """
-        Use the temporary directory as the working directory
-        -------
-        """
+        """Use the temporary directory as the working directory"""
         os.chdir(self.working_dir.name)
 
     def tearDown(self) -> None:
-        """
-        Return to starting directory
-        -------
-        """
+        """Return to starting directory"""
         os.chdir(self.test_dir)
 
     def test_write(self):
         """
-        Low-level logging function. May be called directly in lieu of PgeLogger class.
-        Write one line to a log file, read it back and verify things were written properly
-        -------
+        Write one line to a log file, read it back and verify things
+        were written properly
+
         """
         match_iso_time = re.compile(self.iso_regex).match
 
@@ -145,10 +124,7 @@ class LoggerTestCase(unittest.TestCase):
         self.assertEqual(line_fields[6].strip(), f'"{description}"')
 
     def test_default_log_file_name(self):
-        """
-        Test the formatted string that is returned by the default_log_file_name()
-        -------
-        """
+        """Test the formatted string that is returned by the default_log_file_name()"""
         file_name = default_log_file_name().split(os.sep)[-1]
 
         self.assertEqual(file_name, re.match(self.fn_regex, file_name).group())
@@ -156,32 +132,27 @@ class LoggerTestCase(unittest.TestCase):
     def test_get_severity_from_error_code(self):
         """
         Test get_severity_from_error_code(error_code)
-        -------
+        Only tests one per category
+        Selection is made from a random integer within each individual range.
         """
-        for i in range(999):
-            self.assertEqual(get_severity_from_error_code(i), "Info")
-        for i in range(1000, 1999):
-            self.assertEqual(get_severity_from_error_code(i), "Debug")
-        for i in range(2000, 2999):
-            self.assertEqual(get_severity_from_error_code(i), "Warning")
-        for i in range(3000, 3999):
-            self.assertEqual(get_severity_from_error_code(i), "Critical")
+        info_index = randint(INFO_RANGE_START, DEBUG_RANGE_START - 1)
+        self.assertEqual(get_severity_from_error_code(info_index), "Info")
+        debug_index = randint(DEBUG_RANGE_START, WARNING_RANGE_START - 1)
+        self.assertEqual(get_severity_from_error_code(debug_index), "Debug")
+        warning_index = randint(WARNING_RANGE_START, CRITICAL_RANGE_START - 1)
+        self.assertEqual(get_severity_from_error_code(warning_index), "Warning")
+        critical_index = randint(CRITICAL_RANGE_START, CRITICAL_RANGE_START + CODES_PER_RANGE)
+        self.assertEqual(get_severity_from_error_code(critical_index), "Critical")
 
     def test_standardize_severity_string(self):
-        """
-        Test that the string returned has the first character capitalized and the rest are lower case
-        -------
-        """
+        """Test that the string returned has the first character capitalized and the rest are lower case"""
         self.assertEqual(standardize_severity_string("info"), "Info")
         self.assertEqual(standardize_severity_string("DeBuG"), "Debug")
         self.assertEqual(standardize_severity_string("wARNING"), "Warning")
         self.assertEqual(standardize_severity_string("CrItIcAl"), "Critical")
 
     def test_pge_logger(self):
-        """
-        The PgeLogger class.
-        -------
-        """
+        """The PgeLogger class"""
         self.assertIsInstance(self.logger, PgeLogger)
         # Verify the default arguments that are assigned, and other initializations
         self.assertEqual(self.logger._workflow, "pge_init::logger.py")
@@ -231,9 +202,10 @@ class LoggerTestCase(unittest.TestCase):
         self.add_backframe(0)
 
         # Test append text from another file
-        with open('new_file.txt', 'w') as temp_file:
-            temp_file.write('Text from "new_file.txt" to test append_text_from another file().')
-        self.logger.append('new_file.txt')
+        test_append_file = tempfile.NamedTemporaryFile(prefix="new_file_", suffix='_txt', dir=os.curdir)
+        with open(test_append_file.name, 'w') as temp_file:
+            temp_file.write(f'Text from "{test_append_file.name}" to test append_text_from another file().')
+        self.logger.append(test_append_file.name)
 
         self.logger.move('test_move.log')
         self.logger.log('opera_pge', 8, "Moving log file to: test_move.log")
@@ -259,7 +231,8 @@ class LoggerTestCase(unittest.TestCase):
         self.assertIn('Test debug() method.', log)
         self.assertIn('Test warning() method.', log)
         self.assertIn('Test log() method.', log)
-        self.assertIn('Text from "new_file.txt" to test append_text_from another file()', log)
+        look_for = f'Text from "{test_append_file.name}" to test append_text_from another file().'
+        self.assertIn(look_for, log)
         self.assertIn('Test log_one_metric(): 17', log)
 
         # Check similar methods against each other
@@ -280,8 +253,10 @@ class LoggerTestCase(unittest.TestCase):
         self.arg_test_logger.log('opera_pge', 7, "Verify arguments in the file.")
 
         # Error Cases
+        # Illegal category
         self.arg_test_logger.increment_log_count_by_severity("BROKEN")
-        self.arg_test_logger.get_log_count_by_severity("BrokEN")
+        # Verify there are no entries with a category 'BROKEN'
+        self.assertEqual(self.arg_test_logger.get_log_count_by_severity("BROKEN"), 0)
 
         self.arg_test_logger.close_log_stream()
 

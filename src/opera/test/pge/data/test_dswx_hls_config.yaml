@@ -25,7 +25,7 @@ RunConfig:
                 ProgramPath: /bin/echo
                 ProgramOptions:
                     - 'hello world > dswx_pge_test/output_dir/dswx_hls.tif;'
-                    - '/bin/echo DSWx-HLS invoked with RunConfig '
+                    - '/bin/echo DSWx-HLS invoked with RunConfig'
                 ErrorCodeBase: 100000
                 SchemaPath: dswx_hls_sas_schema.yaml
 

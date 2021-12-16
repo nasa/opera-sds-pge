@@ -52,6 +52,11 @@ class PreProcessorMixin:
     """
     _pre_mixin_name = "PreProcessorMixin"
 
+    def __init__(self):
+        self.logger = None
+        self.name = None
+        self.runconfig_path = None
+
     def _initialize_logger(self):
         """
         Creates the logger object used by the PGE.
@@ -191,6 +196,10 @@ class PostProcessorMixin:
     """
     _post_mixin_name = "PostProcessorMixin"
 
+    def __init__(self):
+        self.name = None
+        self.logger = None
+
     def _run_sas_qa_executable(self):
         # TODO
         pass
@@ -278,6 +287,8 @@ class PgeExecutor(PreProcessorMixin, PostProcessorMixin):
 
         """
 
+ #       TODO pycharm suggested this, not sure if necessary with mixins, but worth checking in on.
+ #       super().__init__()
         self.name = self.NAME
         self.pge_name = pge_name
         self.runconfig_path = runconfig_path
