@@ -26,8 +26,6 @@ import os
 import shutil
 import subprocess
 import time
-from io import StringIO
-import sys
 
 from os.path import abspath
 
@@ -133,6 +131,8 @@ def time_and_execute(command_line, logger, execute_via_shell=False):
 
     # Append the stdout/stderr captured by the subprocess to our log
     logger.append(run_result.stdout.decode())
+
+    print(run_result.stdout.decode())
 
     if run_result.returncode:
         error_msg = (f'Command "{" ".join(command_line)}" failed with exit '

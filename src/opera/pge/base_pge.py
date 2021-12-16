@@ -22,17 +22,18 @@ Module defining the Base PGE interfaces from which all other PGEs are derived.
 """
 
 import os
-import yaml
-
 from os.path import abspath, basename, exists, join, splitext
 
 from yamale import YamaleError
 
-from .runconfig import RunConfig
+import yaml
+
 from opera.util.error_codes import ErrorCode
 from opera.util.logger import PgeLogger
 from opera.util.run_utils import create_sas_command_line
 from opera.util.run_utils import time_and_execute
+
+from .runconfig import RunConfig
 
 
 class PreProcessorMixin:
@@ -50,6 +51,7 @@ class PreProcessorMixin:
     steps as necessary.
 
     """
+
     _pre_mixin_name = "PreProcessorMixin"
 
     def __init__(self):
@@ -63,8 +65,8 @@ class PreProcessorMixin:
 
         The logger is created using a default name, as the proper filename
         cannot be determined until the RunConfig is parsed and validated.
-        """
 
+        """
         if not self.logger:
             self.logger = PgeLogger()
             self.logger.info(self.name, ErrorCode.LOG_FILE_CREATED,
@@ -154,7 +156,7 @@ class PreProcessorMixin:
         self.logger.move(log_file_destination)
 
         self.logger.info(self.name, ErrorCode.LOG_FILE_INIT_COMPLETE,
-                         f'Log file configuration complete')
+                         'Log file configuration complete')
 
     def run_preprocessor(self, **kwargs):
         """
@@ -194,6 +196,7 @@ class PostProcessorMixin:
     steps as necessary.
 
     """
+
     _post_mixin_name = "PostProcessorMixin"
 
     def __init__(self):
@@ -267,6 +270,7 @@ class PgeExecutor(PreProcessorMixin, PostProcessorMixin):
     common functionality from this class.
 
     """
+
     NAME = "PgeExecutor"
 
     def __init__(self, pge_name, runconfig_path, **kwargs):
@@ -286,9 +290,7 @@ class PgeExecutor(PreProcessorMixin, PostProcessorMixin):
                            to use, rather than creating its own.
 
         """
-
- #       TODO pycharm suggested this, not sure if necessary with mixins, but worth checking in on.
- #       super().__init__()
+        
         self.name = self.NAME
         self.pge_name = pge_name
         self.runconfig_path = runconfig_path
