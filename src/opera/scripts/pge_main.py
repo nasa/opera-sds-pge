@@ -32,8 +32,8 @@ import os
 from opera.pge.base_pge import PgeExecutor
 from opera.pge.dswx_pge import DSWxExecutor
 from opera.pge.runconfig import RunConfig
-from opera.util.logger import PgeLogger
 from opera.util.error_codes import ErrorCode
+from opera.util.logger import PgeLogger
 
 PGE_NAME_MAP = {
     'DSWX_HLS_PGE': DSWxExecutor,
@@ -83,7 +83,6 @@ def open_log_file():
         PgeLogger object with initialized filename
 
     """
-
     logger = PgeLogger('PGE::' + os.path.basename(__file__), PgeLogger.LOGGER_CODE_BASE)
 
     logger.info("pge_main", ErrorCode.LOG_FILE_CREATED,
@@ -110,7 +109,6 @@ def load_run_config_file(logger, run_config_filename):
         The python RunConfig instance
 
     """
-
     # Log the yaml config file that is used.
     run_config = RunConfig(run_config_filename)
     msg = f'RunConfig yaml file: {run_config_filename}'
@@ -140,7 +138,6 @@ def pge_start(run_config_filename):
         Path and filename to run config yaml file.
 
     """
-
     logger = open_log_file()
 
     # Load the yaml run config file
@@ -165,7 +162,6 @@ def pge_main():
     specific PGE, then runs that specific PGE.
 
     """
-
     parser = argparse.ArgumentParser(
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter

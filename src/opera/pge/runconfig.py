@@ -26,10 +26,12 @@ Adapted By: Scott Collins
 """
 import os
 
-import yaml
+from pkg_resources import resource_filename
 
 import yamale
-from pkg_resources import resource_filename
+
+import yaml
+
 
 BASE_PGE_SCHEMA = resource_filename('opera', 'schema/base_pge_schema.yaml')
 """Path to the Yamale schema applicable to the PGE portion of each RunConfig"""
@@ -140,12 +142,12 @@ class RunConfig:
                 sas_schema = yamale.make_schema(sas_schema_filepath)
 
                 # Link the SAS schema to the PGE as an "include"
-                # Note that the key name "sas_configuration" must match the include
+                # Note that the key name "sas_configuration" must match the include statement
                 # reference in the base PGE schema.
                 pge_schema.includes['sas_configuration'] = sas_schema
             else:
                 raise RuntimeError(
-                    f'Can not validate RunConfig {self.name} as the associated SAS '
+                    f'Can not validate RunConfig {self.name}, as the associated SAS '
                     f'schema ({sas_schema_filename}) cannot be located within the '
                     f'schemas directory.'
                 )
@@ -184,92 +186,113 @@ class RunConfig:
 
     @property
     def filename(self) -> str:
+        """Returns the of the file parsed to create the RunConfig"""
         return self._filename
 
     @property
     def name(self) -> str:
+        """Returns the name of the RunConfig file"""
         return self._run_config['Name']
 
     # PGENameGroup
     @property
     def pge_name(self) -> str:
+        """Returns the PGE Name from the PGE Name Group"""
         return self._pge_config['PGENameGroup']['PGEName']
 
     # InputFilesGroup
     @property
     def input_files(self) -> list:
+        """Returns the path from the Input Files Group"""
         return self._pge_config['InputFilesGroup']['InputFilePaths']
 
     # DynamicAncillaryFilesGroup
     @property
     def ancillary_file_map(self) -> dict:
+        """Returns the Ancillary File Map from the Dynamic Ancillary Files Group"""
         return self._pge_config['DynamicAncillaryFilesGroup']['AncillaryFileMap']
 
     # ProductPathGroup
     @property
     def product_counter(self) -> int:
+        """Returns the Product Counter from Product Path Group"""
         return self._pge_config['ProductPathGroup']['ProductCounter']
 
     @property
     def output_product_path(self) -> str:
+        """Returns the Output Product Path from the Product Path Group"""
         return self._pge_config['ProductPathGroup']['OutputProductPath']
 
     @property
     def scratch_path(self) -> str:
+        """Returns the Scratch Path from the Product Path Group"""
         return self._pge_config['ProductPathGroup']['ScratchPath']
 
     @property
     def sas_output_file(self) -> str:
+        """Returns the SAS Output File from the Product Path Group"""
         return self._pge_config['ProductPathGroup']['SASOutputFile']
 
     # PrimaryExecutable
     @property
     def product_identifier(self) -> str:
+        """Returns the Product Identifier from a Primary Executable Category"""
         return self._pge_config['PrimaryExecutable']['ProductIdentifier']
 
     @property
     def sas_program_path(self) -> str:
+        """Returns the Program Path from a Primary Executable Category"""
         return self._pge_config['PrimaryExecutable']['ProgramPath']
 
     @property
     def sas_program_options(self) -> str:
+        """Returns the Program Options (arguments) to a Primary Executable"""
         return self._pge_config['PrimaryExecutable']['ProgramOptions']
 
     @property
     def error_code_base(self) -> int:
+        """Returns the Error Code Base for a particular Primary Executable"""
         return self._pge_config['PrimaryExecutable']['ErrorCodeBase']
 
     @property
     def sas_schema_path(self) -> str:
+        """Returns the path to the Schema file for a Primary Executable"""
         return self._pge_config['PrimaryExecutable']['SchemaPath']
 
     @property
     def iso_template_path(self) -> str:
+        """Returns the ISO Template Path for a Primary Executable"""
         return self._pge_config['PrimaryExecutable']['IsoTemplatePath']
 
     # QAExecutable
     @property
     def qa_enabled(self) -> bool:
-        return self._pge_config['QAExecutable']['Enabled']
+        """Returns a boolean indicating the state of QAExecutable: enabled/disabled"""
+        return bool(self._pge_config['QAExecutable']['Enabled'])
 
     @property
     def qa_program_path(self) -> str:
+        """Return the path to a QA Executable"""
         return self._pge_config['QAExecutable']['ProgramPath']
 
     @property
     def qa_program_options(self) -> str:
+        """Return program options (arguments) for an executable command"""
         return self._pge_config['QAExecutable']['ProgramOptions']
 
     @property
     def debug_switch(self) -> bool:
+        """Returns a boolean indicating the debugging state: enabled/disabled."""
         return bool(self._pge_config['DebugLevelGroup']['DebugSwitch'])
 
     @property
     def execute_via_shell(self) -> bool:
+        """Returns a boolean indicating the state of ExecuteViaShell: enabled/disabled"""
         return bool(self._pge_config['DebugLevelGroup'].get('ExecuteViaShell', False))
 
     @property
     def sas_config(self) -> dict:
+        """Returns the short-cut to the SAS-specific section of the parsed RunConfig"""
         return self._sas_config
 
     def get_ancillary_filenames(self):
