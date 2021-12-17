@@ -29,12 +29,11 @@ import inspect
 import shutil
 import time
 from io import StringIO
-
 from os.path import basename, isfile
 
 from opera.util import error_codes
-import opera.util.time as time_util
 
+from . import time as time_util
 from .error_codes import ErrorCode
 from .usage_metrics import get_os_metrics
 
