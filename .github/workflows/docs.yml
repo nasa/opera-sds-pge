@@ -1,0 +1,33 @@
+name: Documentation
+
+on:
+  push:
+    paths:
+      - "docs/**"
+      - "README.rst"
+      - "CONTRIBUTING.rst"
+  pull_request:
+    paths:
+      - "docs/**"
+      - "README.rst"
+      - "CONTRIBUTING.rst"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python 3.6
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.6
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get install pandoc
+          python -m pip install --upgrade pip setuptools wheel
+          pip install -e .[dev]
+      - name: Build documentation
+        run: sphinx-apidoc -o docs/ opera

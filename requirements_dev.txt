@@ -8,3 +8,6 @@ pylint
 pytest
 pytest-cov
 yamale
+tox
+Sphinx
+sphinx-rtd-theme

@@ -21,3 +21,6 @@ Repository for the Product Generation Executable (PGE) code utilized with the
 Observational Products for End-Users from Remote Sensing Analysis (OPERA)
 Science Data System (SDS).
 """
+
+__email__ = "drewm@mit.edu"
+__version__ = "0.1.0"
