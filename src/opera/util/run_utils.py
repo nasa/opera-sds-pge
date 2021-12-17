@@ -26,6 +26,8 @@ import os
 import shutil
 import subprocess
 import time
+from io import StringIO
+import sys
 
 from os.path import abspath
 
@@ -126,8 +128,11 @@ def time_and_execute(command_line, logger, execute_via_shell=False):
 
     # TODO: support for timeout argument?
     run_result = subprocess.run(command_line, env=os.environ.copy(), check=False,
-                                stdout=logger.get_file_object(),
-                                stderr=subprocess.STDOUT, shell=execute_via_shell)
+                                stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                                shell=execute_via_shell)
+
+    # Append the stdout/stderr captured by the subprocess to our log
+    logger.append(run_result.stdout.decode())
 
     if run_result.returncode:
         error_msg = (f'Command "{" ".join(command_line)}" failed with exit '
