@@ -6,8 +6,8 @@ opera-sds-pge
         :target: https://github.com/drewmee/opera-sds-pge/actions/workflows/test.yml
 
 .. image:: https://readthedocs.org/projects/opera-sds-pge/badge/?version=latest
-        :target: https://opera-sds-pge.readthedocs.io/en/latest/
-        :alt: Documentation Status
+    :target: https://opera-sds-pge.readthedocs.io/en/latest/?badge=latest
+    :alt: Documentation Status
 
 
 Repository for the Product Generation Executable (PGE) code utilized with the Observational Products for End-Users from Remote Sensing Analysis (OPERA) Science Data System (SDS).
