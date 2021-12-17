@@ -17,7 +17,7 @@ Installation
 
 Install via pip:
 
-    $ pip install pyeem [--upgrade]
+    $ pip install opera-sds-pge [--upgrade]
 
 Dependencies for Local Development
 ----------------------------------
