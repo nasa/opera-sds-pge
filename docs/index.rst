@@ -1,5 +1,5 @@
 Welcome to opera-sds-pge's documentation!
-======================================
+=========================================
 
 .. toctree::
    :maxdepth: 2
