@@ -10,5 +10,6 @@ Development Lead
 Contributors
 ------------
 
+* Jim Hofman (jhofman@email.com)
 * Drew Meyers <drewm@mit.edu>
 * Your name could be here!
