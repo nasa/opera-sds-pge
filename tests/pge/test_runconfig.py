@@ -27,7 +27,6 @@ import unittest
 from os.path import join
 
 from pkg_resources import resource_filename
-
 from yamale import YamaleError
 
 from opera.pge import RunConfig
@@ -150,8 +149,8 @@ class RunconfigTestCase(unittest.TestCase):
         """
         # Test with an invalid file that does not conform to minimum standard
         # of a RunConfig (all entries keyed under top-level RunConfig tag)
-        with tempfile.NamedTemporaryFile(mode='w', prefix='runconfig_', suffix='.yaml') as outfile:
-            outfile.write('runconfig:\n    Name: Invalid RunConfig')
+        with tempfile.NamedTemporaryFile(mode="w", prefix="runconfig_", suffix=".yaml") as outfile:
+            outfile.write("runconfig:\n    Name: Invalid RunConfig")
             outfile.flush()
 
             with self.assertRaises(RuntimeError):
@@ -169,8 +168,9 @@ class RunconfigTestCase(unittest.TestCase):
             self.assertIn("RunConfig.Groups.PGE.InputFilesGroup.InputFilePaths: 'None' is not a list.", str(err))
             self.assertIn("RunConfig.Groups.PGE.ProductPathGroup.ProductCounter: -1 is less than 1", str(err))
             self.assertIn("RunConfig.Groups.PGE.PrimaryExecutable.ProgramPath: Required field missing", str(err))
-            self.assertIn("RunConfig.Groups.PGE.PrimaryExecutable.ProgramOptions: '--debug --restart' is not a list.",
-                          str(err))
+            self.assertIn(
+                "RunConfig.Groups.PGE.PrimaryExecutable.ProgramOptions: '--debug --restart' is not a list.", str(err)
+            )
             self.assertIn("RunConfig.Groups.PGE.QAExecutable.ProgramOptions: '--debug' is not a list.", str(err))
 
 

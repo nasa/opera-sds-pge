@@ -32,13 +32,10 @@ import os
 from opera.pge.base_pge import PgeExecutor
 from opera.pge.dswx_pge import DSWxExecutor
 from opera.pge.runconfig import RunConfig
-from opera.util.logger import PgeLogger
 from opera.util.error_codes import ErrorCode
+from opera.util.logger import PgeLogger
 
-PGE_NAME_MAP = {
-    'DSWX_HLS_PGE': DSWxExecutor,
-    'default': PgeExecutor
-}
+PGE_NAME_MAP = {"DSWX_HLS_PGE": DSWxExecutor, "default": PgeExecutor}
 """Mapping of PGE names specified by a RunConfig to the PGE class type to instantiate"""
 
 
@@ -64,10 +61,9 @@ def get_pge_class(pge_name, logger):
     """
     # Return either the PGE configured for the name, or the default class
     # if we don't have a mapping for it.
-    pge_class = PGE_NAME_MAP.get(pge_name, PGE_NAME_MAP['default'])
+    pge_class = PGE_NAME_MAP.get(pge_name, PGE_NAME_MAP["default"])
 
-    logger.info("pge_main", ErrorCode.PGE_NAME,
-                f'Using class {pge_class.__name__} for PGE name {pge_name}')
+    logger.info("pge_main", ErrorCode.PGE_NAME, f"Using class {pge_class.__name__} for PGE name {pge_name}")
 
     return pge_class
 
@@ -84,10 +80,9 @@ def open_log_file():
 
     """
 
-    logger = PgeLogger('PGE::' + os.path.basename(__file__), PgeLogger.LOGGER_CODE_BASE)
+    logger = PgeLogger("PGE::" + os.path.basename(__file__), PgeLogger.LOGGER_CODE_BASE)
 
-    logger.info("pge_main", ErrorCode.LOG_FILE_CREATED,
-                f'Log file initialized to {logger.get_file_name()}')
+    logger.info("pge_main", ErrorCode.LOG_FILE_CREATED, f"Log file initialized to {logger.get_file_name()}")
 
     return logger
 
@@ -113,7 +108,7 @@ def load_run_config_file(logger, run_config_filename):
 
     # Log the yaml config file that is used.
     run_config = RunConfig(run_config_filename)
-    msg = f'RunConfig yaml file: {run_config_filename}'
+    msg = f"RunConfig yaml file: {run_config_filename}"
     logger.info("pge_main", ErrorCode.RUN_CONFIG_FILENAME, msg)
 
     # Log the schema file that is used.
@@ -150,9 +145,7 @@ def pge_start(run_config_filename):
     pge_class = get_pge_class(run_config.pge_name, logger)
 
     # Instantiate and run the pge.
-    pge = pge_class(
-        pge_name=run_config.pge_name, runconfig_path=run_config_filename, logger=logger
-    )
+    pge = pge_class(pge_name=run_config.pge_name, runconfig_path=run_config_filename, logger=logger)
 
     pge.run()
 
@@ -166,13 +159,9 @@ def pge_main():
 
     """
 
-    parser = argparse.ArgumentParser(
-        description=__doc__,
-        formatter_class=argparse.RawDescriptionHelpFormatter
-    )
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
 
-    parser.add_argument('-f', '--file', required=True, type=str,
-                        help='Path to the run configuration yaml file.')
+    parser.add_argument("-f", "--file", required=True, type=str, help="Path to the run configuration yaml file.")
 
     args = parser.parse_args()
 
@@ -184,5 +173,5 @@ def pge_main():
     pge_start(run_config_filename)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     pge_main()

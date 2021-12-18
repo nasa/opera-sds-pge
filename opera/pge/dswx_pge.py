@@ -27,9 +27,7 @@ from os.path import abspath, exists, isdir, join
 
 from opera.util.error_codes import ErrorCode
 
-from .base_pge import PgeExecutor
-from .base_pge import PostProcessorMixin
-from .base_pge import PreProcessorMixin
+from .base_pge import PgeExecutor, PostProcessorMixin, PreProcessorMixin
 
 
 class DSWxPreProcessorMixin(PreProcessorMixin):
@@ -61,7 +59,7 @@ class DSWxPreProcessorMixin(PreProcessorMixin):
 
                 self.logger.critical(self.name, ErrorCode.INPUT_NOT_FOUND, error_msg)
             elif isdir(input_file_path):
-                list_of_input_tifs = glob.glob(join(input_file_path, '*.tif'))
+                list_of_input_tifs = glob.glob(join(input_file_path, "*.tif"))
 
                 if len(list_of_input_tifs) <= 0:
                     error_msg = f"Input directory {input_file_path} does not contain any tif files"
@@ -112,9 +110,7 @@ class DSWxPostProcessorMixin(PostProcessorMixin):
         existence, and that the file contains some content (size is greater than
         0).
         """
-        output_path = abspath(
-            join(self.runconfig.output_product_path, self.runconfig.sas_output_file)
-        )
+        output_path = abspath(join(self.runconfig.output_product_path, self.runconfig.sas_output_file))
 
         if not exists(output_path):
             error_msg = f"Expected SAS output file {output_path} does not exist"
@@ -140,7 +136,7 @@ class DSWxPostProcessorMixin(PostProcessorMixin):
             Any keyword arguments needed by the post-processor
 
         """
-        print(f'Running postprocessor for {self._post_mixin_name}')
+        print(f"Running postprocessor for {self._post_mixin_name}")
 
         self._run_sas_qa_executable()
         self._create_catalog_metadata()

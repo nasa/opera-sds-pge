@@ -38,8 +38,7 @@ from .error_codes import ErrorCode
 from .usage_metrics import get_os_metrics
 
 
-def write(log_stream, severity, workflow, module, error_code, error_location,
-          description):
+def write(log_stream, severity, workflow, module, error_code, error_location, description):
     """
     Low-level logging function. May be called directly in lieu of PgeLogger class.
 
@@ -64,8 +63,7 @@ def write(log_stream, severity, workflow, module, error_code, error_location,
 
     time_tag = time_util.get_current_iso_time()
 
-    message_str = f'{time_tag}, {severity}, {workflow}, {module},' \
-                  f'{str(error_code)}, {error_location}, "{description}"\n'
+    message_str = f'{time_tag}, {severity}, {workflow}, {module},{str(error_code)}, {error_location}, "{description}"\n'
 
     log_stream.write(message_str)
 
@@ -150,10 +148,10 @@ class PgeLogger:
     * The class's write() function has fewer arguments that need to be provided.
 
     """
+
     LOGGER_CODE_BASE = 900000
 
-    def __init__(self, workflow=None, error_code_base=None,
-                 log_filename=None):
+    def __init__(self, workflow=None, error_code_base=None, log_filename=None):
         """
         Constructor opens the log file as a stream
 
@@ -181,11 +179,9 @@ class PgeLogger:
         self.log_stream = StringIO()
         self.log_stream.seek(0)
 
-        self._workflow = (workflow
-                          if workflow else f"pge_init::{basename(__file__)}")
+        self._workflow = workflow if workflow else f"pge_init::{basename(__file__)}"
 
-        self._error_code_base = (error_code_base
-                                 if error_code_base else PgeLogger.LOGGER_CODE_BASE)
+        self._error_code_base = error_code_base if error_code_base else PgeLogger.LOGGER_CODE_BASE
 
     @property
     def workflow(self):
@@ -215,7 +211,7 @@ class PgeLogger:
 
             self.log_stream.seek(0)
 
-            with open(self.log_filename, 'w') as outfile:
+            with open(self.log_filename, "w") as outfile:
                 shutil.copyfileobj(self.log_stream, outfile)
 
             self.log_stream.close()
@@ -241,18 +237,16 @@ class PgeLogger:
             count = self.log_count_by_severity[severity]
             return count
         except KeyError:
-            self.warning("PgeLogger", ErrorCode.LOGGING_REQUESTED_SEVERITY_NOT_FOUND,
-                         f"No messages logged with severity: '{severity}' ")
+            self.warning(
+                "PgeLogger",
+                ErrorCode.LOGGING_REQUESTED_SEVERITY_NOT_FOUND,
+                f"No messages logged with severity: '{severity}' ",
+            )
             return 0
 
     @staticmethod
     def _make_blank_log_count_by_severity_dict():
-        return {
-            "Debug": 0,
-            "Info": 0,
-            "Warning": 0,
-            "Critical": 0
-        }
+        return {"Debug": 0, "Info": 0, "Warning": 0, "Critical": 0}
 
     def get_log_count_by_severity_dict(self):
         """Returns a copy of the dictionary of log counts by severity."""
@@ -274,11 +268,13 @@ class PgeLogger:
             count = 1 + self.log_count_by_severity[severity]
             self.log_count_by_severity[severity] = count
         except KeyError:
-            self.warning("PgeLogger", ErrorCode.LOGGING_COULD_NOT_INCREMENT_SEVERITY,
-                         f"Could not increment severity level: '{severity}' ")
+            self.warning(
+                "PgeLogger",
+                ErrorCode.LOGGING_COULD_NOT_INCREMENT_SEVERITY,
+                f"Could not increment severity level: '{severity}' ",
+            )
 
-    def write(self, severity, module, error_code_offset, description,
-              additional_back_frames=0):
+    def write(self, severity, module, error_code_offset, description, additional_back_frames=0):
         """
         Write a message to the log.
 
@@ -310,11 +306,17 @@ class PgeLogger:
         for _ in range(additional_back_frames):
             caller = caller.f_back
 
-        location = caller.f_code.co_filename + ':' + str(caller.f_lineno)
+        location = caller.f_code.co_filename + ":" + str(caller.f_lineno)
 
-        write(self.log_stream, severity, self.workflow, module,
-              self.error_code_base + error_code_offset,
-              location, description)
+        write(
+            self.log_stream,
+            severity,
+            self.workflow,
+            module,
+            self.error_code_base + error_code_offset,
+            location,
+            description,
+        )
 
     def info(self, module, error_code_offset, description):
         """
@@ -332,8 +334,7 @@ class PgeLogger:
             Description message to write to the log.
 
         """
-        self.write("Info", module, error_code_offset, description,
-                   additional_back_frames=1)
+        self.write("Info", module, error_code_offset, description, additional_back_frames=1)
 
     def debug(self, module, error_code_offset, description):
         """
@@ -351,8 +352,7 @@ class PgeLogger:
             Description message to write to the log.
 
         """
-        self.write("Debug", module, error_code_offset, description,
-                   additional_back_frames=1)
+        self.write("Debug", module, error_code_offset, description, additional_back_frames=1)
 
     def warning(self, module, error_code_offset, description):
         """
@@ -370,8 +370,7 @@ class PgeLogger:
             Description message to write to the log.
 
         """
-        self.write("Warning", module, error_code_offset, description,
-                   additional_back_frames=1)
+        self.write("Warning", module, error_code_offset, description, additional_back_frames=1)
 
     def critical(self, module, error_code_offset, description):
         """
@@ -394,8 +393,7 @@ class PgeLogger:
             Description message to write to the log.
 
         """
-        self.write("Critical", module, error_code_offset, description,
-                   additional_back_frames=1)
+        self.write("Critical", module, error_code_offset, description, additional_back_frames=1)
 
         self.close_log_stream()
 
@@ -424,16 +422,15 @@ class PgeLogger:
 
         """
         severity = get_severity_from_error_code(error_code_offset)
-        self.write(severity, module, error_code_offset, description,
-                   additional_back_frames=additional_back_frames + 1)
+        self.write(severity, module, error_code_offset, description, additional_back_frames=additional_back_frames + 1)
 
     def get_warning_count(self):
         """Returns the number of messages logged at the warning level."""
-        return self.get_log_count_by_severity('Warning')
+        return self.get_log_count_by_severity("Warning")
 
     def get_critical_count(self):
         """Returns the number of messages logged at the critical level."""
-        return self.get_log_count_by_severity('Critical')
+        return self.get_log_count_by_severity("Critical")
 
     def move(self, new_filename):
         """
@@ -470,15 +467,14 @@ class PgeLogger:
         """
 
         if isfile(source):
-            with open(source, 'r') as source_file_object:
+            with open(source, "r") as source_file_object:
                 source_contents = source_file_object.read()
         else:
             source_contents = source
 
         self.log_stream.write(source_contents)
 
-    def log_one_metric(self, module, metric_name, metric_value,
-                       additional_back_frames=0):
+    def log_one_metric(self, module, metric_name, metric_value, additional_back_frames=0):
         """
         Writes one metric value to the log file.
 
@@ -497,8 +493,7 @@ class PgeLogger:
         """
         # msg = "{}: {}".format(metric_name, metric_value)
         msg = f"{metric_name}: {metric_value}"
-        self.log(module, ErrorCode.SUMMARY_STATS_MESSAGE, msg,
-                 additional_back_frames=additional_back_frames + 1)
+        self.log(module, ErrorCode.SUMMARY_STATS_MESSAGE, msg, additional_back_frames=additional_back_frames + 1)
 
     def write_log_summary(self):
         """
@@ -522,8 +517,7 @@ class PgeLogger:
 
         # Overall elapsed time
         elapsed_time_seconds = time.monotonic() - self.start_time
-        self.log_one_metric(module_name, "overall.elapsed_seconds",
-                            elapsed_time_seconds)
+        self.log_one_metric(module_name, "overall.elapsed_seconds", elapsed_time_seconds)
 
     def resync_log_count_by_severity(self):
         """
@@ -540,15 +534,18 @@ class PgeLogger:
 
         # read the log_stream and get a count of log messages for each severity
         count_by_severity = self._make_blank_log_count_by_severity_dict()
-        csv_reader = self.log_stream.getvalue().split('\n')
+        csv_reader = self.log_stream.getvalue().split("\n")
         for i in csv_reader:
-            row = i.split(',')
+            row = i.split(",")
             if len(row) >= 2:
                 try:
                     severity = standardize_severity_string(row[1].strip())
                     count_by_severity[severity] += 1
                 except KeyError:
-                    self.warning("PgeLogger", ErrorCode.LOGGING_RESYNC_FAILED,
-                                 f"Unable to resync the 'log_count_by_severity' dict.")
+                    self.warning(
+                        "PgeLogger",
+                        ErrorCode.LOGGING_RESYNC_FAILED,
+                        "Unable to resync the 'log_count_by_severity' dict.",
+                    )
 
         self.log_count_by_severity = count_by_severity

@@ -30,10 +30,7 @@ from os.path import abspath, join
 
 from pkg_resources import resource_filename
 
-from opera.util.time import get_catalog_metadata_datetime_str
-from opera.util.time import get_current_iso_time
-from opera.util.time import get_iso_time
-from opera.util.time import get_time_for_filename
+from opera.util.time import get_catalog_metadata_datetime_str, get_current_iso_time, get_iso_time, get_time_for_filename
 
 
 class TimeTestCase(unittest.TestCase):
@@ -53,11 +50,13 @@ class TimeTestCase(unittest.TestCase):
 
         os.chdir(cls.test_dir)
 
-        cls.working_dir = tempfile.TemporaryDirectory(
-            prefix="test_time_", suffix='temp', dir=os.curdir)
+        cls.working_dir = tempfile.TemporaryDirectory(prefix="test_time_", suffix="temp", dir=os.curdir)
         cls.config_file = join(cls.data_dir, "test_base_pge_config.yaml")
-        cls.iso_regex = r'^(-?(?:[0-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):' \
-                        r''r'([0-5][0-9]):([0-5][0-9])(\.[0-9]+)?(Z)$'
+        cls.iso_regex = (
+            r"^(-?(?:[0-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):"
+            r""
+            r"([0-5][0-9]):([0-5][0-9])(\.[0-9]+)?(Z)$"
+        )
         cls.match_iso_time = re.compile(cls.iso_regex).match
         cls.reps = 1000
 
@@ -98,14 +97,14 @@ class TimeTestCase(unittest.TestCase):
             self.assertEqual(time, self.match_iso_time(time).group())
 
         # Test various bad strings
-        time_1 = '20211102T15:51:39.95566Z'     # missing '-'
-        time_2 = '2021-11-02T155139.955666Z'    # missing ':'
-        time_3 = '202-11-02T15:51:39.955666Z'   # wrong # of time digits
-        time_4 = '2021-1a-02T15:51:39.955666Z'  # wrong character in month
-        time_5 = '2021-11-0215:51:39.955666Z'   # missing 'T'
-        time_6 = '2021-11-02T15:5:39.955666Z'   # wrong # of minute digits
-        time_7 = '2021-11-02T15:51:3.955666Z'   # wrong # of second digits
-        time_8 = '2021-11-02T15:51:39.955666'   # missing 'Z'
+        time_1 = "20211102T15:51:39.95566Z"  # missing '-'
+        time_2 = "2021-11-02T155139.955666Z"  # missing ':'
+        time_3 = "202-11-02T15:51:39.955666Z"  # wrong # of time digits
+        time_4 = "2021-1a-02T15:51:39.955666Z"  # wrong character in month
+        time_5 = "2021-11-0215:51:39.955666Z"  # missing 'T'
+        time_6 = "2021-11-02T15:5:39.955666Z"  # wrong # of minute digits
+        time_7 = "2021-11-02T15:51:3.955666Z"  # wrong # of second digits
+        time_8 = "2021-11-02T15:51:39.955666"  # missing 'Z'
 
         # Assert that none of the above strings match the regex pattern.
         self.assertIsNone(self.match_iso_time(time_1))
@@ -140,7 +139,7 @@ class TimeTestCase(unittest.TestCase):
         Verify the proper number of digits separated by 'T' in the string returned
         """
         # Simple regex to test for YYYYMMDDTHHMMSS format ('Y'ear, 'M'onth, 'D'ay, 'T', 'H'our, 'M'inutes, 'S'econds)
-        filename_regex = r'^\d{8}T\d{6}$'
+        filename_regex = r"^\d{8}T\d{6}$"
 
         # Test multiple times
         for i in range(self.reps):
@@ -149,12 +148,12 @@ class TimeTestCase(unittest.TestCase):
             self.assertEqual(time_for_fname, re.match(filename_regex, time_for_fname).group())
 
         # Sanity check to verify that bad dates will not pass.
-        t1 = '202a1103T102328'  # bad year
-        t2 = '2021103T102328'   # not enough digits for month or day
-        t3 = '20211103102328'   # no 'T'
-        t4 = '20211103T1n2328'  # bad hour
-        t5 = '20211103T10228'   # bad min
-        t6 = '20211103T10232b'  # bad sec
+        t1 = "202a1103T102328"  # bad year
+        t2 = "2021103T102328"  # not enough digits for month or day
+        t3 = "20211103102328"  # no 'T'
+        t4 = "20211103T1n2328"  # bad hour
+        t5 = "20211103T10228"  # bad min
+        t6 = "20211103T10232b"  # bad sec
 
         # Assert that none of the above strings match the regex pattern.
         self.assertIsNone(re.match(filename_regex, t1))
@@ -170,17 +169,17 @@ class TimeTestCase(unittest.TestCase):
         in catalog metadata.
 
         """
-        nano_regex = r'^\d{10}Z$'
+        nano_regex = r"^\d{10}Z$"
         # Test multiple times
         for i in range(self.reps):
             dt = datetime.now()
-            nano_str = get_catalog_metadata_datetime_str(dt).split('.')[-1]
+            nano_str = get_catalog_metadata_datetime_str(dt).split(".")[-1]
             self.assertEqual(nano_str, re.match(nano_regex, nano_str).group())
 
         # Test some bad strings
-        t1 = '012345678Z'    # too few digits
-        t2 = '01234567899Z'  # too many digits
-        t3 = '0123456789'    # no 'Z'
+        t1 = "012345678Z"  # too few digits
+        t2 = "01234567899Z"  # too many digits
+        t3 = "0123456789"  # no 'Z'
 
         self.assertIsNone(re.match(nano_regex, t1))
         self.assertIsNone(re.match(nano_regex, t2))

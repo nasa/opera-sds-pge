@@ -115,4 +115,4 @@ class ErrorCode(IntEnum):
         integer values.
         """
         for name, member in cls.__members__.items():
-            print(f'{name}: {member.value}')
+            print(f"{name}: {member.value}")

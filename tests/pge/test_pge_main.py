@@ -28,9 +28,7 @@ from os.path import abspath, join
 from pkg_resources import resource_filename
 
 from opera.pge import PgeExecutor, RunConfig
-from opera.scripts.pge_main import load_run_config_file
-from opera.scripts.pge_main import open_log_file
-from opera.scripts.pge_main import pge_start
+from opera.scripts.pge_main import load_run_config_file, open_log_file, pge_start
 from opera.util import PgeLogger
 
 
@@ -47,12 +45,11 @@ class PgeMainTestCase(unittest.TestCase):
         cls.starting_dir = abspath(os.curdir)
         cls.test_dir = resource_filename(__name__, "")
         cls.data_dir = join(cls.test_dir, "data")
-        cls.scripts_dir = abspath(join(os.pardir, os.pardir, 'scripts'))
+        cls.scripts_dir = abspath(join(os.pardir, os.pardir, "scripts"))
 
         os.chdir(cls.test_dir)
 
-        cls.working_dir = tempfile.TemporaryDirectory(
-            prefix="test_pge_main_", suffix='temp', dir=os.curdir)
+        cls.working_dir = tempfile.TemporaryDirectory(prefix="test_pge_main_", suffix="temp", dir=os.curdir)
         cls.config_file = join(cls.data_dir, "test_base_pge_config.yaml")
 
     @classmethod
@@ -141,7 +138,7 @@ class PgeMainTestCase(unittest.TestCase):
         self.assertTrue(os.path.isdir(pge.runconfig.scratch_path))
 
         # Check that a RunConfig for the SAS was isolated within the scratch directory
-        expected_sas_config_file = join(pge.runconfig.scratch_path, 'test_base_pge_config_sas.yaml')
+        expected_sas_config_file = join(pge.runconfig.scratch_path, "test_base_pge_config_sas.yaml")
         self.assertTrue(os.path.exists(expected_sas_config_file))
 
         # Check that the log file was created and moved into the output directory
@@ -149,10 +146,10 @@ class PgeMainTestCase(unittest.TestCase):
         self.assertTrue(os.path.exists(expected_log_file))
 
         # Open the log file, and check that "SAS" output was captured
-        with open(expected_log_file, 'r') as infile:
+        with open(expected_log_file, "r") as infile:
             log_contents = infile.read()
 
-        self.assertIn('hello world', log_contents)
+        self.assertIn("hello world", log_contents)
 
     def test_pge_start_args(self):
         """

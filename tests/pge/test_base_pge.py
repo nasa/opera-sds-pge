@@ -45,9 +45,7 @@ class BasePgeTestCase(unittest.TestCase):
 
         os.chdir(cls.test_dir)
 
-        cls.working_dir = tempfile.TemporaryDirectory(
-            prefix="test_base_pge_", suffix='temp', dir=os.curdir
-        )
+        cls.working_dir = tempfile.TemporaryDirectory(prefix="test_base_pge_", suffix="temp", dir=os.curdir)
 
     @classmethod
     def tearDownClass(cls) -> None:
@@ -70,9 +68,9 @@ class BasePgeTestCase(unittest.TestCase):
         SAS executable.
 
         """
-        runconfig_path = join(self.data_dir, 'test_base_pge_config.yaml')
+        runconfig_path = join(self.data_dir, "test_base_pge_config.yaml")
 
-        pge = PgeExecutor(pge_name='BasePgeTest', runconfig_path=runconfig_path)
+        pge = PgeExecutor(pge_name="BasePgeTest", runconfig_path=runconfig_path)
 
         # Check that basic attributes were initialized
         self.assertEqual(pge.name, "PgeExecutor")
@@ -99,7 +97,7 @@ class BasePgeTestCase(unittest.TestCase):
         self.assertTrue(isinstance(stream_obj, StringIO))
 
         # Check that a RunConfig for the SAS was isolated within the scratch directory
-        expected_sas_config_file = join(pge.runconfig.scratch_path, 'test_base_pge_config_sas.yaml')
+        expected_sas_config_file = join(pge.runconfig.scratch_path, "test_base_pge_config_sas.yaml")
         self.assertTrue(os.path.exists(expected_sas_config_file))
 
         # Check that the log file was created and moved into the output directory
@@ -107,10 +105,10 @@ class BasePgeTestCase(unittest.TestCase):
         self.assertTrue(os.path.exists(expected_log_file))
 
         # Open the log file, and check that "SAS" output was captured
-        with open(expected_log_file, 'r') as infile:
+        with open(expected_log_file, "r") as infile:
             log_contents = infile.read()
 
-        self.assertIn('hello world', log_contents)
+        self.assertIn("hello world", log_contents)
 
     def test_base_pge_w_invalid_runconfig(self):
         """
@@ -118,9 +116,9 @@ class BasePgeTestCase(unittest.TestCase):
         validation against the base PGE schema.
 
         """
-        runconfig_path = join(self.data_dir, 'invalid_runconfig.yaml')
+        runconfig_path = join(self.data_dir, "invalid_runconfig.yaml")
 
-        pge = PgeExecutor(pge_name='InvalidConfigPgeTest', runconfig_path=runconfig_path)
+        pge = PgeExecutor(pge_name="InvalidConfigPgeTest", runconfig_path=runconfig_path)
 
         with self.assertRaises(RuntimeError):
             pge.run()
@@ -132,14 +130,15 @@ class BasePgeTestCase(unittest.TestCase):
         self.assertTrue(os.path.exists(expected_log_file))
 
         # Open the log file, and check that the validation error details were captured
-        with open(expected_log_file, 'r') as infile:
+        with open(expected_log_file, "r") as infile:
             log_contents = infile.read()
 
         self.assertIn("RunConfig.Groups.PGE.InputFilesGroup.InputFilePaths: 'None' is not a list.", log_contents)
         self.assertIn("RunConfig.Groups.PGE.ProductPathGroup.ProductCounter: -1 is less than 1", log_contents)
         self.assertIn("RunConfig.Groups.PGE.PrimaryExecutable.ProgramPath: Required field missing", log_contents)
-        self.assertIn("RunConfig.Groups.PGE.PrimaryExecutable.ProgramOptions: '--debug --restart' is not a list.",
-                      log_contents)
+        self.assertIn(
+            "RunConfig.Groups.PGE.PrimaryExecutable.ProgramOptions: '--debug --restart' is not a list.", log_contents
+        )
         self.assertIn("RunConfig.Groups.PGE.QAExecutable.ProgramOptions: '--debug' is not a list.", log_contents)
 
     def test_base_pge_w_failing_sas(self):
@@ -148,9 +147,9 @@ class BasePgeTestCase(unittest.TestCase):
         a SAS execution path which is guaranteed to fail (return a non-zero exit
         code).
         """
-        runconfig_path = join(self.data_dir, 'test_sas_error_config.yaml')
+        runconfig_path = join(self.data_dir, "test_sas_error_config.yaml")
 
-        pge = PgeExecutor(pge_name='FailedSasPgeTest', runconfig_path=runconfig_path)
+        pge = PgeExecutor(pge_name="FailedSasPgeTest", runconfig_path=runconfig_path)
 
         with self.assertRaises(RuntimeError):
             pge.run()
@@ -161,7 +160,7 @@ class BasePgeTestCase(unittest.TestCase):
         self.assertTrue(os.path.exists(expected_log_file))
 
         # Open the log file, and check that the execution error details were captured
-        with open(expected_log_file, 'r') as infile:
+        with open(expected_log_file, "r") as infile:
             log_contents = infile.read()
 
         expected_error_code = 123

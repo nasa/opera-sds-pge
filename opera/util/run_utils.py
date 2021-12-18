@@ -26,16 +26,12 @@ import os
 import shutil
 import subprocess
 import time
-from io import StringIO
-import sys
-
 from os.path import abspath
 
 from .error_codes import ErrorCode
 
 
-def create_sas_command_line(sas_program_path, sas_runconfig_path,
-                            sas_program_options=None):
+def create_sas_command_line(sas_program_path, sas_runconfig_path, sas_program_options=None):
     """
     Forms the appropriate command line for executing a SAS from the parameters
     obtained from the RunConfig.
@@ -76,13 +72,13 @@ def create_sas_command_line(sas_program_path, sas_runconfig_path,
         executable_path = abspath(sas_program_path)
 
         # Check if the executable exists, but does not have execute permissions on it
-        if (os.access(executable_path, mode=os.F_OK)
-                and not os.access(executable_path, mode=os.X_OK)):
-            raise OSError(f"Requested SAS program path {sas_program_path} exists, "
-                          f"but does not have execute permissions.")
+        if os.access(executable_path, mode=os.F_OK) and not os.access(executable_path, mode=os.X_OK):
+            raise OSError(
+                f"Requested SAS program path {sas_program_path} exists, but does not have execute permissions."
+            )
         # Otherwise, sas_program_path might be a python module path
         else:
-            command_line = ['python3', '-m', sas_program_path]
+            command_line = ["python3", "-m", sas_program_path]
 
     # Add any provided arguments
     if sas_program_options:
@@ -117,7 +113,7 @@ def time_and_execute(command_line, logger, execute_via_shell=False):
         The time elapsed during execution, in seconds.
 
     """
-    module_name = f'time_and_execute::{os.path.basename(__file__)}'
+    module_name = f"time_and_execute::{os.path.basename(__file__)}"
 
     start_time = time.monotonic()
 
@@ -127,16 +123,20 @@ def time_and_execute(command_line, logger, execute_via_shell=False):
         command_line = " ".join(command_line)
 
     # TODO: support for timeout argument?
-    run_result = subprocess.run(command_line, env=os.environ.copy(), check=False,
-                                stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                                shell=execute_via_shell)
+    run_result = subprocess.run(
+        command_line,
+        env=os.environ.copy(),
+        check=False,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        shell=execute_via_shell,
+    )
 
     # Append the stdout/stderr captured by the subprocess to our log
     logger.append(run_result.stdout.decode())
 
     if run_result.returncode:
-        error_msg = (f'Command "{" ".join(command_line)}" failed with exit '
-                     f'code {run_result.returncode}')
+        error_msg = f'Command "{" ".join(command_line)}" failed with exit code {run_result.returncode}'
 
         logger.critical(module_name, ErrorCode.SAS_PROGRAM_FAILED, error_msg)
 

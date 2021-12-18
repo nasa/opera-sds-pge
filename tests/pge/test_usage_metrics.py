@@ -50,8 +50,7 @@ class UsageMetricsTestCase(unittest.TestCase):
 
         os.chdir(cls.test_dir)
 
-        cls.working_dir = tempfile.TemporaryDirectory(
-            prefix="test_usage_metrics_", suffix='temp', dir=os.curdir)
+        cls.working_dir = tempfile.TemporaryDirectory(prefix="test_usage_metrics_", suffix="temp", dir=os.curdir)
         cls.config_file = join(cls.data_dir, "test_base_pge_config.yaml")
         cls.reps = 10000
 
@@ -96,27 +95,34 @@ class UsageMetricsTestCase(unittest.TestCase):
 
             os.peak_vm_kb.main_process comes from a call to get_self_peak_vmm_kb().
         """
-        cpu_regex = r'^\d*\.\d+$'  # match positive real numbers
-        int_regex = r'^[0-9]*$'  # match positive integers
+        cpu_regex = r"^\d*\.\d+$"  # match positive real numbers
+        int_regex = r"^[0-9]*$"  # match positive integers
         # Get the results
 
         for i in range(self.reps):
             metrics = get_os_metrics()
             # Verify the format of the values and verify they are all positive
-            self.assertEqual(str(metrics['os.cpu.seconds.sys']), re.match(cpu_regex,
-                             str(metrics['os.cpu.seconds.sys'])).group())
-            self.assertEqual(str(metrics['os.cpu.seconds.user']), re.match(cpu_regex,
-                             str(metrics['os.cpu.seconds.user'])).group())
-            self.assertEqual(str(metrics['os.filesystem.reads']), re.match(int_regex,
-                             str(metrics['os.filesystem.reads'])).group())
-            self.assertEqual(str(metrics['os.filesystem.writes']), re.match(int_regex,
-                             str(metrics['os.filesystem.writes'])).group())
-            self.assertEqual(str(metrics['os.max_rss_kb.largest_child_process']), re.match(int_regex,
-                             str(metrics['os.max_rss_kb.largest_child_process'])).group())
+            self.assertEqual(
+                str(metrics["os.cpu.seconds.sys"]), re.match(cpu_regex, str(metrics["os.cpu.seconds.sys"])).group()
+            )
+            self.assertEqual(
+                str(metrics["os.cpu.seconds.user"]), re.match(cpu_regex, str(metrics["os.cpu.seconds.user"])).group()
+            )
+            self.assertEqual(
+                str(metrics["os.filesystem.reads"]), re.match(int_regex, str(metrics["os.filesystem.reads"])).group()
+            )
+            self.assertEqual(
+                str(metrics["os.filesystem.writes"]), re.match(int_regex, str(metrics["os.filesystem.writes"])).group()
+            )
+            self.assertEqual(
+                str(metrics["os.max_rss_kb.largest_child_process"]),
+                re.match(int_regex, str(metrics["os.max_rss_kb.largest_child_process"])).group(),
+            )
             # Verify that the User process times are greater than the kernel process times
-            self.assertGreater(metrics['os.cpu.seconds.user'], metrics['os.cpu.seconds.sys'])
+            self.assertGreater(metrics["os.cpu.seconds.user"], metrics["os.cpu.seconds.sys"])
             # Verify that the main process, takes more RAM than the child process
-            self.assertGreater(metrics['os.max_rss_kb.main_process'], metrics['os.max_rss_kb.largest_child_process'])
+            self.assertGreater(metrics["os.max_rss_kb.main_process"], metrics["os.max_rss_kb.largest_child_process"])
+
 
 # TODO test get_self_peak_vmm_kb() - right now it is not finding the file.
 

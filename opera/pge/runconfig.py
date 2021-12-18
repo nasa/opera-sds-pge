@@ -26,12 +26,11 @@ Adapted By: Scott Collins
 """
 import os
 
-import yaml
-
 import yamale
+import yaml
 from pkg_resources import resource_filename
 
-BASE_PGE_SCHEMA = resource_filename('opera', 'schema/base_pge_schema.yaml')
+BASE_PGE_SCHEMA = resource_filename("opera", "schema/base_pge_schema.yaml")
 """Path to the Yamale schema applicable to the PGE portion of each RunConfig"""
 
 
@@ -60,10 +59,10 @@ class RunConfig:
         self._filename = filename
 
         self._run_config = self._parse_run_config_file(filename)
-        self._pge_config = self._run_config['Groups']['PGE']
+        self._pge_config = self._run_config["Groups"]["PGE"]
 
         # SAS section may not always be present, during testing for example
-        self._sas_config = self._run_config['Groups'].get('SAS')
+        self._sas_config = self._run_config["Groups"].get("SAS")
 
     @staticmethod
     def _parse_run_config_file(yaml_filename):
@@ -87,15 +86,13 @@ class RunConfig:
             If the parsed config does not define a top-level "RunConfig" entry
 
         """
-        with open(yaml_filename, 'r') as stream:
+        with open(yaml_filename, "r") as stream:
             dictionary = yaml.safe_load(stream)
 
         try:
-            return dictionary['RunConfig']
+            return dictionary["RunConfig"]
         except KeyError:
-            raise RuntimeError(
-                f'Unable to parse {yaml_filename}, expected top-level RunConfig entry'
-            )
+            raise RuntimeError(f"Unable to parse {yaml_filename}, expected top-level RunConfig entry")
 
     def validate(self, pge_schema_file=BASE_PGE_SCHEMA, strict_mode=True):
         """
@@ -132,7 +129,7 @@ class RunConfig:
         if self.sas_config is not None:
             # Determine the SAS schema file to load from the provided RunConfig
             sas_schema_filename = self.sas_schema_path
-            sas_schema_filepath = resource_filename('opera', f'schema/{sas_schema_filename}')
+            sas_schema_filepath = resource_filename("opera", f"schema/{sas_schema_filename}")
 
             if os.path.isfile(sas_schema_filepath):
                 # TODO: better error handling for missing sas schema,
@@ -142,12 +139,12 @@ class RunConfig:
                 # Link the SAS schema to the PGE as an "include"
                 # Note that the key name "sas_configuration" must match the include
                 # reference in the base PGE schema.
-                pge_schema.includes['sas_configuration'] = sas_schema
+                pge_schema.includes["sas_configuration"] = sas_schema
             else:
                 raise RuntimeError(
-                    f'Can not validate RunConfig {self.name} as the associated SAS '
-                    f'schema ({sas_schema_filename}) cannot be located within the '
-                    f'schemas directory.'
+                    f"Can not validate RunConfig {self.name} as the associated SAS "
+                    f"schema ({sas_schema_filename}) cannot be located within the "
+                    "schemas directory."
                 )
 
         # Yamale expects its own formatting of the parsed config, hence the need
@@ -178,9 +175,7 @@ class RunConfig:
             return object.__getattribute__(self, item)
         except KeyError as error:
             # TODO: create exceptions package with more intuitive exception class names
-            raise RuntimeError(
-                f'Expected field "{str(error)}" is missing from RunConfig {self.filename}'
-            )
+            raise RuntimeError(f'Expected field "{str(error)}" is missing from RunConfig {self.filename}')
 
     @property
     def filename(self) -> str:
@@ -188,85 +183,85 @@ class RunConfig:
 
     @property
     def name(self) -> str:
-        return self._run_config['Name']
+        return self._run_config["Name"]
 
     # PGENameGroup
     @property
     def pge_name(self) -> str:
-        return self._pge_config['PGENameGroup']['PGEName']
+        return self._pge_config["PGENameGroup"]["PGEName"]
 
     # InputFilesGroup
     @property
     def input_files(self) -> list:
-        return self._pge_config['InputFilesGroup']['InputFilePaths']
+        return self._pge_config["InputFilesGroup"]["InputFilePaths"]
 
     # DynamicAncillaryFilesGroup
     @property
     def ancillary_file_map(self) -> dict:
-        return self._pge_config['DynamicAncillaryFilesGroup']['AncillaryFileMap']
+        return self._pge_config["DynamicAncillaryFilesGroup"]["AncillaryFileMap"]
 
     # ProductPathGroup
     @property
     def product_counter(self) -> int:
-        return self._pge_config['ProductPathGroup']['ProductCounter']
+        return self._pge_config["ProductPathGroup"]["ProductCounter"]
 
     @property
     def output_product_path(self) -> str:
-        return self._pge_config['ProductPathGroup']['OutputProductPath']
+        return self._pge_config["ProductPathGroup"]["OutputProductPath"]
 
     @property
     def scratch_path(self) -> str:
-        return self._pge_config['ProductPathGroup']['ScratchPath']
+        return self._pge_config["ProductPathGroup"]["ScratchPath"]
 
     @property
     def sas_output_file(self) -> str:
-        return self._pge_config['ProductPathGroup']['SASOutputFile']
+        return self._pge_config["ProductPathGroup"]["SASOutputFile"]
 
     # PrimaryExecutable
     @property
     def product_identifier(self) -> str:
-        return self._pge_config['PrimaryExecutable']['ProductIdentifier']
+        return self._pge_config["PrimaryExecutable"]["ProductIdentifier"]
 
     @property
     def sas_program_path(self) -> str:
-        return self._pge_config['PrimaryExecutable']['ProgramPath']
+        return self._pge_config["PrimaryExecutable"]["ProgramPath"]
 
     @property
     def sas_program_options(self) -> str:
-        return self._pge_config['PrimaryExecutable']['ProgramOptions']
+        return self._pge_config["PrimaryExecutable"]["ProgramOptions"]
 
     @property
     def error_code_base(self) -> int:
-        return self._pge_config['PrimaryExecutable']['ErrorCodeBase']
+        return self._pge_config["PrimaryExecutable"]["ErrorCodeBase"]
 
     @property
     def sas_schema_path(self) -> str:
-        return self._pge_config['PrimaryExecutable']['SchemaPath']
+        return self._pge_config["PrimaryExecutable"]["SchemaPath"]
 
     @property
     def iso_template_path(self) -> str:
-        return self._pge_config['PrimaryExecutable']['IsoTemplatePath']
+        return self._pge_config["PrimaryExecutable"]["IsoTemplatePath"]
 
     # QAExecutable
     @property
     def qa_enabled(self) -> bool:
-        return self._pge_config['QAExecutable']['Enabled']
+        return self._pge_config["QAExecutable"]["Enabled"]
 
     @property
     def qa_program_path(self) -> str:
-        return self._pge_config['QAExecutable']['ProgramPath']
+        return self._pge_config["QAExecutable"]["ProgramPath"]
 
     @property
     def qa_program_options(self) -> str:
-        return self._pge_config['QAExecutable']['ProgramOptions']
+        return self._pge_config["QAExecutable"]["ProgramOptions"]
 
     @property
     def debug_switch(self) -> bool:
-        return bool(self._pge_config['DebugLevelGroup']['DebugSwitch'])
+        return bool(self._pge_config["DebugLevelGroup"]["DebugSwitch"])
 
     @property
     def execute_via_shell(self) -> bool:
-        return bool(self._pge_config['DebugLevelGroup'].get('ExecuteViaShell', False))
+        return bool(self._pge_config["DebugLevelGroup"].get("ExecuteViaShell", False))
 
     @property
     def sas_config(self) -> dict:
@@ -285,8 +280,6 @@ class RunConfig:
             the DynamicAncillaryFilesGroup section.
 
         """
-        result = list(
-            filter(lambda filename: filename, self.ancillary_file_map.values())
-        )
+        result = list(filter(lambda filename: filename, self.ancillary_file_map.values()))
 
         return result

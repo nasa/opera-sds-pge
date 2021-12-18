@@ -67,15 +67,15 @@ def get_os_metrics():
         # these metrics include the current process and "all children
         # of the calling process that have terminated and been waited for";
         # see the Linux man page for getrusage()
-        'os.cpu.seconds.sys': rusage_self.ru_stime + rusage_children.ru_stime,
-        'os.cpu.seconds.user': rusage_self.ru_utime + rusage_children.ru_utime,
-        'os.filesystem.reads': rusage_self.ru_inblock + rusage_children.ru_inblock,
-        'os.filesystem.writes': rusage_self.ru_oublock + rusage_children.ru_oublock,
+        "os.cpu.seconds.sys": rusage_self.ru_stime + rusage_children.ru_stime,
+        "os.cpu.seconds.user": rusage_self.ru_utime + rusage_children.ru_utime,
+        "os.filesystem.reads": rusage_self.ru_inblock + rusage_children.ru_inblock,
+        "os.filesystem.writes": rusage_self.ru_oublock + rusage_children.ru_oublock,
         # unfortunately the max_rss does not account for all child processes;
         # see the Linux man page for getrusage()
-        'os.max_rss_kb.main_process': rusage_self.ru_maxrss,
-        'os.max_rss_kb.largest_child_process': rusage_children.ru_maxrss,
-        'os.peak_vm_kb.main_process': get_self_peak_vmm_kb()
+        "os.max_rss_kb.main_process": rusage_self.ru_maxrss,
+        "os.max_rss_kb.largest_child_process": rusage_children.ru_maxrss,
+        "os.peak_vm_kb.main_process": get_self_peak_vmm_kb(),
     }
 
     return metrics
@@ -97,15 +97,15 @@ def get_self_peak_vmm_kb():
     """
     vm_peak_kb = 0
 
-    status_file = os.path.join(os.sep, 'proc', 'self', 'status')
+    status_file = os.path.join(os.sep, "proc", "self", "status")
 
     if not os.path.exists(status_file) or not os.path.isfile(status_file):
-        return 'file_not_found: {}'.format(status_file)
+        return "file_not_found: {}".format(status_file)
 
-    with open(status_file, 'r') as infile:
+    with open(status_file, "r") as infile:
         for line in infile.readlines():
-            if line.startswith('VmPeak:'):
-                vm_peak_str = line.replace('VmPeak:', '').replace('kB', '')
+            if line.startswith("VmPeak:"):
+                vm_peak_str = line.replace("VmPeak:", "").replace("kB", "")
                 vm_peak_kb = int(vm_peak_str)
                 break
 
