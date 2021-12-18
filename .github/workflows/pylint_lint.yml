@@ -15,4 +15,4 @@ jobs:
           python-version: "3.8"
       - name: Pylint Lint
         uses: cclauss/GitHub-Action-for-pylint@0.7.0
-        run: pylint **/*.py --rcfile=.pylintrc
+        args: pylint **/*.py --rcfile=.pylintrc
