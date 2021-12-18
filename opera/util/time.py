@@ -39,7 +39,7 @@ def get_current_iso_time():
         Current time in ISO format: YYYY-MM-DDTHH:MM:SS.mmmmmmZ
 
     """
-    time_in_iso = datetime.now().isoformat(sep='T', timespec='microseconds') + "Z"
+    time_in_iso = datetime.now().isoformat(sep="T", timespec="microseconds") + "Z"
 
     return time_in_iso
 
@@ -59,7 +59,7 @@ def get_iso_time(dt):
         Provided time in ISO format: YYYY-MM-DDTHH:MM:SS.mmmmmmZ
 
     """
-    time_in_iso = dt.isoformat(sep='T', timespec='microseconds') + "Z"
+    time_in_iso = dt.isoformat(sep="T", timespec="microseconds") + "Z"
 
     return time_in_iso
 
@@ -80,7 +80,7 @@ def get_time_for_filename(dt):
         The provided time converted to YYYYMMDDTHHmmss format.
 
     """
-    datetime_str = dt.strftime('%Y%m%dT%H%M%S')
+    datetime_str = dt.strftime("%Y%m%dT%H%M%S")
 
     return datetime_str
 
@@ -104,6 +104,7 @@ def get_catalog_metadata_datetime_str(dt):
     """
     # TODO: Rework to support 0.1 nanosecond resolution
     # That probably means ditching Python's datetime class.
-    datetime_str = dt.isoformat(sep='T', timespec='microseconds') + "0000" + "Z"
+    # Consider reading through this: https://www.python.org/dev/peps/pep-0564/
+    datetime_str = dt.isoformat(sep="T", timespec="microseconds") + "0000" + "Z"
 
     return datetime_str
