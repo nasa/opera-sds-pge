@@ -16,4 +16,4 @@ jobs:
       - name: Pylint Lint
         uses: cclauss/GitHub-Action-for-pylint@0.7.0
         with:
-          args: pylint **/*.py --rcfile=.pylintrc
+          args: pylint opera/**/*.py --rcfile=.pylintrc
