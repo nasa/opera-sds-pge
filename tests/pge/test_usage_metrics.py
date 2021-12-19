@@ -26,10 +26,11 @@ import re
 import tempfile
 import unittest
 from os.path import abspath, join
+from sys import platform
 
 from pkg_resources import resource_filename
 
-from opera.util.usage_metrics import get_os_metrics
+from opera.util.usage_metrics import get_os_metrics, get_self_peak_vmm_kb
 
 
 class UsageMetricsTestCase(unittest.TestCase):
@@ -123,8 +124,12 @@ class UsageMetricsTestCase(unittest.TestCase):
             # Verify that the main process, takes more RAM than the child process
             self.assertGreater(metrics["os.max_rss_kb.main_process"], metrics["os.max_rss_kb.largest_child_process"])
 
-
-# TODO test get_self_peak_vmm_kb() - right now it is not finding the file.
+    def test_get_self_peak_vmm_kb(self):
+        if platform != "linux":
+            self.assertRaises(EnvironmentError, get_self_peak_vmm_kb)
+        else:
+            peak_vmm_kb = get_self_peak_vmm_kb()
+            self.assertIsInstance(peak_vmm_kb, int)
 
 
 if __name__ == "__main__":

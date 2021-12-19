@@ -20,9 +20,9 @@
 import os
 import sys
 
-import opera
+sys.path.insert(0, os.path.abspath(".."))  # noqa isort:skip
 
-sys.path.insert(0, os.path.abspath(".."))
+import opera  # noqa isort:skip
 
 
 # -- General configuration ---------------------------------------------
