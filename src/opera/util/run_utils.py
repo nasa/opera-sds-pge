@@ -72,10 +72,12 @@ def create_sas_command_line(sas_program_path, sas_runconfig_path,
     else:
         executable_path = abspath(sas_program_path)
 
-        # Check if the executable exists, but does not have 'execute' permissions on it
-        if os.access(executable_path, mode=os.F_OK) and not os.access(executable_path, mode=os.X_OK):
-            raise OSError(f"Requested SAS program path {sas_program_path} exists, "
-                          f"but does not have execute permissions.")
+        # Check if the executable exists
+        if os.access(executable_path, mode=os.F_OK):
+            # Check if the executable has 'execute' permissions on it
+            if not os.access(executable_path, mode=os.X_OK):
+                raise OSError(f"Requested SAS program path {sas_program_path} exists, "
+                              f"but does not have execute permissions.")
         # Otherwise, sas_program_path might be a python module path
         else:
             command_line = ['python3', '-m', sas_program_path]

@@ -203,7 +203,7 @@ class LoggerTestCase(unittest.TestCase):
 
         # Test append text from another file
         test_append_file = tempfile.NamedTemporaryFile(prefix="new_file_", suffix='_txt', dir=os.curdir)
-        with open(test_append_file.name, 'w') as temp_file:
+        with open(test_append_file.name, 'w', encoding='utf-8') as temp_file:
             temp_file.write(f'Text from "{test_append_file.name}" to test append_text_from another file().')
         self.logger.append(test_append_file.name)
 
@@ -217,8 +217,8 @@ class LoggerTestCase(unittest.TestCase):
         # Verify that when a critical event is logged via the critical() method, that a RunTimeError is raised
         self.assertRaises(RuntimeError, self.logger.critical, 'opera_pge', 8, "Test critical() method.")
 
-        with open('test_move.log', 'r') as fn:
-            log = fn.read()
+        with open('test_move.log', 'r', encoding='utf-8') as file_handle:
+            log = file_handle.read()
 
         # Verify that the entries have been made in the log
 
@@ -260,8 +260,8 @@ class LoggerTestCase(unittest.TestCase):
 
         self.arg_test_logger.close_log_stream()
 
-        with open('test_args.log', 'r') as fn:
-            args_log = fn.read()
+        with open('test_args.log', 'r', encoding='utf-8') as file_handle:
+            args_log = file_handle.read()
 
         # Verify warnings
         self.assertIn("Could not increment severity level: 'Broken' ", args_log)
@@ -269,8 +269,8 @@ class LoggerTestCase(unittest.TestCase):
         # Verify the log file was created
         self.assertTrue(exists('test_args.log'))
         # Verify workflow and error_code_base arguments
-        with open('test_args.log', 'r') as f:
-            for line in f:
+        with open('test_args.log', 'r', encoding='utf-8') as file_handle:
+            for line in file_handle:
                 self.assertIn("test_pge_args", line)
                 self.assertIn("1717", line)
 

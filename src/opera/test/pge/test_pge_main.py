@@ -149,7 +149,7 @@ class PgeMainTestCase(unittest.TestCase):
         self.assertTrue(os.path.exists(expected_log_file))
 
         # Open the log file, and check that "SAS" output was captured
-        with open(expected_log_file, 'r') as infile:
+        with open(expected_log_file, 'r', encoding='utf-8') as infile:
             log_contents = infile.read()
 
         self.assertIn('hello world', log_contents)

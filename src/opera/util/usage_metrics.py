@@ -100,7 +100,7 @@ def get_self_peak_vmm_kb():
     status_file = os.path.join(os.sep, 'proc', 'self', 'status')
 
     if not os.path.exists(status_file) or not os.path.isfile(status_file):
-        return 'file_not_found: {}'.format(status_file)
+        return f'file_not_found: {status_file}'
 
     with open(status_file, 'r') as infile:
         for line in infile.readlines():

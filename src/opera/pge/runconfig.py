@@ -89,15 +89,15 @@ class RunConfig:
             If the parsed config does not define a top-level "RunConfig" entry
 
         """
-        with open(yaml_filename, 'r') as stream:
+        with open(yaml_filename, 'r', encoding='utf-8') as stream:
             dictionary = yaml.safe_load(stream)
 
         try:
             return dictionary['RunConfig']
-        except KeyError:
+        except KeyError as key_error:
             raise RuntimeError(
                 f'Unable to parse {yaml_filename}, expected top-level RunConfig entry'
-            )
+            ) from key_error
 
     def validate(self, pge_schema_file=BASE_PGE_SCHEMA, strict_mode=True):
         """
@@ -182,7 +182,7 @@ class RunConfig:
             # TODO: create exceptions package with more intuitive exception class names
             raise RuntimeError(
                 f'Expected field "{str(error)}" is missing from RunConfig {self.filename}'
-            )
+            ) from error
 
     @property
     def filename(self) -> str:

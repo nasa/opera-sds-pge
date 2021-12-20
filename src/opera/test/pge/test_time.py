@@ -30,7 +30,7 @@ from os.path import abspath, join
 
 from pkg_resources import resource_filename
 
-from opera.util.time import get_catalog_metadata_datetime_str
+from opera.util.time import get_cat_metadata_datetime_str
 from opera.util.time import get_current_iso_time
 from opera.util.time import get_iso_time
 from opera.util.time import get_time_for_filename
@@ -164,7 +164,7 @@ class TimeTestCase(unittest.TestCase):
         self.assertIsNone(re.match(filename_regex, t5))
         self.assertIsNone(re.match(filename_regex, t6))
 
-    def test_get_catalog_metadata_datetime_str(self):
+    def test_get_cat_metadata_datetime_str(self):
         """
         Converts the provided datetime object to a time-tag string suitable for use
         in catalog metadata.
@@ -174,7 +174,7 @@ class TimeTestCase(unittest.TestCase):
         # Test multiple times
         for i in range(self.reps):
             dt = datetime.now()
-            nano_str = get_catalog_metadata_datetime_str(dt).split('.')[-1]
+            nano_str = get_cat_metadata_datetime_str(dt).split('.')[-1]
             self.assertEqual(nano_str, re.match(nano_regex, nano_str).group())
 
         # Test some bad strings

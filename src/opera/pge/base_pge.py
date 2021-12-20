@@ -290,7 +290,6 @@ class PgeExecutor(PreProcessorMixin, PostProcessorMixin):
                            to use, rather than creating its own.
 
         """
-        
         self.name = self.NAME
         self.pge_name = pge_name
         self.runconfig_path = runconfig_path
@@ -313,7 +312,7 @@ class PgeExecutor(PreProcessorMixin, PostProcessorMixin):
         sas_runconfig_filepath = join(self.runconfig.scratch_path, sas_runconfig_filename)
 
         try:
-            with open(sas_runconfig_filepath, 'w') as outfile:
+            with open(sas_runconfig_filepath, 'w', encoding='utf-8') as outfile:
                 yaml.safe_dump(sas_config, outfile, sort_keys=False)
         except OSError as err:
             self.logger.critical(self.name, ErrorCode.SAS_CONFIG_CREATION_FAILED,

@@ -111,7 +111,7 @@ class RunUtilsTestCase(unittest.TestCase):
 
         if not exists(sas_runconfig_filepath):
             try:
-                with open(sas_runconfig_filepath, 'w') as outfile:
+                with open(sas_runconfig_filepath, 'w', encoding='utf-8') as outfile:
                     yaml.safe_dump(sas_config, outfile, sort_keys=False)
             except OSError as err:
                 self.logger.critical("test_run_utils", ErrorCode.SAS_CONFIG_CREATION_FAILED,
@@ -173,7 +173,7 @@ class RunUtilsTestCase(unittest.TestCase):
         log_file = self.logger.get_file_name()
         self.assertTrue(os.path.exists(log_file))
         # Open the log file, and check for specific messages
-        with open(log_file, 'r') as infile:
+        with open(log_file, 'r', encoding='utf-8') as infile:
             log = infile.read()
 
         self.assertIn('Testing create_sas_command_line().', log)
