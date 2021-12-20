@@ -23,6 +23,7 @@ Unit tests for the pge/base_pge.py module.
 import os
 import tempfile
 import unittest
+from io import StringIO
 from os.path import abspath, join
 
 from pkg_resources import resource_filename
@@ -32,9 +33,11 @@ from opera.util import PgeLogger
 
 
 class BasePgeTestCase(unittest.TestCase):
+    """Base test class using unittest"""
 
     @classmethod
     def setUpClass(cls) -> None:
+        """Set up class method: set up directories for testing"""
         cls.starting_dir = abspath(os.curdir)
         cls.test_dir = resource_filename(__name__, "")
         cls.data_dir = join(cls.test_dir, "data")
@@ -47,13 +50,16 @@ class BasePgeTestCase(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls) -> None:
+        """At completion re-establish starting directory"""
         cls.working_dir.cleanup()
         os.chdir(cls.starting_dir)
 
     def setUp(self) -> None:
+        """Use the temporary directory as the working directory"""
         os.chdir(self.working_dir.name)
 
     def tearDown(self) -> None:
+        """Return to starting directory"""
         os.chdir(self.test_dir)
 
     def test_base_pge_execution(self):
@@ -87,13 +93,17 @@ class BasePgeTestCase(unittest.TestCase):
         self.assertTrue(os.path.isdir(pge.runconfig.output_product_path))
         self.assertTrue(os.path.isdir(pge.runconfig.scratch_path))
 
-        # Check that the log file was created and moved into the output directory
-        expected_log_file = join(pge.runconfig.output_product_path, pge.logger.get_file_name())
-        self.assertTrue(os.path.exists(expected_log_file))
+        # Check that a in-memory log was created
+        stream_obj = pge.logger.get_stream_object()
+        self.assertTrue(isinstance(stream_obj, StringIO))
 
         # Check that a RunConfig for the SAS was isolated within the scratch directory
         expected_sas_config_file = join(pge.runconfig.scratch_path, 'test_base_pge_config_sas.yaml')
         self.assertTrue(os.path.exists(expected_sas_config_file))
+
+        # Check that the log file was created and moved into the output directory
+        expected_log_file = join(pge.runconfig.output_product_path, pge.logger.get_file_name())
+        self.assertTrue(os.path.exists(expected_log_file))
 
         # Open the log file, and check that "SAS" output was captured
         with open(expected_log_file, 'r') as infile:
@@ -127,7 +137,8 @@ class BasePgeTestCase(unittest.TestCase):
         self.assertIn("RunConfig.Groups.PGE.InputFilesGroup.InputFilePaths: 'None' is not a list.", log_contents)
         self.assertIn("RunConfig.Groups.PGE.ProductPathGroup.ProductCounter: -1 is less than 1", log_contents)
         self.assertIn("RunConfig.Groups.PGE.PrimaryExecutable.ProgramPath: Required field missing", log_contents)
-        self.assertIn("RunConfig.Groups.PGE.PrimaryExecutable.ProgramOptions: '--debug --restart' is not a list.", log_contents)
+        self.assertIn("RunConfig.Groups.PGE.PrimaryExecutable.ProgramOptions: '--debug --restart' is not a list.",
+                      log_contents)
         self.assertIn("RunConfig.Groups.PGE.QAExecutable.ProgramOptions: '--debug' is not a list.", log_contents)
 
     def test_base_pge_w_failing_sas(self):
@@ -159,4 +170,3 @@ class BasePgeTestCase(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

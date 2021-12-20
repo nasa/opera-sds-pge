@@ -24,12 +24,13 @@ Module defining the implementation for the Dynamic Surface Water Extent (DSWx) P
 
 import glob
 import os.path
-from os.path import abspath, exists, join, isdir
+from os.path import abspath, exists, isdir, join
 
-from .base_pge import PreProcessorMixin
-from .base_pge import PostProcessorMixin
-from .base_pge import PgeExecutor
 from opera.util.error_codes import ErrorCode
+
+from .base_pge import PgeExecutor
+from .base_pge import PostProcessorMixin
+from .base_pge import PreProcessorMixin
 
 
 class DSWxPreProcessorMixin(PreProcessorMixin):
@@ -43,6 +44,7 @@ class DSWxPreProcessorMixin(PreProcessorMixin):
     the RunConfig exist and are valid.
 
     """
+
     _pre_mixin_name = "DSWxPreProcessorMixin"
 
     def _validate_inputs(self):
@@ -102,6 +104,7 @@ class DSWxPostProcessorMixin(PostProcessorMixin):
     the RunConfig exist and are valid.
 
     """
+
     _post_mixin_name = "DSWxPostProcessorMixin"
 
     def _validate_output(self):
@@ -156,4 +159,5 @@ class DSWxExecutor(DSWxPreProcessorMixin, DSWxPostProcessorMixin, PgeExecutor):
     while inheriting all other functionality from the base PgeExecutor class.
 
     """
+
     NAME = "DSWx"

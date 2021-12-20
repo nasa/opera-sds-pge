@@ -27,6 +27,8 @@ import os
 import shutil
 import subprocess
 import time
+from io import StringIO
+import sys
 
 from os.path import abspath
 
@@ -84,8 +86,8 @@ def create_sas_command_line(sas_program_path, sas_runconfig_path,
             command_line = ['python3', '-m', sas_program_path]
 
     # Add any provided arguments
-    for sas_program_option in sas_program_options:
-        command_line.extend(sas_program_option.split())
+    if sas_program_options:
+        command_line.extend(sas_program_options)
 
     # Lastly, only explicit input should ever be the path to the runconfig
     command_line.append(sas_runconfig_path)
@@ -127,8 +129,11 @@ def time_and_execute(command_line, logger, execute_via_shell=False):
 
     # TODO: support for timeout argument?
     run_result = subprocess.run(command_line, env=os.environ.copy(), check=False,
-                                stdout=logger.get_file_object(),
-                                stderr=subprocess.STDOUT, shell=execute_via_shell)
+                                stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                                shell=execute_via_shell)
+
+    # Append the stdout/stderr captured by the subprocess to our log
+    logger.append(run_result.stdout.decode())
 
     if run_result.returncode:
         error_msg = (f'Command "{" ".join(command_line)}" failed with exit '

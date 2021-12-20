@@ -1,0 +1,18 @@
+[flake8]
+format = pylint
+output-file = flake8.log
+max-line-length = 120
+ignore =
+    # 1 blank line required between summary line and description
+    D205
+    # First line should end with a period
+    D400
+    # First line should be in imperative mood
+    D401
+    # First word of the docstring should not be 'This'
+    D404
+    # E722: do not use bare 'except'
+    E722
+statistics = 1
+docstring-convention = numpy
+application-import-names = opera

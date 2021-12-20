@@ -53,6 +53,11 @@ class PreProcessorMixin:
     """
     _pre_mixin_name = "PreProcessorMixin"
 
+    def __init__(self):
+        self.logger = None
+        self.name = None
+        self.runconfig_path = None
+
     def _initialize_logger(self):
         """
         Creates the logger object used by the PGE.
@@ -144,6 +149,7 @@ class PreProcessorMixin:
         # TODO: perform the log rename step here (if possible) once file-name convention is defined
         output_product_path = abspath(self.runconfig.output_product_path)
         log_file_destination = join(output_product_path, self.logger.get_file_name())
+
         self.logger.info(self.name, ErrorCode.MOVING_LOG_FILE,
                          f'Moving log file to {log_file_destination}')
         self.logger.move(log_file_destination)
@@ -191,6 +197,10 @@ class PostProcessorMixin:
     """
     _post_mixin_name = "PostProcessorMixin"
 
+    def __init__(self):
+        self.name = None
+        self.logger = None
+
     def _run_sas_qa_executable(self):
         # TODO
         pass
@@ -215,7 +225,9 @@ class PostProcessorMixin:
         writing after this function is called.
 
         """
-        self.logger.close_log_file()
+        self.logger.info(self.name, ErrorCode.CLOSING_LOG_FILE,
+                         f"Closing log file {self.logger.get_file_name()}")
+        self.logger.close_log_stream()
 
     def run_postprocessor(self, **kwargs):
         """
@@ -276,6 +288,8 @@ class PgeExecutor(PreProcessorMixin, PostProcessorMixin):
 
         """
 
+ #       TODO pycharm suggested this, not sure if necessary with mixins, but worth checking in on.
+ #       super().__init__()
         self.name = self.NAME
         self.pge_name = pge_name
         self.runconfig_path = runconfig_path
@@ -336,11 +350,6 @@ class PgeExecutor(PreProcessorMixin, PostProcessorMixin):
 
         self.logger.info(self.name, ErrorCode.SAS_PROGRAM_STARTING,
                          'Starting SAS executable')
-
-        # Before starting the SAS program, flush the log file to keep the
-        # contents properly time ordered, since the SAS program will also write
-        # to the same log file.
-        self.logger.flush()
 
         elapsed_time = time_and_execute(
             command_line, self.logger, self.runconfig.execute_via_shell

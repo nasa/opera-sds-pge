@@ -33,9 +33,16 @@ from opera.pge import RunConfig
 
 
 class RunconfigTestCase(unittest.TestCase):
+    """Base test class using unittest"""
+
+    test_dir = None
 
     @classmethod
     def setUpClass(cls) -> None:
+        """
+        Initialize class variables for required paths
+        -------
+        """
         cls.test_dir = resource_filename(__name__, "")
         cls.data_dir = join(cls.test_dir, "data")
         cls.valid_config_full = join(cls.data_dir, "valid_runconfig_full.yaml")
@@ -116,6 +123,7 @@ class RunconfigTestCase(unittest.TestCase):
     def test_strict_mode_validation(self):
         """
         Test validation of a RunConfig with strict_mode both enabled and disabled
+        -------
         """
         # Parse a valid runconfig, but modify it with fields not in the base
         # PGE schema
@@ -137,6 +145,7 @@ class RunconfigTestCase(unittest.TestCase):
         """
         Test validation of an invalid RunConfig to ensure common errors are
         captured.
+
         """
         # Test with an invalid file that does not conform to minimum standard
         # of a RunConfig (all entries keyed under top-level RunConfig tag)
@@ -159,7 +168,8 @@ class RunconfigTestCase(unittest.TestCase):
             self.assertIn("RunConfig.Groups.PGE.InputFilesGroup.InputFilePaths: 'None' is not a list.", str(err))
             self.assertIn("RunConfig.Groups.PGE.ProductPathGroup.ProductCounter: -1 is less than 1", str(err))
             self.assertIn("RunConfig.Groups.PGE.PrimaryExecutable.ProgramPath: Required field missing", str(err))
-            self.assertIn("RunConfig.Groups.PGE.PrimaryExecutable.ProgramOptions: '--debug --restart' is not a list.", str(err))
+            self.assertIn("RunConfig.Groups.PGE.PrimaryExecutable.ProgramOptions: '--debug --restart' is not a list.",
+                          str(err))
             self.assertIn("RunConfig.Groups.PGE.QAExecutable.ProgramOptions: '--debug' is not a list.", str(err))
 
 

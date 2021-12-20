@@ -15,6 +15,8 @@
 # Script to build the OPERA DSWx-HLS PGE Docker image
 #
 
+set -e
+
 echo '
 =====================================
 
@@ -22,8 +24,6 @@ Building DSWx-HLS PGE docker image...
 
 =====================================
 '
-
-set -e
 
 IMAGE='opera_pge/dswx_hls'
 TAG=$1
@@ -65,6 +65,15 @@ cp -r ${WORKSPACE}/src/opera \
 cp ${WORKSPACE}/COPYING \
    ${STAGING_DIR}/opera
 
+cp ${WORKSPACE}/requirements.txt \
+   ${STAGING_DIR}/opera
+
+cp ${WORKSPACE}/.flake8 \
+   ${STAGING_DIR}/opera
+
+cp ${WORKSPACE}/.pylintrc \
+   ${STAGING_DIR}/opera
+
 # Create a VERSION file in the staging area to track version and build time
 printf "pge_version: ${TAG}\npge_build_datetime: ${BUILD_DATE_TIME}\n" \
     > ${STAGING_DIR}/opera/VERSION \
@@ -82,4 +91,6 @@ docker build --rm --force-rm -t ${IMAGE}:${TAG} \
     --build-arg PGE_SOURCE_DIR=$(basename ${STAGING_DIR}) \
     --file ${WORKSPACE}/.ci/docker/Dockerfile_dswx_hls ${WORKSPACE}
 
-exit $?
+echo "DSWx-HLS PGE Docker image build complete"
+
+exit 0
