@@ -118,6 +118,10 @@ def get_self_peak_vmm_kb():
 
     except EnvironmentError:  # parent of IOError, OSError and WindowsError where available
         # Should we log this?
+        # This pass ensures that zero is returned if the actual VmPeak value cannot be obtained.
+        # Try/except:pass is generally bad practice (although we have narrowed our except to catch only EnvironmentError)
+        # So maybe we should rethink returning zero upon exceptions.
+        # Perhaps allowing the exception to be raised is best.
         pass
 
     return vm_peak_kb
