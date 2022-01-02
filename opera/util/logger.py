@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 #
 # Copyright 2021, by the California Institute of Technology.
 # ALL RIGHTS RESERVED.
@@ -66,7 +67,6 @@ def write(log_stream, severity, workflow, module, error_code, error_location, de
     message_str = f'{time_tag}, {severity}, {workflow}, {module},{str(error_code)}, {error_location}, "{description}"\n'
 
     log_stream.write(message_str)
-
 
 def default_log_file_name():
     """
