@@ -23,16 +23,13 @@ Unit tests for the util/run_utils.py module.
 
 """
 import os
+import shutil
 import tempfile
 import unittest
-from os.path import abspath, basename, exists, join, splitext
+from os.path import abspath, join
 
 from pkg_resources import resource_filename
 
-import yaml
-
-from opera.pge.runconfig import RunConfig
-from opera.util.error_codes import ErrorCode
 from opera.util.logger import PgeLogger
 from opera.util.run_utils import create_sas_command_line
 from opera.util.run_utils import time_and_execute
@@ -43,7 +40,6 @@ class RunUtilsTestCase(unittest.TestCase):
 
     starting_dir = None
     working_dir = None
-    config_file = None
     data_dir = None
     test_dir = None
 
@@ -62,11 +58,8 @@ class RunUtilsTestCase(unittest.TestCase):
 
         cls.working_dir = tempfile.TemporaryDirectory(
             prefix="test_run_utils_", suffix='temp', dir=os.curdir)
-        cls.config_file = join(cls.data_dir, "test_run_utils_config.yaml")
-        cls.first_time = 0.0
-        cls.second_time = 0.0
+
         cls.logger = PgeLogger()
-        cls.run_config = RunConfig(cls.config_file)
 
     @classmethod
     def tearDownClass(cls) -> None:
@@ -78,10 +71,7 @@ class RunUtilsTestCase(unittest.TestCase):
         os.chdir(cls.starting_dir)
 
     def setUp(self) -> None:
-        """
-        Use the temporary directory as the working directory
-        -------
-        """
+        """Use the temporary directory as the working directory"""
         os.chdir(self.working_dir.name)
 
     def tearDown(self) -> None:
@@ -91,95 +81,85 @@ class RunUtilsTestCase(unittest.TestCase):
         """
         os.chdir(self.test_dir)
 
-    def _isolate_sas_runconfig(self):
-        """
-        Isolates the SAS-specific portion of the RunConfig into its own
-        YAML file, so it may be fed into the SAS executable without unneeded
-        PGE configuration settings.  (Note) This is copied from base_pge.py
-        and modified slightly.
-
-        """
-        sas_config = self.run_config.sas_config
-
-        pge_runconfig_filename = basename(self.run_config.filename)
-        pge_runconfig_fileparts = splitext(pge_runconfig_filename)
-
-        sas_runconfig_filename = f'{pge_runconfig_fileparts[0]}_sas{pge_runconfig_fileparts[1]}'
-        # Working in a temporary directory; adjust path to access files
-        dir_tweak = '/base_pge_test/scratch/'
-        sas_runconfig_filepath = join(os.path.dirname(os.getcwd()) + dir_tweak, sas_runconfig_filename)
-
-        if not exists(sas_runconfig_filepath):
-            try:
-                with open(sas_runconfig_filepath, 'w', encoding='utf-8') as outfile:
-                    yaml.safe_dump(sas_config, outfile, sort_keys=False)
-            except OSError as err:
-                self.logger.critical("test_run_utils", ErrorCode.SAS_CONFIG_CREATION_FAILED,
-                                     f'Failed to create SAS config file {sas_runconfig_filepath}, '
-                                     f'reason: {str(err)}')
-
-        self.logger.info("test_run_utils", ErrorCode.CREATED_SAS_CONFIG,
-                         f'SAS RunConfig created at {sas_runconfig_filepath}')
-
-        return sas_runconfig_filepath
-
     def test_create_sas_command_line(self):
-        """
-        This test creates a simple linux command:
-            /bin/echo Hello from test_create_command_line function.
+        """Tests for run_utils.create_sas_command_line()"""
 
-        It uses create_sas_command_line() to make the function then
-        it then uses time_and_execute() to execute the command.
-        It records the elapsed time and writes it to the log file
+        # Make a command from something locally available on PATH (findable
+        # by a which call)
+        cmd = 'echo'
+        runconfig_path = '/path/to/runconfig'
+        options = ['Hello from test_create_command_line function.', '--']
 
-        """
-        # Make a command from something locally available
-        self.logger.info('test', 1, 'Testing create_sas_command_line().')
-        cmd = '/bin/echo'
-        command = create_sas_command_line(cmd, self.config_file,
-                                          sas_program_options=['Hello from test_create_command_line function.'])
-        self.first_time = time_and_execute(command, self.logger, execute_via_shell=False)
-        self.logger.info('test', 1, f'First elapsed time: {self.first_time}.')
+        command_line = create_sas_command_line(cmd, runconfig_path, options)
+
+        self.assertIsInstance(command_line, list)
+        self.assertEqual(len(command_line), 4)
+
+        # Check that the executable was resolved to actual location on disk
+        self.assertEqual(command_line[0], shutil.which(cmd))
+
+        # Check that the runconfig path was appended as the final input argument
+        self.assertEqual(command_line[-1], runconfig_path)
+
+        # Check that each option made it into the command line
+        for option in options:
+            self.assertIn(option, command_line)
+
+        # Make a command using python module name (not findable with which)
+        cmd = 'unittest'
+        options = ['--verbose', '--']
+
+        command_line = create_sas_command_line(cmd, runconfig_path, options)
+
+        self.assertIsInstance(command_line, list)
+        self.assertEqual(len(command_line), 6)
+
+        # Check that python3 was assigned as the executable
+        self.assertEqual(command_line[0], 'python3')
+        self.assertEqual(command_line[1], '-m')
+        self.assertEqual(command_line[2], cmd)
+
+        # Check that the runconfig path was appended as the final input argument
+        self.assertEqual(command_line[-1], runconfig_path)
+
+        # Check that each option made it into the command line
+        for option in options:
+            self.assertIn(option, command_line)
 
     def test_time_and_execute(self):
-        """
-        This is first tested in test_create_sas_command_line().
-        This test generates a command that is derived from a .yaml
-        configuration file.  The command is created by
-        create_sas_command_line(), then executed. It calls
-        check_results() to examine the log file.
+        """Tests for run_utils.time_and_execute()"""
+        program_path = 'echo'
+        program_options = ['Hello from test_time_and_execute function.', '--']
+        runconfig_filepath = '/path/to/runconfig'
 
-        """
-        self.logger.info('test', 1, 'Testing test_time_and_execute().')
-        sas_program_path = self.run_config.sas_program_path
-        sas_program_options = self.run_config.sas_program_options
-        sas_runconfig_filepath = self._isolate_sas_runconfig()
+        command_line = create_sas_command_line(program_path, runconfig_filepath, program_options)
 
-        command_line = create_sas_command_line(sas_program_path, sas_runconfig_filepath, sas_program_options)
+        # Execute a valid command
+        elapsed_time = time_and_execute(command_line, self.logger, execute_via_shell=False)
+        self.logger.info('test', 1, f'Elapsed time: {elapsed_time}.')
 
-        # Execute the command
-        self.second_time = time_and_execute(command_line, self.logger, execute_via_shell=False)
-        self.logger.info('test', 1, f'Second elapsed time: {self.second_time}.')
+        # Execute an invalid command (non-zero return)
+        program_path = 'bash'
+        program_options = ['-c', 'exit 1']
 
-        self.check_results()
+        command_line = create_sas_command_line(program_path, runconfig_filepath, program_options)
 
-    def check_results(self):
-        """
-        Save the log stream to a file, then examine the file for
-        expected values.
+        with self.assertRaises(RuntimeError):
+            time_and_execute(command_line, self.logger, execute_via_shell=False)
 
-        """
         self.logger.close_log_stream()
+
         log_file = self.logger.get_file_name()
+
         self.assertTrue(os.path.exists(log_file))
+
         # Open the log file, and check for specific messages
         with open(log_file, 'r', encoding='utf-8') as infile:
             log = infile.read()
 
-        self.assertIn('Testing create_sas_command_line().', log)
-        self.assertIn('Hello from test_create_command_line function.', log)
-        self.assertIn(f'First elapsed time: {self.first_time}', log)
+        # Check for the successful run
+        self.assertIn('Hello from test_time_and_execute function.', log)
+        self.assertIn(f'Elapsed time: {elapsed_time}', log)
 
-        self.assertIn('Testing test_time_and_execute().', log)
-        self.assertIn('Hello from run_utils unit test, testing time_and_execute().', log)
-        self.assertIn(f'Second elapsed time: {self.second_time}', log)
+        # Check for the erroneous run
+        self.assertIn('Command "/bin/bash -c exit 1 /path/to/runconfig" failed with exit code 1', log)
