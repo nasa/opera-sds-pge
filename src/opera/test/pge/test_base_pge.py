@@ -106,7 +106,7 @@ class BasePgeTestCase(unittest.TestCase):
         self.assertTrue(os.path.exists(expected_log_file))
 
         # Open the log file, and check that "SAS" output was captured
-        with open(expected_log_file, 'r') as infile:
+        with open(expected_log_file, 'r', encoding='utf-8') as infile:
             log_contents = infile.read()
 
         self.assertIn('hello world', log_contents)
@@ -131,7 +131,7 @@ class BasePgeTestCase(unittest.TestCase):
         self.assertTrue(os.path.exists(expected_log_file))
 
         # Open the log file, and check that the validation error details were captured
-        with open(expected_log_file, 'r') as infile:
+        with open(expected_log_file, 'r', encoding='utf-8') as infile:
             log_contents = infile.read()
 
         self.assertIn("RunConfig.Groups.PGE.InputFilesGroup.InputFilePaths: 'None' is not a list.", log_contents)
@@ -160,7 +160,7 @@ class BasePgeTestCase(unittest.TestCase):
         self.assertTrue(os.path.exists(expected_log_file))
 
         # Open the log file, and check that the execution error details were captured
-        with open(expected_log_file, 'r') as infile:
+        with open(expected_log_file, 'r', encoding='utf-8') as infile:
             log_contents = infile.read()
 
         expected_error_code = 123

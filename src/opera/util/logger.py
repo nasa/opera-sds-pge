@@ -30,11 +30,10 @@ import inspect
 import shutil
 import time
 from io import StringIO
-
 from os.path import basename, isfile
 
-from opera.util import error_codes
 import opera.util.time as time_util
+from opera.util import error_codes
 
 from .error_codes import ErrorCode
 from .usage_metrics import get_os_metrics
@@ -63,7 +62,6 @@ def write(log_stream, severity, workflow, module, error_code, error_location,
         Description of the logged event.
 
     """
-
     time_tag = time_util.get_current_iso_time()
 
     message_str = f'{time_tag}, {severity}, {workflow}, {module},' \
@@ -151,6 +149,7 @@ class PgeLogger:
     * The class's write() function has fewer arguments that need to be provided.
 
     """
+
     LOGGER_CODE_BASE = 900000
 
     def __init__(self, workflow=None, error_code_base=None,
@@ -190,6 +189,7 @@ class PgeLogger:
 
     @property
     def workflow(self):
+        """Return specific workflow"""
         return self._workflow
 
     @workflow.setter
@@ -198,6 +198,7 @@ class PgeLogger:
 
     @property
     def error_code_base(self):
+        """Return the error code base from error_codes.py"""
         return self._error_code_base
 
     @error_code_base.setter
@@ -216,7 +217,7 @@ class PgeLogger:
 
             self.log_stream.seek(0)
 
-            with open(self.log_filename, 'w') as outfile:
+            with open(self.log_filename, 'w', encoding='utf-8') as outfile:
                 shutil.copyfileobj(self.log_stream, outfile)
 
             self.log_stream.close()
@@ -394,6 +395,12 @@ class PgeLogger:
         description : str
             Description message to write to the log.
 
+        Raises
+        ------
+        RuntimeError
+            Raised when this method is called. The contents of the description
+            parameter is provided as the exception string.
+
         """
         self.write("Critical", module, error_code_offset, description,
                    additional_back_frames=1)
@@ -469,9 +476,8 @@ class PgeLogger:
             text is appended as is.
 
         """
-
         if isfile(source):
-            with open(source, 'r') as source_file_object:
+            with open(source, 'r', encoding='utf-8') as source_file_object:
                 source_contents = source_file_object.read()
         else:
             source_contents = source
@@ -550,6 +556,6 @@ class PgeLogger:
                     count_by_severity[severity] += 1
                 except KeyError:
                     self.warning("PgeLogger", ErrorCode.LOGGING_RESYNC_FAILED,
-                                 f"Unable to resync the 'log_count_by_severity' dict.")
+                                 "Unable to resync the 'log_count_by_severity' dict.")
 
         self.log_count_by_severity = count_by_severity

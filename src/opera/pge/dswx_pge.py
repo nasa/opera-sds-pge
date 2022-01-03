@@ -68,11 +68,10 @@ class DSWxPreProcessorMixin(PreProcessorMixin):
                     error_msg = f"Input directory {input_file_path} does not contain any tif files"
 
                     self.logger.critical(self.name, ErrorCode.INPUT_NOT_FOUND, error_msg)
-            else:
-                if not input_file_path.endswith(".tif"):
-                    error_msg = f"Input file {input_file_path} does not have .tif extension"
+            elif not input_file_path.endswith(".tif"):
+                error_msg = f"Input file {input_file_path} does not have .tif extension"
 
-                    self.logger.critical(self.name, ErrorCode.INVALID_INPUT, error_msg)
+                self.logger.critical(self.name, ErrorCode.INVALID_INPUT, error_msg)
 
     def run_preprocessor(self, **kwargs):
         """
@@ -84,11 +83,11 @@ class DSWxPreProcessorMixin(PreProcessorMixin):
 
         Parameters
         ----------
-        kwargs : dict
+        **kwargs : dict
             Any keyword arguments needed by the pre-processor
 
         """
-        super(DSWxPreProcessorMixin, self).run_preprocessor(**kwargs)
+        super().run_preprocessor(**kwargs)
 
         self._validate_inputs()
 
@@ -122,7 +121,7 @@ class DSWxPostProcessorMixin(PostProcessorMixin):
 
             self.logger.critical(self.name, ErrorCode.OUTPUT_NOT_FOUND, error_msg)
 
-        if os.path.getsize(output_path) == 0:
+        if not os.path.getsize(output_path):
             error_msg = f"SAS output file {output_path} was created but is empty"
 
             self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
@@ -137,7 +136,7 @@ class DSWxPostProcessorMixin(PostProcessorMixin):
 
         Parameters
         ----------
-        kwargs : dict
+        **kwargs : dict
             Any keyword arguments needed by the post-processor
 
         """

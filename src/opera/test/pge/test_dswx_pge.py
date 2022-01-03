@@ -77,6 +77,7 @@ class DSWxPgeTestCase(unittest.TestCase):
     def tearDown(self) -> None:
         """Return to starting directory"""
         os.chdir(self.test_dir)
+
     def test_dswx_pge_execution(self):
         """
         Test execution of the DSWxExecutor class and its associated mixins using
@@ -121,7 +122,7 @@ class DSWxPgeTestCase(unittest.TestCase):
         self.assertTrue(os.path.exists(expected_log_file))
 
         # Open and read the log
-        with open(expected_log_file, 'r') as infile:
+        with open(expected_log_file, 'r', encoding='utf-8') as infile:
             log_contents = infile.read()
 
         self.assertIn(f"DSWx-HLS invoked with RunConfig {expected_sas_config_file}", log_contents)
@@ -131,7 +132,7 @@ class DSWxPgeTestCase(unittest.TestCase):
         runconfig_path = join(self.data_dir, 'test_dswx_hls_config.yaml')
         test_runconfig_path = join(self.data_dir, 'invalid_dswx_runconfig.yaml')
 
-        with open(runconfig_path, 'r') as stream:
+        with open(runconfig_path, 'r', encoding='utf-8') as stream:
             runconfig_dict = yaml.safe_load(stream)
 
         input_files_group = runconfig_dict['RunConfig']['Groups']['PGE']['InputFilesGroup']
@@ -139,75 +140,77 @@ class DSWxPgeTestCase(unittest.TestCase):
         # Test that a non-existent file is detected by pre-processor
         input_files_group['InputFilePaths'] = ['non_existent_file.tif']
 
-        dir = os.getcwd()
+        with open(test_runconfig_path, 'w', encoding='utf-8') as input_path:
+            yaml.safe_dump(runconfig_dict, input_path, sort_keys=False)
 
-        with open(test_runconfig_path, 'w') as input:
-            yaml.safe_dump(runconfig_dict, input, sort_keys=False)
+        try:
+            pge = DSWxExecutor(pge_name="DSWxPgeTest", runconfig_path=test_runconfig_path)
 
-        pge = DSWxExecutor(pge_name="DSWxPgeTest", runconfig_path=test_runconfig_path)
+            with self.assertRaises(RuntimeError):
+                pge.run()
 
-        with self.assertRaises(RuntimeError):
-            pge.run()
+            # Config validation occurs before the log is fully initialized, but the
+            # initial log file should still exist and contain details of the validation
+            # error
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
 
-        # Config validation occurs before the log is fully initialized, but the
-        # initial log file should still exist and contain details of the validation
-        # error
-        expected_log_file = pge.logger.get_file_name()
-        self.assertTrue(os.path.exists(expected_log_file))
+            # Open the log file, and check that the validation error details were captured
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
 
-        # Open the log file, and check that the validation error details were captured
-        with open(expected_log_file, 'r') as infile:
-            log_contents = infile.read()
+            self.assertIn(f"Could not locate specified input file/directory "
+                          f"{abspath('non_existent_file.tif')}", log_contents)
 
-        self.assertIn(f"Could not locate specified input file/directory "
-                      f"{abspath('non_existent_file.tif')}", log_contents)
+            # Test that an input directory with no .tif files is caught
+            input_files_group['InputFilePaths'] = ['dswx_pge_test/scratch_dir']
 
-        # Test that an input directory with no .tif files is caught
-        input_files_group['InputFilePaths'] = ['dswx_pge_test/scratch_dir']
+            with open(test_runconfig_path, 'w', encoding='utf-8') as out_file:
+                yaml.safe_dump(runconfig_dict, out_file, sort_keys=False)
 
-        with open(test_runconfig_path, 'w') as out_file:
-            yaml.safe_dump(runconfig_dict, out_file, sort_keys=False)
+            pge = DSWxExecutor(pge_name="DSWxPgeTest", runconfig_path=test_runconfig_path)
 
-        pge = DSWxExecutor(pge_name="DSWxPgeTest", runconfig_path=test_runconfig_path)
+            with self.assertRaises(RuntimeError):
+                pge.run()
 
-        with self.assertRaises(RuntimeError):
-            pge.run()
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
 
-        expected_log_file = pge.logger.get_file_name()
-        self.assertTrue(os.path.exists(expected_log_file))
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
 
-        with open(expected_log_file, 'r') as infile:
-            log_contents = infile.read()
+            self.assertIn(f"Input directory {abspath('dswx_pge_test/scratch_dir')} "
+                          f"does not contain any tif files", log_contents)
 
-        self.assertIn(f"Input directory {abspath('dswx_pge_test/scratch_dir')} "
-                      f"does not contain any tif files", log_contents)
+            # Lastly, check that a file that exists but is not a tif is caught
+            input_files_group['InputFilePaths'] = [runconfig_path]
 
-        # Lastly, check that a file that exists but is not a tif is caught
-        input_files_group['InputFilePaths'] = [runconfig_path]
+            with open(test_runconfig_path, 'w', encoding='utf-8') as runconfig_fh:
+                yaml.safe_dump(runconfig_dict, runconfig_fh, sort_keys=False)
 
-        with open(test_runconfig_path, 'w') as runconfig_fh:
-            yaml.safe_dump(runconfig_dict, runconfig_fh, sort_keys=False)
+            pge = DSWxExecutor(pge_name="DSWxPgeTest", runconfig_path=test_runconfig_path)
 
-        pge = DSWxExecutor(pge_name="DSWxPgeTest", runconfig_path=test_runconfig_path)
+            with self.assertRaises(RuntimeError):
+                pge.run()
 
-        with self.assertRaises(RuntimeError):
-            pge.run()
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
 
-        expected_log_file = pge.logger.get_file_name()
-        self.assertTrue(os.path.exists(expected_log_file))
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
 
-        with open(expected_log_file, 'r') as infile:
-            log_contents = infile.read()
-
-        self.assertIn(f"Input file {abspath(runconfig_path)} does not have "
-                      f".tif extension", log_contents)
+            self.assertIn(f"Input file {abspath(runconfig_path)} does not have "
+                          f".tif extension", log_contents)
+        finally:
+            if os.path.exists(test_runconfig_path):
+                os.unlink(test_runconfig_path)
 
     def test_dswx_pge_output_validation(self):
         """Test the output validation checks made by DSWxPostProcessorMixin."""
         runconfig_path = join(self.data_dir, 'test_dswx_hls_config.yaml')
         test_runconfig_path = join(self.data_dir, 'invalid_dswx_runconfig.yaml')
 
-        with open(runconfig_path, 'r') as stream:
+        with open(runconfig_path, 'r', encoding='utf-8') as stream:
             runconfig_dict = yaml.safe_load(stream)
 
         product_path_group = runconfig_dict['RunConfig']['Groups']['PGE']['ProductPathGroup']
@@ -219,52 +222,56 @@ class DSWxPgeTestCase(unittest.TestCase):
         primary_executable_group['ProgramPath'] = 'echo'
         primary_executable_group['ProgramOptions'] = ['hello world']
 
-        with open(test_runconfig_path, 'w') as config_fh:
+        with open(test_runconfig_path, 'w', encoding='utf-8') as config_fh:
             yaml.safe_dump(runconfig_dict, config_fh, sort_keys=False)
 
-        pge = DSWxExecutor(pge_name="DSWxPgeTest", runconfig_path=test_runconfig_path)
+        try:
+            pge = DSWxExecutor(pge_name="DSWxPgeTest", runconfig_path=test_runconfig_path)
 
-        with self.assertRaises(RuntimeError):
-            pge.run()
+            with self.assertRaises(RuntimeError):
+                pge.run()
 
-        expected_output_file = 'dswx_pge_test/output_dir/missing_dswx_hls.tif'
-        self.assertFalse(os.path.exists(expected_output_file))
+            expected_output_file = 'dswx_pge_test/output_dir/missing_dswx_hls.tif'
+            self.assertFalse(os.path.exists(expected_output_file))
 
-        expected_log_file = pge.logger.get_file_name()
-        self.assertTrue(os.path.exists(expected_log_file))
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
 
-        with open(expected_log_file, 'r') as infile:
-            log_contents = infile.read()
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
 
-        self.assertIn(f"Expected SAS output file {abspath(expected_output_file)} "
-                      f"does not exist", log_contents)
+            self.assertIn(f"Expected SAS output file {abspath(expected_output_file)} "
+                          f"does not exist", log_contents)
 
-        # Test with a SAS command that produces the expected output file, but
-        # one that is empty (size 0 bytes). Post-processor should detect this
-        # and flag an error
-        product_path_group['SASOutputFile'] = 'empty_dswx_hls.tif'
-        primary_executable_group['ProgramPath'] = 'touch'
-        primary_executable_group['ProgramOptions'] = ['dswx_pge_test/output_dir/empty_dswx_hls.tif']
+            # Test with a SAS command that produces the expected output file, but
+            # one that is empty (size 0 bytes). Post-processor should detect this
+            # and flag an error
+            product_path_group['SASOutputFile'] = 'empty_dswx_hls.tif'
+            primary_executable_group['ProgramPath'] = 'touch'
+            primary_executable_group['ProgramOptions'] = ['dswx_pge_test/output_dir/empty_dswx_hls.tif']
 
-        with open(test_runconfig_path, 'w') as outfile:
-            yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+            with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+                yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
 
-        pge = DSWxExecutor(pge_name="DSWxPgeTest", runconfig_path=test_runconfig_path)
+            pge = DSWxExecutor(pge_name="DSWxPgeTest", runconfig_path=test_runconfig_path)
 
-        with self.assertRaises(RuntimeError):
-            pge.run()
+            with self.assertRaises(RuntimeError):
+                pge.run()
 
-        expected_output_file = 'dswx_pge_test/output_dir/empty_dswx_hls.tif'
-        self.assertTrue(os.path.exists(expected_output_file))
+            expected_output_file = 'dswx_pge_test/output_dir/empty_dswx_hls.tif'
+            self.assertTrue(os.path.exists(expected_output_file))
 
-        expected_log_file = pge.logger.get_file_name()
-        self.assertTrue(os.path.exists(expected_log_file))
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
 
-        with open(expected_log_file, 'r') as infile:
-            log_contents = infile.read()
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
 
-        self.assertIn(f"SAS output file {abspath(expected_output_file)} was "
-                      f"created but is empty", log_contents)
+            self.assertIn(f"SAS output file {abspath(expected_output_file)} was "
+                          f"created but is empty", log_contents)
+        finally:
+            if os.path.exists(test_runconfig_path):
+                os.unlink(test_runconfig_path)
 
 
 if __name__ == "__main__":

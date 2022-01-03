@@ -164,7 +164,7 @@ class TimeTestCase(unittest.TestCase):
         self.assertIsNone(re.match(filename_regex, t5))
         self.assertIsNone(re.match(filename_regex, t6))
 
-    def test_get_catalog_metadata_datetime_str(self):
+    def test_get_cat_metadata_datetime_str(self):
         """
         Converts the provided datetime object to a time-tag string suitable for use
         in catalog metadata.
