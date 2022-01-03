@@ -175,6 +175,11 @@ class RunConfig:
         attribute : object
             The accessed attribute.
 
+        Raises
+        ------
+        RuntimeError
+            If the attribute requests fails (from missing field in RunConfig).
+
         """
         try:
             return object.__getattribute__(self, item)
@@ -308,8 +313,6 @@ class RunConfig:
             the DynamicAncillaryFilesGroup section.
 
         """
-        result = list(
-            filter(lambda filename: filename, self.ancillary_file_map.values())
-        )
+        result = list(self.ancillary_file_map.values())
 
         return result

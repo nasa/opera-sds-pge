@@ -395,6 +395,12 @@ class PgeLogger:
         description : str
             Description message to write to the log.
 
+        Raises
+        ------
+        RuntimeError
+            Raised when this method is called. The contents of the description
+            parameter is provided as the exception string.
+
         """
         self.write("Critical", module, error_code_offset, description,
                    additional_back_frames=1)

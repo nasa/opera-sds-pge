@@ -167,7 +167,7 @@ class PreProcessorMixin:
 
         Parameters
         ----------
-        kwargs : dict
+        **kwargs : dict
             Any keyword arguments needed by the pre-processor
 
         """
@@ -240,7 +240,7 @@ class PostProcessorMixin:
 
         Parameters
         ----------
-        kwargs : dict
+        **kwargs : dict
             Any keyword arguments needed by the post-processor
 
         """
@@ -333,7 +333,7 @@ class PgeExecutor(PreProcessorMixin, PostProcessorMixin):
 
         Parameters
         ----------
-        kwargs : dict
+        **kwargs : dict
             Any keyword arguments needed for SAS execution.
 
         """

@@ -85,7 +85,7 @@ def get_time_for_filename(date_time):
     return datetime_str
 
 
-def get_cat_metadata_datetime_str(date_time):
+def get_catalog_metadata_datetime_str(date_time):
     """
     Converts the provided datetime object to a time-tag string suitable for use
     in catalog metadata.
@@ -103,7 +103,7 @@ def get_cat_metadata_datetime_str(date_time):
 
     """
     # TODO: Rework to support 0.1 nanosecond resolution
-    # That probably means ditching Python's datetime class.
+    #       That probably means ditching Python's datetime class.
     datetime_str = date_time.isoformat(sep='T', timespec='microseconds') + "0000" + "Z"
 
     return datetime_str

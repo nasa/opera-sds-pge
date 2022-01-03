@@ -65,9 +65,9 @@ def create_sas_command_line(sas_program_path, sas_runconfig_path,
         set with execute permissions for the current process.
 
     """
-    executable_path = shutil.which(sas_program_path)
+    command_line = []
 
-    if executable_path:
+    if executable_path := shutil.which(sas_program_path):
         command_line = [executable_path]
     else:
         executable_path = abspath(sas_program_path)
@@ -131,8 +131,6 @@ def time_and_execute(command_line, logger, execute_via_shell=False):
 
     # Append the stdout/stderr captured by the subprocess to our log
     logger.append(run_result.stdout.decode())
-
-    print(run_result.stdout.decode())
 
     if run_result.returncode:
         error_msg = (f'Command "{" ".join(command_line)}" failed with exit '

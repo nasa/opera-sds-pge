@@ -22,5 +22,5 @@ metrics gathering, for use with the OPERA PGE Subsystem.
 
 """
 
-from .error_codes import ErrorCode
-from .logger import PgeLogger
+from .error_codes import ErrorCode  # noqa: F401
+from .logger import PgeLogger  # noqa: F401

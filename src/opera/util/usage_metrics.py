@@ -102,7 +102,7 @@ def get_self_peak_vmm_kb():
     if not os.path.exists(status_file) or not os.path.isfile(status_file):
         return f'file_not_found: {status_file}'
 
-    with open(status_file, 'r') as infile:
+    with open(status_file, 'r', encoding='utf-8') as infile:
         for line in infile.readlines():
             if line.startswith('VmPeak:'):
                 vm_peak_str = line.replace('VmPeak:', '').replace('kB', '')
