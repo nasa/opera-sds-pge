@@ -26,6 +26,7 @@ import re
 import tempfile
 import unittest
 from os.path import abspath, join
+from sys import platform
 
 from pkg_resources import resource_filename
 
@@ -118,7 +119,13 @@ class UsageMetricsTestCase(unittest.TestCase):
             # Verify that the main process, takes more RAM than the child process
             self.assertGreater(metrics['os.max_rss_kb.main_process'], metrics['os.max_rss_kb.largest_child_process'])
 
-# TODO test get_self_peak_vmm_kb() - right now it is not finding the file.
+            # Testing peak_vmm_kb requires the test to run in a Linux environment,
+            # otherwise we expect -1 back, so test both
+            if platform != "linux":
+                self.assertEqual(metrics['os.peak_vm_kb.main_process'], -1)
+            else:
+                self.assertEqual(str(metrics['os.peak_vm_kb.main_process']), re.match(int_regex,
+                                 str(metrics['os.peak_vm_kb.main_process'])).group())
 
 
 if __name__ == "__main__":
