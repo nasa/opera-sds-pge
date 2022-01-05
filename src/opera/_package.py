@@ -1,6 +1,5 @@
-#!/usr/bin/env python3
 #
-# Copyright 2021, by the California Institute of Technology.
+# Copyright 2022, by the California Institute of Technology.
 # ALL RIGHTS RESERVED.
 # United States Government sponsorship acknowledged.
 # Any commercial use must be negotiated with the Office of Technology Transfer
@@ -14,20 +13,16 @@
 #
 
 """
-=======================
-OPERA SDS PGE Subsystem
-=======================
+===========
+_package.py
+===========
 
-Repository for the Product Generation Executable (PGE) code utilized with the
-Observational Products for End-Users from Remote Sensing Analysis (OPERA)
-Science Data System (SDS).
+Package information for the OPERA PGE repository.
 """
 
-from ._package import (  # noqa: F401
-    __author__,
-    __copyright__,
-    __summary__,
-    __title__,
-    __uri__,
-    __version__,
-)
+__version__ = "1.0.0-er.1"
+__title__ = "opera-sds-pge"
+__summary__ = "OPERA SDS Product Generation Executable (PGE) Repository"
+__uri__ = "https://github.com/nasa/opera-sds-pge"
+__author__ = "California Institute of Technology"
+__copyright__ = f"2021-2022 {__author__}"
