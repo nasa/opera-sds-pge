@@ -161,5 +161,6 @@ class RunUtilsTestCase(unittest.TestCase):
         self.assertIn('Hello from test_time_and_execute function.', log)
         self.assertIn(f'Elapsed time: {elapsed_time}', log)
 
-        # Check for the erroneous run
-        self.assertIn('Command "/bin/bash -c exit 1 /path/to/runconfig" failed with exit code 1', log)
+        # Check for the erroneous run (note this test is generalized to work
+        # on both linux and osx)
+        self.assertIn('bash -c exit 1 /path/to/runconfig" failed with exit code 1', log)
