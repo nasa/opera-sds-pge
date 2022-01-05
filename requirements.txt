@@ -7,9 +7,4 @@ PyYAML
 pylint
 pytest
 pytest-cov
-sphinx
-sphinx-argparse
-sphinx-rtd-theme
-sphinxcontrib-napoleon
-sphinxcontrib-websupport
 yamale
