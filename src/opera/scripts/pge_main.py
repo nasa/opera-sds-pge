@@ -112,7 +112,7 @@ def load_run_config_file(logger, run_config_filename):
     # Log the yaml config file that is used.
     run_config = RunConfig(run_config_filename)
     msg = f'RunConfig yaml file: {run_config_filename}'
-    logger.info("pge_main", ErrorCode.RUN_CONFIG_FILENAME, msg)
+
 
     # Log the schema file that is used.
     schema_file = run_config.sas_schema_path
