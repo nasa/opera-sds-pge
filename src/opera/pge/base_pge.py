@@ -22,6 +22,7 @@ Module defining the Base PGE interfaces from which all other PGEs are derived.
 
 """
 
+from datetime import datetime
 import os
 from os.path import abspath, basename, exists, join, splitext
 
@@ -31,8 +32,10 @@ import yaml
 
 from opera.util.error_codes import ErrorCode
 from opera.util.logger import PgeLogger
+from opera.util.metfile import MetFile
 from opera.util.run_utils import create_sas_command_line
 from opera.util.run_utils import time_and_execute
+from opera.util.time import get_catalog_metadata_datetime_str
 
 from .runconfig import RunConfig
 
@@ -203,14 +206,37 @@ class PostProcessorMixin:
     def __init__(self):
         self.name = None
         self.logger = None
+        self.runconfig_path = None
+        self.runconfig = RunConfig(self.runconfig_path)
+        self.catalog_metadata = {}
 
     def _run_sas_qa_executable(self):
         # TODO
         pass
 
     def _create_catalog_metadata(self):
-        # TODO
-        pass
+        """Returns the catalog metadata as a Python dictionary"""
+
+        self.cached_catalog_metadata = {
+            'PGE_Name': self.runconfig.pge_name,
+            'PGE_Version': "1.0.test",
+            'SAS_Version': "2.0.test",
+            'Input_Files': self.runconfig.input_files,
+            'Ancillary_Files': self.runconfig.get_ancillary_filenames(),
+            'Production_DateTime': get_catalog_metadata_datetime_str(self.production_datetime)
+        }
+        return self.cached_catalog_metadata
+
+    def _write_catalog_metadata(self):
+        """Create and write the catalog metadata file"""
+
+        msg = "Testing catalog metadata file."
+        self.logger.info("pge_main", ErrorCode.RUN_CONFIG_FILENAME, msg)
+
+        met_dict = self._create_catalog_metadata()
+        met_filename = "test_catalog_metadata.json"
+        met_file = MetFile(met_filename, met_dict)
+        met_file.write_met_file()
 
     def _create_iso_metadata(self):
         # TODO
@@ -248,7 +274,7 @@ class PostProcessorMixin:
         print(f'Running postprocessor for {self._post_mixin_name}')
 
         self._run_sas_qa_executable()
-        self._create_catalog_metadata()
+        self._write_catalog_metadata()
         self._create_iso_metadata()
         self._stage_output_files()
         self._finalize_log()
@@ -296,6 +322,7 @@ class PgeExecutor(PreProcessorMixin, PostProcessorMixin):
         self.runconfig_path = runconfig_path
         self.runconfig = None
         self.logger = kwargs.get('logger')
+        self.production_datetime = datetime.now()
 
     def _isolate_sas_runconfig(self):
         """

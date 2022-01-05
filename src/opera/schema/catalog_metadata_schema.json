@@ -1,0 +1,63 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/nasa/opera-sds-pge/tree/main/src/opera/schema/catalog_metadata_schema.json",
+  "title": "OPERA PGE Catalog Metadata Schema",
+  "description": "Schema for validating the catalog metadata output from the OPERA PGEs",
+  "definitions": {
+    "non-empty-string": {
+      "type": "string",
+      "minLength": 1
+    },
+    "opera-metadata-date-time": {
+      "type": "string",
+      "pattern": "^\\d\\d\\d\\d-(0[1-9]|1[0-2])-\\d\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d[\\.\\,\\:]\\d+(Z)?$"
+    },
+    "Input_File": {
+      "description": "input file",
+      "$ref": "#/definitions/non-empty-string"
+    }
+  },
+  "properties": {
+    "PGE_Name": {
+      "description": "PGE Short Name",
+      "$ref": "#/definitions/non-empty-string"
+    },
+    "PGE_Version": {
+      "description": "PGE Version",
+      "$ref": "#/definitions/non-empty-string"
+    },
+    "SAS_Version": {
+      "description": "SAS Version",
+      "$ref": "#/definitions/non-empty-string"
+    },
+    "Input_Files": {
+      "description": "List of input files used for the run",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Input_File"
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "Ancillary_Files": {
+      "description": "List of ancillary files used for the run",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Input_File"
+      }
+    },
+    "Production_DateTime": {
+      "description": "Production DateTime in UTC",
+      "$ref": "#/definitions/opera-metadata-date-time"
+    }
+  },
+  "required": [
+    "PGE_Name",
+    "PGE_Version",
+    "SAS_Version",
+    "Input_Files",
+    "Ancillary_Files",
+    "Production_DateTime"
+  ],
+  "additionalProperties": false
+}
