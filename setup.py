@@ -52,7 +52,7 @@ setup(
     test_suite='test',
     tests_require=test_requirements,
     url='https://github.com/nasa/opera-sds-pge',
-    version='0.1.0',
+    version='1.0.0-er.1.0',
     zip_safe=False,
     extras_require={"dev": dev_requirements},
 )
