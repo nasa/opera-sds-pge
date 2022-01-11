@@ -24,8 +24,10 @@ Original Author: Alice Stanboli
 Adapted By: Jim Hofman
 
 """
-import argparse
+
+
 import json
+import jsonschema
 import os
 
 
@@ -42,8 +44,10 @@ class MetFile:
             Name of the file that will be written to or read.
 
         """
+
         self._met_file = met_file_name
         self.met_dict = met_dict
+        self.combined_error_msg = None
 
     def set_key_value(self, key_name, val):
         """Simply sets a key value pair"""
@@ -69,32 +73,43 @@ class MetFile:
             # Open JSON file
             with open(self._met_file) as json_file:
                 self.met_dict = json.load(json_file)
-                print(f' {self._met_file}: {str(self.met_dict)}')
             return self.met_dict
 
+    def validate_json_file(self, json_filename: str, schema_filename: str) -> (bool, str):
+        """
+        Validates the specified json file against the specified jsonschema file.
 
-def main():
-    parser = argparse.ArgumentParser(
-        description=__doc__,
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+        Parameters
+        ----------
+        json_filename: str
+            JSON file to check against schema
+        schema_filename: str
+            JSON schema file
 
-    # Add arguments to parser
-    parser.add_argument('--file', required=True)
+        Returns
+        -------
+        boolean
+            1: pass
+            0: fail
 
-    # Get command line arguments
-    args = vars(parser.parse_args())
+        """
+        with open(schema_filename, 'tr') as schema_file:
+            schema = json.load(schema_file)
+        with open(json_filename, 'tr') as json_file:
+            json_data = json.load(json_file)
 
-    # Get file names (required)
-    met_file = args['file']
+        # Initialize and run the validator
+        validator = jsonschema.validators.validator_for(schema)(schema)
+        # record errors (if any)
+        errors = validator.iter_errors(json_data)
+        self.combined_error_msg = '\n'.join(error.message for error in errors)
+        # success if combined_error_text is an empty string
+        success = len(self.combined_error_msg) == 0
+        if success:
+            return True
+        else:
+            return False
 
-    met_data = MetFile(met_file)
-    met_data.set_key_value("test key", "test value")
-    met_data.write_met_file()
-    met_data.read_met_file()
-    met_data.set_key_value("test key 2", "test value 2")
-    met_data.write_met_file()
-    met_data.read_met_file()
-
-
-if __name__ == "__main__":
-    main()
+    def get_error_msg(self):
+        """Returns the error message if a schema check is unsuccessful."""
+        return self.combined_error_msg

@@ -113,7 +113,6 @@ def load_run_config_file(logger, run_config_filename):
     run_config = RunConfig(run_config_filename)
     msg = f'RunConfig yaml file: {run_config_filename}'
 
-
     # Log the schema file that is used.
     schema_file = run_config.sas_schema_path
     msg = f"SAS Schema file: {schema_file}"
