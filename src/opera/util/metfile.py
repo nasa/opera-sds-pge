@@ -75,6 +75,11 @@ class MetFile:
                 self.met_dict = json.load(json_file)
             return self.met_dict
 
+    @staticmethod
+    def get_schema_file_path(schema_path='src/opera//schema/catalog_metadata_schema.json'):
+        path = os.getcwd().split('src')[0]
+        return path + schema_path
+
     def validate_json_file(self, json_filename: str, schema_filename: str) -> (bool, str):
         """
         Validates the specified json file against the specified jsonschema file.

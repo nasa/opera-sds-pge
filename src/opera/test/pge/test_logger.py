@@ -168,7 +168,7 @@ class LoggerTestCase(unittest.TestCase):
         log_file = self.logger.get_file_name()
         self.assertEqual(log_file, re.match(self.fn_regex, log_file).group())
 
-        # Write a few log messages to the log file
+        # Write a few log messages to the log file, verify case does not matter in 'type' field
         self.logger.write('info', "opera_pge", 0, 'test string with error code OVERALL_SUCCESS')
         self.logger.write('deBug', "opera_pge", 1, 'test string with error code LOG_FILE_CREATED')
         self.logger.write('Warning', "opera_pge", 2, 'test string with error code LOADING_RUN_CONFIG_FILE')
