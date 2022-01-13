@@ -16,10 +16,10 @@
 
 """
 =================
-test_time.py
+test_metfile.py
 =================
 
-Unit tests for the util/time.py module.
+Unit tests for the util/metfile.py module.
 """
 import fileinput
 import os
@@ -80,6 +80,14 @@ class MetFileTestCase(unittest.TestCase):
         os.chdir(self.test_dir)
 
     def testMetFile(self):
+        """
+        Tests instantiation of MetFile class
+        Methods tested in MetFile class:
+            set_key_value()
+            write_met_file()
+            read_met_file()
+
+        """
         met_file = './testMetFile.met'
         met_data = MetFile(met_file)
         self.assertIsInstance(met_data, MetFile)
@@ -111,6 +119,13 @@ class MetFileTestCase(unittest.TestCase):
         self.assertEqual(met_dict['test key 2'], 'test value 2')
 
     def test_validate_json_file(self):
+        """
+        Instantiates pge objects
+        Verifies that the catalog metadata json file is created
+        Verifies that the schema is correct
+        Verifies that an Error is written to the log file is there is a schema error in the catalog metadata file.
+
+        """
         # instantiate a pge object
         runconfig_path = join(self.data_dir, 'test_base_pge_config.yaml')
 
@@ -179,6 +194,7 @@ class MetFileTestCase(unittest.TestCase):
         self.assertIn("Successfully created catalog metadata json file.", log)
 
     def change_schema(self, schema_file, replace_values):
+        """Used to modify 'catalog_metadata_schema.json'"""
         for line in fileinput.input(schema_file, inplace=True):
             for search_text in replace_values:
                 replace_text = replace_values[search_text]
