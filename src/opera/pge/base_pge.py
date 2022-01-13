@@ -234,8 +234,8 @@ class PostProcessorMixin:
         met_filename = "test_catalog_metadata.json"
         met_file = MetFile(met_filename, met_dict)
         met_file.write_met_file()
-        if met_file.validate_json_file(met_filename, "../schema/catalog_metadata_schema.json"):
-            msg = "Successfully created catalog metadata"
+        if met_file.validate_json_file(met_filename, met_file.get_schema_file_path()):
+            msg = "Successfully created catalog metadata json file."
             self.logger.info("pge_main", ErrorCode.CREATING_CATALOG_METADATA, msg)
         else:
             msg = f"SCHEMA ERROR: {met_file.get_error_msg()}"
