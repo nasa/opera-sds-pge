@@ -1,0 +1,85 @@
+#!/usr/bin/env groovy
+
+// Copyright 2021, by the California Institute of Technology.
+// ALL RIGHTS RESERVED.
+// United States Government sponsorship acknowledged.
+// Any commercial use must be negotiated with the Office of Technology Transfer
+// at the California Institute of Technology.
+// This software may be subject to U.S. export control laws and regulations.
+// By accepting this document, the user agrees to comply with all applicable
+// U.S. export laws and regulations. User has the responsibility to obtain
+// export licenses, or other export authority as may be required, before
+// exporting such information to foreign countries or providing access to
+// foreign persons.
+
+pipeline {
+    agent any
+    parameters {
+        string(name: 'ART_DOCKER_REGISTRY', defaultValue: 'artifactory-fn.jpl.nasa.gov:16001',
+               description: 'Address of Artifactory-FN Docker registry for uploading Docker images.')
+        credentials (name: 'ART_CREDENTIALS',
+                     // TODO: replace once OPERA-specific creds are available
+                     defaultValue: 'collinss-artifactory-fn-credentials',
+                     credentialType: 'com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl',
+                     description: 'Artifactory-FN credentials for account collinss. Used to push/pull images from Artifactory during build.',
+                     required: true)
+    }
+    environment {
+        DOCKER_IMAGE_PREFIX = 'opera_pge'
+        // TODO: update as newer PGE's are added
+        DOCKER_IMAGE_SUFFIXES = 'dswx_hls'
+        DOCKER_TAG = """${sh(
+                     returnStdout: true,
+                     script: 'echo ${GIT_BRANCH##*/}'
+                     ).trim()}"""
+    }
+    stages {
+        stage('Build OPERA PGE Docker image(s)') {
+            steps {
+                script {
+                    docker.withRegistry ('https://' + params.ART_DOCKER_REGISTRY, params.ART_CREDENTIALS) {
+                        echo "Building ${DOCKER_IMAGE_PREFIX} docker images with tag ${DOCKER_TAG}"
+                        sh label: 'Build all OPERA Docker images',
+                           script: ".ci/scripts/build_all_images.sh $DOCKER_TAG"
+                    }
+                }
+            }
+        }
+        stage('Test OPERA PGE Docker image(s)') {
+            steps {
+                echo "Testing ${DOCKER_IMAGE_PREFIX} docker images with tag ${DOCKER_TAG}"
+                sh label: 'Test all OPERA Docker images',
+                   script: ".ci/scripts/test_all_images.sh $DOCKER_TAG"
+                junit 'test_results/**/*.xml'
+                archiveArtifacts artifacts: 'test_results/**/*.log', fingerprint: true
+                // TODO: this will require rework once we have more than one PGE to deal with
+                publishHTML([allowMissing: true,
+                             alwaysLinkToLastBuild: true,
+                             keepAll: true,
+                             reportDir: 'test_results/dswx_hls/coverage_html',
+                             reportFiles: 'index.html',
+                             reportName: 'Code Coverage',
+                             reportTitles: 'DSWx-HLS Code Coverage'])
+            }
+        }
+    }
+    post {
+        always {
+            echo "Cleaning up Docker images from local host"
+            sh ".ci/scripts/cleanup.sh ${DOCKER_TAG}"
+            deleteDir()
+        }
+        success {
+            echo 'Succeeded!'
+        }
+        unstable {
+            echo 'Unstable :/'
+        }
+        failure {
+            echo 'Failed :('
+        }
+        changed {
+            echo 'Things were different before...'
+        }
+    }
+}

@@ -24,6 +24,7 @@ pipeline {
         string(name: 'ART_DOCKER_REGISTRY', defaultValue: 'artifactory-fn.jpl.nasa.gov:16001',
                description: 'Address of Artifactory-FN Docker registry for uploading Docker images.')
         credentials (name: 'ART_CREDENTIALS',
+                     // TODO: replace once OPERA-specific creds are available
                      defaultValue: 'collinss-artifactory-fn-credentials',
                      credentialType: 'com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl',
                      description: 'Artifactory-FN credentials for account collinss. Used to push/pull images from Artifactory during build.',
@@ -31,6 +32,7 @@ pipeline {
     }
     environment {
         DOCKER_IMAGE_PREFIX = 'opera_pge'
+        // TODO: update as newer PGE's are added
         DOCKER_IMAGE_SUFFIXES = 'dswx_hls'
         DOCKER_TAG = """${sh(
                      returnStdout: true,
