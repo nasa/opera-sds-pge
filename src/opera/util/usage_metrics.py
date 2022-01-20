@@ -28,6 +28,7 @@ Adapted By: Scott Collins
 
 import os
 import resource
+from sys import platform
 
 
 def get_os_metrics():
@@ -93,21 +94,25 @@ def get_self_peak_vmm_kb():
     -------
     vm_peak_kb : int
         Peak virtual memory usage, in kilobytes, of the current process. If
-        this value cannot be obtained for any reason, 0 is returned instead.
+        this value cannot be obtained for any reason, -1 is returned instead.
 
     """
     vm_peak_kb = 0
 
     status_file = os.path.join(os.sep, 'proc', 'self', 'status')
 
-    if not os.path.exists(status_file) or not os.path.isfile(status_file):
-        return f'file_not_found: {status_file}'
+    try:
+        if platform != "linux" or not os.path.exists(status_file):
+            raise EnvironmentError
 
-    with open(status_file, 'r', encoding='utf-8') as infile:
-        for line in infile.readlines():
-            if line.startswith('VmPeak:'):
-                vm_peak_str = line.replace('VmPeak:', '').replace('kB', '')
-                vm_peak_kb = int(vm_peak_str)
-                break
+        with open(status_file, "r", encoding='utf-8') as infile:
+            for line in infile.readlines():
+                if line.startswith("VmPeak:"):
+                    vm_peak_str = line.replace("VmPeak:", "").replace("kB", "")
+                    vm_peak_kb = int(vm_peak_str)
+                    break
+
+    except EnvironmentError:
+        vm_peak_kb = -1
 
     return vm_peak_kb
