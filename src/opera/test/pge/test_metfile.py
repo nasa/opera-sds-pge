@@ -39,6 +39,8 @@ from opera.util import PgeLogger
 class MetFileTestCase(unittest.TestCase):
     """Base test class using unittest"""
 
+    TEST_MET_FILE = resource_filename('opera', '/test/pge/base_pge_test/scratch/testMetFile.met')
+
     @classmethod
     def setUpClass(cls) -> None:
         """
@@ -88,26 +90,27 @@ class MetFileTestCase(unittest.TestCase):
             read_met_file()
 
         """
-        met_file = './testMetFile.met'
+        met_file = MetFileTestCase.TEST_MET_FILE
         met_data = MetFile(met_file)
         self.assertIsInstance(met_data, MetFile)
 
-        # Test set_key_value()
-        met_data.set_key_value("test key", "test value")
+        # Test __setitem__ and __getitem__
+        met_data["test key"] = "test value"
+        self.assertEqual(met_data["test key"], "test value")
         # Test write_met_file()
         met_data.write_met_file()
         # Copy contents of the file into a variable
         with open(met_file, 'r') as mf:
             lines = (mf.readlines())
-        # Test string to look for
-        test_str = '  "test key": "test value"\n'
+        # Test string to look for string in the dictionary
+        test_str = '  "test key": "test value",\n'
         self.assertIn(test_str, lines)
         # Test read_met_file()
         met_dict = met_data.read_met_file()
-        self.assertEqual(met_dict['test key'], 'test value')
+        self.assertEqual(met_data['test key'], 'test value')
 
         # Read another line to test for an existing file
-        met_data.set_key_value("test key 2", "test value 2")
+        met_dict = "test key 2", "test value 2"
         met_data.write_met_file()
         with open(met_file, 'r') as mf:
             lines = (mf.readlines())
@@ -194,7 +197,16 @@ class MetFileTestCase(unittest.TestCase):
         self.assertIn("Successfully created catalog metadata json file.", log)
 
     def change_schema(self, schema_file, replace_values):
-        """Used to modify 'catalog_metadata_schema.json'"""
+        """Used to modify 'catalog_metadata_schema.json'
+
+        Parameters
+        ----------
+        schema_file : JSON
+            Schema file for the catalog_metadata_schema check
+        replace_values : str
+            Text string to be added or modify the schema file
+
+        """
         for line in fileinput.input(schema_file, inplace=True):
             for search_text in replace_values:
                 replace_text = replace_values[search_text]

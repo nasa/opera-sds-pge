@@ -30,11 +30,15 @@ import json
 import jsonschema
 import os
 
+from pkg_resources import resource_filename
+
 
 class MetFile:
-    """Class read and write .met files."""
+    """Class read and write catalog metadata .met files."""
 
-    def __init__(self, met_file_name, met_dict={}):
+    SCHEMA_PATH = resource_filename('opera', 'schema/catalog_metadata_schema.json')
+
+    def __init__(self, met_file_name, met_dict=None):
         """
         Constructor get filename and initialize dictionary
 
@@ -42,43 +46,70 @@ class MetFile:
         ----------
         met_file_name : str, required
             Name of the file that will be written to or read.
+        met_dict : dict, optional
+            Dictionary passed to be merged with existing catalog metadata
+            file or to be used to make a new catalog metadata file
 
         """
 
+        if met_dict is None:
+            met_dict = {}
         self._met_file = met_file_name
         self.met_dict = met_dict
         self.combined_error_msg = None
 
-    def set_key_value(self, key_name, val):
-        """Simply sets a key value pair"""
-        self.met_dict[key_name] = val
+    def __setitem__(self, key_name, value):
+        print('in __setitem__')
+        self.met_dict[key_name] = value
+
+    def __getitem__(self, key_name):
+        print('in __getitem__')
+        return self.met_dict[key_name]
+
+    @classmethod
+    def get_schema_file_path(cls):
+        """Returns the path to schema file"""
+        return cls.SCHEMA_PATH
 
     def write_met_file(self):
-        """Writes met file in JSON format to disk"""
+        """
+        Writes the catalog metadata file in JSON format to disk.
+        If there is an existing catalog metadata file:
+            1) Load the file as JSON
+            2) Copy the file into a python dictionary
+            3) Use update() method:
+                 a) Adds new (key, value) pairs based on a unique key
+                 b) Updates any values changes to existing keys
+
+        """
+
+        merged_met_dict = {}
+
         if os.path.exists(self._met_file):
-            merged_met_dict = {}
             with open(self._met_file) as json_file:
                 file_met_dict = json.load(json_file)
                 merged_met_dict = file_met_dict.copy()
-                merged_met_dict.update(self.met_dict)
-            with open(self._met_file, "w") as f:
-                json.dump(merged_met_dict, f, indent=2, sort_keys=True)
-        else:
-            with open(self._met_file, "w") as f:
-                json.dump(self.met_dict, f, indent=2, sort_keys=True)
+
+        merged_met_dict.update(self.met_dict)
+
+        with open(self._met_file, "w") as f:
+            json.dump(merged_met_dict, f, indent=2, sort_keys=True)
 
     def read_met_file(self):
-        """Reads, returns an existing met file."""
+        """
+        Reads, an existing catalog metadata file.
+        Loads the JSON fields into a dictionary
+
+        Returns
+        -------
+        A dictionary containing the catalog metadata JSON pairs
+
+        """
         if os.path.exists(self._met_file):
-            # Open JSON file
             with open(self._met_file) as json_file:
                 self.met_dict = json.load(json_file)
-            return self.met_dict
 
-    @staticmethod
-    def get_schema_file_path(schema_path='src/opera//schema/catalog_metadata_schema.json'):
-        path = os.getcwd().split('src')[0]
-        return path + schema_path
+            return self.met_dict
 
     def validate_json_file(self, json_filename: str, schema_filename: str) -> (bool, str):
         """
@@ -110,10 +141,7 @@ class MetFile:
         self.combined_error_msg = '\n'.join(error.message for error in errors)
         # success if combined_error_text is an empty string
         success = len(self.combined_error_msg) == 0
-        if success:
-            return True
-        else:
-            return False
+        return success
 
     def get_error_msg(self):
         """Returns the error message if a schema check is unsuccessful."""
