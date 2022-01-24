@@ -2,6 +2,7 @@
 
 """The setup script."""
 
+import opera
 from setuptools import find_packages, setup
 
 with open('README.rst') as readme_file:
@@ -41,18 +42,18 @@ setup(
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.8',
     ],
-    description="Repository for the Product Generation Executable (PGE) code utilized with the Observational Products for End-Users from Remote Sensing Analysis (OPERA) Science Data System (SDS).",
+    description=opera.__summary__,
     install_requires=requirements,
     license="Apache Software License 2.0",
     long_description=readme,
     include_package_data=True,
-    keywords='opera_sds_pge',
-    name='opera-sds-pge',
+    keywords=['opera', 'jpl', 'pge', 'sas', 'sds'],
+    name=opera.__title__,
     packages=find_packages(include=['opera', 'opera.*']),
     test_suite='test',
     tests_require=test_requirements,
-    url='https://github.com/nasa/opera-sds-pge',
-    version='1.0.0-er.1.0',
+    url=opera.__uri__,
+    version=opera.__version__,
     zip_safe=False,
     extras_require={"dev": dev_requirements},
 )
