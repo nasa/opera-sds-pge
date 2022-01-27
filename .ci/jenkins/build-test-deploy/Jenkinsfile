@@ -19,6 +19,8 @@ pipeline {
                description: 'Artifactory-FN URL.')
         string(name: 'ART_TAR_PATH', defaultValue: 'general/gov/nasa/jpl/opera/sds/pge/',
                description: 'Artifactory path to publish PGE docker image tar files to.')
+        string(name: 'ART_DOCS_PATH', defaultValue: 'general/gov/nasa/jpl/opera/sds/pge/documentation',
+               description: 'Artifactory path to publish PGE documentation files to.')
         string(name: 'ART_DOCKER_PATH', defaultValue: '/gov/nasa/jpl/opera/sds/pge/',
                description: 'Artifactory path to push Docker images.')
         string(name: 'ART_DOCKER_REGISTRY', defaultValue: 'artifactory-fn.jpl.nasa.gov:16001',
@@ -66,6 +68,69 @@ pipeline {
                              reportFiles: 'index.html',
                              reportName: 'Code Coverage',
                              reportTitles: 'DSWx-HLS Code Coverage'])
+            }
+        }
+        stage('Generate OPERA PGE Sphinx Documentation') {
+            steps {
+                script {
+                    echo "Installing Sphinx Dependencies"
+                    sh '''#!/bin/bash
+                         /usr/local/bin/python3 -m venv sphinx_env
+                         . sphinx_env/bin/activate
+                         pip install -r ./requirements.txt
+                         pip install -r ./requirements_dev.txt
+                    '''
+
+                    sh label: 'Invoking clean target for Sphinx build',
+                       script: '''#!/bin/bash
+                       . sphinx_env/bin/activate
+                       /usr/bin/make --directory=./docs clean
+                       '''
+
+                    sh label: 'Invoking html target for Sphinx build',
+                       script: '''#!/bin/bash
+                       . sphinx_env/bin/activate
+                       /usr/bin/make --directory=./docs html
+                       '''
+
+                    sh label: 'Invoking latexpdf target for Sphinx build',
+                       script: '''#!/bin/bash
+                       . sphinx_env/bin/activate
+                       /usr/bin/make --directory=./docs latexpdf
+                       '''
+                }
+            }
+        }
+        // TODO: stage to push html to gh-pages branch
+        stage('Upload OPERA PDF Documentation to Artifactory FN') {
+            steps {
+                script {
+                    rtServer (
+                        id: 'ARTIFACTORY_FN_SERVER',
+                        url: params.ART_URL,
+                        credentialsId: params.ART_CREDENTIALS,
+                        timeout: 300
+                    )
+
+                    sh "mv ./docs/opera-pge-manual.pdf opera-pge-manual-${DOCKER_TAG}.pdf"
+
+                    echo "Uploading PDF documentation to Artifactory-FN"
+
+                    rtUpload(
+                        serverId: "ARTIFACTORY_FN_SERVER",
+                        spec:
+                          """{
+                              "files": [
+                                  {
+                                      "pattern": "opera-pge-manual-${DOCKER_TAG}.pdf",
+                                      "target": "${params.ART_DOCS_PATH}"
+                                  }
+                              ]
+                          }"""
+                    )
+
+                    sh "rm -f opera-pge-manual-${DOCKER_TAG}.pdf"
+                }
             }
         }
         stage('Upload OPERA PGE Docker image tar files to Artifactory-FN') {
@@ -134,6 +199,8 @@ pipeline {
         always {
             echo "Cleaning up Docker images from local host"
             sh ".ci/scripts/cleanup.sh ${DOCKER_TAG}"
+            echo "Removing Sphinx build environment"
+            sh "rm -rf sphinx_env"
             deleteDir()
         }
         success {
