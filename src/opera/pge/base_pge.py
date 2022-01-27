@@ -22,6 +22,7 @@ Module defining the Base PGE interfaces from which all other PGEs are derived.
 
 """
 
+from datetime import datetime
 import os
 from os.path import abspath, basename, exists, join, splitext
 
@@ -31,8 +32,10 @@ import yaml
 
 from opera.util.error_codes import ErrorCode
 from opera.util.logger import PgeLogger
+from opera.util.metfile import MetFile
 from opera.util.run_utils import create_sas_command_line
 from opera.util.run_utils import time_and_execute
+from opera.util.time import get_catalog_metadata_datetime_str
 
 from .runconfig import RunConfig
 
@@ -209,8 +212,33 @@ class PostProcessorMixin:
         pass
 
     def _create_catalog_metadata(self):
-        # TODO
-        pass
+        """Returns the catalog metadata as a Python dictionary"""
+
+        catalog_metadata = {
+            'PGE_Name': self.runconfig.pge_name,
+            # TODO PGE_Version and SAS_Version: temp placeholders -> need to integrate versioning
+            'PGE_Version': "1.0.test",
+            'SAS_Version': "2.1.test",
+            'Input_Files': self.runconfig.input_files,
+            'Ancillary_Files': self.runconfig.get_ancillary_filenames(),
+            'Production_DateTime': get_catalog_metadata_datetime_str(self.production_datetime)
+        }
+        return catalog_metadata
+
+    def _write_catalog_metadata(self):
+        """Create, write and validate the catalog metadata json file"""
+
+        met_dict = self._create_catalog_metadata()
+        # TODO - placeholder until file-naming conventions are established
+        met_filename = "test_catalog_metadata.json"
+        met_file = MetFile(met_filename, met_dict)
+        met_file.write()
+        if met_file.validate_json_file(met_filename, met_file.get_schema_file_path()):
+            msg = "Successfully created catalog metadata json file."
+            self.logger.info("pge_main", ErrorCode.CREATING_CATALOG_METADATA, msg)
+        else:
+            msg = f"SCHEMA ERROR: {met_file.get_error_msg()}"
+            self.logger.info("pge_main", ErrorCode.CREATING_CATALOG_METADATA, msg)
 
     def _create_iso_metadata(self):
         # TODO
@@ -248,7 +276,7 @@ class PostProcessorMixin:
         print(f'Running postprocessor for {self._post_mixin_name}')
 
         self._run_sas_qa_executable()
-        self._create_catalog_metadata()
+        self._write_catalog_metadata()
         self._create_iso_metadata()
         self._stage_output_files()
         self._finalize_log()
@@ -296,6 +324,7 @@ class PgeExecutor(PreProcessorMixin, PostProcessorMixin):
         self.runconfig_path = runconfig_path
         self.runconfig = None
         self.logger = kwargs.get('logger')
+        self.production_datetime = datetime.now()
 
     def _isolate_sas_runconfig(self):
         """
