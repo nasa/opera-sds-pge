@@ -90,11 +90,12 @@ class MetFileTestCase(unittest.TestCase):
         Methods tested in MetFile class:
             __setitem__
             __getitem__
-            set_key_value()
-            write_met_file(met_file_name, met_dict=None)
-            write_met_file(met_file_name, met_dict='update_dict')
-            read_met_file() - assigning the returned dict
-            read_met_file() - making a call with no assignment
+            write(met_file_name, met_dict=None):
+                - Writes .json catalog metadata file
+            write(met_file_name, met_dict='update_dict'):
+                - Adds key/value pairs before writing .json catalog metadata file
+            read():
+                - Reads the catalog metadata file into self.met_dict.
 
         """
         met_file = 'testMetFile.json'
@@ -108,9 +109,9 @@ class MetFileTestCase(unittest.TestCase):
         # Verify that write() created the simple met file
         self.assertTrue(exists(met_file))
         # Verify read and return
-        test_read = met_data.read()
+        met_data.read()
         # Verify the key value pair read from the file
-        self.assertEqual(test_read["test key"], "test value")
+        self.assertEqual(met_data["test key"], "test value")
         # Verify merge with an existing met file
         update_dict = {"test key 2": "test value 2"}
         met_merge = MetFile(met_file, update_dict)
@@ -144,14 +145,14 @@ class MetFileTestCase(unittest.TestCase):
         met_file = 'testCatalogMetadata.json'
         met_data = MetFile(met_file, catalog_metadata)
         self.assertIsInstance(met_data, MetFile)
-        # Save the test catalog metadata to disk
+        # Save the test catalog metadata to temporary
         met_data.write()
         # Verify that the schema test passes
         self.assertTrue(met_data.validate_json_file(met_file, met_data.get_schema_file_path()))
         # Modify the test catalog metadata
-        temp_metadata = met_data.read()
+        met_data.read()
         # Remove a ':' from the between mm:ss
-        temp_metadata['Production_DateTime'] = "2022-01-20T12:0710.9143060000Z"
+        met_data['Production_DateTime'] = "2022-01-20T12:0710.9143060000Z"
         # Verify that the schema test fails
         met_data.write()
         self.assertFalse(met_data.validate_json_file(met_file, met_data.get_schema_file_path()))

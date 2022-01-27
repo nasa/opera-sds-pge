@@ -98,16 +98,10 @@ class MetFile:
         Reads, an existing catalog metadata file.
         Loads the JSON fields into the instance's met_dict
 
-        Returns  optional
-        -------
-        A dictionary containing the catalog metadata JSON pairs
-
         """
         if os.path.exists(self._met_file):
             with open(self._met_file) as json_file:
                 self.met_dict = json.load(json_file)
-
-            return self.met_dict
 
     def validate_json_file(self, json_filename: str, schema_filename: str) -> (bool, str):
         """
