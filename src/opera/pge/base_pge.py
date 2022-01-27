@@ -206,9 +206,6 @@ class PostProcessorMixin:
     def __init__(self):
         self.name = None
         self.logger = None
-        # TODO remove blank lines
-
-        self.catalog_metadata = {}
 
     def _run_sas_qa_executable(self):
         # TODO
@@ -217,7 +214,7 @@ class PostProcessorMixin:
     def _create_catalog_metadata(self):
         """Returns the catalog metadata as a Python dictionary"""
 
-        self.catalog_metadata = {
+        catalog_metadata = {
             'PGE_Name': self.runconfig.pge_name,
             # TODO PGE_Version and SAS_Version: temp placeholders -> need to integrate versioning
             'PGE_Version': "1.0.test",
@@ -226,7 +223,7 @@ class PostProcessorMixin:
             'Ancillary_Files': self.runconfig.get_ancillary_filenames(),
             'Production_DateTime': get_catalog_metadata_datetime_str(self.production_datetime)
         }
-        return self.catalog_metadata
+        return catalog_metadata
 
     def _write_catalog_metadata(self):
         """Create, write and validate the catalog metadata json file"""
@@ -235,7 +232,7 @@ class PostProcessorMixin:
         # TODO - placeholder until file-naming conventions are established
         met_filename = "test_catalog_metadata.json"
         met_file = MetFile(met_filename, met_dict)
-        met_file.write_met_file()
+        met_file.write()
         if met_file.validate_json_file(met_filename, met_file.get_schema_file_path()):
             msg = "Successfully created catalog metadata json file."
             self.logger.info("pge_main", ErrorCode.CREATING_CATALOG_METADATA, msg)

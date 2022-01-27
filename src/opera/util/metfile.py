@@ -34,7 +34,7 @@ from pkg_resources import resource_filename
 
 
 class MetFile:
-    """Class read and write catalog metadata .met files."""
+    """Class used to read and write .json catalog metadata files."""
 
     SCHEMA_PATH = resource_filename('opera', 'schema/catalog_metadata_schema.json')
 
@@ -59,11 +59,9 @@ class MetFile:
         self.combined_error_msg = None
 
     def __setitem__(self, key_name, value):
-        print('in __setitem__')
         self.met_dict[key_name] = value
 
     def __getitem__(self, key_name):
-        print('in __getitem__')
         return self.met_dict[key_name]
 
     @classmethod
@@ -71,7 +69,7 @@ class MetFile:
         """Returns the path to schema file"""
         return cls.SCHEMA_PATH
 
-    def write_met_file(self):
+    def write(self):
         """
         Writes the catalog metadata file in JSON format to disk.
         If there is an existing catalog metadata file:
@@ -95,12 +93,12 @@ class MetFile:
         with open(self._met_file, "w") as f:
             json.dump(merged_met_dict, f, indent=2, sort_keys=True)
 
-    def read_met_file(self):
+    def read(self):
         """
         Reads, an existing catalog metadata file.
-        Loads the JSON fields into a dictionary
+        Loads the JSON fields into the instance's met_dict
 
-        Returns
+        Returns  optional
         -------
         A dictionary containing the catalog metadata JSON pairs
 
