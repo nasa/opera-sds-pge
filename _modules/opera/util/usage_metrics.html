@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>opera.util.usage_metrics &mdash; opera-sds-pge 1.0.0-er.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> opera-sds-pge
+          </a>
+              <div class="version">
+                1.0.0-er.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme.html">opera-sds-pge</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">opera</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../authors.html">Credits</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">opera-sds-pge</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>opera.util.usage_metrics</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for opera.util.usage_metrics</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright 2021, by the California Institute of Technology.</span>
+<span class="c1"># ALL RIGHTS RESERVED.</span>
+<span class="c1"># United States Government sponsorship acknowledged.</span>
+<span class="c1"># Any commercial use must be negotiated with the Office of Technology Transfer</span>
+<span class="c1"># at the California Institute of Technology.</span>
+<span class="c1"># This software may be subject to U.S. export control laws and regulations.</span>
+<span class="c1"># By accepting this document, the user agrees to comply with all applicable</span>
+<span class="c1"># U.S. export laws and regulations. User has the responsibility to obtain</span>
+<span class="c1"># export licenses, or other export authority as may be required, before</span>
+<span class="c1"># exporting such information to foreign countries or providing access to</span>
+<span class="c1"># foreign persons.</span>
+<span class="c1">#</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">================</span>
+<span class="sd">usage_metrics.py</span>
+<span class="sd">================</span>
+
+<span class="sd">OS-level metrics gathering functions for use with OPERA PGEs.</span>
+
+<span class="sd">This module is adapted for OPERA from the NISAR PGE R2.0.0 util/usage_metrics.py</span>
+<span class="sd">Original Author: David White</span>
+<span class="sd">Adapted By: Scott Collins</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">resource</span>
+<span class="kn">from</span> <span class="nn">sys</span> <span class="kn">import</span> <span class="n">platform</span>
+
+
+<div class="viewcode-block" id="get_os_metrics"><a class="viewcode-back" href="../../../opera.util.html#opera.util.usage_metrics.get_os_metrics">[docs]</a><span class="k">def</span> <span class="nf">get_os_metrics</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Gets metrics related to machine resource usage, both by the current process</span>
+<span class="sd">    as well as all of its children processes.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    metrics : dict</span>
+<span class="sd">        Dictionary containing metrics mapped to the following keys</span>
+<span class="sd">            os.cpu.seconds.sys -</span>
+<span class="sd">                System CPU time, in seconds, consumed by the current process and</span>
+<span class="sd">                its children</span>
+<span class="sd">            os.cpu.seconds.user -</span>
+<span class="sd">                User CPU time, in seconds, consumed by the current process and</span>
+<span class="sd">                its children</span>
+<span class="sd">            os.filesystem.reads -</span>
+<span class="sd">                Number of file system reads performed by the current process and</span>
+<span class="sd">                its children</span>
+<span class="sd">            os.filesystem.writes -</span>
+<span class="sd">                Number of file system writes performed by the current process</span>
+<span class="sd">                and its children</span>
+<span class="sd">            os.max_rss_kb.main_process -</span>
+<span class="sd">                Maximum resident set size (physical memory consumption), in</span>
+<span class="sd">                kilobytes, of the current process</span>
+<span class="sd">            os.max_rss_kb.largest_child_process -</span>
+<span class="sd">                Maximum resident set size (physical memory consumption), in</span>
+<span class="sd">                kilobytes, of the largest child process</span>
+<span class="sd">            os.peak_vm_kb.main_process -</span>
+<span class="sd">                Peak virtual memory usage, in kilobytes, of the current process.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">rusage_self</span> <span class="o">=</span> <span class="n">resource</span><span class="o">.</span><span class="n">getrusage</span><span class="p">(</span><span class="n">resource</span><span class="o">.</span><span class="n">RUSAGE_SELF</span><span class="p">)</span>
+    <span class="n">rusage_children</span> <span class="o">=</span> <span class="n">resource</span><span class="o">.</span><span class="n">getrusage</span><span class="p">(</span><span class="n">resource</span><span class="o">.</span><span class="n">RUSAGE_CHILDREN</span><span class="p">)</span>
+
+    <span class="n">metrics</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="c1"># these metrics include the current process and &quot;all children</span>
+        <span class="c1"># of the calling process that have terminated and been waited for&quot;;</span>
+        <span class="c1"># see the Linux man page for getrusage()</span>
+        <span class="s1">&#39;os.cpu.seconds.sys&#39;</span><span class="p">:</span> <span class="n">rusage_self</span><span class="o">.</span><span class="n">ru_stime</span> <span class="o">+</span> <span class="n">rusage_children</span><span class="o">.</span><span class="n">ru_stime</span><span class="p">,</span>
+        <span class="s1">&#39;os.cpu.seconds.user&#39;</span><span class="p">:</span> <span class="n">rusage_self</span><span class="o">.</span><span class="n">ru_utime</span> <span class="o">+</span> <span class="n">rusage_children</span><span class="o">.</span><span class="n">ru_utime</span><span class="p">,</span>
+        <span class="s1">&#39;os.filesystem.reads&#39;</span><span class="p">:</span> <span class="n">rusage_self</span><span class="o">.</span><span class="n">ru_inblock</span> <span class="o">+</span> <span class="n">rusage_children</span><span class="o">.</span><span class="n">ru_inblock</span><span class="p">,</span>
+        <span class="s1">&#39;os.filesystem.writes&#39;</span><span class="p">:</span> <span class="n">rusage_self</span><span class="o">.</span><span class="n">ru_oublock</span> <span class="o">+</span> <span class="n">rusage_children</span><span class="o">.</span><span class="n">ru_oublock</span><span class="p">,</span>
+        <span class="c1"># unfortunately the max_rss does not account for all child processes;</span>
+        <span class="c1"># see the Linux man page for getrusage()</span>
+        <span class="s1">&#39;os.max_rss_kb.main_process&#39;</span><span class="p">:</span> <span class="n">rusage_self</span><span class="o">.</span><span class="n">ru_maxrss</span><span class="p">,</span>
+        <span class="s1">&#39;os.max_rss_kb.largest_child_process&#39;</span><span class="p">:</span> <span class="n">rusage_children</span><span class="o">.</span><span class="n">ru_maxrss</span><span class="p">,</span>
+        <span class="s1">&#39;os.peak_vm_kb.main_process&#39;</span><span class="p">:</span> <span class="n">get_self_peak_vmm_kb</span><span class="p">()</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">metrics</span></div>
+
+
+<div class="viewcode-block" id="get_self_peak_vmm_kb"><a class="viewcode-back" href="../../../opera.util.html#opera.util.usage_metrics.get_self_peak_vmm_kb">[docs]</a><span class="k">def</span> <span class="nf">get_self_peak_vmm_kb</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Attempt to get the peak virtual memory by looking into the /proc/self/status</span>
+
+<span class="sd">    Note that this accounts for the peak virtual memory of just the current</span>
+<span class="sd">    process, not the sum of the current process and all its children.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    vm_peak_kb : int</span>
+<span class="sd">        Peak virtual memory usage, in kilobytes, of the current process. If</span>
+<span class="sd">        this value cannot be obtained for any reason, -1 is returned instead.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">vm_peak_kb</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="n">status_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="s1">&#39;proc&#39;</span><span class="p">,</span> <span class="s1">&#39;self&#39;</span><span class="p">,</span> <span class="s1">&#39;status&#39;</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">platform</span> <span class="o">!=</span> <span class="s2">&quot;linux&quot;</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">status_file</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">EnvironmentError</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">status_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">infile</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">infile</span><span class="o">.</span><span class="n">readlines</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;VmPeak:&quot;</span><span class="p">):</span>
+                    <span class="n">vm_peak_str</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;VmPeak:&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;kB&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                    <span class="n">vm_peak_kb</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">vm_peak_str</span><span class="p">)</span>
+                    <span class="k">break</span>
+
+    <span class="k">except</span> <span class="ne">EnvironmentError</span><span class="p">:</span>
+        <span class="n">vm_peak_kb</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">vm_peak_kb</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021-2022 California Institute of Technology.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

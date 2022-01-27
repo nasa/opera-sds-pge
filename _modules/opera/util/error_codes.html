@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>opera.util.error_codes &mdash; opera-sds-pge 1.0.0-er.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> opera-sds-pge
+          </a>
+              <div class="version">
+                1.0.0-er.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme.html">opera-sds-pge</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">opera</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../authors.html">Credits</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">opera-sds-pge</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>opera.util.error_codes</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for opera.util.error_codes</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright 2021, by the California Institute of Technology.</span>
+<span class="c1"># ALL RIGHTS RESERVED.</span>
+<span class="c1"># United States Government sponsorship acknowledged.</span>
+<span class="c1"># Any commercial use must be negotiated with the Office of Technology Transfer</span>
+<span class="c1"># at the California Institute of Technology.</span>
+<span class="c1"># This software may be subject to U.S. export control laws and regulations.</span>
+<span class="c1"># By accepting this document, the user agrees to comply with all applicable</span>
+<span class="c1"># U.S. export laws and regulations. User has the responsibility to obtain</span>
+<span class="c1"># export licenses, or other export authority as may be required, before</span>
+<span class="c1"># exporting such information to foreign countries or providing access to</span>
+<span class="c1"># foreign persons.</span>
+<span class="c1">#</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">==============</span>
+<span class="sd">error_codes.py</span>
+<span class="sd">==============</span>
+
+<span class="sd">Error codes for use with OPERA PGEs.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">IntEnum</span><span class="p">,</span> <span class="n">auto</span><span class="p">,</span> <span class="n">unique</span>
+
+<span class="n">CODES_PER_RANGE</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="sd">&quot;&quot;&quot;Number of error codes allocated to each range&quot;&quot;&quot;</span>
+
+<span class="n">INFO_RANGE_START</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="sd">&quot;&quot;&quot;Starting value for the Info code range&quot;&quot;&quot;</span>
+
+<span class="n">DEBUG_RANGE_START</span> <span class="o">=</span> <span class="n">INFO_RANGE_START</span> <span class="o">+</span> <span class="n">CODES_PER_RANGE</span>
+<span class="sd">&quot;&quot;&quot;Starting value for the Debug code range&quot;&quot;&quot;</span>
+
+<span class="n">WARNING_RANGE_START</span> <span class="o">=</span> <span class="n">DEBUG_RANGE_START</span> <span class="o">+</span> <span class="n">CODES_PER_RANGE</span>
+<span class="sd">&quot;&quot;&quot;Starting value for the Warning code range&quot;&quot;&quot;</span>
+
+<span class="n">CRITICAL_RANGE_START</span> <span class="o">=</span> <span class="n">WARNING_RANGE_START</span> <span class="o">+</span> <span class="n">CODES_PER_RANGE</span>
+<span class="sd">&quot;&quot;&quot;Starting value for the Critical code range&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="ErrorCode"><a class="viewcode-back" href="../../../opera.util.html#opera.util.error_codes.ErrorCode">[docs]</a><span class="nd">@unique</span>
+<span class="k">class</span> <span class="nc">ErrorCode</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Error codes for OPERA PGEs.</span>
+
+<span class="sd">    Each code is combined with the designated error code offset defined by</span>
+<span class="sd">    the RunConfig to determine the final, logged error code.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Info - 0 to 999</span>
+    <span class="n">OVERALL_SUCCESS</span> <span class="o">=</span> <span class="n">INFO_RANGE_START</span>
+    <span class="n">LOG_FILE_CREATED</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">LOADING_RUN_CONFIG_FILE</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">VALIDATING_RUN_CONFIG_FILE</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">LOG_FILE_INIT_COMPLETE</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">CREATING_WORKING_DIRECTORY</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">DIRECTORY_SETUP_COMPLETE</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">MOVING_LOG_FILE</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">MOVING_OUTPUT_FILE</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">SUMMARY_STATS_MESSAGE</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">RUN_CONFIG_FILENAME</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">PGE_NAME</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">SCHEMA_FILE</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">INPUT_FILE</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">PROCESSING_INPUT_FILE</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">USING_CONFIG_FILE</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">CREATED_SAS_CONFIG</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">CREATING_OUTPUT_FILE</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">CREATING_CATALOG_METADATA</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">CREATING_ISO_METADATA</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">SAS_PROGRAM_STARTING</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">SAS_PROGRAM_COMPLETED</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">QA_SAS_PROGRAM_STARTING</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">QA_SAS_PROGRAM_COMPLETED</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">QA_SAS_PRODUCED_VALIDATION_LOG_MESSAGES</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">QA_SAS_END_OF_VALIDATION_LOG_MESSAGES</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">QA_SAS_DID_NOT_PRODUCE_VALIDATION_LOG_MESSAGES</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">RENDERING_ISO_METADATA</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">CLOSING_LOG_FILE</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+
+    <span class="c1"># Debug - 1000 – 1999</span>
+    <span class="n">CONFIGURATION_DETAILS</span> <span class="o">=</span> <span class="n">DEBUG_RANGE_START</span>
+    <span class="n">PROCESSING_DETAILS</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">SAS_EXE_COMMAND_LINE</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+
+    <span class="c1"># Warning - 2000 – 2999</span>
+    <span class="n">DATE_RANGE_MISSING</span> <span class="o">=</span> <span class="n">WARNING_RANGE_START</span>
+    <span class="n">ISO_METADATA_CANT_RENDER_ONE_VARIABLE</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">LOGGING_REQUESTED_SEVERITY_NOT_FOUND</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">LOGGING_SOURCE_FILE_DOES_NOT_EXIST</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">LOGGING_COULD_NOT_INCREMENT_SEVERITY</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">LOGGING_RESYNC_FAILED</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+
+    <span class="c1"># Critical - 3000 to 3999</span>
+    <span class="n">RUN_CONFIG_VALIDATION_FAILED</span> <span class="o">=</span> <span class="n">CRITICAL_RANGE_START</span>
+    <span class="n">DIRECTORY_CREATION_FAILED</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">SAS_CONFIG_CREATION_FAILED</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">INPUT_NOT_FOUND</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">OUTPUT_NOT_FOUND</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">INVALID_INPUT</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">INVALID_OUTPUT</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">FILENAME_VIOLATES_NAMING_CONVENTION</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">SAS_PROGRAM_NOT_FOUND</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">SAS_PROGRAM_FAILED</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">QA_SAS_PROGRAM_NOT_FOUND</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">QA_SAS_PROGRAM_FAILED</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">ISO_METADATA_GOT_SOME_RENDERING_ERRORS</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">ISO_METADATA_RENDER_FAILED</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">SAS_OUTPUT_FILE_HAS_MISSING_DATA</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+
+<div class="viewcode-block" id="ErrorCode.describe"><a class="viewcode-back" href="../../../opera.util.html#opera.util.error_codes.ErrorCode.describe">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">describe</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Provides a listing of the available error codes and their associated</span>
+<span class="sd">        integer values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">member</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__members__</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">member</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021-2022 California Institute of Technology.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

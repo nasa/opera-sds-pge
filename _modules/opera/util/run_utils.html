@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>opera.util.run_utils &mdash; opera-sds-pge 1.0.0-er.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> opera-sds-pge
+          </a>
+              <div class="version">
+                1.0.0-er.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme.html">opera-sds-pge</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">opera</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../authors.html">Credits</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">opera-sds-pge</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>opera.util.run_utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for opera.util.run_utils</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright 2021, by the California Institute of Technology.</span>
+<span class="c1"># ALL RIGHTS RESERVED.</span>
+<span class="c1"># United States Government sponsorship acknowledged.</span>
+<span class="c1"># Any commercial use must be negotiated with the Office of Technology Transfer</span>
+<span class="c1"># at the California Institute of Technology.</span>
+<span class="c1"># This software may be subject to U.S. export control laws and regulations.</span>
+<span class="c1"># By accepting this document, the user agrees to comply with all applicable</span>
+<span class="c1"># U.S. export laws and regulations. User has the responsibility to obtain</span>
+<span class="c1"># export licenses, or other export authority as may be required, before</span>
+<span class="c1"># exporting such information to foreign countries or providing access to</span>
+<span class="c1"># foreign persons.</span>
+<span class="c1">#</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">============</span>
+<span class="sd">run_utils.py</span>
+<span class="sd">============</span>
+
+<span class="sd">Contains utility functions for running executable processes within the OPERA PGE</span>
+<span class="sd">subsystem.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">abspath</span>
+
+<span class="kn">from</span> <span class="nn">.error_codes</span> <span class="kn">import</span> <span class="n">ErrorCode</span>
+
+
+<div class="viewcode-block" id="create_sas_command_line"><a class="viewcode-back" href="../../../opera.util.html#opera.util.run_utils.create_sas_command_line">[docs]</a><span class="k">def</span> <span class="nf">create_sas_command_line</span><span class="p">(</span><span class="n">sas_program_path</span><span class="p">,</span> <span class="n">sas_runconfig_path</span><span class="p">,</span>
+                            <span class="n">sas_program_options</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Forms the appropriate command line for executing a SAS from the parameters</span>
+<span class="sd">    obtained from the RunConfig.</span>
+
+<span class="sd">    By default, this function assumes the SAS program path corresponds to an</span>
+<span class="sd">    executable file reaching within the current environment&#39;s PATH. If this</span>
+<span class="sd">    function cannot locate the executable, the SAS program path is assumed to be</span>
+<span class="sd">    a Python module path and treated accordingly.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    sas_program_path : str</span>
+<span class="sd">        The path to the SAS executable to be invoked by the returned command line.</span>
+<span class="sd">    sas_runconfig_path : str</span>
+<span class="sd">        The path to the RunConfig to feed to the SAS executable in the returned</span>
+<span class="sd">        command line.</span>
+<span class="sd">    sas_program_options : list[str], optional</span>
+<span class="sd">        List of options to include in the returned command line.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    command_line : list[str]</span>
+<span class="sd">        The fully formed command line, returned in list format suitable for use</span>
+<span class="sd">        with subprocess.run.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    OSError</span>
+<span class="sd">        If the SAS executable exists within the current environment, but is not</span>
+<span class="sd">        set with execute permissions for the current process.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">command_line</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">if</span> <span class="n">executable_path</span> <span class="o">:=</span> <span class="n">shutil</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="n">sas_program_path</span><span class="p">):</span>
+        <span class="n">command_line</span> <span class="o">=</span> <span class="p">[</span><span class="n">executable_path</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">executable_path</span> <span class="o">=</span> <span class="n">abspath</span><span class="p">(</span><span class="n">sas_program_path</span><span class="p">)</span>
+
+        <span class="c1"># Check if the executable exists</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">access</span><span class="p">(</span><span class="n">executable_path</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">F_OK</span><span class="p">):</span>
+            <span class="c1"># Check if the executable has &#39;execute&#39; permissions on it</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">access</span><span class="p">(</span><span class="n">executable_path</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">X_OK</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Requested SAS program path </span><span class="si">{</span><span class="n">sas_program_path</span><span class="si">}</span><span class="s2"> exists, &quot;</span>
+                              <span class="sa">f</span><span class="s2">&quot;but does not have execute permissions.&quot;</span><span class="p">)</span>
+        <span class="c1"># Otherwise, sas_program_path might be a python module path</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">command_line</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;python3&#39;</span><span class="p">,</span> <span class="s1">&#39;-m&#39;</span><span class="p">,</span> <span class="n">sas_program_path</span><span class="p">]</span>
+
+    <span class="c1"># Add any provided arguments</span>
+    <span class="k">if</span> <span class="n">sas_program_options</span><span class="p">:</span>
+        <span class="n">command_line</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">sas_program_options</span><span class="p">)</span>
+
+    <span class="c1"># Lastly, only explicit input should ever be the path to the runconfig</span>
+    <span class="n">command_line</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sas_runconfig_path</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">command_line</span></div>
+
+
+<div class="viewcode-block" id="time_and_execute"><a class="viewcode-back" href="../../../opera.util.html#opera.util.run_utils.time_and_execute">[docs]</a><span class="k">def</span> <span class="nf">time_and_execute</span><span class="p">(</span><span class="n">command_line</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">execute_via_shell</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Executes the provided command line via subprocess while collecting the</span>
+<span class="sd">    runtime of the execution.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    command_line : Iterable[str]</span>
+<span class="sd">        The command line program, including options/arguments, to execute.</span>
+<span class="sd">        Each</span>
+<span class="sd">    logger : PgeLogger</span>
+<span class="sd">        A logger object used to capture any error status returned from execution.</span>
+<span class="sd">    execute_via_shell : bool, optional</span>
+<span class="sd">        If true, instruct subprocess.run to execute the command-line via system</span>
+<span class="sd">        shell. Useful for running test commands but should generally not be used</span>
+<span class="sd">        for production.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    elapsed_time : float</span>
+<span class="sd">        The time elapsed during execution, in seconds.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">module_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;time_and_execute::</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
+
+    <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">monotonic</span><span class="p">()</span>
+
+    <span class="c1"># If the command is to be fed to shell, recombine the list into a single</span>
+    <span class="c1"># string. Otherwise only the first token (the executable) would be invoked.</span>
+    <span class="k">if</span> <span class="n">execute_via_shell</span><span class="p">:</span>
+        <span class="n">command_line</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">command_line</span><span class="p">)</span>
+
+    <span class="c1"># TODO: support for timeout argument?</span>
+    <span class="n">run_result</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">command_line</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">check</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">STDOUT</span><span class="p">,</span>
+                                <span class="n">shell</span><span class="o">=</span><span class="n">execute_via_shell</span><span class="p">)</span>
+
+    <span class="c1"># Append the stdout/stderr captured by the subprocess to our log</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">run_result</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">decode</span><span class="p">())</span>
+
+    <span class="k">if</span> <span class="n">run_result</span><span class="o">.</span><span class="n">returncode</span><span class="p">:</span>
+        <span class="n">error_msg</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Command &quot;</span><span class="si">{</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">command_line</span><span class="p">)</span><span class="si">}</span><span class="s1">&quot; failed with exit &#39;</span>
+                     <span class="sa">f</span><span class="s1">&#39;code </span><span class="si">{</span><span class="n">run_result</span><span class="o">.</span><span class="n">returncode</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="n">module_name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">SAS_PROGRAM_FAILED</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">)</span>
+
+    <span class="n">stop_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">monotonic</span><span class="p">()</span>
+
+    <span class="n">elapsed_time</span> <span class="o">=</span> <span class="n">stop_time</span> <span class="o">-</span> <span class="n">start_time</span>
+
+    <span class="k">return</span> <span class="n">elapsed_time</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021-2022 California Institute of Technology.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
