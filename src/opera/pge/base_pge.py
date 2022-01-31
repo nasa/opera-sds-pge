@@ -34,6 +34,7 @@ from opera.util.error_codes import ErrorCode
 from opera.util.logger import PgeLogger
 from opera.util.metfile import MetFile
 from opera.util.run_utils import create_sas_command_line
+from opera.util.run_utils import create_qa_command_line
 from opera.util.run_utils import time_and_execute
 from opera.util.time import get_catalog_metadata_datetime_str
 
@@ -208,8 +209,42 @@ class PostProcessorMixin:
         self.logger = None
 
     def _run_sas_qa_executable(self):
-        # TODO
-        pass
+        """
+        Executes an optional Quality Assurance (QA) application which may be bundled
+        with a SAS delivery. QA execution is controlled by settings within the
+        provided RunConfig.
+
+        If enabled, execution time for the QA application is collected and logged by
+        this method.
+
+        """
+        if self.runconfig.qa_enabled:
+            qa_program_path = self.runconfig.qa_program_path
+            qa_program_options = self.runconfig.qa_program_options
+
+            try:
+                command_line = create_qa_command_line(qa_program_path, qa_program_options)
+            except OSError as err:
+                self.logger.critical(self.name, ErrorCode.QA_SAS_PROGRAM_FAILED,
+                                     f'Failed to create QA command line, reason: {str(err)}')
+
+            self.logger.debug(self.name, ErrorCode.SAS_QA_COMMAND_LINE,
+                              f'QA EXE command line: {" ".join(command_line)}')
+
+            self.logger.info(self.name, ErrorCode.QA_SAS_PROGRAM_STARTING,
+                             'Starting SAS QA executable')
+
+            elapsed_time = time_and_execute(
+                command_line, self.logger, self.runconfig.execute_via_shell
+            )
+
+            self.logger.info(self.name, ErrorCode.QA_SAS_PROGRAM_COMPLETED,
+                             'SAS QA executable complete')
+
+            self.logger.log_one_metric(self.name, 'sas.qa.elapsed_seconds', elapsed_time)
+        else:
+            self.logger.info(self.name, ErrorCode.QA_SAS_PROGRAM_DISABLED,
+                             'SAS QA is disabled, skipping')
 
     def _create_catalog_metadata(self):
         """Returns the catalog metadata as a Python dictionary"""
@@ -371,9 +406,13 @@ class PgeExecutor(PreProcessorMixin, PostProcessorMixin):
         sas_program_options = self.runconfig.sas_program_options
         sas_runconfig_filepath = self._isolate_sas_runconfig()
 
-        command_line = create_sas_command_line(
-            sas_program_path, sas_runconfig_filepath, sas_program_options
-        )
+        try:
+            command_line = create_sas_command_line(
+                sas_program_path, sas_runconfig_filepath, sas_program_options
+            )
+        except OSError as err:
+            self.logger.critical(self.name, ErrorCode.SAS_PROGRAM_FAILED,
+                                 f'Failed to create SAS command line, reason: {str(err)}')
 
         self.logger.debug(self.name, ErrorCode.SAS_EXE_COMMAND_LINE,
                           f'SAS EXE command line: {" ".join(command_line)}')
