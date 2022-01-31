@@ -32,6 +32,7 @@ from pkg_resources import resource_filename
 
 from opera.util.logger import PgeLogger
 from opera.util.run_utils import create_sas_command_line
+from opera.util.run_utils import create_qa_command_line
 from opera.util.run_utils import time_and_execute
 
 
@@ -88,7 +89,7 @@ class RunUtilsTestCase(unittest.TestCase):
         # by a which call)
         cmd = 'echo'
         runconfig_path = '/path/to/runconfig'
-        options = ['Hello from test_create_command_line function.', '--']
+        options = ['Hello from test_create_sas_command_line function.', '--']
 
         command_line = create_sas_command_line(cmd, runconfig_path, options)
 
@@ -121,6 +122,44 @@ class RunUtilsTestCase(unittest.TestCase):
 
         # Check that the runconfig path was appended as the final input argument
         self.assertEqual(command_line[-1], runconfig_path)
+
+        # Check that each option made it into the command line
+        for option in options:
+            self.assertIn(option, command_line)
+
+    def test_create_qa_command_line(self):
+        """Tests for run_utils.create_qa_command_line()"""
+
+        # Make a command from something locally available on PATH (findable by a
+        # which call)
+        cmd = 'echo'
+        options = ['Hello from test_create_qa_command_line function.']
+
+        command_line = create_qa_command_line(cmd, options)
+
+        self.assertIsInstance(command_line, list)
+        self.assertEqual(len(command_line), 2)
+
+        # Check that the executable was resolved to an actual location on disk
+        self.assertEqual(command_line[0], shutil.which(cmd))
+
+        # Check that the option(s) made it into the command line
+        for option in options:
+            self.assertIn(option, command_line)
+
+        # Make a command using a python module name (not findable with which)
+        cmd = 'unittest'
+        options = ['--verbose', '--', 'opera.test.test_run_utils']
+
+        command_line = create_qa_command_line(cmd, options)
+
+        self.assertIsInstance(command_line, list)
+        self.assertEqual(len(command_line), 6)
+
+        # Check that python3 was assigned as the executable
+        self.assertEqual(command_line[0], 'python3')
+        self.assertEqual(command_line[1], '-m')
+        self.assertEqual(command_line[2], cmd)
 
         # Check that each option made it into the command line
         for option in options:

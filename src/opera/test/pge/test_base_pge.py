@@ -78,7 +78,7 @@ class BasePgeTestCase(unittest.TestCase):
         self.assertEqual(pge.pge_name, "BasePgeTest")
         self.assertEqual(pge.runconfig_path, runconfig_path)
 
-        # Check that other objects have not be instantiated yet
+        # Check that other objects have not been instantiated yet
         self.assertIsNone(pge.runconfig)
         self.assertIsNone(pge.logger)
 
@@ -93,7 +93,7 @@ class BasePgeTestCase(unittest.TestCase):
         self.assertTrue(os.path.isdir(pge.runconfig.output_product_path))
         self.assertTrue(os.path.isdir(pge.runconfig.scratch_path))
 
-        # Check that a in-memory log was created
+        # Check that an in-memory log was created
         stream_obj = pge.logger.get_stream_object()
         self.assertTrue(isinstance(stream_obj, StringIO))
 
@@ -110,6 +110,9 @@ class BasePgeTestCase(unittest.TestCase):
             log_contents = infile.read()
 
         self.assertIn('hello world', log_contents)
+
+        # Make sure the run time metric was captured as well
+        self.assertIn('sas.elapsed_seconds:', log_contents)
 
     def test_base_pge_w_invalid_runconfig(self):
         """
@@ -166,6 +169,38 @@ class BasePgeTestCase(unittest.TestCase):
         expected_error_code = 123
 
         self.assertIn(f"failed with exit code {expected_error_code}", log_contents)
+
+    def test_sas_qa_execution(self):
+        """
+        Test execution of the PgeExecutor class using a test RunConfig that invokes
+        a Quality Assurance (QA) application, in addition to the configured SAS
+        executable.
+
+        For this test, both the SAS an QA exes are configured to be just echo
+        statements by the test RunConfig.
+
+        """
+        runconfig_path = join(self.data_dir, 'test_sas_qa_config.yaml')
+
+        pge = PgeExecutor(pge_name='PgeQATest', runconfig_path=runconfig_path)
+
+        # Kickoff execution of the PGE
+        pge.run()
+
+        # Check that the log file was created and moved into the output directory
+        expected_log_file = join(pge.runconfig.output_product_path, pge.logger.get_file_name())
+        self.assertTrue(os.path.exists(expected_log_file))
+
+        # Open the log file, and check that we got expected output for both the SAS exe and the QA exe
+        with open(expected_log_file, 'r', encoding='utf-8') as infile:
+            log_contents = infile.read()
+
+        self.assertIn('hello from primary executable', log_contents)
+        self.assertIn('hello from qa executable', log_contents)
+
+        # Make sure the run time metrics were captured for both applications
+        self.assertIn('sas.elapsed_seconds:', log_contents)
+        self.assertIn('sas.qa.elapsed_seconds:', log_contents)
 
 
 if __name__ == "__main__":
