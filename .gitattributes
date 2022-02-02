@@ -1,0 +1,8 @@
+*.tif binary
+*.img binary
+*.pdf binary
+*.tar binary
+*.tar.gz binary
+*.tar.bz2 binary
+*.pptx binary
+*.png binary
