@@ -46,7 +46,7 @@ class PgeMainTestCase(unittest.TestCase):
         """
         cls.starting_dir = abspath(os.curdir)
         cls.test_dir = resource_filename(__name__, "")
-        cls.data_dir = join(cls.test_dir, "data")
+        cls.data_dir = join(cls.test_dir, os.pardir, "data")
         cls.scripts_dir = abspath(join(os.pardir, os.pardir, 'scripts'))
 
         os.chdir(cls.test_dir)

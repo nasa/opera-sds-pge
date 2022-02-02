@@ -54,7 +54,6 @@ class MetFileTestCase(unittest.TestCase):
         """
         cls.starting_dir = abspath(os.curdir)
         cls.test_dir = resource_filename(__name__, "")
-        cls.data_dir = join(cls.test_dir, "data")
 
         os.chdir(cls.test_dir)
 
