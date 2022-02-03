@@ -74,28 +74,38 @@ pipeline {
             steps {
                 script {
                     echo "Installing Sphinx Dependencies"
-                    sh '''#!/bin/bash
-                         /usr/local/bin/python3 -m venv sphinx_env
-                         . sphinx_env/bin/activate
-                         pip install -r ./requirements.txt
-                         pip install -r ./requirements_dev.txt
+                    sh label: 'Installing conda environment for Sphinx',
+                       script: '''#!/bin/bash
+                         /usr/local/anaconda3/bin/conda create -n sphinx_env python=3.8 pip
+                         /usr/local/anaconda3/bin/conda init bash
                     '''
+
+                    sh label: 'Installing Sphinx to conda environment',
+                       script: '''#!/bin/bash
+                       . /var/lib/jenkins/.bashrc
+                       conda activate sphinx_env
+                       pip install -r ./requirements.txt
+                       pip install -r ./requirements_dev.txt
+                       '''
 
                     sh label: 'Invoking clean target for Sphinx build',
                        script: '''#!/bin/bash
-                       . sphinx_env/bin/activate
+                       . /var/lib/jenkins/.bashrc
+                       conda activate sphinx_env
                        /usr/bin/make --directory=./docs clean
                        '''
 
                     sh label: 'Invoking html target for Sphinx build',
                        script: '''#!/bin/bash
-                       . sphinx_env/bin/activate
+                       . /var/lib/jenkins/.bashrc
+                       conda activate sphinx_env
                        /usr/bin/make --directory=./docs html
                        '''
 
                     sh label: 'Invoking latexpdf target for Sphinx build',
                        script: '''#!/bin/bash
-                       . sphinx_env/bin/activate
+                       . /var/lib/jenkins/.bashrc
+                       conda activate sphinx_env
                        /usr/bin/make --directory=./docs latexpdf
                        '''
                 }
@@ -200,7 +210,8 @@ pipeline {
             echo "Cleaning up Docker images from local host"
             sh ".ci/scripts/cleanup.sh ${DOCKER_TAG}"
             echo "Removing Sphinx build environment"
-            sh "rm -rf sphinx_env"
+            sh "/usr/local/anaconda3/bin/conda env remove --name sphinx_env"
+            sh "/usr/local/anaconda3/bin/conda init --reverse"
             deleteDir()
         }
         success {
