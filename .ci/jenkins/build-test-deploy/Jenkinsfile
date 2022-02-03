@@ -31,6 +31,11 @@ pipeline {
                      credentialType: 'com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl',
                      description: 'Artifactory-FN credentials for account collinss. Used to push/pull images from Artifactory during build.',
                      required: true)
+        credentials(name: 'GITHUB_OAUTH_TOKEN',
+                    defaultValue: '8443f80e-014a-4dea-b122-5ca34d8aaab1',
+                    credentialType: 'org.jenkinsci.plugins.plaincredentials.impl.StringCredentialsImpl',
+                    description: 'GitHub OAUTH Token for user collinss-jpl on github.com',
+                    required: true)
     }
     environment {
         DOCKER_IMAGE_PREFIX = 'opera_pge'
@@ -111,8 +116,27 @@ pipeline {
                 }
             }
         }
-        // TODO: stage to push html to gh-pages branch
-        stage('Upload OPERA PDF Documentation to Artifactory FN') {
+        stage('Push OPERA PGE HTML documentation to GitHub Pages') {
+            steps {
+                git branch: 'gh-pages',
+                    changelog: false,
+                    poll: false,
+                    url: 'https://github.com/nasa/opera-sds-pge'
+
+                withCredentials([string(credentialsId: params.GITHUB_OAUTH_TOKEN, variable: 'TOKEN')]) {
+                    sh label: 'Updating gh-pages branch with latest HTML docs',
+                       script: '''#!/bin/bash
+                       cp -rf ./docs/_build/html/* .
+                       git add .
+                       git add -u
+                       git commit -m "HTML docs update by Jenkins"
+                       git remote set-url origin https://${TOKEN}@github.com/nasa/opera-sds-pge.git
+                       git push --set-upstream origin gh-pages
+                       '''
+                }
+            }
+        }
+        stage('Upload OPERA PGE PDF Documentation to Artifactory FN') {
             steps {
                 script {
                     rtServer (
