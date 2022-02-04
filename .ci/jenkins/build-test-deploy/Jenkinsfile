@@ -107,12 +107,13 @@ pipeline {
                        /usr/bin/make --directory=./docs html
                        '''
 
-                    sh label: 'Invoking latexpdf target for Sphinx build',
-                       script: '''#!/bin/bash
-                       . /var/lib/jenkins/.bashrc
-                       conda activate sphinx_env
-                       /usr/bin/make --directory=./docs latexpdf
-                       '''
+                    // TODO: revisit once latexpdf is working on CI system
+                    //sh label: 'Invoking latexpdf target for Sphinx build',
+                    //   script: '''#!/bin/bash
+                    //   . /var/lib/jenkins/.bashrc
+                    //   conda activate sphinx_env
+                    //   /usr/bin/make --directory=./docs latexpdf
+                    //   '''
                 }
             }
         }
@@ -136,37 +137,38 @@ pipeline {
                 }
             }
         }
-        stage('Upload OPERA PGE PDF Documentation to Artifactory FN') {
-            steps {
-                script {
-                    rtServer (
-                        id: 'ARTIFACTORY_FN_SERVER',
-                        url: params.ART_URL,
-                        credentialsId: params.ART_CREDENTIALS,
-                        timeout: 300
-                    )
-
-                    sh "mv ./docs/opera-pge-manual.pdf opera-pge-manual-${DOCKER_TAG}.pdf"
-
-                    echo "Uploading PDF documentation to Artifactory-FN"
-
-                    rtUpload(
-                        serverId: "ARTIFACTORY_FN_SERVER",
-                        spec:
-                          """{
-                              "files": [
-                                  {
-                                      "pattern": "opera-pge-manual-${DOCKER_TAG}.pdf",
-                                      "target": "${params.ART_DOCS_PATH}"
-                                  }
-                              ]
-                          }"""
-                    )
-
-                    sh "rm -f opera-pge-manual-${DOCKER_TAG}.pdf"
-                }
-            }
-        }
+        // TODO: revisit once latexpdf is working on CI system
+//         stage('Upload OPERA PGE PDF Documentation to Artifactory FN') {
+//             steps {
+//                 script {
+//                     rtServer (
+//                         id: 'ARTIFACTORY_FN_SERVER',
+//                         url: params.ART_URL,
+//                         credentialsId: params.ART_CREDENTIALS,
+//                         timeout: 300
+//                     )
+//
+//                     sh "mv ./docs/opera-pge-manual.pdf opera-pge-manual-${DOCKER_TAG}.pdf"
+//
+//                     echo "Uploading PDF documentation to Artifactory-FN"
+//
+//                     rtUpload(
+//                         serverId: "ARTIFACTORY_FN_SERVER",
+//                         spec:
+//                           """{
+//                               "files": [
+//                                   {
+//                                       "pattern": "opera-pge-manual-${DOCKER_TAG}.pdf",
+//                                       "target": "${params.ART_DOCS_PATH}"
+//                                   }
+//                               ]
+//                           }"""
+//                     )
+//
+//                     sh "rm -f opera-pge-manual-${DOCKER_TAG}.pdf"
+//                 }
+//             }
+//         }
         stage('Upload OPERA PGE Docker image tar files to Artifactory-FN') {
             steps {
                 script {
