@@ -19,6 +19,8 @@ pipeline {
                description: 'Artifactory-FN URL.')
         string(name: 'ART_TAR_PATH', defaultValue: 'general/gov/nasa/jpl/opera/sds/pge/',
                description: 'Artifactory path to publish PGE docker image tar files to.')
+        string(name: 'ART_DOCS_PATH', defaultValue: 'general/gov/nasa/jpl/opera/sds/pge/documentation',
+               description: 'Artifactory path to publish PGE documentation files to.')
         string(name: 'ART_DOCKER_PATH', defaultValue: '/gov/nasa/jpl/opera/sds/pge/',
                description: 'Artifactory path to push Docker images.')
         string(name: 'ART_DOCKER_REGISTRY', defaultValue: 'artifactory-fn.jpl.nasa.gov:16001',
@@ -29,6 +31,11 @@ pipeline {
                      credentialType: 'com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl',
                      description: 'Artifactory-FN credentials for account collinss. Used to push/pull images from Artifactory during build.',
                      required: true)
+        credentials(name: 'GITHUB_OAUTH_TOKEN',
+                    defaultValue: '8443f80e-014a-4dea-b122-5ca34d8aaab1',
+                    credentialType: 'org.jenkinsci.plugins.plaincredentials.impl.StringCredentialsImpl',
+                    description: 'GitHub OAUTH Token for user collinss-jpl on github.com',
+                    required: true)
     }
     environment {
         DOCKER_IMAGE_PREFIX = 'opera_pge'
@@ -68,6 +75,100 @@ pipeline {
                              reportTitles: 'DSWx-HLS Code Coverage'])
             }
         }
+        stage('Generate OPERA PGE Sphinx Documentation') {
+            steps {
+                script {
+                    echo "Installing Sphinx Dependencies"
+                    sh label: 'Installing conda environment for Sphinx',
+                       script: '''#!/bin/bash
+                         /usr/local/anaconda3/bin/conda create -n sphinx_env python=3.8 pip
+                         /usr/local/anaconda3/bin/conda init bash
+                    '''
+
+                    sh label: 'Installing Sphinx to conda environment',
+                       script: '''#!/bin/bash
+                       . /var/lib/jenkins/.bashrc
+                       conda activate sphinx_env
+                       pip install -r ./requirements.txt
+                       pip install -r ./requirements_dev.txt
+                       '''
+
+                    sh label: 'Invoking clean target for Sphinx build',
+                       script: '''#!/bin/bash
+                       . /var/lib/jenkins/.bashrc
+                       conda activate sphinx_env
+                       /usr/bin/make --directory=./docs clean
+                       '''
+
+                    sh label: 'Invoking html target for Sphinx build',
+                       script: '''#!/bin/bash
+                       . /var/lib/jenkins/.bashrc
+                       conda activate sphinx_env
+                       /usr/bin/make --directory=./docs html
+                       '''
+
+                    // TODO: revisit once latexpdf is working on CI system
+                    //sh label: 'Invoking latexpdf target for Sphinx build',
+                    //   script: '''#!/bin/bash
+                    //   . /var/lib/jenkins/.bashrc
+                    //   conda activate sphinx_env
+                    //   /usr/bin/make --directory=./docs latexpdf
+                    //   '''
+                }
+            }
+        }
+        stage('Push OPERA PGE HTML documentation to GitHub Pages') {
+            steps {
+                git branch: 'gh-pages',
+                    changelog: false,
+                    poll: false,
+                    url: 'https://github.com/nasa/opera-sds-pge'
+
+                withCredentials([string(credentialsId: params.GITHUB_OAUTH_TOKEN, variable: 'TOKEN')]) {
+                    sh label: 'Updating gh-pages branch with latest HTML docs',
+                       script: '''#!/bin/bash
+                       cp -rf ./docs/_build/html/* .
+                       git add .
+                       git add -u
+                       git commit -m "HTML docs update by Jenkins"
+                       git remote set-url origin https://${TOKEN}@github.com/nasa/opera-sds-pge.git
+                       git push --set-upstream origin gh-pages
+                       '''
+                }
+            }
+        }
+        // TODO: revisit once latexpdf is working on CI system
+//         stage('Upload OPERA PGE PDF Documentation to Artifactory FN') {
+//             steps {
+//                 script {
+//                     rtServer (
+//                         id: 'ARTIFACTORY_FN_SERVER',
+//                         url: params.ART_URL,
+//                         credentialsId: params.ART_CREDENTIALS,
+//                         timeout: 300
+//                     )
+//
+//                     sh "mv ./docs/opera-pge-manual.pdf opera-pge-manual-${DOCKER_TAG}.pdf"
+//
+//                     echo "Uploading PDF documentation to Artifactory-FN"
+//
+//                     rtUpload(
+//                         serverId: "ARTIFACTORY_FN_SERVER",
+//                         spec:
+//                           """{
+//                               "files": [
+//                                   {
+//                                       "pattern": "opera-pge-manual-${DOCKER_TAG}.pdf",
+//                                       "target": "${params.ART_DOCS_PATH}"
+//                                   }
+//                               ]
+//                           }"""
+//                     )
+//
+//                     sh "rm -f opera-pge-manual-${DOCKER_TAG}.pdf"
+//                 }
+//             }
+//         }
         stage('Upload OPERA PGE Docker image tar files to Artifactory-FN') {
             steps {
                 script {
@@ -134,6 +235,9 @@ pipeline {
         always {
             echo "Cleaning up Docker images from local host"
             sh ".ci/scripts/cleanup.sh ${DOCKER_TAG}"
+            echo "Removing Sphinx build environment"
+            sh "/usr/local/anaconda3/bin/conda env remove --name sphinx_env"
+            sh "/usr/local/anaconda3/bin/conda init --reverse"
             deleteDir()
         }
         success {
