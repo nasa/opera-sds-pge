@@ -20,7 +20,7 @@ test_runconfig.py
 
 Unit tests for the pge/runconfig.py module.
 """
-
+import os
 import tempfile
 import unittest
 from os.path import join
@@ -44,7 +44,7 @@ class RunconfigTestCase(unittest.TestCase):
         -------
         """
         cls.test_dir = resource_filename(__name__, "")
-        cls.data_dir = join(cls.test_dir, "data")
+        cls.data_dir = join(cls.test_dir, os.pardir, "data")
         cls.valid_config_full = join(cls.data_dir, "valid_runconfig_full.yaml")
         cls.valid_config_no_sas = join(cls.data_dir, "valid_runconfig_no_sas.yaml")
         cls.valid_config_extra_fields = join(cls.data_dir, "valid_runconfig_extra_fields.yaml")
