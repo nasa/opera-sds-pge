@@ -32,7 +32,7 @@ RunConfig:
         IsoTemplatePath: sample_iso_template.xml.jinja2
 
       QAExecutable:
-        Enabled: True
+        Enabled: False
         ProgramPath: /opt/QualityAssurance/sample_qa.py
         ProgramOptions:
          -  --debug
