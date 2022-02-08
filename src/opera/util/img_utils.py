@@ -22,6 +22,8 @@ Image file utilities for use with OPERA PGEs.
 
 """
 
+from collections import namedtuple
+from datetime import datetime
 from os.path import exists
 
 
@@ -123,3 +125,30 @@ def get_geotiff_spacecraft_name(filename):
 
     return metadata.get('SPACECRAFT_NAME')
 
+
+def get_hls_filename_fields(file_name):
+    """
+    Parse the HLS filename into components, change Julian datetime to (YYYYMMDDTHHMMSS)
+
+    Parameters
+    ----------
+    file_name : str
+        Name of the HLS file
+
+    Returns
+    -------
+    fields : Ordered Dictionary
+        Keys are basic descriptions of the value
+        Values are the fields parsed from the HLS file_name
+
+
+    """
+    Fields = namedtuple('Fields', ['product', 'short_name', 'tile_id', 'acquisition_time',
+                                   'collection_version', 'sub_version', 'band', 'extension'])
+    fields = Fields._make(file_name.split('.'))._asdict()
+    # Convert to 'YYYYMMDDTHHMMSS' format from Julian datetime
+    julian_time = fields['acquisition_time'].split('T')
+    julian_time[0] = str(datetime.strptime(julian_time[0], '%Y%j').date()).replace('-', '')
+    fields['acquisition_time'] = 'T'.join(julian_time)
+
+    return fields

@@ -26,14 +26,18 @@ Unit tests for the util/img_utils.py module.
 import os
 import unittest
 
+from collections import namedtuple
+from datetime import datetime
 from os.path import abspath, join
 from pkg_resources import resource_filename
+from re import match
 from unittest import skipIf
 
 from opera.util.img_utils import get_geotiff_metadata
 from opera.util.img_utils import get_geotiff_processing_datetime
 from opera.util.img_utils import get_geotiff_product_version
 from opera.util.img_utils import get_geotiff_spacecraft_name
+from opera.util.img_utils import get_hls_filename_fields
 
 
 def gdal_is_available():
@@ -101,6 +105,25 @@ class ImgUtilsTestCase(unittest.TestCase):
         # Try with an invalid file type
         with self.assertRaises(RuntimeError):
             get_geotiff_metadata(join(self.data_dir, "valid_runconfig_full.yaml"))
+
+    def test_get_hls_filename_fields(self):
+        # Use an example HLS filename
+        file_name = 'HLS.S30.T53SMS.2020276T013701.v1.5.B01.tif'
+        # Call the function
+        hls_file_fields = get_hls_filename_fields(file_name)
+        # Verify a dictionary is returned
+        self.assertIsInstance(hls_file_fields, dict)
+        # Check 4 of the key names
+        self.assertIn('product', hls_file_fields)
+        self.assertIn('tile_id', hls_file_fields)
+        self.assertIn('collection_version', hls_file_fields)
+        self.assertIn('band', hls_file_fields)
+        # Check the other 3 Values
+        self.assertEqual(hls_file_fields['short_name'], 'S30')
+        self.assertEqual(hls_file_fields['sub_version'], '5')
+        self.assertEqual(hls_file_fields['extension'], 'tif')
+        # Verify the conversion from Julian
+        self.assertNotEqual(match(r'\d{8}T\d{6}\b', hls_file_fields['acquisition_time']), None)
 
 
 if __name__ == "__main__":
