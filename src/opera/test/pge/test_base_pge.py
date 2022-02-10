@@ -44,23 +44,22 @@ class BasePgeTestCase(unittest.TestCase):
 
         os.chdir(cls.test_dir)
 
-        cls.working_dir = tempfile.TemporaryDirectory(
-            prefix="test_base_pge_", suffix='temp', dir=os.curdir
-        )
-
     @classmethod
     def tearDownClass(cls) -> None:
         """At completion re-establish starting directory"""
-        cls.working_dir.cleanup()
         os.chdir(cls.starting_dir)
 
     def setUp(self) -> None:
         """Use the temporary directory as the working directory"""
+        self.working_dir = tempfile.TemporaryDirectory(
+            prefix="test_base_pge_", suffix='temp', dir=os.curdir
+        )
         os.chdir(self.working_dir.name)
 
     def tearDown(self) -> None:
         """Return to starting directory"""
         os.chdir(self.test_dir)
+        self.working_dir.cleanup()
 
     def test_base_pge_execution(self):
         """

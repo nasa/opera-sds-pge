@@ -51,32 +51,32 @@ class DSWxPgeTestCase(unittest.TestCase):
 
         os.chdir(cls.test_dir)
 
-        cls.working_dir = tempfile.TemporaryDirectory(
+    @classmethod
+    def tearDownClass(cls) -> None:
+        """At completion re-establish starting directory"""
+        os.chdir(cls.starting_dir)
+
+    def setUp(self) -> None:
+        """Use the temporary directory as the working directory"""
+        self.working_dir = tempfile.TemporaryDirectory(
             prefix="test_dswx_pge_", suffix='_temp', dir=os.curdir
         )
 
         # Create the input dir expected by the test RunConfig and add a dummy
         # input file for validation
-        input_dir = join(cls.working_dir.name, "dswx_pge_test/input_dir")
+        input_dir = join(self.working_dir.name, "dswx_pge_test/input_dir")
         os.makedirs(input_dir, exist_ok=True)
 
-        cls.input_file = tempfile.NamedTemporaryFile(
-            dir=input_dir, prefix="test_input", suffix=".tif")
-
-    @classmethod
-    def tearDownClass(cls) -> None:
-        """At completion re-establish starting directory"""
-        cls.input_file.close()
-        cls.working_dir.cleanup()
-        os.chdir(cls.starting_dir)
-
-    def setUp(self) -> None:
-        """Use the temporary directory as the working directory"""
+        self.input_file = tempfile.NamedTemporaryFile(
+            dir=input_dir, prefix="test_input", suffix=".tif"
+        )
         os.chdir(self.working_dir.name)
 
     def tearDown(self) -> None:
         """Return to starting directory"""
         os.chdir(self.test_dir)
+        self.input_file.close()
+        self.working_dir.cleanup()
 
     def test_dswx_pge_execution(self):
         """
@@ -109,7 +109,7 @@ class DSWxPgeTestCase(unittest.TestCase):
         self.assertTrue(os.path.isdir(pge.runconfig.output_product_path))
         self.assertTrue(os.path.isdir(pge.runconfig.scratch_path))
 
-        # Check that a in-memory log was created
+        # Check that an in-memory log was created
         stream = pge.logger.get_stream_object()
         self.assertTrue(isinstance(stream, StringIO))
 

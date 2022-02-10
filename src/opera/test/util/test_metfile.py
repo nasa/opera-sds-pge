@@ -57,16 +57,12 @@ class MetFileTestCase(unittest.TestCase):
 
         os.chdir(cls.test_dir)
 
-        cls.working_dir = tempfile.TemporaryDirectory(
-            prefix="test_met_file_", suffix='_temp', dir=os.curdir)
-
     @classmethod
     def tearDownClass(cls) -> None:
         """
         At completion re-establish starting directory
         -------
         """
-        cls.working_dir.cleanup()
         os.chdir(cls.starting_dir)
 
     def setUp(self) -> None:
@@ -74,6 +70,9 @@ class MetFileTestCase(unittest.TestCase):
         Use the temporary directory as the working directory
         -------
         """
+        self.working_dir = tempfile.TemporaryDirectory(
+            prefix="test_met_file_", suffix='_temp', dir=os.curdir
+        )
         os.chdir(self.working_dir.name)
 
     def tearDown(self) -> None:
@@ -82,6 +81,7 @@ class MetFileTestCase(unittest.TestCase):
         -------
         """
         os.chdir(self.test_dir)
+        self.working_dir.cleanup()
 
     def testMetFile(self):
         """
