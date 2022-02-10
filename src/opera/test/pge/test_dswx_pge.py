@@ -20,6 +20,7 @@ test_dswx_pge.py
 
 Unit tests for the pge/dswx_pge.py module.
 """
+import glob
 import os
 import tempfile
 import unittest
@@ -117,9 +118,17 @@ class DSWxPgeTestCase(unittest.TestCase):
         expected_sas_config_file = join(pge.runconfig.scratch_path, 'test_dswx_hls_config_sas.yaml')
         self.assertTrue(os.path.exists(expected_sas_config_file))
 
+        # Check that the catalog metadata file was created in the output directory
+        expected_metadata_file = join(pge.runconfig.output_product_path, pge._catalog_metadata_filename())
+        self.assertTrue(os.path.exists(expected_metadata_file))
+
         # Check that the log file was created and moved into the output directory
         expected_log_file = join(pge.runconfig.output_product_path, pge.logger.get_file_name())
         self.assertTrue(os.path.exists(expected_log_file))
+
+        # Lastly, check that at least one "image" file was created
+        image_files = glob.glob(join(pge.runconfig.output_product_path, "*.tif"))
+        self.assertGreater(len(image_files), 0)
 
         # Open and read the log
         with open(expected_log_file, 'r', encoding='utf-8') as infile:
