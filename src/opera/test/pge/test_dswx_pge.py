@@ -26,13 +26,16 @@ import tempfile
 import unittest
 from io import StringIO
 from os.path import abspath, join
+from unittest.mock import patch
 
 from pkg_resources import resource_filename
 
 import yaml
 
+import opera.util.img_utils
 from opera.pge import DSWxExecutor, RunConfig
 from opera.util import PgeLogger
+from opera.util.img_utils import MockGdal
 
 
 class DSWxPgeTestCase(unittest.TestCase):
@@ -79,6 +82,15 @@ class DSWxPgeTestCase(unittest.TestCase):
         self.input_file.close()
         self.working_dir.cleanup()
 
+    def get_geotiff_metadata_patch(self):
+        """
+        Patch for img_utils.get_geotiff_metadata. Needed because test_dswx_pge_execution
+        will not produce a legitimate output DSWx-HLS file to obtain metadata
+        from when assigning output filenames.
+        """
+        return MockGdal.MockGdalDataset().GetMetadata()
+
+    @patch.object(opera.util.img_utils, "get_geotiff_metadata", get_geotiff_metadata_patch)
     def test_dswx_pge_execution(self):
         """
         Test execution of the DSWxExecutor class and its associated mixins using
