@@ -46,6 +46,7 @@ class MockGdal:  # pragma: no cover
             This function should be updated as needed for requisite metadata fields.
             """
             return {
+                'HLS_DATASET': 'HLS.L30.T22VEQ.2021248T143156.v2.0',
                 'PROCESSING_DATETIME': '2022-01-31T21:54:26',
                 'PRODUCT_ID': 'dswx_hls', 'PRODUCT_SOURCE': 'HLS',
                 'PRODUCT_TYPE': 'DSWx', 'PRODUCT_VERSION': '0.1',
@@ -105,6 +106,13 @@ def get_geotiff_metadata(filename):
     return gdal_data.GetMetadata()
 
 
+def get_geotiff_hls_dataset(filename):
+    """Returns the HLS_DATASET value from the provided file, if it exists. None otherwise."""
+    metadata = get_geotiff_metadata(filename)
+
+    return metadata.get('HLS_DATASET')
+
+
 def get_geotiff_processing_datetime(filename):
     """Returns the PROCESSING_DATETIME value from the provided file, if it exists. None otherwise."""
     metadata = get_geotiff_metadata(filename)
@@ -128,7 +136,8 @@ def get_geotiff_spacecraft_name(filename):
 
 def get_hls_filename_fields(file_name):
     """
-    Parse the HLS filename into components, change Julian datetime to (YYYYMMDDTHHMMSS)
+    Parse the HLS filename into components, changing Julian datetime to isoformat
+    (YYYYMMDDTHHMMSS).
 
     Parameters
     ----------
@@ -141,11 +150,11 @@ def get_hls_filename_fields(file_name):
         Keys are basic descriptions of the value
         Values are the fields parsed from the HLS file_name
 
-
     """
     Fields = namedtuple('Fields', ['product', 'short_name', 'tile_id', 'acquisition_time',
                                    'collection_version', 'sub_version', 'band', 'extension'])
     fields = Fields._make(file_name.split('.'))._asdict()
+
     # Convert to 'YYYYMMDDTHHMMSS' format from Julian datetime
     julian_time = fields['acquisition_time'].split('T')
     julian_time[0] = str(datetime.strptime(julian_time[0], '%Y%j').date()).replace('-', '')
