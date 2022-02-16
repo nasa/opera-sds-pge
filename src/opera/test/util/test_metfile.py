@@ -57,16 +57,12 @@ class MetFileTestCase(unittest.TestCase):
 
         os.chdir(cls.test_dir)
 
-        cls.working_dir = tempfile.TemporaryDirectory(
-            prefix="test_met_file_", suffix='_temp', dir=os.curdir)
-
     @classmethod
     def tearDownClass(cls) -> None:
         """
         At completion re-establish starting directory
         -------
         """
-        cls.working_dir.cleanup()
         os.chdir(cls.starting_dir)
 
     def setUp(self) -> None:
@@ -74,6 +70,9 @@ class MetFileTestCase(unittest.TestCase):
         Use the temporary directory as the working directory
         -------
         """
+        self.working_dir = tempfile.TemporaryDirectory(
+            prefix="test_met_file_", suffix='_temp', dir=os.curdir
+        )
         os.chdir(self.working_dir.name)
 
     def tearDown(self) -> None:
@@ -82,6 +81,7 @@ class MetFileTestCase(unittest.TestCase):
         -------
         """
         os.chdir(self.test_dir)
+        self.working_dir.cleanup()
 
     def testMetFile(self):
         """
@@ -98,25 +98,25 @@ class MetFileTestCase(unittest.TestCase):
 
         """
         met_file = 'testMetFile.json'
-        met_data = MetFile(met_file)
+        met_data = MetFile()
         self.assertIsInstance(met_data, MetFile)
         # Verify __setitem__ and __getitem__
         met_data["test key"] = "test value"
         self.assertEqual(met_data["test key"], "test value")
         # Verify write()
-        met_data.write()
+        met_data.write(met_file)
         # Verify that write() created the simple met file
         self.assertTrue(exists(met_file))
         # Verify read and return
-        met_data.read()
+        met_data.read(met_file)
         # Verify the key value pair read from the file
         self.assertEqual(met_data["test key"], "test value")
         # Verify merge with an existing met file
         update_dict = {"test key 2": "test value 2"}
-        met_merge = MetFile(met_file, update_dict)
-        met_merge.write()
+        met_merge = MetFile(update_dict)
+        met_merge.write(met_file)
         # Verify the update
-        met_data.read()
+        met_data.read(met_file)
         # Verify both lines are in the file
         self.assertEqual(met_data["test key"], "test value")
         self.assertEqual(met_data["test key 2"], "test value 2")
@@ -142,16 +142,15 @@ class MetFileTestCase(unittest.TestCase):
         }
 
         met_file = 'testCatalogMetadata.json'
-        met_data = MetFile(met_file, catalog_metadata)
+        met_data = MetFile(catalog_metadata)
         self.assertIsInstance(met_data, MetFile)
         # Save the test catalog metadata to temporary
-        met_data.write()
+        met_data.write(met_file)
         # Verify that the schema test passes
-        self.assertTrue(met_data.validate_json_file(met_file, met_data.get_schema_file_path()))
+        self.assertTrue(met_data.validate(met_data.get_schema_file_path()))
         # Modify the test catalog metadata
-        met_data.read()
+        met_data.read(met_file)
         # Remove a ':' from the between mm:ss
         met_data['Production_DateTime'] = "2022-01-20T12:0710.9143060000Z"
         # Verify that the schema test fails
-        met_data.write()
-        self.assertFalse(met_data.validate_json_file(met_file, met_data.get_schema_file_path()))
+        self.assertFalse(met_data.validate(met_data.get_schema_file_path()))

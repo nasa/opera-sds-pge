@@ -25,7 +25,6 @@ Adapted By: Jim Hofman
 
 """
 
-
 import json
 import jsonschema
 import os
@@ -38,14 +37,12 @@ class MetFile:
 
     SCHEMA_PATH = resource_filename('opera', 'schema/catalog_metadata_schema.json')
 
-    def __init__(self, met_file_name, met_dict=None):
+    def __init__(self, met_dict=None):
         """
         Constructor get filename and initialize dictionary
 
         Parameters
         ----------
-        met_file_name : str, required
-            Name of the file that will be written to or read.
         met_dict : dict, optional
             Dictionary passed to be merged with existing catalog metadata
             file or to be used to make a new catalog metadata file
@@ -54,7 +51,7 @@ class MetFile:
 
         if met_dict is None:
             met_dict = {}
-        self._met_file = met_file_name
+
         self.met_dict = met_dict
         self.combined_error_msg = None
 
@@ -69,7 +66,7 @@ class MetFile:
         """Returns the path to schema file"""
         return cls.SCHEMA_PATH
 
-    def write(self):
+    def write(self, output_path):
         """
         Writes the catalog metadata file in JSON format to disk.
         If there is an existing catalog metadata file:
@@ -83,34 +80,31 @@ class MetFile:
 
         merged_met_dict = {}
 
-        if os.path.exists(self._met_file):
-            with open(self._met_file) as json_file:
+        if os.path.exists(output_path):
+            with open(output_path) as json_file:
                 file_met_dict = json.load(json_file)
                 merged_met_dict = file_met_dict.copy()
 
         merged_met_dict.update(self.met_dict)
 
-        with open(self._met_file, "w") as f:
-            json.dump(merged_met_dict, f, indent=2, sort_keys=True)
+        with open(output_path, "w") as outfile:
+            json.dump(merged_met_dict, outfile, indent=2, sort_keys=True)
 
-    def read(self):
+    def read(self, input_path):
         """
         Reads, an existing catalog metadata file.
         Loads the JSON fields into the instance's met_dict
 
         """
-        if os.path.exists(self._met_file):
-            with open(self._met_file) as json_file:
-                self.met_dict = json.load(json_file)
+        with open(input_path) as json_file:
+            self.met_dict = json.load(json_file)
 
-    def validate_json_file(self, json_filename: str, schema_filename: str) -> (bool, str):
+    def validate(self, schema_filename: str) -> bool:
         """
         Validates the specified json file against the specified jsonschema file.
 
         Parameters
         ----------
-        json_filename: str
-            JSON file to check against schema
         schema_filename: str
             JSON schema file
 
@@ -123,16 +117,17 @@ class MetFile:
         """
         with open(schema_filename, 'tr') as schema_file:
             schema = json.load(schema_file)
-        with open(json_filename, 'tr') as json_file:
-            json_data = json.load(json_file)
 
         # Initialize and run the validator
         validator = jsonschema.validators.validator_for(schema)(schema)
+
         # record errors (if any)
-        errors = validator.iter_errors(json_data)
+        errors = validator.iter_errors(self.met_dict)
         self.combined_error_msg = '\n'.join(error.message for error in errors)
+
         # success if combined_error_text is an empty string
         success = len(self.combined_error_msg) == 0
+
         return success
 
     def get_error_msg(self):

@@ -20,18 +20,22 @@ test_dswx_pge.py
 
 Unit tests for the pge/dswx_pge.py module.
 """
+import glob
 import os
 import tempfile
 import unittest
 from io import StringIO
 from os.path import abspath, join
+from unittest.mock import patch
 
 from pkg_resources import resource_filename
 
 import yaml
 
+import opera.util.img_utils
 from opera.pge import DSWxExecutor, RunConfig
 from opera.util import PgeLogger
+from opera.util.img_utils import MockGdal
 
 
 class DSWxPgeTestCase(unittest.TestCase):
@@ -51,33 +55,42 @@ class DSWxPgeTestCase(unittest.TestCase):
 
         os.chdir(cls.test_dir)
 
-        cls.working_dir = tempfile.TemporaryDirectory(
+    @classmethod
+    def tearDownClass(cls) -> None:
+        """At completion re-establish starting directory"""
+        os.chdir(cls.starting_dir)
+
+    def setUp(self) -> None:
+        """Use the temporary directory as the working directory"""
+        self.working_dir = tempfile.TemporaryDirectory(
             prefix="test_dswx_pge_", suffix='_temp', dir=os.curdir
         )
 
         # Create the input dir expected by the test RunConfig and add a dummy
         # input file for validation
-        input_dir = join(cls.working_dir.name, "dswx_pge_test/input_dir")
+        input_dir = join(self.working_dir.name, "dswx_pge_test/input_dir")
         os.makedirs(input_dir, exist_ok=True)
 
-        cls.input_file = tempfile.NamedTemporaryFile(
-            dir=input_dir, prefix="test_input", suffix=".tif")
-
-    @classmethod
-    def tearDownClass(cls) -> None:
-        """At completion re-establish starting directory"""
-        cls.input_file.close()
-        cls.working_dir.cleanup()
-        os.chdir(cls.starting_dir)
-
-    def setUp(self) -> None:
-        """Use the temporary directory as the working directory"""
+        self.input_file = tempfile.NamedTemporaryFile(
+            dir=input_dir, prefix="test_input", suffix=".tif"
+        )
         os.chdir(self.working_dir.name)
 
     def tearDown(self) -> None:
         """Return to starting directory"""
         os.chdir(self.test_dir)
+        self.input_file.close()
+        self.working_dir.cleanup()
 
+    def get_geotiff_metadata_patch(self):
+        """
+        Patch for img_utils.get_geotiff_metadata. Needed because test_dswx_pge_execution
+        will not produce a legitimate output DSWx-HLS file to obtain metadata
+        from when assigning output filenames.
+        """
+        return MockGdal.MockGdalDataset().GetMetadata()
+
+    @patch.object(opera.util.img_utils, "get_geotiff_metadata", get_geotiff_metadata_patch)
     def test_dswx_pge_execution(self):
         """
         Test execution of the DSWxExecutor class and its associated mixins using
@@ -109,7 +122,7 @@ class DSWxPgeTestCase(unittest.TestCase):
         self.assertTrue(os.path.isdir(pge.runconfig.output_product_path))
         self.assertTrue(os.path.isdir(pge.runconfig.scratch_path))
 
-        # Check that a in-memory log was created
+        # Check that an in-memory log was created
         stream = pge.logger.get_stream_object()
         self.assertTrue(isinstance(stream, StringIO))
 
@@ -117,9 +130,17 @@ class DSWxPgeTestCase(unittest.TestCase):
         expected_sas_config_file = join(pge.runconfig.scratch_path, 'test_dswx_hls_config_sas.yaml')
         self.assertTrue(os.path.exists(expected_sas_config_file))
 
+        # Check that the catalog metadata file was created in the output directory
+        expected_metadata_file = join(pge.runconfig.output_product_path, pge._catalog_metadata_filename())
+        self.assertTrue(os.path.exists(expected_metadata_file))
+
         # Check that the log file was created and moved into the output directory
         expected_log_file = join(pge.runconfig.output_product_path, pge.logger.get_file_name())
         self.assertTrue(os.path.exists(expected_log_file))
+
+        # Lastly, check that at least one "image" file was created
+        image_files = glob.glob(join(pge.runconfig.output_product_path, "*.tif"))
+        self.assertGreater(len(image_files), 0)
 
         # Open and read the log
         with open(expected_log_file, 'r', encoding='utf-8') as infile:

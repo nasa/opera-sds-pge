@@ -24,19 +24,22 @@ Module defining the Base PGE interfaces from which all other PGEs are derived.
 
 from datetime import datetime
 import os
-from os.path import abspath, basename, exists, join, splitext
+from os.path import abspath, basename, exists, isfile, join, splitext
 
 from yamale import YamaleError
 
 import yaml
 
+import opera
 from opera.util.error_codes import ErrorCode
+from opera.util.logger import default_log_file_name
 from opera.util.logger import PgeLogger
 from opera.util.metfile import MetFile
 from opera.util.run_utils import create_sas_command_line
 from opera.util.run_utils import create_qa_command_line
 from opera.util.run_utils import time_and_execute
 from opera.util.time import get_catalog_metadata_datetime_str
+from opera.util.time import get_time_for_filename
 
 from .runconfig import RunConfig
 
@@ -58,11 +61,6 @@ class PreProcessorMixin:
     """
 
     _pre_mixin_name = "PreProcessorMixin"
-
-    def __init__(self):
-        self.logger = None
-        self.name = None
-        self.runconfig_path = None
 
     def _initialize_logger(self):
         """
@@ -152,13 +150,9 @@ class PreProcessorMixin:
 
         self.logger.workflow = f'{self.runconfig.pge_name}::{basename(__file__)}'
 
-        # TODO: perform the log rename step here (if possible) once file-name convention is defined
-        output_product_path = abspath(self.runconfig.output_product_path)
-        log_file_destination = join(output_product_path, self.logger.get_file_name())
-
-        self.logger.info(self.name, ErrorCode.MOVING_LOG_FILE,
-                         f'Moving log file to {log_file_destination}')
-        self.logger.move(log_file_destination)
+        # Relocate the output destination for the log file now that we
+        # can access output_product_path from the parsed RunConfig
+        self.logger.move(join(self.runconfig.output_product_path, default_log_file_name()))
 
         self.logger.info(self.name, ErrorCode.LOG_FILE_INIT_COMPLETE,
                          'Log file configuration complete')
@@ -204,10 +198,6 @@ class PostProcessorMixin:
 
     _post_mixin_name = "PostProcessorMixin"
 
-    def __init__(self):
-        self.name = None
-        self.logger = None
-
     def _run_sas_qa_executable(self):
         """
         Executes an optional Quality Assurance (QA) application which may be bundled
@@ -247,39 +237,20 @@ class PostProcessorMixin:
                              'SAS QA is disabled, skipping')
 
     def _create_catalog_metadata(self):
-        """Returns the catalog metadata as a Python dictionary"""
+        """Returns the catalog metadata as a MetFile instance"""
 
         catalog_metadata = {
             'PGE_Name': self.runconfig.pge_name,
-            # TODO PGE_Version and SAS_Version: temp placeholders -> need to integrate versioning
-            'PGE_Version': "1.0.test",
-            'SAS_Version': "2.1.test",
+            'PGE_Version': opera.__version__,
+            'SAS_Version': self.SAS_VERSION,
             'Input_Files': self.runconfig.input_files,
             'Ancillary_Files': self.runconfig.get_ancillary_filenames(),
             'Production_DateTime': get_catalog_metadata_datetime_str(self.production_datetime)
         }
-        return catalog_metadata
 
-    def _write_catalog_metadata(self):
-        """Create, write and validate the catalog metadata json file"""
-
-        met_dict = self._create_catalog_metadata()
-        # TODO - placeholder until file-naming conventions are established
-        met_filename = "test_catalog_metadata.json"
-        met_file = MetFile(met_filename, met_dict)
-        met_file.write()
-        if met_file.validate_json_file(met_filename, met_file.get_schema_file_path()):
-            msg = "Successfully created catalog metadata json file."
-            self.logger.info("pge_main", ErrorCode.CREATING_CATALOG_METADATA, msg)
-        else:
-            msg = f"SCHEMA ERROR: {met_file.get_error_msg()}"
-            self.logger.info("pge_main", ErrorCode.CREATING_CATALOG_METADATA, msg)
+        return MetFile(catalog_metadata)
 
     def _create_iso_metadata(self):
-        # TODO
-        pass
-
-    def _stage_output_files(self):
         # TODO
         pass
 
@@ -294,6 +265,197 @@ class PostProcessorMixin:
         self.logger.info(self.name, ErrorCode.CLOSING_LOG_FILE,
                          f"Closing log file {self.logger.get_file_name()}")
         self.logger.close_log_stream()
+
+    def _core_filename(self, inter_filename=None):
+        """
+        Returns the core file name component for products produced by the
+        Base PGE. This function should typically be overridden by inheritors
+        of PostProcessorMixin to accomplish the specific file-naming conventions
+        required by the PGE.
+
+        The core file name component of the Base PGE consists of:
+
+            <PROJECT>_<LEVEL>_<PGE NAME>_<TIMETAG>
+
+        Callers of this function are responsible for assignment of any other
+        product-specific fields, such as the file extension.
+
+        Parameters
+        ----------
+        inter_filename : str, optional
+            The intermediate filename of the output product to generate the
+            core filename for. This parameter may be used to inspect the file
+            in order to derive any necessary components of the returned filename.
+            For the base PGE, this parameter is unused and may be omitted.
+
+        Returns
+        -------
+        core_filename : str
+            The core file name component to assign to products created by this PGE.
+
+        """
+        time_tag = get_time_for_filename(self.production_datetime)
+
+        return f"{self.PROJECT}_{self.LEVEL}_{self.NAME}_{time_tag}"
+
+    def _geotiff_filename(self, inter_filename):
+        """
+        Returns the file name to use for GeoTIFF's produced by the Base PGE.
+
+        The GeoTIFF filename for the Base PGE consists of:
+
+            <Core filename>_<inter_filename>.tif
+
+        Where <Core filename> is returned by PostProcessorMixin._core_filename()
+
+        Parameters
+        ----------
+        inter_filename : str
+            The intermediate filename of the output GeoTIFF to generate
+            a filename for. This parameter may be used to inspect the file
+            in order to derive any necessary components of the returned filename.
+
+        Returns
+        -------
+        geotiff_filename : str
+            The file name to assign to GeoTIFF product(s) created by this PGE.
+
+        """
+        base_filename = splitext(inter_filename)[0]
+        return self._core_filename() + f"_{base_filename}.tif"
+
+    def _catalog_metadata_filename(self):
+        """
+        Returns the file name to use for Catalog Metadata produced by the Base PGE.
+
+        The Catalog Metadata file name for the Base PGE consists of:
+
+            <Core filename>.catalog.json
+
+        Where <Core filename> is returned by PostProcessorMixin._core_filename()
+
+        Returns
+        -------
+        catalog_metadata_filename : str
+            The file name to assign to the Catalog Metadata product created by this PGE.
+
+        """
+        return self._core_filename() + ".catalog.json"
+
+    def _log_filename(self):
+        """
+        Returns the file name to use for the PGE/SAS Log file produced by the Base PGE.
+
+        The Log file name for the Base PGE consists of:
+
+            <Core filename>.log
+
+        Where <Core filename> is returned by PostProcessorMixin._core_filename()
+
+        Returns
+        -------
+        log_filename : str
+            The file name to assign to the PGE/SAS Log created by this PGE.
+
+        """
+        return self._core_filename() + ".log"
+
+    def _assign_filename(self, input_filepath, output_dir):
+        """
+        Assigns the appropriate file name which meets the file-naming conventions
+        for the PGE to the provided input file on disk.
+
+        The file name to assign is determined based on the file extension of
+        the provided input file. If no file name assignment function is configured
+        for a given extension, the file name assignment is skipped.
+
+        Parameters
+        ----------
+        input_filepath : str
+            Absolute path to the file on disk to be renamed by this function.
+        output_dir : str
+            The output directory destination for the renamed file.
+
+        """
+        file_extension = splitext(input_filepath)[-1]
+
+        # Lookup the specific rename function configured for the current file extension
+        try:
+            rename_function = self.rename_by_extension_map[file_extension]
+        except KeyError:
+            msg = f'No rename function configured for file "{basename(input_filepath)}", skipping assignment'
+            self.logger.warning(self.name, ErrorCode.NO_RENAME_FUNCTION_FOR_EXTENSION, msg)
+            return
+
+        # Generate the final file name to assign
+        final_filename = rename_function(input_filepath)
+
+        final_filepath = os.path.join(output_dir, final_filename)
+
+        self.logger.info(self.name, ErrorCode.MOVING_LOG_FILE,
+                         f"Renaming output file {input_filepath} to {final_filepath}")
+
+        try:
+            os.rename(input_filepath, final_filepath)
+        except OSError as err:
+            msg = f"Failed to rename output file {input_filepath}, reason: {str(err)}"
+            self.logger.critical(self.name, ErrorCode.FILE_MOVE_FAILED, msg)
+
+    def _stage_output_files(self):
+        """
+        Ensures that all output products produced by both the SAS and this PGE
+        are staged to the output location defined by the RunConfig. This includes
+        reassignment of file names to meet the file-naming conventions required
+        by the PGE.
+
+        In addition to staging of the output products created by the SAS, this
+        function is also responsible for ensuring the catalog metadata, ISO
+        metadata, and combined PGE/SAS log are also written to the expected
+        output product location with the appropriate file names.
+
+        """
+        # Gather the list of output files produced by the SAS
+        output_product_path = abspath(self.runconfig.output_product_path)
+        output_products = [join(output_product_path, filename)
+                           for filename in os.listdir(output_product_path)
+                           if isfile(join(output_product_path, filename))]
+
+        # For each output file name, assign the final file name matching the
+        # expected conventions
+        for output_product in output_products:
+            self._assign_filename(output_product, output_product_path)
+
+        # Write the catalog metadata to disk with the appropriate filename
+        catalog_metadata = self._create_catalog_metadata()
+
+        if not catalog_metadata.validate(catalog_metadata.get_schema_file_path()):
+            msg = f"Failed to create valid catalog metadata, reason(s):\n {catalog_metadata.get_error_msg()}"
+            self.logger.critical(self.name, ErrorCode.INVALID_CATALOG_METADATA, msg)
+
+        cat_meta_filename = self._catalog_metadata_filename()
+        cat_meta_filepath = join(output_product_path, cat_meta_filename)
+
+        self.logger.info(self.name, ErrorCode.CREATING_CATALOG_METADATA,
+                         f"Writing Catalog Metadata to {cat_meta_filepath}")
+
+        try:
+            catalog_metadata.write(cat_meta_filepath)
+        except OSError as err:
+            msg = f"Failed to write catalog metadata file {cat_meta_filepath}, reason: {str(err)}"
+            self.logger.critical(self.name, ErrorCode.CATALOG_METADATA_CREATION_FAILED, msg)
+
+        # TODO: create ISO metadata and assign filename
+
+        # Write the combined PGE/SAS log to disk with the appropriate filename
+        log_filename = self._log_filename()
+        log_filepath = join(output_product_path, log_filename)
+        self.logger.move(log_filepath)
+
+        try:
+            self._finalize_log()
+        except OSError as err:
+            msg = f"Failed to write log file to {log_filepath}, reason: {str(err)}"
+            self.logger.critical(self.name, ErrorCode.LOG_FILE_CREATION_FAILED, msg)
 
     def run_postprocessor(self, **kwargs):
         """
@@ -311,10 +473,7 @@ class PostProcessorMixin:
         print(f'Running postprocessor for {self._post_mixin_name}')
 
         self._run_sas_qa_executable()
-        self._write_catalog_metadata()
-        self._create_iso_metadata()
         self._stage_output_files()
-        self._finalize_log()
 
 
 class PgeExecutor(PreProcessorMixin, PostProcessorMixin):
@@ -335,7 +494,17 @@ class PgeExecutor(PreProcessorMixin, PostProcessorMixin):
 
     """
 
-    NAME = "PgeExecutor"
+    PROJECT = "OPERA"
+    """Name of the project associated to this PGE"""
+
+    NAME = "BasePge"
+    """Short name for the Base PGE"""
+
+    LEVEL = "L0"
+    """Processing Level for Base PGE Products (dummy value)"""
+
+    SAS_VERSION = "0.1"
+    """Version of the SAS wrapped by this PGE (dummy value)"""
 
     def __init__(self, pge_name, runconfig_path, **kwargs):
         """
@@ -348,8 +517,8 @@ class PgeExecutor(PreProcessorMixin, PostProcessorMixin):
         runconfig_path : str
             Path to the RunConfig to be used with this PGE.
         kwargs : dict
-            Any additional keyword arguments needed by the PGE. Currently
-            supported kwargs include:
+            Any additional keyword arguments needed by the PGE.
+            Supported kwargs include:
                 - logger : An existing instance of PgeLogger for this PgeExecutor
                            to use, rather than creating its own.
 
@@ -361,10 +530,15 @@ class PgeExecutor(PreProcessorMixin, PostProcessorMixin):
         self.logger = kwargs.get('logger')
         self.production_datetime = datetime.now()
 
+        self.rename_by_extension_map = {
+            '.tif': self._geotiff_filename,
+            '.tiff': self._geotiff_filename
+        }
+
     def _isolate_sas_runconfig(self):
         """
         Isolates the SAS-specific portion of the RunConfig into its own
-        YAML file so it may be fed into the SAS executable without unneeded
+        YAML file, so it may be fed into the SAS executable without unneeded
         PGE configuration settings.
 
         """

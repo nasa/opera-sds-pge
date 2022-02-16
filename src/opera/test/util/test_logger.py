@@ -64,8 +64,6 @@ class LoggerTestCase(unittest.TestCase):
 
         os.chdir(cls.test_dir)
 
-        cls.working_dir = tempfile.TemporaryDirectory(
-            prefix="test_usage_metrics_", suffix='temp', dir=os.curdir)
         cls.config_file = join(cls.data_dir, "test_base_pge_config.yaml")
         cls.fn_regex = r'^pge_\d[0-9]{7}T\d{6}.log$'
         cls.iso_regex = r'^(-?(?:[0-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):' \
@@ -80,16 +78,18 @@ class LoggerTestCase(unittest.TestCase):
     @classmethod
     def tearDownClass(cls) -> None:
         """At completion re-establish starting directory"""
-        cls.working_dir.cleanup()
         os.chdir(cls.starting_dir)
 
     def setUp(self) -> None:
         """Use the temporary directory as the working directory"""
+        self.working_dir = tempfile.TemporaryDirectory(
+            prefix="test_usage_metrics_", suffix='temp', dir=os.curdir)
         os.chdir(self.working_dir.name)
 
     def tearDown(self) -> None:
         """Return to starting directory"""
         os.chdir(self.test_dir)
+        self.working_dir.cleanup()
 
     def test_write(self):
         """

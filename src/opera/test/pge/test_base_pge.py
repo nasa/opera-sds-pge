@@ -44,23 +44,22 @@ class BasePgeTestCase(unittest.TestCase):
 
         os.chdir(cls.test_dir)
 
-        cls.working_dir = tempfile.TemporaryDirectory(
-            prefix="test_base_pge_", suffix='temp', dir=os.curdir
-        )
-
     @classmethod
     def tearDownClass(cls) -> None:
         """At completion re-establish starting directory"""
-        cls.working_dir.cleanup()
         os.chdir(cls.starting_dir)
 
     def setUp(self) -> None:
         """Use the temporary directory as the working directory"""
+        self.working_dir = tempfile.TemporaryDirectory(
+            prefix="test_base_pge_", suffix='temp', dir=os.curdir
+        )
         os.chdir(self.working_dir.name)
 
     def tearDown(self) -> None:
         """Return to starting directory"""
         os.chdir(self.test_dir)
+        self.working_dir.cleanup()
 
     def test_base_pge_execution(self):
         """
@@ -74,7 +73,7 @@ class BasePgeTestCase(unittest.TestCase):
         pge = PgeExecutor(pge_name='BasePgeTest', runconfig_path=runconfig_path)
 
         # Check that basic attributes were initialized
-        self.assertEqual(pge.name, "PgeExecutor")
+        self.assertEqual(pge.name, "BasePge")
         self.assertEqual(pge.pge_name, "BasePgeTest")
         self.assertEqual(pge.runconfig_path, runconfig_path)
 
@@ -101,7 +100,11 @@ class BasePgeTestCase(unittest.TestCase):
         expected_sas_config_file = join(pge.runconfig.scratch_path, 'test_base_pge_config_sas.yaml')
         self.assertTrue(os.path.exists(expected_sas_config_file))
 
-        # Check that the log file was created and moved into the output directory
+        # Check that the catalog metadata file was created in the output directory
+        expected_metadata_file = join(pge.runconfig.output_product_path, pge._catalog_metadata_filename())
+        self.assertTrue(os.path.exists(expected_metadata_file))
+
+        # Check that the log file was created into the output directory
         expected_log_file = join(pge.runconfig.output_product_path, pge.logger.get_file_name())
         self.assertTrue(os.path.exists(expected_log_file))
 
@@ -159,7 +162,7 @@ class BasePgeTestCase(unittest.TestCase):
 
         # Log should be fully initialized before SAS execution, so make sure it was
         # moved where we expect.
-        expected_log_file = join(pge.runconfig.output_product_path, pge.logger.get_file_name())
+        expected_log_file = pge.logger.get_file_name()
         self.assertTrue(os.path.exists(expected_log_file))
 
         # Open the log file, and check that the execution error details were captured
