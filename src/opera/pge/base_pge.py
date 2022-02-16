@@ -286,6 +286,7 @@ class PostProcessorMixin:
             The intermediate filename of the output product to generate the
             core filename for. This parameter may be used to inspect the file
             in order to derive any necessary components of the returned filename.
+            For the base PGE, this parameter is unused and may be omitted.
 
         Returns
         -------
@@ -309,7 +310,7 @@ class PostProcessorMixin:
 
         Parameters
         ----------
-        inter_filename : str, optional
+        inter_filename : str
             The intermediate filename of the output GeoTIFF to generate
             a filename for. This parameter may be used to inspect the file
             in order to derive any necessary components of the returned filename.

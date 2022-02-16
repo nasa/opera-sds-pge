@@ -155,6 +155,8 @@ class DSWxPostProcessorMixin(PostProcessorMixin):
             The intermediate filename of the output product to generate the
             core filename for. This parameter may be used to inspect the file
             in order to derive any necessary components of the returned filename.
+            Once the core filename is cached upon first call to this function,
+            this parameter may be omitted.
 
         Returns
         -------
@@ -166,6 +168,11 @@ class DSWxPostProcessorMixin(PostProcessorMixin):
         # and return it if so
         if self._cached_core_filename is not None:
             return self._cached_core_filename
+
+        if not inter_filename:
+            msg = (f"No filename provided to {self.__class__.__name__}._core_filename(), "
+                   f"First call must provide a filename before result is cached.")
+            self.logger.critical(self.name, ErrorCode.FILE_MOVE_FAILED, msg)
 
         dataset = get_geotiff_hls_dataset(inter_filename)
 
@@ -198,7 +205,7 @@ class DSWxPostProcessorMixin(PostProcessorMixin):
 
         Parameters
         ----------
-        inter_filename : str, optional
+        inter_filename : str
             The intermediate filename of the output GeoTIFF to generate
             a filename for. This parameter may be used to inspect the file
             in order to derive any necessary components of the returned filename.
