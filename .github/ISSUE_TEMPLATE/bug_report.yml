@@ -1,0 +1,56 @@
+name: Bug Report
+description: Create a report to help us improve
+title: "[Bug]: "
+labels: ["bug", "needs triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        > _Thank you for filing a bug ticket. We very much appreciate your time._
+  - type: checkboxes
+    id: checked
+    attributes:
+      label: Checked for duplicates
+      description: By submitting this issue, you confirm you've already scanned the [list of existing issues](https://github.com/riverma/github_test_area/issues?q=is%3Aissue) and not found duplicates
+      options:
+        - label: I confirm this bug is new
+          required: true
+  - type: textarea
+    id: bug-description
+    attributes:
+      label: Describe the bug
+      description: A clear and concise description of what the bug is. Screenshots welcome.
+      placeholder: Tell us what you saw
+      value: "When I did [...] action, I noticed [...]"
+    validations:
+      required: true
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: What did you expect?
+      description: A clear and concise description of what you expect to happen
+      placeholder: Tell us what you expected
+      value: "I expected [...]"
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproducible steps
+      description: "How would we reproduce this bug? Please walk us through it step by step. Screenshots welcome."
+      value: |
+        1.
+        2.
+        3.
+        ...
+      render: bash
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: "What is your environment?"
+      value: |
+        - Version of this software [e.g. vX.Y.Z]
+        - Operating System: [e.g. MacOSX with Docker Desktop vX.Y]
+        ...
+      render: bash
