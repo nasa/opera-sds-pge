@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera.util.error_codes &mdash; opera-sds-pge 1.0.0-er.1.0 documentation</title>
+  <title>opera.util.error_codes &mdash; opera-sds-pge 1.0.0-er.2.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -27,7 +27,7 @@
             <a href="../../../index.html" class="icon icon-home"> opera-sds-pge
           </a>
               <div class="version">
-                1.0.0-er.1.0
+                1.0.0-er.2.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -146,9 +146,7 @@
     <span class="n">SAS_PROGRAM_COMPLETED</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
     <span class="n">QA_SAS_PROGRAM_STARTING</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
     <span class="n">QA_SAS_PROGRAM_COMPLETED</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
-    <span class="n">QA_SAS_PRODUCED_VALIDATION_LOG_MESSAGES</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
-    <span class="n">QA_SAS_END_OF_VALIDATION_LOG_MESSAGES</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
-    <span class="n">QA_SAS_DID_NOT_PRODUCE_VALIDATION_LOG_MESSAGES</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">QA_SAS_PROGRAM_DISABLED</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
     <span class="n">RENDERING_ISO_METADATA</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
     <span class="n">CLOSING_LOG_FILE</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
 
@@ -156,9 +154,11 @@
     <span class="n">CONFIGURATION_DETAILS</span> <span class="o">=</span> <span class="n">DEBUG_RANGE_START</span>
     <span class="n">PROCESSING_DETAILS</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
     <span class="n">SAS_EXE_COMMAND_LINE</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">SAS_QA_COMMAND_LINE</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
 
     <span class="c1"># Warning - 2000 – 2999</span>
     <span class="n">DATE_RANGE_MISSING</span> <span class="o">=</span> <span class="n">WARNING_RANGE_START</span>
+    <span class="n">NO_RENAME_FUNCTION_FOR_EXTENSION</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
     <span class="n">ISO_METADATA_CANT_RENDER_ONE_VARIABLE</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
     <span class="n">LOGGING_REQUESTED_SEVERITY_NOT_FOUND</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
     <span class="n">LOGGING_SOURCE_FILE_DOES_NOT_EXIST</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
@@ -169,10 +169,14 @@
     <span class="n">RUN_CONFIG_VALIDATION_FAILED</span> <span class="o">=</span> <span class="n">CRITICAL_RANGE_START</span>
     <span class="n">DIRECTORY_CREATION_FAILED</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
     <span class="n">SAS_CONFIG_CREATION_FAILED</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">CATALOG_METADATA_CREATION_FAILED</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">LOG_FILE_CREATION_FAILED</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
     <span class="n">INPUT_NOT_FOUND</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
     <span class="n">OUTPUT_NOT_FOUND</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
     <span class="n">INVALID_INPUT</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
     <span class="n">INVALID_OUTPUT</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">INVALID_CATALOG_METADATA</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">FILE_MOVE_FAILED</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
     <span class="n">FILENAME_VIOLATES_NAMING_CONVENTION</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
     <span class="n">SAS_PROGRAM_NOT_FOUND</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
     <span class="n">SAS_PROGRAM_FAILED</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>

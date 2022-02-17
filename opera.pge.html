@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera.pge package &mdash; opera-sds-pge 1.0.0-er.1.0 documentation</title>
+  <title>opera.pge package &mdash; opera-sds-pge 1.0.0-er.2.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -30,7 +30,7 @@
             <a href="index.html" class="icon icon-home"> opera-sds-pge
           </a>
               <div class="version">
-                1.0.0-er.1.0
+                1.0.0-er.2.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -112,9 +112,28 @@ implementations of the Mixin classes to tailor the behavior of the pre-
 and post-processing phases, where necessary, while still inheriting any
 common functionality from this class.</p>
 <dl class="py attribute">
+<dt class="sig sig-object py" id="opera.pge.base_pge.PgeExecutor.LEVEL">
+<span class="sig-name descname"><span class="pre">LEVEL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'L0'</span></em><a class="headerlink" href="#opera.pge.base_pge.PgeExecutor.LEVEL" title="Permalink to this definition"></a></dt>
+<dd><p>Processing Level for Base PGE Products (dummy value)</p>
+</dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="opera.pge.base_pge.PgeExecutor.NAME">
-<span class="sig-name descname"><span class="pre">NAME</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'PgeExecutor'</span></em><a class="headerlink" href="#opera.pge.base_pge.PgeExecutor.NAME" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">NAME</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'BasePge'</span></em><a class="headerlink" href="#opera.pge.base_pge.PgeExecutor.NAME" title="Permalink to this definition"></a></dt>
+<dd><p>Short name for the Base PGE</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="opera.pge.base_pge.PgeExecutor.PROJECT">
+<span class="sig-name descname"><span class="pre">PROJECT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'OPERA'</span></em><a class="headerlink" href="#opera.pge.base_pge.PgeExecutor.PROJECT" title="Permalink to this definition"></a></dt>
+<dd><p>Name of the project associated to this PGE</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="opera.pge.base_pge.PgeExecutor.SAS_VERSION">
+<span class="sig-name descname"><span class="pre">SAS_VERSION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'0.1'</span></em><a class="headerlink" href="#opera.pge.base_pge.PgeExecutor.SAS_VERSION" title="Permalink to this definition"></a></dt>
+<dd><p>Version of the SAS wrapped by this PGE (dummy value)</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="opera.pge.base_pge.PgeExecutor.run">
@@ -211,9 +230,22 @@ order of pre-processing steps.</p>
 <p>This class essentially rolls up the DSWx-tailored pre- and post-processors
 while inheriting all other functionality from the base PgeExecutor class.</p>
 <dl class="py attribute">
+<dt class="sig sig-object py" id="opera.pge.dswx_pge.DSWxExecutor.LEVEL">
+<span class="sig-name descname"><span class="pre">LEVEL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'L3'</span></em><a class="headerlink" href="#opera.pge.dswx_pge.DSWxExecutor.LEVEL" title="Permalink to this definition"></a></dt>
+<dd><p>Processing Level for DSWx Products</p>
+</dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="opera.pge.dswx_pge.DSWxExecutor.NAME">
 <span class="sig-name descname"><span class="pre">NAME</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'DSWx'</span></em><a class="headerlink" href="#opera.pge.dswx_pge.DSWxExecutor.NAME" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Short name for the DSWx PGE</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="opera.pge.dswx_pge.DSWxExecutor.SAS_VERSION">
+<span class="sig-name descname"><span class="pre">SAS_VERSION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'0.1'</span></em><a class="headerlink" href="#opera.pge.dswx_pge.DSWxExecutor.SAS_VERSION" title="Permalink to this definition"></a></dt>
+<dd><p>Version of the SAS wrapped by this PGE, should be updated as needed with new SAS deliveries</p>
+</dd></dl>
 
 </dd></dl>
 

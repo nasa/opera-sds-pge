@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera.util package &mdash; opera-sds-pge 1.0.0-er.1.0 documentation</title>
+  <title>opera.util package &mdash; opera-sds-pge 1.0.0-er.2.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -30,7 +30,7 @@
             <a href="index.html" class="icon icon-home"> opera-sds-pge
           </a>
               <div class="version">
-                1.0.0-er.1.0
+                1.0.0-er.2.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -122,8 +122,13 @@
 <p>Each code is combined with the designated error code offset defined by
 the RunConfig to determine the final, logged error code.</p>
 <dl class="py attribute">
+<dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode.CATALOG_METADATA_CREATION_FAILED">
+<span class="sig-name descname"><span class="pre">CATALOG_METADATA_CREATION_FAILED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3003</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.CATALOG_METADATA_CREATION_FAILED" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode.CLOSING_LOG_FILE">
-<span class="sig-name descname"><span class="pre">CLOSING_LOG_FILE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">28</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.CLOSING_LOG_FILE" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">CLOSING_LOG_FILE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">26</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.CLOSING_LOG_FILE" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -173,7 +178,12 @@ the RunConfig to determine the final, logged error code.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode.FILENAME_VIOLATES_NAMING_CONVENTION">
-<span class="sig-name descname"><span class="pre">FILENAME_VIOLATES_NAMING_CONVENTION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3007</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.FILENAME_VIOLATES_NAMING_CONVENTION" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">FILENAME_VIOLATES_NAMING_CONVENTION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3011</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.FILENAME_VIOLATES_NAMING_CONVENTION" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode.FILE_MOVE_FAILED">
+<span class="sig-name descname"><span class="pre">FILE_MOVE_FAILED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3010</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.FILE_MOVE_FAILED" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -183,32 +193,37 @@ the RunConfig to determine the final, logged error code.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode.INPUT_NOT_FOUND">
-<span class="sig-name descname"><span class="pre">INPUT_NOT_FOUND</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3003</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.INPUT_NOT_FOUND" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">INPUT_NOT_FOUND</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3005</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.INPUT_NOT_FOUND" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode.INVALID_CATALOG_METADATA">
+<span class="sig-name descname"><span class="pre">INVALID_CATALOG_METADATA</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3009</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.INVALID_CATALOG_METADATA" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode.INVALID_INPUT">
-<span class="sig-name descname"><span class="pre">INVALID_INPUT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3005</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.INVALID_INPUT" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">INVALID_INPUT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3007</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.INVALID_INPUT" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode.INVALID_OUTPUT">
-<span class="sig-name descname"><span class="pre">INVALID_OUTPUT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3006</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.INVALID_OUTPUT" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">INVALID_OUTPUT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3008</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.INVALID_OUTPUT" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode.ISO_METADATA_CANT_RENDER_ONE_VARIABLE">
-<span class="sig-name descname"><span class="pre">ISO_METADATA_CANT_RENDER_ONE_VARIABLE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2001</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.ISO_METADATA_CANT_RENDER_ONE_VARIABLE" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">ISO_METADATA_CANT_RENDER_ONE_VARIABLE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2002</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.ISO_METADATA_CANT_RENDER_ONE_VARIABLE" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode.ISO_METADATA_GOT_SOME_RENDERING_ERRORS">
-<span class="sig-name descname"><span class="pre">ISO_METADATA_GOT_SOME_RENDERING_ERRORS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3012</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.ISO_METADATA_GOT_SOME_RENDERING_ERRORS" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">ISO_METADATA_GOT_SOME_RENDERING_ERRORS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3016</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.ISO_METADATA_GOT_SOME_RENDERING_ERRORS" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode.ISO_METADATA_RENDER_FAILED">
-<span class="sig-name descname"><span class="pre">ISO_METADATA_RENDER_FAILED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3013</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.ISO_METADATA_RENDER_FAILED" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">ISO_METADATA_RENDER_FAILED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3017</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.ISO_METADATA_RENDER_FAILED" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -218,27 +233,32 @@ the RunConfig to determine the final, logged error code.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode.LOGGING_COULD_NOT_INCREMENT_SEVERITY">
-<span class="sig-name descname"><span class="pre">LOGGING_COULD_NOT_INCREMENT_SEVERITY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2004</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.LOGGING_COULD_NOT_INCREMENT_SEVERITY" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">LOGGING_COULD_NOT_INCREMENT_SEVERITY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2005</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.LOGGING_COULD_NOT_INCREMENT_SEVERITY" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode.LOGGING_REQUESTED_SEVERITY_NOT_FOUND">
-<span class="sig-name descname"><span class="pre">LOGGING_REQUESTED_SEVERITY_NOT_FOUND</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2002</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.LOGGING_REQUESTED_SEVERITY_NOT_FOUND" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">LOGGING_REQUESTED_SEVERITY_NOT_FOUND</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2003</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.LOGGING_REQUESTED_SEVERITY_NOT_FOUND" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode.LOGGING_RESYNC_FAILED">
-<span class="sig-name descname"><span class="pre">LOGGING_RESYNC_FAILED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2005</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.LOGGING_RESYNC_FAILED" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">LOGGING_RESYNC_FAILED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2006</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.LOGGING_RESYNC_FAILED" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode.LOGGING_SOURCE_FILE_DOES_NOT_EXIST">
-<span class="sig-name descname"><span class="pre">LOGGING_SOURCE_FILE_DOES_NOT_EXIST</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2003</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.LOGGING_SOURCE_FILE_DOES_NOT_EXIST" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">LOGGING_SOURCE_FILE_DOES_NOT_EXIST</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2004</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.LOGGING_SOURCE_FILE_DOES_NOT_EXIST" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode.LOG_FILE_CREATED">
 <span class="sig-name descname"><span class="pre">LOG_FILE_CREATED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.LOG_FILE_CREATED" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode.LOG_FILE_CREATION_FAILED">
+<span class="sig-name descname"><span class="pre">LOG_FILE_CREATION_FAILED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3004</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.LOG_FILE_CREATION_FAILED" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -257,8 +277,13 @@ the RunConfig to determine the final, logged error code.</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode.NO_RENAME_FUNCTION_FOR_EXTENSION">
+<span class="sig-name descname"><span class="pre">NO_RENAME_FUNCTION_FOR_EXTENSION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2001</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.NO_RENAME_FUNCTION_FOR_EXTENSION" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode.OUTPUT_NOT_FOUND">
-<span class="sig-name descname"><span class="pre">OUTPUT_NOT_FOUND</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3004</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.OUTPUT_NOT_FOUND" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">OUTPUT_NOT_FOUND</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3006</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.OUTPUT_NOT_FOUND" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -282,33 +307,23 @@ the RunConfig to determine the final, logged error code.</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode.QA_SAS_DID_NOT_PRODUCE_VALIDATION_LOG_MESSAGES">
-<span class="sig-name descname"><span class="pre">QA_SAS_DID_NOT_PRODUCE_VALIDATION_LOG_MESSAGES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">26</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.QA_SAS_DID_NOT_PRODUCE_VALIDATION_LOG_MESSAGES" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode.QA_SAS_END_OF_VALIDATION_LOG_MESSAGES">
-<span class="sig-name descname"><span class="pre">QA_SAS_END_OF_VALIDATION_LOG_MESSAGES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">25</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.QA_SAS_END_OF_VALIDATION_LOG_MESSAGES" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode.QA_SAS_PRODUCED_VALIDATION_LOG_MESSAGES">
-<span class="sig-name descname"><span class="pre">QA_SAS_PRODUCED_VALIDATION_LOG_MESSAGES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">24</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.QA_SAS_PRODUCED_VALIDATION_LOG_MESSAGES" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
 <dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode.QA_SAS_PROGRAM_COMPLETED">
 <span class="sig-name descname"><span class="pre">QA_SAS_PROGRAM_COMPLETED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">23</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.QA_SAS_PROGRAM_COMPLETED" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode.QA_SAS_PROGRAM_DISABLED">
+<span class="sig-name descname"><span class="pre">QA_SAS_PROGRAM_DISABLED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">24</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.QA_SAS_PROGRAM_DISABLED" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode.QA_SAS_PROGRAM_FAILED">
-<span class="sig-name descname"><span class="pre">QA_SAS_PROGRAM_FAILED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3011</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.QA_SAS_PROGRAM_FAILED" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">QA_SAS_PROGRAM_FAILED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3015</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.QA_SAS_PROGRAM_FAILED" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode.QA_SAS_PROGRAM_NOT_FOUND">
-<span class="sig-name descname"><span class="pre">QA_SAS_PROGRAM_NOT_FOUND</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3010</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.QA_SAS_PROGRAM_NOT_FOUND" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">QA_SAS_PROGRAM_NOT_FOUND</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3014</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.QA_SAS_PROGRAM_NOT_FOUND" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -318,7 +333,7 @@ the RunConfig to determine the final, logged error code.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode.RENDERING_ISO_METADATA">
-<span class="sig-name descname"><span class="pre">RENDERING_ISO_METADATA</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">27</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.RENDERING_ISO_METADATA" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">RENDERING_ISO_METADATA</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">25</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.RENDERING_ISO_METADATA" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -343,7 +358,7 @@ the RunConfig to determine the final, logged error code.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode.SAS_OUTPUT_FILE_HAS_MISSING_DATA">
-<span class="sig-name descname"><span class="pre">SAS_OUTPUT_FILE_HAS_MISSING_DATA</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3014</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.SAS_OUTPUT_FILE_HAS_MISSING_DATA" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">SAS_OUTPUT_FILE_HAS_MISSING_DATA</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3018</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.SAS_OUTPUT_FILE_HAS_MISSING_DATA" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -353,17 +368,22 @@ the RunConfig to determine the final, logged error code.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode.SAS_PROGRAM_FAILED">
-<span class="sig-name descname"><span class="pre">SAS_PROGRAM_FAILED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3009</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.SAS_PROGRAM_FAILED" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">SAS_PROGRAM_FAILED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3013</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.SAS_PROGRAM_FAILED" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode.SAS_PROGRAM_NOT_FOUND">
-<span class="sig-name descname"><span class="pre">SAS_PROGRAM_NOT_FOUND</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3008</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.SAS_PROGRAM_NOT_FOUND" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">SAS_PROGRAM_NOT_FOUND</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3012</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.SAS_PROGRAM_NOT_FOUND" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode.SAS_PROGRAM_STARTING">
 <span class="sig-name descname"><span class="pre">SAS_PROGRAM_STARTING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">20</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.SAS_PROGRAM_STARTING" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode.SAS_QA_COMMAND_LINE">
+<span class="sig-name descname"><span class="pre">SAS_QA_COMMAND_LINE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1003</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.SAS_QA_COMMAND_LINE" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -768,6 +788,36 @@ provided error code.</p>
 <h3>run_utils.py<a class="headerlink" href="#run-utils-py" title="Permalink to this headline"></a></h3>
 <p>Contains utility functions for running executable processes within the OPERA PGE
 subsystem.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="opera.util.run_utils.create_qa_command_line">
+<span class="sig-prename descclassname"><span class="pre">opera.util.run_utils.</span></span><span class="sig-name descname"><span class="pre">create_qa_command_line</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qa_program_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qa_program_options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/opera/util/run_utils.html#create_qa_command_line"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opera.util.run_utils.create_qa_command_line" title="Permalink to this definition"></a></dt>
+<dd><p>Forms the appropriate command line for executing a SAS Quality Assurance (QA)
+application from parameters obtained from the RunConfig.</p>
+<p>By default, this function assumes the QA program path corresponds to an
+executable file reaching within the current environment’s PATH. If this
+function cannot locate the executable, the QA program path is assumed to be
+a Python module path and treated accordingly.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>qa_program_path</strong> (<em>str</em>) – The path to the QA executable to be invoked by the returned command line.</p></li>
+<li><p><strong>qa_program_options</strong> (<em>list</em><em>[</em><em>str</em><em>]</em><em>, </em><em>optional</em>) – List of options to include in the returned command line.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>command_line</strong> – The fully formed command line, returned in list format suitable for use
+with subprocess.run.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list[str]</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>OSError</strong> – If the QA executable exists within the current environment, but is not
+    set with execute permissions for the current process.</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="opera.util.run_utils.create_sas_command_line">
 <span class="sig-prename descclassname"><span class="pre">opera.util.run_utils.</span></span><span class="sig-name descname"><span class="pre">create_sas_command_line</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sas_program_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sas_runconfig_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sas_program_options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/opera/util/run_utils.html#create_sas_command_line"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opera.util.run_utils.create_sas_command_line" title="Permalink to this definition"></a></dt>

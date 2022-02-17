@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera.util.run_utils &mdash; opera-sds-pge 1.0.0-er.1.0 documentation</title>
+  <title>opera.util.run_utils &mdash; opera-sds-pge 1.0.0-er.2.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -27,7 +27,7 @@
             <a href="../../../index.html" class="icon icon-home"> opera-sds-pge
           </a>
               <div class="version">
-                1.0.0-er.1.0
+                1.0.0-er.2.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -166,6 +166,60 @@
     <span class="k">return</span> <span class="n">command_line</span></div>
 
 
+<div class="viewcode-block" id="create_qa_command_line"><a class="viewcode-back" href="../../../opera.util.html#opera.util.run_utils.create_qa_command_line">[docs]</a><span class="k">def</span> <span class="nf">create_qa_command_line</span><span class="p">(</span><span class="n">qa_program_path</span><span class="p">,</span> <span class="n">qa_program_options</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Forms the appropriate command line for executing a SAS Quality Assurance (QA)</span>
+<span class="sd">    application from parameters obtained from the RunConfig.</span>
+
+<span class="sd">    By default, this function assumes the QA program path corresponds to an</span>
+<span class="sd">    executable file reaching within the current environment&#39;s PATH. If this</span>
+<span class="sd">    function cannot locate the executable, the QA program path is assumed to be</span>
+<span class="sd">    a Python module path and treated accordingly.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    qa_program_path : str</span>
+<span class="sd">        The path to the QA executable to be invoked by the returned command line.</span>
+<span class="sd">    qa_program_options : list[str], optional</span>
+<span class="sd">        List of options to include in the returned command line.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    command_line : list[str]</span>
+<span class="sd">        The fully formed command line, returned in list format suitable for use</span>
+<span class="sd">        with subprocess.run.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    OSError</span>
+<span class="sd">        If the QA executable exists within the current environment, but is not</span>
+<span class="sd">        set with execute permissions for the current process.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">command_line</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">if</span> <span class="n">executable_path</span> <span class="o">:=</span> <span class="n">shutil</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="n">qa_program_path</span><span class="p">):</span>
+        <span class="n">command_line</span> <span class="o">=</span> <span class="p">[</span><span class="n">executable_path</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">executable_path</span> <span class="o">=</span> <span class="n">abspath</span><span class="p">(</span><span class="n">qa_program_path</span><span class="p">)</span>
+
+        <span class="c1"># Check if the executable exists</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">access</span><span class="p">(</span><span class="n">executable_path</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">F_OK</span><span class="p">):</span>
+            <span class="c1"># Check if the executable has &#39;execute&#39; permissions on it</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">access</span><span class="p">(</span><span class="n">executable_path</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">X_OK</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Requested QA program path </span><span class="si">{</span><span class="n">qa_program_path</span><span class="si">}</span><span class="s2"> exists, &quot;</span>
+                              <span class="sa">f</span><span class="s2">&quot;but does not have execute permissions.&quot;</span><span class="p">)</span>
+        <span class="c1"># Otherwise, qa_program_path might be a python module path</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">command_line</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;python3&#39;</span><span class="p">,</span> <span class="s1">&#39;-m&#39;</span><span class="p">,</span> <span class="n">qa_program_path</span><span class="p">]</span>
+
+    <span class="c1"># Add any provided arguments</span>
+    <span class="k">if</span> <span class="n">qa_program_options</span><span class="p">:</span>
+        <span class="n">command_line</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">qa_program_options</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">command_line</span></div>
+
+
 <div class="viewcode-block" id="time_and_execute"><a class="viewcode-back" href="../../../opera.util.html#opera.util.run_utils.time_and_execute">[docs]</a><span class="k">def</span> <span class="nf">time_and_execute</span><span class="p">(</span><span class="n">command_line</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">execute_via_shell</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Executes the provided command line via subprocess while collecting the</span>
@@ -194,7 +248,7 @@
     <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">monotonic</span><span class="p">()</span>
 
     <span class="c1"># If the command is to be fed to shell, recombine the list into a single</span>
-    <span class="c1"># string. Otherwise only the first token (the executable) would be invoked.</span>
+    <span class="c1"># string. Otherwise, only the first token (the executable) would be invoked.</span>
     <span class="k">if</span> <span class="n">execute_via_shell</span><span class="p">:</span>
         <span class="n">command_line</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">command_line</span><span class="p">)</span>
 

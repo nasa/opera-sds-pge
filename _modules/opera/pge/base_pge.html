@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera.pge.base_pge &mdash; opera-sds-pge 1.0.0-er.1.0 documentation</title>
+  <title>opera.pge.base_pge &mdash; opera-sds-pge 1.0.0-er.2.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -27,7 +27,7 @@
             <a href="../../../index.html" class="icon icon-home"> opera-sds-pge
           </a>
               <div class="version">
-                1.0.0-er.1.0
+                1.0.0-er.2.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -95,17 +95,24 @@
 
 <span class="sd">&quot;&quot;&quot;</span>
 
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
 <span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">abspath</span><span class="p">,</span> <span class="n">basename</span><span class="p">,</span> <span class="n">exists</span><span class="p">,</span> <span class="n">join</span><span class="p">,</span> <span class="n">splitext</span>
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">abspath</span><span class="p">,</span> <span class="n">basename</span><span class="p">,</span> <span class="n">exists</span><span class="p">,</span> <span class="n">isfile</span><span class="p">,</span> <span class="n">join</span><span class="p">,</span> <span class="n">splitext</span>
 
 <span class="kn">from</span> <span class="nn">yamale</span> <span class="kn">import</span> <span class="n">YamaleError</span>
 
 <span class="kn">import</span> <span class="nn">yaml</span>
 
+<span class="kn">import</span> <span class="nn">opera</span>
 <span class="kn">from</span> <span class="nn">opera.util.error_codes</span> <span class="kn">import</span> <span class="n">ErrorCode</span>
+<span class="kn">from</span> <span class="nn">opera.util.logger</span> <span class="kn">import</span> <span class="n">default_log_file_name</span>
 <span class="kn">from</span> <span class="nn">opera.util.logger</span> <span class="kn">import</span> <span class="n">PgeLogger</span>
+<span class="kn">from</span> <span class="nn">opera.util.metfile</span> <span class="kn">import</span> <span class="n">MetFile</span>
 <span class="kn">from</span> <span class="nn">opera.util.run_utils</span> <span class="kn">import</span> <span class="n">create_sas_command_line</span>
+<span class="kn">from</span> <span class="nn">opera.util.run_utils</span> <span class="kn">import</span> <span class="n">create_qa_command_line</span>
 <span class="kn">from</span> <span class="nn">opera.util.run_utils</span> <span class="kn">import</span> <span class="n">time_and_execute</span>
+<span class="kn">from</span> <span class="nn">opera.util.time</span> <span class="kn">import</span> <span class="n">get_catalog_metadata_datetime_str</span>
+<span class="kn">from</span> <span class="nn">opera.util.time</span> <span class="kn">import</span> <span class="n">get_time_for_filename</span>
 
 <span class="kn">from</span> <span class="nn">.runconfig</span> <span class="kn">import</span> <span class="n">RunConfig</span>
 
@@ -127,11 +134,6 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">_pre_mixin_name</span> <span class="o">=</span> <span class="s2">&quot;PreProcessorMixin&quot;</span>
-
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">runconfig_path</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">def</span> <span class="nf">_initialize_logger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -221,13 +223,9 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">workflow</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">pge_name</span><span class="si">}</span><span class="s1">::</span><span class="si">{</span><span class="n">basename</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
 
-        <span class="c1"># TODO: perform the log rename step here (if possible) once file-name convention is defined</span>
-        <span class="n">output_product_path</span> <span class="o">=</span> <span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">output_product_path</span><span class="p">)</span>
-        <span class="n">log_file_destination</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">output_product_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">get_file_name</span><span class="p">())</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">MOVING_LOG_FILE</span><span class="p">,</span>
-                         <span class="sa">f</span><span class="s1">&#39;Moving log file to </span><span class="si">{</span><span class="n">log_file_destination</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">log_file_destination</span><span class="p">)</span>
+        <span class="c1"># Relocate the output destination for the log file now that we</span>
+        <span class="c1"># can access output_product_path from the parsed RunConfig</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">output_product_path</span><span class="p">,</span> <span class="n">default_log_file_name</span><span class="p">()))</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">LOG_FILE_INIT_COMPLETE</span><span class="p">,</span>
                          <span class="s1">&#39;Log file configuration complete&#39;</span><span class="p">)</span>
@@ -273,23 +271,59 @@
 
     <span class="n">_post_mixin_name</span> <span class="o">=</span> <span class="s2">&quot;PostProcessorMixin&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="kc">None</span>
-
     <span class="k">def</span> <span class="nf">_run_sas_qa_executable</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="c1"># TODO</span>
-        <span class="k">pass</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Executes an optional Quality Assurance (QA) application which may be bundled</span>
+<span class="sd">        with a SAS delivery. QA execution is controlled by settings within the</span>
+<span class="sd">        provided RunConfig.</span>
+
+<span class="sd">        If enabled, execution time for the QA application is collected and logged by</span>
+<span class="sd">        this method.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">qa_enabled</span><span class="p">:</span>
+            <span class="n">qa_program_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">qa_program_path</span>
+            <span class="n">qa_program_options</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">qa_program_options</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">command_line</span> <span class="o">=</span> <span class="n">create_qa_command_line</span><span class="p">(</span><span class="n">qa_program_path</span><span class="p">,</span> <span class="n">qa_program_options</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">QA_SAS_PROGRAM_FAILED</span><span class="p">,</span>
+                                     <span class="sa">f</span><span class="s1">&#39;Failed to create QA command line, reason: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">SAS_QA_COMMAND_LINE</span><span class="p">,</span>
+                              <span class="sa">f</span><span class="s1">&#39;QA EXE command line: </span><span class="si">{</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">command_line</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">QA_SAS_PROGRAM_STARTING</span><span class="p">,</span>
+                             <span class="s1">&#39;Starting SAS QA executable&#39;</span><span class="p">)</span>
+
+            <span class="n">elapsed_time</span> <span class="o">=</span> <span class="n">time_and_execute</span><span class="p">(</span>
+                <span class="n">command_line</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">execute_via_shell</span>
+            <span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">QA_SAS_PROGRAM_COMPLETED</span><span class="p">,</span>
+                             <span class="s1">&#39;SAS QA executable complete&#39;</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">log_one_metric</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;sas.qa.elapsed_seconds&#39;</span><span class="p">,</span> <span class="n">elapsed_time</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">QA_SAS_PROGRAM_DISABLED</span><span class="p">,</span>
+                             <span class="s1">&#39;SAS QA is disabled, skipping&#39;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_create_catalog_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="c1"># TODO</span>
-        <span class="k">pass</span>
+        <span class="sd">&quot;&quot;&quot;Returns the catalog metadata as a MetFile instance&quot;&quot;&quot;</span>
+
+        <span class="n">catalog_metadata</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;PGE_Name&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">pge_name</span><span class="p">,</span>
+            <span class="s1">&#39;PGE_Version&#39;</span><span class="p">:</span> <span class="n">opera</span><span class="o">.</span><span class="n">__version__</span><span class="p">,</span>
+            <span class="s1">&#39;SAS_Version&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">SAS_VERSION</span><span class="p">,</span>
+            <span class="s1">&#39;Input_Files&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">input_files</span><span class="p">,</span>
+            <span class="s1">&#39;Ancillary_Files&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">get_ancillary_filenames</span><span class="p">(),</span>
+            <span class="s1">&#39;Production_DateTime&#39;</span><span class="p">:</span> <span class="n">get_catalog_metadata_datetime_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">production_datetime</span><span class="p">)</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">MetFile</span><span class="p">(</span><span class="n">catalog_metadata</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_create_iso_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="c1"># TODO</span>
-        <span class="k">pass</span>
-
-    <span class="k">def</span> <span class="nf">_stage_output_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># TODO</span>
         <span class="k">pass</span>
 
@@ -304,6 +338,197 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">CLOSING_LOG_FILE</span><span class="p">,</span>
                          <span class="sa">f</span><span class="s2">&quot;Closing log file </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">get_file_name</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">close_log_stream</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_core_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inter_filename</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the core file name component for products produced by the</span>
+<span class="sd">        Base PGE. This function should typically be overridden by inheritors</span>
+<span class="sd">        of PostProcessorMixin to accomplish the specific file-naming conventions</span>
+<span class="sd">        required by the PGE.</span>
+
+<span class="sd">        The core file name component of the Base PGE consists of:</span>
+
+<span class="sd">            &lt;PROJECT&gt;_&lt;LEVEL&gt;_&lt;PGE NAME&gt;_&lt;TIMETAG&gt;</span>
+
+<span class="sd">        Callers of this function are responsible for assignment of any other</span>
+<span class="sd">        product-specific fields, such as the file extension.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        inter_filename : str, optional</span>
+<span class="sd">            The intermediate filename of the output product to generate the</span>
+<span class="sd">            core filename for. This parameter may be used to inspect the file</span>
+<span class="sd">            in order to derive any necessary components of the returned filename.</span>
+<span class="sd">            For the base PGE, this parameter is unused and may be omitted.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        core_filename : str</span>
+<span class="sd">            The core file name component to assign to products created by this PGE.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">time_tag</span> <span class="o">=</span> <span class="n">get_time_for_filename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">production_datetime</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">PROJECT</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">LEVEL</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">NAME</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">time_tag</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_geotiff_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inter_filename</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the file name to use for GeoTIFF&#39;s produced by the Base PGE.</span>
+
+<span class="sd">        The GeoTIFF filename for the Base PGE consists of:</span>
+
+<span class="sd">            &lt;Core filename&gt;_&lt;inter_filename&gt;.tif</span>
+
+<span class="sd">        Where &lt;Core filename&gt; is returned by PostProcessorMixin._core_filename()</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        inter_filename : str</span>
+<span class="sd">            The intermediate filename of the output GeoTIFF to generate</span>
+<span class="sd">            a filename for. This parameter may be used to inspect the file</span>
+<span class="sd">            in order to derive any necessary components of the returned filename.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        geotiff_filename : str</span>
+<span class="sd">            The file name to assign to GeoTIFF product(s) created by this PGE.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">base_filename</span> <span class="o">=</span> <span class="n">splitext</span><span class="p">(</span><span class="n">inter_filename</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_core_filename</span><span class="p">()</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">base_filename</span><span class="si">}</span><span class="s2">.tif&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_catalog_metadata_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the file name to use for Catalog Metadata produced by the Base PGE.</span>
+
+<span class="sd">        The Catalog Metadata file name for the Base PGE consists of:</span>
+
+<span class="sd">            &lt;Core filename&gt;.catalog.json</span>
+
+<span class="sd">        Where &lt;Core filename&gt; is returned by PostProcessorMixin._core_filename()</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        catalog_metadata_filename : str</span>
+<span class="sd">            The file name to assign to the Catalog Metadata product created by this PGE.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_core_filename</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;.catalog.json&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_log_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the file name to use for the PGE/SAS Log file produced by the Base PGE.</span>
+
+<span class="sd">        The Log file name for the Base PGE consists of:</span>
+
+<span class="sd">            &lt;Core filename&gt;.log</span>
+
+<span class="sd">        Where &lt;Core filename&gt; is returned by PostProcessorMixin._core_filename()</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        log_filename : str</span>
+<span class="sd">            The file name to assign to the PGE/SAS Log created by this PGE.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_core_filename</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;.log&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_assign_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_filepath</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Assigns the appropriate file name which meets the file-naming conventions</span>
+<span class="sd">        for the PGE to the provided input file on disk.</span>
+
+<span class="sd">        The file name to assign is determined based on the file extension of</span>
+<span class="sd">        the provided input file. If no file name assignment function is configured</span>
+<span class="sd">        for a given extension, the file name assignment is skipped.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        input_filepath : str</span>
+<span class="sd">            Absolute path to the file on disk to be renamed by this function.</span>
+<span class="sd">        output_dir : str</span>
+<span class="sd">            The output directory destination for the renamed file.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">file_extension</span> <span class="o">=</span> <span class="n">splitext</span><span class="p">(</span><span class="n">input_filepath</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="c1"># Lookup the specific rename function configured for the current file extension</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">rename_function</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rename_by_extension_map</span><span class="p">[</span><span class="n">file_extension</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;No rename function configured for file &quot;</span><span class="si">{</span><span class="n">basename</span><span class="p">(</span><span class="n">input_filepath</span><span class="p">)</span><span class="si">}</span><span class="s1">&quot;, skipping assignment&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">NO_RENAME_FUNCTION_FOR_EXTENSION</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Generate the final file name to assign</span>
+        <span class="n">final_filename</span> <span class="o">=</span> <span class="n">rename_function</span><span class="p">(</span><span class="n">input_filepath</span><span class="p">)</span>
+
+        <span class="n">final_filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">final_filename</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">MOVING_LOG_FILE</span><span class="p">,</span>
+                         <span class="sa">f</span><span class="s2">&quot;Renaming output file </span><span class="si">{</span><span class="n">input_filepath</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">final_filepath</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">input_filepath</span><span class="p">,</span> <span class="n">final_filepath</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Failed to rename output file </span><span class="si">{</span><span class="n">input_filepath</span><span class="si">}</span><span class="s2">, reason: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">FILE_MOVE_FAILED</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_stage_output_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Ensures that all output products produced by both the SAS and this PGE</span>
+<span class="sd">        are staged to the output location defined by the RunConfig. This includes</span>
+<span class="sd">        reassignment of file names to meet the file-naming conventions required</span>
+<span class="sd">        by the PGE.</span>
+
+<span class="sd">        In addition to staging of the output products created by the SAS, this</span>
+<span class="sd">        function is also responsible for ensuring the catalog metadata, ISO</span>
+<span class="sd">        metadata, and combined PGE/SAS log are also written to the expected</span>
+<span class="sd">        output product location with the appropriate file names.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Gather the list of output files produced by the SAS</span>
+        <span class="n">output_product_path</span> <span class="o">=</span> <span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">output_product_path</span><span class="p">)</span>
+        <span class="n">output_products</span> <span class="o">=</span> <span class="p">[</span><span class="n">join</span><span class="p">(</span><span class="n">output_product_path</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+                           <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">output_product_path</span><span class="p">)</span>
+                           <span class="k">if</span> <span class="n">isfile</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">output_product_path</span><span class="p">,</span> <span class="n">filename</span><span class="p">))]</span>
+
+        <span class="c1"># For each output file name, assign the final file name matching the</span>
+        <span class="c1"># expected conventions</span>
+        <span class="k">for</span> <span class="n">output_product</span> <span class="ow">in</span> <span class="n">output_products</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_assign_filename</span><span class="p">(</span><span class="n">output_product</span><span class="p">,</span> <span class="n">output_product_path</span><span class="p">)</span>
+
+        <span class="c1"># Write the catalog metadata to disk with the appropriate filename</span>
+        <span class="n">catalog_metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_catalog_metadata</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">catalog_metadata</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">catalog_metadata</span><span class="o">.</span><span class="n">get_schema_file_path</span><span class="p">()):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Failed to create valid catalog metadata, reason(s):</span><span class="se">\n</span><span class="s2"> </span><span class="si">{</span><span class="n">catalog_metadata</span><span class="o">.</span><span class="n">get_error_msg</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INVALID_CATALOG_METADATA</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+
+        <span class="n">cat_meta_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_catalog_metadata_filename</span><span class="p">()</span>
+        <span class="n">cat_meta_filepath</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">output_product_path</span><span class="p">,</span> <span class="n">cat_meta_filename</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">CREATING_CATALOG_METADATA</span><span class="p">,</span>
+                         <span class="sa">f</span><span class="s2">&quot;Writing Catalog Metadata to </span><span class="si">{</span><span class="n">cat_meta_filepath</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">catalog_metadata</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">cat_meta_filepath</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Failed to write catalog metadata file </span><span class="si">{</span><span class="n">cat_meta_filepath</span><span class="si">}</span><span class="s2">, reason: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">CATALOG_METADATA_CREATION_FAILED</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+
+        <span class="c1"># TODO: create ISO metadata and assign filename</span>
+
+        <span class="c1"># Write the combined PGE/SAS log to disk with the appropriate filename</span>
+        <span class="n">log_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log_filename</span><span class="p">()</span>
+        <span class="n">log_filepath</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">output_product_path</span><span class="p">,</span> <span class="n">log_filename</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">log_filepath</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_finalize_log</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Failed to write log file to </span><span class="si">{</span><span class="n">log_filepath</span><span class="si">}</span><span class="s2">, reason: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">LOG_FILE_CREATION_FAILED</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
 
 <div class="viewcode-block" id="PostProcessorMixin.run_postprocessor"><a class="viewcode-back" href="../../../opera.pge.html#opera.pge.base_pge.PostProcessorMixin.run_postprocessor">[docs]</a>    <span class="k">def</span> <span class="nf">run_postprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -321,10 +546,7 @@
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Running postprocessor for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_post_mixin_name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_run_sas_qa_executable</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_create_catalog_metadata</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_create_iso_metadata</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_stage_output_files</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_finalize_log</span><span class="p">()</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stage_output_files</span><span class="p">()</span></div></div>
 
 
 <div class="viewcode-block" id="PgeExecutor"><a class="viewcode-back" href="../../../opera.pge.html#opera.pge.base_pge.PgeExecutor">[docs]</a><span class="k">class</span> <span class="nc">PgeExecutor</span><span class="p">(</span><span class="n">PreProcessorMixin</span><span class="p">,</span> <span class="n">PostProcessorMixin</span><span class="p">):</span>
@@ -345,7 +567,17 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">NAME</span> <span class="o">=</span> <span class="s2">&quot;PgeExecutor&quot;</span>
+    <span class="n">PROJECT</span> <span class="o">=</span> <span class="s2">&quot;OPERA&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Name of the project associated to this PGE&quot;&quot;&quot;</span>
+
+    <span class="n">NAME</span> <span class="o">=</span> <span class="s2">&quot;BasePge&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Short name for the Base PGE&quot;&quot;&quot;</span>
+
+    <span class="n">LEVEL</span> <span class="o">=</span> <span class="s2">&quot;L0&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Processing Level for Base PGE Products (dummy value)&quot;&quot;&quot;</span>
+
+    <span class="n">SAS_VERSION</span> <span class="o">=</span> <span class="s2">&quot;0.1&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Version of the SAS wrapped by this PGE (dummy value)&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pge_name</span><span class="p">,</span> <span class="n">runconfig_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -358,8 +590,8 @@
 <span class="sd">        runconfig_path : str</span>
 <span class="sd">            Path to the RunConfig to be used with this PGE.</span>
 <span class="sd">        kwargs : dict</span>
-<span class="sd">            Any additional keyword arguments needed by the PGE. Currently</span>
-<span class="sd">            supported kwargs include:</span>
+<span class="sd">            Any additional keyword arguments needed by the PGE.</span>
+<span class="sd">            Supported kwargs include:</span>
 <span class="sd">                - logger : An existing instance of PgeLogger for this PgeExecutor</span>
 <span class="sd">                           to use, rather than creating its own.</span>
 
@@ -369,11 +601,17 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">runconfig_path</span> <span class="o">=</span> <span class="n">runconfig_path</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;logger&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">production_datetime</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">rename_by_extension_map</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;.tif&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geotiff_filename</span><span class="p">,</span>
+            <span class="s1">&#39;.tiff&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geotiff_filename</span>
+        <span class="p">}</span>
 
     <span class="k">def</span> <span class="nf">_isolate_sas_runconfig</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Isolates the SAS-specific portion of the RunConfig into its own</span>
-<span class="sd">        YAML file so it may be fed into the SAS executable without unneeded</span>
+<span class="sd">        YAML file, so it may be fed into the SAS executable without unneeded</span>
 <span class="sd">        PGE configuration settings.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -415,9 +653,13 @@
         <span class="n">sas_program_options</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">sas_program_options</span>
         <span class="n">sas_runconfig_filepath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_isolate_sas_runconfig</span><span class="p">()</span>
 
-        <span class="n">command_line</span> <span class="o">=</span> <span class="n">create_sas_command_line</span><span class="p">(</span>
-            <span class="n">sas_program_path</span><span class="p">,</span> <span class="n">sas_runconfig_filepath</span><span class="p">,</span> <span class="n">sas_program_options</span>
-        <span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">command_line</span> <span class="o">=</span> <span class="n">create_sas_command_line</span><span class="p">(</span>
+                <span class="n">sas_program_path</span><span class="p">,</span> <span class="n">sas_runconfig_filepath</span><span class="p">,</span> <span class="n">sas_program_options</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">SAS_PROGRAM_FAILED</span><span class="p">,</span>
+                                 <span class="sa">f</span><span class="s1">&#39;Failed to create SAS command line, reason: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">SAS_EXE_COMMAND_LINE</span><span class="p">,</span>
                           <span class="sa">f</span><span class="s1">&#39;SAS EXE command line: </span><span class="si">{</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">command_line</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera.pge.dswx_pge &mdash; opera-sds-pge 1.0.0-er.1.0 documentation</title>
+  <title>opera.pge.dswx_pge &mdash; opera-sds-pge 1.0.0-er.2.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -27,7 +27,7 @@
             <a href="../../../index.html" class="icon icon-home"> opera-sds-pge
           </a>
               <div class="version">
-                1.0.0-er.1.0
+                1.0.0-er.2.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -100,6 +100,9 @@
 <span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">abspath</span><span class="p">,</span> <span class="n">exists</span><span class="p">,</span> <span class="n">isdir</span><span class="p">,</span> <span class="n">join</span>
 
 <span class="kn">from</span> <span class="nn">opera.util.error_codes</span> <span class="kn">import</span> <span class="n">ErrorCode</span>
+<span class="kn">from</span> <span class="nn">opera.util.img_utils</span> <span class="kn">import</span> <span class="n">get_geotiff_hls_dataset</span>
+<span class="kn">from</span> <span class="nn">opera.util.img_utils</span> <span class="kn">import</span> <span class="n">get_geotiff_spacecraft_name</span>
+<span class="kn">from</span> <span class="nn">opera.util.img_utils</span> <span class="kn">import</span> <span class="n">get_hls_filename_fields</span>
 
 <span class="kn">from</span> <span class="nn">.base_pge</span> <span class="kn">import</span> <span class="n">PgeExecutor</span>
 <span class="kn">from</span> <span class="nn">.base_pge</span> <span class="kn">import</span> <span class="n">PostProcessorMixin</span>
@@ -178,6 +181,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">_post_mixin_name</span> <span class="o">=</span> <span class="s2">&quot;DSWxPostProcessorMixin&quot;</span>
+    <span class="n">_cached_core_filename</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">def</span> <span class="nf">_validate_output</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -199,6 +203,97 @@
 
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INVALID_OUTPUT</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">)</span>
 
+    <span class="k">def</span> <span class="nf">_core_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inter_filename</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the core file name component for products produced by the</span>
+<span class="sd">        DSWx PGE.</span>
+
+<span class="sd">        The core file name component of the DSWx PGE consists of:</span>
+
+<span class="sd">            &lt;PROJECT&gt;_&lt;LEVEL&gt;_&lt;PGE NAME&gt;_&lt;SOURCE&gt;_&lt;SENSOR&gt;_&lt;TILE ID&gt;_&lt;TIMETAG&gt;_&lt;PRODUCT VERSION&gt;</span>
+
+<span class="sd">        Callers of this function are responsible for assignment of any other</span>
+<span class="sd">        product-specific fields, such as the file extension.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        On first call to this function, the returned core filename is cached</span>
+<span class="sd">        for subsequent calls. This allows the core filename to be easily reused</span>
+<span class="sd">        across product types without needing to provide inter_filename for</span>
+<span class="sd">        each subsequent call.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        inter_filename : str, optional</span>
+<span class="sd">            The intermediate filename of the output product to generate the</span>
+<span class="sd">            core filename for. This parameter may be used to inspect the file</span>
+<span class="sd">            in order to derive any necessary components of the returned filename.</span>
+<span class="sd">            Once the core filename is cached upon first call to this function,</span>
+<span class="sd">            this parameter may be omitted.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        core_filename : str</span>
+<span class="sd">            The core file name component to assign to products created by this PGE.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Check if the core filename has already been generated and cached,</span>
+        <span class="c1"># and return it if so</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cached_core_filename</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cached_core_filename</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">inter_filename</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No filename provided to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">._core_filename(), &quot;</span>
+                   <span class="sa">f</span><span class="s2">&quot;First call must provide a filename before result is cached.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">FILE_MOVE_FAILED</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">get_geotiff_hls_dataset</span><span class="p">(</span><span class="n">inter_filename</span><span class="p">)</span>
+
+        <span class="c1"># TODO: Kludge to be removed once SAS produces per-band outputs</span>
+        <span class="n">dataset_fields</span> <span class="o">=</span> <span class="n">get_hls_filename_fields</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dataset</span><span class="si">}</span><span class="s2">.BAND.tif&quot;</span><span class="p">)</span>
+
+        <span class="n">source</span> <span class="o">=</span> <span class="n">dataset_fields</span><span class="p">[</span><span class="s1">&#39;product&#39;</span><span class="p">]</span>
+        <span class="n">sensor</span> <span class="o">=</span> <span class="n">get_geotiff_spacecraft_name</span><span class="p">(</span><span class="n">inter_filename</span><span class="p">)</span>
+        <span class="n">tile_id</span> <span class="o">=</span> <span class="n">dataset_fields</span><span class="p">[</span><span class="s1">&#39;tile_id&#39;</span><span class="p">]</span>
+        <span class="n">timetag</span> <span class="o">=</span> <span class="n">dataset_fields</span><span class="p">[</span><span class="s1">&#39;acquisition_time&#39;</span><span class="p">]</span>
+        <span class="n">version</span> <span class="o">=</span> <span class="n">dataset_fields</span><span class="p">[</span><span class="s1">&#39;collection_version&#39;</span><span class="p">]</span>
+        <span class="n">subversion</span> <span class="o">=</span> <span class="n">dataset_fields</span><span class="p">[</span><span class="s1">&#39;sub_version&#39;</span><span class="p">]</span>
+
+        <span class="c1"># Assign the core file to the cached class attribute</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cached_core_filename</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">PROJECT</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">LEVEL</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">NAME</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">source</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">sensor</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">tile_id</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">timetag</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">subversion</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cached_core_filename</span>
+
+    <span class="k">def</span> <span class="nf">_geotiff_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inter_filename</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the file name to use for GeoTIFF&#39;s produced by the DSWx PGE.</span>
+
+<span class="sd">        The GeoTIFF filename for the DSWx PGE consists of:</span>
+
+<span class="sd">            &lt;Core filename&gt;.tif</span>
+
+<span class="sd">        Where &lt;Core filename&gt; is returned by DSWxPostProcessorMixin._core_filename()</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        inter_filename : str</span>
+<span class="sd">            The intermediate filename of the output GeoTIFF to generate</span>
+<span class="sd">            a filename for. This parameter may be used to inspect the file</span>
+<span class="sd">            in order to derive any necessary components of the returned filename.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        geotiff_filename : str</span>
+<span class="sd">            The file name to assign to GeoTIFF product(s) created by this PGE.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">core_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_core_filename</span><span class="p">(</span><span class="n">inter_filename</span><span class="p">)</span>
+
+        <span class="c1"># TODO: include band once SAS produces per-band outputs</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">core_filename</span><span class="si">}</span><span class="s2">.tif&quot;</span>
+
 <div class="viewcode-block" id="DSWxPostProcessorMixin.run_postprocessor"><a class="viewcode-back" href="../../../opera.pge.html#opera.pge.dswx_pge.DSWxPostProcessorMixin.run_postprocessor">[docs]</a>    <span class="k">def</span> <span class="nf">run_postprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Executes the post-processing steps for DSWx PGE job completion.</span>
@@ -216,11 +311,8 @@
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Running postprocessor for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_post_mixin_name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_run_sas_qa_executable</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_create_catalog_metadata</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_create_iso_metadata</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_output</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_stage_output_files</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_finalize_log</span><span class="p">()</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stage_output_files</span><span class="p">()</span></div></div>
 
 
 <div class="viewcode-block" id="DSWxExecutor"><a class="viewcode-back" href="../../../opera.pge.html#opera.pge.dswx_pge.DSWxExecutor">[docs]</a><span class="k">class</span> <span class="nc">DSWxExecutor</span><span class="p">(</span><span class="n">DSWxPreProcessorMixin</span><span class="p">,</span> <span class="n">DSWxPostProcessorMixin</span><span class="p">,</span> <span class="n">PgeExecutor</span><span class="p">):</span>
@@ -232,7 +324,14 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">NAME</span> <span class="o">=</span> <span class="s2">&quot;DSWx&quot;</span></div>
+    <span class="n">NAME</span> <span class="o">=</span> <span class="s2">&quot;DSWx&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Short name for the DSWx PGE&quot;&quot;&quot;</span>
+
+    <span class="n">LEVEL</span> <span class="o">=</span> <span class="s2">&quot;L3&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Processing Level for DSWx Products&quot;&quot;&quot;</span>
+
+    <span class="n">SAS_VERSION</span> <span class="o">=</span> <span class="s2">&quot;0.1&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Version of the SAS wrapped by this PGE, should be updated as needed with new SAS deliveries&quot;&quot;&quot;</span></div>
 </pre></div>
 
            </div>
