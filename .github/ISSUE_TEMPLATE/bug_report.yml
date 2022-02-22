@@ -19,7 +19,7 @@ body:
     id: bug-description
     attributes:
       label: Describe the bug
-      description: A clear and concise description of what the bug is. Screenshots welcome.
+      description: A clear and concise description of what the bug is. Plain-text snippets preferred but screenshots welcome.
       placeholder: Tell us what you saw
       value: "When I did [...] action, I noticed [...]"
     validations:
@@ -37,7 +37,7 @@ body:
     id: reproduction
     attributes:
       label: Reproducible steps
-      description: "How would we reproduce this bug? Please walk us through it step by step. Screenshots welcome."
+      description: "How would we reproduce this bug? Please walk us through it step by step. Plain-text snippets preferred but screenshots welcome."
       value: |
         1.
         2.
