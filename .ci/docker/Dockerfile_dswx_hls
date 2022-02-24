@@ -65,3 +65,6 @@ CMD []
 
 # Set the user/group back to the default
 USER conda:conda
+
+# Open up permissions on the pre-made scratch_dir so its writable by the Docker host
+RUN chmod 777 ${PGE_DEST_DIR}/scratch_dir
