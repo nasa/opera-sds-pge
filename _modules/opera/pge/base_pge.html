@@ -95,8 +95,8 @@
 
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
 <span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
 <span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">abspath</span><span class="p">,</span> <span class="n">basename</span><span class="p">,</span> <span class="n">exists</span><span class="p">,</span> <span class="n">isfile</span><span class="p">,</span> <span class="n">join</span><span class="p">,</span> <span class="n">splitext</span>
 
 <span class="kn">from</span> <span class="nn">yamale</span> <span class="kn">import</span> <span class="n">YamaleError</span>
@@ -105,11 +105,11 @@
 
 <span class="kn">import</span> <span class="nn">opera</span>
 <span class="kn">from</span> <span class="nn">opera.util.error_codes</span> <span class="kn">import</span> <span class="n">ErrorCode</span>
-<span class="kn">from</span> <span class="nn">opera.util.logger</span> <span class="kn">import</span> <span class="n">default_log_file_name</span>
 <span class="kn">from</span> <span class="nn">opera.util.logger</span> <span class="kn">import</span> <span class="n">PgeLogger</span>
+<span class="kn">from</span> <span class="nn">opera.util.logger</span> <span class="kn">import</span> <span class="n">default_log_file_name</span>
 <span class="kn">from</span> <span class="nn">opera.util.metfile</span> <span class="kn">import</span> <span class="n">MetFile</span>
-<span class="kn">from</span> <span class="nn">opera.util.run_utils</span> <span class="kn">import</span> <span class="n">create_sas_command_line</span>
 <span class="kn">from</span> <span class="nn">opera.util.run_utils</span> <span class="kn">import</span> <span class="n">create_qa_command_line</span>
+<span class="kn">from</span> <span class="nn">opera.util.run_utils</span> <span class="kn">import</span> <span class="n">create_sas_command_line</span>
 <span class="kn">from</span> <span class="nn">opera.util.run_utils</span> <span class="kn">import</span> <span class="n">time_and_execute</span>
 <span class="kn">from</span> <span class="nn">opera.util.time</span> <span class="kn">import</span> <span class="n">get_catalog_metadata_datetime_str</span>
 <span class="kn">from</span> <span class="nn">opera.util.time</span> <span class="kn">import</span> <span class="n">get_time_for_filename</span>
@@ -188,6 +188,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates the output/scratch directory locations referenced by the</span>
 <span class="sd">        RunConfig if they don&#39;t exist already.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">output_product_path</span> <span class="o">=</span> <span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">output_product_path</span><span class="p">)</span>
         <span class="n">scratch_path</span> <span class="o">=</span> <span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">scratch_path</span><span class="p">)</span>
@@ -218,6 +219,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Configures the logger used by the PGE using information from the</span>
 <span class="sd">        parsed and validated RunConfig.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error_code_base</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">error_code_base</span>
 
@@ -311,7 +313,6 @@
 
     <span class="k">def</span> <span class="nf">_create_catalog_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns the catalog metadata as a MetFile instance&quot;&quot;&quot;</span>
-
         <span class="n">catalog_metadata</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s1">&#39;PGE_Name&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">pge_name</span><span class="p">,</span>
             <span class="s1">&#39;PGE_Version&#39;</span><span class="p">:</span> <span class="n">opera</span><span class="o">.</span><span class="n">__version__</span><span class="p">,</span>
