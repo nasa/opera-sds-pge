@@ -26,13 +26,13 @@ import os
 import shutil
 import tempfile
 import unittest
-from os.path import abspath, join
+from os.path import abspath
 
 from pkg_resources import resource_filename
 
 from opera.util.logger import PgeLogger
-from opera.util.run_utils import create_sas_command_line
 from opera.util.run_utils import create_qa_command_line
+from opera.util.run_utils import create_sas_command_line
 from opera.util.run_utils import time_and_execute
 
 
@@ -82,7 +82,6 @@ class RunUtilsTestCase(unittest.TestCase):
 
     def test_create_sas_command_line(self):
         """Tests for run_utils.create_sas_command_line()"""
-
         # Make a command from something locally available on PATH (findable
         # by a which call)
         cmd = 'echo'
@@ -127,7 +126,6 @@ class RunUtilsTestCase(unittest.TestCase):
 
     def test_create_qa_command_line(self):
         """Tests for run_utils.create_qa_command_line()"""
-
         # Make a command from something locally available on PATH (findable by a
         # which call)
         cmd = 'echo'

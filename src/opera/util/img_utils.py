@@ -37,6 +37,7 @@ class MockGdal:  # pragma: no cover
     osgeo.gdal should always be installed and importable.
 
     """
+
     class MockGdalDataset:
         """Mock class for gdal.Dataset objects, as returned from an Open call."""
 

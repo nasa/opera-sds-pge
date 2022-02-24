@@ -25,17 +25,17 @@ Unit tests for the util/img_utils.py module.
 
 import os
 import unittest
-
 from os.path import abspath, join
-from pkg_resources import resource_filename
 from re import match
 from unittest import skipIf
 
+from pkg_resources import resource_filename
+
+from opera.util.img_utils import get_geotiff_hls_dataset
 from opera.util.img_utils import get_geotiff_metadata
 from opera.util.img_utils import get_geotiff_processing_datetime
 from opera.util.img_utils import get_geotiff_product_version
 from opera.util.img_utils import get_geotiff_spacecraft_name
-from opera.util.img_utils import get_geotiff_hls_dataset
 from opera.util.img_utils import get_hls_filename_fields
 
 
@@ -53,9 +53,11 @@ def gdal_is_available():
 
 
 class ImgUtilsTestCase(unittest.TestCase):
+    """Unit test Image Utilities"""
 
     @classmethod
     def setUpClass(cls) -> None:
+        """Set directories"""
         cls.starting_dir = abspath(os.curdir)
         cls.test_dir = resource_filename(__name__, "")
         cls.data_dir = join(cls.test_dir, os.pardir, "data")
@@ -64,6 +66,7 @@ class ImgUtilsTestCase(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls) -> None:
+        """Return to starting directory"""
         os.chdir(cls.starting_dir)
 
     @skipIf(not gdal_is_available(), reason="GDAL is not installed on the local instance")
@@ -108,6 +111,7 @@ class ImgUtilsTestCase(unittest.TestCase):
             get_geotiff_metadata(join(self.data_dir, "valid_runconfig_full.yaml"))
 
     def test_get_hls_filename_fields(self):
+        """Test get_get_hls_filename_fields()"""
         # Use an example HLS filename
         file_name = 'HLS.S30.T53SMS.2020276T013701.v1.5.B01.tif'
         # Call the function

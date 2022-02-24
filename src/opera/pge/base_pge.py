@@ -22,8 +22,8 @@ Module defining the Base PGE interfaces from which all other PGEs are derived.
 
 """
 
-from datetime import datetime
 import os
+from datetime import datetime
 from os.path import abspath, basename, exists, isfile, join, splitext
 
 from yamale import YamaleError
@@ -32,11 +32,11 @@ import yaml
 
 import opera
 from opera.util.error_codes import ErrorCode
-from opera.util.logger import default_log_file_name
 from opera.util.logger import PgeLogger
+from opera.util.logger import default_log_file_name
 from opera.util.metfile import MetFile
-from opera.util.run_utils import create_sas_command_line
 from opera.util.run_utils import create_qa_command_line
+from opera.util.run_utils import create_sas_command_line
 from opera.util.run_utils import time_and_execute
 from opera.util.time import get_catalog_metadata_datetime_str
 from opera.util.time import get_time_for_filename
@@ -115,6 +115,7 @@ class PreProcessorMixin:
         """
         Creates the output/scratch directory locations referenced by the
         RunConfig if they don't exist already.
+
         """
         output_product_path = abspath(self.runconfig.output_product_path)
         scratch_path = abspath(self.runconfig.scratch_path)
@@ -145,6 +146,7 @@ class PreProcessorMixin:
         """
         Configures the logger used by the PGE using information from the
         parsed and validated RunConfig.
+
         """
         self.logger.error_code_base = self.runconfig.error_code_base
 
@@ -238,7 +240,6 @@ class PostProcessorMixin:
 
     def _create_catalog_metadata(self):
         """Returns the catalog metadata as a MetFile instance"""
-
         catalog_metadata = {
             'PGE_Name': self.runconfig.pge_name,
             'PGE_Version': opera.__version__,

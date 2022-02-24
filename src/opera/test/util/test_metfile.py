@@ -21,20 +21,14 @@ test_metfile.py
 
 Unit tests for the util/metfile.py module.
 """
-import fileinput
 import os
-import shutil
 import tempfile
 import unittest
-
-import os
-from os.path import abspath, exists, join
+from os.path import abspath, exists
 
 from pkg_resources import resource_filename
 
-from opera.pge import PgeExecutor, RunConfig
 from opera.util.metfile import MetFile
-from opera.util import PgeLogger
 
 
 class MetFileTestCase(unittest.TestCase):

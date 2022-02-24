@@ -2,8 +2,9 @@
 
 """The setup script."""
 
-import opera
 from setuptools import find_packages, setup
+
+import opera
 
 with open('README.rst') as readme_file:
     readme = readme_file.read()
@@ -19,7 +20,7 @@ requirements = [
     "pytest-cov",
     "yamale"
 ]
-test_requirements = ['pytest>=3',]
+test_requirements = ['pytest>=3', ]
 dev_requirements = [
     "coverage>=4.5.4",
     "sphinx>=1.8.5",
