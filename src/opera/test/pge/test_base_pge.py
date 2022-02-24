@@ -173,6 +173,12 @@ class BasePgeTestCase(unittest.TestCase):
 
         self.assertIn(f"failed with exit code {expected_error_code}", log_contents)
 
+    def test_geotiff_filename(self):
+        """Test _geotiff_filename() method"""
+        runconfig_path = join(self.data_dir, 'test_sas_qa_config.yaml')
+        pge = PgeExecutor(pge_name='PgeQATest', runconfig_path=runconfig_path)
+        pge._geotiff_filename("TestName.ext")
+
     def test_sas_qa_execution(self):
         """
         Test execution of the PgeExecutor class using a test RunConfig that invokes

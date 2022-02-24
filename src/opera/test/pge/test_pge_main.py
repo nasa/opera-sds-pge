@@ -28,6 +28,7 @@ from os.path import abspath, join
 from pkg_resources import resource_filename
 
 from opera.pge import PgeExecutor, RunConfig
+from opera.scripts import pge_main
 from opera.scripts.pge_main import load_run_config_file
 from opera.scripts.pge_main import open_log_file
 from opera.scripts.pge_main import pge_start
@@ -166,6 +167,12 @@ class PgeMainTestCase(unittest.TestCase):
 
         # Verify that a bad filename raises an error
         self.assertRaises(FileNotFoundError, pge_start, "abc")
+
+    def test_pge_main(self):
+        """Verifies command line start up of pge_main"""
+        cmd = [str(pge_main).split("'")[3], '-f', join(self.data_dir, 'test_base_pge_config.yaml')]
+        # Verify a zero is returned indicating it started
+        self.assertEqual(os.system(' '.join(cmd)), 0)
 
 
 if __name__ == "__main__":

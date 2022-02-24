@@ -69,6 +69,7 @@ def write(log_stream, severity, workflow, module, error_code, error_location,
 
     log_stream.write(message_str)
 
+
 def default_log_file_name():
     """
     Returns a path + filename that can be used for the log file right away.

@@ -26,8 +26,9 @@ Adapted By: Jim Hofman
 """
 
 import json
-import jsonschema
 import os
+
+import jsonschema
 
 from pkg_resources import resource_filename
 
@@ -48,7 +49,6 @@ class MetFile:
             file or to be used to make a new catalog metadata file
 
         """
-
         if met_dict is None:
             met_dict = {}
 
@@ -56,9 +56,11 @@ class MetFile:
         self.combined_error_msg = None
 
     def __setitem__(self, key_name, value):
+        """Set as dictionary"""
         self.met_dict[key_name] = value
 
     def __getitem__(self, key_name):
+        """Get as dictionary"""
         return self.met_dict[key_name]
 
     @classmethod
@@ -77,7 +79,6 @@ class MetFile:
                  b) Updates any values changes to existing keys
 
         """
-
         merged_met_dict = {}
 
         if os.path.exists(output_path):
