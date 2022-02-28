@@ -6,12 +6,12 @@ body:
   - type: markdown
     attributes:
       value: |
-        > _Thank you for filing a new feature request. We very much appreciate your time._
+        > _Thanks for filing a new feature request. We appreciate your time and effort. Please answer a few questions._
   - type: dropdown
-    id: checked-duplicates
+    id: checked-for-duplicates
     attributes:
       label: Checked for duplicates
-      description: Have you checked for duplicate issues?
+      description: Have you checked for duplicate issue tickets?
       multiple: false
       options:
         - "Yes - I've already checked"
@@ -29,20 +29,20 @@ body:
     validations:
       required: yes
   - type: textarea
-    id: feature-problem
+    id: related-problems
     attributes:
-      label: Related problem
-      description: Is your feature request related to a problem? Please help us understand if so.
-      placeholder: Tell us the problem
-      value: "Ex. I'm frustrated when [...] happens"
+      label: Related problems
+      description: Is your feature request related to any problems? Please help us understand if so, including linking to any other issue tickets.
+      placeholder: Tell us the problems
+      value: "I'm frustrated when [...] happens as documented in issue-XYZ"
     validations:
       required: false
   - type: textarea
-    id: feature-description
+    id: description
     attributes:
       label: Describe the feature request
       description: A clear and concise description of your request. 
       placeholder: Tell us what you want
-      value: "Ex. I need or want [...]"
+      value: "I need or want [...]"
     validations:
       required: true
