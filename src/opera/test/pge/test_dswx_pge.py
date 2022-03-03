@@ -295,6 +295,7 @@ class DSWxPgeTestCase(unittest.TestCase):
             if os.path.exists(test_runconfig_path):
                 os.unlink(test_runconfig_path)
 
+    @patch.object(opera.util.img_utils, "get_geotiff_metadata", get_geotiff_metadata_patch)
     def test_geotiff_filename(self):
         """Test _geotiff_filename() method"""
         runconfig_path = join(self.data_dir, 'test_dswx_hls_config.yaml')
@@ -308,8 +309,8 @@ class DSWxPgeTestCase(unittest.TestCase):
             file_name = pge._geotiff_filename(image_files[i])
             md = get_geotiff_metadata(image_files[i])
             file_name_regex = rf"{pge.PROJECT}_{pge.LEVEL}_{md['PRODUCT_TYPE']}_{md['PRODUCT_SOURCE']}_" \
-                              rf"{md['SPACECRAFT_NAME']}_{md['HLS_DATASET'].split('.')[2]}_\d{{8}}T\d{{6}}_\d{{3}}_" \
-                              rf"{'.'.join(md['HLS_DATASET'].split('.')[-2:])}.tif?"
+                              rf"{md['SPACECRAFT_NAME']}_{md['HLS_DATASET'].split('.')[2]}_\d{{8}}T\d{{6}}_" \
+                              rf"{'.'.join(md['HLS_DATASET'].split('.')[-2:])}_\d{{3}}.tif?"
             self.assertEqual(re.match(file_name_regex, file_name).group(), file_name)
 
 

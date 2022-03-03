@@ -137,7 +137,7 @@ class DSWxPostProcessorMixin(PostProcessorMixin):
 
         The core file name component of the DSWx PGE consists of:
 
-            <PROJECT>_<LEVEL>_<PGE NAME>_<SOURCE>_<SENSOR>_<TILE ID>_<TIMETAG>_<PRODUCT VERSION>
+        <PROJECT>_<LEVEL>_<PGE NAME>_<SOURCE>_<SPACECRAFT_NAME>_<TILE ID>_<TIMETAG>_<PRODUCT VERSION>_<PRODUCT_COUNTER>
 
         Callers of this function are responsible for assignment of any other
         product-specific fields, such as the file extension.
@@ -189,12 +189,12 @@ class DSWxPostProcessorMixin(PostProcessorMixin):
         # Assign the core file to the cached class attribute
         self._cached_core_filename = (
             f"{self.PROJECT}_{self.LEVEL}_{self.NAME}_{source}_{spacecraft_name}_"
-            f"{tile_id}_{timetag}_{str(self.runconfig.product_counter).zfill(3)}_{version}.{subversion}"
+            f"{tile_id}_{timetag}_{version}.{subversion}_{str(self.runconfig.product_counter).zfill(3)}"
         )
 
         return self._cached_core_filename
 
-    def _geotiff_filename(self, inter_filename=None):
+    def _geotiff_filename(self, inter_filename):
         """
         Returns the file name to use for GeoTIFF's produced by the DSWx PGE.
 
