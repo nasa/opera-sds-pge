@@ -180,7 +180,7 @@ class DSWxPostProcessorMixin(PostProcessorMixin):
         dataset_fields = get_hls_filename_fields(f"{dataset}.BAND.tif")
 
         source = dataset_fields['product']
-        sensor = get_geotiff_spacecraft_name(inter_filename)
+        spacecraft_name = get_geotiff_spacecraft_name(inter_filename)
         tile_id = dataset_fields['tile_id']
         timetag = dataset_fields['acquisition_time']
         version = dataset_fields['collection_version']
@@ -188,12 +188,13 @@ class DSWxPostProcessorMixin(PostProcessorMixin):
 
         # Assign the core file to the cached class attribute
         self._cached_core_filename = (
-            f"{self.PROJECT}_{self.LEVEL}_{self.NAME}_{source}_{sensor}_{tile_id}_{timetag}_{version}.{subversion}"
+            f"{self.PROJECT}_{self.LEVEL}_{self.NAME}_{source}_{spacecraft_name}_"
+            f"{tile_id}_{timetag}_{str(self.runconfig.product_counter).zfill(3)}_{version}.{subversion}"
         )
 
         return self._cached_core_filename
 
-    def _geotiff_filename(self, inter_filename):
+    def _geotiff_filename(self, inter_filename=None):
         """
         Returns the file name to use for GeoTIFF's produced by the DSWx PGE.
 
