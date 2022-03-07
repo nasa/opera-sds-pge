@@ -307,7 +307,7 @@ class DSWxPgeTestCase(unittest.TestCase):
         image_files = glob.glob(join(pge.runconfig.output_product_path, "*.tif"))
         for i in range(len(image_files)):
             file_name = pge._geotiff_filename(image_files[i])
-            md = get_geotiff_metadata(image_files[i])
+            md = self.get_geotiff_metadata_patch()
             file_name_regex = rf"{pge.PROJECT}_{pge.LEVEL}_{md['PRODUCT_TYPE']}_{md['PRODUCT_SOURCE']}_" \
                               rf"{md['SPACECRAFT_NAME']}_{md['HLS_DATASET'].split('.')[2]}_\d{{8}}T\d{{6}}_" \
                               rf"{'.'.join(md['HLS_DATASET'].split('.')[-2:])}_\d{{3}}.tif?"
