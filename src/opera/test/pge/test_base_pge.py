@@ -38,6 +38,9 @@ from opera.util import PgeLogger
 class BasePgeTestCase(unittest.TestCase):
     """Base test class using unittest"""
 
+    test_dir = None
+    starting_dir = None
+
     @classmethod
     def setUpClass(cls) -> None:
         """Set up class method: set up directories for testing"""
@@ -182,12 +185,6 @@ class BasePgeTestCase(unittest.TestCase):
 
         self.assertIn(f"failed with exit code {expected_error_code}", log_contents)
 
-    def test_geotiff_filename(self):
-        """Test _geotiff_filename() method"""
-        runconfig_path = join(self.data_dir, 'test_sas_qa_config.yaml')
-        pge = PgeExecutor(pge_name='PgeQATest', runconfig_path=runconfig_path)
-        pge._geotiff_filename("TestName.ext")
-
     def test_sas_qa_execution(self):
         """
         Test execution of the PgeExecutor class using a test RunConfig that invokes
@@ -263,6 +260,17 @@ class BasePgeTestCase(unittest.TestCase):
                         data = json.load(j_file)
                     for i in expected_input_files:
                         self.assertIn(i, data["Input_Files"])
+
+    def test_geotiff_filename(self):
+        """Test _geotiff_filename() method"""
+        runconfig_path = join(self.data_dir, 'test_sas_qa_config.yaml')
+        pge = PgeExecutor(pge_name='BasePgeFilenameTest', runconfig_path=runconfig_path)
+        pge._initialize_logger()
+        pge._load_runconfig()
+        name = "TestName.tif"
+        file_name = pge._geotiff_filename(name)
+        file_name_regex = rf'{pge.PROJECT}_{pge.LEVEL}_BasePge_\d{{8}}T\d{{6}}_\d{{3}}_{name}{{1,2}}?'
+        self.assertEqual(re.match(file_name_regex, file_name).group(), file_name)
 
 
 if __name__ == "__main__":

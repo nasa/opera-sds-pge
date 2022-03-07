@@ -22,6 +22,7 @@ Unit tests for the pge/dswx_pge.py module.
 """
 import glob
 import os
+import re
 import tempfile
 import unittest
 from io import StringIO
@@ -35,7 +36,7 @@ import yaml
 import opera.util.img_utils
 from opera.pge import DSWxExecutor, RunConfig
 from opera.util import PgeLogger
-from opera.util.img_utils import MockGdal
+from opera.util.img_utils import MockGdal, get_geotiff_metadata
 
 
 class DSWxPgeTestCase(unittest.TestCase):
@@ -293,6 +294,24 @@ class DSWxPgeTestCase(unittest.TestCase):
         finally:
             if os.path.exists(test_runconfig_path):
                 os.unlink(test_runconfig_path)
+
+    @patch.object(opera.util.img_utils, "get_geotiff_metadata", get_geotiff_metadata_patch)
+    def test_geotiff_filename(self):
+        """Test _geotiff_filename() method"""
+        runconfig_path = join(self.data_dir, 'test_dswx_hls_config.yaml')
+
+        pge = DSWxExecutor(pge_name="DSWxPgeTest", runconfig_path=runconfig_path)
+
+        pge.run()
+
+        image_files = glob.glob(join(pge.runconfig.output_product_path, "*.tif"))
+        for i in range(len(image_files)):
+            file_name = pge._geotiff_filename(image_files[i])
+            md = self.get_geotiff_metadata_patch()
+            file_name_regex = rf"{pge.PROJECT}_{pge.LEVEL}_{md['PRODUCT_TYPE']}_{md['PRODUCT_SOURCE']}_" \
+                              rf"{md['SPACECRAFT_NAME']}_{md['HLS_DATASET'].split('.')[2]}_\d{{8}}T\d{{6}}_" \
+                              rf"{'.'.join(md['HLS_DATASET'].split('.')[-2:])}_\d{{3}}.tif?"
+            self.assertEqual(re.match(file_name_regex, file_name).group(), file_name)
 
 
 if __name__ == "__main__":
