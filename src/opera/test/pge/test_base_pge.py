@@ -20,12 +20,14 @@ test_base_pge.py
 
 Unit tests for the pge/base_pge.py module.
 """
+import json
 import os
 import re
 import tempfile
 import unittest
 from io import StringIO
 from os.path import abspath, join
+from pathlib import Path
 
 from pkg_resources import resource_filename
 
@@ -55,10 +57,16 @@ class BasePgeTestCase(unittest.TestCase):
 
     def setUp(self) -> None:
         """Use the temporary directory as the working directory"""
+
         self.working_dir = tempfile.TemporaryDirectory(
             prefix="test_base_pge_", suffix='temp', dir=os.curdir
         )
         os.chdir(self.working_dir.name)
+
+        # Create dummy input files expected by test RunConfigs
+        os.mkdir('input')
+        Path('input/input_file01.h5').touch()
+        Path('input/input_file02.h5').touch()
 
     def tearDown(self) -> None:
         """Return to starting directory"""
@@ -208,6 +216,46 @@ class BasePgeTestCase(unittest.TestCase):
         # Make sure the run time metrics were captured for both applications
         self.assertIn('sas.elapsed_seconds:', log_contents)
         self.assertIn('sas.qa.elapsed_seconds:', log_contents)
+
+    def test_input_files(self):
+        """
+        Test checking input files from the config.yaml file.
+        Must be able to distinguish between a file path and a directory.
+        If it finds a directory it must add the files in the directory to the input_file list.
+
+        """
+        # Create some additional input files within a subdirectory, as expected
+        # by the RunConfig
+        os.mkdir('new_input')
+        Path('new_input/input_file03.h5').touch()
+        Path('new_input/input_file04.h5').touch()
+
+        runconfig_path = join(self.data_dir, 'test_base_pge_input_files_config.yaml')
+        pge = PgeExecutor(pge_name='BasePgeTest', runconfig_path=runconfig_path)
+        pge.run()
+        log_file = pge.logger.get_file_name()
+        output_dir = None
+        expected_input_files = ['input/input_file01.h5', 'input/input_file02.h5',
+                                'new_input/input_file03.h5', 'new_input/input_file04.h5']
+
+        # find the output directory in the log file
+        with open(log_file, 'r') as infile:
+            for line in infile.readlines():
+                if 'Creating output' in line:
+                    output_dir = line.split('directory ')[1].strip()[:-1]
+                    break
+
+        # Find the catalog.json file and extract the 'Input_Files' field.
+        if output_dir is not None:
+            for filename in os.listdir(output_dir):
+                if re.match(r"OPERA_L0_BasePge_\d{8}T\d{6}.catalog.json", filename):
+                    output_file = "/".join((output_dir, filename))
+
+                    with open(output_file) as outfile:
+                        data = json.load(outfile)
+
+                    for i in expected_input_files:
+                        self.assertIn(i, data["Input_Files"])
 
     def test_geotiff_filename(self):
         """Test _geotiff_filename() method"""

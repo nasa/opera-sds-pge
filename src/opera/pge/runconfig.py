@@ -301,6 +301,48 @@ class RunConfig:
         """Returns the short-cut to the SAS-specific section of the parsed RunConfig"""
         return self._sas_config
 
+    def get_input_filenames(self):
+        """
+        Iterates over the input_file list from the runconfig and returns a list
+        of all files.
+
+        Files in the list are immediately included in the returned list.
+
+        Directories in the list will be examined and any files found will be
+        added to the list.
+
+        Returns
+        -------
+        input_file : list of str
+            The expanded list of input files determined from the RunConfig
+            setting. The list is sorted prior to being returned.
+
+        Raises
+        ------
+        OSError
+            If anything that is not a file or directory is encountered while
+            traversing the set of input file locations.
+
+        """
+        preliminary_file_list = self.input_files
+
+        input_files = []
+
+        for item in preliminary_file_list:
+            if os.path.isfile(item):
+                input_files.append(item)
+            elif os.path.isdir(item):
+                for dir_item in os.listdir(item):
+                    path = os.path.join(item, dir_item)
+
+                    # for now only look for files at first level
+                    if os.path.isfile(path):
+                        input_files.append(path)
+
+        input_files.sort()
+
+        return input_files
+
     def get_ancillary_filenames(self):
         """
         Returns a list of all ancillary filenames listed in the

@@ -240,11 +240,12 @@ class PostProcessorMixin:
 
     def _create_catalog_metadata(self):
         """Returns the catalog metadata as a MetFile instance"""
+
         catalog_metadata = {
             'PGE_Name': self.runconfig.pge_name,
             'PGE_Version': opera.__version__,
             'SAS_Version': self.SAS_VERSION,
-            'Input_Files': self.runconfig.input_files,
+            'Input_Files': self.runconfig.get_input_filenames(),
             'Ancillary_Files': self.runconfig.get_ancillary_filenames(),
             'Production_DateTime': get_catalog_metadata_datetime_str(self.production_datetime)
         }
