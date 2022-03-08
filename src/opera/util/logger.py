@@ -152,6 +152,7 @@ class PgeLogger:
     """
 
     LOGGER_CODE_BASE = 900000
+    QA_LOGGER_CODE_BASE = 800000
 
     def __init__(self, workflow=None, error_code_base=None,
                  log_filename=None):
