@@ -238,40 +238,14 @@ class PostProcessorMixin:
             self.logger.info(self.name, ErrorCode.QA_SAS_PROGRAM_DISABLED,
                              'SAS QA is disabled, skipping')
 
-    def _get_input_files(self):
-        """
-        Iterates over the input_file list from the runconfig and returns a list of all files.
-            Files in the list are immediately included in the returned list.
-            Directories in the list will be examined and any files found will be added to the list
-
-        """
-        preliminary_file_list = self.runconfig.input_files
-        input_files = []
-        for item in preliminary_file_list:
-            if os.path.isfile(item):
-                input_files.append(item)
-            elif os.path.isdir(item):
-                # allow for directory name without '/'
-                item = item + '/' if item[-1] != '/' else item
-                for j in os.listdir(item):
-                    # for now only look for files at first level
-                    if os.path.isfile(item + j):
-                        input_files.append(item + j)
-            else:
-                self.logger.info(self.name, ErrorCode.NON_FILE_OR_DIR_IN_INPUT_FILE_PATH,
-                                 'None file or directory in InputFilePaths:')
-        input_files.sort()
-        return input_files
-
     def _create_catalog_metadata(self):
         """Returns the catalog metadata as a MetFile instance"""
 
-        input_files = self._get_input_files()
         catalog_metadata = {
             'PGE_Name': self.runconfig.pge_name,
             'PGE_Version': opera.__version__,
             'SAS_Version': self.SAS_VERSION,
-            'Input_Files': input_files,
+            'Input_Files': self.runconfig.get_input_filenames(),
             'Ancillary_Files': self.runconfig.get_ancillary_filenames(),
             'Production_DateTime': get_catalog_metadata_datetime_str(self.production_datetime)
         }

@@ -21,9 +21,11 @@ test_main_pge.py
 Unit tests for the pge/base_pge.py module.
 """
 import os
+import subprocess
 import tempfile
 import unittest
 from os.path import abspath, join
+from pathlib import Path
 
 from pkg_resources import resource_filename
 
@@ -71,6 +73,11 @@ class PgeMainTestCase(unittest.TestCase):
             prefix="test_pge_main_", suffix='temp', dir=os.curdir
         )
         os.chdir(self.working_dir.name)
+
+        # Create dummy input files expected by test RunConfigs
+        os.mkdir('input')
+        Path('input/input_file01.h5').touch()
+        Path('input/input_file02.h5').touch()
 
     def tearDown(self) -> None:
         """
@@ -122,7 +129,7 @@ class PgeMainTestCase(unittest.TestCase):
         Test follows the function calls of pge_start()
         A logger and a config file are created then used in instantiating a PgeExecutor class.
         Instances and paths are checked.
-        Finally a 'hello world' string in the log file is verified to be there.
+        Finally, a 'hello world' string in the log file is verified to be there.
         """
         #  New logger to pass to load_run_config_file
         logger = open_log_file()
@@ -171,8 +178,11 @@ class PgeMainTestCase(unittest.TestCase):
     def test_pge_main(self):
         """Verifies command line start up of pge_main"""
         cmd = [str(pge_main).split("'")[3], '-f', join(self.data_dir, 'test_base_pge_config.yaml')]
+
+        run_result = subprocess.run(cmd)
+
         # Verify a zero is returned indicating it started
-        self.assertEqual(os.system(' '.join(cmd)), 0)
+        self.assertEqual(run_result.returncode, 0)
 
 
 if __name__ == "__main__":

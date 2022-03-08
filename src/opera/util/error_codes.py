@@ -76,7 +76,6 @@ class ErrorCode(IntEnum):
     QA_SAS_PROGRAM_DISABLED = auto()
     RENDERING_ISO_METADATA = auto()
     CLOSING_LOG_FILE = auto()
-    NON_FILE_OR_DIR_IN_INPUT_FILE_PATH = auto()
 
     # Debug - 1000 – 1999
     CONFIGURATION_DETAILS = DEBUG_RANGE_START
