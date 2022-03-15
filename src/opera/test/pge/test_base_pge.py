@@ -206,16 +206,23 @@ class BasePgeTestCase(unittest.TestCase):
         expected_log_file = join(pge.runconfig.output_product_path, pge.logger.get_file_name())
         self.assertTrue(os.path.exists(expected_log_file))
 
-        # Open the log file, and check that we got expected output for both the SAS exe and the QA exe
+        # Open the log file, and check that we got expected output for the SAS exe
         with open(expected_log_file, 'r', encoding='utf-8') as infile:
             log_contents = infile.read()
 
         self.assertIn('hello from primary executable', log_contents)
-        self.assertIn('hello from qa executable', log_contents)
-
-        # Make sure the run time metrics were captured for both applications
         self.assertIn('sas.elapsed_seconds:', log_contents)
-        self.assertIn('sas.qa.elapsed_seconds:', log_contents)
+
+        # Check that a separate log file was created to capture the output from
+        # the QA application
+        expected_qa_log_file = join(pge.runconfig.output_product_path, pge.qa_logger.get_file_name())
+        self.assertTrue(os.path.exists(expected_qa_log_file))
+
+        with open(expected_qa_log_file, 'r', encoding='utf-8') as infile:
+            qa_log_contents = infile.read()
+
+        self.assertIn('hello from qa executable', qa_log_contents)
+        self.assertIn('sas.qa.elapsed_seconds:', qa_log_contents)
 
     def test_input_files(self):
         """
