@@ -220,20 +220,20 @@ class PostProcessorMixin:
                 self.logger.critical(self.name, ErrorCode.QA_SAS_PROGRAM_FAILED,
                                      f'Failed to create QA command line, reason: {str(err)}')
 
-            self.logger.debug(self.name, ErrorCode.SAS_QA_COMMAND_LINE,
-                              f'QA EXE command line: {" ".join(command_line)}')
+            self.qa_logger.debug(self.name, ErrorCode.SAS_QA_COMMAND_LINE,
+                                 f'QA EXE command line: {" ".join(command_line)}')
 
-            self.logger.info(self.name, ErrorCode.QA_SAS_PROGRAM_STARTING,
-                             'Starting SAS QA executable')
+            self.qa_logger.info(self.name, ErrorCode.QA_SAS_PROGRAM_STARTING,
+                                'Starting SAS QA executable')
 
             elapsed_time = time_and_execute(
-                command_line, self.logger, self.runconfig.execute_via_shell
+                command_line, self.qa_logger, self.runconfig.execute_via_shell
             )
 
-            self.logger.info(self.name, ErrorCode.QA_SAS_PROGRAM_COMPLETED,
-                             'SAS QA executable complete')
+            self.qa_logger.info(self.name, ErrorCode.QA_SAS_PROGRAM_COMPLETED,
+                                'SAS QA executable complete')
 
-            self.logger.log_one_metric(self.name, 'sas.qa.elapsed_seconds', elapsed_time)
+            self.qa_logger.log_one_metric(self.name, 'sas.qa.elapsed_seconds', elapsed_time)
         else:
             self.logger.info(self.name, ErrorCode.QA_SAS_PROGRAM_DISABLED,
                              'SAS QA is disabled, skipping')
@@ -256,17 +256,22 @@ class PostProcessorMixin:
         # TODO
         pass
 
-    def _finalize_log(self):
+    def _finalize_log(self, logger):
         """
-        Finalizes the logger such that the execution summary is logged before
+        Finalizes the provided logger such that the execution summary is logged before
         the log file is closed. This should typically be one of the last functions
         invoked by a post-processor, since the log file will be unavailable for
         writing after this function is called.
 
+        Parameters
+        ----------
+        logger : PgeLogger
+            The PgeLogger instance to finalize.
+
         """
-        self.logger.info(self.name, ErrorCode.CLOSING_LOG_FILE,
-                         f"Closing log file {self.logger.get_file_name()}")
-        self.logger.close_log_stream()
+        logger.info(self.name, ErrorCode.CLOSING_LOG_FILE,
+                    f"Closing log file {logger.get_file_name()}")
+        logger.close_log_stream()
 
     def _core_filename(self, inter_filename=None):
         """
@@ -347,9 +352,9 @@ class PostProcessorMixin:
 
     def _log_filename(self):
         """
-        Returns the file name to use for the PGE/SAS Log file produced by the Base PGE.
+        Returns the file name to use for the PGE/SAS log file produced by the Base PGE.
 
-        The Log file name for the Base PGE consists of:
+        The log file name for the Base PGE consists of:
 
             <Core filename>.log
 
@@ -358,10 +363,29 @@ class PostProcessorMixin:
         Returns
         -------
         log_filename : str
-            The file name to assign to the PGE/SAS Log created by this PGE.
+            The file name to assign to the PGE/SAS log created by this PGE.
 
         """
         return self._core_filename() + ".log"
+
+    def _qa_log_filename(self):
+        """
+        Returns the file name to use for the Quality Assurance application log
+        file produced by the Base PGE.
+
+        The log file name for the Base PGE consists of:
+
+            <Core filename>.qa.log
+
+        Where <Core filename> is returned by PostProcessorMixin._core_filename()
+
+        Returns
+        -------
+        log_filename : str
+            The file name to assign to the QA log created by this PGE.
+
+        """
+        return self._core_filename() + ".qa.log"
 
     def _assign_filename(self, input_filepath, output_dir):
         """
@@ -448,16 +472,31 @@ class PostProcessorMixin:
 
         # TODO: create ISO metadata and assign filename
 
-        # Write the combined PGE/SAS log to disk with the appropriate filename
+        # Write the QA application log to disk with the appropriate filename,
+        # if necessary
+        if self.runconfig.qa_enabled:
+            qa_log_filename = self._qa_log_filename()
+            qa_log_filepath = join(output_product_path, qa_log_filename)
+            self.qa_logger.move(qa_log_filepath)
+
+            try:
+                self._finalize_log(self.qa_logger)
+            except OSError as err:
+                msg = f"Failed to write QA log file to {qa_log_filepath}, reason: {str(err)}"
+                self.logger.critical(self.name, ErrorCode.LOG_FILE_CREATION_FAILED, msg)
+
+        # Lastly, write the combined PGE/SAS log to disk with the appropriate filename
         log_filename = self._log_filename()
         log_filepath = join(output_product_path, log_filename)
         self.logger.move(log_filepath)
 
         try:
-            self._finalize_log()
+            self._finalize_log(self.logger)
         except OSError as err:
             msg = f"Failed to write log file to {log_filepath}, reason: {str(err)}"
-            self.logger.critical(self.name, ErrorCode.LOG_FILE_CREATION_FAILED, msg)
+
+            # Log stream might be closed by this point so raise an Exception instead
+            raise RuntimeError(msg)
 
     def run_postprocessor(self, **kwargs):
         """
@@ -530,6 +569,9 @@ class PgeExecutor(PreProcessorMixin, PostProcessorMixin):
         self.runconfig_path = runconfig_path
         self.runconfig = None
         self.logger = kwargs.get('logger')
+        self.qa_logger = PgeLogger(
+            workflow="qa_logger", error_code_base=PgeLogger.QA_LOGGER_CODE_BASE
+        )
         self.production_datetime = datetime.now()
 
         self.rename_by_extension_map = {
