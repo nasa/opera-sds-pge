@@ -252,9 +252,10 @@ class PostProcessorMixin:
 
         return MetFile(catalog_metadata)
 
+
     def _create_iso_metadata(self):
-        # TODO
-        pass
+        # TODO - doing
+        print('create iso metadata')
 
     def _finalize_log(self, logger):
         """
@@ -471,6 +472,10 @@ class PostProcessorMixin:
             self.logger.critical(self.name, ErrorCode.CATALOG_METADATA_CREATION_FAILED, msg)
 
         # TODO: create ISO metadata and assign filename
+        # call _create_iso_metadata after you write it.
+        print(f'mixin name: {self._post_mixin_name}')
+        if self._post_mixin_name == "DSWxPostProcessorMixin":
+            self._create_iso_metadata()
 
         # Write the QA application log to disk with the appropriate filename,
         # if necessary
