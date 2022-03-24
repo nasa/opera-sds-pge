@@ -61,7 +61,7 @@ def _make_undefined_handler_class(logger: PgeLogger):
         undef : object
 
         """
-        msg = f"Missing/undefined ISO metadata template variable: {undef}"
+        msg = f"Missing/undefined ISO metadata template variable: {undef._undefined_name}"
         logger.log("render_jinja2", ErrorCode.ISO_METADATA_CANT_RENDER_ONE_VARIABLE, msg)
 
     class LoggingUndefined(jinja2.Undefined):
