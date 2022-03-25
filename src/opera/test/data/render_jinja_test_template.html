@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+     <div id="contents">
+        <h1>Movies</h1>
+            <p>
+            {%- for movie in input_data%}
+            {{ movie['title'] }}
+            {%- endfor %}
+            </p>
+            <p>
+            {%- for movie in input_data%}
+            {{ movie['description'] }}
+            {%- endfor %}
+            </p>
+    </div>
+</body>
+</html>

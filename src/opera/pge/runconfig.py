@@ -79,10 +79,6 @@ class RunConfig:
         yaml_filename : str
             Path to the RunConfig YAML file to parse.
 
-        Returns
-        -------
-        run_config : dict
-            All contents of the parsed
 
         Raises
         ------
