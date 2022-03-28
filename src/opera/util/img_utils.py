@@ -24,6 +24,7 @@ Image file utilities for use with OPERA PGEs.
 
 from collections import namedtuple
 from datetime import datetime
+from functools import cache
 from os.path import exists
 
 
@@ -43,16 +44,25 @@ class MockGdal:  # pragma: no cover
 
         def GetMetadata(self):
             """
-            Returns a subset of dummy metadata which might be expected by the PGE.
+            Returns a subset of dummy metadata expected by the PGE.
             This function should be updated as needed for requisite metadata fields.
             """
             return {
+                'BUILT_UP_COVER_FRACTION_FILE': '(not provided)',
+                'CLOUD_COVERAGE': '43', 'DEM_FILE': '(not provided)',
                 'HLS_DATASET': 'HLS.L30.T22VEQ.2021248T143156.v2.0',
+                'LANDCOVER_FILE': '(not provided)', 'LEVEL': '3',
+                'MEAN_SUN_AZIMUTH_ANGLE': '145.002203258435',
+                'MEAN_SUN_ZENITH_ANGLE': '30.7162834439185',
+                'MEAN_VIEW_AZIMUTH_ANGLE': '100.089770731169',
+                'MEAN_VIEW_ZENITH_ANGLE': '4.6016561116873',
+                'NBAR_SOLAR_ZENITH': '31.7503071022442',
                 'PROCESSING_DATETIME': '2022-01-31T21:54:26',
                 'PRODUCT_ID': 'dswx_hls', 'PRODUCT_SOURCE': 'HLS',
                 'PRODUCT_TYPE': 'DSWx', 'PRODUCT_VERSION': '0.1',
-                'PROJECT': 'OPERA', 'SENSOR': 'MSI',
-                'SPACECRAFT_NAME': 'SENTINEL-2A'
+                'PROJECT': 'OPERA', 'SENSING_TIME': '2021-09-07T16:54:47.751044Z',
+                'SENSOR': 'MSI', 'SPACECRAFT_NAME': 'SENTINEL-2A',
+                'SPATIAL_COVERAGE': '99'
             }
 
     @staticmethod
@@ -75,9 +85,11 @@ except (ImportError, ModuleNotFoundError):  # pragma: no cover
     gdal = MockGdal                         # pragma: no cover
 
 
+@cache
 def get_geotiff_metadata(filename):
     """
     Returns the set of metadata fields associated to the provided GeoTIFF
+    file name. The metadata returned is cached for future lookups on the same
     file name.
 
     Parameters
@@ -152,9 +164,10 @@ def get_hls_filename_fields(file_name):
         Values are the fields parsed from the HLS file_name
 
     """
-    Fields = namedtuple('Fields', ['product', 'short_name', 'tile_id', 'acquisition_time',
-                                   'collection_version', 'sub_version', 'band', 'extension'])
-    fields = Fields._make(file_name.split('.'))._asdict()
+    Fields = namedtuple('Fields',
+                        ['product', 'short_name', 'tile_id', 'acquisition_time',
+                         'collection_version'])
+    fields = Fields._make(file_name.split('.', maxsplit=4))._asdict()
 
     # Convert to 'YYYYMMDDTHHMMSS' format from Julian datetime
     julian_time = fields['acquisition_time'].split('T')
