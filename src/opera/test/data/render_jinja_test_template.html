@@ -7,16 +7,14 @@
 <body>
      <div id="contents">
         <h1>Movies</h1>
+            {%- for movie in movies %}
             <p>
-            {%- for movie in input_data%}
             {{ movie['title'] }}
-            {%- endfor %}
             </p>
             <p>
-            {%- for movie in input_data%}
             {{ movie['description'] }}
-            {%- endfor %}
             </p>
+            {%- endfor %}
     </div>
 </body>
 </html>
