@@ -13,7 +13,7 @@
                 <gmi:MI_Metadata>
                     <!-- The granule file name. Should map to core filename used with the PGE -->
                     <gmd:fileIdentifier>
-                        <gco:CharacterString>{{ pge_wrapper.ISO_OPERA_FilePackageName }}{# ISO_OPERA_FilePackageName #}</gco:CharacterString>
+                        <gco:CharacterString>{{ custom_data.ISO_OPERA_FilePackageName }}{# ISO_OPERA_FilePackageName #}</gco:CharacterString>
                     </gmd:fileIdentifier>
                     <!-- The language used as the content of this metadata record. -->
                     <gmd:language>
@@ -159,7 +159,7 @@
                                         </gmd:CI_Date>
                                     </gmd:date>
                                     <gmd:edition>
-                                        <gco:CharacterString>{{ product_output.productVersion }}{# ISO_OPERA_ProductVersion #}</gco:CharacterString>
+                                        <gco:CharacterString>{{ product_output.PRODUCT_VERSION }}{# ISO_OPERA_ProductVersion #}</gco:CharacterString>
                                     </gmd:edition>
                                     <!-- This is the producer granule id -->
                                     <gmd:identifier>
@@ -207,7 +207,7 @@
                                     <gmd:identifier>
                                         <gmd:MD_Identifier>
                                             <gmd:code>
-                                                <gco:CharacterString>{{ run_config.ProductPathGroup.ProductCounter }}{# ISO_OPERA_ProductCounter #}</gco:CharacterString>
+                                                <gco:CharacterString>{{ run_config.Groups.PGE.ProductPathGroup.ProductCounter }}{# ISO_OPERA_ProductCounter #}</gco:CharacterString>
                                             </gmd:code>
                                             <gmd:codeSpace>
                                                 <gco:CharacterString>gov.nasa.esdis.umm.otherid</gco:CharacterString>
@@ -537,7 +537,7 @@
                                         <gmd:EX_TemporalExtent id="boundingTemporalExtent">
                                             <gmd:extent>
                                                 <gml:TimeInstant>
-                                                    <gml:timePosition>{{ product_output.sensingTime }}{# ISO_OPERA_ProductSensingTime #}</gml:timePosition>
+                                                    <gml:timePosition>{{ product_output.SENSING_TIME }}{# ISO_OPERA_ProductSensingTime #}</gml:timePosition>
                                                 </gml:TimeInstant>
                                             </gmd:extent>
                                         </gmd:EX_TemporalExtent>
@@ -601,7 +601,7 @@
                                                         </eos:EOS_AdditionalAttributeDescription>
                                                     </eos:reference>
                                                     <eos:value>
-                                                        <gco:CharacterString>{{ product_output.meanSunAzimuthAngle }}{# ISO_OPERA_meanSunAzimuthAngle #}</gco:CharacterString>
+                                                        <gco:CharacterString>{{ product_output.MEAN_SUN_AZIMUTH_ANGLE }}{# ISO_OPERA_meanSunAzimuthAngle #}</gco:CharacterString>
                                                     </eos:value>
                                                 </eos:AdditionalAttribute>
                                                 <eos:AdditionalAttribute>
@@ -619,7 +619,7 @@
                                                         </eos:EOS_AdditionalAttributeDescription>
                                                     </eos:reference>
                                                     <eos:value>
-                                                        <gco:CharacterString>{{ product_output.meanSunZenithAngle }}{# ISO_OPERA_meanSunZenithAngle #}</gco:CharacterString>
+                                                        <gco:CharacterString>{{ product_output.MEAN_SUN_ZENITH_ANGLE }}{# ISO_OPERA_meanSunZenithAngle #}</gco:CharacterString>
                                                     </eos:value>
                                                 </eos:AdditionalAttribute>
                                                 <eos:AdditionalAttribute>
@@ -637,7 +637,7 @@
                                                         </eos:EOS_AdditionalAttributeDescription>
                                                     </eos:reference>
                                                     <eos:value>
-                                                        <gco:CharacterString>{{ product_output.nbarSolarZenith }}{# ISO_OPERA_nbarSolarZenith #}</gco:CharacterString>
+                                                        <gco:CharacterString>{{ product_output.NBAR_SOLAR_ZENITH }}{# ISO_OPERA_nbarSolarZenith #}</gco:CharacterString>
                                                     </eos:value>
                                                 </eos:AdditionalAttribute>
                                                 <eos:AdditionalAttribute>
@@ -655,7 +655,7 @@
                                                         </eos:EOS_AdditionalAttributeDescription>
                                                     </eos:reference>
                                                     <eos:value>
-                                                        <gco:CharacterString>{{ product_output.meanViewAzimuthAngle }}{# ISO_OPERA_meanViewAzimuthAngle #}</gco:CharacterString>
+                                                        <gco:CharacterString>{{ product_output.MEAN_VIEW_AZIMUTH_ANGLE }}{# ISO_OPERA_meanViewAzimuthAngle #}</gco:CharacterString>
                                                     </eos:value>
                                                 </eos:AdditionalAttribute>
                                                 <eos:AdditionalAttribute>
@@ -673,7 +673,7 @@
                                                         </eos:EOS_AdditionalAttributeDescription>
                                                     </eos:reference>
                                                     <eos:value>
-                                                        <gco:CharacterString>{{ product_output.meanViewZenithAngle }}{# ISO_OPERA_meanViewZenithAngle #}</gco:CharacterString>
+                                                        <gco:CharacterString>{{ product_output.MEAN_VIEW_ZENITH_ANGLE }}{# ISO_OPERA_meanViewZenithAngle #}</gco:CharacterString>
                                                     </eos:value>
                                                 </eos:AdditionalAttribute>
                                                 <eos:AdditionalAttribute>
@@ -691,7 +691,7 @@
                                                         </eos:EOS_AdditionalAttributeDescription>
                                                     </eos:reference>
                                                     <eos:value>
-                                                        <gco:CharacterString>{{ product_output.spatialCoverage }}{# ISO_OPERA_spatialCoverage #}</gco:CharacterString>
+                                                        <gco:CharacterString>{{ product_output.SPATIAL_COVERAGE }}{# ISO_OPERA_spatialCoverage #}</gco:CharacterString>
                                                     </eos:value>
                                                 </eos:AdditionalAttribute>
                                                 <eos:AdditionalAttribute>
@@ -709,7 +709,7 @@
                                                         </eos:EOS_AdditionalAttributeDescription>
                                                     </eos:reference>
                                                     <eos:value>
-                                                        <gco:CharacterString>{{ product_output.cloudCoverage }}{# ISO_OPERA_cloudCoverage #}</gco:CharacterString>
+                                                        <gco:CharacterString>{{ product_output.CLOUD_COVERAGE }}{# ISO_OPERA_cloudCoverage #}</gco:CharacterString>
                                                     </eos:value>
                                                 </eos:AdditionalAttribute>
                                             </eos:AdditionalAttributes>
@@ -827,21 +827,21 @@
                                     <gmd:source>
                                         <gmd:LI_Source>
                                             <gmd:description>
-                                                <gco:CharacterString>Reference DEM - {{ product_output.demFile }}{# ISO_OPERA_digitalElevationModelFile #}</gco:CharacterString>
+                                                <gco:CharacterString>Reference DEM - {{ product_output.DEM_FILE }}{# ISO_OPERA_digitalElevationModelFile #}</gco:CharacterString>
                                             </gmd:description>
                                         </gmd:LI_Source>
                                     </gmd:source>
                                     <gmd:source>
                                         <gmd:LI_Source>
                                             <gmd:description>
-                                                <gco:CharacterString>Built Up Cover Fraction File - {{ product_output.builtUpCoverFractionFile }}{# ISO_OPERA_builtUpCoverFractionFile #}</gco:CharacterString>
+                                                <gco:CharacterString>Built Up Cover Fraction File - {{ product_output.BUILT_UP_COVER_FRACTION_FILE }}{# ISO_OPERA_builtUpCoverFractionFile #}</gco:CharacterString>
                                             </gmd:description>
                                         </gmd:LI_Source>
                                     </gmd:source>
                                     <gmd:source>
                                         <gmd:LI_Source>
                                             <gmd:description>
-                                                <gco:CharacterString>Landcover File - {{ product_output.landcoverFile }}{# ISO_OPERA_landcoverFile #}</gco:CharacterString>
+                                                <gco:CharacterString>Landcover File - {{ product_output.LANDCOVER_FILE }}{# ISO_OPERA_landcoverFile #}</gco:CharacterString>
                                             </gmd:description>
                                         </gmd:LI_Source>
                                     </gmd:source>
