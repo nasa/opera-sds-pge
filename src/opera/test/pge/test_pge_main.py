@@ -154,7 +154,7 @@ class PgeMainTestCase(unittest.TestCase):
         self.assertTrue(os.path.exists(expected_sas_config_file))
 
         # Check that the log file was created and moved into the output directory
-        expected_log_file = join(pge.runconfig.output_product_path, pge.logger.get_file_name())
+        expected_log_file = pge.logger.get_file_name()
         self.assertTrue(os.path.exists(expected_log_file))
 
         # Open the log file, and check that "SAS" output was captured

@@ -293,10 +293,16 @@ class PostProcessorMixin:
 
         return MetFile(catalog_metadata)
 
-
     def _create_iso_metadata(self):
-        # TODO - doing
-        print('create iso metadata')
+        """
+        Creates the ISO metadata utilized by the DAAC's for indexing output
+        products submitted by OPERA. Inheritors of PostProcessorMixin must
+        provide their own implementations, as ISO metadata is not applicable
+        to the base PGE.
+
+        """
+        # Base PGE does not produce ISO metadata.
+        return None
 
     def _finalize_log(self, logger):
         """
@@ -392,6 +398,24 @@ class PostProcessorMixin:
         """
         return self._core_filename() + ".catalog.json"
 
+    def _iso_metadata_filename(self):
+        """
+        Returns the file name to use for ISO Metadata produced by the Base PGE.
+
+        The ISO Metadata file name for the Base PGE consists of:
+
+            <Core filename>.iso.xml
+
+        Where <Core filename> is returned by PostProcessorMixin._core_filename()
+
+        Returns
+        -------
+        iso_metadata_filename : str
+            The file name to assign to the ISO Metadata product created by this PGE.
+
+        """
+        return self._core_filename() + ".iso.xml"
+
     def _log_filename(self):
         """
         Returns the file name to use for the PGE/SAS log file produced by the Base PGE.
@@ -483,15 +507,12 @@ class PostProcessorMixin:
 
         """
         # Gather the list of output files produced by the SAS
-        output_product_path = abspath(self.runconfig.output_product_path)
-        output_products = [join(output_product_path, filename)
-                           for filename in os.listdir(output_product_path)
-                           if isfile(join(output_product_path, filename))]
+        output_products = self.runconfig.get_output_product_filenames()
 
         # For each output file name, assign the final file name matching the
         # expected conventions
         for output_product in output_products:
-            self._assign_filename(output_product, output_product_path)
+            self._assign_filename(output_product, self.runconfig.output_product_path)
 
         # Write the catalog metadata to disk with the appropriate filename
         catalog_metadata = self._create_catalog_metadata()
@@ -501,7 +522,7 @@ class PostProcessorMixin:
             self.logger.critical(self.name, ErrorCode.INVALID_CATALOG_METADATA, msg)
 
         cat_meta_filename = self._catalog_metadata_filename()
-        cat_meta_filepath = join(output_product_path, cat_meta_filename)
+        cat_meta_filepath = join(self.runconfig.output_product_path, cat_meta_filename)
 
         self.logger.info(self.name, ErrorCode.CREATING_CATALOG_METADATA,
                          f"Writing Catalog Metadata to {cat_meta_filepath}")
@@ -512,17 +533,23 @@ class PostProcessorMixin:
             msg = f"Failed to write catalog metadata file {cat_meta_filepath}, reason: {str(err)}"
             self.logger.critical(self.name, ErrorCode.CATALOG_METADATA_CREATION_FAILED, msg)
 
-        # TODO: create ISO metadata and assign filename
-        # call _create_iso_metadata after you write it.
-        print(f'mixin name: {self._post_mixin_name}')
-        if self._post_mixin_name == "DSWxPostProcessorMixin":
-            self._create_iso_metadata()
+        # Generate the ISO metadata for use with product submission to DAAC(s)
+        iso_metadata = self._create_iso_metadata()
+
+        iso_meta_filename = self._iso_metadata_filename()
+        iso_meta_filepath = join(self.runconfig.output_product_path, iso_meta_filename)
+
+        if iso_metadata:
+            self.logger.info(self.name, ErrorCode.RENDERING_ISO_METADATA,
+                             f"Writing ISO Metadata to {iso_meta_filepath}")
+            with open(iso_meta_filepath, 'w', encoding='utf-8') as outfile:
+                outfile.write(iso_metadata)
 
         # Write the QA application log to disk with the appropriate filename,
         # if necessary
         if self.runconfig.qa_enabled:
             qa_log_filename = self._qa_log_filename()
-            qa_log_filepath = join(output_product_path, qa_log_filename)
+            qa_log_filepath = join(self.runconfig.output_product_path, qa_log_filename)
             self.qa_logger.move(qa_log_filepath)
 
             try:
@@ -533,7 +560,7 @@ class PostProcessorMixin:
 
         # Lastly, write the combined PGE/SAS log to disk with the appropriate filename
         log_filename = self._log_filename()
-        log_filepath = join(output_product_path, log_filename)
+        log_filepath = join(self.runconfig.output_product_path, log_filename)
         self.logger.move(log_filepath)
 
         try:
