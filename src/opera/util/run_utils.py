@@ -23,6 +23,7 @@ subsystem.
 
 """
 
+import hashlib
 import os
 import shutil
 import subprocess
@@ -30,6 +31,38 @@ import time
 from os.path import abspath
 
 from .error_codes import ErrorCode
+
+
+def get_checksum(file_name):
+    """
+    Generate the MD5 checksum of the provided file.
+
+    This function was adapted from swot_pge.util.BasePgeWrapper.get_checksum()
+
+    Parameters
+    ----------
+    file_name : str
+        Path the file on disk to generate the checksum for.
+
+    Returns
+    -------
+    checksum : str
+        MD5 checksum of the provided file.
+
+    """
+    hash_md5 = hashlib.md5()
+
+    with open(file_name, "rb") as infile:
+        # chunk size is set to 1048576
+        for chunk in iter(lambda: infile.read(2 ** 20), b""):
+            hash_md5.update(chunk)
+
+    return hash_md5.hexdigest()
+
+
+def get_extension(file_name):
+    """Returns the file extension (including the dot) of the provided file name."""
+    return os.path.splitext(file_name)[-1]
 
 
 def create_sas_command_line(sas_program_path, sas_runconfig_path,
