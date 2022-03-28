@@ -63,6 +63,10 @@ class MetFile:
         """Get as dictionary"""
         return self.met_dict[key_name]
 
+    def asdict(self):
+        """Return dictionary representation of catalog metadata"""
+        return self.met_dict
+
     @classmethod
     def get_schema_file_path(cls):
         """Returns the path to schema file"""
