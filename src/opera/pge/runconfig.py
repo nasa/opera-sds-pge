@@ -26,6 +26,7 @@ Adapted By: Scott Collins
 
 """
 import os
+from os.path import abspath, isabs, isdir, isfile, join
 
 from pkg_resources import resource_filename
 
@@ -133,7 +134,7 @@ class RunConfig:
             sas_schema_filename = self.sas_schema_path
             sas_schema_filepath = resource_filename('opera', f'schema/{sas_schema_filename}')
 
-            if os.path.isfile(sas_schema_filepath):
+            if isfile(sas_schema_filepath):
                 # TODO: better error handling for missing sas schema,
                 #       support for absolute paths as fallback when resource_filename fails?
                 sas_schema = yamale.make_schema(sas_schema_filepath)
@@ -183,7 +184,8 @@ class RunConfig:
         except KeyError as error:
             # TODO: create exceptions package with more intuitive exception class names
             raise RuntimeError(
-                f'Expected field "{str(error)}" is missing from RunConfig {self.filename}'
+                f'Expected field "{str(error)}" is missing from RunConfig '
+                f'{abspath(self.filename)}'
             ) from error
 
     @property
@@ -297,6 +299,10 @@ class RunConfig:
         """Returns the short-cut to the SAS-specific section of the parsed RunConfig"""
         return self._sas_config
 
+    def asdict(self) -> dict:
+        """Returns the entire parsed RunConfig in its dictonary representation"""
+        return self._run_config
+
     def get_input_filenames(self):
         """
         Iterates over the input_file list from the runconfig and returns a list
@@ -325,14 +331,14 @@ class RunConfig:
         input_files = []
 
         for item in preliminary_file_list:
-            if os.path.isfile(item):
+            if isfile(item):
                 input_files.append(item)
-            elif os.path.isdir(item):
+            elif isdir(item):
                 for dir_item in os.listdir(item):
-                    path = os.path.join(item, dir_item)
+                    path = join(item, dir_item)
 
                     # for now only look for files at first level
-                    if os.path.isfile(path):
+                    if isfile(path):
                         input_files.append(path)
 
         input_files.sort()
@@ -355,3 +361,18 @@ class RunConfig:
         result = list(self.ancillary_file_map.values())
 
         return result
+
+    def get_output_product_filenames(self):
+        """
+        Returns a list of all product file paths currently written to the output
+        location specified by the RunConfig. Note that only top-level files
+        are returned, this function does not recurse into any directories
+        encountered.
+
+        """
+        output_product_path = abspath(self.output_product_path)
+        output_products = [join(output_product_path, filename)
+                           for filename in os.listdir(output_product_path)
+                           if isfile(join(output_product_path, filename))]
+
+        return output_products
