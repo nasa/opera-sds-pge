@@ -24,7 +24,8 @@ Module defining the Base PGE interfaces from which all other PGEs are derived.
 
 import os
 from datetime import datetime
-from os.path import abspath, basename, exists, isfile, join, splitext
+from os.path import abspath, basename, exists, join, splitext
+from functools import cache
 
 from yamale import YamaleError
 
@@ -35,6 +36,8 @@ from opera.util.error_codes import ErrorCode
 from opera.util.logger import PgeLogger
 from opera.util.logger import default_log_file_name
 from opera.util.metfile import MetFile
+from opera.util.run_utils import get_checksum
+from opera.util.run_utils import get_extension
 from opera.util.run_utils import create_qa_command_line
 from opera.util.run_utils import create_sas_command_line
 from opera.util.run_utils import time_and_execute
@@ -238,8 +241,45 @@ class PostProcessorMixin:
             self.logger.info(self.name, ErrorCode.QA_SAS_PROGRAM_DISABLED,
                              'SAS QA is disabled, skipping')
 
+    def _checksum_output_products(self):
+        """
+        Generates a dictionary mapping output product file names to the
+        corresponding MD5 checksum digest of the file's contents.
+
+        The output products to generate checksums for is determined by scanning
+        the output product location specified by the RunConfig. Any files
+        within the directory that have the expected file extensions for output
+        products are then picked up for checksum generation.
+
+        Returns
+        -------
+        checksums : dict
+            Mapping of output product file names to MD5 checksums of said
+            products.
+
+        """
+        output_products = self.runconfig.get_output_product_filenames()
+
+        # Filter out any files that are not renamed by the PGE
+        output_products = filter(
+            lambda product: get_extension(product) in self.rename_by_extension_map,
+            output_products
+        )
+
+        # Generate checksums on the filtered product list
+        checksums = {
+            basename(output_product): get_checksum(output_product)
+            for output_product in output_products
+        }
+
+        return checksums
+
+    @cache
     def _create_catalog_metadata(self):
-        """Returns the catalog metadata as a MetFile instance"""
+        """
+        Returns the catalog metadata as a MetFile instance. Once generated, the
+        catalog metadata is cached for the life of the PGE instance.
+        """
 
         catalog_metadata = {
             'PGE_Name': self.runconfig.pge_name,
@@ -247,7 +287,8 @@ class PostProcessorMixin:
             'SAS_Version': self.SAS_VERSION,
             'Input_Files': self.runconfig.get_input_filenames(),
             'Ancillary_Files': self.runconfig.get_ancillary_filenames(),
-            'Production_DateTime': get_catalog_metadata_datetime_str(self.production_datetime)
+            'Production_DateTime': get_catalog_metadata_datetime_str(self.production_datetime),
+            'Output_Product_Checksums': self._checksum_output_products()
         }
 
         return MetFile(catalog_metadata)
