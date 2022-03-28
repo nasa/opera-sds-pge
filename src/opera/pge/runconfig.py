@@ -38,6 +38,9 @@ import yaml
 BASE_PGE_SCHEMA = resource_filename('opera', 'schema/base_pge_schema.yaml')
 """Path to the Yamale schema applicable to the PGE portion of each RunConfig"""
 
+ISO_TEMPLATE_DIR = resource_filename('opera', 'pge/templates')
+"""Path to the repository directory containing ISO metadata Jinja2 templates"""
+
 
 class RunConfig:
     """
@@ -266,7 +269,12 @@ class RunConfig:
     @property
     def iso_template_path(self) -> str:
         """Returns the ISO Template Path for a Primary Executable"""
-        return self._pge_config['PrimaryExecutable']['IsoTemplatePath']
+        iso_template_path = self._pge_config['PrimaryExecutable']['IsoTemplatePath']
+        return (
+            iso_template_path
+            if isabs(iso_template_path)
+            else join(ISO_TEMPLATE_DIR, iso_template_path)
+        )
 
     # QAExecutable
     @property
