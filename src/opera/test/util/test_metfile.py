@@ -125,26 +125,34 @@ class MetFileTestCase(unittest.TestCase):
         Verify the schema test fails
 
         """
-        # Creat a dummy metadata file
+        # Create a dummy metadata file
         catalog_metadata = {
             'PGE_Name': "BASE_PGE_TEST",
             'PGE_Version': "1.0.test",
             'SAS_Version': "2.0.test",
             'Input_Files': ["input/input_file01.h5", "input/input_file02.h5"],
             'Ancillary_Files': ["input/input_dem.vrt"],
-            'Production_DateTime': "2022-01-20T12:07:10.9143060000Z"
+            'Production_DateTime': "2022-01-20T12:07:10.9143060000Z",
+            'Output_Product_Checksums': {
+                "output_file01.tif": "abcdefghijklmnop"
+            }
         }
 
         met_file = 'testCatalogMetadata.json'
         met_data = MetFile(catalog_metadata)
         self.assertIsInstance(met_data, MetFile)
+
         # Save the test catalog metadata to temporary
         met_data.write(met_file)
+
         # Verify that the schema test passes
         self.assertTrue(met_data.validate(met_data.get_schema_file_path()))
+
         # Modify the test catalog metadata
         met_data.read(met_file)
+
         # Remove a ':' from the between mm:ss
         met_data['Production_DateTime'] = "2022-01-20T12:0710.9143060000Z"
+
         # Verify that the schema test fails
         self.assertFalse(met_data.validate(met_data.get_schema_file_path()))

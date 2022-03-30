@@ -49,6 +49,13 @@
     "Production_DateTime": {
       "description": "Production DateTime in UTC",
       "$ref": "#/definitions/opera-metadata-date-time"
+    },
+    "Output_Product_Checksums": {
+      "description": "Mapping of output product file names to corresponding MD5 checksums",
+      "type": "object",
+      "propertyNames": {
+        "$ref": "#/definitions/non-empty-string"
+      }
     }
   },
   "required": [
@@ -57,7 +64,8 @@
     "SAS_Version",
     "Input_Files",
     "Ancillary_Files",
-    "Production_DateTime"
+    "Production_DateTime",
+    "Output_Product_Checksums"
   ],
   "additionalProperties": false
 }

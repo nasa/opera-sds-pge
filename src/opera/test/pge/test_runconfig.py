@@ -30,6 +30,7 @@ from pkg_resources import resource_filename
 from yamale import YamaleError
 
 from opera.pge import RunConfig
+from opera.pge.runconfig import ISO_TEMPLATE_DIR
 
 
 class RunconfigTestCase(unittest.TestCase):
@@ -68,7 +69,8 @@ class RunconfigTestCase(unittest.TestCase):
         self.assertListEqual(runconfig.sas_program_options, ["--debug", "--restart"])
         self.assertEqual(runconfig.error_code_base, 100000)
         self.assertEqual(runconfig.sas_schema_path, "sample_sas_schema.yaml")
-        self.assertEqual(runconfig.iso_template_path, "sample_iso_template.xml.jinja2")
+        self.assertEqual(runconfig.iso_template_path,
+                         join(ISO_TEMPLATE_DIR, "sample_iso_template.xml.jinja2"))
         self.assertEqual(runconfig.qa_enabled, True)
         self.assertEqual(runconfig.qa_program_path, "/opt/QualityAssurance/sample_qa.py")
         self.assertListEqual(runconfig.qa_program_options, ["--debug"])

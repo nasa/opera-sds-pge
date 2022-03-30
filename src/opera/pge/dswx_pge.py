@@ -27,9 +27,12 @@ import os.path
 from os.path import abspath, exists, isdir, join
 
 from opera.util.error_codes import ErrorCode
+from opera.util.img_utils import get_geotiff_metadata
 from opera.util.img_utils import get_geotiff_hls_dataset
 from opera.util.img_utils import get_geotiff_spacecraft_name
 from opera.util.img_utils import get_hls_filename_fields
+from opera.util.render_jinja2 import render_jinja2
+from opera.util.run_utils import get_extension
 
 from .base_pge import PgeExecutor
 from .base_pge import PostProcessorMixin
@@ -176,20 +179,18 @@ class DSWxPostProcessorMixin(PostProcessorMixin):
 
         dataset = get_geotiff_hls_dataset(inter_filename)
 
-        # TODO: Kludge to be removed once SAS produces per-band outputs
-        dataset_fields = get_hls_filename_fields(f"{dataset}.BAND.tif")
+        dataset_fields = get_hls_filename_fields(dataset)
 
         source = dataset_fields['product']
         spacecraft_name = get_geotiff_spacecraft_name(inter_filename)
         tile_id = dataset_fields['tile_id']
         timetag = dataset_fields['acquisition_time']
         version = dataset_fields['collection_version']
-        subversion = dataset_fields['sub_version']
 
         # Assign the core file to the cached class attribute
         self._cached_core_filename = (
             f"{self.PROJECT}_{self.LEVEL}_{self.NAME}_{source}_{spacecraft_name}_"
-            f"{tile_id}_{timetag}_{version}.{subversion}_{str(self.runconfig.product_counter).zfill(3)}"
+            f"{tile_id}_{timetag}_{version}_{str(self.runconfig.product_counter).zfill(3)}"
         )
 
         return self._cached_core_filename
@@ -221,6 +222,127 @@ class DSWxPostProcessorMixin(PostProcessorMixin):
 
         # TODO: include band once SAS produces per-band outputs
         return f"{core_filename}.tif"
+
+    def _collect_dswx_product_metadata(self):
+        """
+        Gathers the available metadata from a sample output DSWx product for
+        use in filling out the ISO metadata template for the DSWx-HLS PGE.
+
+        Returns
+        -------
+        output_product_metadata : dict
+            Dictionary containing DSWx-HLS output product metadata, formatted
+            for use with the ISO metadata Jinja2 template.
+
+        """
+        # Find a single representative output DSWx-HLS product, they should all
+        # have identical sets of metadata
+        output_products = self.runconfig.get_output_product_filenames()
+        representative_product = None
+
+        for output_product in output_products:
+            if get_extension(output_product) in self.rename_by_extension_map:
+                representative_product = output_product
+                break
+        else:
+            msg = (f"Could not find sample output product to derive metadata from "
+                   f"within {self.runconfig.output_product_path}")
+            self.logger.critical(self.name, ErrorCode.ISO_METADATA_RENDER_FAILED, msg)
+
+        # Extract all metadata assigned by the SAS at product creation time
+        output_product_metadata = get_geotiff_metadata(representative_product)
+
+        # Get the Military Grid Reference System (MGRS) tile code and zone identifier
+        # from the name of the input HLS dataset
+        hls_fields = get_hls_filename_fields(
+            get_geotiff_hls_dataset(representative_product)
+        )
+
+        output_product_metadata['tileCode'] = hls_fields['tile_id']
+        output_product_metadata['zoneIdentifier'] = hls_fields['tile_id'][:2]
+
+        # Add some fields on the dimensions of the data. These values should
+        # be the same for all DSWx-HLS products, and were derived from the
+        # ADT product spec
+        output_product_metadata['xCoordinates'] = {
+            'size': 3660,  # pixels
+            'spacing': 30  # meters/pixel
+        }
+        output_product_metadata['yCoordinates'] = {
+            'size': 3660,  # pixels
+            'spacing': 30  # meters/pixel
+        }
+
+        return output_product_metadata
+
+    def _create_custom_metadata(self):
+        """
+        Creates the "custom data" dictionary used with the ISO metadata rendering.
+
+        Custom data contains all metadata information needed for the ISO template
+        that is not found within any of the other metadata sources (such as the
+        RunConfig, output product, or catalog metadata).
+
+        Returns
+        -------
+        custom_data : dict
+            Dictionary containing the custom metadata as expected by the ISO
+            metadata Jinja2 template.
+
+        """
+        custom_metadata = {
+            'ISO_OPERA_FilePackageName': self._core_filename(),
+            'ISO_OPERA_ProducerGranuleId': self._core_filename(),
+            'MetadataProviderAction': "revision" if int(self.runconfig.product_counter) > 1 else "creation",
+            'GranuleFilename': self._core_filename(),
+            'ISO_OPERA_ProjectKeywords': ['OPERA', 'JPL', 'DSWx', 'Dynamic', 'Surface', 'Water', 'Extent'],
+            'ISO_OPERA_PlatformKeywords': ['HLS'],
+            'ISO_OPERA_InstrumentKeywords': ['Landsat8', 'Sentinel 1 A/B']
+        }
+
+        return custom_metadata
+
+    def _create_iso_metadata(self):
+        """
+        Creates a rendered version of the ISO metadata template for DSWx-HLS
+        output products using metadata sourced from the following locations:
+
+            * RunConfig (in dictionary form)
+            * Output products (extracted from a sample product)
+            * Catalog metadata
+            * "Custom" metadata (all metadata not found anywhere else)
+
+        Returns
+        -------
+        rendered_template : str
+            The ISO metadata template for DSWx-HLS filled in with values from
+            the sourced metadata dictionaries.
+
+        """
+        runconfig_dict = self.runconfig.asdict()
+
+        product_output_dict = self._collect_dswx_product_metadata()
+
+        catalog_metadata_dict = self._create_catalog_metadata().asdict()
+
+        custom_data_dict = self._create_custom_metadata()
+
+        iso_metadata = {
+            'run_config': runconfig_dict,
+            'product_output': product_output_dict,
+            'catalog_metadata': catalog_metadata_dict,
+            'custom_data': custom_data_dict
+        }
+
+        iso_template_path = os.path.abspath(self.runconfig.iso_template_path)
+
+        if not os.path.exists(iso_template_path):
+            msg = f"Could not load ISO template {iso_template_path}, file does not exist"
+            self.logger.critical(self.name, ErrorCode.ISO_METADATA_TEMPLATE_NOT_FOUND, msg)
+
+        rendered_template = render_jinja2(iso_template_path, iso_metadata, self.logger)
+
+        return rendered_template
 
     def run_postprocessor(self, **kwargs):
         """

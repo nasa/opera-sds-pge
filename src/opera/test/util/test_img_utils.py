@@ -112,21 +112,22 @@ class ImgUtilsTestCase(unittest.TestCase):
 
     def test_get_hls_filename_fields(self):
         """Test get_get_hls_filename_fields()"""
-        # Use an example HLS filename
-        file_name = 'HLS.S30.T53SMS.2020276T013701.v1.5.B01.tif'
+        # Use an example HLS dataset name
+        file_name = 'HLS.S30.T53SMS.2020276T013701.v1.5'
+
         # Call the function
         hls_file_fields = get_hls_filename_fields(file_name)
+
         # Verify a dictionary is returned
         self.assertIsInstance(hls_file_fields, dict)
-        # Check 4 of the key names
+
+        # Check the key names/values
         self.assertIn('product', hls_file_fields)
         self.assertIn('tile_id', hls_file_fields)
         self.assertIn('collection_version', hls_file_fields)
-        self.assertIn('band', hls_file_fields)
-        # Check the other 3 Values
         self.assertEqual(hls_file_fields['short_name'], 'S30')
-        self.assertEqual(hls_file_fields['sub_version'], '5')
-        self.assertEqual(hls_file_fields['extension'], 'tif')
+        self.assertEqual(hls_file_fields['collection_version'], 'v1.5')
+
         # Verify the conversion from Julian
         self.assertNotEqual(match(r'\d{8}T\d{6}\b', hls_file_fields['acquisition_time']), None)
 

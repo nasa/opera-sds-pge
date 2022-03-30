@@ -117,7 +117,7 @@ class BasePgeTestCase(unittest.TestCase):
         self.assertTrue(os.path.exists(expected_metadata_file))
 
         # Check that the log file was created into the output directory
-        expected_log_file = join(pge.runconfig.output_product_path, pge.logger.get_file_name())
+        expected_log_file = pge.logger.get_file_name()
         self.assertTrue(os.path.exists(expected_log_file))
 
         # Open the log file, and check that "SAS" output was captured
@@ -203,7 +203,7 @@ class BasePgeTestCase(unittest.TestCase):
         pge.run()
 
         # Check that the log file was created and moved into the output directory
-        expected_log_file = join(pge.runconfig.output_product_path, pge.logger.get_file_name())
+        expected_log_file = pge.logger.get_file_name()
         self.assertTrue(os.path.exists(expected_log_file))
 
         # Open the log file, and check that we got expected output for the SAS exe
@@ -215,7 +215,7 @@ class BasePgeTestCase(unittest.TestCase):
 
         # Check that a separate log file was created to capture the output from
         # the QA application
-        expected_qa_log_file = join(pge.runconfig.output_product_path, pge.qa_logger.get_file_name())
+        expected_qa_log_file = pge.qa_logger.get_file_name()
         self.assertTrue(os.path.exists(expected_qa_log_file))
 
         with open(expected_qa_log_file, 'r', encoding='utf-8') as infile:
