@@ -90,8 +90,7 @@ def _make_undefined_handler_class(logger: PgeLogger):
     return LoggingUndefined
 
 
-def render_jinja2(template_filename: str, input_data: dict,
-                  logger: PgeLogger = None):
+def render_jinja2(template_filename: str, input_data: dict, logger: PgeLogger = None):
     """
     Renders from a jinja2 template using the specified input data.
     Writes the rendered output to the specified output file.
