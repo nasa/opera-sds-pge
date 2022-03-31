@@ -161,3 +161,9 @@ class RenderJinja2TestCase(unittest.TestCase):
         self.assertNotIn('Terminator', rendered_template)
         self.assertNotIn('The Sandlot', rendered_template)
         self.assertNotIn('The Lion King', rendered_template)
+
+        # Run again without a logger and expect a KeyError
+        new_data = self.get_data()
+        self.remove_key(new_data, 'title')
+        render_jinja2(template_file, new_data['movies'], 'test.html')
+        self.assertRaises(KeyError)
