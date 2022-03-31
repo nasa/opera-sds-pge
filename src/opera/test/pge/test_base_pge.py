@@ -47,7 +47,6 @@ class BasePgeTestCase(unittest.TestCase):
         cls.starting_dir = abspath(os.curdir)
         cls.test_dir = resource_filename(__name__, "")
         cls.data_dir = join(cls.test_dir, os.pardir, "data")
-
         os.chdir(cls.test_dir)
 
     @classmethod
@@ -57,7 +56,6 @@ class BasePgeTestCase(unittest.TestCase):
 
     def setUp(self) -> None:
         """Use the temporary directory as the working directory"""
-
         self.working_dir = tempfile.TemporaryDirectory(
             prefix="test_base_pge_", suffix='temp', dir=os.curdir
         )

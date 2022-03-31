@@ -22,13 +22,14 @@ Original Author: David White
 Adapted by: Jim Hofman
 """
 import os
+
 import jinja2
-from opera.util.logger import PgeLogger
+
 from opera.util.error_codes import ErrorCode
+from opera.util.logger import PgeLogger
 
 
 def _make_undefined_handler_class(logger: PgeLogger):
-
     """
     Factory function, returns a child class of the jinja2.Undefined class for
     use when rendering templates.

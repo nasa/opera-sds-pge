@@ -35,6 +35,7 @@ from opera.util.render_jinja2 import render_jinja2
 
 class RenderJinja2TestCase(unittest.TestCase):
     """Base test class using unittest"""
+
     starting_dir = None
     working_dir = None
     test_dir = None
@@ -72,6 +73,7 @@ class RenderJinja2TestCase(unittest.TestCase):
         self.working_dir.cleanup()
 
     def get_data(self):
+        """Returns a test dictionary"""
         data = {
             "movies": [
                 {
@@ -94,7 +96,6 @@ class RenderJinja2TestCase(unittest.TestCase):
 
     def remove_key(self, movie_dict, key):
         """Remove all passed 'key' from dictionary"""
-
         for entry in movie_dict['movies']:
             entry.pop(key)
 
@@ -105,7 +106,6 @@ class RenderJinja2TestCase(unittest.TestCase):
         Test that the proper substitutions are made in the rendered html file.
 
         """
-
         self.logger.write('info', "opera_pge", 0, 'Dummy entry in log')
 
         template_file = join(self.data_dir, 'render_jinja_test_template.html')
@@ -121,7 +121,8 @@ class RenderJinja2TestCase(unittest.TestCase):
         self.assertIn('The Lion King', rendered_template)
 
         # Verify the descriptions were properly added into the html file
-        self.assertIn('A soldier is sent back in time to protect an important woman from a killing android.', rendered_template)
+        self.assertIn('A soldier is sent back in time to protect an important woman from a killing android.',
+                      rendered_template)
         self.assertIn('Boys have a magical summer of baseball and discovery.', rendered_template)
         self.assertIn('A young lion prince is born in Africa.', rendered_template)
 
@@ -134,7 +135,8 @@ class RenderJinja2TestCase(unittest.TestCase):
         self.assertIn('The Lion King', rendered_template)
 
         # Verify the descriptions were properly added into the html file
-        self.assertIn('A soldier is sent back in time to protect an important woman from a killing android.', rendered_template)
+        self.assertIn('A soldier is sent back in time to protect an important ''woman from a killing android.',
+                      rendered_template)
         self.assertIn('Boys have a magical summer of baseball and discovery.', rendered_template)
         self.assertIn('A young lion prince is born in Africa.', rendered_template)
 

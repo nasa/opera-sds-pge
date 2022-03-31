@@ -24,8 +24,8 @@ Module defining the Base PGE interfaces from which all other PGEs are derived.
 
 import os
 from datetime import datetime
+from functools import lru_cache
 from os.path import abspath, basename, exists, join, splitext
-from functools import cache
 
 from yamale import YamaleError
 
@@ -36,10 +36,10 @@ from opera.util.error_codes import ErrorCode
 from opera.util.logger import PgeLogger
 from opera.util.logger import default_log_file_name
 from opera.util.metfile import MetFile
-from opera.util.run_utils import get_checksum
-from opera.util.run_utils import get_extension
 from opera.util.run_utils import create_qa_command_line
 from opera.util.run_utils import create_sas_command_line
+from opera.util.run_utils import get_checksum
+from opera.util.run_utils import get_extension
 from opera.util.run_utils import time_and_execute
 from opera.util.time import get_catalog_metadata_datetime_str
 from opera.util.time import get_time_for_filename
@@ -274,13 +274,12 @@ class PostProcessorMixin:
 
         return checksums
 
-    @cache
+    @lru_cache
     def _create_catalog_metadata(self):
         """
         Returns the catalog metadata as a MetFile instance. Once generated, the
         catalog metadata is cached for the life of the PGE instance.
         """
-
         catalog_metadata = {
             'PGE_Name': self.runconfig.pge_name,
             'PGE_Version': opera.__version__,

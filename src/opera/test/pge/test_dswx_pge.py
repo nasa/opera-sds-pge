@@ -36,7 +36,7 @@ import yaml
 import opera.util.img_utils
 from opera.pge import DSWxExecutor, RunConfig
 from opera.util import PgeLogger
-from opera.util.img_utils import MockGdal, get_geotiff_metadata
+from opera.util.img_utils import MockGdal
 
 
 class DSWxPgeTestCase(unittest.TestCase):
