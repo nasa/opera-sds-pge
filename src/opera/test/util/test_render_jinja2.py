@@ -132,46 +132,39 @@ class RenderJinja2TestCase(unittest.TestCase):
 
         data = self.get_data()
         # run with a logger
-        render_jinja2(template_file, data['movies'], 'test.html', self.logger)
-        # Write test.html into a string
-        with open('test.html', 'r') as html_file:
-            file_str = html_file.read().rstrip()
+        rendered_text = render_jinja2(template_file, data, self.logger)
         # Verify the titles were properly added to the html file
-        self.assertIn('Terminator', file_str)
-        self.assertIn('The Sandlot', file_str)
-        self.assertIn('The Lion King', file_str)
+        self.assertIn('Terminator', rendered_text)
+        self.assertIn('The Sandlot', rendered_text)
+        self.assertIn('The Lion King', rendered_text)
         # Verify the descriptions were properly added into the html file
-        self.assertIn('A soldier is sent back in time to protect an important woman from a killing android.', file_str)
-        self.assertIn('Boys have a magical summer of baseball and discovery.', file_str)
-        self.assertIn('A young lion prince is born in Africa.', file_str)
+        self.assertIn('A soldier is sent back in time to protect an important woman from a killing android.',
+                      rendered_text)
+        self.assertIn('Boys have a magical summer of baseball and discovery.', rendered_text)
+        self.assertIn('A young lion prince is born in Africa.', rendered_text)
 
         # run without a logger
-        render_jinja2(template_file, data['movies'], 'test.html')
-        # Write test.html into a string
-        with open('test.html', 'r') as html_file:
-            file_str = html_file.read().rstrip()
+        rendered_text = render_jinja2(template_file, data)
         # Verify the titles were properly added to the html file
-        self.assertIn('Terminator', file_str)
-        self.assertIn('The Sandlot', file_str)
-        self.assertIn('The Lion King', file_str)
+        self.assertIn('Terminator', rendered_text)
+        self.assertIn('The Sandlot', rendered_text)
+        self.assertIn('The Lion King', rendered_text)
         # Verify the descriptions were properly added into the html file
-        self.assertIn('A soldier is sent back in time to protect an important woman from a killing android.', file_str)
-        self.assertIn('Boys have a magical summer of baseball and discovery.', file_str)
-        self.assertIn('A young lion prince is born in Africa.', file_str)
+        self.assertIn('A soldier is sent back in time to protect an important woman from a killing android.',
+                      rendered_text)
+        self.assertIn('Boys have a magical summer of baseball and discovery.', rendered_text)
+        self.assertIn('A young lion prince is born in Africa.', rendered_text)
         # Move a template with another name into the temp directory.
         shutil.copy(template_file, join(os.getcwd(), 'render_jinja_test_template_2.html'))
         # Verify that os.getcmd() is used to find the new template.
-        render_jinja2('render_jinja_test_template_2.html', data['movies'], 'test.html')
+        render_jinja2('render_jinja_test_template_2.html', data)
 
         # Remove the title fields and verify the '!Not Found! is returned
         new_data = self.get_data()
         self.remove_key(new_data, 'title')
 
-        render_jinja2(template_file, new_data['movies'], 'test.html', self.logger)
-        # Write test.html into a string
-        with open('test.html', 'r') as html_file:
-            file_str = html_file.read().rstrip()
-        self.assertIn('!Not found!', file_str)
+        rendered_text = render_jinja2(template_file, new_data, self.logger)
+        self.assertIn('!Not found!', rendered_text)
         # Verify the log has been updated.
         stream = self.logger.get_stream_object()
         self.assertIn('Missing/undefined ISO metadata template variable:', stream.getvalue())
@@ -179,5 +172,5 @@ class RenderJinja2TestCase(unittest.TestCase):
         # Run again without a logger and expect a KeyError
         new_data = self.get_data()
         self.remove_key(new_data, 'title')
-        render_jinja2(template_file, new_data['movies'], 'test.html')
+        render_jinja2(template_file, new_data)
         self.assertRaises(KeyError)

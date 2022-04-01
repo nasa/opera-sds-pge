@@ -27,6 +27,7 @@ import shutil
 import tempfile
 import unittest
 from os.path import abspath
+from unittest.mock import patch
 
 from pkg_resources import resource_filename
 
@@ -160,6 +161,30 @@ class RunUtilsTestCase(unittest.TestCase):
         # Check that each option made it into the command line
         for option in options:
             self.assertIn(option, command_line)
+
+    def _access_mock(self, executable_path='./', mode=os.F_OK):
+        """Mock os.access with os.F_OK returning True and os.X_OK returning False"""
+        if mode == os.F_OK:
+            return True
+        if mode == os.X_OK:
+            return False
+
+    @patch.object(os, 'access', _access_mock)
+    def test_create_sas_command_line_exception(self):
+        """Test exception handling for create_sas_command_line() function"""
+        cmd = ''
+        runconfig_path = ''
+        options = ['Hello from test_create_sas_command_line function.', '--']
+        with self.assertRaises(OSError):
+            create_sas_command_line(cmd, runconfig_path, options)
+
+    @patch.object(os, 'access', _access_mock)
+    def test_qa_command_line_exception(self):
+        """Test exception handling for create_qa_command_line() function"""
+        cmd = ''
+        options = ['Hello from test_create_qa_command_line function.']
+        with self.assertRaises(OSError):
+            create_qa_command_line(cmd, options)
 
     def test_time_and_execute(self):
         """Tests for run_utils.time_and_execute()"""

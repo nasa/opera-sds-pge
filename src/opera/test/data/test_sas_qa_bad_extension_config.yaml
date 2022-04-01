@@ -20,23 +20,22 @@ RunConfig:
         ProductCounter: 005
         OutputProductPath: base_pge_test/outputs/
         ScratchPath: base_pge_test/scratch/
-        SASOutputFile: output_file.h5
+        SASOutputFile: output_file.abc
 
       PrimaryExecutable:
         ProductIdentifier: EXAMPLE
         ProgramPath: echo
         ProgramOptions:
-          - 'hello world > base_pge_test/outputs/dswx_hls.tif;'
-          - '/bin/echo hello world'
+          - 'hello world > base_pge_test/outputs/output_file.abc'
         ErrorCodeBase: 100000
         SchemaPath: sample_sas_schema.yaml
         IsoTemplatePath: sample_iso_template.xml.jinja2
 
       QAExecutable:
-        Enabled: False
-        ProgramPath: /opt/QualityAssurance/sample_qa.py
+        Enabled: True
+        ProgramPath: echo
         ProgramOptions:
-         -  --debug
+         -  hello from qa executable
 
       DebugLevelGroup:
         DebugSwitch: False

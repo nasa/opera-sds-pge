@@ -68,18 +68,18 @@ def _make_undefined_handler_class(logger: PgeLogger):
     class LoggingUndefined(jinja2.Undefined):
         """Override the default behavior which can raise an exception"""
 
-        def _fail_with_undefined_error(self, *args, **kwargs):
+        def _fail_with_undefined_error(self, *args, **kwargs):   # pragma no cover
             _log_message(self)
 
         def __str__(self):
             _log_message(self)
             return "!Not found!"
 
-        def __iter__(self):
+        def __iter__(self):   # pragma no cover
             _log_message(self)
             return super().__iter__()
 
-        def __bool__(self):
+        def __bool__(self):   # pragma no cover
             _log_message(self)
             return super().__bool__()
 

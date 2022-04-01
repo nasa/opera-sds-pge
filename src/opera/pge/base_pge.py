@@ -376,7 +376,7 @@ class PostProcessorMixin:
             The file name to assign to GeoTIFF product(s) created by this PGE.
 
         """
-        base_filename = splitext(inter_filename)[0]
+        base_filename = splitext(basename(inter_filename))[0]
         return self._core_filename() + f"_{base_filename}.tif"
 
     def _catalog_metadata_filename(self):
@@ -489,7 +489,7 @@ class PostProcessorMixin:
         try:
             os.rename(input_filepath, final_filepath)
         except OSError as err:
-            msg = f"Failed to rename output file {input_filepath}, reason: {str(err)}"
+            msg = f"Failed to rename output file {basename(input_filepath)}, reason: {str(err)}"
             self.logger.critical(self.name, ErrorCode.FILE_MOVE_FAILED, msg)
 
     def _stage_output_files(self):
