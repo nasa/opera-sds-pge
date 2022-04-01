@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera.pge.runconfig &mdash; opera-sds-pge 1.0.0-er.2.0 documentation</title>
+  <title>opera.pge.runconfig &mdash; opera-sds-pge 1.0.0-er.3.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -27,7 +27,7 @@
             <a href="../../../index.html" class="icon icon-home"> opera-sds-pge
           </a>
               <div class="version">
-                1.0.0-er.2.0
+                1.0.0-er.3.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -99,6 +99,7 @@
 
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">abspath</span><span class="p">,</span> <span class="n">isabs</span><span class="p">,</span> <span class="n">isdir</span><span class="p">,</span> <span class="n">isfile</span><span class="p">,</span> <span class="n">join</span>
 
 <span class="kn">from</span> <span class="nn">pkg_resources</span> <span class="kn">import</span> <span class="n">resource_filename</span>
 
@@ -109,6 +110,9 @@
 
 <span class="n">BASE_PGE_SCHEMA</span> <span class="o">=</span> <span class="n">resource_filename</span><span class="p">(</span><span class="s1">&#39;opera&#39;</span><span class="p">,</span> <span class="s1">&#39;schema/base_pge_schema.yaml&#39;</span><span class="p">)</span>
 <span class="sd">&quot;&quot;&quot;Path to the Yamale schema applicable to the PGE portion of each RunConfig&quot;&quot;&quot;</span>
+
+<span class="n">ISO_TEMPLATE_DIR</span> <span class="o">=</span> <span class="n">resource_filename</span><span class="p">(</span><span class="s1">&#39;opera&#39;</span><span class="p">,</span> <span class="s1">&#39;pge/templates&#39;</span><span class="p">)</span>
+<span class="sd">&quot;&quot;&quot;Path to the repository directory containing ISO metadata Jinja2 templates&quot;&quot;&quot;</span>
 
 
 <div class="viewcode-block" id="RunConfig"><a class="viewcode-back" href="../../../opera.pge.html#opera.pge.runconfig.RunConfig">[docs]</a><span class="k">class</span> <span class="nc">RunConfig</span><span class="p">:</span>
@@ -152,10 +156,6 @@
 <span class="sd">        yaml_filename : str</span>
 <span class="sd">            Path to the RunConfig YAML file to parse.</span>
 
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        run_config : dict</span>
-<span class="sd">            All contents of the parsed</span>
 
 <span class="sd">        Raises</span>
 <span class="sd">        ------</span>
@@ -210,7 +210,7 @@
             <span class="n">sas_schema_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sas_schema_path</span>
             <span class="n">sas_schema_filepath</span> <span class="o">=</span> <span class="n">resource_filename</span><span class="p">(</span><span class="s1">&#39;opera&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;schema/</span><span class="si">{</span><span class="n">sas_schema_filename</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">sas_schema_filepath</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">isfile</span><span class="p">(</span><span class="n">sas_schema_filepath</span><span class="p">):</span>
                 <span class="c1"># TODO: better error handling for missing sas schema,</span>
                 <span class="c1">#       support for absolute paths as fallback when resource_filename fails?</span>
                 <span class="n">sas_schema</span> <span class="o">=</span> <span class="n">yamale</span><span class="o">.</span><span class="n">make_schema</span><span class="p">(</span><span class="n">sas_schema_filepath</span><span class="p">)</span>
@@ -260,7 +260,8 @@
         <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
             <span class="c1"># TODO: create exceptions package with more intuitive exception class names</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s1">&#39;Expected field &quot;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">error</span><span class="p">)</span><span class="si">}</span><span class="s1">&quot; is missing from RunConfig </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="si">}</span><span class="s1">&#39;</span>
+                <span class="sa">f</span><span class="s1">&#39;Expected field &quot;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">error</span><span class="p">)</span><span class="si">}</span><span class="s1">&quot; is missing from RunConfig &#39;</span>
+                <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
             <span class="p">)</span> <span class="kn">from</span> <span class="nn">error</span>
 
     <span class="nd">@property</span>
@@ -341,7 +342,12 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">iso_template_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Returns the ISO Template Path for a Primary Executable&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pge_config</span><span class="p">[</span><span class="s1">&#39;PrimaryExecutable&#39;</span><span class="p">][</span><span class="s1">&#39;IsoTemplatePath&#39;</span><span class="p">]</span>
+        <span class="n">iso_template_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pge_config</span><span class="p">[</span><span class="s1">&#39;PrimaryExecutable&#39;</span><span class="p">][</span><span class="s1">&#39;IsoTemplatePath&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">iso_template_path</span>
+            <span class="k">if</span> <span class="n">isabs</span><span class="p">(</span><span class="n">iso_template_path</span><span class="p">)</span>
+            <span class="k">else</span> <span class="n">join</span><span class="p">(</span><span class="n">ISO_TEMPLATE_DIR</span><span class="p">,</span> <span class="n">iso_template_path</span><span class="p">)</span>
+        <span class="p">)</span>
 
     <span class="c1"># QAExecutable</span>
     <span class="nd">@property</span>
@@ -374,6 +380,52 @@
         <span class="sd">&quot;&quot;&quot;Returns the short-cut to the SAS-specific section of the parsed RunConfig&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sas_config</span>
 
+<div class="viewcode-block" id="RunConfig.asdict"><a class="viewcode-back" href="../../../opera.pge.html#opera.pge.runconfig.RunConfig.asdict">[docs]</a>    <span class="k">def</span> <span class="nf">asdict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the entire parsed RunConfig in its dictonary representation&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_config</span></div>
+
+<div class="viewcode-block" id="RunConfig.get_input_filenames"><a class="viewcode-back" href="../../../opera.pge.html#opera.pge.runconfig.RunConfig.get_input_filenames">[docs]</a>    <span class="k">def</span> <span class="nf">get_input_filenames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Iterates over the input_file list from the runconfig and returns a list</span>
+<span class="sd">        of all files.</span>
+
+<span class="sd">        Files in the list are immediately included in the returned list.</span>
+
+<span class="sd">        Directories in the list will be examined and any files found will be</span>
+<span class="sd">        added to the list.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        input_file : list of str</span>
+<span class="sd">            The expanded list of input files determined from the RunConfig</span>
+<span class="sd">            setting. The list is sorted prior to being returned.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        OSError</span>
+<span class="sd">            If anything that is not a file or directory is encountered while</span>
+<span class="sd">            traversing the set of input file locations.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">preliminary_file_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_files</span>
+
+        <span class="n">input_files</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">preliminary_file_list</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">isfile</span><span class="p">(</span><span class="n">item</span><span class="p">):</span>
+                <span class="n">input_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">isdir</span><span class="p">(</span><span class="n">item</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">dir_item</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">item</span><span class="p">):</span>
+                    <span class="n">path</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">dir_item</span><span class="p">)</span>
+
+                    <span class="c1"># for now only look for files at first level</span>
+                    <span class="k">if</span> <span class="n">isfile</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+                        <span class="n">input_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+        <span class="n">input_files</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">input_files</span></div>
+
 <div class="viewcode-block" id="RunConfig.get_ancillary_filenames"><a class="viewcode-back" href="../../../opera.pge.html#opera.pge.runconfig.RunConfig.get_ancillary_filenames">[docs]</a>    <span class="k">def</span> <span class="nf">get_ancillary_filenames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a list of all ancillary filenames listed in the</span>
@@ -389,7 +441,22 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">result</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ancillary_file_map</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
 
-        <span class="k">return</span> <span class="n">result</span></div></div>
+        <span class="k">return</span> <span class="n">result</span></div>
+
+<div class="viewcode-block" id="RunConfig.get_output_product_filenames"><a class="viewcode-back" href="../../../opera.pge.html#opera.pge.runconfig.RunConfig.get_output_product_filenames">[docs]</a>    <span class="k">def</span> <span class="nf">get_output_product_filenames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of all product file paths currently written to the output</span>
+<span class="sd">        location specified by the RunConfig. Note that only top-level files</span>
+<span class="sd">        are returned, this function does not recurse into any directories</span>
+<span class="sd">        encountered.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">output_product_path</span> <span class="o">=</span> <span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_product_path</span><span class="p">)</span>
+        <span class="n">output_products</span> <span class="o">=</span> <span class="p">[</span><span class="n">join</span><span class="p">(</span><span class="n">output_product_path</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+                           <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">output_product_path</span><span class="p">)</span>
+                           <span class="k">if</span> <span class="n">isfile</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">output_product_path</span><span class="p">,</span> <span class="n">filename</span><span class="p">))]</span>
+
+        <span class="k">return</span> <span class="n">output_products</span></div></div>
 </pre></div>
 
            </div>

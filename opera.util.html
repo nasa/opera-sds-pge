@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera.util package &mdash; opera-sds-pge 1.0.0-er.2.0 documentation</title>
+  <title>opera.util package &mdash; opera-sds-pge 1.0.0-er.3.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -30,7 +30,7 @@
             <a href="index.html" class="icon icon-home"> opera-sds-pge
           </a>
               <div class="version">
-                1.0.0-er.2.0
+                1.0.0-er.3.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -218,12 +218,17 @@ the RunConfig to determine the final, logged error code.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode.ISO_METADATA_GOT_SOME_RENDERING_ERRORS">
-<span class="sig-name descname"><span class="pre">ISO_METADATA_GOT_SOME_RENDERING_ERRORS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3016</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.ISO_METADATA_GOT_SOME_RENDERING_ERRORS" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">ISO_METADATA_GOT_SOME_RENDERING_ERRORS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3017</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.ISO_METADATA_GOT_SOME_RENDERING_ERRORS" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode.ISO_METADATA_RENDER_FAILED">
-<span class="sig-name descname"><span class="pre">ISO_METADATA_RENDER_FAILED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3017</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.ISO_METADATA_RENDER_FAILED" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">ISO_METADATA_RENDER_FAILED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3018</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.ISO_METADATA_RENDER_FAILED" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode.ISO_METADATA_TEMPLATE_NOT_FOUND">
+<span class="sig-name descname"><span class="pre">ISO_METADATA_TEMPLATE_NOT_FOUND</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3016</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.ISO_METADATA_TEMPLATE_NOT_FOUND" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -358,7 +363,7 @@ the RunConfig to determine the final, logged error code.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode.SAS_OUTPUT_FILE_HAS_MISSING_DATA">
-<span class="sig-name descname"><span class="pre">SAS_OUTPUT_FILE_HAS_MISSING_DATA</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3018</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.SAS_OUTPUT_FILE_HAS_MISSING_DATA" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">SAS_OUTPUT_FILE_HAS_MISSING_DATA</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3019</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.SAS_OUTPUT_FILE_HAS_MISSING_DATA" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -448,6 +453,11 @@ Adapted By: Scott Collins, Jim Hofman</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="opera.util.logger.PgeLogger.LOGGER_CODE_BASE">
 <span class="sig-name descname"><span class="pre">LOGGER_CODE_BASE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">900000</span></em><a class="headerlink" href="#opera.util.logger.PgeLogger.LOGGER_CODE_BASE" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="opera.util.logger.PgeLogger.QA_LOGGER_CODE_BASE">
+<span class="sig-name descname"><span class="pre">QA_LOGGER_CODE_BASE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">800000</span></em><a class="headerlink" href="#opera.util.logger.PgeLogger.QA_LOGGER_CODE_BASE" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -848,6 +858,30 @@ with subprocess.run.</p>
     set with execute permissions for the current process.</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="opera.util.run_utils.get_checksum">
+<span class="sig-prename descclassname"><span class="pre">opera.util.run_utils.</span></span><span class="sig-name descname"><span class="pre">get_checksum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/opera/util/run_utils.html#get_checksum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opera.util.run_utils.get_checksum" title="Permalink to this definition"></a></dt>
+<dd><p>Generate the MD5 checksum of the provided file.</p>
+<p>This function was adapted from swot_pge.util.BasePgeWrapper.get_checksum()</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>file_name</strong> (<em>str</em>) – Path the file on disk to generate the checksum for.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>checksum</strong> – MD5 checksum of the provided file.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="opera.util.run_utils.get_extension">
+<span class="sig-prename descclassname"><span class="pre">opera.util.run_utils.</span></span><span class="sig-name descname"><span class="pre">get_extension</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/opera/util/run_utils.html#get_extension"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opera.util.run_utils.get_extension" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the file extension (including the dot) of the provided file name.</p>
 </dd></dl>
 
 <dl class="py function">

@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera.pge package &mdash; opera-sds-pge 1.0.0-er.2.0 documentation</title>
+  <title>opera.pge package &mdash; opera-sds-pge 1.0.0-er.3.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -30,7 +30,7 @@
             <a href="index.html" class="icon icon-home"> opera-sds-pge
           </a>
               <div class="version">
-                1.0.0-er.2.0
+                1.0.0-er.3.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -313,8 +313,14 @@ Original Author: David White
 Adapted By: Scott Collins</p>
 <dl class="py data">
 <dt class="sig sig-object py" id="opera.pge.runconfig.BASE_PGE_SCHEMA">
-<span class="sig-prename descclassname"><span class="pre">opera.pge.runconfig.</span></span><span class="sig-name descname"><span class="pre">BASE_PGE_SCHEMA</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'/var/lib/jenkins/workspace/se-pipeline_release_1.0.0-er.2.0/src/opera/schema/base_pge_schema.yaml'</span></em><a class="headerlink" href="#opera.pge.runconfig.BASE_PGE_SCHEMA" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">opera.pge.runconfig.</span></span><span class="sig-name descname"><span class="pre">BASE_PGE_SCHEMA</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'/var/lib/jenkins/workspace/se-pipeline_release_1.0.0-er.3.0/src/opera/schema/base_pge_schema.yaml'</span></em><a class="headerlink" href="#opera.pge.runconfig.BASE_PGE_SCHEMA" title="Permalink to this definition"></a></dt>
 <dd><p>Path to the Yamale schema applicable to the PGE portion of each RunConfig</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="opera.pge.runconfig.ISO_TEMPLATE_DIR">
+<span class="sig-prename descclassname"><span class="pre">opera.pge.runconfig.</span></span><span class="sig-name descname"><span class="pre">ISO_TEMPLATE_DIR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'/var/lib/jenkins/workspace/se-pipeline_release_1.0.0-er.3.0/src/opera/pge/templates'</span></em><a class="headerlink" href="#opera.pge.runconfig.ISO_TEMPLATE_DIR" title="Permalink to this definition"></a></dt>
+<dd><p>Path to the repository directory containing ISO metadata Jinja2 templates</p>
 </dd></dl>
 
 <dl class="py class">
@@ -375,6 +381,12 @@ performed via the Yamale library (<a class="reference external" href="https://gi
 <dd><p>Returns the Ancillary File Map from the Dynamic Ancillary Files Group</p>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="opera.pge.runconfig.RunConfig.asdict">
+<span class="sig-name descname"><span class="pre">asdict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/opera/pge/runconfig.html#RunConfig.asdict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opera.pge.runconfig.RunConfig.asdict" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the entire parsed RunConfig in its dictonary representation</p>
+</dd></dl>
+
 <dl class="py property">
 <dt class="sig sig-object py" id="opera.pge.runconfig.RunConfig.debug_switch">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">debug_switch</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#opera.pge.runconfig.RunConfig.debug_switch" title="Permalink to this definition"></a></dt>
@@ -424,6 +436,38 @@ the DynamicAncillaryFilesGroup section.</p>
 <dd class="field-even"><p>list of str</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="opera.pge.runconfig.RunConfig.get_input_filenames">
+<span class="sig-name descname"><span class="pre">get_input_filenames</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/opera/pge/runconfig.html#RunConfig.get_input_filenames"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opera.pge.runconfig.RunConfig.get_input_filenames" title="Permalink to this definition"></a></dt>
+<dd><p>Iterates over the input_file list from the runconfig and returns a list
+of all files.</p>
+<p>Files in the list are immediately included in the returned list.</p>
+<p>Directories in the list will be examined and any files found will be
+added to the list.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>input_file</strong> – The expanded list of input files determined from the RunConfig
+setting. The list is sorted prior to being returned.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>list of str</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>OSError</strong> – If anything that is not a file or directory is encountered while
+    traversing the set of input file locations.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="opera.pge.runconfig.RunConfig.get_output_product_filenames">
+<span class="sig-name descname"><span class="pre">get_output_product_filenames</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/opera/pge/runconfig.html#RunConfig.get_output_product_filenames"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opera.pge.runconfig.RunConfig.get_output_product_filenames" title="Permalink to this definition"></a></dt>
+<dd><p>Returns a list of all product file paths currently written to the output
+location specified by the RunConfig. Note that only top-level files
+are returned, this function does not recurse into any directories
+encountered.</p>
 </dd></dl>
 
 <dl class="py property">
@@ -529,7 +573,7 @@ the DynamicAncillaryFilesGroup section.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="opera.pge.runconfig.RunConfig.validate">
-<span class="sig-name descname"><span class="pre">validate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pge_schema_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'/var/lib/jenkins/workspace/se-pipeline_release_1.0.0-er.2.0/src/opera/schema/base_pge_schema.yaml'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strict_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/opera/pge/runconfig.html#RunConfig.validate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opera.pge.runconfig.RunConfig.validate" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">validate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pge_schema_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'/var/lib/jenkins/workspace/se-pipeline_release_1.0.0-er.3.0/src/opera/schema/base_pge_schema.yaml'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strict_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/opera/pge/runconfig.html#RunConfig.validate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opera.pge.runconfig.RunConfig.validate" title="Permalink to this definition"></a></dt>
 <dd><p>Validates the RunConfig using a combination of the base PGE schema,
 and the specific SAS schema defined by the RunConfig itself.</p>
 <dl class="field-list simple">
