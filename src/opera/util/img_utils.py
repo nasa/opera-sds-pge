@@ -24,7 +24,7 @@ Image file utilities for use with OPERA PGEs.
 
 from collections import namedtuple
 from datetime import datetime
-from functools import cache
+from functools import lru_cache
 from os.path import exists
 
 
@@ -85,7 +85,7 @@ except (ImportError, ModuleNotFoundError):  # pragma: no cover
     gdal = MockGdal                         # pragma: no cover
 
 
-@cache
+@lru_cache
 def get_geotiff_metadata(filename):
     """
     Returns the set of metadata fields associated to the provided GeoTIFF

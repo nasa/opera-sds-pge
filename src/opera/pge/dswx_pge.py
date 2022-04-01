@@ -27,8 +27,8 @@ import os.path
 from os.path import abspath, exists, isdir, join
 
 from opera.util.error_codes import ErrorCode
-from opera.util.img_utils import get_geotiff_metadata
 from opera.util.img_utils import get_geotiff_hls_dataset
+from opera.util.img_utils import get_geotiff_metadata
 from opera.util.img_utils import get_geotiff_spacecraft_name
 from opera.util.img_utils import get_hls_filename_fields
 from opera.util.render_jinja2 import render_jinja2

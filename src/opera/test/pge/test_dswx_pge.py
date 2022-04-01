@@ -36,7 +36,7 @@ import yaml
 import opera.util.img_utils
 from opera.pge import DSWxExecutor, RunConfig
 from opera.util import PgeLogger
-from opera.util.img_utils import MockGdal, get_geotiff_metadata
+from opera.util.img_utils import MockGdal
 
 
 class DSWxPgeTestCase(unittest.TestCase):
@@ -83,15 +83,7 @@ class DSWxPgeTestCase(unittest.TestCase):
         self.input_file.close()
         self.working_dir.cleanup()
 
-    def get_geotiff_metadata_patch(self):
-        """
-        Patch for img_utils.get_geotiff_metadata. Needed because test_dswx_pge_execution
-        will not produce a legitimate output DSWx-HLS file to obtain metadata
-        from when assigning output filenames.
-        """
-        return MockGdal.MockGdalDataset().GetMetadata()
-
-    @patch.object(opera.util.img_utils, "get_geotiff_metadata", get_geotiff_metadata_patch)
+    @patch.object(opera.util.img_utils, "gdal", MockGdal)
     def test_dswx_pge_execution(self):
         """
         Test execution of the DSWxExecutor class and its associated mixins using
@@ -307,7 +299,7 @@ class DSWxPgeTestCase(unittest.TestCase):
             if os.path.exists(test_runconfig_path):
                 os.unlink(test_runconfig_path)
 
-    @patch.object(opera.util.img_utils, "get_geotiff_metadata", get_geotiff_metadata_patch)
+    @patch.object(opera.util.img_utils, "gdal", MockGdal)
     def test_geotiff_filename(self):
         """Test _geotiff_filename() method"""
         runconfig_path = join(self.data_dir, 'test_dswx_hls_config.yaml')
@@ -319,7 +311,7 @@ class DSWxPgeTestCase(unittest.TestCase):
         image_files = glob.glob(join(pge.runconfig.output_product_path, "*.tif"))
         for i in range(len(image_files)):
             file_name = pge._geotiff_filename(image_files[i])
-            md = self.get_geotiff_metadata_patch()
+            md = MockGdal.MockGdalDataset().GetMetadata()
             file_name_regex = rf"{pge.PROJECT}_{pge.LEVEL}_{md['PRODUCT_TYPE']}_{md['PRODUCT_SOURCE']}_" \
                               rf"{md['SPACECRAFT_NAME']}_{md['HLS_DATASET'].split('.')[2]}_\d{{8}}T\d{{6}}_" \
                               rf"{'.'.join(md['HLS_DATASET'].split('.')[-2:])}_\d{{3}}.tif?"

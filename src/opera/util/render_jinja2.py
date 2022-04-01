@@ -22,13 +22,14 @@ Original Author: David White
 Adapted by: Jim Hofman
 """
 import os
+
 import jinja2
-from opera.util.logger import PgeLogger
+
 from opera.util.error_codes import ErrorCode
+from opera.util.logger import PgeLogger
 
 
 def _make_undefined_handler_class(logger: PgeLogger):
-
     """
     Factory function, returns a child class of the jinja2.Undefined class for
     use when rendering templates.
@@ -67,18 +68,18 @@ def _make_undefined_handler_class(logger: PgeLogger):
     class LoggingUndefined(jinja2.Undefined):
         """Override the default behavior which can raise an exception"""
 
-        def _fail_with_undefined_error(self, *args, **kwargs):
+        def _fail_with_undefined_error(self, *args, **kwargs):   # pragma no cover
             _log_message(self)
 
         def __str__(self):
             _log_message(self)
             return "!Not found!"
 
-        def __iter__(self):
+        def __iter__(self):   # pragma no cover
             _log_message(self)
             return super().__iter__()
 
-        def __bool__(self):
+        def __bool__(self):   # pragma no cover
             _log_message(self)
             return super().__bool__()
 
@@ -89,8 +90,7 @@ def _make_undefined_handler_class(logger: PgeLogger):
     return LoggingUndefined
 
 
-def render_jinja2(template_filename: str, input_data: dict,
-                  logger: PgeLogger = None):
+def render_jinja2(template_filename: str, input_data: dict, logger: PgeLogger = None):
     """
     Renders from a jinja2 template using the specified input data.
     Writes the rendered output to the specified output file.

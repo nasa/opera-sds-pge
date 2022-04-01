@@ -28,11 +28,16 @@ import unittest
 from io import StringIO
 from os.path import abspath, join
 from pathlib import Path
+from unittest.mock import patch
 
 from pkg_resources import resource_filename
 
+import yaml
+
+import opera
 from opera.pge import PgeExecutor, RunConfig
 from opera.util import PgeLogger
+from opera.util import run_utils
 
 
 class BasePgeTestCase(unittest.TestCase):
@@ -47,7 +52,6 @@ class BasePgeTestCase(unittest.TestCase):
         cls.starting_dir = abspath(os.curdir)
         cls.test_dir = resource_filename(__name__, "")
         cls.data_dir = join(cls.test_dir, os.pardir, "data")
-
         os.chdir(cls.test_dir)
 
     @classmethod
@@ -57,7 +61,6 @@ class BasePgeTestCase(unittest.TestCase):
 
     def setUp(self) -> None:
         """Use the temporary directory as the working directory"""
-
         self.working_dir = tempfile.TemporaryDirectory(
             prefix="test_base_pge_", suffix='temp', dir=os.curdir
         )
@@ -274,6 +277,164 @@ class BasePgeTestCase(unittest.TestCase):
         file_name = pge._geotiff_filename(name)
         file_name_regex = rf'{pge.PROJECT}_{pge.LEVEL}_BasePge_\d{{8}}T\d{{6}}_\d{{3}}_{name}{{1,2}}?'
         self.assertEqual(re.match(file_name_regex, file_name).group(), file_name)
+
+    def _makedirs_mock(self, mode=511, exist_ok=False):
+        """Mock function for os.makedirs that always raises OSError"""
+        raise OSError("Mock OSError from os.makedirs")
+
+    @patch.object(os, 'makedirs', _makedirs_mock)
+    def test_setup_directories_exception(self):
+        """Test IOError exception in _setup_directories()"""
+        runconfig_path = join(self.data_dir, 'test_sas_qa_config.yaml')
+        pge = PgeExecutor(pge_name='BasePgeFilenameTest', runconfig_path=runconfig_path)
+        pge._initialize_logger()
+        pge._load_runconfig()
+
+        with self.assertRaises(RuntimeError):
+            pge._setup_directories()
+
+        expected_log_file = pge.logger.get_file_name()
+        self.assertTrue(os.path.exists(expected_log_file))
+
+        # Open the log file, and check that we got expected error message
+        with open(expected_log_file, 'r', encoding='utf-8') as infile:
+            log_contents = infile.read()
+
+        self.assertIn(
+            'Could not create one or more working directories. reason: \n'
+            'Mock OSError from os.makedirs',
+            log_contents
+        )
+
+    def create_sas_command_line_mock(self, sas_program_path='', sas_runconfig_filepath='',
+                                     sas_program_options=None):
+        """Mock run_util.create_qa_command_line()"""
+        raise OSError("Mock OSError from run_utils.create_sas_command_line")
+
+    @patch.object(opera.pge.base_pge, 'create_sas_command_line', create_sas_command_line_mock)
+    def test_run_sas_executable_exception(self):
+        """Test IOError exception in _run_sas_executable()"""
+        runconfig_path = join(self.data_dir, 'test_sas_qa_config.yaml')
+        pge = PgeExecutor(pge_name='PgeQATest', runconfig_path=runconfig_path)
+
+        with self.assertRaises(RuntimeError):
+            pge.run()
+
+        expected_log_file = pge.logger.get_file_name()
+        self.assertTrue(os.path.exists(expected_log_file))
+
+        # Open the log file, and check that we got expected error message
+        with open(expected_log_file, 'r', encoding='utf-8') as infile:
+            log_contents = infile.read()
+
+        self.assertIn(
+            'Failed to create SAS command line, reason: '
+            'Mock OSError from run_utils.create_sas_command_line',
+            log_contents
+        )
+
+    def create_qa_command_line_mock(self, qa_program_path='./', qa_program_options=None):
+        """Mock function for run_utils.create_qa_command_line that always raises OSError"""
+        raise OSError("Mock OSError from run_utils.create_qa_command_line")
+
+    @patch.object(opera.pge.base_pge, 'create_qa_command_line', create_qa_command_line_mock)
+    def test_run_sas_qa_executable_exception(self):
+        """Test OSError in _run_sas_qa_executable()"""
+        runconfig_path = join(self.data_dir, 'test_sas_qa_config.yaml')
+        pge = PgeExecutor(pge_name='PgeQATest', runconfig_path=runconfig_path)
+        pge.run_preprocessor()
+        pge.run_sas_executable()
+
+        with self.assertRaises(RuntimeError):
+            pge._run_sas_qa_executable()
+
+        expected_log_file = pge.logger.get_file_name()
+        self.assertTrue(os.path.exists(expected_log_file))
+
+        # Open the log file, and check that we got expected error message
+        with open(expected_log_file, 'r', encoding='utf-8') as infile:
+            log_contents = infile.read()
+
+        self.assertIn(
+            'Failed to create QA command line, reason: '
+            'Mock OSError from run_utils.create_qa_command_line',
+            log_contents
+        )
+
+    def test_assign_filename_with_unknown_extension(self):
+        """
+        Test _assign_filename against an output file with an unknown extension.
+        File renaming should be skipped.
+        """
+        runconfig_path = join(self.data_dir, 'test_sas_qa_bad_extension_config.yaml')
+        pge = PgeExecutor(pge_name='PgeQATest', runconfig_path=runconfig_path)
+        pge.run_preprocessor()
+        pge.run_sas_executable()
+        pge._stage_output_files()
+
+        expected_log_file = pge.logger.get_file_name()
+        self.assertTrue(os.path.exists(expected_log_file))
+
+        # Open the log file, and check that we got expected error message
+        with open(expected_log_file, 'r', encoding='utf-8') as infile:
+            log_contents = infile.read()
+
+        self.assertIn(
+            'No rename function configured for file "output_file.abc", skipping assignment',
+            log_contents
+        )
+
+    def _os_rename_mock(self, input_filepath='./', final_filepath='./'):
+        """Mock function for os.rename that always raises OSError"""
+        raise OSError("Mock OSError from os.rename")
+
+    @patch.object(os, 'rename', _os_rename_mock)
+    def test_assign_filename_exception(self):
+        """Test IOError exception in _assign_filename()"""
+        runconfig_path = join(self.data_dir, 'test_base_pge_config.yaml')
+        pge = PgeExecutor(pge_name='PgeQATest', runconfig_path=runconfig_path)
+
+        with self.assertRaises(RuntimeError):
+            pge.run()
+
+        expected_log_file = pge.logger.get_file_name()
+        self.assertTrue(os.path.exists(expected_log_file))
+
+        # Open the log file, and check that we got expected error message
+        with open(expected_log_file, 'r', encoding='utf-8') as infile:
+            log_contents = infile.read()
+
+        self.assertIn(
+            "Failed to rename output file dswx_hls.tif, reason: "
+            "Mock OSError from os.rename",
+            log_contents
+        )
+
+    def safe_dump_mock(self, sas_config='./', outfile='./', sort_keys=False):
+        """Mock function for yaml.safe_dump() that always raises OSError"""
+        raise OSError("Mock OSError from yaml.safe_dump")
+
+    @patch.object(yaml, 'safe_dump', safe_dump_mock)
+    def test_isolate_sas_runconfig_exception(self):
+        """Test IOError exception in _isolate_sas_runconfig()"""
+        runconfig_path = join(self.data_dir, 'test_sas_qa_config.yaml')
+        pge = PgeExecutor(pge_name='PgeQATest', runconfig_path=runconfig_path)
+
+        with self.assertRaises(RuntimeError):
+            pge.run()
+
+        expected_log_file = pge.logger.get_file_name()
+        self.assertTrue(os.path.exists(expected_log_file))
+
+        # Open the log file, and check that we got expected error message
+        with open(expected_log_file, 'r', encoding='utf-8') as infile:
+            log_contents = infile.read()
+
+        self.assertIn(
+            'Failed to create SAS config file base_pge_test/scratch/test_sas_qa_config_sas.yaml, '
+            'reason: Mock OSError from yaml.safe_dump',
+            log_contents
+        )
 
 
 if __name__ == "__main__":
