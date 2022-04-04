@@ -235,11 +235,6 @@ class RunConfig:
         """Returns the Scratch Path from the Product Path Group"""
         return self._pge_config['ProductPathGroup']['ScratchPath']
 
-    @property
-    def sas_output_file(self) -> str:
-        """Returns the SAS Output File from the Product Path Group"""
-        return self._pge_config['ProductPathGroup']['SASOutputFile']
-
     # PrimaryExecutable
     @property
     def product_identifier(self) -> str:

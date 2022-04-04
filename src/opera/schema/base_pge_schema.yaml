@@ -1,5 +1,5 @@
 #
-# Copyright 2021, by the California Institute of Technology.
+# Copyright 2021-22, by the California Institute of Technology.
 # ALL RIGHTS RESERVED.
 # United States Government sponsorship acknowledged.
 # Any commercial use must be negotiated with the Office of Technology Transfer
@@ -32,7 +32,6 @@ RunConfig:
         ProductCounter: int(min=1, max=999, required=False)
         OutputProductPath: str(required=True)
         ScratchPath: str(required=True)
-        SASOutputFile: str(required=True)
 
       PrimaryExecutable:
         ProductIdentifier: str(required=False)
