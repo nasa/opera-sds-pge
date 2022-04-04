@@ -20,7 +20,6 @@ RunConfig:
         ProductCounter: 005
         OutputProductPath: base_pge_test/outputs/
         ScratchPath: base_pge_test/scratch/
-        SASOutputFile: output_file.h5
 
       PrimaryExecutable:
         ProductIdentifier: EXAMPLE

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# Copyright 2021, by the California Institute of Technology.
+# Copyright 2021-22, by the California Institute of Technology.
 # ALL RIGHTS RESERVED.
 # United States Government sponsorship acknowledged.
 # Any commercial use must be negotiated with the Office of Technology Transfer
@@ -244,7 +244,6 @@ class DSWxPgeTestCase(unittest.TestCase):
 
         # Test with a SAS command that does not produce any output file,
         # post-processor should detect that expected output is missing
-        product_path_group['SASOutputFile'] = 'missing_dswx_hls.tif'
         primary_executable_group['ProgramPath'] = 'echo'
         primary_executable_group['ProgramOptions'] = ['hello world']
 
@@ -266,13 +265,12 @@ class DSWxPgeTestCase(unittest.TestCase):
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
 
-            self.assertIn(f"Expected SAS output file {abspath(expected_output_file)} "
-                          f"does not exist", log_contents)
+            self.assertIn(f"No SAS output file(s) containing product ID dswx_hls",
+                          log_contents)
 
             # Test with a SAS command that produces the expected output file, but
             # one that is empty (size 0 bytes). Post-processor should detect this
             # and flag an error
-            product_path_group['SASOutputFile'] = 'empty_dswx_hls.tif'
             primary_executable_group['ProgramPath'] = 'touch'
             primary_executable_group['ProgramOptions'] = ['dswx_pge_test/output_dir/empty_dswx_hls.tif']
 
@@ -294,7 +292,7 @@ class DSWxPgeTestCase(unittest.TestCase):
                 log_contents = infile.read()
 
             self.assertIn(f"SAS output file {abspath(expected_output_file)} was "
-                          f"created but is empty", log_contents)
+                          f"created, but is empty", log_contents)
         finally:
             if os.path.exists(test_runconfig_path):
                 os.unlink(test_runconfig_path)
@@ -309,12 +307,13 @@ class DSWxPgeTestCase(unittest.TestCase):
         pge.run()
 
         image_files = glob.glob(join(pge.runconfig.output_product_path, "*.tif"))
+
         for i in range(len(image_files)):
             file_name = pge._geotiff_filename(image_files[i])
             md = MockGdal.MockGdalDataset().GetMetadata()
             file_name_regex = rf"{pge.PROJECT}_{pge.LEVEL}_{md['PRODUCT_TYPE']}_{md['PRODUCT_SOURCE']}_" \
                               rf"{md['SPACECRAFT_NAME']}_{md['HLS_DATASET'].split('.')[2]}_\d{{8}}T\d{{6}}_" \
-                              rf"{'.'.join(md['HLS_DATASET'].split('.')[-2:])}_\d{{3}}.tif?"
+                              rf"{'.'.join(md['HLS_DATASET'].split('.')[-2:])}_\d{{3}}_B\d{{2}}_\w+.tif?"
             self.assertEqual(re.match(file_name_regex, file_name).group(), file_name)
 
 
