@@ -26,7 +26,7 @@ Adapted By: Scott Collins
 
 """
 import os
-from os.path import abspath, isabs, isdir, isfile, join
+from os.path import abspath, basename, isabs, isdir, isfile, join
 
 from pkg_resources import resource_filename
 
@@ -187,7 +187,7 @@ class RunConfig:
         except KeyError as error:
             # TODO: create exceptions package with more intuitive exception class names
             raise RuntimeError(
-                f'Expected field "{str(error)}" is missing from RunConfig '
+                f'Expected field {str(error)} is missing from RunConfig '
                 f'{abspath(self.filename)}'
             ) from error
 
@@ -333,15 +333,19 @@ class RunConfig:
 
         input_files = []
 
+        def __is_input_file(filename):
+            """Helper function for filtering out directories and hidden files"""
+            return isfile(filename) and not basename(filename).startswith('.')
+
         for item in preliminary_file_list:
-            if isfile(item):
+            if __is_input_file(item):
                 input_files.append(item)
             elif isdir(item):
                 for dir_item in os.listdir(item):
                     path = join(item, dir_item)
 
                     # for now only look for files at first level
-                    if isfile(path):
+                    if __is_input_file(path):
                         input_files.append(path)
 
         input_files.sort()
