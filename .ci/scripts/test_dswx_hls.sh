@@ -17,6 +17,35 @@
 
 set -e
 
+# Parse args
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    -h|--help)
+      echo "Usage: test_dswx_hls.sh [-h|--help] [-t|--tag <tag>] [-w|--workspace <path>]"
+      exit 0
+      ;;
+    -t|--tag)
+      TAG=$2
+      shift
+      shift
+      ;;
+    -w|--workspace)
+      WORKSPACE=$2
+      shift
+      shift
+      ;;
+    -*|--*)
+      echo "Unknown arguments $1 $2, ignoring..."
+      shift
+      shift
+      ;;
+    *)
+      echo "Unknown argument $1, ignoring..."
+      shift
+      ;;
+  esac
+done
+
 echo '
 =====================================
 
@@ -28,9 +57,6 @@ Testing DSWx-HLS PGE Docker image...
 PGE_NAME="dswx_hls"
 IMAGE="opera_pge/${PGE_NAME}"
 TEST_RESULTS_REL_DIR="test_results"
-
-TAG=$1
-WORKSPACE=$2
 
 # defaults
 [ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath $(dirname $(realpath $0))/../..)

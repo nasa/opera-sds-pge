@@ -41,7 +41,7 @@ fi
 
 # Build all of the Docker images
 BUILD_SCRIPTS_DIR=${WORKSPACE}/.ci/scripts
-${BUILD_SCRIPTS_DIR}/build_dswx_hls.sh ${TAG}
+${BUILD_SCRIPTS_DIR}/build_dswx_hls.sh --tag ${TAG} --workspace ${WORKSPACE} --sas-image artifactory-fn.jpl.nasa.gov:16001/gov/nasa/jpl/opera/adt/opera/dswx_hls:interface
 
 echo 'Build Complete'
 
