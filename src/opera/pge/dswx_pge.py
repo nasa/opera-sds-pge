@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# Copyright 2021, by the California Institute of Technology.
+# Copyright 2021-22, by the California Institute of Technology.
 # ALL RIGHTS RESERVED.
 # United States Government sponsorship acknowledged.
 # Any commercial use must be negotiated with the Office of Technology Transfer
@@ -24,7 +24,7 @@ Module defining the implementation for the Dynamic Surface Water Extent (DSWx) P
 
 import glob
 import os.path
-from os.path import abspath, exists, isdir, join
+from os.path import abspath, exists, isdir, join, splitext
 
 from opera.util.error_codes import ErrorCode
 from opera.util.img_utils import get_geotiff_hls_dataset
@@ -115,23 +115,31 @@ class DSWxPostProcessorMixin(PostProcessorMixin):
 
     def _validate_output(self):
         """
-        Evaluates the output file generated from SAS execution to ensure its
-        existence, and that the file contains some content (size is greater than
+        Evaluates the output file(s) generated from SAS execution to ensure
+        existence, and that the file(s) contains some content (size is greater than
         0).
         """
-        output_path = abspath(
-            join(self.runconfig.output_product_path, self.runconfig.sas_output_file)
+        # Get the product ID that the SAS should have used to tag all output images
+        product_id = self.runconfig.sas_config['runconfig']['groups']['product_path_group']['product_id']
+
+        output_products = list(
+            filter(
+                lambda filename: product_id in filename,
+                self.runconfig.get_output_product_filenames()
+            )
         )
 
-        if not exists(output_path):
-            error_msg = f"Expected SAS output file {output_path} does not exist"
+        if not output_products:
+            error_msg = f"No SAS output file(s) containing product ID {product_id} " \
+                        f"found within {self.runconfig.output_product_path}"
 
             self.logger.critical(self.name, ErrorCode.OUTPUT_NOT_FOUND, error_msg)
 
-        if not os.path.getsize(output_path):
-            error_msg = f"SAS output file {output_path} was created but is empty"
+        for output_product in output_products:
+            if not os.path.getsize(output_product):
+                error_msg = f"SAS output file {output_product} was created, but is empty"
 
-            self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
+                self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
 
     def _core_filename(self, inter_filename=None):
         """
@@ -182,7 +190,7 @@ class DSWxPostProcessorMixin(PostProcessorMixin):
         dataset_fields = get_hls_filename_fields(dataset)
 
         source = dataset_fields['product']
-        spacecraft_name = get_geotiff_spacecraft_name(inter_filename)
+        spacecraft_name = get_geotiff_spacecraft_name(inter_filename).upper()
         tile_id = dataset_fields['tile_id']
         timetag = dataset_fields['acquisition_time']
         version = dataset_fields['collection_version']
@@ -201,9 +209,11 @@ class DSWxPostProcessorMixin(PostProcessorMixin):
 
         The GeoTIFF filename for the DSWx PGE consists of:
 
-            <Core filename>.tif
+            <Core filename>_<Band Index>_<Band Name>.tif
 
         Where <Core filename> is returned by DSWxPostProcessorMixin._core_filename()
+        and <Band Index> and <Band Name> are determined from the name of the
+        intermediate geotiff file to be renamed.
 
         Parameters
         ----------
@@ -220,8 +230,11 @@ class DSWxPostProcessorMixin(PostProcessorMixin):
         """
         core_filename = self._core_filename(inter_filename)
 
-        # TODO: include band once SAS produces per-band outputs
-        return f"{core_filename}.tif"
+        # Specific output product band index and name should be the last parts
+        # of the filename before the extension, delimited by underscores
+        band_idx, band_name = splitext(inter_filename)[0].split("_")[-2:]
+
+        return f"{core_filename}_{band_idx}_{band_name}.tif"
 
     def _collect_dswx_product_metadata(self):
         """
