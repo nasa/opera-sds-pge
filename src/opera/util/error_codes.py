@@ -39,6 +39,7 @@ CRITICAL_RANGE_START = WARNING_RANGE_START + CODES_PER_RANGE
 """Starting value for the Critical code range"""
 
 
+# noinspection PyArgumentList
 @unique
 class ErrorCode(IntEnum):
     """
@@ -76,12 +77,14 @@ class ErrorCode(IntEnum):
     QA_SAS_PROGRAM_DISABLED = auto()
     RENDERING_ISO_METADATA = auto()
     CLOSING_LOG_FILE = auto()
+    LOGGED_INFO_LINE = auto()
 
     # Debug - 1000 – 1999
     CONFIGURATION_DETAILS = DEBUG_RANGE_START
     PROCESSING_DETAILS = auto()
     SAS_EXE_COMMAND_LINE = auto()
     SAS_QA_COMMAND_LINE = auto()
+    LOGGED_DEBUG_LINE = auto()
 
     # Warning - 2000 – 2999
     DATE_RANGE_MISSING = WARNING_RANGE_START
@@ -91,6 +94,7 @@ class ErrorCode(IntEnum):
     LOGGING_SOURCE_FILE_DOES_NOT_EXIST = auto()
     LOGGING_COULD_NOT_INCREMENT_SEVERITY = auto()
     LOGGING_RESYNC_FAILED = auto()
+    LOGGED_WARNING_LINE = auto()
 
     # Critical - 3000 to 3999
     RUN_CONFIG_VALIDATION_FAILED = CRITICAL_RANGE_START
@@ -113,6 +117,7 @@ class ErrorCode(IntEnum):
     ISO_METADATA_GOT_SOME_RENDERING_ERRORS = auto()
     ISO_METADATA_RENDER_FAILED = auto()
     SAS_OUTPUT_FILE_HAS_MISSING_DATA = auto()
+    LOGGED_CRITICAL_LINE = auto()
 
     @classmethod
     def describe(cls):
