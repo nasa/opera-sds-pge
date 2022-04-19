@@ -28,6 +28,10 @@ Install the package and its dependencies for development into the virtual enviro
 
     pip install --editable '.[dev]'
 
+Some of the container build scripts expect the GNU style of common shell utilities, as opposed to the OSX versions.
+If developing on OSX, make sure you install the `coreutils` (via Homebrew https://brew.sh/), package prior to attempting a container build:
+
+    brew install coreutils
 
 Unit tests
 ----------
