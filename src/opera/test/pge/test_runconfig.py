@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# Copyright 2021, by the California Institute of Technology.
+# Copyright 2021-22, by the California Institute of Technology.
 # ALL RIGHTS RESERVED.
 # United States Government sponsorship acknowledged.
 # Any commercial use must be negotiated with the Office of Technology Transfer
@@ -63,7 +63,6 @@ class RunconfigTestCase(unittest.TestCase):
         self.assertEqual(runconfig.product_counter, 5)
         self.assertEqual(runconfig.output_product_path, "outputs/")
         self.assertEqual(runconfig.scratch_path, "temp/")
-        self.assertEqual(runconfig.sas_output_file, "outputs/output_file.h5")
         self.assertEqual(runconfig.product_identifier, "EXAMPLE")
         self.assertEqual(runconfig.sas_program_path, "pybind_opera.workflows.example_workflow")
         self.assertListEqual(runconfig.sas_program_options, ["--debug", "--restart"])

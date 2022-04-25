@@ -36,11 +36,12 @@ import opera.util.time as time_util
 from opera.util import error_codes
 
 from .error_codes import ErrorCode
+from .time import get_iso_time
 from .usage_metrics import get_os_metrics
 
 
 def write(log_stream, severity, workflow, module, error_code, error_location,
-          description):
+          description, time_tag=None):
     """
     Low-level logging function. May be called directly in lieu of PgeLogger class.
 
@@ -60,11 +61,15 @@ def write(log_stream, severity, workflow, module, error_code, error_location,
         File name and line number where the logging took place.
     description : str
         Description of the logged event.
+    time_tag : str, optional
+        ISO format time tag to associate to the message. If not provided,
+        the current time is used.
 
     """
-    time_tag = time_util.get_current_iso_time()
+    if not time_tag:
+        time_tag = time_util.get_current_iso_time()
 
-    message_str = f'{time_tag}, {severity}, {workflow}, {module},' \
+    message_str = f'{time_tag}, {severity}, {workflow}, {module}, ' \
                   f'{str(error_code)}, {error_location}, "{description}"\n'
 
     log_stream.write(message_str)
@@ -76,7 +81,7 @@ def default_log_file_name():
 
     To minimize the risk of errors opening a log file, the initial log filename
     does not rely on anything read from a run config file, SAS output file, etc.
-    Therefore this filename does not follow the file naming convention.
+    Therefore, this filename does not follow the file naming convention.
 
     Later (elsewhere), after everything is known, the log file will be renamed.
 
@@ -138,7 +143,16 @@ def standardize_severity_string(severity):
         The standardized severity string.
 
     """
-    return severity.title()  # first char uppercase, rest lowercase.
+    severity = severity.strip().title()  # first char uppercase, rest lowercase.
+
+    # Convert some potential log level name variations
+    if severity == 'Warn':
+        severity = 'Warning'
+
+    if severity == 'Error':
+        severity = 'Critical'
+
+    return severity
 
 
 class PgeLogger:
@@ -154,8 +168,7 @@ class PgeLogger:
     LOGGER_CODE_BASE = 900000
     QA_LOGGER_CODE_BASE = 800000
 
-    def __init__(self, workflow=None, error_code_base=None,
-                 log_filename=None):
+    def __init__(self, workflow=None, error_code_base=None, log_filename=None):
         """
         Constructor opens the log file as a stream
 
@@ -294,9 +307,8 @@ class PgeLogger:
         module : str
             Name of the module where the logging took place.
         error_code_offset : int
-            Error code offset to add to the specified base to determine the
-            error code associated with the log message
-            TODO: should this be just the error code itself?
+            Error code offset to add to this logger's error code base value
+            to determine the final error code associated with the log message.
         description : str
             Description message to write to the log.
         additional_back_frames : int, optional
@@ -329,9 +341,8 @@ class PgeLogger:
         module : str
             Name of the module where the logging took place.
         error_code_offset : int
-            Error code offset to add to the specified base to determine the
-            error code associated with the log message
-            TODO: should this be just the error code itself?
+            Error code offset to add to this logger's error code base value
+            to determine the final error code associated with the log message.
         description : str
             Description message to write to the log.
 
@@ -348,9 +359,8 @@ class PgeLogger:
         module : str
             Name of the module where the logging took place.
         error_code_offset : int
-            Error code offset to add to the specified base to determine the
-            error code associated with the log message
-            TODO: should this be just the error code itself?
+            Error code offset to add to this logger's error code base value
+            to determine the final error code associated with the log message.
         description : str
             Description message to write to the log.
 
@@ -367,9 +377,8 @@ class PgeLogger:
         module : str
             Name of the module where the logging took place.
         error_code_offset : int
-            Error code offset to add to the specified base to determine the
-            error code associated with the log message
-            TODO: should this be just the error code itself?
+            Error code offset to add to this logger's error code base value
+            to determine the final error code associated with the log message.
         description : str
             Description message to write to the log.
 
@@ -391,9 +400,8 @@ class PgeLogger:
         module : str
             Name of the module where the logging took place.
         error_code_offset : int
-            Error code offset to add to the specified base to determine the
-            error code associated with the log message
-            TODO: should this be just the error code itself?
+            Error code offset to add to this logger's error code base value
+            to determine the final error code associated with the log message.
         description : str
             Description message to write to the log.
 
@@ -423,9 +431,8 @@ class PgeLogger:
         module : str
             Name of the module where the logging took place.
         error_code_offset : int
-            Error code offset to add to the specified base to determine the
-            error code associated with the log message
-            TODO: should this be just the error code itself?
+            Error code offset to add to this logger's error code base value
+            to determine the final error code associated with the log message.
         description : str
             Description message to write to the log.
         additional_back_frames : int, optional
@@ -480,11 +487,89 @@ class PgeLogger:
         """
         if isfile(source):
             with open(source, 'r', encoding='utf-8') as source_file_object:
-                source_contents = source_file_object.read()
+                source_contents = source_file_object.read().strip()
         else:
-            source_contents = source
+            source_contents = source.strip()
 
-        self.log_stream.write(source_contents)
+        # Parse the contents to append to see if they conform to the expected log
+        # formatting for OPERA
+        for log_line in source_contents.split('\n'):
+            try:
+                parsed_line = self.parse_line(log_line)
+                write(self.log_stream, *parsed_line)
+                severity = parsed_line[0]
+                self.increment_log_count_by_severity(severity)
+            # If the line does not conform to the expected formatting, just append as-is
+            except ValueError:
+                self.log_stream.write(log_line + "\n")
+
+    def parse_line(self, line):
+        """
+        Parses the provided formatted log line into its component parts according
+        to the log formatting style for OPERA.
+
+        Parameters
+        ----------
+        line : str
+            The log line to parse
+
+        Returns
+        -------
+        parsed_line : tuple
+            The provided log line parsed into its component parts.
+
+        Raises
+        ------
+        ValueError
+            If the line cannot be parsed according to the OPERA log formatting style.
+
+        """
+        try:
+            line_components = line.split(',', maxsplit=6)
+
+            if len(line_components) < 7:
+                raise ValueError('Line does not conform to expected formatting style')
+
+            # Remove leading/trailing whitespace from all parsed fields
+            line_components = tuple(map(str.strip, line_components))
+
+            (time_tag,
+             severity,
+             workflow,
+             module,
+             error_code,
+             error_location,
+             description) = line_components
+
+            # Convert time-tag to expected iso format
+            time_tag = get_iso_time(datetime.datetime.fromisoformat(time_tag))
+
+            # Standardize the error string
+            severity = standardize_severity_string(severity)
+
+            # Remove redundant quotes from log descriptions
+            description = description.strip('"').strip("'")
+
+            # Standardize on single quotes within log descriptions
+            description = description.replace('"', "'")
+
+            # Map the error code based on message severity
+            error_code = {
+                "Debug": ErrorCode.LOGGED_DEBUG_LINE,
+                "Info": ErrorCode.LOGGED_INFO_LINE,
+                "Warning": ErrorCode.LOGGED_WARNING_LINE,
+                "Critical": ErrorCode.LOGGED_CRITICAL_LINE
+            }[severity]
+
+            # Add the error code base
+            error_code += self.error_code_base
+
+            # Return a tuple of the parsed, standardized log line
+            return severity, workflow, module, error_code, error_location, description, time_tag
+        except Exception as err:
+            raise ValueError(
+                f'Failed to parse log line "{line}" reason: {str(err)}'
+            )
 
     def log_one_metric(self, module, metric_name, metric_value,
                        additional_back_frames=0):
@@ -533,31 +618,3 @@ class PgeLogger:
         elapsed_time_seconds = time.monotonic() - self.start_time
         self.log_one_metric(module_name, "overall.elapsed_seconds",
                             elapsed_time_seconds)
-
-    def resync_log_count_by_severity(self):
-        """
-        Resynchronizes the dictionary of log counts by severity for all log
-        messages in the log file, including messages logged by anything external
-        to the PgeLogger class, such as an external SAS invoked by a PGE wrapper.
-
-        """
-        # TODO: is this method really necessary? if the log file was kept in
-        #       memory, could these tallies be kept in real-time?
-
-        if not self.log_stream:
-            return
-
-        # read the log_stream and get a count of log messages for each severity
-        count_by_severity = self._make_blank_log_count_by_severity_dict()
-        csv_reader = self.log_stream.getvalue().split('\n')
-        for i in csv_reader:
-            row = i.split(',')
-            if len(row) >= 2:
-                try:
-                    severity = standardize_severity_string(row[1].strip())
-                    count_by_severity[severity] += 1
-                except KeyError:
-                    self.warning("PgeLogger", ErrorCode.LOGGING_RESYNC_FAILED,
-                                 "Unable to resync the 'log_count_by_severity' dict.")
-
-        self.log_count_by_severity = count_by_severity

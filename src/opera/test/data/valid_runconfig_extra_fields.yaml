@@ -23,7 +23,6 @@ RunConfig:
         ProductCounter: 005
         OutputProductPath: outputs/
         ScratchPath: temp/
-        SASOutputFile: outputs/output_file.h5
 
       PrimaryExecutable:
         ProductIdentifier: EXAMPLE

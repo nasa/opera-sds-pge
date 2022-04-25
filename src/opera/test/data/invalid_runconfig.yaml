@@ -18,7 +18,6 @@ RunConfig:
         ProductCounter: -1 # value must be between 1-999
         OutputProductPath: outputs/
         ScratchPath: temp/
-        SASOutputFile: outputs/output_file.h5
 
       PrimaryExecutable:
         ProductIdentifier: EXAMPLE
