@@ -16,13 +16,13 @@
 # a command line argument, plus it outputs execution statistics to a file.
 #
 # Usage:
-# run_docker_stats.sh <command> [arg...] [--stats filename]
+# pge_run_docker_stats.sh <command> [arg...] [--stats filename]
 #
 # where [--stats <filename>] specifies the filename of the statistics output.
 # This argument can come in any order, before [arg...] or before the <command>,
 # it does not matter.  The entire command line arguments are searched, and
 # if --stats <filename> is found, that pair of arguments is intercepted.
-
+co
 set -e
 
 DOCKER_ENTRYPOINT_SCRIPT_DIR=$(dirname ${BASH_SOURCE[0]})
@@ -30,7 +30,7 @@ original_args=("$@")
 pass_through_args=()
 
 # default execution statistics filename
-stats_filename='_docker_stats.json'
+stats_filename='/home/conda/output_dir/_docker_stats.json'
 
 # Most of the command line arguments get passed through to the
 # command, but pick out the stats filename (if specified)
@@ -65,5 +65,6 @@ echo "Execution statistics will be output to file: ${stats_filename}"
 # create the directory for the stats file if necessary
 stats_dir=$(dirname ${stats_filename})
 [[ -z "$stats_dir" ]] || [[ "$stats_dir" == '.' ]] || mkdir -p "$stats_dir"
+echo "Directory holding execution statistics: ${stats_dir}"
 
 $DOCKER_ENTRYPOINT_SCRIPT_DIR/docker-stats-on-exit-shim "${stats_filename}" "${pass_through_args[@]}"
