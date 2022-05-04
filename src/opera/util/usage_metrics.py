@@ -83,7 +83,7 @@ def get_os_metrics():
     return metrics
 
 
-def get_self_peak_vmm_kb():
+def get_self_peak_vmm_kb():  # pylint: disable=missing-raises-doc
     """
     Attempt to get the peak virtual memory by looking into the /proc/self/status
 
@@ -102,7 +102,7 @@ def get_self_peak_vmm_kb():
     status_file = os.path.join(os.sep, 'proc', 'self', 'status')
 
     try:
-        if platform != "linux" or not os.path.exists(status_file):
+        if platform != "linux" or not os.path.exists(status_file):  # pragma no cover
             raise EnvironmentError
 
         with open(status_file, "r", encoding='utf-8') as infile:  # pragma no cover

@@ -35,9 +35,9 @@ from pkg_resources import resource_filename
 from opera.util.error_codes import (CODES_PER_RANGE,
                                     CRITICAL_RANGE_START,
                                     DEBUG_RANGE_START,
+                                    ErrorCode,
                                     INFO_RANGE_START,
-                                    WARNING_RANGE_START,
-                                    ErrorCode)
+                                    WARNING_RANGE_START)
 from opera.util.logger import PgeLogger
 from opera.util.logger import default_log_file_name
 from opera.util.logger import get_severity_from_error_code

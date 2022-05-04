@@ -86,13 +86,13 @@ class MetFile:
         merged_met_dict = {}
 
         if os.path.exists(output_path):
-            with open(output_path) as json_file:
+            with open(output_path, "r", encoding="utf-8") as json_file:
                 file_met_dict = json.load(json_file)
                 merged_met_dict = file_met_dict.copy()
 
         merged_met_dict.update(self.met_dict)
 
-        with open(output_path, "w") as outfile:
+        with open(output_path, "w", encoding='utf-8') as outfile:
             json.dump(merged_met_dict, outfile, indent=2, sort_keys=True)
 
     def read(self, input_path):
@@ -101,7 +101,7 @@ class MetFile:
         Loads the JSON fields into the instance's met_dict
 
         """
-        with open(input_path) as json_file:
+        with open(input_path, "r", encoding='utf-8') as json_file:
             self.met_dict = json.load(json_file)
 
     def validate(self, schema_filename: str) -> bool:
@@ -120,7 +120,7 @@ class MetFile:
             0: fail
 
         """
-        with open(schema_filename, 'tr') as schema_file:
+        with open(schema_filename, "tr", encoding='utf-8') as schema_file:
             schema = json.load(schema_file)
 
         # Initialize and run the validator
@@ -131,7 +131,7 @@ class MetFile:
         self.combined_error_msg = '\n'.join(error.message for error in errors)
 
         # success if combined_error_text is an empty string
-        success = len(self.combined_error_msg) == 0
+        success = len(self.combined_error_msg) == 0  # pylint: disable=compare-to-zero
 
         return success
 

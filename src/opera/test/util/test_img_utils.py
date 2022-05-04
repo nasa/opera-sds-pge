@@ -46,7 +46,7 @@ def gdal_is_available():
     Used to skip tests that require GDAL if it's not available.
     """
     try:
-        from osgeo import gdal
+        from osgeo import gdal  # noqa: F401
         return True
     except (ImportError, ModuleNotFoundError):
         return False

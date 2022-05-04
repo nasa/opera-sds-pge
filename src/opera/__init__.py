@@ -23,6 +23,7 @@ Observational Products for End-Users from Remote Sensing Analysis (OPERA)
 Science Data System (SDS).
 """
 
+# pylint: disable=import-private-name
 from ._package import (  # noqa: F401
     __author__,
     __copyright__,
