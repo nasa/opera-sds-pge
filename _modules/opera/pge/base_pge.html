@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera.pge.base_pge &mdash; opera-sds-pge 1.0.0-er.3.0 documentation</title>
+  <title>opera.pge.base_pge &mdash; opera-sds-pge 1.0.0-er.4.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -27,7 +27,7 @@
             <a href="../../../index.html" class="icon icon-home"> opera-sds-pge
           </a>
               <div class="version">
-                1.0.0-er.3.0
+                1.0.0-er.4.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -235,7 +235,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">LOG_FILE_INIT_COMPLETE</span><span class="p">,</span>
                          <span class="s1">&#39;Log file configuration complete&#39;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="PreProcessorMixin.run_preprocessor"><a class="viewcode-back" href="../../../opera.pge.html#opera.pge.base_pge.PreProcessorMixin.run_preprocessor">[docs]</a>    <span class="k">def</span> <span class="nf">run_preprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="PreProcessorMixin.run_preprocessor"><a class="viewcode-back" href="../../../opera.pge.html#opera.pge.base_pge.PreProcessorMixin.run_preprocessor">[docs]</a>    <span class="k">def</span> <span class="nf">run_preprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>  <span class="c1"># pylint: disable=unused-argument</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Executes the pre-processing steps for PGE initialization.</span>
 
@@ -365,7 +365,7 @@
 
         <span class="k">return</span> <span class="n">MetFile</span><span class="p">(</span><span class="n">catalog_metadata</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_create_iso_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_create_iso_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pylint: disable=no-self-use</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates the ISO metadata utilized by the DAAC&#39;s for indexing output</span>
 <span class="sd">        products submitted by OPERA. Inheritors of PostProcessorMixin must</span>
@@ -393,7 +393,7 @@
                     <span class="sa">f</span><span class="s2">&quot;Closing log file </span><span class="si">{</span><span class="n">logger</span><span class="o">.</span><span class="n">get_file_name</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">close_log_stream</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">_core_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inter_filename</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_core_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inter_filename</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>  <span class="c1"># pylint: disable=unused-argument</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the core file name component for products produced by the</span>
 <span class="sd">        Base PGE. This function should typically be overridden by inheritors</span>
@@ -643,7 +643,7 @@
             <span class="c1"># Log stream might be closed by this point so raise an Exception instead</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
-<div class="viewcode-block" id="PostProcessorMixin.run_postprocessor"><a class="viewcode-back" href="../../../opera.pge.html#opera.pge.base_pge.PostProcessorMixin.run_postprocessor">[docs]</a>    <span class="k">def</span> <span class="nf">run_postprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="PostProcessorMixin.run_postprocessor"><a class="viewcode-back" href="../../../opera.pge.html#opera.pge.base_pge.PostProcessorMixin.run_postprocessor">[docs]</a>    <span class="k">def</span> <span class="nf">run_postprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>  <span class="c1"># pylint: disable=unused-argument</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Executes the post-processing steps for PGE job completion.</span>
 
@@ -752,7 +752,7 @@
 
         <span class="k">return</span> <span class="n">sas_runconfig_filepath</span>
 
-<div class="viewcode-block" id="PgeExecutor.run_sas_executable"><a class="viewcode-back" href="../../../opera.pge.html#opera.pge.base_pge.PgeExecutor.run_sas_executable">[docs]</a>    <span class="k">def</span> <span class="nf">run_sas_executable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="PgeExecutor.run_sas_executable"><a class="viewcode-back" href="../../../opera.pge.html#opera.pge.base_pge.PgeExecutor.run_sas_executable">[docs]</a>    <span class="k">def</span> <span class="nf">run_sas_executable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>  <span class="c1"># pylint: disable=unused-argument</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Kicks off a SAS executable as defined by the RunConfig provided to</span>
 <span class="sd">        the PGE.</span>

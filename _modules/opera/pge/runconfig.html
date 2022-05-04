@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera.pge.runconfig &mdash; opera-sds-pge 1.0.0-er.3.0 documentation</title>
+  <title>opera.pge.runconfig &mdash; opera-sds-pge 1.0.0-er.4.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -27,7 +27,7 @@
             <a href="../../../index.html" class="icon icon-home"> opera-sds-pge
           </a>
               <div class="version">
-                1.0.0-er.3.0
+                1.0.0-er.4.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -99,7 +99,7 @@
 
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">abspath</span><span class="p">,</span> <span class="n">isabs</span><span class="p">,</span> <span class="n">isdir</span><span class="p">,</span> <span class="n">isfile</span><span class="p">,</span> <span class="n">join</span>
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">abspath</span><span class="p">,</span> <span class="n">basename</span><span class="p">,</span> <span class="n">isabs</span><span class="p">,</span> <span class="n">isdir</span><span class="p">,</span> <span class="n">isfile</span><span class="p">,</span> <span class="n">join</span>
 
 <span class="kn">from</span> <span class="nn">pkg_resources</span> <span class="kn">import</span> <span class="n">resource_filename</span>
 
@@ -260,7 +260,7 @@
         <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
             <span class="c1"># TODO: create exceptions package with more intuitive exception class names</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s1">&#39;Expected field &quot;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">error</span><span class="p">)</span><span class="si">}</span><span class="s1">&quot; is missing from RunConfig &#39;</span>
+                <span class="sa">f</span><span class="s1">&#39;Expected field </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">error</span><span class="p">)</span><span class="si">}</span><span class="s1"> is missing from RunConfig &#39;</span>
                 <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
             <span class="p">)</span> <span class="kn">from</span> <span class="nn">error</span>
 
@@ -307,11 +307,6 @@
     <span class="k">def</span> <span class="nf">scratch_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Returns the Scratch Path from the Product Path Group&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pge_config</span><span class="p">[</span><span class="s1">&#39;ProductPathGroup&#39;</span><span class="p">][</span><span class="s1">&#39;ScratchPath&#39;</span><span class="p">]</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">sas_output_file</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns the SAS Output File from the Product Path Group&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pge_config</span><span class="p">[</span><span class="s1">&#39;ProductPathGroup&#39;</span><span class="p">][</span><span class="s1">&#39;SASOutputFile&#39;</span><span class="p">]</span>
 
     <span class="c1"># PrimaryExecutable</span>
     <span class="nd">@property</span>
@@ -411,15 +406,19 @@
 
         <span class="n">input_files</span> <span class="o">=</span> <span class="p">[]</span>
 
+        <span class="k">def</span> <span class="nf">__is_input_file</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;Helper function for filtering out directories and hidden files&quot;&quot;&quot;</span>
+            <span class="k">return</span> <span class="n">isfile</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">basename</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+
         <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">preliminary_file_list</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">isfile</span><span class="p">(</span><span class="n">item</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">__is_input_file</span><span class="p">(</span><span class="n">item</span><span class="p">):</span>
                 <span class="n">input_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">isdir</span><span class="p">(</span><span class="n">item</span><span class="p">):</span>
                 <span class="k">for</span> <span class="n">dir_item</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">item</span><span class="p">):</span>
                     <span class="n">path</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">dir_item</span><span class="p">)</span>
 
                     <span class="c1"># for now only look for files at first level</span>
-                    <span class="k">if</span> <span class="n">isfile</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">__is_input_file</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
                         <span class="n">input_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
 
         <span class="n">input_files</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>

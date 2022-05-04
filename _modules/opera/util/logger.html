@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera.util.logger &mdash; opera-sds-pge 1.0.0-er.3.0 documentation</title>
+  <title>opera.util.logger &mdash; opera-sds-pge 1.0.0-er.4.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -27,7 +27,7 @@
             <a href="../../../index.html" class="icon icon-home"> opera-sds-pge
           </a>
               <div class="version">
-                1.0.0-er.3.0
+                1.0.0-er.4.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -109,11 +109,12 @@
 <span class="kn">from</span> <span class="nn">opera.util</span> <span class="kn">import</span> <span class="n">error_codes</span>
 
 <span class="kn">from</span> <span class="nn">.error_codes</span> <span class="kn">import</span> <span class="n">ErrorCode</span>
+<span class="kn">from</span> <span class="nn">.time</span> <span class="kn">import</span> <span class="n">get_iso_time</span>
 <span class="kn">from</span> <span class="nn">.usage_metrics</span> <span class="kn">import</span> <span class="n">get_os_metrics</span>
 
 
 <div class="viewcode-block" id="write"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.write">[docs]</a><span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="n">log_stream</span><span class="p">,</span> <span class="n">severity</span><span class="p">,</span> <span class="n">workflow</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">error_code</span><span class="p">,</span> <span class="n">error_location</span><span class="p">,</span>
-          <span class="n">description</span><span class="p">):</span>
+          <span class="n">description</span><span class="p">,</span> <span class="n">time_tag</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Low-level logging function. May be called directly in lieu of PgeLogger class.</span>
 
@@ -133,11 +134,15 @@
 <span class="sd">        File name and line number where the logging took place.</span>
 <span class="sd">    description : str</span>
 <span class="sd">        Description of the logged event.</span>
+<span class="sd">    time_tag : str, optional</span>
+<span class="sd">        ISO format time tag to associate to the message. If not provided,</span>
+<span class="sd">        the current time is used.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">time_tag</span> <span class="o">=</span> <span class="n">time_util</span><span class="o">.</span><span class="n">get_current_iso_time</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">time_tag</span><span class="p">:</span>
+        <span class="n">time_tag</span> <span class="o">=</span> <span class="n">time_util</span><span class="o">.</span><span class="n">get_current_iso_time</span><span class="p">()</span>
 
-    <span class="n">message_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">time_tag</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">severity</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">workflow</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">module</span><span class="si">}</span><span class="s1">,&#39;</span> \
+    <span class="n">message_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">time_tag</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">severity</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">workflow</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">module</span><span class="si">}</span><span class="s1">, &#39;</span> \
                   <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">error_code</span><span class="p">)</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">error_location</span><span class="si">}</span><span class="s1">, &quot;</span><span class="si">{</span><span class="n">description</span><span class="si">}</span><span class="s1">&quot;</span><span class="se">\n</span><span class="s1">&#39;</span>
 
     <span class="n">log_stream</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">message_str</span><span class="p">)</span></div>
@@ -149,7 +154,7 @@
 
 <span class="sd">    To minimize the risk of errors opening a log file, the initial log filename</span>
 <span class="sd">    does not rely on anything read from a run config file, SAS output file, etc.</span>
-<span class="sd">    Therefore this filename does not follow the file naming convention.</span>
+<span class="sd">    Therefore, this filename does not follow the file naming convention.</span>
 
 <span class="sd">    Later (elsewhere), after everything is known, the log file will be renamed.</span>
 
@@ -211,7 +216,16 @@
 <span class="sd">        The standardized severity string.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">severity</span><span class="o">.</span><span class="n">title</span><span class="p">()</span>  <span class="c1"># first char uppercase, rest lowercase.</span></div>
+    <span class="n">severity</span> <span class="o">=</span> <span class="n">severity</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">title</span><span class="p">()</span>  <span class="c1"># first char uppercase, rest lowercase.</span>
+
+    <span class="c1"># Convert some potential log level name variations</span>
+    <span class="k">if</span> <span class="n">severity</span> <span class="o">==</span> <span class="s1">&#39;Warn&#39;</span><span class="p">:</span>
+        <span class="n">severity</span> <span class="o">=</span> <span class="s1">&#39;Warning&#39;</span>
+
+    <span class="k">if</span> <span class="n">severity</span> <span class="o">==</span> <span class="s1">&#39;Error&#39;</span><span class="p">:</span>
+        <span class="n">severity</span> <span class="o">=</span> <span class="s1">&#39;Critical&#39;</span>
+
+    <span class="k">return</span> <span class="n">severity</span></div>
 
 
 <div class="viewcode-block" id="PgeLogger"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.PgeLogger">[docs]</a><span class="k">class</span> <span class="nc">PgeLogger</span><span class="p">:</span>
@@ -227,8 +241,7 @@
     <span class="n">LOGGER_CODE_BASE</span> <span class="o">=</span> <span class="mi">900000</span>
     <span class="n">QA_LOGGER_CODE_BASE</span> <span class="o">=</span> <span class="mi">800000</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workflow</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">error_code_base</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">log_filename</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workflow</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">error_code_base</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">log_filename</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructor opens the log file as a stream</span>
 
@@ -367,9 +380,8 @@
 <span class="sd">        module : str</span>
 <span class="sd">            Name of the module where the logging took place.</span>
 <span class="sd">        error_code_offset : int</span>
-<span class="sd">            Error code offset to add to the specified base to determine the</span>
-<span class="sd">            error code associated with the log message</span>
-<span class="sd">            TODO: should this be just the error code itself?</span>
+<span class="sd">            Error code offset to add to this logger&#39;s error code base value</span>
+<span class="sd">            to determine the final error code associated with the log message.</span>
 <span class="sd">        description : str</span>
 <span class="sd">            Description message to write to the log.</span>
 <span class="sd">        additional_back_frames : int, optional</span>
@@ -402,9 +414,8 @@
 <span class="sd">        module : str</span>
 <span class="sd">            Name of the module where the logging took place.</span>
 <span class="sd">        error_code_offset : int</span>
-<span class="sd">            Error code offset to add to the specified base to determine the</span>
-<span class="sd">            error code associated with the log message</span>
-<span class="sd">            TODO: should this be just the error code itself?</span>
+<span class="sd">            Error code offset to add to this logger&#39;s error code base value</span>
+<span class="sd">            to determine the final error code associated with the log message.</span>
 <span class="sd">        description : str</span>
 <span class="sd">            Description message to write to the log.</span>
 
@@ -421,9 +432,8 @@
 <span class="sd">        module : str</span>
 <span class="sd">            Name of the module where the logging took place.</span>
 <span class="sd">        error_code_offset : int</span>
-<span class="sd">            Error code offset to add to the specified base to determine the</span>
-<span class="sd">            error code associated with the log message</span>
-<span class="sd">            TODO: should this be just the error code itself?</span>
+<span class="sd">            Error code offset to add to this logger&#39;s error code base value</span>
+<span class="sd">            to determine the final error code associated with the log message.</span>
 <span class="sd">        description : str</span>
 <span class="sd">            Description message to write to the log.</span>
 
@@ -440,9 +450,8 @@
 <span class="sd">        module : str</span>
 <span class="sd">            Name of the module where the logging took place.</span>
 <span class="sd">        error_code_offset : int</span>
-<span class="sd">            Error code offset to add to the specified base to determine the</span>
-<span class="sd">            error code associated with the log message</span>
-<span class="sd">            TODO: should this be just the error code itself?</span>
+<span class="sd">            Error code offset to add to this logger&#39;s error code base value</span>
+<span class="sd">            to determine the final error code associated with the log message.</span>
 <span class="sd">        description : str</span>
 <span class="sd">            Description message to write to the log.</span>
 
@@ -464,9 +473,8 @@
 <span class="sd">        module : str</span>
 <span class="sd">            Name of the module where the logging took place.</span>
 <span class="sd">        error_code_offset : int</span>
-<span class="sd">            Error code offset to add to the specified base to determine the</span>
-<span class="sd">            error code associated with the log message</span>
-<span class="sd">            TODO: should this be just the error code itself?</span>
+<span class="sd">            Error code offset to add to this logger&#39;s error code base value</span>
+<span class="sd">            to determine the final error code associated with the log message.</span>
 <span class="sd">        description : str</span>
 <span class="sd">            Description message to write to the log.</span>
 
@@ -496,9 +504,8 @@
 <span class="sd">        module : str</span>
 <span class="sd">            Name of the module where the logging took place.</span>
 <span class="sd">        error_code_offset : int</span>
-<span class="sd">            Error code offset to add to the specified base to determine the</span>
-<span class="sd">            error code associated with the log message</span>
-<span class="sd">            TODO: should this be just the error code itself?</span>
+<span class="sd">            Error code offset to add to this logger&#39;s error code base value</span>
+<span class="sd">            to determine the final error code associated with the log message.</span>
 <span class="sd">        description : str</span>
 <span class="sd">            Description message to write to the log.</span>
 <span class="sd">        additional_back_frames : int, optional</span>
@@ -553,11 +560,89 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">isfile</span><span class="p">(</span><span class="n">source</span><span class="p">):</span>
             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">source_file_object</span><span class="p">:</span>
-                <span class="n">source_contents</span> <span class="o">=</span> <span class="n">source_file_object</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+                <span class="n">source_contents</span> <span class="o">=</span> <span class="n">source_file_object</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">source_contents</span> <span class="o">=</span> <span class="n">source</span>
+            <span class="n">source_contents</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">log_stream</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">source_contents</span><span class="p">)</span></div>
+        <span class="c1"># Parse the contents to append to see if they conform to the expected log</span>
+        <span class="c1"># formatting for OPERA</span>
+        <span class="k">for</span> <span class="n">log_line</span> <span class="ow">in</span> <span class="n">source_contents</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">parsed_line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_line</span><span class="p">(</span><span class="n">log_line</span><span class="p">)</span>
+                <span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log_stream</span><span class="p">,</span> <span class="o">*</span><span class="n">parsed_line</span><span class="p">)</span>
+                <span class="n">severity</span> <span class="o">=</span> <span class="n">parsed_line</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">increment_log_count_by_severity</span><span class="p">(</span><span class="n">severity</span><span class="p">)</span>
+            <span class="c1"># If the line does not conform to the expected formatting, just append as-is</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log_stream</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">log_line</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PgeLogger.parse_line"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.PgeLogger.parse_line">[docs]</a>    <span class="k">def</span> <span class="nf">parse_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parses the provided formatted log line into its component parts according</span>
+<span class="sd">        to the log formatting style for OPERA.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        line : str</span>
+<span class="sd">            The log line to parse</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        parsed_line : tuple</span>
+<span class="sd">            The provided log line parsed into its component parts.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If the line cannot be parsed according to the OPERA log formatting style.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">line_components</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="n">maxsplit</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">line_components</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">7</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Line does not conform to expected formatting style&#39;</span><span class="p">)</span>
+
+            <span class="c1"># Remove leading/trailing whitespace from all parsed fields</span>
+            <span class="n">line_components</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">str</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="n">line_component</span><span class="p">)</span> <span class="k">for</span> <span class="n">line_component</span> <span class="ow">in</span> <span class="n">line_components</span><span class="p">)</span>
+
+            <span class="p">(</span><span class="n">time_tag</span><span class="p">,</span>
+             <span class="n">severity</span><span class="p">,</span>
+             <span class="n">workflow</span><span class="p">,</span>
+             <span class="n">module</span><span class="p">,</span>
+             <span class="n">error_code</span><span class="p">,</span>
+             <span class="n">error_location</span><span class="p">,</span>
+             <span class="n">description</span><span class="p">)</span> <span class="o">=</span> <span class="n">line_components</span>
+
+            <span class="c1"># Convert time-tag to expected iso format</span>
+            <span class="n">time_tag</span> <span class="o">=</span> <span class="n">get_iso_time</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span><span class="n">time_tag</span><span class="p">))</span>
+
+            <span class="c1"># Standardize the error string</span>
+            <span class="n">severity</span> <span class="o">=</span> <span class="n">standardize_severity_string</span><span class="p">(</span><span class="n">severity</span><span class="p">)</span>
+
+            <span class="c1"># Remove redundant quotes from log descriptions</span>
+            <span class="n">description</span> <span class="o">=</span> <span class="n">description</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Standardize on single quotes within log descriptions</span>
+            <span class="n">description</span> <span class="o">=</span> <span class="n">description</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span> <span class="s2">&quot;&#39;&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Map the error code based on message severity</span>
+            <span class="n">error_code</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;Debug&quot;</span><span class="p">:</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">LOGGED_DEBUG_LINE</span><span class="p">,</span>
+                <span class="s2">&quot;Info&quot;</span><span class="p">:</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">LOGGED_INFO_LINE</span><span class="p">,</span>
+                <span class="s2">&quot;Warning&quot;</span><span class="p">:</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">LOGGED_WARNING_LINE</span><span class="p">,</span>
+                <span class="s2">&quot;Critical&quot;</span><span class="p">:</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">LOGGED_CRITICAL_LINE</span>
+            <span class="p">}[</span><span class="n">severity</span><span class="p">]</span>
+
+            <span class="c1"># Add the error code base</span>
+            <span class="n">error_code</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">error_code_base</span>
+
+            <span class="c1"># Return a tuple of the parsed, standardized log line</span>
+            <span class="k">return</span> <span class="n">severity</span><span class="p">,</span> <span class="n">workflow</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">error_code</span><span class="p">,</span> <span class="n">error_location</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">time_tag</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;Failed to parse log line &quot;</span><span class="si">{</span><span class="n">line</span><span class="si">}</span><span class="s1">&quot; reason: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PgeLogger.log_one_metric"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.PgeLogger.log_one_metric">[docs]</a>    <span class="k">def</span> <span class="nf">log_one_metric</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">metric_name</span><span class="p">,</span> <span class="n">metric_value</span><span class="p">,</span>
                        <span class="n">additional_back_frames</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
@@ -605,35 +690,7 @@
         <span class="c1"># Overall elapsed time</span>
         <span class="n">elapsed_time_seconds</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">monotonic</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_time</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">log_one_metric</span><span class="p">(</span><span class="n">module_name</span><span class="p">,</span> <span class="s2">&quot;overall.elapsed_seconds&quot;</span><span class="p">,</span>
-                            <span class="n">elapsed_time_seconds</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="PgeLogger.resync_log_count_by_severity"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.PgeLogger.resync_log_count_by_severity">[docs]</a>    <span class="k">def</span> <span class="nf">resync_log_count_by_severity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Resynchronizes the dictionary of log counts by severity for all log</span>
-<span class="sd">        messages in the log file, including messages logged by anything external</span>
-<span class="sd">        to the PgeLogger class, such as an external SAS invoked by a PGE wrapper.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># TODO: is this method really necessary? if the log file was kept in</span>
-        <span class="c1">#       memory, could these tallies be kept in real-time?</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">log_stream</span><span class="p">:</span>
-            <span class="k">return</span>
-
-        <span class="c1"># read the log_stream and get a count of log messages for each severity</span>
-        <span class="n">count_by_severity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_blank_log_count_by_severity_dict</span><span class="p">()</span>
-        <span class="n">csv_reader</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">log_stream</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">csv_reader</span><span class="p">:</span>
-            <span class="n">row</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
-                <span class="k">try</span><span class="p">:</span>
-                    <span class="n">severity</span> <span class="o">=</span> <span class="n">standardize_severity_string</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
-                    <span class="n">count_by_severity</span><span class="p">[</span><span class="n">severity</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
-                <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;PgeLogger&quot;</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">LOGGING_RESYNC_FAILED</span><span class="p">,</span>
-                                 <span class="s2">&quot;Unable to resync the &#39;log_count_by_severity&#39; dict.&quot;</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">log_count_by_severity</span> <span class="o">=</span> <span class="n">count_by_severity</span></div></div>
+                            <span class="n">elapsed_time_seconds</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>

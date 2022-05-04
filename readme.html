@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera-sds-pge &mdash; opera-sds-pge 1.0.0-er.3.0 documentation</title>
+  <title>opera-sds-pge &mdash; opera-sds-pge 1.0.0-er.4.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -30,7 +30,7 @@
             <a href="index.html" class="icon icon-home"> opera-sds-pge
           </a>
               <div class="version">
-                1.0.0-er.3.0
+                1.0.0-er.4.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -106,6 +106,11 @@ source venv/bin/activate</p>
 <p>Install the package and its dependencies for development into the virtual environment:</p>
 <blockquote>
 <div><p>pip install –editable ‘.[dev]’</p>
+</div></blockquote>
+<p>Some of the container build scripts expect the GNU style of common shell utilities, as opposed to the OSX versions.
+If developing on OSX, make sure you install the <cite>coreutils</cite> (via Homebrew <a class="reference external" href="https://brew.sh/">https://brew.sh/</a>), package prior to attempting a container build:</p>
+<blockquote>
+<div><p>brew install coreutils</p>
 </div></blockquote>
 </section>
 <section id="unit-tests">

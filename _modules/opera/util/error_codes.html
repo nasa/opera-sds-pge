@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera.util.error_codes &mdash; opera-sds-pge 1.0.0-er.3.0 documentation</title>
+  <title>opera.util.error_codes &mdash; opera-sds-pge 1.0.0-er.4.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -27,7 +27,7 @@
             <a href="../../../index.html" class="icon icon-home"> opera-sds-pge
           </a>
               <div class="version">
-                1.0.0-er.3.0
+                1.0.0-er.4.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -112,6 +112,7 @@
 <span class="sd">&quot;&quot;&quot;Starting value for the Critical code range&quot;&quot;&quot;</span>
 
 
+<span class="c1"># noinspection PyArgumentList</span>
 <div class="viewcode-block" id="ErrorCode"><a class="viewcode-back" href="../../../opera.util.html#opera.util.error_codes.ErrorCode">[docs]</a><span class="nd">@unique</span>
 <span class="k">class</span> <span class="nc">ErrorCode</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -149,12 +150,14 @@
     <span class="n">QA_SAS_PROGRAM_DISABLED</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
     <span class="n">RENDERING_ISO_METADATA</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
     <span class="n">CLOSING_LOG_FILE</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">LOGGED_INFO_LINE</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
 
     <span class="c1"># Debug - 1000 – 1999</span>
     <span class="n">CONFIGURATION_DETAILS</span> <span class="o">=</span> <span class="n">DEBUG_RANGE_START</span>
     <span class="n">PROCESSING_DETAILS</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
     <span class="n">SAS_EXE_COMMAND_LINE</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
     <span class="n">SAS_QA_COMMAND_LINE</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">LOGGED_DEBUG_LINE</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
 
     <span class="c1"># Warning - 2000 – 2999</span>
     <span class="n">DATE_RANGE_MISSING</span> <span class="o">=</span> <span class="n">WARNING_RANGE_START</span>
@@ -164,6 +167,7 @@
     <span class="n">LOGGING_SOURCE_FILE_DOES_NOT_EXIST</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
     <span class="n">LOGGING_COULD_NOT_INCREMENT_SEVERITY</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
     <span class="n">LOGGING_RESYNC_FAILED</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">LOGGED_WARNING_LINE</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
 
     <span class="c1"># Critical - 3000 to 3999</span>
     <span class="n">RUN_CONFIG_VALIDATION_FAILED</span> <span class="o">=</span> <span class="n">CRITICAL_RANGE_START</span>
@@ -186,6 +190,7 @@
     <span class="n">ISO_METADATA_GOT_SOME_RENDERING_ERRORS</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
     <span class="n">ISO_METADATA_RENDER_FAILED</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
     <span class="n">SAS_OUTPUT_FILE_HAS_MISSING_DATA</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">LOGGED_CRITICAL_LINE</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
 
 <div class="viewcode-block" id="ErrorCode.describe"><a class="viewcode-back" href="../../../opera.util.html#opera.util.error_codes.ErrorCode.describe">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">describe</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>

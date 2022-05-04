@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Index &mdash; opera-sds-pge 1.0.0-er.3.0 documentation</title>
+  <title>Index &mdash; opera-sds-pge 1.0.0-er.4.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -27,7 +27,7 @@
             <a href="index.html" class="icon icon-home"> opera-sds-pge
           </a>
               <div class="version">
-                1.0.0-er.3.0
+                1.0.0-er.4.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -331,11 +331,19 @@
 </li>
       <li><a href="opera.util.html#opera.util.error_codes.ErrorCode.LOG_FILE_CREATION_FAILED">LOG_FILE_CREATION_FAILED (opera.util.error_codes.ErrorCode attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="opera.util.html#opera.util.error_codes.ErrorCode.LOG_FILE_INIT_COMPLETE">LOG_FILE_INIT_COMPLETE (opera.util.error_codes.ErrorCode attribute)</a>
 </li>
       <li><a href="opera.util.html#opera.util.logger.PgeLogger.log_one_metric">log_one_metric() (opera.util.logger.PgeLogger method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="opera.util.html#opera.util.error_codes.ErrorCode.LOGGED_CRITICAL_LINE">LOGGED_CRITICAL_LINE (opera.util.error_codes.ErrorCode attribute)</a>
+</li>
+      <li><a href="opera.util.html#opera.util.error_codes.ErrorCode.LOGGED_DEBUG_LINE">LOGGED_DEBUG_LINE (opera.util.error_codes.ErrorCode attribute)</a>
+</li>
+      <li><a href="opera.util.html#opera.util.error_codes.ErrorCode.LOGGED_INFO_LINE">LOGGED_INFO_LINE (opera.util.error_codes.ErrorCode attribute)</a>
+</li>
+      <li><a href="opera.util.html#opera.util.error_codes.ErrorCode.LOGGED_WARNING_LINE">LOGGED_WARNING_LINE (opera.util.error_codes.ErrorCode attribute)</a>
 </li>
       <li><a href="opera.util.html#opera.util.logger.PgeLogger.LOGGER_CODE_BASE">LOGGER_CODE_BASE (opera.util.logger.PgeLogger attribute)</a>
 </li>
@@ -503,6 +511,8 @@
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="opera.util.html#opera.util.logger.PgeLogger.parse_line">parse_line() (opera.util.logger.PgeLogger method)</a>
+</li>
       <li><a href="opera.pge.html#opera.pge.runconfig.RunConfig.pge_name">pge_name (opera.pge.runconfig.RunConfig property)</a>
 </li>
       <li><a href="opera.util.html#opera.util.error_codes.ErrorCode.PGE_NAME">PGE_NAME (opera.util.error_codes.ErrorCode attribute)</a>
@@ -561,22 +571,20 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="opera.util.html#opera.util.error_codes.ErrorCode.RENDERING_ISO_METADATA">RENDERING_ISO_METADATA (opera.util.error_codes.ErrorCode attribute)</a>
 </li>
-      <li><a href="opera.util.html#opera.util.logger.PgeLogger.resync_log_count_by_severity">resync_log_count_by_severity() (opera.util.logger.PgeLogger method)</a>
-</li>
       <li><a href="opera.pge.html#opera.pge.base_pge.PgeExecutor.run">run() (opera.pge.base_pge.PgeExecutor method)</a>
 </li>
       <li><a href="opera.util.html#opera.util.error_codes.ErrorCode.RUN_CONFIG_FILENAME">RUN_CONFIG_FILENAME (opera.util.error_codes.ErrorCode attribute)</a>
 </li>
       <li><a href="opera.util.html#opera.util.error_codes.ErrorCode.RUN_CONFIG_VALIDATION_FAILED">RUN_CONFIG_VALIDATION_FAILED (opera.util.error_codes.ErrorCode attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="opera.pge.html#opera.pge.base_pge.PostProcessorMixin.run_postprocessor">run_postprocessor() (opera.pge.base_pge.PostProcessorMixin method)</a>
 
       <ul>
         <li><a href="opera.pge.html#opera.pge.dswx_pge.DSWxPostProcessorMixin.run_postprocessor">(opera.pge.dswx_pge.DSWxPostProcessorMixin method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="opera.pge.html#opera.pge.base_pge.PreProcessorMixin.run_preprocessor">run_preprocessor() (opera.pge.base_pge.PreProcessorMixin method)</a>
 
       <ul>
@@ -599,8 +607,6 @@
 </li>
       <li><a href="opera.util.html#opera.util.error_codes.ErrorCode.SAS_EXE_COMMAND_LINE">SAS_EXE_COMMAND_LINE (opera.util.error_codes.ErrorCode attribute)</a>
 </li>
-      <li><a href="opera.pge.html#opera.pge.runconfig.RunConfig.sas_output_file">sas_output_file (opera.pge.runconfig.RunConfig property)</a>
-</li>
       <li><a href="opera.util.html#opera.util.error_codes.ErrorCode.SAS_OUTPUT_FILE_HAS_MISSING_DATA">SAS_OUTPUT_FILE_HAS_MISSING_DATA (opera.util.error_codes.ErrorCode attribute)</a>
 </li>
       <li><a href="opera.util.html#opera.util.error_codes.ErrorCode.SAS_PROGRAM_COMPLETED">SAS_PROGRAM_COMPLETED (opera.util.error_codes.ErrorCode attribute)</a>
@@ -611,10 +617,10 @@
 </li>
       <li><a href="opera.pge.html#opera.pge.runconfig.RunConfig.sas_program_options">sas_program_options (opera.pge.runconfig.RunConfig property)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="opera.pge.html#opera.pge.runconfig.RunConfig.sas_program_path">sas_program_path (opera.pge.runconfig.RunConfig property)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="opera.util.html#opera.util.error_codes.ErrorCode.SAS_PROGRAM_STARTING">SAS_PROGRAM_STARTING (opera.util.error_codes.ErrorCode attribute)</a>
 </li>
       <li><a href="opera.util.html#opera.util.error_codes.ErrorCode.SAS_QA_COMMAND_LINE">SAS_QA_COMMAND_LINE (opera.util.error_codes.ErrorCode attribute)</a>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera.util.usage_metrics &mdash; opera-sds-pge 1.0.0-er.3.0 documentation</title>
+  <title>opera.util.usage_metrics &mdash; opera-sds-pge 1.0.0-er.4.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -27,7 +27,7 @@
             <a href="../../../index.html" class="icon icon-home"> opera-sds-pge
           </a>
               <div class="version">
-                1.0.0-er.3.0
+                1.0.0-er.4.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -156,7 +156,7 @@
     <span class="k">return</span> <span class="n">metrics</span></div>
 
 
-<div class="viewcode-block" id="get_self_peak_vmm_kb"><a class="viewcode-back" href="../../../opera.util.html#opera.util.usage_metrics.get_self_peak_vmm_kb">[docs]</a><span class="k">def</span> <span class="nf">get_self_peak_vmm_kb</span><span class="p">():</span>
+<div class="viewcode-block" id="get_self_peak_vmm_kb"><a class="viewcode-back" href="../../../opera.util.html#opera.util.usage_metrics.get_self_peak_vmm_kb">[docs]</a><span class="k">def</span> <span class="nf">get_self_peak_vmm_kb</span><span class="p">():</span>  <span class="c1"># pylint: disable=missing-raises-doc</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Attempt to get the peak virtual memory by looking into the /proc/self/status</span>
 
@@ -175,7 +175,7 @@
     <span class="n">status_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="s1">&#39;proc&#39;</span><span class="p">,</span> <span class="s1">&#39;self&#39;</span><span class="p">,</span> <span class="s1">&#39;status&#39;</span><span class="p">)</span>
 
     <span class="k">try</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">platform</span> <span class="o">!=</span> <span class="s2">&quot;linux&quot;</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">status_file</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">platform</span> <span class="o">!=</span> <span class="s2">&quot;linux&quot;</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">status_file</span><span class="p">):</span>  <span class="c1"># pragma no cover</span>
             <span class="k">raise</span> <span class="ne">EnvironmentError</span>
 
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">status_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">infile</span><span class="p">:</span>  <span class="c1"># pragma no cover</span>

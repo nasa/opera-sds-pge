@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera.util package &mdash; opera-sds-pge 1.0.0-er.3.0 documentation</title>
+  <title>opera.util package &mdash; opera-sds-pge 1.0.0-er.4.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -30,7 +30,7 @@
             <a href="index.html" class="icon icon-home"> opera-sds-pge
           </a>
               <div class="version">
-                1.0.0-er.3.0
+                1.0.0-er.4.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -234,6 +234,26 @@ the RunConfig to determine the final, logged error code.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode.LOADING_RUN_CONFIG_FILE">
 <span class="sig-name descname"><span class="pre">LOADING_RUN_CONFIG_FILE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.LOADING_RUN_CONFIG_FILE" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode.LOGGED_CRITICAL_LINE">
+<span class="sig-name descname"><span class="pre">LOGGED_CRITICAL_LINE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3020</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.LOGGED_CRITICAL_LINE" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode.LOGGED_DEBUG_LINE">
+<span class="sig-name descname"><span class="pre">LOGGED_DEBUG_LINE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1004</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.LOGGED_DEBUG_LINE" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode.LOGGED_INFO_LINE">
+<span class="sig-name descname"><span class="pre">LOGGED_INFO_LINE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">27</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.LOGGED_INFO_LINE" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode.LOGGED_WARNING_LINE">
+<span class="sig-name descname"><span class="pre">LOGGED_WARNING_LINE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2007</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.LOGGED_WARNING_LINE" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -493,9 +513,8 @@ finalized before the exception is raised.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>module</strong> (<em>str</em>) – Name of the module where the logging took place.</p></li>
-<li><p><strong>error_code_offset</strong> (<em>int</em>) – Error code offset to add to the specified base to determine the
-error code associated with the log message
-TODO: should this be just the error code itself?</p></li>
+<li><p><strong>error_code_offset</strong> (<em>int</em>) – Error code offset to add to this logger’s error code base value
+to determine the final error code associated with the log message.</p></li>
 <li><p><strong>description</strong> (<em>str</em>) – Description message to write to the log.</p></li>
 </ul>
 </dd>
@@ -514,9 +533,8 @@ TODO: should this be just the error code itself?</p></li>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>module</strong> (<em>str</em>) – Name of the module where the logging took place.</p></li>
-<li><p><strong>error_code_offset</strong> (<em>int</em>) – Error code offset to add to the specified base to determine the
-error code associated with the log message
-TODO: should this be just the error code itself?</p></li>
+<li><p><strong>error_code_offset</strong> (<em>int</em>) – Error code offset to add to this logger’s error code base value
+to determine the final error code associated with the log message.</p></li>
 <li><p><strong>description</strong> (<em>str</em>) – Description message to write to the log.</p></li>
 </ul>
 </dd>
@@ -597,9 +615,8 @@ info, debug, warning, critical (case-insensitive).</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>module</strong> (<em>str</em>) – Name of the module where the logging took place.</p></li>
-<li><p><strong>error_code_offset</strong> (<em>int</em>) – Error code offset to add to the specified base to determine the
-error code associated with the log message
-TODO: should this be just the error code itself?</p></li>
+<li><p><strong>error_code_offset</strong> (<em>int</em>) – Error code offset to add to this logger’s error code base value
+to determine the final error code associated with the log message.</p></li>
 <li><p><strong>description</strong> (<em>str</em>) – Description message to write to the log.</p></li>
 </ul>
 </dd>
@@ -616,9 +633,8 @@ the provided error code offset.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>module</strong> (<em>str</em>) – Name of the module where the logging took place.</p></li>
-<li><p><strong>error_code_offset</strong> (<em>int</em>) – Error code offset to add to the specified base to determine the
-error code associated with the log message
-TODO: should this be just the error code itself?</p></li>
+<li><p><strong>error_code_offset</strong> (<em>int</em>) – Error code offset to add to this logger’s error code base value
+to determine the final error code associated with the log message.</p></li>
 <li><p><strong>description</strong> (<em>str</em>) – Description message to write to the log.</p></li>
 <li><p><strong>additional_back_frames</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of call-stack frames to “back up” to in order to determine
 the calling function and line number.</p></li>
@@ -657,11 +673,24 @@ and needs to be assigned a name that meets the PGE file naming conventions.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="opera.util.logger.PgeLogger.resync_log_count_by_severity">
-<span class="sig-name descname"><span class="pre">resync_log_count_by_severity</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/opera/util/logger.html#PgeLogger.resync_log_count_by_severity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opera.util.logger.PgeLogger.resync_log_count_by_severity" title="Permalink to this definition"></a></dt>
-<dd><p>Resynchronizes the dictionary of log counts by severity for all log
-messages in the log file, including messages logged by anything external
-to the PgeLogger class, such as an external SAS invoked by a PGE wrapper.</p>
+<dt class="sig sig-object py" id="opera.util.logger.PgeLogger.parse_line">
+<span class="sig-name descname"><span class="pre">parse_line</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">line</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/opera/util/logger.html#PgeLogger.parse_line"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opera.util.logger.PgeLogger.parse_line" title="Permalink to this definition"></a></dt>
+<dd><p>Parses the provided formatted log line into its component parts according
+to the log formatting style for OPERA.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>line</strong> (<em>str</em>) – The log line to parse</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>parsed_line</strong> – The provided log line parsed into its component parts.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the line cannot be parsed according to the OPERA log formatting style.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -672,9 +701,8 @@ to the PgeLogger class, such as an external SAS invoked by a PGE wrapper.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>module</strong> (<em>str</em>) – Name of the module where the logging took place.</p></li>
-<li><p><strong>error_code_offset</strong> (<em>int</em>) – Error code offset to add to the specified base to determine the
-error code associated with the log message
-TODO: should this be just the error code itself?</p></li>
+<li><p><strong>error_code_offset</strong> (<em>int</em>) – Error code offset to add to this logger’s error code base value
+to determine the final error code associated with the log message.</p></li>
 <li><p><strong>description</strong> (<em>str</em>) – Description message to write to the log.</p></li>
 </ul>
 </dd>
@@ -697,9 +725,8 @@ TODO: should this be just the error code itself?</p></li>
 <li><p><strong>severity</strong> (<em>str</em>) – The severity level to log at. Should be one of info, debug, warning,
 critical (case-insensitive).</p></li>
 <li><p><strong>module</strong> (<em>str</em>) – Name of the module where the logging took place.</p></li>
-<li><p><strong>error_code_offset</strong> (<em>int</em>) – Error code offset to add to the specified base to determine the
-error code associated with the log message
-TODO: should this be just the error code itself?</p></li>
+<li><p><strong>error_code_offset</strong> (<em>int</em>) – Error code offset to add to this logger’s error code base value
+to determine the final error code associated with the log message.</p></li>
 <li><p><strong>description</strong> (<em>str</em>) – Description message to write to the log.</p></li>
 <li><p><strong>additional_back_frames</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of call-stack frames to “back up” to in order to determine
 the calling function and line number.</p></li>
@@ -724,7 +751,7 @@ and total elapsed run time (since logger creation).</p>
 <dd><p>Returns a path + filename that can be used for the log file right away.</p>
 <p>To minimize the risk of errors opening a log file, the initial log filename
 does not rely on anything read from a run config file, SAS output file, etc.
-Therefore this filename does not follow the file naming convention.</p>
+Therefore, this filename does not follow the file naming convention.</p>
 <p>Later (elsewhere), after everything is known, the log file will be renamed.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -773,7 +800,7 @@ provided error code.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="opera.util.logger.write">
-<span class="sig-prename descclassname"><span class="pre">opera.util.logger.</span></span><span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log_stream</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">severity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workflow</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_code</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_location</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/opera/util/logger.html#write"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opera.util.logger.write" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">opera.util.logger.</span></span><span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log_stream</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">severity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workflow</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_code</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_location</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_tag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/opera/util/logger.html#write"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opera.util.logger.write" title="Permalink to this definition"></a></dt>
 <dd><p>Low-level logging function. May be called directly in lieu of PgeLogger class.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -785,6 +812,8 @@ provided error code.</p>
 <li><p><strong>error_code</strong> (<em>int</em><em> or </em><a class="reference internal" href="#opera.util.error_codes.ErrorCode" title="opera.util.error_codes.ErrorCode"><em>ErrorCode</em></a>) – The error code associated with the logged message.</p></li>
 <li><p><strong>error_location</strong> (<em>str</em>) – File name and line number where the logging took place.</p></li>
 <li><p><strong>description</strong> (<em>str</em>) – Description of the logged event.</p></li>
+<li><p><strong>time_tag</strong> (<em>str</em><em>, </em><em>optional</em>) – ISO format time tag to associate to the message. If not provided,
+the current time is used.</p></li>
 </ul>
 </dd>
 </dl>
