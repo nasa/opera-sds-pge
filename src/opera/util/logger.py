@@ -531,7 +531,7 @@ class PgeLogger:
                 raise ValueError('Line does not conform to expected formatting style')
 
             # Remove leading/trailing whitespace from all parsed fields
-            line_components = tuple(map(str.strip, line_components))
+            line_components = tuple(str.strip(line_component) for line_component in line_components)
 
             (time_tag,
              severity,

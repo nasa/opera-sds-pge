@@ -39,6 +39,7 @@ class MockGdal:  # pragma: no cover
 
     """
 
+    # pylint: disable=all
     class MockGdalDataset:
         """Mock class for gdal.Dataset objects, as returned from an Open call."""
 

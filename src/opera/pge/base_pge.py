@@ -162,7 +162,7 @@ class PreProcessorMixin:
         self.logger.info(self.name, ErrorCode.LOG_FILE_INIT_COMPLETE,
                          'Log file configuration complete')
 
-    def run_preprocessor(self, **kwargs):
+    def run_preprocessor(self, **kwargs):  # pylint: disable=unused-argument
         """
         Executes the pre-processing steps for PGE initialization.
 
@@ -292,7 +292,7 @@ class PostProcessorMixin:
 
         return MetFile(catalog_metadata)
 
-    def _create_iso_metadata(self):
+    def _create_iso_metadata(self):  # pylint: disable=no-self-use
         """
         Creates the ISO metadata utilized by the DAAC's for indexing output
         products submitted by OPERA. Inheritors of PostProcessorMixin must
@@ -320,7 +320,7 @@ class PostProcessorMixin:
                     f"Closing log file {logger.get_file_name()}")
         logger.close_log_stream()
 
-    def _core_filename(self, inter_filename=None):
+    def _core_filename(self, inter_filename=None):  # pylint: disable=unused-argument
         """
         Returns the core file name component for products produced by the
         Base PGE. This function should typically be overridden by inheritors
@@ -570,7 +570,7 @@ class PostProcessorMixin:
             # Log stream might be closed by this point so raise an Exception instead
             raise RuntimeError(msg)
 
-    def run_postprocessor(self, **kwargs):
+    def run_postprocessor(self, **kwargs):  # pylint: disable=unused-argument
         """
         Executes the post-processing steps for PGE job completion.
 
@@ -679,7 +679,7 @@ class PgeExecutor(PreProcessorMixin, PostProcessorMixin):
 
         return sas_runconfig_filepath
 
-    def run_sas_executable(self, **kwargs):
+    def run_sas_executable(self, **kwargs):  # pylint: disable=unused-argument
         """
         Kicks off a SAS executable as defined by the RunConfig provided to
         the PGE.

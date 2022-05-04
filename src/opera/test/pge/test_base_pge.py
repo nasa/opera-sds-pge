@@ -37,7 +37,6 @@ import yaml
 import opera
 from opera.pge import PgeExecutor, RunConfig
 from opera.util import PgeLogger
-from opera.util import run_utils
 
 
 class BasePgeTestCase(unittest.TestCase):

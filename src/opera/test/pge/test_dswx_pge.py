@@ -239,7 +239,6 @@ class DSWxPgeTestCase(unittest.TestCase):
         with open(runconfig_path, 'r', encoding='utf-8') as stream:
             runconfig_dict = yaml.safe_load(stream)
 
-        product_path_group = runconfig_dict['RunConfig']['Groups']['PGE']['ProductPathGroup']
         primary_executable_group = runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']
 
         # Test with a SAS command that does not produce any output file,
@@ -265,7 +264,7 @@ class DSWxPgeTestCase(unittest.TestCase):
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
 
-            self.assertIn(f"No SAS output file(s) containing product ID dswx_hls",
+            self.assertIn("No SAS output file(s) containing product ID dswx_hls",
                           log_contents)
 
             # Test with a SAS command that produces the expected output file, but

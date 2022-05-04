@@ -62,6 +62,7 @@ def _make_undefined_handler_class(logger: PgeLogger):
         undef : object
 
         """
+        # pylint: disable=protected-access
         msg = f"Missing/undefined ISO metadata template variable: {undef._undefined_message}"
         logger.log("render_jinja2", ErrorCode.ISO_METADATA_CANT_RENDER_ONE_VARIABLE, msg)
 
@@ -124,10 +125,9 @@ def render_jinja2(template_filename: str, input_data: dict, logger: PgeLogger = 
 
     template_loader = jinja2.FileSystemLoader(searchpath=template_directory)
 
-    if logger is not None:
-        undefined_handler_class = _make_undefined_handler_class(logger)
-    else:
-        undefined_handler_class = jinja2.Undefined
+    undefined_handler_class = (_make_undefined_handler_class(logger)
+                               if logger is not None
+                               else jinja2.Undefined)
 
     template_env = jinja2.Environment(loader=template_loader,
                                       autoescape=jinja2.select_autoescape(),
