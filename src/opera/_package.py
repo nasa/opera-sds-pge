@@ -8,7 +8,7 @@ _package.py
 Package information for the OPERA PGE repository.
 """
 
-__version__ = "1.0.0-er.4.0"
+__version__ = "1.0.0-er.4.1"
 __title__ = "opera-sds-pge"
 __summary__ = "OPERA SDS Product Generation Executable (PGE) Repository"
 __uri__ = "https://github.com/nasa/opera-sds-pge"
