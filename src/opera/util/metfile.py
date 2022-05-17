@@ -1,9 +1,9 @@
-#
+#!/usr/bin/env python3
 
 """
-=========
+==========
 metfile.py
-=========
+==========
 
 Creates .met file for the OPERA PGEs.
 
