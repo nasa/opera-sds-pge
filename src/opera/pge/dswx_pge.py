@@ -242,8 +242,10 @@ class DSWxPostProcessorMixin(PostProcessorMixin):
 
         for output_product in output_products:
             if get_extension(output_product) in self.rename_by_extension_map:
-                representative_product = output_product
-                break
+                # TODO: kludge for avoiding output products that are missing expected metadata
+                if get_geotiff_hls_dataset(output_product) is not None:
+                    representative_product = output_product
+                    break
         else:
             msg = (f"Could not find sample output product to derive metadata from "
                    f"within {self.runconfig.output_product_path}")
