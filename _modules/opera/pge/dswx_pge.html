@@ -315,8 +315,10 @@
 
         <span class="k">for</span> <span class="n">output_product</span> <span class="ow">in</span> <span class="n">output_products</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">get_extension</span><span class="p">(</span><span class="n">output_product</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">rename_by_extension_map</span><span class="p">:</span>
-                <span class="n">representative_product</span> <span class="o">=</span> <span class="n">output_product</span>
-                <span class="k">break</span>
+                <span class="c1"># TODO: kludge for avoiding output products that are missing expected metadata</span>
+                <span class="k">if</span> <span class="n">get_geotiff_hls_dataset</span><span class="p">(</span><span class="n">output_product</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">representative_product</span> <span class="o">=</span> <span class="n">output_product</span>
+                    <span class="k">break</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not find sample output product to derive metadata from &quot;</span>
                    <span class="sa">f</span><span class="s2">&quot;within </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">output_product_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
