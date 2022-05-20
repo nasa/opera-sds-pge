@@ -101,7 +101,6 @@ class DSWxPostProcessorMixin(PostProcessorMixin):
 
     _post_mixin_name = "DSWxPostProcessorMixin"
     _cached_core_filename = None
-    _representative_product = None
 
     def _validate_output(self):
         """
@@ -130,24 +129,6 @@ class DSWxPostProcessorMixin(PostProcessorMixin):
                 error_msg = f"SAS output file {output_product} was created, but is empty"
 
                 self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
-
-        # All output products should have identical sets of metadata and contain
-        # the required elements to determine the core filename.
-        for output_product in output_products:
-            try:
-                if get_extension(output_product) in self.rename_by_extension_map:
-                    self._core_filename(output_product)
-                    # This seems to be a good sample product to get metadata from.
-                    self._representative_product = output_product
-                    break
-            except:
-                msg = f"Unable to get core filename for {output_product}"
-                self.logger.info(self.name, ErrorCode.INVALID_OUTPUT, msg)
-                pass
-        if not self._cached_core_filename:
-            error_msg = f"No SAS output with sufficient metadata to determine core filename " \
-                        f"found within {self.runconfig.output_product_path}"
-            self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
 
     def _core_filename(self, inter_filename=None):
         """
@@ -256,14 +237,27 @@ class DSWxPostProcessorMixin(PostProcessorMixin):
             for use with the ISO metadata Jinja2 template.
 
         """
+        # Find a single representative output DSWx-HLS product, they should all
+        # have identical sets of metadata
+        output_products = self.runconfig.get_output_product_filenames()
+        representative_product = None
+
+        for output_product in output_products:
+            if get_extension(output_product) in self.rename_by_extension_map:
+                representative_product = output_product
+                break
+        else:
+            msg = (f"Could not find sample output product to derive metadata from "
+                   f"within {self.runconfig.output_product_path}")
+            self.logger.critical(self.name, ErrorCode.ISO_METADATA_RENDER_FAILED, msg)
 
         # Extract all metadata assigned by the SAS at product creation time
-        output_product_metadata = get_geotiff_metadata(self._representative_product)
+        output_product_metadata = get_geotiff_metadata(representative_product)
 
         # Get the Military Grid Reference System (MGRS) tile code and zone identifier
         # from the name of the input HLS dataset
         hls_fields = get_hls_filename_fields(
-            get_geotiff_hls_dataset(self._representative_product)
+            get_geotiff_hls_dataset(representative_product)
         )
 
         output_product_metadata['tileCode'] = hls_fields['tile_id']
