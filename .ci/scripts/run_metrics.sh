@@ -1,3 +1,7 @@
+#!/bin/bash
+
+# run_metrics()
+# {
 # Run a PGE from the test data directory (where the runconfig XML is) with different ProcessingThreads values
 #
 # This script wraps a "docker run" command with metrics_collection_start() and
@@ -12,56 +16,43 @@
 # If there is a ProcessingThreads entry in the run config, it will be adjusted for each loop iteration.
 # If there is not a ProcessingThreads, then the sed command will not modify the run config.
 
+echo "hello"
+
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 . "${SCRIPT_DIR}"/util.sh
 
-PGE=$1
-RC=$2
-shift 2
+PGE=$1   # pge
+RC=$2    # runconfig file
+# shift 2
+
+# Temporary runconfig
+RC="/home/conda/runconfig/dswx_hls_sample_runconfig-v1.0.0-er.4.1.yaml"
 
 echo "$PGE"
 echo "$RC"
 
-container_name="${ghrVersion}.${PGE}.${RC}"
-metrics_collection_start "$container_name"
+# container_name="${ghrVersion}.${PGE}.${RC}"
 
-docker run --rm --name "${container_name}" -u ${UID} -v "$(pwd)":/pge/run -w /pge/run pge/"${PGE}":"${ghrVersion}" /pge/run/"${RC}"
+container_name="$PGE"
+#
+metrics_collection_start "$container_name"
+#
+echo "Running pge $PGE using run config $RC"
+#
+# docker run --rm --name "${container_name}" -u ${UID} -v "$(pwd)":/pge/run -w /pge/run pge/"${PGE}":"${ghrVersion}" /pge/run/"${RC}"
+echo "Starting docker"
+docker run --rm --name "${container_name}" -u $UID:$(id -g)\
+  -v /Users/jehofman/Documents/OPERA/docker_latest/DSWX/delivery_2.1_mid_may/l30_greenland/runconfig:/home/conda/runconfig:ro \
+  -v /Users/jehofman/Documents/OPERA/docker_latest/DSWX/delivery_2.1_mid_may/l30_greenland/input_dir:/home/conda/input_dir:ro \
+  -v /Users/jehofman/Documents/OPERA/docker_latest/DSWX/delivery_2.1_mid_may/l30_greenland/output_dir:/home/conda/output_dir \
+  -i --tty opera_pge/dswx_hls:jehofman-dev \
+   --file /home/conda/runconfig/dswx_hls_sample_runconfig-v1.0.0-er.4.1.yaml
+   #  --file ${RC}
+#
 docker_run_exit_code=$?
 echo "docker run exited with code $docker_run_exit_code"
-
+#
 metrics_collection_end "$container_name" $docker_run_exit_code "$PGE" "$RC"
 
-
-
-
-container_name="abc"
-metrics_collection_start "$container_name"
-
-exit 0
-
-
-#
-#for npt in "$@"
-#do
-#    # clean up any disk space that may have been used by a prior run
-#    rm -rf output/
-#    rm -rf scratch/
-#
-#    # modify the runconfig to set the processors value
-#    sed -i "s/ProcessingThreads=\"[0-9]*\"/ProcessingThreads=\"$npt\"/g" "${RC}"
-#
-#    # do the thing
-#    echo "Running pge $PGE using run config $RC"
-#    NPT=$(grep ProcessingThreads "$RC")
-#    echo "$NPT"
-#
-#    container_name="${ghrVersion}.${PGE}.${RC}"
-#    metrics_collection_start "$container_name"
-#
-#    docker run --rm --name "${container_name}" -u ${UID} -v "$(pwd)":/pge/run -w /pge/run pge/"${PGE}":"${ghrVersion}" /pge/run/"${RC}"
-#    docker_run_exit_code=$?
-#    echo "docker run exited with code $docker_run_exit_code"
-#
-#    metrics_collection_end "$container_name" $docker_run_exit_code "$PGE" "$RC"
-#done
+# }
