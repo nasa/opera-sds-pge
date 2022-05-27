@@ -1,58 +1,47 @@
 #!/bin/bash
 
 # run_metrics()
-# {
-# Run a PGE from the test data directory (where the runconfig XML is) with different ProcessingThreads values
 #
 # This script wraps a "docker run" command with metrics_collection_start() and
-# metrics_collection_end() function calls.  See swot_pge/.ci/util.sh for details.
+# metrics_collection_end() function calls.
 #
 # usage:
-#     run_metrics_series.sh <pge> <run config> <processing threads list, e.g. 8 16 32 48 96>
+#     run_metrics_series.sh <pge> <run config_fn> (file name only) <data_dir> (full path)
 #
-# example:
+# example: NOT IMPLEMENTED
 #     run_metrics_series.sh l1b_hr_slc l1bhrslc.rc.xml 64 32 16 8 4 2 1bash
 #
-# If there is a ProcessingThreads entry in the run config, it will be adjusted for each loop iteration.
-# If there is not a ProcessingThreads, then the sed command will not modify the run config.
-
-echo "hello"
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 . "${SCRIPT_DIR}"/util.sh
 
-PGE=$1   # pge
-RC=$2    # runconfig file
-# shift 2
+PGE=$1          # pge to run in docker
+RUNCONFIG=$2    # runconfig file name (not full path)
+DATA_DIR=$3     # data directory for input and output to the docker run command
 
-# Temporary runconfig
-RC="/home/conda/runconfig/dswx_hls_sample_runconfig-v1.0.0-er.4.1.yaml"
-
-echo "$PGE"
-echo "$RC"
-
-# container_name="${ghrVersion}.${PGE}.${RC}"
+# will add the docker tag in a future version
+# container_name="${pge_docker_tag}.${PGE}.${RUNCONFIG}"
 
 container_name="$PGE"
-#
-metrics_collection_start "$container_name"
-#
-echo "Running pge $PGE using run config $RC"
-#
-# docker run --rm --name "${container_name}" -u ${UID} -v "$(pwd)":/pge/run -w /pge/run pge/"${PGE}":"${ghrVersion}" /pge/run/"${RC}"
-echo "Starting docker"
-docker run --rm --name "${container_name}" -u $UID:$(id -g)\
-  -v /Users/jehofman/Documents/OPERA/docker_latest/DSWX/delivery_2.1_mid_may/l30_greenland/runconfig:/home/conda/runconfig:ro \
-  -v /Users/jehofman/Documents/OPERA/docker_latest/DSWX/delivery_2.1_mid_may/l30_greenland/input_dir:/home/conda/input_dir:ro \
-  -v /Users/jehofman/Documents/OPERA/docker_latest/DSWX/delivery_2.1_mid_may/l30_greenland/output_dir:/home/conda/output_dir \
-  -i --tty opera_pge/dswx_hls:jehofman-dev \
-   --file /home/conda/runconfig/dswx_hls_sample_runconfig-v1.0.0-er.4.1.yaml
-   #  --file ${RC}
-#
-docker_run_exit_code=$?
-echo "docker run exited with code $docker_run_exit_code"
-#
-metrics_collection_end "$container_name" $docker_run_exit_code "$PGE" "$RC"
 
-# }
+metrics_collection_start "$container_name"
+
+echo "Running pge '$PGE' using run config '$RUNCONFIG'"
+echo "Sending 'docker run' command"
+
+# Set variables to use in 'docker run' command
+data_set_dir=$DATA_DIR
+image_name="opera_pge/dswx_hls:jehofman-dev"
+
+docker run --rm --name "${container_name}" -u $UID:$(id -g)\
+  -v ${data_set_dir}/runconfig:/home/conda/runconfig:ro \
+  -v ${data_set_dir}/input_dir:/home/conda/input_dir:ro \
+  -v ${data_set_dir}/output_dir:/home/conda/output_dir \
+  -i --tty ${image_name} \
+  --file /home/conda/runconfig/${RUNCONFIG}
+
+docker_run_exit_code=$?
+echo "Docker run exited with code $docker_run_exit_code"
+
+metrics_collection_end "$container_name" $docker_run_exit_code "$PGE" "$RUNCONFIG"
