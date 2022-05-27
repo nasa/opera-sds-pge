@@ -1,4 +1,5 @@
-#
+#!/usr/bin/env python3
+
 """
 ================
 render_jinja2.py
@@ -9,6 +10,7 @@ Helper function(s) to render a Jinja2-based template.
 Original Author: David White
 Adapted by: Jim Hofman
 """
+
 import os
 
 import jinja2

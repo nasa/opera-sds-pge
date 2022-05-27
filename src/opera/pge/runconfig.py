@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-#
-#
+
 
 """
 ============
@@ -360,8 +359,8 @@ class RunConfig:
 
     def get_output_product_filenames(self):
         """
-        Returns a list of all product file paths currently written to the output
-        location specified by the RunConfig. Note that only top-level files
+        Returns a sorted list of all product file paths currently written to the
+        output location specified by the RunConfig. Note that only top-level files
         are returned, this function does not recurse into any directories
         encountered.
 
@@ -371,4 +370,4 @@ class RunConfig:
                            for filename in os.listdir(output_product_path)
                            if isfile(join(output_product_path, filename))]
 
-        return output_products
+        return sorted(output_products)

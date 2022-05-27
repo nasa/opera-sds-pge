@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#
+
 # Original Author: David White
 # Adapted By: Jim Hofman
 
