@@ -11,7 +11,8 @@ Module defining the implementation for the Dynamic Surface Water Extent (DSWx) P
 
 import glob
 import os.path
-from os.path import abspath, exists, isdir, join, splitext
+from collections import OrderedDict
+from os.path import abspath, basename, exists, isdir, join, splitext
 
 from opera.util.error_codes import ErrorCode
 from opera.util.img_utils import get_geotiff_hls_dataset
@@ -19,7 +20,6 @@ from opera.util.img_utils import get_geotiff_metadata
 from opera.util.img_utils import get_geotiff_spacecraft_name
 from opera.util.img_utils import get_hls_filename_fields
 from opera.util.render_jinja2 import render_jinja2
-from opera.util.run_utils import get_extension
 
 from .base_pge import PgeExecutor
 from .base_pge import PostProcessorMixin
@@ -241,7 +241,7 @@ class DSWxPostProcessorMixin(PostProcessorMixin):
         representative_product = None
 
         for output_product in output_products:
-            if get_extension(output_product) in self.rename_by_extension_map:
+            if basename(output_product) in self.renamed_files.values():
                 # TODO: kludge for avoiding output products that are missing expected metadata
                 if get_geotiff_hls_dataset(output_product) is not None:
                     representative_product = output_product
@@ -384,3 +384,12 @@ class DSWxExecutor(DSWxPreProcessorMixin, DSWxPostProcessorMixin, PgeExecutor):
 
     SAS_VERSION = "0.1"
     """Version of the SAS wrapped by this PGE, should be updated as needed with new SAS deliveries"""
+
+    def __init__(self, pge_name, runconfig_path, **kwargs):
+        super().__init__(pge_name, runconfig_path, **kwargs)
+
+        self.rename_by_pattern_map = OrderedDict(
+            {
+                'dswx_hls_*.tif*': self._geotiff_filename
+            }
+        )
