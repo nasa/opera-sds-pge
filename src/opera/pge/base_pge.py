@@ -12,6 +12,8 @@ Module defining the Base PGE interfaces from which all other PGEs are derived.
 import os
 from datetime import datetime
 from functools import lru_cache
+from collections import OrderedDict
+from fnmatch import fnmatch
 from os.path import abspath, basename, exists, join, splitext
 
 from yamale import YamaleError
@@ -26,7 +28,6 @@ from opera.util.metfile import MetFile
 from opera.util.run_utils import create_qa_command_line
 from opera.util.run_utils import create_sas_command_line
 from opera.util.run_utils import get_checksum
-from opera.util.run_utils import get_extension
 from opera.util.run_utils import time_and_execute
 from opera.util.time import get_catalog_metadata_datetime_str
 from opera.util.time import get_time_for_filename
@@ -247,16 +248,16 @@ class PostProcessorMixin:
         """
         output_products = self.runconfig.get_output_product_filenames()
 
-        # Filter out any files that are not renamed by the PGE
-        output_products = filter(
-            lambda product: get_extension(product) in self.rename_by_extension_map,
+        # Filter out any files that were not renamed by the PGE
+        filtered_output_products = filter(
+            lambda product: basename(product) in self.renamed_files.values(),
             output_products
         )
 
         # Generate checksums on the filtered product list
         checksums = {
             basename(output_product): get_checksum(output_product)
-            for output_product in output_products
+            for output_product in filtered_output_products
         }
 
         return checksums
@@ -444,8 +445,11 @@ class PostProcessorMixin:
         Assigns the appropriate file name which meets the file-naming conventions
         for the PGE to the provided input file on disk.
 
-        The file name to assign is determined based on the file extension of
-        the provided input file. If no file name assignment function is configured
+        The file name function used to assign is determined based on a unix-style
+        pattern match of the provided input file name against the patterns
+        configured in the renaming map for the PGE class.
+
+        If no file name assignment function is configured
         for a given extension, the file name assignment is skipped.
 
         Parameters
@@ -456,18 +460,20 @@ class PostProcessorMixin:
             The output directory destination for the renamed file.
 
         """
-        file_extension = splitext(input_filepath)[-1]
-        # Lookup the specific rename function configured for the current file extension
-        try:
-            rename_function = self.rename_by_extension_map[file_extension]
-        except KeyError:
+        file_name = os.path.basename(input_filepath)
+
+        # Lookup the specific rename function configured for the current filename
+        for file_pattern, rename_function in self.rename_by_pattern_map.items():
+            if fnmatch(file_name, file_pattern):
+                final_filename = rename_function(input_filepath)
+                self.renamed_files[file_name] = final_filename
+                break
+        else:
             msg = f'No rename function configured for file "{basename(input_filepath)}", skipping assignment'
             self.logger.warning(self.name, ErrorCode.NO_RENAME_FUNCTION_FOR_EXTENSION, msg)
             return
 
         # Generate the final file name to assign
-        final_filename = rename_function(input_filepath)
-
         final_filepath = os.path.join(output_dir, final_filename)
 
         self.logger.info(self.name, ErrorCode.MOVING_LOG_FILE,
@@ -633,10 +639,16 @@ class PgeExecutor(PreProcessorMixin, PostProcessorMixin):
         )
         self.production_datetime = datetime.now()
 
-        self.rename_by_extension_map = {
-            '.tif': self._geotiff_filename,
-            '.tiff': self._geotiff_filename
-        }
+        # Mapping of unix-style file name patterns to function pointers
+        # used to rename said file
+        self.rename_by_pattern_map = OrderedDict(
+            {
+                '*.tif*': self._geotiff_filename
+            }
+        )
+
+        # Keeps track of the files that were renamed by the PGE
+        self.renamed_files = OrderedDict()
 
     def _isolate_sas_runconfig(self):
         """
