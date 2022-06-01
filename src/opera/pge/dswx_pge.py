@@ -19,6 +19,7 @@ from opera.util.img_utils import get_geotiff_hls_dataset
 from opera.util.img_utils import get_geotiff_metadata
 from opera.util.img_utils import get_geotiff_spacecraft_name
 from opera.util.img_utils import get_hls_filename_fields
+from opera.util.metadata_utils import get_geographic_boundaries_from_mgrs_tile
 from opera.util.render_jinja2 import render_jinja2
 
 from .base_pge import PgeExecutor
@@ -259,9 +260,21 @@ class DSWxPostProcessorMixin(PostProcessorMixin):
         hls_fields = get_hls_filename_fields(
             get_geotiff_hls_dataset(representative_product)
         )
+        mgrs_tile_id = hls_fields['tile_id']
 
-        output_product_metadata['tileCode'] = hls_fields['tile_id']
-        output_product_metadata['zoneIdentifier'] = hls_fields['tile_id'][:2]
+        output_product_metadata['tileCode'] = mgrs_tile_id
+        output_product_metadata['zoneIdentifier'] = mgrs_tile_id[:2]
+
+        # Translate the MGRS tile ID to a lat/lon bounding box
+        (lat_min,
+         lat_max,
+         lon_min,
+         lon_max) = get_geographic_boundaries_from_mgrs_tile(mgrs_tile_id)
+
+        output_product_metadata['geospatial_lon_min'] = lon_min
+        output_product_metadata['geospatial_lon_max'] = lon_max
+        output_product_metadata['geospatial_lat_min'] = lat_min
+        output_product_metadata['geospatial_lat_max'] = lat_max
 
         # Add some fields on the dimensions of the data. These values should
         # be the same for all DSWx-HLS products, and were derived from the
