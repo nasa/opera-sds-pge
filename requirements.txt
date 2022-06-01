@@ -3,6 +3,7 @@ flake8-docstrings
 flake8-import-order
 Jinja2
 jsonschema
+mgrs
 PyYAML
 pylint
 pytest

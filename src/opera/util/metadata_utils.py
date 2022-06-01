@@ -14,7 +14,7 @@ from osgeo import gdal
 from osgeo import osr
 import mgrs
 
-def get_geographic_boundaries_from_mgrs_tile(mgrs_tile_name, verbose=False):
+def get_geographic_boundaries_from_mgrs_tile(mgrs_tile_name):
     """
     Returns the Lat/Lon min/max values that comprise the bounding box for a given mgrs tile region.
 
@@ -34,8 +34,17 @@ def get_geographic_boundaries_from_mgrs_tile(mgrs_tile_name, verbose=False):
         maximum longitude of bounding box
     """
  
+    # mgrs_tile_name may begin with the letter T which must be removed
+    if mgrs_tile_name.startswith('T'):
+        mgrs_tile_name = mgrs_tile_name[1:]
     mgrs_obj = mgrs.MGRS()
-    lower_left_utm_coordinate = mgrs_obj.MGRSToUTM(mgrs_tile_name)
+    try:
+        lower_left_utm_coordinate = mgrs_obj.MGRSToUTM(mgrs_tile_name)
+    except:
+        raise RuntimeError(
+            f'Failed to convert MGRS tile name "{mgrs_tile_name}" to lat/lon.'
+        )
+
     utm_zone = lower_left_utm_coordinate[0]
     is_northern = lower_left_utm_coordinate[1] == 'N'
     x_min = lower_left_utm_coordinate[2]
@@ -68,13 +77,6 @@ def get_geographic_boundaries_from_mgrs_tile(mgrs_tile_name, verbose=False):
             y = y_min + offset_y_multiplier * 109.8 * 1000
             lat, lon, z = transformation.TransformPoint(x, y, elevation)
  
-            if verbose:
-                print('')
-                print('x:', x)
-                print('y:', y)
-                print('lon:', lon)
-                print('lat:', lat)
- 
             if lat_min is None or lat_min > lat:
                 lat_min = lat
             if lat_max is None or lat_max < lat:
@@ -83,13 +85,5 @@ def get_geographic_boundaries_from_mgrs_tile(mgrs_tile_name, verbose=False):
                 lon_min = lon
             if lon_max is None or lon_max < lon:
                 lon_max = lon
- 
-    if verbose:
-        print('')
-        print('lat_min:', lat_min)
-        print('lat_max:', lat_max)
-        print('lon_min:', lon_min)
-        print('lon_max:', lon_max)
-        print('')
  
     return lat_min, lat_max, lon_min, lon_max
