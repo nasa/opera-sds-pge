@@ -276,6 +276,20 @@ class DSWxPostProcessorMixin(PostProcessorMixin):
         output_product_metadata['geospatial_lat_min'] = lat_min
         output_product_metadata['geospatial_lat_max'] = lat_max
 
+        # Split the sensing time into the beginning/end portions
+        sensing_time = output_product_metadata.pop('SENSING_TIME')
+
+        # Sensing time for L30 datasets contain both begin and end times delimited
+        # by semi-colon
+        if ';' in sensing_time:
+            sensing_time_begin, sensing_time_end = sensing_time.split(';')
+        # S30 datasets seem to only provide a single sensing time value
+        else:
+            sensing_time_begin = sensing_time_end = sensing_time
+
+        output_product_metadata['sensingTimeBegin'] = sensing_time_begin.strip()
+        output_product_metadata['sensingTimeEnd'] = sensing_time_end.strip()
+
         # Add some fields on the dimensions of the data. These values should
         # be the same for all DSWx-HLS products, and were derived from the
         # ADT product spec
