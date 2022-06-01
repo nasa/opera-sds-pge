@@ -549,9 +549,10 @@
                         <!--RangeDateTime-->
                         <gmd:EX_TemporalExtent id="boundingTemporalExtent">
                             <gmd:extent>
-                                <gml:TimeInstant>
-                                    <gml:timePosition>{{ product_output.SENSING_TIME }}{# ISO_OPERA_ProductSensingTime #}</gml:timePosition>
-                                </gml:TimeInstant>
+                                <gml:TimePeriod gml:id="d11e38">
+                                    <gml:beginPosition>{{ product_output.sensingTimeBegin }}{# ISO_OPERA_SensingTimeBegin #}</gml:beginPosition>
+                                    <gml:endPosition>{{ product_output.sensingTimeEnd}}{# ISO_OPERA_SensingTimeEnd #}</gml:endPosition>>
+                                </gml:TimePeriod>
                             </gmd:extent>
                         </gmd:EX_TemporalExtent>
                     </gmd:temporalElement>
