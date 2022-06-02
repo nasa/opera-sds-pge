@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera.pge.base_pge &mdash; opera-sds-pge 1.0.0-er.4.1 documentation</title>
+  <title>opera.pge.base_pge &mdash; opera-sds-pge 1.0.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -13,6 +13,7 @@
         <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../_static/doctools.js"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -27,7 +28,7 @@
             <a href="../../../index.html" class="icon icon-home"> opera-sds-pge
           </a>
               <div class="version">
-                1.0.0-er.4.1
+                1.0.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -85,6 +86,8 @@
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">lru_cache</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">fnmatch</span> <span class="kn">import</span> <span class="n">fnmatch</span>
 <span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">abspath</span><span class="p">,</span> <span class="n">basename</span><span class="p">,</span> <span class="n">exists</span><span class="p">,</span> <span class="n">join</span><span class="p">,</span> <span class="n">splitext</span>
 
 <span class="kn">from</span> <span class="nn">yamale</span> <span class="kn">import</span> <span class="n">YamaleError</span>
@@ -99,7 +102,6 @@
 <span class="kn">from</span> <span class="nn">opera.util.run_utils</span> <span class="kn">import</span> <span class="n">create_qa_command_line</span>
 <span class="kn">from</span> <span class="nn">opera.util.run_utils</span> <span class="kn">import</span> <span class="n">create_sas_command_line</span>
 <span class="kn">from</span> <span class="nn">opera.util.run_utils</span> <span class="kn">import</span> <span class="n">get_checksum</span>
-<span class="kn">from</span> <span class="nn">opera.util.run_utils</span> <span class="kn">import</span> <span class="n">get_extension</span>
 <span class="kn">from</span> <span class="nn">opera.util.run_utils</span> <span class="kn">import</span> <span class="n">time_and_execute</span>
 <span class="kn">from</span> <span class="nn">opera.util.time</span> <span class="kn">import</span> <span class="n">get_catalog_metadata_datetime_str</span>
 <span class="kn">from</span> <span class="nn">opera.util.time</span> <span class="kn">import</span> <span class="n">get_time_for_filename</span>
@@ -320,16 +322,16 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">output_products</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">get_output_product_filenames</span><span class="p">()</span>
 
-        <span class="c1"># Filter out any files that are not renamed by the PGE</span>
-        <span class="n">output_products</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span>
-            <span class="k">lambda</span> <span class="n">product</span><span class="p">:</span> <span class="n">get_extension</span><span class="p">(</span><span class="n">product</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">rename_by_extension_map</span><span class="p">,</span>
+        <span class="c1"># Filter out any files that were not renamed by the PGE</span>
+        <span class="n">filtered_output_products</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">product</span><span class="p">:</span> <span class="n">basename</span><span class="p">(</span><span class="n">product</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">renamed_files</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span>
             <span class="n">output_products</span>
         <span class="p">)</span>
 
         <span class="c1"># Generate checksums on the filtered product list</span>
         <span class="n">checksums</span> <span class="o">=</span> <span class="p">{</span>
             <span class="n">basename</span><span class="p">(</span><span class="n">output_product</span><span class="p">):</span> <span class="n">get_checksum</span><span class="p">(</span><span class="n">output_product</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">output_product</span> <span class="ow">in</span> <span class="n">output_products</span>
+            <span class="k">for</span> <span class="n">output_product</span> <span class="ow">in</span> <span class="n">filtered_output_products</span>
         <span class="p">}</span>
 
         <span class="k">return</span> <span class="n">checksums</span>
@@ -517,8 +519,11 @@
 <span class="sd">        Assigns the appropriate file name which meets the file-naming conventions</span>
 <span class="sd">        for the PGE to the provided input file on disk.</span>
 
-<span class="sd">        The file name to assign is determined based on the file extension of</span>
-<span class="sd">        the provided input file. If no file name assignment function is configured</span>
+<span class="sd">        The file name function used to assign is determined based on a unix-style</span>
+<span class="sd">        pattern match of the provided input file name against the patterns</span>
+<span class="sd">        configured in the renaming map for the PGE class.</span>
+
+<span class="sd">        If no file name assignment function is configured</span>
 <span class="sd">        for a given extension, the file name assignment is skipped.</span>
 
 <span class="sd">        Parameters</span>
@@ -529,18 +534,20 @@
 <span class="sd">            The output directory destination for the renamed file.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">file_extension</span> <span class="o">=</span> <span class="n">splitext</span><span class="p">(</span><span class="n">input_filepath</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-        <span class="c1"># Lookup the specific rename function configured for the current file extension</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">rename_function</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rename_by_extension_map</span><span class="p">[</span><span class="n">file_extension</span><span class="p">]</span>
-        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="n">file_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">input_filepath</span><span class="p">)</span>
+
+        <span class="c1"># Lookup the specific rename function configured for the current filename</span>
+        <span class="k">for</span> <span class="n">file_pattern</span><span class="p">,</span> <span class="n">rename_function</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">rename_by_pattern_map</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">fnmatch</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">file_pattern</span><span class="p">):</span>
+                <span class="n">final_filename</span> <span class="o">=</span> <span class="n">rename_function</span><span class="p">(</span><span class="n">input_filepath</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">renamed_files</span><span class="p">[</span><span class="n">file_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">final_filename</span>
+                <span class="k">break</span>
+        <span class="k">else</span><span class="p">:</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;No rename function configured for file &quot;</span><span class="si">{</span><span class="n">basename</span><span class="p">(</span><span class="n">input_filepath</span><span class="p">)</span><span class="si">}</span><span class="s1">&quot;, skipping assignment&#39;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">NO_RENAME_FUNCTION_FOR_EXTENSION</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
             <span class="k">return</span>
 
         <span class="c1"># Generate the final file name to assign</span>
-        <span class="n">final_filename</span> <span class="o">=</span> <span class="n">rename_function</span><span class="p">(</span><span class="n">input_filepath</span><span class="p">)</span>
-
         <span class="n">final_filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">final_filename</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">MOVING_LOG_FILE</span><span class="p">,</span>
@@ -706,10 +713,16 @@
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">production_datetime</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">rename_by_extension_map</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">&#39;.tif&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geotiff_filename</span><span class="p">,</span>
-            <span class="s1">&#39;.tiff&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geotiff_filename</span>
-        <span class="p">}</span>
+        <span class="c1"># Mapping of unix-style file name patterns to function pointers</span>
+        <span class="c1"># used to rename said file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rename_by_pattern_map</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s1">&#39;*.tif*&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geotiff_filename</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Keeps track of the files that were renamed by the PGE</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">renamed_files</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">_isolate_sas_runconfig</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>

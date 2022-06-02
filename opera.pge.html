@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera.pge package &mdash; opera-sds-pge 1.0.0-er.4.1 documentation</title>
+  <title>opera.pge package &mdash; opera-sds-pge 1.0.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -14,6 +14,7 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -30,7 +31,7 @@
             <a href="index.html" class="icon icon-home"> opera-sds-pge
           </a>
               <div class="version">
-                1.0.0-er.4.1
+                1.0.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -87,19 +88,19 @@
            <div itemprop="articleBody">
              
   <section id="opera-pge-package">
-<h1>opera.pge package<a class="headerlink" href="#opera-pge-package" title="Permalink to this headline"></a></h1>
+<h1>opera.pge package<a class="headerlink" href="#opera-pge-package" title="Permalink to this heading"></a></h1>
 <section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline"></a></h2>
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
 </section>
 <section id="module-opera.pge.base_pge">
-<span id="opera-pge-base-pge-module"></span><h2>opera.pge.base_pge module<a class="headerlink" href="#module-opera.pge.base_pge" title="Permalink to this headline"></a></h2>
+<span id="opera-pge-base-pge-module"></span><h2>opera.pge.base_pge module<a class="headerlink" href="#module-opera.pge.base_pge" title="Permalink to this heading"></a></h2>
 <section id="base-pge-py">
-<h3>base_pge.py<a class="headerlink" href="#base-pge-py" title="Permalink to this headline"></a></h3>
+<h3>base_pge.py<a class="headerlink" href="#base-pge-py" title="Permalink to this heading"></a></h3>
 <p>Module defining the Base PGE interfaces from which all other PGEs are derived.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="opera.pge.base_pge.PgeExecutor">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">opera.pge.base_pge.</span></span><span class="sig-name descname"><span class="pre">PgeExecutor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pge_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runconfig_path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/opera/pge/base_pge.html#PgeExecutor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opera.pge.base_pge.PgeExecutor" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#opera.pge.base_pge.PreProcessorMixin" title="opera.pge.base_pge.PreProcessorMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">opera.pge.base_pge.PreProcessorMixin</span></code></a>, <a class="reference internal" href="#opera.pge.base_pge.PostProcessorMixin" title="opera.pge.base_pge.PostProcessorMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">opera.pge.base_pge.PostProcessorMixin</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#opera.pge.base_pge.PreProcessorMixin" title="opera.pge.base_pge.PreProcessorMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">PreProcessorMixin</span></code></a>, <a class="reference internal" href="#opera.pge.base_pge.PostProcessorMixin" title="opera.pge.base_pge.PostProcessorMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">PostProcessorMixin</span></code></a></p>
 <p>Main class for execution of a PGE, including the SAS layer.</p>
 <p>The PgeExecutor class is primarily responsible for defining the interface
 for PGE execution and managing the actual execution of the SAS executable
@@ -218,14 +219,14 @@ order of pre-processing steps.</p>
 </section>
 </section>
 <section id="module-opera.pge.dswx_pge">
-<span id="opera-pge-dswx-pge-module"></span><h2>opera.pge.dswx_pge module<a class="headerlink" href="#module-opera.pge.dswx_pge" title="Permalink to this headline"></a></h2>
+<span id="opera-pge-dswx-pge-module"></span><h2>opera.pge.dswx_pge module<a class="headerlink" href="#module-opera.pge.dswx_pge" title="Permalink to this heading"></a></h2>
 <section id="dswx-pge-py">
-<h3>dswx_pge.py<a class="headerlink" href="#dswx-pge-py" title="Permalink to this headline"></a></h3>
+<h3>dswx_pge.py<a class="headerlink" href="#dswx-pge-py" title="Permalink to this heading"></a></h3>
 <p>Module defining the implementation for the Dynamic Surface Water Extent (DSWx) PGE.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="opera.pge.dswx_pge.DSWxExecutor">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">opera.pge.dswx_pge.</span></span><span class="sig-name descname"><span class="pre">DSWxExecutor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pge_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runconfig_path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/opera/pge/dswx_pge.html#DSWxExecutor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opera.pge.dswx_pge.DSWxExecutor" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#opera.pge.dswx_pge.DSWxPreProcessorMixin" title="opera.pge.dswx_pge.DSWxPreProcessorMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">opera.pge.dswx_pge.DSWxPreProcessorMixin</span></code></a>, <a class="reference internal" href="#opera.pge.dswx_pge.DSWxPostProcessorMixin" title="opera.pge.dswx_pge.DSWxPostProcessorMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">opera.pge.dswx_pge.DSWxPostProcessorMixin</span></code></a>, <a class="reference internal" href="#opera.pge.base_pge.PgeExecutor" title="opera.pge.base_pge.PgeExecutor"><code class="xref py py-class docutils literal notranslate"><span class="pre">opera.pge.base_pge.PgeExecutor</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#opera.pge.dswx_pge.DSWxPreProcessorMixin" title="opera.pge.dswx_pge.DSWxPreProcessorMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">DSWxPreProcessorMixin</span></code></a>, <a class="reference internal" href="#opera.pge.dswx_pge.DSWxPostProcessorMixin" title="opera.pge.dswx_pge.DSWxPostProcessorMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">DSWxPostProcessorMixin</span></code></a>, <a class="reference internal" href="#opera.pge.base_pge.PgeExecutor" title="opera.pge.base_pge.PgeExecutor"><code class="xref py py-class docutils literal notranslate"><span class="pre">PgeExecutor</span></code></a></p>
 <p>Main class for execution of a DSWx PGE, including the SAS layer.</p>
 <p>This class essentially rolls up the DSWx-tailored pre- and post-processors
 while inheriting all other functionality from the base PgeExecutor class.</p>
@@ -252,7 +253,7 @@ while inheriting all other functionality from the base PgeExecutor class.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="opera.pge.dswx_pge.DSWxPostProcessorMixin">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">opera.pge.dswx_pge.</span></span><span class="sig-name descname"><span class="pre">DSWxPostProcessorMixin</span></span><a class="reference internal" href="_modules/opera/pge/dswx_pge.html#DSWxPostProcessorMixin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opera.pge.dswx_pge.DSWxPostProcessorMixin" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#opera.pge.base_pge.PostProcessorMixin" title="opera.pge.base_pge.PostProcessorMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">opera.pge.base_pge.PostProcessorMixin</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#opera.pge.base_pge.PostProcessorMixin" title="opera.pge.base_pge.PostProcessorMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">PostProcessorMixin</span></code></a></p>
 <p>Mixin class responsible for handling all post-processing steps for the DSWx
 PGE. The post-processing phase is defined as all steps necessary after
 SAS execution has completed.</p>
@@ -278,7 +279,7 @@ validation check prior to staging of the output files.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="opera.pge.dswx_pge.DSWxPreProcessorMixin">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">opera.pge.dswx_pge.</span></span><span class="sig-name descname"><span class="pre">DSWxPreProcessorMixin</span></span><a class="reference internal" href="_modules/opera/pge/dswx_pge.html#DSWxPreProcessorMixin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opera.pge.dswx_pge.DSWxPreProcessorMixin" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#opera.pge.base_pge.PreProcessorMixin" title="opera.pge.base_pge.PreProcessorMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">opera.pge.base_pge.PreProcessorMixin</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#opera.pge.base_pge.PreProcessorMixin" title="opera.pge.base_pge.PreProcessorMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">PreProcessorMixin</span></code></a></p>
 <p>Mixin class responsible for handling all pre-processing steps for the
 DSWx PGE. The pre-processing phase is defined as all steps necessary prior
 to SAS execution.</p>
@@ -304,22 +305,22 @@ input files/directories.</p>
 </section>
 </section>
 <section id="module-opera.pge.runconfig">
-<span id="opera-pge-runconfig-module"></span><h2>opera.pge.runconfig module<a class="headerlink" href="#module-opera.pge.runconfig" title="Permalink to this headline"></a></h2>
+<span id="opera-pge-runconfig-module"></span><h2>opera.pge.runconfig module<a class="headerlink" href="#module-opera.pge.runconfig" title="Permalink to this heading"></a></h2>
 <section id="runconfig-py">
-<h3>runconfig.py<a class="headerlink" href="#runconfig-py" title="Permalink to this headline"></a></h3>
+<h3>runconfig.py<a class="headerlink" href="#runconfig-py" title="Permalink to this heading"></a></h3>
 <p>Module for parsing and validating run configuration files for OPERA PGEs.</p>
 <p>This module is adapted for OPERA from the NISAR PGE R2.0.0 util/l1_l2_runconfig.py
 Original Author: David White
 Adapted By: Scott Collins</p>
 <dl class="py data">
 <dt class="sig sig-object py" id="opera.pge.runconfig.BASE_PGE_SCHEMA">
-<span class="sig-prename descclassname"><span class="pre">opera.pge.runconfig.</span></span><span class="sig-name descname"><span class="pre">BASE_PGE_SCHEMA</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'/var/lib/jenkins/workspace/se-pipeline_release_1.0.0-er.4.1/src/opera/schema/base_pge_schema.yaml'</span></em><a class="headerlink" href="#opera.pge.runconfig.BASE_PGE_SCHEMA" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">opera.pge.runconfig.</span></span><span class="sig-name descname"><span class="pre">BASE_PGE_SCHEMA</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'/var/lib/jenkins/workspace/e-release-pipeline_release_1.0.0/src/opera/schema/base_pge_schema.yaml'</span></em><a class="headerlink" href="#opera.pge.runconfig.BASE_PGE_SCHEMA" title="Permalink to this definition"></a></dt>
 <dd><p>Path to the Yamale schema applicable to the PGE portion of each RunConfig</p>
 </dd></dl>
 
 <dl class="py data">
 <dt class="sig sig-object py" id="opera.pge.runconfig.ISO_TEMPLATE_DIR">
-<span class="sig-prename descclassname"><span class="pre">opera.pge.runconfig.</span></span><span class="sig-name descname"><span class="pre">ISO_TEMPLATE_DIR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'/var/lib/jenkins/workspace/se-pipeline_release_1.0.0-er.4.1/src/opera/pge/templates'</span></em><a class="headerlink" href="#opera.pge.runconfig.ISO_TEMPLATE_DIR" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">opera.pge.runconfig.</span></span><span class="sig-name descname"><span class="pre">ISO_TEMPLATE_DIR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'/var/lib/jenkins/workspace/e-release-pipeline_release_1.0.0/src/opera/pge/templates'</span></em><a class="headerlink" href="#opera.pge.runconfig.ISO_TEMPLATE_DIR" title="Permalink to this definition"></a></dt>
 <dd><p>Path to the repository directory containing ISO metadata Jinja2 templates</p>
 </dd></dl>
 
@@ -567,7 +568,7 @@ encountered.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="opera.pge.runconfig.RunConfig.validate">
-<span class="sig-name descname"><span class="pre">validate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pge_schema_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'/var/lib/jenkins/workspace/se-pipeline_release_1.0.0-er.4.1/src/opera/schema/base_pge_schema.yaml'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strict_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/opera/pge/runconfig.html#RunConfig.validate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opera.pge.runconfig.RunConfig.validate" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">validate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pge_schema_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'/var/lib/jenkins/workspace/e-release-pipeline_release_1.0.0/src/opera/schema/base_pge_schema.yaml'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strict_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/opera/pge/runconfig.html#RunConfig.validate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opera.pge.runconfig.RunConfig.validate" title="Permalink to this definition"></a></dt>
 <dd><p>Validates the RunConfig using a combination of the base PGE schema,
 and the specific SAS schema defined by the RunConfig itself.</p>
 <dl class="field-list simple">
@@ -596,9 +597,9 @@ elements not defined by the schema will raise validation errors.</p></li>
 </section>
 </section>
 <section id="module-opera.pge">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-opera.pge" title="Permalink to this headline"></a></h2>
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-opera.pge" title="Permalink to this heading"></a></h2>
 <section id="pge">
-<h3>pge<a class="headerlink" href="#pge" title="Permalink to this headline"></a></h3>
+<h3>pge<a class="headerlink" href="#pge" title="Permalink to this heading"></a></h3>
 <p>Contains modules for stand-up and execution of a PGE application.</p>
 </section>
 </section>

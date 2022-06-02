@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera.pge.dswx_pge &mdash; opera-sds-pge 1.0.0-er.4.1 documentation</title>
+  <title>opera.pge.dswx_pge &mdash; opera-sds-pge 1.0.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -13,6 +13,7 @@
         <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../_static/doctools.js"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -27,7 +28,7 @@
             <a href="../../../index.html" class="icon icon-home"> opera-sds-pge
           </a>
               <div class="version">
-                1.0.0-er.4.1
+                1.0.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -84,15 +85,16 @@
 
 <span class="kn">import</span> <span class="nn">glob</span>
 <span class="kn">import</span> <span class="nn">os.path</span>
-<span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">abspath</span><span class="p">,</span> <span class="n">exists</span><span class="p">,</span> <span class="n">isdir</span><span class="p">,</span> <span class="n">join</span><span class="p">,</span> <span class="n">splitext</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">abspath</span><span class="p">,</span> <span class="n">basename</span><span class="p">,</span> <span class="n">exists</span><span class="p">,</span> <span class="n">isdir</span><span class="p">,</span> <span class="n">join</span><span class="p">,</span> <span class="n">splitext</span>
 
 <span class="kn">from</span> <span class="nn">opera.util.error_codes</span> <span class="kn">import</span> <span class="n">ErrorCode</span>
 <span class="kn">from</span> <span class="nn">opera.util.img_utils</span> <span class="kn">import</span> <span class="n">get_geotiff_hls_dataset</span>
 <span class="kn">from</span> <span class="nn">opera.util.img_utils</span> <span class="kn">import</span> <span class="n">get_geotiff_metadata</span>
 <span class="kn">from</span> <span class="nn">opera.util.img_utils</span> <span class="kn">import</span> <span class="n">get_geotiff_spacecraft_name</span>
 <span class="kn">from</span> <span class="nn">opera.util.img_utils</span> <span class="kn">import</span> <span class="n">get_hls_filename_fields</span>
+<span class="kn">from</span> <span class="nn">opera.util.metadata_utils</span> <span class="kn">import</span> <span class="n">get_geographic_boundaries_from_mgrs_tile</span>
 <span class="kn">from</span> <span class="nn">opera.util.render_jinja2</span> <span class="kn">import</span> <span class="n">render_jinja2</span>
-<span class="kn">from</span> <span class="nn">opera.util.run_utils</span> <span class="kn">import</span> <span class="n">get_extension</span>
 
 <span class="kn">from</span> <span class="nn">.base_pge</span> <span class="kn">import</span> <span class="n">PgeExecutor</span>
 <span class="kn">from</span> <span class="nn">.base_pge</span> <span class="kn">import</span> <span class="n">PostProcessorMixin</span>
@@ -314,7 +316,7 @@
         <span class="n">representative_product</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="k">for</span> <span class="n">output_product</span> <span class="ow">in</span> <span class="n">output_products</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">get_extension</span><span class="p">(</span><span class="n">output_product</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">rename_by_extension_map</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">basename</span><span class="p">(</span><span class="n">output_product</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">renamed_files</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
                 <span class="c1"># TODO: kludge for avoiding output products that are missing expected metadata</span>
                 <span class="k">if</span> <span class="n">get_geotiff_hls_dataset</span><span class="p">(</span><span class="n">output_product</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">representative_product</span> <span class="o">=</span> <span class="n">output_product</span>
@@ -332,9 +334,35 @@
         <span class="n">hls_fields</span> <span class="o">=</span> <span class="n">get_hls_filename_fields</span><span class="p">(</span>
             <span class="n">get_geotiff_hls_dataset</span><span class="p">(</span><span class="n">representative_product</span><span class="p">)</span>
         <span class="p">)</span>
+        <span class="n">mgrs_tile_id</span> <span class="o">=</span> <span class="n">hls_fields</span><span class="p">[</span><span class="s1">&#39;tile_id&#39;</span><span class="p">]</span>
 
-        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;tileCode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">hls_fields</span><span class="p">[</span><span class="s1">&#39;tile_id&#39;</span><span class="p">]</span>
-        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;zoneIdentifier&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">hls_fields</span><span class="p">[</span><span class="s1">&#39;tile_id&#39;</span><span class="p">][:</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;tileCode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mgrs_tile_id</span>
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;zoneIdentifier&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mgrs_tile_id</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
+
+        <span class="c1"># Translate the MGRS tile ID to a lat/lon bounding box</span>
+        <span class="p">(</span><span class="n">lat_min</span><span class="p">,</span>
+         <span class="n">lat_max</span><span class="p">,</span>
+         <span class="n">lon_min</span><span class="p">,</span>
+         <span class="n">lon_max</span><span class="p">)</span> <span class="o">=</span> <span class="n">get_geographic_boundaries_from_mgrs_tile</span><span class="p">(</span><span class="n">mgrs_tile_id</span><span class="p">)</span>
+
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;geospatial_lon_min&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lon_min</span>
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;geospatial_lon_max&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lon_max</span>
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;geospatial_lat_min&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lat_min</span>
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;geospatial_lat_max&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lat_max</span>
+
+        <span class="c1"># Split the sensing time into the beginning/end portions</span>
+        <span class="n">sensing_time</span> <span class="o">=</span> <span class="n">output_product_metadata</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;SENSING_TIME&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Sensing time for L30 datasets contain both begin and end times delimited</span>
+        <span class="c1"># by semi-colon</span>
+        <span class="k">if</span> <span class="s1">&#39;;&#39;</span> <span class="ow">in</span> <span class="n">sensing_time</span><span class="p">:</span>
+            <span class="n">sensing_time_begin</span><span class="p">,</span> <span class="n">sensing_time_end</span> <span class="o">=</span> <span class="n">sensing_time</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;;&#39;</span><span class="p">)</span>
+        <span class="c1"># S30 datasets seem to only provide a single sensing time value</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sensing_time_begin</span> <span class="o">=</span> <span class="n">sensing_time_end</span> <span class="o">=</span> <span class="n">sensing_time</span>
+
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;sensingTimeBegin&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sensing_time_begin</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;sensingTimeEnd&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sensing_time_end</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
 
         <span class="c1"># Add some fields on the dimensions of the data. These values should</span>
         <span class="c1"># be the same for all DSWx-HLS products, and were derived from the</span>
@@ -456,7 +484,16 @@
     <span class="sd">&quot;&quot;&quot;Processing Level for DSWx Products&quot;&quot;&quot;</span>
 
     <span class="n">SAS_VERSION</span> <span class="o">=</span> <span class="s2">&quot;0.1&quot;</span>
-    <span class="sd">&quot;&quot;&quot;Version of the SAS wrapped by this PGE, should be updated as needed with new SAS deliveries&quot;&quot;&quot;</span></div>
+    <span class="sd">&quot;&quot;&quot;Version of the SAS wrapped by this PGE, should be updated as needed with new SAS deliveries&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pge_name</span><span class="p">,</span> <span class="n">runconfig_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">pge_name</span><span class="p">,</span> <span class="n">runconfig_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">rename_by_pattern_map</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s1">&#39;dswx_hls_*.tif*&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geotiff_filename</span>
+            <span class="p">}</span>
+        <span class="p">)</span></div>
 </pre></div>
 
            </div>

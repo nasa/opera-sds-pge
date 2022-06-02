@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera.util package &mdash; opera-sds-pge 1.0.0-er.4.1 documentation</title>
+  <title>opera.util package &mdash; opera-sds-pge 1.0.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -14,6 +14,7 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -30,7 +31,7 @@
             <a href="index.html" class="icon icon-home"> opera-sds-pge
           </a>
               <div class="version">
-                1.0.0-er.4.1
+                1.0.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -87,14 +88,14 @@
            <div itemprop="articleBody">
              
   <section id="opera-util-package">
-<h1>opera.util package<a class="headerlink" href="#opera-util-package" title="Permalink to this headline"></a></h1>
+<h1>opera.util package<a class="headerlink" href="#opera-util-package" title="Permalink to this heading"></a></h1>
 <section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline"></a></h2>
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
 </section>
 <section id="module-opera.util.error_codes">
-<span id="opera-util-error-codes-module"></span><h2>opera.util.error_codes module<a class="headerlink" href="#module-opera.util.error_codes" title="Permalink to this headline"></a></h2>
+<span id="opera-util-error-codes-module"></span><h2>opera.util.error_codes module<a class="headerlink" href="#module-opera.util.error_codes" title="Permalink to this heading"></a></h2>
 <section id="error-codes-py">
-<h3>error_codes.py<a class="headerlink" href="#error-codes-py" title="Permalink to this headline"></a></h3>
+<h3>error_codes.py<a class="headerlink" href="#error-codes-py" title="Permalink to this heading"></a></h3>
 <p>Error codes for use with OPERA PGEs.</p>
 <dl class="py data">
 <dt class="sig sig-object py" id="opera.util.error_codes.CODES_PER_RANGE">
@@ -117,7 +118,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">opera.util.error_codes.</span></span><span class="sig-name descname"><span class="pre">ErrorCode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/opera/util/error_codes.html#ErrorCode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opera.util.error_codes.ErrorCode" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.IntEnum</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">IntEnum</span></code></p>
 <p>Error codes for OPERA PGEs.</p>
 <p>Each code is combined with the designated error code offset defined by
 the RunConfig to determine the final, logged error code.</p>
@@ -455,9 +456,9 @@ integer values.</p>
 </section>
 </section>
 <section id="module-opera.util.logger">
-<span id="opera-util-logger-module"></span><h2>opera.util.logger module<a class="headerlink" href="#module-opera.util.logger" title="Permalink to this headline"></a></h2>
+<span id="opera-util-logger-module"></span><h2>opera.util.logger module<a class="headerlink" href="#module-opera.util.logger" title="Permalink to this heading"></a></h2>
 <section id="logger-py">
-<h3>logger.py<a class="headerlink" href="#logger-py" title="Permalink to this headline"></a></h3>
+<h3>logger.py<a class="headerlink" href="#logger-py" title="Permalink to this heading"></a></h3>
 <p>Logging utilities for use with OPERA PGEs.</p>
 <p>This module is adapted for OPERA from the NISAR PGE R2.0.0 util/logger.py
 Original Authors: Alice Stanboli, David White
@@ -822,9 +823,9 @@ the current time is used.</p></li>
 </section>
 </section>
 <section id="module-opera.util.run_utils">
-<span id="opera-util-run-utils-module"></span><h2>opera.util.run_utils module<a class="headerlink" href="#module-opera.util.run_utils" title="Permalink to this headline"></a></h2>
+<span id="opera-util-run-utils-module"></span><h2>opera.util.run_utils module<a class="headerlink" href="#module-opera.util.run_utils" title="Permalink to this heading"></a></h2>
 <section id="run-utils-py">
-<h3>run_utils.py<a class="headerlink" href="#run-utils-py" title="Permalink to this headline"></a></h3>
+<h3>run_utils.py<a class="headerlink" href="#run-utils-py" title="Permalink to this heading"></a></h3>
 <p>Contains utility functions for running executable processes within the OPERA PGE
 subsystem.</p>
 <dl class="py function">
@@ -941,9 +942,9 @@ for production.</p></li>
 </section>
 </section>
 <section id="module-opera.util.time">
-<span id="opera-util-time-module"></span><h2>opera.util.time module<a class="headerlink" href="#module-opera.util.time" title="Permalink to this headline"></a></h2>
+<span id="opera-util-time-module"></span><h2>opera.util.time module<a class="headerlink" href="#module-opera.util.time" title="Permalink to this heading"></a></h2>
 <section id="time-py">
-<h3>time.py<a class="headerlink" href="#time-py" title="Permalink to this headline"></a></h3>
+<h3>time.py<a class="headerlink" href="#time-py" title="Permalink to this heading"></a></h3>
 <p>Time-tag generation utilities for use with OPERA PGEs.</p>
 <p>This module is adapted for OPERA from the NISAR PGE R2.0.0 util/time.py
 Original Author: Alice Stanboli
@@ -1020,9 +1021,9 @@ use with output filenames.</p>
 </section>
 </section>
 <section id="module-opera.util.usage_metrics">
-<span id="opera-util-usage-metrics-module"></span><h2>opera.util.usage_metrics module<a class="headerlink" href="#module-opera.util.usage_metrics" title="Permalink to this headline"></a></h2>
+<span id="opera-util-usage-metrics-module"></span><h2>opera.util.usage_metrics module<a class="headerlink" href="#module-opera.util.usage_metrics" title="Permalink to this heading"></a></h2>
 <section id="usage-metrics-py">
-<h3>usage_metrics.py<a class="headerlink" href="#usage-metrics-py" title="Permalink to this headline"></a></h3>
+<h3>usage_metrics.py<a class="headerlink" href="#usage-metrics-py" title="Permalink to this heading"></a></h3>
 <p>OS-level metrics gathering functions for use with OPERA PGEs.</p>
 <p>This module is adapted for OPERA from the NISAR PGE R2.0.0 util/usage_metrics.py
 Original Author: David White
@@ -1088,9 +1089,9 @@ this value cannot be obtained for any reason, -1 is returned instead.</p>
 </section>
 </section>
 <section id="module-opera.util">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-opera.util" title="Permalink to this headline"></a></h2>
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-opera.util" title="Permalink to this heading"></a></h2>
 <section id="util">
-<h3>util<a class="headerlink" href="#util" title="Permalink to this headline"></a></h3>
+<h3>util<a class="headerlink" href="#util" title="Permalink to this heading"></a></h3>
 <p>Contains utility modules for performing common operations, such as logging and
 metrics gathering, for use with the OPERA PGE Subsystem.</p>
 </section>
