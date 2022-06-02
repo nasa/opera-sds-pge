@@ -19,6 +19,7 @@ from opera.util.img_utils import get_geotiff_hls_dataset
 from opera.util.img_utils import get_geotiff_metadata
 from opera.util.img_utils import get_geotiff_spacecraft_name
 from opera.util.img_utils import get_hls_filename_fields
+from opera.util.metadata_utils import get_geographic_boundaries_from_mgrs_tile
 from opera.util.render_jinja2 import render_jinja2
 
 from .base_pge import PgeExecutor
@@ -259,9 +260,35 @@ class DSWxPostProcessorMixin(PostProcessorMixin):
         hls_fields = get_hls_filename_fields(
             get_geotiff_hls_dataset(representative_product)
         )
+        mgrs_tile_id = hls_fields['tile_id']
 
-        output_product_metadata['tileCode'] = hls_fields['tile_id']
-        output_product_metadata['zoneIdentifier'] = hls_fields['tile_id'][:2]
+        output_product_metadata['tileCode'] = mgrs_tile_id
+        output_product_metadata['zoneIdentifier'] = mgrs_tile_id[:2]
+
+        # Translate the MGRS tile ID to a lat/lon bounding box
+        (lat_min,
+         lat_max,
+         lon_min,
+         lon_max) = get_geographic_boundaries_from_mgrs_tile(mgrs_tile_id)
+
+        output_product_metadata['geospatial_lon_min'] = lon_min
+        output_product_metadata['geospatial_lon_max'] = lon_max
+        output_product_metadata['geospatial_lat_min'] = lat_min
+        output_product_metadata['geospatial_lat_max'] = lat_max
+
+        # Split the sensing time into the beginning/end portions
+        sensing_time = output_product_metadata.pop('SENSING_TIME')
+
+        # Sensing time for L30 datasets contain both begin and end times delimited
+        # by semi-colon
+        if ';' in sensing_time:
+            sensing_time_begin, sensing_time_end = sensing_time.split(';')
+        # S30 datasets seem to only provide a single sensing time value
+        else:
+            sensing_time_begin = sensing_time_end = sensing_time
+
+        output_product_metadata['sensingTimeBegin'] = sensing_time_begin.strip()
+        output_product_metadata['sensingTimeEnd'] = sensing_time_end.strip()
 
         # Add some fields on the dimensions of the data. These values should
         # be the same for all DSWx-HLS products, and were derived from the
