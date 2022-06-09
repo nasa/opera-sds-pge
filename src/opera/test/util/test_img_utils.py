@@ -11,6 +11,7 @@ Unit tests for the util/img_utils.py module.
 
 import os
 import unittest
+from datetime import datetime
 from os.path import abspath, join
 from re import match
 from unittest import skipIf
@@ -69,7 +70,8 @@ class ImgUtilsTestCase(unittest.TestCase):
 
         # Try the other utility functions
         self.assertEqual(get_geotiff_hls_dataset(input_dswx_hls_file), 'HLS.S30.T15SXR.2021250T163901.v2.0')
-        self.assertEqual(get_geotiff_processing_datetime(input_dswx_hls_file), '2022-01-31T21:54:26')
+        self.assertIsInstance(get_geotiff_processing_datetime(input_dswx_hls_file), datetime)
+        self.assertEqual(get_geotiff_processing_datetime(input_dswx_hls_file), datetime(2022, 1, 31, 21, 54, 26))
         self.assertEqual(get_geotiff_product_version(input_dswx_hls_file), '0.1')
         self.assertEqual(get_geotiff_spacecraft_name(input_dswx_hls_file), 'SENTINEL-2A')
 
@@ -84,7 +86,8 @@ class ImgUtilsTestCase(unittest.TestCase):
 
         # Try the other utility functions
         self.assertEqual(get_geotiff_hls_dataset(input_dswx_hls_file), 'HLS.L30.T22VEQ.2021248T143156.v2.0')
-        self.assertEqual(get_geotiff_processing_datetime(input_dswx_hls_file), '2022-01-07T19:25:31')
+        self.assertIsInstance(get_geotiff_processing_datetime(input_dswx_hls_file), datetime)
+        self.assertEqual(get_geotiff_processing_datetime(input_dswx_hls_file), datetime(2022, 1, 7, 19, 25, 31))
         self.assertEqual(get_geotiff_product_version(input_dswx_hls_file), '0.1')
         self.assertEqual(get_geotiff_spacecraft_name(input_dswx_hls_file), 'LANDSAT-8')
 

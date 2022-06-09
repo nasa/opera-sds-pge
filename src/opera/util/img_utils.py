@@ -115,10 +115,17 @@ def get_geotiff_hls_dataset(filename):
 
 
 def get_geotiff_processing_datetime(filename):
-    """Returns the PROCESSING_DATETIME value from the provided file, if it exists. None otherwise."""
+    """
+    Returns the PROCESSING_DATETIME value from the provided file, if it exists,
+    as a datetime object. None otherwise.
+    """
     metadata = get_geotiff_metadata(filename)
+    processing_datetime = metadata.get('PROCESSING_DATETIME')
 
-    return metadata.get('PROCESSING_DATETIME')
+    if processing_datetime:
+        processing_datetime = datetime.strptime(processing_datetime, '%Y-%m-%dT%H:%M:%S')
+
+    return processing_datetime
 
 
 def get_geotiff_product_version(filename):
