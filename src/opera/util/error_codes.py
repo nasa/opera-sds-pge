@@ -95,6 +95,7 @@ class ErrorCode(IntEnum):
     ISO_METADATA_GOT_SOME_RENDERING_ERRORS = auto()
     ISO_METADATA_RENDER_FAILED = auto()
     SAS_OUTPUT_FILE_HAS_MISSING_DATA = auto()
+    DYNAMIC_IMPORT_FAILED = auto()
 
     @classmethod
     def describe(cls):
