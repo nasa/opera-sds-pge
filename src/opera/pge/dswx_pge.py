@@ -17,10 +17,14 @@ from os.path import abspath, basename, exists, isdir, join, splitext
 from opera.util.error_codes import ErrorCode
 from opera.util.img_utils import get_geotiff_hls_dataset
 from opera.util.img_utils import get_geotiff_metadata
+from opera.util.img_utils import get_geotiff_processing_datetime
+from opera.util.img_utils import get_geotiff_product_version
 from opera.util.img_utils import get_geotiff_spacecraft_name
 from opera.util.img_utils import get_hls_filename_fields
+from opera.util.metadata_utils import get_sensor_from_spacecraft_name
 from opera.util.metadata_utils import get_geographic_boundaries_from_mgrs_tile
 from opera.util.render_jinja2 import render_jinja2
+from opera.util.time import get_time_for_filename
 
 from .base_pge import PgeExecutor
 from .base_pge import PostProcessorMixin
@@ -173,20 +177,37 @@ class DSWxPostProcessorMixin(PostProcessorMixin):
                    f"First call must provide a filename before result is cached.")
             self.logger.critical(self.name, ErrorCode.FILE_MOVE_FAILED, msg)
 
+        spacecraft_name = get_geotiff_spacecraft_name(inter_filename).upper()
+        sensor = get_sensor_from_spacecraft_name(spacecraft_name)
+        pixel_spacing = "30"  # fixed for HLS-based products
+
         dataset = get_geotiff_hls_dataset(inter_filename)
 
         dataset_fields = get_hls_filename_fields(dataset)
 
         source = dataset_fields['product']
-        spacecraft_name = get_geotiff_spacecraft_name(inter_filename).upper()
         tile_id = dataset_fields['tile_id']
-        timetag = dataset_fields['acquisition_time']
-        version = dataset_fields['collection_version']
+        acquisition_time = dataset_fields['acquisition_time']
+
+        if not acquisition_time.endswith('Z'):
+            acquisition_time = f'{acquisition_time}Z'
+
+        processing_datetime = get_geotiff_processing_datetime(inter_filename)
+        processing_time = get_time_for_filename(processing_datetime)
+
+        if not processing_time.endswith('Z'):
+            processing_time = f'{processing_time}Z'
+
+        product_version = get_geotiff_product_version(inter_filename)
+
+        if not product_version.startswith('v'):
+            product_version = f'v{product_version}'
 
         # Assign the core file to the cached class attribute
         self._cached_core_filename = (
-            f"{self.PROJECT}_{self.LEVEL}_{self.NAME}_{source}_{spacecraft_name}_"
-            f"{tile_id}_{timetag}_{version}_{str(self.runconfig.product_counter).zfill(3)}"
+            f"{self.PROJECT}_{self.LEVEL}_{self.NAME}_{source}_{sensor}_{pixel_spacing}_"
+            f"{tile_id}_{acquisition_time}_{processing_time}_{product_version}_"
+            f"{str(self.runconfig.product_counter).zfill(3)}"
         )
 
         return self._cached_core_filename
@@ -222,7 +243,7 @@ class DSWxPostProcessorMixin(PostProcessorMixin):
         # of the filename before the extension, delimited by underscores
         band_idx, band_name = splitext(inter_filename)[0].split("_")[-2:]
 
-        return f"{core_filename}_{band_idx}_{band_name}.tif"
+        return f"{core_filename}_{band_idx}_{band_name}.tiff"
 
     def _collect_dswx_product_metadata(self):
         """

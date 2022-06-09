@@ -72,6 +72,38 @@ except (ImportError, ModuleNotFoundError):  # pragma: no cover
     osr = MockOsr                           # pragma: no cover
 
 
+def get_sensor_from_spacecraft_name(spacecraft_name):
+    """
+    Returns the HLS sensor short name from the full spacecraft name.
+    The short name is used with output file naming conventions for DSWx-HLS
+    products
+
+    Parameters
+    ----------
+    spacecraft_name : str
+        Name of the spacecraft to translate to a sensor short name.
+
+    Returns
+    -------
+    sensor_shortname : str
+        The sensor shortname for the provided spacecraft name
+
+    Raises
+    ------
+    RuntimeError
+        If an unknown spacecraft name is provided.
+
+    """
+    try:
+        return {
+            'LANDSAT-8': 'L8',
+            'SENTINEL-2A': 'S2A',
+            'SENTINEL-2B': 'S2B'
+        }[spacecraft_name]
+    except KeyError:
+        raise RuntimeError(f"Unknown spacecraft name '{spacecraft_name}'")
+
+
 def get_geographic_boundaries_from_mgrs_tile(mgrs_tile_name):
     """
     Returns the Lat/Lon min/max values that comprise the bounding box for a given mgrs tile region.

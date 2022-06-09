@@ -131,7 +131,7 @@ class DSWxPgeTestCase(unittest.TestCase):
         self.assertTrue(os.path.exists(expected_log_file))
 
         # Lastly, check that at least one "image" file was created
-        image_files = glob.glob(join(pge.runconfig.output_product_path, "*.tif"))
+        image_files = glob.glob(join(pge.runconfig.output_product_path, "*.tiff"))
         self.assertGreater(len(image_files), 0)
 
         # Open and read the log
