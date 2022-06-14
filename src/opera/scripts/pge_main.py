@@ -23,7 +23,7 @@ from opera.util.logger import PgeLogger, default_log_file_name
 
 
 PGE_NAME_MAP = {
-    'DSWX_HLS_PGE': ('opera.pge.dswx_hls.dswx_pge', 'DSWxExecutor'),
+    'DSWX_HLS_PGE': ('opera.pge.dswx_hls.dswx_hls_pge', 'DSWxHLSExecutor'),
     'BASE_PGE': ('opera.pge.base.base_pge', 'PgeExecutor')
 }
 """Mapping of PGE names specified by a RunConfig to the PGE module and class type to instantiate"""
