@@ -19,7 +19,7 @@ from importlib import import_module
 
 from opera.pge.runconfig import RunConfig
 from opera.util.error_codes import ErrorCode
-from opera.util.logger import PgeLogger
+from opera.util.logger import PgeLogger, default_log_file_name
 
 
 PGE_NAME_MAP = {
@@ -136,6 +136,10 @@ def pge_start(run_config_filename):
 
     """
     logger = open_log_file()
+
+    # Configure logger to write out to /tmp until PGE can reassign to the proper
+    # location
+    logger.move(f'/tmp/{default_log_file_name()}')
 
     # Load the yaml run config file
     run_config = load_run_config_file(logger, run_config_filename)
