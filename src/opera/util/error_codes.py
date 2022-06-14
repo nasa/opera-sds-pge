@@ -105,6 +105,7 @@ class ErrorCode(IntEnum):
     ISO_METADATA_RENDER_FAILED = auto()
     SAS_OUTPUT_FILE_HAS_MISSING_DATA = auto()
     LOGGED_CRITICAL_LINE = auto()
+    DYNAMIC_IMPORT_FAILED = auto()
 
     @classmethod
     def describe(cls):
