@@ -297,7 +297,7 @@ class BasePgeTestCase(unittest.TestCase):
         """Mock run_util.create_qa_command_line()"""
         raise OSError("Mock OSError from run_utils.create_sas_command_line")
 
-    @patch.object(opera.pge.base_pge, 'create_sas_command_line', create_sas_command_line_mock)
+    @patch.object(opera.pge.base.base_pge, 'create_sas_command_line', create_sas_command_line_mock)
     def test_run_sas_executable_exception(self):
         """Test IOError exception in _run_sas_executable()"""
         runconfig_path = join(self.data_dir, 'test_sas_qa_config.yaml')
@@ -323,7 +323,7 @@ class BasePgeTestCase(unittest.TestCase):
         """Mock function for run_utils.create_qa_command_line that always raises OSError"""
         raise OSError("Mock OSError from run_utils.create_qa_command_line")
 
-    @patch.object(opera.pge.base_pge, 'create_qa_command_line', create_qa_command_line_mock)
+    @patch.object(opera.pge.base.base_pge, 'create_qa_command_line', create_qa_command_line_mock)
     def test_run_sas_qa_executable_exception(self):
         """Test OSError in _run_sas_qa_executable()"""
         runconfig_path = join(self.data_dir, 'test_sas_qa_config.yaml')

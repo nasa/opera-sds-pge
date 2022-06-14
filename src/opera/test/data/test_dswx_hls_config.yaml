@@ -26,8 +26,8 @@ RunConfig:
                     - 'hello world > dswx_pge_test/output_dir/dswx_hls_v0.1_B01_WTR.tif;'
                     - '/bin/echo DSWx-HLS invoked with RunConfig'
                 ErrorCodeBase: 100000
-                SchemaPath: dswx_hls_sas_schema.yaml
-                IsoTemplatePath: OPERA_ISO_metadata_L3_DSWx_HLS_template.xml.jinja2
+                SchemaPath: pge/dswx_hls/schema/dswx_hls_sas_schema.yaml
+                IsoTemplatePath: pge/dswx_hls/templates/OPERA_ISO_metadata_L3_DSWx_HLS_template.xml.jinja2
 
             QAExecutable:
                 Enabled: False
