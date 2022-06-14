@@ -5,7 +5,7 @@ RunConfig:
 
     PGE:
       PGENameGroup:
-        PGEName: BASE_PGE_TEST
+        PGEName: BASE_PGE
 
       InputFilesGroup:
         InputFilePaths:

@@ -15,16 +15,16 @@ The PGE type instantiated is determined from the provided RunConfig.
 
 import argparse
 import os
+from importlib import import_module
 
-from opera.pge.base_pge import PgeExecutor
-from opera.pge.dswx_pge import DSWxExecutor
 from opera.pge.runconfig import RunConfig
 from opera.util.error_codes import ErrorCode
 from opera.util.logger import PgeLogger
 
+
 PGE_NAME_MAP = {
-    'DSWX_HLS_PGE': DSWxExecutor,
-    'default': PgeExecutor
+    'DSWX_HLS_PGE': ['opera.pge.dswx_pge', 'DSWxExecutor'],
+    'BASE_PGE': ['opera.pge.base_pge', 'PgeExecutor']
 }
 """Mapping of PGE names specified by a RunConfig to the PGE class type to instantiate"""
 
@@ -32,7 +32,8 @@ PGE_NAME_MAP = {
 def get_pge_class(pge_name, logger):
     """
     Returns the PGE class type to be instantiated for the given PGE name.
-    If the name is unknown, the default PGE class type is returned.
+    The import is done dynamically using the PGE name as a key to
+    the module and class name; as defined in 'PGE_NAME_MAP'.
 
     Parameters
     ----------
@@ -49,9 +50,15 @@ def get_pge_class(pge_name, logger):
         from the returned class according to the signature of PgeExecutor.__init__.
 
     """
-    # Return either the PGE configured for the name, or the default class
-    # if we don't have a mapping for it.
-    pge_class = PGE_NAME_MAP.get(pge_name, PGE_NAME_MAP['default'])
+    # Instantiate the class
+    pge_class = None
+    try:
+        module = import_module(PGE_NAME_MAP[pge_name][0], package=None)
+        pge_class = getattr(module, PGE_NAME_MAP[pge_name][1])
+    except (AttributeError, KeyError, RuntimeError) as exception:
+        logger.critical("pge_main", ErrorCode.DYNAMIC_IMPORT_FAILED,
+                        f'Import failed for class "{pge_class}" for PGE name '
+                        f'"{pge_name}": "{exception}"')
 
     logger.info("pge_main", ErrorCode.PGE_NAME,
                 f'Using class {pge_class.__name__} for PGE name {pge_name}')

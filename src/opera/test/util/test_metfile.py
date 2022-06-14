@@ -113,7 +113,7 @@ class MetFileTestCase(unittest.TestCase):
         """
         # Create a dummy metadata file
         catalog_metadata = {
-            'PGE_Name': "BASE_PGE_TEST",
+            'PGE_Name': "BASE_PGE",
             'PGE_Version': "1.0.test",
             'SAS_Version': "2.0.test",
             'Input_Files': ["input/input_file01.h5", "input/input_file02.h5"],

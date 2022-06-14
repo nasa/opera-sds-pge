@@ -18,6 +18,7 @@ from pkg_resources import resource_filename
 
 from opera.pge import PgeExecutor, RunConfig
 from opera.scripts import pge_main
+from opera.scripts.pge_main import get_pge_class
 from opera.scripts.pge_main import load_run_config_file
 from opera.scripts.pge_main import open_log_file
 from opera.scripts.pge_main import pge_start
@@ -110,6 +111,15 @@ class PgeMainTestCase(unittest.TestCase):
 
         # Verify the instance of a RunConfig object
         self.assertIsInstance(run_config, RunConfig)
+
+    def test_get_pge_class(self):
+        """
+        This test verifies a RuntimeError when a bad PGE name is
+        passed to get_pge_class
+
+        """
+        log = open_log_file()
+        self.assertRaises(RuntimeError, get_pge_class,  pge_name='BAD_NAME', logger=log)
 
     def test_pge_start_functionality(self):
         """
