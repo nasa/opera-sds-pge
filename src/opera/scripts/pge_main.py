@@ -23,10 +23,10 @@ from opera.util.logger import PgeLogger
 
 
 PGE_NAME_MAP = {
-    'DSWX_HLS_PGE': ['opera.pge.dswx_pge', 'DSWxExecutor'],
-    'BASE_PGE': ['opera.pge.base_pge', 'PgeExecutor']
+    'DSWX_HLS_PGE': ('opera.pge.dswx_pge', 'DSWxExecutor'),
+    'BASE_PGE': ('opera.pge.base_pge', 'PgeExecutor')
 }
-"""Mapping of PGE names specified by a RunConfig to the PGE class type to instantiate"""
+"""Mapping of PGE names specified by a RunConfig to the PGE module and class type to instantiate"""
 
 
 def get_pge_class(pge_name, logger):
@@ -52,16 +52,19 @@ def get_pge_class(pge_name, logger):
     """
     # Instantiate the class
     pge_class = None
-    try:
-        module = import_module(PGE_NAME_MAP[pge_name][0], package=None)
-        pge_class = getattr(module, PGE_NAME_MAP[pge_name][1])
-    except (AttributeError, KeyError, RuntimeError) as exception:
-        logger.critical("pge_main", ErrorCode.DYNAMIC_IMPORT_FAILED,
-                        f'Import failed for class "{pge_class}" for PGE name '
-                        f'"{pge_name}": "{exception}"')
 
-    logger.info("pge_main", ErrorCode.PGE_NAME,
-                f'Using class {pge_class.__name__} for PGE name {pge_name}')
+    try:
+        pge_module, pge_class_name = PGE_NAME_MAP[pge_name]
+        module = import_module(pge_module, package=None)
+        pge_class = getattr(module, pge_class_name)
+
+        logger.info("pge_main", ErrorCode.PGE_NAME,
+                    f'Using class {pge_class.__name__} for PGE name {pge_name}')
+    except (AttributeError, KeyError, RuntimeError) as exception:
+        logger.critical(
+            "pge_main", ErrorCode.DYNAMIC_IMPORT_FAILED,
+            f'Import failed for PGE name "{pge_name}": "{exception}"'
+        )
 
     return pge_class
 
