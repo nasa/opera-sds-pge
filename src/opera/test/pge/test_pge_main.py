@@ -119,7 +119,11 @@ class PgeMainTestCase(unittest.TestCase):
 
         """
         log = open_log_file()
-        self.assertRaises(RuntimeError, get_pge_class,  pge_name='BAD_NAME', logger=log)
+        # A tuple containing the exception classes may be passed as 'exception'
+        # to catch any of a group of exceptions.
+        # https://docs.python.org/3/library/unittest.html#unittest.TestCase.assertRaises
+        self.assertRaises((AttributeError, KeyError, RuntimeError), get_pge_class,
+                          pge_name='BAD_NAME', logger=log)
 
     def test_pge_start_functionality(self):
         """
