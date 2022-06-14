@@ -61,6 +61,7 @@ chmod -R 775 ${TEST_RESULTS_DIR}
 # Docker image rather than code found on the host.
 DOCKER_RUN="docker run --rm \
     -v ${WORKSPACE}:/workspace \
+    -v ${WORKSPACE}/src/opera/test/data:/home/conda/opera/test/data \
     -w /workspace/${TEST_RESULTS_REL_DIR}
     -u ${UID}:$(id -g) \
     --entrypoint /opt/conda/bin/pge_tests_entrypoint.sh \

@@ -78,8 +78,28 @@ function cleanup {
 trap cleanup EXIT
 
 # Copy files to the staging area and build the PGE docker image
-cp -r ${WORKSPACE}/src/opera \
-      ${STAGING_DIR}/
+mkdir -p ${STAGING_DIR}/opera/pge
+
+cp ${WORKSPACE}/src/opera/__init__.py \
+   ${STAGING_DIR}/opera/
+
+cp ${WORKSPACE}/src/opera/_package.py \
+   ${STAGING_DIR}/opera/
+
+cp ${WORKSPACE}/src/opera/pge/__init__.py \
+   ${STAGING_DIR}/opera/pge/
+
+cp -r ${WORKSPACE}/src/opera/pge/base \
+      ${STAGING_DIR}/opera/pge/
+
+cp -r ${WORKSPACE}/src/opera/pge/${PGE_NAME} \
+      ${STAGING_DIR}/opera/pge/
+
+cp -r ${WORKSPACE}/src/opera/scripts \
+      ${STAGING_DIR}/opera/
+
+cp -r ${WORKSPACE}/src/opera/util \
+      ${STAGING_DIR}/opera/
 
 cp ${WORKSPACE}/COPYING \
    ${STAGING_DIR}/opera

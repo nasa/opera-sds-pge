@@ -15,7 +15,7 @@ ARG BUILD_VERSION
 # the label-schema convention: http://label-schema.org/rc1/
 LABEL org.label-schema.build-date=${BUILD_DATE_TIME} \
   org.label-schema.version=${BUILD_VERSION} \
-  org.label-schema.license="Copyright 2021,\
+  org.label-schema.license="Copyright 2022,\
  by the California Institute of Technology.\
  ALL RIGHTS RESERVED.\
  United States Government sponsorship acknowledged.\
