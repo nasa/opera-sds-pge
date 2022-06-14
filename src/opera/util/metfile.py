@@ -24,7 +24,7 @@ from pkg_resources import resource_filename
 class MetFile:
     """Class used to read and write .json catalog metadata files."""
 
-    SCHEMA_PATH = resource_filename('opera', 'schema/catalog_metadata_schema.json')
+    SCHEMA_PATH = resource_filename('opera', 'pge/base/schema/catalog_metadata_schema.json')
 
     def __init__(self, met_dict=None):
         """
