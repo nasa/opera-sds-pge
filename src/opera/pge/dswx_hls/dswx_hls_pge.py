@@ -140,7 +140,7 @@ class DSWxHLSPostProcessorMixin(PostProcessorMixin):
 
         The core file name component of the DSWx PGE consists of:
 
-        <PROJECT>_<LEVEL>_<PGE NAME>_<SOURCE>_<SPACECRAFT_NAME>_<TILE ID>_<TIMETAG>_<PRODUCT VERSION>_<PRODUCT_COUNTER>
+        <PROJECT>_<LEVEL>_<PGE NAME>_<SOURCE>_<SPACECRAFT_NAME>_<TILE ID>_<TIMETAG>_<PRODUCT VERSION>
 
         Callers of this function are responsible for assignment of any other
         product-specific fields, such as the file extension.
@@ -206,8 +206,7 @@ class DSWxHLSPostProcessorMixin(PostProcessorMixin):
         # Assign the core file to the cached class attribute
         self._cached_core_filename = (
             f"{self.PROJECT}_{self.LEVEL}_{self.NAME}_{source}_{sensor}_{pixel_spacing}_"
-            f"{tile_id}_{acquisition_time}_{processing_time}_{product_version}_"
-            f"{str(self.runconfig.product_counter).zfill(3)}"
+            f"{tile_id}_{acquisition_time}_{processing_time}_{product_version}"
         )
 
         return self._cached_core_filename
@@ -343,7 +342,7 @@ class DSWxHLSPostProcessorMixin(PostProcessorMixin):
         custom_metadata = {
             'ISO_OPERA_FilePackageName': self._core_filename(),
             'ISO_OPERA_ProducerGranuleId': self._core_filename(),
-            'MetadataProviderAction': "revision" if int(self.runconfig.product_counter) > 1 else "creation",
+            'MetadataProviderAction': "creation",
             'GranuleFilename': self._core_filename(),
             'ISO_OPERA_ProjectKeywords': ['OPERA', 'JPL', 'DSWx', 'Dynamic', 'Surface', 'Water', 'Extent'],
             'ISO_OPERA_PlatformKeywords': ['HLS'],

@@ -17,7 +17,6 @@ RunConfig:
           DEMFile: input/input_dem.vrt
 
       ProductPathGroup:
-        ProductCounter: 005
         OutputProductPath: base_pge_test/outputs/
         ScratchPath: base_pge_test/scratch/
 

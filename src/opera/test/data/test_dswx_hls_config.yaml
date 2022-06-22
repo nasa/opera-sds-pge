@@ -15,7 +15,6 @@ RunConfig:
                 AncillaryFileMap: {}
 
             ProductPathGroup:
-                ProductCounter: 001
                 OutputProductPath: dswx_pge_test/output_dir
                 ScratchPath: dswx_pge_test/scratch_dir
 

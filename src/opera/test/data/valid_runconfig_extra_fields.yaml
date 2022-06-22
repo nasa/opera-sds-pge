@@ -20,7 +20,6 @@ RunConfig:
           DEMFile: input/input_dem.vrt
 
       ProductPathGroup:
-        ProductCounter: 005
         OutputProductPath: outputs/
         ScratchPath: temp/
 

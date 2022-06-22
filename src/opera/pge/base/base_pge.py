@@ -325,7 +325,7 @@ class PostProcessorMixin:
 
         The core file name component of the Base PGE consists of:
 
-            <PROJECT>_<LEVEL>_<PGE NAME>_<TIMETAG>_<PRODUCT_COUNTER>
+            <PROJECT>_<LEVEL>_<PGE NAME>_<TIMETAG>
 
         Callers of this function are responsible for assignment of any other
         product-specific fields, such as the file extension.
@@ -346,8 +346,7 @@ class PostProcessorMixin:
         """
         time_tag = get_time_for_filename(self.production_datetime)
 
-        return f"{self.PROJECT}_{self.LEVEL}_{self.NAME}_" \
-               f"{time_tag}_{str(self.runconfig.product_counter).zfill(3)}"
+        return f"{self.PROJECT}_{self.LEVEL}_{self.NAME}_{time_tag}"
 
     def _geotiff_filename(self, inter_filename):
         """

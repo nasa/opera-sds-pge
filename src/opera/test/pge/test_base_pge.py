@@ -142,7 +142,6 @@ class BasePgeTestCase(unittest.TestCase):
             log_contents = infile.read()
 
         self.assertIn("RunConfig.Groups.PGE.InputFilesGroup.InputFilePaths: 'None' is not a list.", log_contents)
-        self.assertIn("RunConfig.Groups.PGE.ProductPathGroup.ProductCounter: -1 is less than 1", log_contents)
         self.assertIn("RunConfig.Groups.PGE.PrimaryExecutable.ProgramPath: Required field missing", log_contents)
         self.assertIn("RunConfig.Groups.PGE.PrimaryExecutable.ProgramOptions: '--debug --restart' is not a list.",
                       log_contents)
@@ -261,7 +260,7 @@ class BasePgeTestCase(unittest.TestCase):
         pge._load_runconfig()
         name = "TestName.tif"
         file_name = pge._geotiff_filename(name)
-        file_name_regex = rf'{pge.PROJECT}_{pge.LEVEL}_BasePge_\d{{8}}T\d{{6}}_\d{{3}}_{name}{{1,2}}?'
+        file_name_regex = rf'{pge.PROJECT}_{pge.LEVEL}_BasePge_\d{{8}}T\d{{6}}_{name}{{1,2}}?'
         self.assertEqual(re.match(file_name_regex, file_name).group(), file_name)
 
     def _makedirs_mock(self, mode=511, exist_ok=False):
