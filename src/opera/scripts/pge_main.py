@@ -17,14 +17,14 @@ import argparse
 import os
 from importlib import import_module
 
-from opera.pge.runconfig import RunConfig
+from opera.pge.base.runconfig import RunConfig
 from opera.util.error_codes import ErrorCode
 from opera.util.logger import PgeLogger, default_log_file_name
 
 
 PGE_NAME_MAP = {
-    'DSWX_HLS_PGE': ('opera.pge.dswx_pge', 'DSWxExecutor'),
-    'BASE_PGE': ('opera.pge.base_pge', 'PgeExecutor')
+    'DSWX_HLS_PGE': ('opera.pge.dswx_hls.dswx_hls_pge', 'DSWxHLSExecutor'),
+    'BASE_PGE': ('opera.pge.base.base_pge', 'PgeExecutor')
 }
 """Mapping of PGE names specified by a RunConfig to the PGE module and class type to instantiate"""
 

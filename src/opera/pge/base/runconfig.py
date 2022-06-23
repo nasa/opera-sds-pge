@@ -23,11 +23,8 @@ import yamale
 import yaml
 
 
-BASE_PGE_SCHEMA = resource_filename('opera', 'schema/base_pge_schema.yaml')
+BASE_PGE_SCHEMA = resource_filename('opera', 'pge/base/schema/base_pge_schema.yaml')
 """Path to the Yamale schema applicable to the PGE portion of each RunConfig"""
-
-ISO_TEMPLATE_DIR = resource_filename('opera', 'pge/templates')
-"""Path to the repository directory containing ISO metadata Jinja2 templates"""
 
 
 class RunConfig:
@@ -122,12 +119,9 @@ class RunConfig:
         # will be used.
         if self.sas_config is not None:
             # Determine the SAS schema file to load from the provided RunConfig
-            sas_schema_filename = self.sas_schema_path
-            sas_schema_filepath = resource_filename('opera', f'schema/{sas_schema_filename}')
+            sas_schema_filepath = self.sas_schema_path
 
             if isfile(sas_schema_filepath):
-                # TODO: better error handling for missing sas schema,
-                #       support for absolute paths as fallback when resource_filename fails?
                 sas_schema = yamale.make_schema(sas_schema_filepath)
 
                 # Link the SAS schema to the PGE as an "include"
@@ -137,8 +131,7 @@ class RunConfig:
             else:
                 raise RuntimeError(
                     f'Can not validate RunConfig {self.name}, as the associated SAS '
-                    f'schema ({sas_schema_filename}) cannot be located within the '
-                    f'schemas directory.'
+                    f'schema ({sas_schema_filepath}) cannot be located.'
                 )
 
         # Yamale expects its own formatting of the parsed config, hence the need
@@ -247,7 +240,12 @@ class RunConfig:
     @property
     def sas_schema_path(self) -> str:
         """Returns the path to the Schema file for a Primary Executable"""
-        return self._pge_config['PrimaryExecutable']['SchemaPath']
+        sas_schema_path = self._pge_config['PrimaryExecutable']['SchemaPath']
+        return (
+            sas_schema_path
+            if isabs(sas_schema_path)
+            else resource_filename('opera', sas_schema_path)
+        )
 
     @property
     def iso_template_path(self) -> str:
@@ -256,7 +254,7 @@ class RunConfig:
         return (
             iso_template_path
             if isabs(iso_template_path)
-            else join(ISO_TEMPLATE_DIR, iso_template_path)
+            else resource_filename('opera', iso_template_path)
         )
 
     # QAExecutable

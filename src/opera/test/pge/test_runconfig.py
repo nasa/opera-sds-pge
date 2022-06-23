@@ -17,7 +17,6 @@ from pkg_resources import resource_filename
 from yamale import YamaleError
 
 from opera.pge import RunConfig
-from opera.pge.runconfig import ISO_TEMPLATE_DIR
 
 
 class RunconfigTestCase(unittest.TestCase):
@@ -27,10 +26,7 @@ class RunconfigTestCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
-        """
-        Initialize class variables for required paths
-        -------
-        """
+        """Initialize class variables for required paths"""
         cls.test_dir = resource_filename(__name__, "")
         cls.data_dir = join(cls.test_dir, os.pardir, "data")
         cls.valid_config_full = join(cls.data_dir, "valid_runconfig_full.yaml")
@@ -54,9 +50,8 @@ class RunconfigTestCase(unittest.TestCase):
         self.assertEqual(runconfig.sas_program_path, "pybind_opera.workflows.example_workflow")
         self.assertListEqual(runconfig.sas_program_options, ["--debug", "--restart"])
         self.assertEqual(runconfig.error_code_base, 100000)
-        self.assertEqual(runconfig.sas_schema_path, "sample_sas_schema.yaml")
-        self.assertEqual(runconfig.iso_template_path,
-                         join(ISO_TEMPLATE_DIR, "sample_iso_template.xml.jinja2"))
+        self.assertEqual(runconfig.sas_schema_path, resource_filename("opera", "test/data/sample_sas_schema.yaml"))
+        self.assertEqual(runconfig.iso_template_path, resource_filename("opera", "sample_iso_template.xml.jinja2"))
         self.assertEqual(runconfig.qa_enabled, True)
         self.assertEqual(runconfig.qa_program_path, "/opt/QualityAssurance/sample_qa.py")
         self.assertListEqual(runconfig.qa_program_options, ["--debug"])
@@ -66,7 +61,7 @@ class RunconfigTestCase(unittest.TestCase):
     def test_full_pge_config_parse_and_validate(self):
         """
         Test basic parsing and validation of an input RunConfig that includes
-        both the base PGE section as well as a SAS section.
+        both the base PGE section and the SAS section.
         """
         # Create a RunConfig with the valid test data
         runconfig = RunConfig(self.valid_config_full)
@@ -111,7 +106,6 @@ class RunconfigTestCase(unittest.TestCase):
     def test_strict_mode_validation(self):
         """
         Test validation of a RunConfig with strict_mode both enabled and disabled
-        -------
         """
         # Parse a valid runconfig, but modify it with fields not in the base
         # PGE schema

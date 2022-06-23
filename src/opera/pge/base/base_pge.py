@@ -94,7 +94,11 @@ class PreProcessorMixin:
 
         try:
             self.runconfig.validate()
-        except YamaleError as error:
+        except (RuntimeError, YamaleError) as error:
+            # Since we can't rely on directories from RunConfig existing yet,
+            # dump log to /tmp, where we should have write permissions
+            self.logger.move(join('/tmp', default_log_file_name()))
+
             error_msg = (f'Validation of RunConfig file {self.runconfig.filename} '
                          f'failed, reason(s): \n{str(error)}')
 
@@ -126,6 +130,10 @@ class PreProcessorMixin:
             self.logger.info(self.name, ErrorCode.DIRECTORY_SETUP_COMPLETE,
                              'Directory setup complete')
         except OSError as error:
+            # Since we can't rely on directories from RunConfig existing yet,
+            # dump log to /tmp, where we should have write permissions
+            self.logger.move(join('/tmp', default_log_file_name()))
+
             error_msg = (f'Could not create one or more working directories. '
                          f'reason: \n{str(error)}')
 

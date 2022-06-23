@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 
 """
-================
-test_dswx_pge.py
-================
+====================
+test_dswx_hls_pge.py
+====================
 
-Unit tests for the pge/dswx_pge.py module.
+Unit tests for the pge/dswx_hls/dswx_hls_pge.py module.
 """
 import glob
 import os
@@ -21,7 +21,8 @@ from pkg_resources import resource_filename
 import yaml
 
 import opera.util.img_utils
-from opera.pge import DSWxExecutor, RunConfig
+from opera.pge import RunConfig
+from opera.pge.dswx_hls.dswx_hls_pge import DSWxHLSExecutor
 from opera.util import PgeLogger
 from opera.util.img_utils import MockGdal
 
@@ -80,7 +81,7 @@ class DSWxPgeTestCase(unittest.TestCase):
         """
         runconfig_path = join(self.data_dir, 'test_dswx_hls_config.yaml')
 
-        pge = DSWxExecutor(pge_name="DSWxPgeTest", runconfig_path=runconfig_path)
+        pge = DSWxHLSExecutor(pge_name="DSWxPgeTest", runconfig_path=runconfig_path)
 
         # Check that basic attributes were initialized
         self.assertEqual(pge.name, "DSWx")
@@ -157,7 +158,7 @@ class DSWxPgeTestCase(unittest.TestCase):
             yaml.safe_dump(runconfig_dict, input_path, sort_keys=False)
 
         try:
-            pge = DSWxExecutor(pge_name="DSWxPgeTest", runconfig_path=test_runconfig_path)
+            pge = DSWxHLSExecutor(pge_name="DSWxPgeTest", runconfig_path=test_runconfig_path)
 
             with self.assertRaises(RuntimeError):
                 pge.run()
@@ -181,7 +182,7 @@ class DSWxPgeTestCase(unittest.TestCase):
             with open(test_runconfig_path, 'w', encoding='utf-8') as out_file:
                 yaml.safe_dump(runconfig_dict, out_file, sort_keys=False)
 
-            pge = DSWxExecutor(pge_name="DSWxPgeTest", runconfig_path=test_runconfig_path)
+            pge = DSWxHLSExecutor(pge_name="DSWxPgeTest", runconfig_path=test_runconfig_path)
 
             with self.assertRaises(RuntimeError):
                 pge.run()
@@ -201,7 +202,7 @@ class DSWxPgeTestCase(unittest.TestCase):
             with open(test_runconfig_path, 'w', encoding='utf-8') as runconfig_fh:
                 yaml.safe_dump(runconfig_dict, runconfig_fh, sort_keys=False)
 
-            pge = DSWxExecutor(pge_name="DSWxPgeTest", runconfig_path=test_runconfig_path)
+            pge = DSWxHLSExecutor(pge_name="DSWxPgeTest", runconfig_path=test_runconfig_path)
 
             with self.assertRaises(RuntimeError):
                 pge.run()
@@ -237,7 +238,7 @@ class DSWxPgeTestCase(unittest.TestCase):
             yaml.safe_dump(runconfig_dict, config_fh, sort_keys=False)
 
         try:
-            pge = DSWxExecutor(pge_name="DSWxPgeTest", runconfig_path=test_runconfig_path)
+            pge = DSWxHLSExecutor(pge_name="DSWxPgeTest", runconfig_path=test_runconfig_path)
 
             with self.assertRaises(RuntimeError):
                 pge.run()
@@ -263,7 +264,7 @@ class DSWxPgeTestCase(unittest.TestCase):
             with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
                 yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
 
-            pge = DSWxExecutor(pge_name="DSWxPgeTest", runconfig_path=test_runconfig_path)
+            pge = DSWxHLSExecutor(pge_name="DSWxPgeTest", runconfig_path=test_runconfig_path)
 
             with self.assertRaises(RuntimeError):
                 pge.run()
@@ -288,7 +289,7 @@ class DSWxPgeTestCase(unittest.TestCase):
         """Test _geotiff_filename() method"""
         runconfig_path = join(self.data_dir, 'test_dswx_hls_config.yaml')
 
-        pge = DSWxExecutor(pge_name="DSWxPgeTest", runconfig_path=runconfig_path)
+        pge = DSWxHLSExecutor(pge_name="DSWxPgeTest", runconfig_path=runconfig_path)
 
         pge.run()
 

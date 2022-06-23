@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 
 """
-===========
-dswx_pge.py
-===========
+===============
+dswx_hls_pge.py
+===============
 
-Module defining the implementation for the Dynamic Surface Water Extent (DSWx) PGE.
+Module defining the implementation for the Dynamic Surface Water Extent (DSWx)
+from Harmonized Landsat and Sentinel-1 (HLS) PGE.
 
 """
 
@@ -14,6 +15,9 @@ import os.path
 from collections import OrderedDict
 from os.path import abspath, basename, exists, isdir, join, splitext
 
+from opera.pge.base.base_pge import PgeExecutor
+from opera.pge.base.base_pge import PostProcessorMixin
+from opera.pge.base.base_pge import PreProcessorMixin
 from opera.util.error_codes import ErrorCode
 from opera.util.img_utils import get_geotiff_hls_dataset
 from opera.util.img_utils import get_geotiff_metadata
@@ -26,24 +30,20 @@ from opera.util.metadata_utils import get_geographic_boundaries_from_mgrs_tile
 from opera.util.render_jinja2 import render_jinja2
 from opera.util.time import get_time_for_filename
 
-from .base_pge import PgeExecutor
-from .base_pge import PostProcessorMixin
-from .base_pge import PreProcessorMixin
 
-
-class DSWxPreProcessorMixin(PreProcessorMixin):
+class DSWxHLSPreProcessorMixin(PreProcessorMixin):
     """
     Mixin class responsible for handling all pre-processing steps for the
-    DSWx PGE. The pre-processing phase is defined as all steps necessary prior
+    DSWx-HLS PGE. The pre-processing phase is defined as all steps necessary prior
     to SAS execution.
 
     In addition to the base functionality inherited from PreProcessorMixin, this
-    mixin adds a input validation step to ensure that the input(s) defined by
+    mixin adds an input validation step to ensure that the input(s) defined by
     the RunConfig exist and are valid.
 
     """
 
-    _pre_mixin_name = "DSWxPreProcessorMixin"
+    _pre_mixin_name = "DSWxHLSPreProcessorMixin"
 
     def _validate_inputs(self):
         """
@@ -73,9 +73,9 @@ class DSWxPreProcessorMixin(PreProcessorMixin):
 
     def run_preprocessor(self, **kwargs):
         """
-        Executes the pre-processing steps for DSWx PGE initialization.
+        Executes the pre-processing steps for DSWx-HLS PGE initialization.
 
-        The DSWxPreProcessorMixin version of this function performs all actions
+        The DSWxHLSPreProcessorMixin version of this function performs all actions
         of the base PreProcessorMixin class, and adds the validation check for
         input files/directories.
 
@@ -90,19 +90,19 @@ class DSWxPreProcessorMixin(PreProcessorMixin):
         self._validate_inputs()
 
 
-class DSWxPostProcessorMixin(PostProcessorMixin):
+class DSWxHLSPostProcessorMixin(PostProcessorMixin):
     """
-    Mixin class responsible for handling all post-processing steps for the DSWx
-    PGE. The post-processing phase is defined as all steps necessary after
-    SAS execution has completed.
+    Mixin class responsible for handling all post-processing steps for the
+    DSWx-HLS PGE. The post-processing phase is defined as all steps necessary
+    after SAS execution has completed.
 
     In addition to the base functionality inherited from PostProcessorMixin, this
-    mixin adds a output validation step to ensure that the output file defined by
+    mixin adds an output validation step to ensure that the output file defined by
     the RunConfig exist and are valid.
 
     """
 
-    _post_mixin_name = "DSWxPostProcessorMixin"
+    _post_mixin_name = "DSWxHLSPostProcessorMixin"
     _cached_core_filename = None
 
     def _validate_output(self):
@@ -122,8 +122,8 @@ class DSWxPostProcessorMixin(PostProcessorMixin):
         )
 
         if not output_products:
-            error_msg = f"No SAS output file(s) containing product ID {product_id} " \
-                        f"found within {self.runconfig.output_product_path}"
+            error_msg = (f"No SAS output file(s) containing product ID {product_id} "
+                         f"found within {self.runconfig.output_product_path}")
 
             self.logger.critical(self.name, ErrorCode.OUTPUT_NOT_FOUND, error_msg)
 
@@ -214,13 +214,13 @@ class DSWxPostProcessorMixin(PostProcessorMixin):
 
     def _geotiff_filename(self, inter_filename):
         """
-        Returns the file name to use for GeoTIFF's produced by the DSWx PGE.
+        Returns the file name to use for GeoTIFF's produced by the DSWx-HLS PGE.
 
-        The GeoTIFF filename for the DSWx PGE consists of:
+        The GeoTIFF filename for the DSWx-HLS PGE consists of:
 
             <Core filename>_<Band Index>_<Band Name>.tif
 
-        Where <Core filename> is returned by DSWxPostProcessorMixin._core_filename()
+        Where <Core filename> is returned by DSWxHLSPostProcessorMixin._core_filename()
         and <Band Index> and <Band Name> are determined from the name of the
         intermediate geotiff file to be renamed.
 
@@ -247,7 +247,7 @@ class DSWxPostProcessorMixin(PostProcessorMixin):
 
     def _collect_dswx_product_metadata(self):
         """
-        Gathers the available metadata from a sample output DSWx product for
+        Gathers the available metadata from a sample output DSWx-HLS product for
         use in filling out the ISO metadata template for the DSWx-HLS PGE.
 
         Returns
@@ -396,9 +396,9 @@ class DSWxPostProcessorMixin(PostProcessorMixin):
 
     def run_postprocessor(self, **kwargs):
         """
-        Executes the post-processing steps for DSWx PGE job completion.
+        Executes the post-processing steps for DSWx-HLS PGE job completion.
 
-        The DSWxPostProcessorMixin version of this function performs the same
+        The DSWxHLSPostProcessorMixin version of this function performs the same
         steps as the base PostProcessorMixin, but inserts the output file
         validation check prior to staging of the output files.
 
@@ -415,20 +415,20 @@ class DSWxPostProcessorMixin(PostProcessorMixin):
         self._stage_output_files()
 
 
-class DSWxExecutor(DSWxPreProcessorMixin, DSWxPostProcessorMixin, PgeExecutor):
+class DSWxHLSExecutor(DSWxHLSPreProcessorMixin, DSWxHLSPostProcessorMixin, PgeExecutor):
     """
-    Main class for execution of a DSWx PGE, including the SAS layer.
+    Main class for execution of a DSWx-HLS PGE, including the SAS layer.
 
-    This class essentially rolls up the DSWx-tailored pre- and post-processors
+    This class essentially rolls up the tailored pre- and post-processors
     while inheriting all other functionality from the base PgeExecutor class.
 
     """
 
     NAME = "DSWx"
-    """Short name for the DSWx PGE"""
+    """Short name for the DSWx-HLS PGE"""
 
     LEVEL = "L3"
-    """Processing Level for DSWx Products"""
+    """Processing Level for DSWx-HLS Products"""
 
     SAS_VERSION = "0.1"
     """Version of the SAS wrapped by this PGE, should be updated as needed with new SAS deliveries"""
