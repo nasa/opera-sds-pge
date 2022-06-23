@@ -141,9 +141,6 @@
                         <gco:CharacterString>Dynamic Surface Water Extent from Harmonized Landsat-8 and Sentinel-2 A/B Product</gco:CharacterString>
                     </gmd:alternateTitle>
                     <!-- The date/time that data provider created or updated the granule info on data provider's database.-->
-                    <!-- SDS: If ProductCounter is "01" or), use the "creation".
-                         If SDS regenerates a product to increase the "ProductCounter", use the "revision" instead of "creation"
-                         If Creation DateTime is the only file versioning scheme, this record will be always "creation" -->
                     <gmd:date>
                         <gmd:CI_Date>
                             <gmd:date>
@@ -196,20 +193,6 @@
                             </gmd:codeSpace>
                             <gmd:description>
                                 <gco:CharacterString>OtherId: SASVersionId</gco:CharacterString>
-                            </gmd:description>
-                        </gmd:MD_Identifier>
-                    </gmd:identifier>
-                    <!-- Product Counter -->
-                    <gmd:identifier>
-                        <gmd:MD_Identifier>
-                            <gmd:code>
-                                <gco:CharacterString>{{ run_config.Groups.PGE.ProductPathGroup.ProductCounter }}{# ISO_OPERA_ProductCounter #}</gco:CharacterString>
-                            </gmd:code>
-                            <gmd:codeSpace>
-                                <gco:CharacterString>gov.nasa.esdis.umm.otherid</gco:CharacterString>
-                            </gmd:codeSpace>
-                            <gmd:description>
-                                <gco:CharacterString>OtherId: ProductCounter</gco:CharacterString>
                             </gmd:description>
                         </gmd:MD_Identifier>
                     </gmd:identifier>

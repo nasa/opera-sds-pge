@@ -43,7 +43,6 @@ class RunconfigTestCase(unittest.TestCase):
         self.assertEqual(runconfig.pge_name, "EXAMPLE_PGE")
         self.assertListEqual(runconfig.input_files, ["input/input_file01.h5", "input/input_file02.h5"])
         self.assertDictEqual(runconfig.ancillary_file_map, {"DEMFile": "input/input_dem.vrt"})
-        self.assertEqual(runconfig.product_counter, 5)
         self.assertEqual(runconfig.output_product_path, "outputs/")
         self.assertEqual(runconfig.scratch_path, "temp/")
         self.assertEqual(runconfig.product_identifier, "EXAMPLE")
@@ -148,7 +147,6 @@ class RunconfigTestCase(unittest.TestCase):
         except YamaleError as err:
             # Make sure Yamale caught the errors we expect
             self.assertIn("RunConfig.Groups.PGE.InputFilesGroup.InputFilePaths: 'None' is not a list.", str(err))
-            self.assertIn("RunConfig.Groups.PGE.ProductPathGroup.ProductCounter: -1 is less than 1", str(err))
             self.assertIn("RunConfig.Groups.PGE.PrimaryExecutable.ProgramPath: Required field missing", str(err))
             self.assertIn("RunConfig.Groups.PGE.PrimaryExecutable.ProgramOptions: '--debug --restart' is not a list.",
                           str(err))

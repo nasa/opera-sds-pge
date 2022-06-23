@@ -202,11 +202,6 @@ class RunConfig:
 
     # ProductPathGroup
     @property
-    def product_counter(self) -> int:
-        """Returns the Product Counter from Product Path Group"""
-        return self._pge_config['ProductPathGroup']['ProductCounter']
-
-    @property
     def output_product_path(self) -> str:
         """Returns the Output Product Path from the Product Path Group"""
         return self._pge_config['ProductPathGroup']['OutputProductPath']
