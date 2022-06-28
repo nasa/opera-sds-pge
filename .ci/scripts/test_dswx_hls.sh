@@ -44,6 +44,8 @@ Testing DSWx-HLS PGE Docker image...
 PGE_NAME="dswx_hls"
 IMAGE="opera_pge/${PGE_NAME}"
 TEST_RESULTS_REL_DIR="test_results"
+CONTAINER_HOME="/home/conda"
+CONDA_ROOT="/opt/conda"
 
 # defaults
 [ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath $(dirname $(realpath $0))/../..)
@@ -52,7 +54,7 @@ TEST_RESULTS_REL_DIR="test_results"
 TEST_RESULTS_DIR="${WORKSPACE}/${TEST_RESULTS_REL_DIR}/${PGE_NAME}"
 
 echo "Test results output directory: ${TEST_RESULTS_DIR}"
-mkdir --mode=775 --parents ${TEST_RESULTS_DIR}
+mkdir --parents ${TEST_RESULTS_DIR}
 chmod -R 775 ${TEST_RESULTS_DIR}
 
 # Use the environment of the docker image to run linting, tests, etc...
@@ -61,16 +63,16 @@ chmod -R 775 ${TEST_RESULTS_DIR}
 # Docker image rather than code found on the host.
 DOCKER_RUN="docker run --rm \
     -v ${WORKSPACE}:/workspace \
-    -v ${WORKSPACE}/src/opera/test/data:/home/conda/opera/test/data \
-    -w /workspace/${TEST_RESULTS_REL_DIR}
+    -v ${WORKSPACE}/src/opera/test/data:${CONTAINER_HOME}/opera/test/data \
+    -w /workspace/${TEST_RESULTS_REL_DIR} \
     -u ${UID}:$(id -g) \
-    --entrypoint /opt/conda/bin/pge_tests_entrypoint.sh \
+    --entrypoint ${CONDA_ROOT}/bin/pge_tests_entrypoint.sh \
     ${IMAGE}:${TAG}"
 
 # Configure a trap to set permissions on exit regardless of whether the testing succeeds
 function set_perms {
-    # Open up permissions on all test results we can be sure the CI system can
-    # delete them after they're archived within Jenkins
+    # Open up permissions on all test results so we can be sure the CI system can
+    # delete them after results are archived within Jenkins
     ${DOCKER_RUN} bash -c "find \
         /workspace/${TEST_RESULTS_REL_DIR} -type d -exec chmod 775 {} +"
 
@@ -82,30 +84,34 @@ trap set_perms EXIT
 
 # linting and pep8 style check (configured by .flake8 and .pylintrc)
 ${DOCKER_RUN} flake8 \
-    --config /home/conda/opera/.flake8 \
+    --config ${CONTAINER_HOME}/opera/.flake8 \
     --jobs auto \
     --exit-zero \
     --application-import-names opera \
     --output-file /workspace/${TEST_RESULTS_REL_DIR}/${PGE_NAME}/flake8.log \
-    /home/conda/opera
+    ${CONTAINER_HOME}/opera
 
 ${DOCKER_RUN} pylint \
-    --rcfile=/home/conda/opera/.pylintrc \
+    --rcfile=${CONTAINER_HOME}/opera/.pylintrc \
     --jobs 0 \
     --exit-zero \
     --output=/workspace/${TEST_RESULTS_REL_DIR}/${PGE_NAME}/pylint.log \
     --enable-all-extensions \
-    /home/conda/opera
+    ${CONTAINER_HOME}/opera
 
 # pytest (including code coverage)
 ${DOCKER_RUN} bash -c "pytest \
     --junit-xml=/workspace/${TEST_RESULTS_REL_DIR}/${PGE_NAME}/pytest-junit.xml \
-    --cov=/home/conda/opera/pge \
-    --cov=/home/conda/opera/scripts \
-    --cov=/home/conda/opera/util \
+    --cov=${CONTAINER_HOME}/opera/pge/base \
+    --cov=${CONTAINER_HOME}/opera/pge/${PGE_NAME} \
+    --cov=${CONTAINER_HOME}/opera/scripts \
+    --cov=${CONTAINER_HOME}/opera/util \
     --cov-report=term \
     --cov-report=html:/workspace/${TEST_RESULTS_REL_DIR}/${PGE_NAME}/coverage_html \
-    /workspace/src/opera/test > /workspace/${TEST_RESULTS_REL_DIR}/${PGE_NAME}/pytest.log 2>&1"
+    /workspace/src/opera/test/pge/base \
+    /workspace/src/opera/test/pge/${PGE_NAME} \
+    /workspace/src/opera/test/scripts \
+    /workspace/src/opera/test/util > /workspace/${TEST_RESULTS_REL_DIR}/${PGE_NAME}/pytest.log 2>&1"
 
 echo "DSWx-HLS PGE Docker image test complete"
 
