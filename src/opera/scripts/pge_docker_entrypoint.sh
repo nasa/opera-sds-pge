@@ -4,7 +4,7 @@
 # Responsible for configuring the shell environment for the execution of pge_main.py
 
 DOCKER_ENTRYPOINT_SCRIPT_DIR=$(dirname ${BASH_SOURCE[0]})
-PGE_PROGRAM_DIR=/home/conda
+PGE_PROGRAM_DIR=${PGE_DEST_DIR}
 
 # Python path setup
 export PYTHONPATH=$PYTHONPATH:${PGE_PROGRAM_DIR}
