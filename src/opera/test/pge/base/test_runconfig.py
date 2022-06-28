@@ -28,7 +28,7 @@ class RunconfigTestCase(unittest.TestCase):
     def setUpClass(cls) -> None:
         """Initialize class variables for required paths"""
         cls.test_dir = resource_filename(__name__, "")
-        cls.data_dir = join(cls.test_dir, os.pardir, "data")
+        cls.data_dir = join(cls.test_dir, os.pardir, os.pardir, "data")
         cls.valid_config_full = join(cls.data_dir, "valid_runconfig_full.yaml")
         cls.valid_config_no_sas = join(cls.data_dir, "valid_runconfig_no_sas.yaml")
         cls.valid_config_extra_fields = join(cls.data_dir, "valid_runconfig_extra_fields.yaml")

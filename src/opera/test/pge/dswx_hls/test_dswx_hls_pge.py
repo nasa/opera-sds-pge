@@ -40,7 +40,7 @@ class DSWxPgeTestCase(unittest.TestCase):
         """Set up directories and files for testing"""
         cls.starting_dir = abspath(os.curdir)
         cls.test_dir = resource_filename(__name__, "")
-        cls.data_dir = join(cls.test_dir, os.pardir, "data")
+        cls.data_dir = join(cls.test_dir, os.pardir, os.pardir, "data")
 
         os.chdir(cls.test_dir)
 
@@ -52,7 +52,7 @@ class DSWxPgeTestCase(unittest.TestCase):
     def setUp(self) -> None:
         """Use the temporary directory as the working directory"""
         self.working_dir = tempfile.TemporaryDirectory(
-            prefix="test_dswx_pge_", suffix='_temp', dir=os.curdir
+            prefix="test_dswx_hls_pge_", suffix='_temp', dir=os.curdir
         )
 
         # Create the input dir expected by the test RunConfig and add a dummy
@@ -72,27 +72,27 @@ class DSWxPgeTestCase(unittest.TestCase):
         self.working_dir.cleanup()
 
     @patch.object(opera.util.img_utils, "gdal", MockGdal)
-    def test_dswx_pge_execution(self):
+    def test_dswx_hls_pge_execution(self):
         """
-        Test execution of the DSWxExecutor class and its associated mixins using
+        Test execution of the DSWxHLSExecutor class and its associated mixins using
         a test RunConfig that creates a dummy expected output file and logs a
         message to be captured by PgeLogger.
 
         """
         runconfig_path = join(self.data_dir, 'test_dswx_hls_config.yaml')
 
-        pge = DSWxHLSExecutor(pge_name="DSWxPgeTest", runconfig_path=runconfig_path)
+        pge = DSWxHLSExecutor(pge_name="DSWxHLSPgeTest", runconfig_path=runconfig_path)
 
         # Check that basic attributes were initialized
         self.assertEqual(pge.name, "DSWx")
-        self.assertEqual(pge.pge_name, "DSWxPgeTest")
+        self.assertEqual(pge.pge_name, "DSWxHLSPgeTest")
         self.assertEqual(pge.runconfig_path, runconfig_path)
 
         # Check that other objects have not been instantiated yet
         self.assertIsNone(pge.runconfig)
         self.assertIsNone(pge.logger)
 
-        # Kickoff execution of DSWx PGE
+        # Kickoff execution of DSWx-HLS PGE
         pge.run()
 
         # Check that the runconfig and logger were instantiated
@@ -105,7 +105,7 @@ class DSWxPgeTestCase(unittest.TestCase):
 
         # Check that an in-memory log was created
         stream = pge.logger.get_stream_object()
-        self.assertTrue(isinstance(stream, StringIO))
+        self.assertIsInstance(stream, StringIO)
 
         # Check that a RunConfig for the SAS was isolated within the scratch directory
         expected_sas_config_file = join(pge.runconfig.scratch_path, 'test_dswx_hls_config_sas.yaml')
