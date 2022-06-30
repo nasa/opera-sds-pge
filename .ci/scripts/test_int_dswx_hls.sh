@@ -51,7 +51,7 @@ PGE_NAME="dswx_hls"
 PGE_IMAGE="opera_pge/${PGE_NAME}"
 
 # For this version of integration test, an archive has been created which contains
-# the unmodified ADT SAS test data archive, a PGE runconfig, and PGE expected output.
+# the unmodified ADT SAS test data archive and PGE expected output.
 
 # TESTDATA should be the name of the test data archive.
 # Execution will take place in the current directory.
