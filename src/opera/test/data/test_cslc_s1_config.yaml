@@ -1,0 +1,110 @@
+RunConfig:
+    Name: OPERA-CSLC-S1-PGE-TEST-CONFIG
+
+    Groups:
+
+        PGE:
+            PGENameGroup:
+                PGEName: CSLC_S1_PGE
+
+            InputFilesGroup:
+                InputFilePaths:
+                    - cslc_pge_test/input_dir
+
+            DynamicAncillaryFilesGroup:
+                AncillaryFileMap:
+                    dem_file: cslc_pge_test/input_dir/dem_4326.tiff
+
+            ProductPathGroup:
+                OutputProductPath: cslc_pge_test/output_dir
+                ScratchPath: cslc_pge_test/scratch_dir
+
+            PrimaryExecutable:
+                ProductIdentifier: CSLC_S1
+                ProgramPath: /bin/echo
+                ProgramOptions:
+                    - 'hello world > cslc_pge_test/output_dir/t64_iw2_b204_20220501_VV.slc;'
+                    - '/bin/echo "hello json" > cslc_pge_test/output_dir/t64_iw2_b204_20220501_VV.json;'
+                    - '/bin/echo CSLC-S1 invoked with RunConfig'
+                ErrorCodeBase: 200000
+                SchemaPath: pge/cslc_s1/schema/cslc_s1_sas_schema.yaml
+                IsoTemplatePath:
+
+            QAExecutable:
+                Enabled: False
+                ProgramPath:
+                ProgramOptions: []
+
+            DebugLevelGroup:
+                DebugSwitch: False
+                ExecuteViaShell: True  # Must be set to True for test to work
+
+        SAS:
+            runconfig:
+                name: cslc_s1_workflow_default
+
+                groups:
+                    pge_name_group:
+                        pge_name: CSLC_S1_PGE
+
+                    input_file_group:
+                        # Required. List of SAFE files (min=1)
+                        safe_file_path:
+                            - input_data/S1A_IW_SLC__1SDV_20220501T015035_20220501T015102_043011_0522A4_42CC.zip
+                        # Required. List of orbit (EOF) files (min=1)
+                        orbit_file_path:
+                            - input_data/S1A_OPER_AUX_POEORB_OPOD_20220521T081912_V20220430T225942_20220502T005942.EOF
+                        # Required. Path to the burst data
+                        burst_file_path: input_data/burst_t64_iw2_b204_20210501_VV.slc.vrt
+                        # Required. Path to light metadata file
+                        light_metadata_path: input_data/light_metadata_t64_iw2_b204_20210501_VV.json
+                        # Required. The unique burst ID to process
+                        burst_id: t64_iw2_b204
+
+                    dynamic_ancillary_file_group:
+                        # Digital elevation model
+                        dem_file: input_data/dem_4326.tiff
+
+                    product_path_group:
+                        # Directory where PGE will place results
+                        product_path: output_dir
+                        # Directory where SAS writes temporary data
+                        scratch_path: output_dir/scratch_dir
+                        # Intermediate file name. SAS writes the output to this file.
+                        # PGE may rename the product according to file naming convention
+                        sas_output_file: output_s1_cslc
+
+                    primary_executable:
+                        product_type: CSLC_S1
+
+                    processing:
+                        polarization: co-pol
+                        geocoding:
+                            output_format: GTiff
+                            flatten: True
+                            # Dem margin (in units of input DEM)
+                            lines_per_block: 1000
+                            output_epsg: 32611
+                            x_posting: 5
+                            y_posting: 10
+                            x_snap:
+                            y_snap:
+                            top_left:
+                                x: 393220.0
+                                y: 3897270.0
+                            bottom_right:
+                                x: 498265.0
+                                y: 3935210.0
+                        geo2rdr:
+                            lines_per_block: 1000
+                            threshold: 1.0e-8
+                            numiter: 25
+
+                    worker:
+                        # Optional. To prevent downloading DEM or other data (default: False)
+                        internet_access: False
+                        # Optional. Use GPU capabilities if available (default: False)
+                        gpu_enabled: False
+                        # Optional. Index of GPU to be used for processing. Ignored if
+                        # *gpu_enabled* is False (default: 0)
+                        gpu_id: 0

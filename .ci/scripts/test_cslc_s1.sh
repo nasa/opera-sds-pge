@@ -1,5 +1,5 @@
 #!/bin/bash
-# Script to execute tests on OPERA DSWx-HLS PGE Docker image
+# Script to execute tests on OPERA CSLC-S1 PGE Docker image
 #
 
 set -e
@@ -8,7 +8,7 @@ set -e
 while [[ $# -gt 0 ]]; do
   case $1 in
     -h|--help)
-      echo "Usage: test_dswx_hls.sh [-h|--help] [-t|--tag <tag>] [-w|--workspace <path>]"
+      echo "Usage: test_cslc_s1.sh [-h|--help] [-t|--tag <tag>] [-w|--workspace <path>]"
       exit 0
       ;;
     -t|--tag)
@@ -36,16 +36,16 @@ done
 echo '
 =====================================
 
-Testing DSWx-HLS PGE Docker image...
+Testing CSLC-S1 PGE Docker image...
 
 =====================================
 '
 
-PGE_NAME="dswx_hls"
+PGE_NAME="cslc_s1"
 IMAGE="opera_pge/${PGE_NAME}"
 TEST_RESULTS_REL_DIR="test_results"
-CONTAINER_HOME="/home/conda"
-CONDA_ROOT="/opt/conda"
+CONTAINER_HOME="/home/compass_user"
+CONDA_ROOT="/home/compass_user/miniconda3"
 
 # defaults
 [ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath $(dirname $(realpath $0))/../..)
@@ -55,7 +55,7 @@ TEST_RESULTS_DIR="${WORKSPACE}/${TEST_RESULTS_REL_DIR}/${PGE_NAME}"
 
 echo "Test results output directory: ${TEST_RESULTS_DIR}"
 mkdir --parents ${TEST_RESULTS_DIR}
-chmod -R 775 ${TEST_RESULTS_DIR}
+chmod -R 775 ${WORKSPACE}/${TEST_RESULTS_REL_DIR}
 
 # Use the environment of the docker image to run linting, tests, etc...
 # Note the change of working directory (-w) to a directory without
@@ -113,6 +113,6 @@ ${DOCKER_RUN} bash -c "pytest \
     /workspace/src/opera/test/scripts \
     /workspace/src/opera/test/util > /workspace/${TEST_RESULTS_REL_DIR}/${PGE_NAME}/pytest.log 2>&1"
 
-echo "DSWx-HLS PGE Docker image test complete"
+echo "CSLC-S1 PGE Docker image test complete"
 
 exit 0
