@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>opera.pge.cslc_s1.cslc_s1_pge &mdash; opera-sds-pge 2.0.0-er.1.0 documentation</title>
+      <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../../index.html" class="icon icon-home"> opera-sds-pge
+          </a>
+              <div class="version">
+                2.0.0-er.1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../readme.html">opera-sds-pge</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">opera</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../authors.html">Credits</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">opera-sds-pge</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+      <li>opera.pge.cslc_s1.cslc_s1_pge</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for opera.pge.cslc_s1.cslc_s1_pge</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">==============</span>
+<span class="sd">cslc_s1_pge.py</span>
+<span class="sd">==============</span>
+
+<span class="sd">Module defining the implementation for the Co-registered Single Look Complex (CSLC)</span>
+<span class="sd">from Sentinel-1 A/B (S1) PGE.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">opera.pge.base.base_pge</span> <span class="kn">import</span> <span class="n">PgeExecutor</span>
+<span class="kn">from</span> <span class="nn">opera.pge.base.base_pge</span> <span class="kn">import</span> <span class="n">PostProcessorMixin</span>
+<span class="kn">from</span> <span class="nn">opera.pge.base.base_pge</span> <span class="kn">import</span> <span class="n">PreProcessorMixin</span>
+
+
+<div class="viewcode-block" id="CslcS1PreProcessorMixin"><a class="viewcode-back" href="../../../../opera.pge.cslc_s1.html#opera.pge.cslc_s1.cslc_s1_pge.CslcS1PreProcessorMixin">[docs]</a><span class="k">class</span> <span class="nc">CslcS1PreProcessorMixin</span><span class="p">(</span><span class="n">PreProcessorMixin</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Mixin class responsible for handling all pre-processing steps for the CSLC-S1</span>
+<span class="sd">    PGE. The pre-processing phase is defined as all steps necessary prior</span>
+<span class="sd">    to SAS execution.</span>
+
+<span class="sd">    In addition to the base functionality inherited from PreProcessorMixin, this</span>
+<span class="sd">    mixin adds an input validation step to ensure that input(s) defined by the</span>
+<span class="sd">    RunConfig exist and are valid.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_pre_mixin_name</span> <span class="o">=</span> <span class="s2">&quot;CslcS1PreProcessorMixin&quot;</span>
+
+<div class="viewcode-block" id="CslcS1PreProcessorMixin.run_preprocessor"><a class="viewcode-back" href="../../../../opera.pge.cslc_s1.html#opera.pge.cslc_s1.cslc_s1_pge.CslcS1PreProcessorMixin.run_preprocessor">[docs]</a>    <span class="k">def</span> <span class="nf">run_preprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Executes the pre-processing steps for CSLC-S1 PGE initialization.</span>
+
+<span class="sd">        The CslcS1PreProcessorMixin version of this class performs all actions</span>
+<span class="sd">        of the base PreProcessorMixin class, and adds an input validation step for</span>
+<span class="sd">        the inputs defined within the RunConfig (TODO).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        **kwargs: dict</span>
+<span class="sd">            Any keyword arguments needed by the pre-processor</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">run_preprocessor</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="CslcS1PostProcessorMixin"><a class="viewcode-back" href="../../../../opera.pge.cslc_s1.html#opera.pge.cslc_s1.cslc_s1_pge.CslcS1PostProcessorMixin">[docs]</a><span class="k">class</span> <span class="nc">CslcS1PostProcessorMixin</span><span class="p">(</span><span class="n">PostProcessorMixin</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Mixin class responsible for handling all post-processing steps for the CSLC-S1</span>
+<span class="sd">    PGE. The post-processing phase is defined as all steps required after SAS</span>
+<span class="sd">    execution has completed, prior to handover of output products to PCM.</span>
+
+<span class="sd">    In addition to the base functionality inherited from PostProcessorMixin, this</span>
+<span class="sd">    mixin adds an output validation step to ensure that the output file(s) defined</span>
+<span class="sd">    by the RunConfig exist and are valid (TODO).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_post_mixin_name</span> <span class="o">=</span> <span class="s2">&quot;CslcS1PostProcessorMixin&quot;</span>
+    <span class="n">_cached_core_filename</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="CslcS1PostProcessorMixin.run_postprocessor"><a class="viewcode-back" href="../../../../opera.pge.cslc_s1.html#opera.pge.cslc_s1.cslc_s1_pge.CslcS1PostProcessorMixin.run_postprocessor">[docs]</a>    <span class="k">def</span> <span class="nf">run_postprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Executes the post-processing steps for the CSLC-S1 PGE.</span>
+
+<span class="sd">        The CslcS1PostProcessorMixin version of this method performs the same</span>
+<span class="sd">        steps as the base PostProcessorMixin, but inserts a step to perform</span>
+<span class="sd">        output product validation prior to staging and renaming of the output</span>
+<span class="sd">        files (TODO).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        **kwargs: dict</span>
+<span class="sd">            Any keyword arguments needed by the post-processor</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">run_postprocessor</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="CslcS1Executor"><a class="viewcode-back" href="../../../../opera.pge.cslc_s1.html#opera.pge.cslc_s1.cslc_s1_pge.CslcS1Executor">[docs]</a><span class="k">class</span> <span class="nc">CslcS1Executor</span><span class="p">(</span><span class="n">CslcS1PreProcessorMixin</span><span class="p">,</span> <span class="n">CslcS1PostProcessorMixin</span><span class="p">,</span> <span class="n">PgeExecutor</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Main class for execution of the CSLC-S1 PGE, including the SAS layer.</span>
+
+<span class="sd">    This class essentially rolls up the CSLC-specific pre- and post-processor</span>
+<span class="sd">    functionality, while inheriting all other functionality for setup and execution</span>
+<span class="sd">    of the SAS from the base PgeExecutor class.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">NAME</span> <span class="o">=</span> <span class="s2">&quot;CSLC&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Short name for the CSLC-S1 PGE&quot;&quot;&quot;</span>
+
+    <span class="n">LEVEL</span> <span class="o">=</span> <span class="s2">&quot;L2&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Processing Level for CSLC-S1 Products&quot;&quot;&quot;</span>
+
+    <span class="n">SAS_VERSION</span> <span class="o">=</span> <span class="s2">&quot;0.1&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Version of the SAS wrapped by this PGE, should be updated as needed&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pge_name</span><span class="p">,</span> <span class="n">runconfig_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">pge_name</span><span class="p">,</span> <span class="n">runconfig_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">rename_by_pattern_map</span> <span class="o">=</span> <span class="p">{}</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021-2022 California Institute of Technology.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>opera.pge.dswx_hls.dswx_hls_pge &mdash; opera-sds-pge 2.0.0-er.1.0 documentation</title>
+      <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../../index.html" class="icon icon-home"> opera-sds-pge
+          </a>
+              <div class="version">
+                2.0.0-er.1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../readme.html">opera-sds-pge</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">opera</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../authors.html">Credits</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">opera-sds-pge</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+      <li>opera.pge.dswx_hls.dswx_hls_pge</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for opera.pge.dswx_hls.dswx_hls_pge</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">===============</span>
+<span class="sd">dswx_hls_pge.py</span>
+<span class="sd">===============</span>
+
+<span class="sd">Module defining the implementation for the Dynamic Surface Water Extent (DSWx)</span>
+<span class="sd">from Harmonized Landsat and Sentinel-1 (HLS) PGE.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">os.path</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">abspath</span><span class="p">,</span> <span class="n">basename</span><span class="p">,</span> <span class="n">exists</span><span class="p">,</span> <span class="n">isdir</span><span class="p">,</span> <span class="n">join</span><span class="p">,</span> <span class="n">splitext</span>
+
+<span class="kn">from</span> <span class="nn">opera.pge.base.base_pge</span> <span class="kn">import</span> <span class="n">PgeExecutor</span>
+<span class="kn">from</span> <span class="nn">opera.pge.base.base_pge</span> <span class="kn">import</span> <span class="n">PostProcessorMixin</span>
+<span class="kn">from</span> <span class="nn">opera.pge.base.base_pge</span> <span class="kn">import</span> <span class="n">PreProcessorMixin</span>
+<span class="kn">from</span> <span class="nn">opera.util.error_codes</span> <span class="kn">import</span> <span class="n">ErrorCode</span>
+<span class="kn">from</span> <span class="nn">opera.util.img_utils</span> <span class="kn">import</span> <span class="n">get_geotiff_hls_dataset</span>
+<span class="kn">from</span> <span class="nn">opera.util.img_utils</span> <span class="kn">import</span> <span class="n">get_geotiff_metadata</span>
+<span class="kn">from</span> <span class="nn">opera.util.img_utils</span> <span class="kn">import</span> <span class="n">get_geotiff_processing_datetime</span>
+<span class="kn">from</span> <span class="nn">opera.util.img_utils</span> <span class="kn">import</span> <span class="n">get_geotiff_product_version</span>
+<span class="kn">from</span> <span class="nn">opera.util.img_utils</span> <span class="kn">import</span> <span class="n">get_geotiff_spacecraft_name</span>
+<span class="kn">from</span> <span class="nn">opera.util.img_utils</span> <span class="kn">import</span> <span class="n">get_hls_filename_fields</span>
+<span class="kn">from</span> <span class="nn">opera.util.metadata_utils</span> <span class="kn">import</span> <span class="n">get_sensor_from_spacecraft_name</span>
+<span class="kn">from</span> <span class="nn">opera.util.metadata_utils</span> <span class="kn">import</span> <span class="n">get_geographic_boundaries_from_mgrs_tile</span>
+<span class="kn">from</span> <span class="nn">opera.util.render_jinja2</span> <span class="kn">import</span> <span class="n">render_jinja2</span>
+<span class="kn">from</span> <span class="nn">opera.util.time</span> <span class="kn">import</span> <span class="n">get_time_for_filename</span>
+
+
+<div class="viewcode-block" id="DSWxHLSPreProcessorMixin"><a class="viewcode-back" href="../../../../opera.pge.dswx_hls.html#opera.pge.dswx_hls.dswx_hls_pge.DSWxHLSPreProcessorMixin">[docs]</a><span class="k">class</span> <span class="nc">DSWxHLSPreProcessorMixin</span><span class="p">(</span><span class="n">PreProcessorMixin</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Mixin class responsible for handling all pre-processing steps for the</span>
+<span class="sd">    DSWx-HLS PGE. The pre-processing phase is defined as all steps necessary prior</span>
+<span class="sd">    to SAS execution.</span>
+
+<span class="sd">    In addition to the base functionality inherited from PreProcessorMixin, this</span>
+<span class="sd">    mixin adds an input validation step to ensure that the input(s) defined by</span>
+<span class="sd">    the RunConfig exist and are valid.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_pre_mixin_name</span> <span class="o">=</span> <span class="s2">&quot;DSWxHLSPreProcessorMixin&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_validate_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Evaluates the list of inputs from the RunConfig to ensure they are valid.</span>
+<span class="sd">        For directories, this means checking for directory existence, and that</span>
+<span class="sd">        at least one .tif file resides within the directory. For files,</span>
+<span class="sd">        each file is checked for existence and that it has a .tif extension.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">input_file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">input_files</span><span class="p">:</span>
+            <span class="n">input_file_path</span> <span class="o">=</span> <span class="n">abspath</span><span class="p">(</span><span class="n">input_file</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">exists</span><span class="p">(</span><span class="n">input_file_path</span><span class="p">):</span>
+                <span class="n">error_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Could not locate specified input file/directory </span><span class="si">{</span><span class="n">input_file_path</span><span class="si">}</span><span class="s2">&quot;</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INPUT_NOT_FOUND</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">isdir</span><span class="p">(</span><span class="n">input_file_path</span><span class="p">):</span>
+                <span class="n">list_of_input_tifs</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">input_file_path</span><span class="p">,</span> <span class="s1">&#39;*.tif&#39;</span><span class="p">))</span>
+
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">list_of_input_tifs</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">error_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Input directory </span><span class="si">{</span><span class="n">input_file_path</span><span class="si">}</span><span class="s2"> does not contain any tif files&quot;</span>
+
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INPUT_NOT_FOUND</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="ow">not</span> <span class="n">input_file_path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.tif&quot;</span><span class="p">):</span>
+                <span class="n">error_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Input file </span><span class="si">{</span><span class="n">input_file_path</span><span class="si">}</span><span class="s2"> does not have .tif extension&quot;</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INVALID_INPUT</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">)</span>
+
+<div class="viewcode-block" id="DSWxHLSPreProcessorMixin.run_preprocessor"><a class="viewcode-back" href="../../../../opera.pge.dswx_hls.html#opera.pge.dswx_hls.dswx_hls_pge.DSWxHLSPreProcessorMixin.run_preprocessor">[docs]</a>    <span class="k">def</span> <span class="nf">run_preprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Executes the pre-processing steps for DSWx-HLS PGE initialization.</span>
+
+<span class="sd">        The DSWxHLSPreProcessorMixin version of this function performs all actions</span>
+<span class="sd">        of the base PreProcessorMixin class, and adds the validation check for</span>
+<span class="sd">        input files/directories.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        **kwargs : dict</span>
+<span class="sd">            Any keyword arguments needed by the pre-processor</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">run_preprocessor</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_inputs</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="DSWxHLSPostProcessorMixin"><a class="viewcode-back" href="../../../../opera.pge.dswx_hls.html#opera.pge.dswx_hls.dswx_hls_pge.DSWxHLSPostProcessorMixin">[docs]</a><span class="k">class</span> <span class="nc">DSWxHLSPostProcessorMixin</span><span class="p">(</span><span class="n">PostProcessorMixin</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Mixin class responsible for handling all post-processing steps for the</span>
+<span class="sd">    DSWx-HLS PGE. The post-processing phase is defined as all steps necessary</span>
+<span class="sd">    after SAS execution has completed.</span>
+
+<span class="sd">    In addition to the base functionality inherited from PostProcessorMixin, this</span>
+<span class="sd">    mixin adds an output validation step to ensure that the output file defined by</span>
+<span class="sd">    the RunConfig exist and are valid.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_post_mixin_name</span> <span class="o">=</span> <span class="s2">&quot;DSWxHLSPostProcessorMixin&quot;</span>
+    <span class="n">_cached_core_filename</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">_validate_output</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Evaluates the output file(s) generated from SAS execution to ensure</span>
+<span class="sd">        existence, and that the file(s) contains some content (size is greater than</span>
+<span class="sd">        0).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Get the product ID that the SAS should have used to tag all output images</span>
+        <span class="n">product_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">sas_config</span><span class="p">[</span><span class="s1">&#39;runconfig&#39;</span><span class="p">][</span><span class="s1">&#39;groups&#39;</span><span class="p">][</span><span class="s1">&#39;product_path_group&#39;</span><span class="p">][</span><span class="s1">&#39;product_id&#39;</span><span class="p">]</span>
+
+        <span class="n">output_products</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+            <span class="nb">filter</span><span class="p">(</span>
+                <span class="k">lambda</span> <span class="n">filename</span><span class="p">:</span> <span class="n">product_id</span> <span class="ow">in</span> <span class="n">filename</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">get_output_product_filenames</span><span class="p">()</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">output_products</span><span class="p">:</span>
+            <span class="n">error_msg</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No SAS output file(s) containing product ID </span><span class="si">{</span><span class="n">product_id</span><span class="si">}</span><span class="s2"> &quot;</span>
+                         <span class="sa">f</span><span class="s2">&quot;found within </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">output_product_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">OUTPUT_NOT_FOUND</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">output_product</span> <span class="ow">in</span> <span class="n">output_products</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getsize</span><span class="p">(</span><span class="n">output_product</span><span class="p">):</span>
+                <span class="n">error_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SAS output file </span><span class="si">{</span><span class="n">output_product</span><span class="si">}</span><span class="s2"> was created, but is empty&quot;</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INVALID_OUTPUT</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_core_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inter_filename</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the core file name component for products produced by the</span>
+<span class="sd">        DSWx PGE.</span>
+
+<span class="sd">        The core file name component of the DSWx PGE consists of:</span>
+
+<span class="sd">        &lt;PROJECT&gt;_&lt;LEVEL&gt;_&lt;PGE NAME&gt;_&lt;SOURCE&gt;_&lt;SPACECRAFT_NAME&gt;_&lt;TILE ID&gt;_&lt;TIMETAG&gt;_&lt;PRODUCT VERSION&gt;</span>
+
+<span class="sd">        Callers of this function are responsible for assignment of any other</span>
+<span class="sd">        product-specific fields, such as the file extension.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        On first call to this function, the returned core filename is cached</span>
+<span class="sd">        for subsequent calls. This allows the core filename to be easily reused</span>
+<span class="sd">        across product types without needing to provide inter_filename for</span>
+<span class="sd">        each subsequent call.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        inter_filename : str, optional</span>
+<span class="sd">            The intermediate filename of the output product to generate the</span>
+<span class="sd">            core filename for. This parameter may be used to inspect the file</span>
+<span class="sd">            in order to derive any necessary components of the returned filename.</span>
+<span class="sd">            Once the core filename is cached upon first call to this function,</span>
+<span class="sd">            this parameter may be omitted.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        core_filename : str</span>
+<span class="sd">            The core file name component to assign to products created by this PGE.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Check if the core filename has already been generated and cached,</span>
+        <span class="c1"># and return it if so</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cached_core_filename</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cached_core_filename</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">inter_filename</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No filename provided to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">._core_filename(), &quot;</span>
+                   <span class="sa">f</span><span class="s2">&quot;First call must provide a filename before result is cached.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">FILE_MOVE_FAILED</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+
+        <span class="n">spacecraft_name</span> <span class="o">=</span> <span class="n">get_geotiff_spacecraft_name</span><span class="p">(</span><span class="n">inter_filename</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+        <span class="n">sensor</span> <span class="o">=</span> <span class="n">get_sensor_from_spacecraft_name</span><span class="p">(</span><span class="n">spacecraft_name</span><span class="p">)</span>
+        <span class="n">pixel_spacing</span> <span class="o">=</span> <span class="s2">&quot;30&quot;</span>  <span class="c1"># fixed for HLS-based products</span>
+
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">get_geotiff_hls_dataset</span><span class="p">(</span><span class="n">inter_filename</span><span class="p">)</span>
+
+        <span class="n">dataset_fields</span> <span class="o">=</span> <span class="n">get_hls_filename_fields</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+
+        <span class="n">source</span> <span class="o">=</span> <span class="n">dataset_fields</span><span class="p">[</span><span class="s1">&#39;product&#39;</span><span class="p">]</span>
+        <span class="n">tile_id</span> <span class="o">=</span> <span class="n">dataset_fields</span><span class="p">[</span><span class="s1">&#39;tile_id&#39;</span><span class="p">]</span>
+        <span class="n">acquisition_time</span> <span class="o">=</span> <span class="n">dataset_fields</span><span class="p">[</span><span class="s1">&#39;acquisition_time&#39;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">acquisition_time</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;Z&#39;</span><span class="p">):</span>
+            <span class="n">acquisition_time</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">acquisition_time</span><span class="si">}</span><span class="s1">Z&#39;</span>
+
+        <span class="n">processing_datetime</span> <span class="o">=</span> <span class="n">get_geotiff_processing_datetime</span><span class="p">(</span><span class="n">inter_filename</span><span class="p">)</span>
+        <span class="n">processing_time</span> <span class="o">=</span> <span class="n">get_time_for_filename</span><span class="p">(</span><span class="n">processing_datetime</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">processing_time</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;Z&#39;</span><span class="p">):</span>
+            <span class="n">processing_time</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">processing_time</span><span class="si">}</span><span class="s1">Z&#39;</span>
+
+        <span class="n">product_version</span> <span class="o">=</span> <span class="n">get_geotiff_product_version</span><span class="p">(</span><span class="n">inter_filename</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">product_version</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;v&#39;</span><span class="p">):</span>
+            <span class="n">product_version</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;v</span><span class="si">{</span><span class="n">product_version</span><span class="si">}</span><span class="s1">&#39;</span>
+
+        <span class="c1"># Assign the core file to the cached class attribute</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cached_core_filename</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">PROJECT</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">LEVEL</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">NAME</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">source</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">sensor</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">pixel_spacing</span><span class="si">}</span><span class="s2">_&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">tile_id</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">acquisition_time</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">processing_time</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">product_version</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cached_core_filename</span>
+
+    <span class="k">def</span> <span class="nf">_geotiff_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inter_filename</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the file name to use for GeoTIFF&#39;s produced by the DSWx-HLS PGE.</span>
+
+<span class="sd">        The GeoTIFF filename for the DSWx-HLS PGE consists of:</span>
+
+<span class="sd">            &lt;Core filename&gt;_&lt;Band Index&gt;_&lt;Band Name&gt;.tif</span>
+
+<span class="sd">        Where &lt;Core filename&gt; is returned by DSWxHLSPostProcessorMixin._core_filename()</span>
+<span class="sd">        and &lt;Band Index&gt; and &lt;Band Name&gt; are determined from the name of the</span>
+<span class="sd">        intermediate geotiff file to be renamed.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        inter_filename : str</span>
+<span class="sd">            The intermediate filename of the output GeoTIFF to generate</span>
+<span class="sd">            a filename for. This parameter may be used to inspect the file</span>
+<span class="sd">            in order to derive any necessary components of the returned filename.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        geotiff_filename : str</span>
+<span class="sd">            The file name to assign to GeoTIFF product(s) created by this PGE.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">core_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_core_filename</span><span class="p">(</span><span class="n">inter_filename</span><span class="p">)</span>
+
+        <span class="c1"># Specific output product band index and name should be the last parts</span>
+        <span class="c1"># of the filename before the extension, delimited by underscores</span>
+        <span class="n">band_idx</span><span class="p">,</span> <span class="n">band_name</span> <span class="o">=</span> <span class="n">splitext</span><span class="p">(</span><span class="n">inter_filename</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span>
+
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">core_filename</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">band_idx</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">band_name</span><span class="si">}</span><span class="s2">.tiff&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_collect_dswx_product_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gathers the available metadata from a sample output DSWx-HLS product for</span>
+<span class="sd">        use in filling out the ISO metadata template for the DSWx-HLS PGE.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        output_product_metadata : dict</span>
+<span class="sd">            Dictionary containing DSWx-HLS output product metadata, formatted</span>
+<span class="sd">            for use with the ISO metadata Jinja2 template.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Find a single representative output DSWx-HLS product, they should all</span>
+        <span class="c1"># have identical sets of metadata</span>
+        <span class="n">output_products</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">get_output_product_filenames</span><span class="p">()</span>
+        <span class="n">representative_product</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">for</span> <span class="n">output_product</span> <span class="ow">in</span> <span class="n">output_products</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">basename</span><span class="p">(</span><span class="n">output_product</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">renamed_files</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="c1"># TODO: kludge for avoiding output products that are missing expected metadata</span>
+                <span class="k">if</span> <span class="n">get_geotiff_hls_dataset</span><span class="p">(</span><span class="n">output_product</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">representative_product</span> <span class="o">=</span> <span class="n">output_product</span>
+                    <span class="k">break</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not find sample output product to derive metadata from &quot;</span>
+                   <span class="sa">f</span><span class="s2">&quot;within </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">output_product_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">ISO_METADATA_RENDER_FAILED</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+
+        <span class="c1"># Extract all metadata assigned by the SAS at product creation time</span>
+        <span class="n">output_product_metadata</span> <span class="o">=</span> <span class="n">get_geotiff_metadata</span><span class="p">(</span><span class="n">representative_product</span><span class="p">)</span>
+
+        <span class="c1"># Get the Military Grid Reference System (MGRS) tile code and zone identifier</span>
+        <span class="c1"># from the name of the input HLS dataset</span>
+        <span class="n">hls_fields</span> <span class="o">=</span> <span class="n">get_hls_filename_fields</span><span class="p">(</span>
+            <span class="n">get_geotiff_hls_dataset</span><span class="p">(</span><span class="n">representative_product</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">mgrs_tile_id</span> <span class="o">=</span> <span class="n">hls_fields</span><span class="p">[</span><span class="s1">&#39;tile_id&#39;</span><span class="p">]</span>
+
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;tileCode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mgrs_tile_id</span>
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;zoneIdentifier&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mgrs_tile_id</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
+
+        <span class="c1"># Translate the MGRS tile ID to a lat/lon bounding box</span>
+        <span class="p">(</span><span class="n">lat_min</span><span class="p">,</span>
+         <span class="n">lat_max</span><span class="p">,</span>
+         <span class="n">lon_min</span><span class="p">,</span>
+         <span class="n">lon_max</span><span class="p">)</span> <span class="o">=</span> <span class="n">get_geographic_boundaries_from_mgrs_tile</span><span class="p">(</span><span class="n">mgrs_tile_id</span><span class="p">)</span>
+
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;geospatial_lon_min&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lon_min</span>
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;geospatial_lon_max&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lon_max</span>
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;geospatial_lat_min&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lat_min</span>
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;geospatial_lat_max&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lat_max</span>
+
+        <span class="c1"># Split the sensing time into the beginning/end portions</span>
+        <span class="n">sensing_time</span> <span class="o">=</span> <span class="n">output_product_metadata</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;SENSING_TIME&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Sensing time for L30 datasets contain both begin and end times delimited</span>
+        <span class="c1"># by semi-colon</span>
+        <span class="k">if</span> <span class="s1">&#39;;&#39;</span> <span class="ow">in</span> <span class="n">sensing_time</span><span class="p">:</span>
+            <span class="n">sensing_time_begin</span><span class="p">,</span> <span class="n">sensing_time_end</span> <span class="o">=</span> <span class="n">sensing_time</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;;&#39;</span><span class="p">)</span>
+        <span class="c1"># S30 datasets seem to only provide a single sensing time value</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sensing_time_begin</span> <span class="o">=</span> <span class="n">sensing_time_end</span> <span class="o">=</span> <span class="n">sensing_time</span>
+
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;sensingTimeBegin&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sensing_time_begin</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;sensingTimeEnd&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sensing_time_end</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+        <span class="c1"># Add some fields on the dimensions of the data. These values should</span>
+        <span class="c1"># be the same for all DSWx-HLS products, and were derived from the</span>
+        <span class="c1"># ADT product spec</span>
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;xCoordinates&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="mi">3660</span><span class="p">,</span>  <span class="c1"># pixels</span>
+            <span class="s1">&#39;spacing&#39;</span><span class="p">:</span> <span class="mi">30</span>  <span class="c1"># meters/pixel</span>
+        <span class="p">}</span>
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;yCoordinates&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="mi">3660</span><span class="p">,</span>  <span class="c1"># pixels</span>
+            <span class="s1">&#39;spacing&#39;</span><span class="p">:</span> <span class="mi">30</span>  <span class="c1"># meters/pixel</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">output_product_metadata</span>
+
+    <span class="k">def</span> <span class="nf">_create_custom_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates the &quot;custom data&quot; dictionary used with the ISO metadata rendering.</span>
+
+<span class="sd">        Custom data contains all metadata information needed for the ISO template</span>
+<span class="sd">        that is not found within any of the other metadata sources (such as the</span>
+<span class="sd">        RunConfig, output product, or catalog metadata).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        custom_data : dict</span>
+<span class="sd">            Dictionary containing the custom metadata as expected by the ISO</span>
+<span class="sd">            metadata Jinja2 template.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">custom_metadata</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;ISO_OPERA_FilePackageName&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_core_filename</span><span class="p">(),</span>
+            <span class="s1">&#39;ISO_OPERA_ProducerGranuleId&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_core_filename</span><span class="p">(),</span>
+            <span class="s1">&#39;MetadataProviderAction&#39;</span><span class="p">:</span> <span class="s2">&quot;creation&quot;</span><span class="p">,</span>
+            <span class="s1">&#39;GranuleFilename&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_core_filename</span><span class="p">(),</span>
+            <span class="s1">&#39;ISO_OPERA_ProjectKeywords&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;OPERA&#39;</span><span class="p">,</span> <span class="s1">&#39;JPL&#39;</span><span class="p">,</span> <span class="s1">&#39;DSWx&#39;</span><span class="p">,</span> <span class="s1">&#39;Dynamic&#39;</span><span class="p">,</span> <span class="s1">&#39;Surface&#39;</span><span class="p">,</span> <span class="s1">&#39;Water&#39;</span><span class="p">,</span> <span class="s1">&#39;Extent&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;ISO_OPERA_PlatformKeywords&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;HLS&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;ISO_OPERA_InstrumentKeywords&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Landsat8&#39;</span><span class="p">,</span> <span class="s1">&#39;Sentinel 1 A/B&#39;</span><span class="p">]</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">custom_metadata</span>
+
+    <span class="k">def</span> <span class="nf">_create_iso_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a rendered version of the ISO metadata template for DSWx-HLS</span>
+<span class="sd">        output products using metadata sourced from the following locations:</span>
+
+<span class="sd">            * RunConfig (in dictionary form)</span>
+<span class="sd">            * Output products (extracted from a sample product)</span>
+<span class="sd">            * Catalog metadata</span>
+<span class="sd">            * &quot;Custom&quot; metadata (all metadata not found anywhere else)</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        rendered_template : str</span>
+<span class="sd">            The ISO metadata template for DSWx-HLS filled in with values from</span>
+<span class="sd">            the sourced metadata dictionaries.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">runconfig_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">asdict</span><span class="p">()</span>
+
+        <span class="n">product_output_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_collect_dswx_product_metadata</span><span class="p">()</span>
+
+        <span class="n">catalog_metadata_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_catalog_metadata</span><span class="p">()</span><span class="o">.</span><span class="n">asdict</span><span class="p">()</span>
+
+        <span class="n">custom_data_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_custom_metadata</span><span class="p">()</span>
+
+        <span class="n">iso_metadata</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;run_config&#39;</span><span class="p">:</span> <span class="n">runconfig_dict</span><span class="p">,</span>
+            <span class="s1">&#39;product_output&#39;</span><span class="p">:</span> <span class="n">product_output_dict</span><span class="p">,</span>
+            <span class="s1">&#39;catalog_metadata&#39;</span><span class="p">:</span> <span class="n">catalog_metadata_dict</span><span class="p">,</span>
+            <span class="s1">&#39;custom_data&#39;</span><span class="p">:</span> <span class="n">custom_data_dict</span>
+        <span class="p">}</span>
+
+        <span class="n">iso_template_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">iso_template_path</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">iso_template_path</span><span class="p">):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Could not load ISO template </span><span class="si">{</span><span class="n">iso_template_path</span><span class="si">}</span><span class="s2">, file does not exist&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">ISO_METADATA_TEMPLATE_NOT_FOUND</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+
+        <span class="n">rendered_template</span> <span class="o">=</span> <span class="n">render_jinja2</span><span class="p">(</span><span class="n">iso_template_path</span><span class="p">,</span> <span class="n">iso_metadata</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">rendered_template</span>
+
+<div class="viewcode-block" id="DSWxHLSPostProcessorMixin.run_postprocessor"><a class="viewcode-back" href="../../../../opera.pge.dswx_hls.html#opera.pge.dswx_hls.dswx_hls_pge.DSWxHLSPostProcessorMixin.run_postprocessor">[docs]</a>    <span class="k">def</span> <span class="nf">run_postprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Executes the post-processing steps for DSWx-HLS PGE job completion.</span>
+
+<span class="sd">        The DSWxHLSPostProcessorMixin version of this function performs the same</span>
+<span class="sd">        steps as the base PostProcessorMixin, but inserts the output file</span>
+<span class="sd">        validation check prior to staging of the output files.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        **kwargs : dict</span>
+<span class="sd">            Any keyword arguments needed by the post-processor</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Running postprocessor for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_post_mixin_name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_run_sas_qa_executable</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_output</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stage_output_files</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="DSWxHLSExecutor"><a class="viewcode-back" href="../../../../opera.pge.dswx_hls.html#opera.pge.dswx_hls.dswx_hls_pge.DSWxHLSExecutor">[docs]</a><span class="k">class</span> <span class="nc">DSWxHLSExecutor</span><span class="p">(</span><span class="n">DSWxHLSPreProcessorMixin</span><span class="p">,</span> <span class="n">DSWxHLSPostProcessorMixin</span><span class="p">,</span> <span class="n">PgeExecutor</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Main class for execution of a DSWx-HLS PGE, including the SAS layer.</span>
+
+<span class="sd">    This class essentially rolls up the tailored pre- and post-processors</span>
+<span class="sd">    while inheriting all other functionality from the base PgeExecutor class.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">NAME</span> <span class="o">=</span> <span class="s2">&quot;DSWx&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Short name for the DSWx-HLS PGE&quot;&quot;&quot;</span>
+
+    <span class="n">LEVEL</span> <span class="o">=</span> <span class="s2">&quot;L3&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Processing Level for DSWx-HLS Products&quot;&quot;&quot;</span>
+
+    <span class="n">SAS_VERSION</span> <span class="o">=</span> <span class="s2">&quot;0.1&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Version of the SAS wrapped by this PGE, should be updated as needed with new SAS deliveries&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pge_name</span><span class="p">,</span> <span class="n">runconfig_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">pge_name</span><span class="p">,</span> <span class="n">runconfig_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">rename_by_pattern_map</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s1">&#39;dswx_hls_*.tif*&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geotiff_filename</span>
+            <span class="p">}</span>
+        <span class="p">)</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021-2022 California Institute of Technology.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
