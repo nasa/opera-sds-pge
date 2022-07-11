@@ -102,7 +102,7 @@ do
     echo "Running Docker image ${PGE_IMAGE}:${TAG} for ${DATA_DIR}"
     docker run --rm -u $UID:$(id -g) -v $(pwd):/home/conda/runconfig:ro \
                      -v $(pwd)/${DATA_DIR}/input_dir:/home/conda/input_dir:ro \
-                     -v $(pwd)/$OUTPUT_DIR:/home/conda/output_dir -i --tty \
+                     -v $(pwd)/$OUTPUT_DIR:/home/conda/output_dir \
                      ${PGE_IMAGE}:${TAG} --file /home/conda/runconfig/$RUNCONFIG_FILENAME
 
     docker_exit_status=$?
