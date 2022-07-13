@@ -66,6 +66,8 @@ if [ -f $TESTDATA ]; then
     # cd into the extracted directory which must be named to match the archive file
     filename=$(basename -- "$TESTDATA")
     filename="${filename%.*}"
+
+    chmod 777 $filename
     cd $filename
 else
     echo "Unable to find test data file $TESTDATA"
