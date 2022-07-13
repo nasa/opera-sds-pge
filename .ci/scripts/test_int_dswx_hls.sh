@@ -54,7 +54,9 @@ PGE_IMAGE="opera_pge/${PGE_NAME}"
 # the unmodified ADT SAS test data archive and PGE expected output.
 
 # TESTDATA should be the name of the test data archive.
-# Execution will take place in the current directory.
+
+# Change directory to /tmp to allow Jenkins to create directories
+cd /tmp
 
 # Extract the test data archive to the current directory
 if [ -f $TESTDATA ]; then
