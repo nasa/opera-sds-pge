@@ -13,6 +13,8 @@ pipeline {
         // TODO: update default value as newer PGE's are added
         string(name: 'DOCKER_IMAGE_SUFFIXES', defaultValue: 'dswx_hls,cslc_s1',
                description: 'Comma-delimited list of PGE names to include for build/test/deploy')
+        booleanParam(name: 'PUBLISH_DOCS', defaultValue: true,
+                     description: 'Publish sphinx documentation to ghpages')
         string(name: 'ART_URL', defaultValue: 'https://artifactory-fn.jpl.nasa.gov/artifactory',
                description: 'Artifactory-FN URL.')
         string(name: 'ART_TAR_PATH', defaultValue: 'general/gov/nasa/jpl/opera/sds/pge/',
@@ -77,6 +79,7 @@ pipeline {
             }
         }
         stage('Generate OPERA PGE Sphinx Documentation') {
+            when { expression { return params.PUBLISH_DOCS } }
             steps {
                 script {
                     echo "Installing Sphinx Dependencies"
@@ -119,6 +122,7 @@ pipeline {
             }
         }
         stage('Push OPERA PGE HTML documentation to GitHub Pages') {
+            when { expression { return params.PUBLISH_DOCS } }
             steps {
                 git branch: 'gh-pages',
                     changelog: false,
