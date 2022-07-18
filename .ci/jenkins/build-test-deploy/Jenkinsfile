@@ -201,7 +201,7 @@ pipeline {
                                   "files": [
                                       {
                                           "pattern": "${TAR_GZ_FILE_NAME}",
-                                          "target": "${params.ART_TAR_PATH}"
+                                          "target": "${params.ART_TAR_PATH}${DOCKER_IMAGE_SUFFIX}/"
                                       }
                                   ]
                               }"""
