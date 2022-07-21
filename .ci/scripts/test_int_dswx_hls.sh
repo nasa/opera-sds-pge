@@ -50,6 +50,15 @@ Integration Testing DSWx-HLS PGE docker image...
 PGE_NAME="dswx_hls"
 PGE_IMAGE="opera_pge/${PGE_NAME}"
 
+TEST_RESULTS_REL_DIR="test_results"
+[ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath $(dirname $(realpath $0))/../..)
+TEST_RESULTS_DIR="${WORKSPACE}/${TEST_RESULTS_REL_DIR}/${PGE_NAME}"
+
+echo "Test results output directory: ${TEST_RESULTS_DIR}"
+mkdir --parents ${TEST_RESULTS_DIR}
+chmod -R 775 ${TEST_RESULTS_DIR}
+RESULTS_FILE="${TEST_RESULTS_DIR}/test_int_dswx_results.html"
+
 # For this version of integration test, an archive has been created which contains
 # the unmodified ADT SAS test data archive and PGE expected output.
 
@@ -65,9 +74,12 @@ cd $local_dir
 local_testdata_archive=${local_dir}/${TESTDATA}
 local_runconfig=${local_dir}/${RUNCONFIG}
 
+echo "<html><table>" > $RESULTS_FILE
+
 # Configure a trap to set permissions on exit regardless of whether the testing succeeds
 function cleanup {
 
+    echo "</table></html>" >> $RESULTS_FILE
     DOCKER_RUN="docker run --rm -u $UID:$(id -g)"
 
     echo "Cleaning up before exit. Setting permissions for output files and directories."
@@ -157,12 +169,15 @@ do
         # Compare output files against expected files
         for output_file in $output_dir/*
         do
+            compare_result="N/A"
+            expected_file="N/A"
             echo "output_file $output_file"
             output_file=$(basename -- "$output_file")
 
             if [[ "${output_file##*/}" == *.log ]]
             then
                 echo "Not comparing log file ${output_file}"
+                compare_result="SKIPPED"
 
             elif [[ "${output_file##*/}" == *.tif* ]]
             then
@@ -197,17 +212,23 @@ do
                     echo "$docker_out"
                     if [[ "$docker_out" == *"[FAIL]"* ]]; then
                         echo "File comparison failed. Output and expected files differ for ${output_file}"
-                        overall_status=1
+                        compare_result="FAIL"
+                        overall_status=2
                     elif [[ "$docker_out" == *"ERROR"* ]]; then
                         echo "An error occurred during file comparison."
+                        compare_result="ERROR"
                         overall_status=1
                     else
                         echo "File comparison passed for ${output_file}"
+                        compare_result="PASS"
                     fi
                 fi
             else
                 echo "Not comparing file ${output_file}"
+                compare_result="SKIPPED"
             fi
+
+            echo "<tr><td>${compare_result}</td><td>Output: ${output_file}<br>Expected: ${expected_file}</td></tr>" >> $RESULTS_FILE
         done
     fi
 done
