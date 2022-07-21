@@ -44,7 +44,7 @@ pipeline {
                              reportDir: "test_results",
                              reportFiles: "dswx_hls/test_int_dswx_results.html,
                              reportName: "Integration Test Results",
-                             reportTitles: "Test Results")
+                             reportTitles: "Test Results"])
             }
         }
     }
