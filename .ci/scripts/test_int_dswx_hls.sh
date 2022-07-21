@@ -71,8 +71,9 @@ function cleanup {
     DOCKER_RUN="docker run --rm -u $UID:$(id -g)"
 
     echo "Cleaning up before exit. Setting permissions for output files and directories."
-    ${DOCKER_RUN} -v ${local_dir}:/local_dir --entrypoint /usr/bin/find ${PGE_IMAGE}:${TAG} /local_dir -type d -exec chmod 775 {} +
-    ${DOCKER_RUN} -v ${local_dir}:/local_dir --entrypoint /usr/bin/find ${PGE_IMAGE}:${TAG} /local_dir -type f -exec chmod 664 {} +
+    ${DOCKER_RUN} -v ${local_dir}:${local_dir} --entrypoint /usr/bin/find ${PGE_IMAGE}:${TAG} ${local_dir} -type d -exec chmod 775 {} +
+    ${DOCKER_RUN} -v ${local_dir}:${local_dir} --entrypoint /usr/bin/find ${PGE_IMAGE}:${TAG} ${local_dir} -type f -exec chmod 664 {} +
+    rm -rf ${local_dir}
 }
 
 trap cleanup EXIT
@@ -215,10 +216,6 @@ if [ $overall_status -ne 0 ]; then
     echo "Test FAILED."
 else
     echo "Test PASSED."
-fi
-
-if [ -d ${local_dir} ]; then
-    rm -rf ${local_dir}
 fi
 
 exit $overall_status
