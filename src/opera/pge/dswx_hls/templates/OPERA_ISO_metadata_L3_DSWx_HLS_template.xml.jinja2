@@ -172,7 +172,7 @@
                     <gmd:identifier>
                         <gmd:MD_Identifier>
                             <gmd:code>
-                                <gco:CharacterString>{{ catalog_metadata.PGE_Version }}{# ISO_OPERA_PGEVersionId #}</gco:CharacterString>
+                                <gco:CharacterString>{{ catalog_metadata.PGE_Version|truncate(10, True, '', 0) }}{# ISO_OPERA_PGEVersionId #}</gco:CharacterString>
                             </gmd:code>
                             <gmd:codeSpace>
                                 <gco:CharacterString>gov.nasa.esdis.umm.otherid</gco:CharacterString>
@@ -416,7 +416,7 @@
                     <gmd:aggregateDataSetIdentifier>
                         <gmd:MD_Identifier>
                             <gmd:code>
-                                <gco:CharacterString>{{ catalog_metadata.PGE_Version }}{# ISO_OPERA_CollectionVersion #}</gco:CharacterString>
+                                <gco:CharacterString>{{ catalog_metadata.PGE_Version|truncate(10, True, '', 0) }}{# ISO_OPERA_CollectionVersion #}</gco:CharacterString>
                             </gmd:code>
                             <gmd:codeSpace>
                                 <gco:CharacterString>gov.nasa.esdis.umm.collectionversion</gco:CharacterString>
@@ -769,7 +769,7 @@
                                     <gmi:identifier>
                                         <gmd:MD_Identifier>
                                             <gmd:code>
-                                                <gco:CharacterString>PGEName: {{ catalog_metadata.PGE_Name }}{# ISO_OPERA_pgeName #} PGEVersion: {{ catalog_metadata.PGE_Version }}{# ISO_OPERA_PGEVersionId #}</gco:CharacterString>
+                                                <gco:CharacterString>PGEName: {{ catalog_metadata.PGE_Name }}{# ISO_OPERA_pgeName #} PGEVersion: {{ catalog_metadata.PGE_Version|truncate(10, True, '', 0) }}{# ISO_OPERA_PGEVersionId #}</gco:CharacterString>
                                             </gmd:code>
                                             <gmd:codeSpace>
                                                 <gco:CharacterString>gov.nasa.esdis.umm.pgeversionclass</gco:CharacterString>
