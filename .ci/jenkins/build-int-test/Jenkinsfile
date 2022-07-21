@@ -36,7 +36,7 @@ pipeline {
             steps {
                 echo "Testing ${DOCKER_IMAGE_PREFIX} docker images with tag ${DOCKER_TAG}"
                 sh label: 'Test all OPERA Docker images',
-                   script: ".ci/scripts/test_int_dswx_hls.sh --tag $DOCKER_TAG --testdata /tmp/dswx_hls_testdata_v001.tgz --runconfig /tmp/dswx_hls.yaml"
+                   script: ".ci/scripts/test_int_dswx_hls.sh --tag $DOCKER_TAG --testdata delivery_2.1_mid_may.zip --runconfig dswx_hls.yaml"
                 //junit 'test_results/**/*.xml'
                 //archiveArtifacts artifacts: 'test_results/**/*.log', fingerprint: true
                 // TODO: this will require rework once we have more than one PGE to deal with
