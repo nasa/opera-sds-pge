@@ -217,4 +217,8 @@ else
     echo "Test PASSED."
 fi
 
+if [ -d ${local_dir} ]; then
+    rm -rf ${local_dir}
+fi
+
 exit $overall_status
