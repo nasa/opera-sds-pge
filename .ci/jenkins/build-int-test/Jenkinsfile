@@ -37,13 +37,15 @@ pipeline {
                 echo "Testing ${DOCKER_IMAGE_PREFIX} docker images with tag ${DOCKER_TAG}"
                 sh label: 'Test all OPERA Docker images',
                    script: ".ci/scripts/test_int_dswx_hls.sh --tag $DOCKER_TAG --testdata delivery_2.1_mid_may.zip --runconfig opera_pge_dswx_hls_delivery_2.1_mid_may_runconfig.yaml"
-                publishHTML([allowMissing: true,
-                             alwaysLinkToLastBuild: true,
-                             keepAll: true,
-                             reportDir: "test_results/dswx_hls",
-                             reportFiles: "test_int_dswx_results.html",
-                             reportName: "Integration Test Results",
-                             reportTitles: "Test Results"])
+                script {
+                    publishHTML([allowMissing: true,
+                                 alwaysLinkToLastBuild: true,
+                                 keepAll: true,
+                                 reportDir: "test_results",
+                                 reportFiles: "dswx_hls/test_int_dswx_results.html",
+                                 reportName: "Integration Test Results",
+                                 reportTitles: "dswx_hls Test Results"])
+                }
             }
         }
     }
