@@ -278,7 +278,7 @@ class PostProcessorMixin:
         """
         catalog_metadata = {
             'PGE_Name': self.runconfig.pge_name,
-            'PGE_Version': opera.__version__,
+            'PGE_Version': self.PGE_VERSION,
             'SAS_Version': self.SAS_VERSION,
             'Input_Files': self.runconfig.get_input_filenames(),
             'Ancillary_Files': self.runconfig.get_ancillary_filenames(),
@@ -615,6 +615,9 @@ class PgeExecutor(PreProcessorMixin, PostProcessorMixin):
 
     LEVEL = "L0"
     """Processing Level for Base PGE Products (dummy value)"""
+
+    PGE_VERSION = opera.__version__
+    """Version of the PGE (tracks repo version by default)"""
 
     SAS_VERSION = "0.1"
     """Version of the SAS wrapped by this PGE (dummy value)"""
