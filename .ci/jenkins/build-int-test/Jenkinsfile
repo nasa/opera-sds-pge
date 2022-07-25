@@ -48,7 +48,7 @@ pipeline {
                         currentBuild.result = 'SUCCESS'
                     }
                 }
-                archiveArtifacts includes: 'test_results/dswx_hls/test_int_dswx_results.html'
+                archiveArtifacts artifacts: 'test_results/dswx_hls/test_int_dswx_results.html'
                 publishHTML target: [
                     allowMissing: true,
                     alwaysLinkToLastBuild: true,
