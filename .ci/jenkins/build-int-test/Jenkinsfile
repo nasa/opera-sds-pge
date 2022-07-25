@@ -38,13 +38,14 @@ pipeline {
                 script {
                     def statusCode = sh label: 'Test all OPERA Docker images', returnStatus:true,
                        script: ".ci/scripts/test_int_dswx_hls.sh --tag $DOCKER_TAG --testdata delivery_2.1_mid_may.zip --runconfig opera_pge_dswx_hls_delivery_2.1_mid_may_runconfig.yaml"
+                    echo "Test returned code ${statusCode}"
                     if (statusCode == 2) {
-                        currentStage.result = 'UNSTABLE'
+                        unstable "Product comparison failure detected. Setting stage result to unstable."
                     }
                     else if (statusCode != 0) {
                         currentStage.result = 'FAILURE'
                     }
-                    else if (statudCode == 0) {
+                    else if (statusCode == 0) {
                         currentStage.result = 'SUCCESS'
                     }
                 }
