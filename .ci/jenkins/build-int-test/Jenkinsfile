@@ -39,13 +39,13 @@ pipeline {
                     def statusCode = sh label: 'Test all OPERA Docker images', returnStatus:true,
                        script: ".ci/scripts/test_int_dswx_hls.sh --tag $DOCKER_TAG --testdata delivery_2.1_mid_may.zip --runconfig opera_pge_dswx_hls_delivery_2.1_mid_may_runconfig.yaml"
                     if (statusCode == 2) {
-                        currentBuild.result = 'UNSTABLE'
+                        currentStage.result = 'UNSTABLE'
                     }
                     else if (statusCode != 0) {
-                        currentBuild.result = 'FAILURE'
+                        currentStage.result = 'FAILURE'
                     }
-                    else {
-                        currentBuild.result = 'SUCCESS'
+                    else if (statudCode == 0) {
+                        currentStage.result = 'SUCCESS'
                     }
                 }
                 archiveArtifacts artifacts: 'test_results/dswx_hls/test_int_dswx_results.html'
