@@ -35,11 +35,20 @@ pipeline {
         stage('Test OPERA PGE Docker image(s)') {
             steps {
                 echo "Testing ${DOCKER_IMAGE_PREFIX} docker images with tag ${DOCKER_TAG}"
-                catchError {
-                    sh label: 'Test all OPERA Docker images',
+                script {
+                    def statusCode = sh label: 'Test all OPERA Docker images', returnStatus:true,
                        script: ".ci/scripts/test_int_dswx_hls.sh --tag $DOCKER_TAG --testdata delivery_2.1_mid_may.zip --runconfig opera_pge_dswx_hls_delivery_2.1_mid_may_runconfig.yaml"
+                    if (statusCode == 2) {
+                        currentBuild.result = 'UNSTABLE'
+                    }
+                    else if (statusCode != 0) {
+                        currentBuild.result = 'FAILURE'
+                    }
+                    else {
+                        currentBuild.result = 'SUCCESS'
+                    }
                 }
-                archive includes: 'test_results/dswx_hls/test_int_dswx_results.html'
+                archiveArtifacts includes: 'test_results/dswx_hls/test_int_dswx_results.html'
                 publishHTML target: [
                     allowMissing: true,
                     alwaysLinkToLastBuild: true,
