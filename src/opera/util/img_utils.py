@@ -36,7 +36,7 @@ class MockGdal:  # pragma: no cover
             This function should be updated as needed for requisite metadata fields.
             """
             return {
-                'CLOUD_COVERAGE': '43', 'DEM_FILE': 'dem.tif',
+                'ACCODE': 'LaSRC', 'CLOUD_COVERAGE': '43', 'DEM_FILE': 'dem.tif',
                 'HLS_DATASET': 'HLS.L30.T22VEQ.2021248T143156.v2.0',
                 'LANDCOVER_FILE': 'landcover.tif', 'LEVEL': '3',
                 'MEAN_SUN_AZIMUTH_ANGLE': '145.002203258435',
@@ -49,8 +49,9 @@ class MockGdal:  # pragma: no cover
                 'PRODUCT_TYPE': 'DSWx', 'PRODUCT_VERSION': '0.1',
                 'PROJECT': 'OPERA', 'WORLDCOVER_FILE': 'worldcover.tif',
                 'SENSING_TIME': '2021-09-05T14:31:56.9300799Z; 2021-09-05T14:32:20.8126470Z',
-                'SENSOR': 'MSI', 'SPACECRAFT_NAME': 'SENTINEL-2A',
-                'SPATIAL_COVERAGE': '99'
+                'SENSOR': 'MSI',
+                'SENSOR_PRODUCT_ID': 'S2A_MSIL1C_20210907T163901_N0301_R126_T15SXR_20210907T202434.SAFE',
+                'SPACECRAFT_NAME': 'SENTINEL-2A', 'SPATIAL_COVERAGE': '99'
             }
 
     @staticmethod
