@@ -75,11 +75,11 @@ local_testdata_archive=${local_dir}/${TESTDATA}
 local_runconfig=${local_dir}/${RUNCONFIG}
 
 results_html_init="<html><b>dswx_hls product comparison results</b> \
-    <style>* {font-family: sans-serif;}\n \
-    table {border-collapse: collapse;}\n \
-    th,td {padding: 4px 6px; border: thin solid white}\n \
-    tr:nth-child(even) {background-color: whitesmoke;}\n \
-    </style><table>\n"
+    <style>* {font-family: sans-serif;} \
+    table {border-collapse: collapse;} \
+    th,td {padding: 4px 6px; border: thin solid white} \
+    tr:nth-child(even) {background-color: whitesmoke;} \
+    </style><table>"
 
 echo $results_html_init > $RESULTS_FILE
 
