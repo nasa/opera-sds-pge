@@ -169,6 +169,7 @@ do
         # Compare output files against expected files
         for output_file in $output_dir/*
         do
+            docker_out="N/A"
             compare_result="N/A"
             expected_file="N/A"
             echo "output_file $output_file"
@@ -228,7 +229,7 @@ do
                 compare_result="SKIPPED"
             fi
 
-            echo "<tr><td>${compare_result}</td><td>Output: ${output_file}<br>Expected: ${expected_file}</td></tr>" >> $RESULTS_FILE
+            echo "<tr><td>${compare_result}</td><td>Output: ${output_file}<br>Expected: ${expected_file}</td><td>${docker_out}</td></tr>" >> $RESULTS_FILE
         done
     fi
 done
