@@ -263,10 +263,8 @@ class DSWxHLSPostProcessorMixin(PostProcessorMixin):
 
         for output_product in output_products:
             if basename(output_product) in self.renamed_files.values():
-                # TODO: kludge for avoiding output products that are missing expected metadata
-                if get_geotiff_hls_dataset(output_product) is not None:
-                    representative_product = output_product
-                    break
+                representative_product = output_product
+                break
         else:
             msg = (f"Could not find sample output product to derive metadata from "
                    f"within {self.runconfig.output_product_path}")
@@ -428,6 +426,9 @@ class DSWxHLSExecutor(DSWxHLSPreProcessorMixin, DSWxHLSPostProcessorMixin, PgeEx
 
     LEVEL = "L3"
     """Processing Level for DSWx-HLS Products"""
+
+    PGE_VERSION = "1.0.0-rc.2.0"
+    """Version of the PGE (overrides default from base_pge)"""
 
     SAS_VERSION = "0.1"
     """Version of the SAS wrapped by this PGE, should be updated as needed with new SAS deliveries"""
