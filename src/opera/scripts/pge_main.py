@@ -177,9 +177,7 @@ def pge_main():
     run_config_filename = os.path.abspath(args.file)
 
     if not os.path.exists(run_config_filename):
-        msg = f"Could not find config file: {run_config_filename}: argument entered {run_config_filename}"
-        # raise FileNotFoundError(f"Could not find config file: {run_config_filename}")
-        raise FileNotFoundError(msg)
+        raise FileNotFoundError(f"Could not find config file: {run_config_filename}")
 
     pge_start(run_config_filename)
 

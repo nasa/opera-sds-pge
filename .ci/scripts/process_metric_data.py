@@ -100,7 +100,7 @@ def conv_to_gb(meas_str):
     elif "B" in meas_str:
         numeric_val = float(meas_str.split("B")[0]) / 1000000000
     else:
-        print(f"unexpected string value {meas-str}")
+        print(f"unexpected string value {meas_str}")
         numeric_val = meas_str
     return numeric_val
 
@@ -123,32 +123,37 @@ def get_disk_read_write(block_str):
 
 def format_out_row_misc(misc_row):
     """
-       Return a formatted, comma separated row of docker miscellaneous data.
+    Return a formatted, comma separated row of docker miscellaneous data.
 
-       Parameters
-       ----------
-       misc_row : dictionary
-           row from the data collection of miscellaneous stats
+    Parameters
+    ----------
+    misc_row : dictionary
+        row from the data collection of miscellaneous stats
 
-       Returns
-       -------
-       formatted, comma separated string
+    Returns
+    -------
+    formatted, comma separated string
 
-       """
+    """
 
     secs = misc_row['SECONDS']
-    disk = get_disk_gb(misc_row['disk_used'])
-    # swap = dr['swap_used'].split()[2]
-    threads = misc_row['total_threads']
+    disk = get_disk_gb(misc_row[' disk_used'])
+    if sys.platform == 'darwin':
+        swap = 'N/A'
+    else:
+        swap = misc_row[' swap_used'].split()[2]
+    threads = misc_row[' total_threads'].strip()
     # Todo fix this code so we get the last line stuff: right now it's blank
     # only update last line if it has changed
     global prior_log_line
-    if prior_log_line is not None and misc_row['last_line'] == prior_log_line:
-        last_line = ""
+    if prior_log_line is not None and misc_row[' last_line'] == prior_log_line:
+        last_line = "N/A"
     else:
-        last_line = misc_row['last_line']
+        last_line = misc_row[' last_line']
         prior_log_line = last_line
-    return f"{secs},{disk},{threads},{last_line}"
+        # Temp until this is fixed
+        last_line = 'N/A'
+    return f"{secs},{disk},{swap},{threads},{last_line}"
 
 
 def format_out_row_docker(stats_row):
@@ -160,9 +165,9 @@ def format_out_row_docker(stats_row):
     stats_row : dictionary
         row from data collection of docker stats
 
-    Returns : string
+    Returns
     -------
-        formatted, comma separated string
+    formatted, comma separated string
 
     """
 
@@ -192,12 +197,9 @@ def make_lists(csv_file):
         List that is now ready to be formatted
 
     """
-    csv_to_list = []
+
     with open(csv_file) as csv_handle:
-        reader = csv.DictReader(csv_handle)
-        for row in reader:
-            csv_to_list.append(row)
-    return csv_to_list
+        return [row for row in csv.DictReader(csv_handle)]
 
 
 def main():
@@ -236,9 +238,7 @@ def main():
             out_file.write(f"{row}\n")
 
     # Write out the miscellaneous file
-    # Todo - divide out mac OS runs and linux runs - Swap will work on linux
-    # misc_columns = "SECONDS, Disk, Swap, Threads, LastLogLine"
-    misc_columns = "SECONDS, Disk, Threads, LastLogLine"
+    misc_columns = "SECONDS, Disk, Swap, Threads, LastLogLine"
     with open(misc_report_file, 'w') as out_file:
         out_file.write(f"{misc_columns}\n")
         for stats_row in misc_list:

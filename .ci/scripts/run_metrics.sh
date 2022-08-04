@@ -6,7 +6,7 @@
 #
 # usage:
 #     run_metrics.sh <pge> <run config_fn> (file name only) <data_dir> (full path) <image name>
-#     Eg. run_metrics  DSWX_HLS_PGE  dswx_hls.yaml  /Users/..../l30_greenland  opera/proteus:mid_may_2022
+#     Eg. bash run_metrics  DSWX_HLS_PGE  dswx_hls.yaml  /Users/..../l30_greenland  opera/proteus:mid_may_2022 5
 #
 #
 
@@ -29,12 +29,6 @@ metrics_collection_start "$container_name" "$IMAGE_NAME" "$SAMPLE_TIME"
 
 echo "Running pge '{$PGE}' (image $IMAGE_NAME) using run config '$RUNCONFIG'"
 echo "Sending 'docker run' command"
-
-#docker run --rm --name "$PGE" -u $UID:$(id -g)\
-#  -v "${DATA_DIR}"/runconfig:/home/conda/runconfig:ro \
-#  -v "${DATA_DIR}"/input_dir:/home/conda/input_dir:ro \
-#  -v "${DATA_DIR}"/output_dir:/home/conda/output_dir \
-#  -i --tty opera/proteus:mid_may_2022 sh -ci "python3 proteus-0.1/bin/dswx_hls.py runconfig/dswx_hls.yaml --log output_dir/test_log.log"
 
 docker run --rm --name "${container_name}" -u $UID:$(id -g)\
   -v "${DATA_DIR}"/runconfig:/home/conda/runconfig:ro \
