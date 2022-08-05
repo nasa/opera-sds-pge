@@ -66,7 +66,7 @@ metrics_collection_start()
         # Use 'free' to get the total amount of Swap space available
         swap_space_cmd='free -g | grep Swap'
     else
-        swap_space_cmd='echo"N/A"'
+        swap_space_cmd='echo "N/A"'
     fi
 
     # Set directory fo the log file
@@ -97,7 +97,7 @@ metrics_collection_end()
     local metrics_stats="${container_info}_metrics_stats.csv"
     local metrics_misc="${container_info}_metrics_misc.csv"
 
-    # kill the background tasks
+    # kill the background tasks (the pid number is stored in the file below)
     kill "$(cat "${container_info}_metrics_stats_bg_pid.txt")"
     rm "${container_info}"_metrics_stats_bg_pid.txt
     kill "$(cat "${container_info}_metrics_misc_bg_pid.txt")"
@@ -109,13 +109,12 @@ metrics_collection_end()
         process_metrics_exit_code=$?
         if [[ $process_metrics_exit_code == 0 ]]
         then
-            echo "TODO UNCOMMENT LATER"
-#            rm "$metrics_stats"
-#            rm "$metrics_misc"
+            echo "Remove temporary gathering files."
+            rm "$metrics_stats"
+            rm "$metrics_misc"
         fi
     else
-        echo "Docker exited with an error and so metrics will not be processed or uploaded (csv files will be saved)."
-        echo "Error code: $process_metrics_exit_code"
+        echo "Docker exited with an error and so metrics will not be processed or uploaded (csv files will be saved)."git
     fi
 
     echo "metrics_collection has completed."
