@@ -140,7 +140,7 @@ class DSWxHLSPostProcessorMixin(PostProcessorMixin):
 
         The core file name component of the DSWx PGE consists of:
 
-        <PROJECT>_<LEVEL>_<PGE NAME>_<SOURCE>_<SPACECRAFT_NAME>_<TILE ID>_<TIMETAG>_<PRODUCT VERSION>
+        <PROJECT>_<LEVEL>_<PGE NAME>_<SOURCE>_<SENSOR>_<SPACING>_<TILE ID>_<ACQ TIMETAG>_<PROD TIMETAG>_<PRODUCT VERSION>
 
         Callers of this function are responsible for assignment of any other
         product-specific fields, such as the file extension.
@@ -217,7 +217,7 @@ class DSWxHLSPostProcessorMixin(PostProcessorMixin):
 
         The GeoTIFF filename for the DSWx-HLS PGE consists of:
 
-            <Core filename>_<Band Index>_<Band Name>.tif
+            <Core filename>_<Band Index>_<Band Name>.tiff
 
         Where <Core filename> is returned by DSWxHLSPostProcessorMixin._core_filename()
         and <Band Index> and <Band Name> are determined from the name of the

@@ -17,14 +17,15 @@ RunConfig:
 
             ProductPathGroup:
                 OutputProductPath: cslc_pge_test/output_dir
-                ScratchPath: cslc_pge_test/scratch_dir
+                ScratchPath: cslc_pge_test/output_dir/scratch_dir
 
             PrimaryExecutable:
                 ProductIdentifier: CSLC_S1
-                ProgramPath: /bin/echo
+                ProgramPath: mkdir
                 ProgramOptions:
-                    - 'hello world > cslc_pge_test/output_dir/t64_iw2_b204_20220501_VV.slc;'
-                    - '/bin/echo "hello json" > cslc_pge_test/output_dir/t64_iw2_b204_20220501_VV.json;'
+                    - '-p cslc_pge_test/output_dir/t64_iw2_b204/20220501/;'
+                    - '/bin/echo hello world > cslc_pge_test/output_dir/t64_iw2_b204/20220501/t64_iw2_b204_20220501_VV.slc;'
+                    - '/bin/echo "{\"sensing_start\": \"2022-05-01 01:50:52.530024\", \"polarization\": \"VV\", \"burst_id\": \"t64_iw2_b204\", \"platform_id\": \"S1A\"}" > cslc_pge_test/output_dir/t64_iw2_b204/20220501/t64_iw2_b204_20220501_VV.json;'
                     - '/bin/echo CSLC-S1 invoked with RunConfig'
                 ErrorCodeBase: 200000
                 SchemaPath: pge/cslc_s1/schema/cslc_s1_sas_schema.yaml

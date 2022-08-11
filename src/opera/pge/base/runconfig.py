@@ -353,14 +353,23 @@ class RunConfig:
     def get_output_product_filenames(self):
         """
         Returns a sorted list of all product file paths currently written to the
-        output location specified by the RunConfig. Note that only top-level files
-        are returned, this function does not recurse into any directories
-        encountered.
+        output location specified by the RunConfig.
+
+        Any hidden files (starting with ".") are ignored, as well as any files
+        within the designated "scratch" path (if it happens to be defined within
+        the output product directory).
 
         """
         output_product_path = abspath(self.output_product_path)
-        output_products = [join(output_product_path, filename)
-                           for filename in os.listdir(output_product_path)
-                           if isfile(join(output_product_path, filename))]
+        scratch_path = abspath(self.scratch_path)
+
+        output_products = []
+
+        for dirpath, dirnames, filenames in os.walk(output_product_path, topdown=False):
+            for filename in filter(lambda name: not name.startswith('.'), filenames):
+                product_path = os.path.join(dirpath, filename)
+
+                if scratch_path not in product_path:
+                    output_products.append(product_path)
 
         return sorted(output_products)

@@ -9,7 +9,9 @@ Unit tests for the pge/cslc_s1/cslc_s1_pge.py module.
 """
 
 import glob
+import json
 import os
+import re
 import tempfile
 import unittest
 from io import StringIO
@@ -105,25 +107,64 @@ class CslcS1PgeTestCase(unittest.TestCase):
         expected_sas_config_file = join(pge.runconfig.scratch_path, 'test_cslc_s1_config_sas.yaml')
         self.assertTrue(os.path.exists(expected_sas_config_file))
 
+        # Check that the catalog metadata file was created in the output directory
+        expected_catalog_metadata_file = join(
+            pge.runconfig.output_product_path, pge._catalog_metadata_filename())
+        self.assertTrue(os.path.exists(expected_catalog_metadata_file))
+
         # Check that the log file was created and moved into the output directory
         expected_log_file = pge.logger.get_file_name()
         self.assertTrue(os.path.exists(expected_log_file))
 
-        # Lastly, check that the dummy output products were created
-        slc_files = glob.glob(join(pge.runconfig.output_product_path, "*.slc"))
-        self.assertEqual(len(slc_files), 1)
+        # Lastly, check that the dummy output products were created and renamed
+        expected_image_file = join(
+            pge.runconfig.output_product_path, pge._geotiff_filename(inter_filename=''))
+        self.assertTrue(os.path.exists(expected_image_file))
 
-        # Check that a JSON file was created along with the dummy slc product
-        slc_filename = os.path.basename(slc_files[0])
-        json_filename = os.path.splitext(slc_filename)[0] + ".json"
-
-        self.assertTrue(os.path.exists(join(pge.runconfig.output_product_path, json_filename)))
+        expected_image_metadata_file = join(
+            pge.runconfig.output_product_path, pge._json_metadata_filename(inter_filename='')
+        )
+        self.assertTrue(os.path.exists(expected_image_metadata_file))
 
         # Open and read the log
         with open(expected_log_file, 'r', encoding='utf-8') as infile:
             log_contents = infile.read()
 
         self.assertIn(f"CSLC-S1 invoked with RunConfig {expected_sas_config_file}", log_contents)
+
+    def test_filename_application(self):
+        """Test the filename convention applied to CSLC output products"""
+        runconfig_path = join(self.data_dir, 'test_cslc_s1_config.yaml')
+
+        pge = CslcS1Executor(pge_name="CslcPgeTest", runconfig_path=runconfig_path)
+
+        pge.run()
+
+        # Grab the metadata generated from the PGE run, as it is used to generate
+        # the final filename for output products
+        metadata_files = glob.glob(join(pge.runconfig.output_product_path, "*Z.json"))
+
+        self.assertEqual(len(metadata_files), 1)
+
+        metadata_file = metadata_files[0]
+
+        with open(metadata_file, 'r') as infile:
+            cslc_metadata = json.load(infile)
+
+        # Compare the filename returned by the PGE for JSON metadata files
+        # to a regex which should match each component of the final filename
+        file_name = pge._json_metadata_filename(inter_filename='')
+
+        file_name_regex = rf"{pge.PROJECT}_{pge.LEVEL}_{pge.NAME}_" \
+                          rf"{cslc_metadata['platform_id']}_" \
+                          rf"IW_{cslc_metadata['burst_id'].upper().replace('_', '-')}_" \
+                          rf"{cslc_metadata['polarization']}_" \
+                          rf"\d{{8}}T\d{{6}}Z_v{pge.SAS_VERSION}_\d{{8}}T\d{{6}}Z.json"
+
+        result = re.match(file_name_regex, file_name)
+
+        self.assertIsNotNone(result)
+        self.assertEqual(result.group(), file_name)
 
 
 if __name__ == "__main__":
