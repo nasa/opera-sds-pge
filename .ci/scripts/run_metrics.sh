@@ -34,7 +34,8 @@ docker run --rm --name "${container_name}" -u $UID:$(id -g)\
   -v "${DATA_DIR}"/runconfig:/home/conda/runconfig:ro \
   -v "${DATA_DIR}"/input_dir:/home/conda/input_dir:ro \
   -v "${DATA_DIR}"/output_dir:/home/conda/output_dir \
-  -i --tty opera/proteus:mid_may_2022 sh -ci "python3 proteus-0.1/bin/dswx_hls.py runconfig/dswx_hls.yaml --log output_dir/test_log.log"
+  -i --tty "${IMAGE_NAME}" \
+  --file /home/conda/runconfig/"${RUNCONFIG}"
 
 docker_run_exit_code=$?
 echo "Docker run exited with code: " $docker_run_exit_code
