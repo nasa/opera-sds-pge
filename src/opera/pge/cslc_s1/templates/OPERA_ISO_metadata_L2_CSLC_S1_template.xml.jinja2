@@ -152,8 +152,8 @@
                         </gmd:CI_Date>
                     </gmd:date>
                     <gmd:edition>
-                        <!-- TODO need to verify this is coming from output json metadata or within tiff -->
-                        <gco:CharacterString>{{ product_output.product_version }}{# ISO_OPERA_ProductVersion #}</gco:CharacterString>
+                        <!-- TODO this will probably come from the RunConfig eventually -->
+                        <gco:CharacterString>{{ product_output.isce3_version }}{# ISO_OPERA_ProductVersion #}</gco:CharacterString>
                     </gmd:edition>
                     <!-- This is the producer granule id -->
                     <gmd:identifier>
@@ -498,7 +498,7 @@
                             <gmd:polygon>
                                 <gml:Point gml:id="CSLC_Burst_Center">
                                     <gml:description>Burst geographical center coordinates (meters) in the projection system used for processing</gml:description>
-                                    <gml:pos>{{ product_output.burstCenter }}{# ISO_OPERA_burstCenter #}</gml:pos>
+                                    <gml:pos>{{ product_output.burst_center }}{# ISO_OPERA_burstCenter #}</gml:pos>
                                 </gml:Point>
                             </gmd:polygon>
                         </gmd:EX_BoundingPolygon>
@@ -512,7 +512,7 @@
                                     <gml:exterior>
                                         <gml:LinearRing>
                                             <gml:description>X- and Y- coordinates (meters) of the polygon including valid L2_CSLC_S1 data</gml:description>
-                                            <gml:posList>{{ product_output.exteriorPosList }}{# ISO_OPERA_exteriorPosList #}</gml:posList>
+                                            <gml:posList>{{ product_output.burst_polygon }}{# ISO_OPERA_burstPolygon #}</gml:posList>
                                         </gml:LinearRing>
                                     </gml:exterior>
                                 </gml:Polygon>
@@ -1366,7 +1366,7 @@
                         </gmi:LE_ProcessStep>
                     </gmd:processStep>
                     <!-- This section holds the GranuleInputs -->
-                    {%- for input_list_item in catalog_metadata.Input_Files %}
+                    {%- for safe_file in run_config.Groups.SAS.runconfig.groups.input_file_group.safe_file_path %}
                     <gmd:source>
                         <gmi:LE_Source>
                             <gmd:description>
@@ -1375,8 +1375,8 @@
                             <gmd:sourceCitation>
                                 <gmd:CI_Citation>
                                     <gmd:title>
-                                        <gmx:FileName src="{{ input_list_item }}{# ISO_OPERA_InputGranuleN #}">
-                                            {{ input_list_item }}{# ISO_OPERA_InputGranuleN #}
+                                        <gmx:FileName src="{{ safe_file }}{# ISO_OPERA_InputGranuleN #}">
+                                            {{ safe_file }}{# ISO_OPERA_InputGranuleN #}
                                         </gmx:FileName>
                                     </gmd:title>
                                     <gmd:date gco:nilReason="unknown"/>
@@ -1392,13 +1392,15 @@
                             </gmd:description>
                         </gmd:LI_Source>
                     </gmd:source>
+                    {%- for orbit_file in run_config.Groups.SAS.runconfig.groups.input_file_group.orbit_file_path %}
                     <gmd:source>
                         <gmd:LI_Source>
                             <gmd:description>
-                                <gco:CharacterString>Orbit Ephemerides - {{ run_config.Groups.PGE.DynamicAncillaryFilesGroup.AncillaryFileMap.orbit_file }}{# ISO_OPERA_orbitFile #}</gco:CharacterString>
+                                <gco:CharacterString>Orbit Ephemerides - {{ orbit_file }}{# ISO_OPERA_orbitFile #}</gco:CharacterString>
                             </gmd:description>
                         </gmd:LI_Source>
                     </gmd:source>
+                    {%- endfor %}
                 </gmd:LI_Lineage>
             </gmd:lineage>
         </gmd:DQ_DataQuality>
