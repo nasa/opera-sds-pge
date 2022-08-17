@@ -49,21 +49,25 @@ Integration Testing DSWx-HLS PGE docker image...
 
 PGE_NAME="dswx_hls"
 PGE_IMAGE="opera_pge/${PGE_NAME}"
-
 TEST_RESULTS_REL_DIR="test_results"
+
+# defaults, test data and runconfig files should be updated as-needed to use
+# the latest available as defaults for use with the Jenkins pipeline call
+# TESTDATA should be the name of the test data archive in s3://operasds-dev-pge/dswx_hls/
+# RUNCONFIG should be the name of the runconfig in s3://operasds-dev-pge/dswx_hls/
 [ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath $(dirname $(realpath $0))/../..)
+[ -z "${TESTDATA}" ] && TESTDATA="delivery_3_cal_val.zip"
+[ -z "${RUNCONFIG}" ] && RUNCONFIG="opera_pge_dswx_hls_delivery_3.0_cal_val_runconfig.yaml"
+
 TEST_RESULTS_DIR="${WORKSPACE}/${TEST_RESULTS_REL_DIR}/${PGE_NAME}"
 
 echo "Test results output directory: ${TEST_RESULTS_DIR}"
 mkdir --parents ${TEST_RESULTS_DIR}
 chmod -R 775 ${TEST_RESULTS_DIR}
-RESULTS_FILE="${TEST_RESULTS_DIR}/test_int_dswx_results.html"
+RESULTS_FILE="${TEST_RESULTS_DIR}/test_int_${PGE_NAME}_results.html"
 
 # For this version of integration test, an archive has been created which contains
 # the unmodified ADT SAS test data archive and PGE expected output.
-
-# TESTDATA should be the name of the test data archive in s3://operasds-dev-pge/dswx_hls/
-# RUNCONFIG should be the name of the runconfig in s3://operasds-dev-pge/dswx_hls/
 
 # Create a temporary directory to allow Jenkins to write to it and avoid collisions
 # with other users
@@ -74,7 +78,7 @@ cd $local_dir
 local_testdata_archive=${local_dir}/${TESTDATA}
 local_runconfig=${local_dir}/${RUNCONFIG}
 
-results_html_init="<html><b>dswx_hls product comparison results</b> \
+results_html_init="<html><b>${PGE_NAME} product comparison results</b> \
     <style>* {font-family: sans-serif;} \
     table {border-collapse: collapse;} \
     th,td {padding: 4px 6px; border: thin solid white} \
@@ -98,10 +102,10 @@ function cleanup {
 trap cleanup EXIT
 
 # Pull in test data and runconfig from S3
-echo "Downloading test data from s3://operasds-dev-pge/dswx_hls/${TESTDATA} to $local_testdata_archive"
-aws s3 cp s3://operasds-dev-pge/dswx_hls/${TESTDATA} $local_testdata_archive
-echo "Downloading runconfig from s3://operasds-dev-pge/dswx_hls/${RUNCONFIG} to $local_runconfig"
-aws s3 cp s3://operasds-dev-pge/dswx_hls/${RUNCONFIG} $local_runconfig
+echo "Downloading test data from s3://operasds-dev-pge/${PGE_NAME}/${TESTDATA} to $local_testdata_archive"
+aws s3 cp s3://operasds-dev-pge/${PGE_NAME}/${TESTDATA} $local_testdata_archive
+echo "Downloading runconfig from s3://operasds-dev-pge/${PGE_NAME}/${RUNCONFIG} to $local_runconfig"
+aws s3 cp s3://operasds-dev-pge/${PGE_NAME}/${RUNCONFIG} $local_runconfig
 
 # Extract the test data archive to the current directory
 if [ -f $local_testdata_archive ]; then
