@@ -2,7 +2,17 @@
 
 pipeline {
     agent any
+    environment {
+        DOCKER_IMAGE_PREFIX = 'opera_pge'
+        DOCKER_TAG = """${sh(
+                     returnStdout: true,
+                     script: 'echo ${GIT_BRANCH##*/}'
+                     ).trim()}"""
+    }
     parameters {
+        // TODO: update default value as newer PGE's are added
+        string(name: 'DOCKER_IMAGE_SUFFIXES', defaultValue: 'dswx_hls',
+               description: 'Comma-delimited list of PGE names to run integration tests for')
         string(name: 'ART_DOCKER_REGISTRY', defaultValue: 'artifactory-fn.jpl.nasa.gov:16001',
                description: 'Address of Artifactory-FN Docker registry for uploading Docker images.')
         credentials (name: 'ART_CREDENTIALS',
@@ -11,53 +21,59 @@ pipeline {
                      description: 'Artifactory-FN credentials for account operapgebot. Used to push/pull images from Artifactory during build.',
                      required: true)
     }
-    environment {
-        DOCKER_IMAGE_PREFIX = 'opera_pge'
-        // TODO: update as newer PGE's are added
-        DOCKER_IMAGE_SUFFIXES = 'dswx_hls'
-        DOCKER_TAG = """${sh(
-                     returnStdout: true,
-                     script: 'echo ${GIT_BRANCH##*/}'
-                     ).trim()}"""
-    }
     stages {
         stage('Build OPERA PGE Docker image(s)') {
             steps {
                 script {
                     docker.withRegistry ('https://' + params.ART_DOCKER_REGISTRY, params.ART_CREDENTIALS) {
-                        echo "Building ${DOCKER_IMAGE_PREFIX} docker images with tag ${DOCKER_TAG}"
-                        sh label: 'Build all OPERA Docker images',
-                           script: ".ci/scripts/build_all_images.sh $DOCKER_TAG"
+                        DOCKER_IMAGE_SUFFIXES.tokenize(',').each { DOCKER_IMAGE_SUFFIX ->
+                            echo "Building ${DOCKER_IMAGE_PREFIX}/${DOCKER_IMAGE_SUFFIX} docker image with tag ${DOCKER_TAG}"
+                            sh label: "Build ${DOCKER_IMAGE_PREFIX}/${DOCKER_IMAGE_SUFFIX} OPERA Docker image",
+                               script: ".ci/scripts/build_${DOCKER_IMAGE_SUFFIX}.sh --tag $DOCKER_TAG"
+                        }
                     }
                 }
             }
         }
-        stage('Test OPERA PGE Docker image(s)') {
+        stage('Integration Test OPERA PGE Docker image(s)') {
             steps {
-                echo "Testing ${DOCKER_IMAGE_PREFIX} docker images with tag ${DOCKER_TAG}"
                 script {
-                    def statusCode = sh label: 'Test all OPERA Docker images', returnStatus:true,
-                       script: ".ci/scripts/test_int_dswx_hls.sh --tag $DOCKER_TAG --testdata delivery_2.1_mid_may.zip --runconfig opera_pge_dswx_hls_delivery_2.1_mid_may_runconfig.yaml"
-                    echo "Test returned code ${statusCode}"
-                    if (statusCode == 2) {
-                        unstable "Product comparison failure detected. Setting stage result to unstable."
+                    def htmlFiles = []
+                    def reportTitles = []
+
+                    DOCKER_IMAGE_SUFFIXES.tokenize(',').each { DOCKER_IMAGE_SUFFIX ->
+                        echo "Integration testing Docker image ${DOCKER_IMAGE_PREFIX}/${DOCKER_IMAGE_SUFFIX}:${DOCKER_TAG}"
+
+                        def statusCode = sh label: "Running Integration Test for image ${DOCKER_IMAGE_PREFIX}/${DOCKER_IMAGE_SUFFIX}:${DOCKER_TAG}", returnStatus:true,
+                           script: ".ci/scripts/test_int_${DOCKER_IMAGE_SUFFIX}.sh --tag ${DOCKER_TAG}"
+
+                        echo "Test returned code ${statusCode}"
+
+                        if (statusCode == 2) {
+                            unstable "Product comparison failure detected. Setting stage result to unstable."
+                        }
+                        else if (statusCode != 0) {
+                            currentStage.result = 'FAILURE'
+                        }
+                        else if (statusCode == 0) {
+                            currentStage.result = 'SUCCESS'
+                        }
+
+                        htmlFiles << "${DOCKER_IMAGE_SUFFIX}/test_int_${DOCKER_IMAGE_SUFFIX}_results.html"
+                        reportTitles << "${DOCKER_IMAGE_SUFFIX}"
                     }
-                    else if (statusCode != 0) {
-                        currentStage.result = 'FAILURE'
-                    }
-                    else if (statusCode == 0) {
-                        currentStage.result = 'SUCCESS'
-                    }
+
+                    publishHTML target: [
+                        allowMissing: true,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: "test_results",
+                        reportFiles: htmlFiles.join(','),
+                        reportName: "Integration Test Results",
+                        reportTitles: reportTitles.join(',')
+                    ]
                 }
-                archiveArtifacts artifacts: 'test_results/dswx_hls/test_int_dswx_results.html'
-                publishHTML target: [
-                    allowMissing: true,
-                    alwaysLinkToLastBuild: true,
-                    keepAll: true,
-                    reportDir: "test_results",
-                    reportFiles: "dswx_hls/test_int_dswx_results.html",
-                    reportName: "Integration Test Results",
-                ]
+                archiveArtifacts artifacts: 'test_results/**/test_int_*_results.html'
             }
         }
     }
