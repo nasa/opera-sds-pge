@@ -11,7 +11,7 @@ umask 002
 while [[ $# -gt 0 ]]; do
   case $1 in
     -h|--help)
-      echo "Usage: test_int_dswx_hls.sh [-h|--help] [-t|--tag <tag>] [--testdata <testdata .tgz file>] [--runconfig <runconfig .yaml file>]"
+      echo "Usage: test_int_dswx_hls.sh [-h|--help] [-t|--tag <tag>] [--testdata <testdata .zip file>] [--runconfig <runconfig .yaml file>]"
       exit 0
       ;;
     -t|--tag)
