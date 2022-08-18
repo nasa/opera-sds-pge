@@ -55,10 +55,6 @@ RunConfig:
                         # Required. List of orbit (EOF) files (min=1)
                         orbit_file_path:
                             - input_data/S1A_OPER_AUX_POEORB_OPOD_20220521T081912_V20220430T225942_20220502T005942.EOF
-                        # Required. Path to the burst data
-                        burst_file_path: input_data/burst_t64_iw2_b204_20210501_VV.slc.vrt
-                        # Required. Path to light metadata file
-                        light_metadata_path: input_data/light_metadata_t64_iw2_b204_20210501_VV.json
                         # Required. The unique burst ID to process
                         burst_id: t64_iw2_b204
 
