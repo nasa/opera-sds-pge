@@ -15,7 +15,7 @@ while [[ $# -gt 0 ]]; do
       exit 0
       ;;
     -t|--tag)
-      TAG=$2
+      PGE_TAG=$2
       shift
       shift
       ;;
@@ -51,19 +51,21 @@ PGE_NAME="cslc_s1"
 PGE_IMAGE="opera_pge/${PGE_NAME}"
 
 TEST_RESULTS_REL_DIR="test_results"
+
+# defaults, test data and runconfig files should be updated as-needed to use
+# the latest available as defaults for use with the Jenkins pipeline call
+# TESTDATA should be the name of the test data archive in s3://operasds-dev-pge/cslc_s1/
+# RUNCONFIG should be the name of the runconfig in s3://operasds-dev-pge/cslc_s1/
 [ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath $(dirname $(realpath $0))/../..)
+[ -z "${TESTDATA}" ] && TESTDATA="delivery_cslc_s1_interface_0.1.zip"
+[ -z "${RUNCONFIG}" ] && RUNCONFIG="cslc_s1.yaml"
+
 TEST_RESULTS_DIR="${WORKSPACE}/${TEST_RESULTS_REL_DIR}/${PGE_NAME}"
 
 echo "Test results output directory: ${TEST_RESULTS_DIR}"
 mkdir --parents ${TEST_RESULTS_DIR}
 chmod -R 775 ${TEST_RESULTS_DIR}
 RESULTS_FILE="${TEST_RESULTS_DIR}/test_int_${PGE_NAME}_results.html"
-
-# For this version of integration test, an archive has been created which contains
-# the unmodified ADT SAS test data archive and PGE expected output.
-
-# TESTDATA should be the name of the test data archive in s3://operasds-dev-pge/cslc_s1/
-# RUNCONFIG should be the name of the runconfig in s3://operasds-dev-pge/cslc_s1/
 
 # Create a temporary directory to allow Jenkins to write to it and avoid collisions
 # with other users
@@ -90,8 +92,9 @@ function cleanup {
     DOCKER_RUN="docker run --rm -u $UID:$(id -g)"
 
     echo "Cleaning up before exit. Setting permissions for output files and directories."
-    ${DOCKER_RUN} -v ${local_dir}:${local_dir} --entrypoint /usr/bin/find ${PGE_IMAGE}:${TAG} ${local_dir} -type d -exec chmod 775 {} +
-    ${DOCKER_RUN} -v ${local_dir}:${local_dir} --entrypoint /usr/bin/find ${PGE_IMAGE}:${TAG} ${local_dir} -type f -exec chmod 664 {} +
+    ${DOCKER_RUN} -v ${local_dir}:${local_dir} --entrypoint /usr/bin/find ${PGE_IMAGE}:${PGE_TAG} ${local_dir} -type d -exec chmod 775 {} +
+    ${DOCKER_RUN} -v ${local_dir}:${local_dir} --entrypoint /usr/bin/find ${PGE_IMAGE}:${PGE_TAG} ${local_dir} -type f -exec chmod 664 {} +
+    cd /tmp
     rm -rf ${local_dir}
 }
 
@@ -106,9 +109,8 @@ aws s3 cp s3://operasds-dev-pge/${PGE_NAME}/${RUNCONFIG} $local_runconfig
 # Pull in validation script from S3. This utility doesn't appear to be source-controlled
 # so we have cached the delivery version in S3.
 local_validate_cslc=${local_dir}/validate_cslc.py
-echo "Downloading runconfig from s3://operasds-dev-pge/${PGE_NAME}/validate_cslc.py to $local_runconfig"
+echo "Downloading s3://operasds-dev-pge/${PGE_NAME}/validate_cslc.py to $local_validate_cslc"
 aws s3 cp s3://operasds-dev-pge/${PGE_NAME}/validate_cslc.py $local_validate_cslc
-
 
 # Extract the test data archive to the current directory
 if [ -f $local_testdata_archive ]; then
@@ -121,6 +123,7 @@ if [ -f $local_testdata_archive ]; then
     unzip $local_testdata_archive
 
     if [ -d $testdata_dir ]; then
+        rm $local_testdata_archive
         cd $testdata_dir
     else
         echo "The test data archive needs to include a directory named $testdata_dir, but it does not."
@@ -141,14 +144,18 @@ else
     exit 1
 fi
 
-# If any test case fails, this is set to non-zero
+# overall_status values and their meaning
+# 0 - pass
+# 1 - failure to execute some part of this script
+# 2 - product validation failure
 overall_status=0
 
 # There is only 1 expected output directory for CSLC_S1
 expected_dir="$(pwd)/expected_output"
-data_dir=$(pwd)
-echo -e "\nTest data directory: ${data_dir}"
-output_dir="$(pwd)/pge_${PGE_NAME}_output"
+
+# the testdata reference metadata contains this path so we use it here
+output_dir="$(pwd)/output_s1_cslc"
+rmdir ${output_dir}
 echo "Checking if $output_dir exists (it shouldn't)."
 if [ -d $output_dir ]; then
     echo "Output directory $output_dir already exists (and should not). Exiting."
@@ -156,7 +163,10 @@ if [ -d $output_dir ]; then
 fi
 echo "Creating output directory $output_dir."
 mkdir $output_dir
-scratch_dir="$(pwd)/pge_${PGE_NAME}_scratch"
+
+# the testdata reference metadata contains this path so we use it here
+scratch_dir="$(pwd)/scratch_s1_cslc"
+rmdir $scratch_dir
 if [ -d $scratch_dir ]; then
     echo "Scratch directory $scratch_dir already exists (and should not). Exiting."
     exit 1
@@ -164,86 +174,76 @@ fi
 echo "Creating scratch directory $scratch_dir."
 mkdir $scratch_dir
 
+echo "Running Docker image ${PGE_IMAGE}:${PGE_TAG}"
 
-echo "Running Docker image ${PGE_IMAGE}:${TAG} for ${data_dir}"
-docker run --rm -u $UID:$(id -g) -v $(pwd):/home/conda/runconfig:ro \
-           -v $data_dir/input_data:/home/conda/input_data:ro \
-           -v $output_dir:/home/conda/output_dir \
-           -v $scratch_dir:/home/conda/scratch_dir \
-           ${PGE_IMAGE}:${TAG} --file /home/conda/runconfig/$runconfig_filename
+docker run --rm -u $UID:$(id -g) -w /home/compass_user \
+           -v $(pwd):/home/compass_user/runconfig:ro \
+           -v $(pwd)/input_data:/home/compass_user/input_data:ro \
+           -v ${output_dir}:/home/compass_user/output_s1_cslc \
+           -v ${scratch_dir}:/home/compass_user/scratch_s1_cslc \
+           ${PGE_IMAGE}:${PGE_TAG} --file /home/compass_user/runconfig/$runconfig_filename
 
 docker_exit_status=$?
 if [ $docker_exit_status -ne 0 ]; then
-    echo "$data_dir docker exit indicates failure: ${docker_exit_status}"
+    echo "docker exit indicates failure: ${docker_exit_status}"
     overall_status=1
 else
-    # Compare output files against expected files
-    for output_file in $output_dir/*
-    do
-        echo "output_file $output_file"
-        output_file=$(basename -- "$output_file")
+    # Prepare to validate output products
+    cp $local_validate_cslc .
 
-        if [[ "${output_file##*/}" == *.slc ]]
-        then
-            echo "Output product is ${output_file}"
-            sec_product=${output_file}
-        elif [[ "${output_file##*/}" == *.json ]]
-            echo "Output metadata is ${output_file}"
-            sec_metadata=${output_file}
-        else
-            echo "Ignoring output file ${output_file}"
-        fi
-    done
-    for expected_file in $expected_dir/*
-    do
-        echo "expected_file $expected_file"
-        expected_file=$(basename -- "$expected_file")
+    # Compare output files against expected files. There is a varying timestamp in the product filenames.
+    sec_product_file=$(ls -1 ${output_dir}/OPERA_L2_CSLC_S1A_IW_T64-135524-IW2_VV_20220501T015052Z_v0.1_*Z.tiff)
+    sec_product=$(basename -- "${sec_product_file}")
+    sec_metadata_file=$(ls -1 ${output_dir}/OPERA_L2_CSLC_S1A_IW_T64-135524-IW2_VV_20220501T015052Z_v0.1_*Z.json)
+    sec_metadata=$(basename -- "${sec_metadata_file}")
+    ref_product="t64_135524_iw2/20220501/t64_135524_iw2_20220501_VV.slc"
+    ref_metadata="t64_135524_iw2/20220501/t64_135524_iw2_20220501_VV.json"
 
-        if [[ "${expected_file##*/}" == *.slc ]]
-        then
-            echo "Expected product is ${expected_file}"
-            ref_product=${expected_file}
-        elif [[ "${expected_file##*/}" == *.json ]]
-            echo "Expected metadata is ${expected_file}"
-            ref_metadata=${expected_file}
-        else
-            echo "Ignoring expected file ${expected_file}"
-        fi
-    done
-
-    if [ -z sec_product ] || [ -z sec_metadata ] || [ -z ref_product ] || [ -z ref_metadata ]
+    if [ ! -f ${output_dir}/${sec_product} ] || [ ! -f ${output_dir}/${sec_metadata} ] ||
+       [ ! -f ${expected_dir}/${ref_product} ] || [ ! -f ${expected_dir}/${ref_metadata} ]
     then
         echo "One or more output files or expected files are missing."
+        ls ${output_dir}/${sec_product}
+        ls ${output_dir}/${sec_metadata}
+        ls ${expected_dir}/${ref_product}
+        ls ${expected_dir}/${ref_metadata}
         overall_status=1
     else
         docker_out="N/A"
         compare_result="N/A"
-        expected_file="N/A"
-        # compare output and expected files
-        expected_file=$(basename -- "$expected_file")
-        docker_out=$(docker run --rm -u conda:conda \
+
+        # Run validation script on output files
+        docker_out=$(docker run --rm -u compass_user:compass_user \
+                                -v $(pwd):/working:ro \
                                 -v ${output_dir}:/out:ro \
                                 -v ${expected_dir}:/exp:ro \
-                                --entrypoint python3 ${PGE_IMAGE}:${TAG} \
-                                validate_cslc.py \
-                                /out/${output_file} /exp/${expected_file})
+                                --entrypoint /home/compass_user/miniconda3/envs/COMPASS/bin/python3 \
+                                ${PGE_IMAGE}:${PGE_TAG} \
+                                /working/validate_cslc.py \
+                                --ref-product /exp/${ref_product} \
+                                --sec-product /out/${sec_product} \
+                                --ref-metadata /exp/${ref_metadata} \
+                                --sec-metadata /out/${sec_metadata})
+
         echo "$docker_out"
-        if [[ "$docker_out" == *"[FAIL]"* ]]; then
-            echo "File comparison failed. Output and expected files differ for ${output_file}"
+        if [[ "$docker_out" != *"All CSLC product checks have passed"* ]]; then
+            echo "Failure: All CSLC product checks DID NOT PASS"
             compare_result="FAIL"
             overall_status=2
-        elif [[ "$docker_out" == *"ERROR"* ]]; then
-            echo "An error occurred during file comparison."
-            compare_result="ERROR"
-            overall_status=1
+        elif [[ "$docker_out" != *"All CSLC metadata checks have passed"* ]]; then
+            echo "Failure: All CSLC metadata checks DID NOT PASS"
+            compare_result="FAIL"
+            overall_status=2
         else
-            echo "File comparison passed for ${output_file}"
+            echo "Product validation was successful"
             compare_result="PASS"
         fi
     fi
 
-    echo "<tr><td>${compare_result}</td><td>Output: ${output_file}<br>Expected: ${expected_file}</td><td>${docker_out}</td></tr>" >> $RESULTS_FILE
+    echo "<tr><td>${compare_result}</td><td>${ref_product}<br>${sec_product}<br>${ref_metadata}<br>${sec_metadata}</td><td>${docker_out}</td></tr>" >> $RESULTS_FILE
+fi
 echo " "
+
 if [ $overall_status -ne 0 ]; then
     echo "Test FAILED."
 else
