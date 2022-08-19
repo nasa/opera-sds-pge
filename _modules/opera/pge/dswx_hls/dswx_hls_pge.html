@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera.pge.dswx_hls.dswx_hls_pge &mdash; opera-sds-pge 2.0.0-er.1.0 documentation</title>
+  <title>opera.pge.dswx_hls.dswx_hls_pge &mdash; opera-sds-pge 2.0.0-er.2.0 documentation</title>
       <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -13,6 +13,7 @@
         <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
         <script src="../../../../_static/jquery.js"></script>
         <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../../_static/doctools.js"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
@@ -27,7 +28,7 @@
             <a href="../../../../index.html" class="icon icon-home"> opera-sds-pge
           </a>
               <div class="version">
-                2.0.0-er.1.0
+                2.0.0-er.2.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
@@ -213,7 +214,7 @@
 
 <span class="sd">        The core file name component of the DSWx PGE consists of:</span>
 
-<span class="sd">        &lt;PROJECT&gt;_&lt;LEVEL&gt;_&lt;PGE NAME&gt;_&lt;SOURCE&gt;_&lt;SPACECRAFT_NAME&gt;_&lt;TILE ID&gt;_&lt;TIMETAG&gt;_&lt;PRODUCT VERSION&gt;</span>
+<span class="sd">        &lt;PROJECT&gt;_&lt;LEVEL&gt;_&lt;PGE NAME&gt;_&lt;SOURCE&gt;_&lt;TILE ID&gt;_&lt;ACQ TIMETAG&gt;_&lt;PROD TIMETAG&gt;_&lt;SENSOR&gt;_&lt;SPACING&gt;_&lt;PRODUCT VERSION&gt;</span>
 
 <span class="sd">        Callers of this function are responsible for assignment of any other</span>
 <span class="sd">        product-specific fields, such as the file extension.</span>
@@ -278,8 +279,9 @@
 
         <span class="c1"># Assign the core file to the cached class attribute</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cached_core_filename</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">PROJECT</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">LEVEL</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">NAME</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">source</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">sensor</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">pixel_spacing</span><span class="si">}</span><span class="s2">_&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">tile_id</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">acquisition_time</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">processing_time</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">product_version</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">PROJECT</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">LEVEL</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">NAME</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">source</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">tile_id</span><span class="si">}</span><span class="s2">_&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">acquisition_time</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">processing_time</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">sensor</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">pixel_spacing</span><span class="si">}</span><span class="s2">_&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">product_version</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cached_core_filename</span>
@@ -290,7 +292,7 @@
 
 <span class="sd">        The GeoTIFF filename for the DSWx-HLS PGE consists of:</span>
 
-<span class="sd">            &lt;Core filename&gt;_&lt;Band Index&gt;_&lt;Band Name&gt;.tif</span>
+<span class="sd">            &lt;Core filename&gt;_&lt;Band Index&gt;_&lt;Band Name&gt;.tiff</span>
 
 <span class="sd">        Where &lt;Core filename&gt; is returned by DSWxHLSPostProcessorMixin._core_filename()</span>
 <span class="sd">        and &lt;Band Index&gt; and &lt;Band Name&gt; are determined from the name of the</span>
@@ -336,10 +338,8 @@
 
         <span class="k">for</span> <span class="n">output_product</span> <span class="ow">in</span> <span class="n">output_products</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">basename</span><span class="p">(</span><span class="n">output_product</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">renamed_files</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-                <span class="c1"># TODO: kludge for avoiding output products that are missing expected metadata</span>
-                <span class="k">if</span> <span class="n">get_geotiff_hls_dataset</span><span class="p">(</span><span class="n">output_product</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">representative_product</span> <span class="o">=</span> <span class="n">output_product</span>
-                    <span class="k">break</span>
+                <span class="n">representative_product</span> <span class="o">=</span> <span class="n">output_product</span>
+                <span class="k">break</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not find sample output product to derive metadata from &quot;</span>
                    <span class="sa">f</span><span class="s2">&quot;within </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">output_product_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -501,6 +501,9 @@
 
     <span class="n">LEVEL</span> <span class="o">=</span> <span class="s2">&quot;L3&quot;</span>
     <span class="sd">&quot;&quot;&quot;Processing Level for DSWx-HLS Products&quot;&quot;&quot;</span>
+
+    <span class="n">PGE_VERSION</span> <span class="o">=</span> <span class="s2">&quot;1.0.0-rc.2.0&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Version of the PGE (overrides default from base_pge)&quot;&quot;&quot;</span>
 
     <span class="n">SAS_VERSION</span> <span class="o">=</span> <span class="s2">&quot;0.1&quot;</span>
     <span class="sd">&quot;&quot;&quot;Version of the SAS wrapped by this PGE, should be updated as needed with new SAS deliveries&quot;&quot;&quot;</span>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera.pge.base.runconfig &mdash; opera-sds-pge 2.0.0-er.1.0 documentation</title>
+  <title>opera.pge.base.runconfig &mdash; opera-sds-pge 2.0.0-er.2.0 documentation</title>
       <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -13,6 +13,7 @@
         <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
         <script src="../../../../_static/jquery.js"></script>
         <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../../_static/doctools.js"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
@@ -27,7 +28,7 @@
             <a href="../../../../index.html" class="icon icon-home"> opera-sds-pge
           </a>
               <div class="version">
-                2.0.0-er.1.0
+                2.0.0-er.2.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
@@ -426,15 +427,24 @@
 <div class="viewcode-block" id="RunConfig.get_output_product_filenames"><a class="viewcode-back" href="../../../../opera.pge.base.html#opera.pge.base.runconfig.RunConfig.get_output_product_filenames">[docs]</a>    <span class="k">def</span> <span class="nf">get_output_product_filenames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a sorted list of all product file paths currently written to the</span>
-<span class="sd">        output location specified by the RunConfig. Note that only top-level files</span>
-<span class="sd">        are returned, this function does not recurse into any directories</span>
-<span class="sd">        encountered.</span>
+<span class="sd">        output location specified by the RunConfig.</span>
+
+<span class="sd">        Any hidden files (starting with &quot;.&quot;) are ignored, as well as any files</span>
+<span class="sd">        within the designated &quot;scratch&quot; path (if it happens to be defined within</span>
+<span class="sd">        the output product directory).</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">output_product_path</span> <span class="o">=</span> <span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_product_path</span><span class="p">)</span>
-        <span class="n">output_products</span> <span class="o">=</span> <span class="p">[</span><span class="n">join</span><span class="p">(</span><span class="n">output_product_path</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
-                           <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">output_product_path</span><span class="p">)</span>
-                           <span class="k">if</span> <span class="n">isfile</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">output_product_path</span><span class="p">,</span> <span class="n">filename</span><span class="p">))]</span>
+        <span class="n">scratch_path</span> <span class="o">=</span> <span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scratch_path</span><span class="p">)</span>
+
+        <span class="n">output_products</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">dirpath</span><span class="p">,</span> <span class="n">dirnames</span><span class="p">,</span> <span class="n">filenames</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">output_product_path</span><span class="p">,</span> <span class="n">topdown</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">name</span><span class="p">:</span> <span class="ow">not</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">),</span> <span class="n">filenames</span><span class="p">):</span>
+                <span class="n">product_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dirpath</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">scratch_path</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">product_path</span><span class="p">:</span>
+                    <span class="n">output_products</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">product_path</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">output_products</span><span class="p">)</span></div></div>
 </pre></div>

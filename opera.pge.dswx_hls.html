@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera.pge.dswx_hls package &mdash; opera-sds-pge 2.0.0-er.1.0 documentation</title>
+  <title>opera.pge.dswx_hls package &mdash; opera-sds-pge 2.0.0-er.2.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -13,6 +14,7 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -29,7 +31,7 @@
             <a href="index.html" class="icon icon-home"> opera-sds-pge
           </a>
               <div class="version">
-                2.0.0-er.1.0
+                2.0.0-er.2.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -86,21 +88,21 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <div class="section" id="opera-pge-dswx-hls-package">
-<h1>opera.pge.dswx_hls package<a class="headerlink" href="#opera-pge-dswx-hls-package" title="Permalink to this headline"></a></h1>
-<div class="section" id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline"></a></h2>
-</div>
-<div class="section" id="module-opera.pge.dswx_hls.dswx_hls_pge">
-<span id="opera-pge-dswx-hls-dswx-hls-pge-module"></span><h2>opera.pge.dswx_hls.dswx_hls_pge module<a class="headerlink" href="#module-opera.pge.dswx_hls.dswx_hls_pge" title="Permalink to this headline"></a></h2>
-<div class="section" id="dswx-hls-pge-py">
-<h3>dswx_hls_pge.py<a class="headerlink" href="#dswx-hls-pge-py" title="Permalink to this headline"></a></h3>
+  <section id="opera-pge-dswx-hls-package">
+<h1>opera.pge.dswx_hls package<a class="headerlink" href="#opera-pge-dswx-hls-package" title="Permalink to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-opera.pge.dswx_hls.dswx_hls_pge">
+<span id="opera-pge-dswx-hls-dswx-hls-pge-module"></span><h2>opera.pge.dswx_hls.dswx_hls_pge module<a class="headerlink" href="#module-opera.pge.dswx_hls.dswx_hls_pge" title="Permalink to this heading"></a></h2>
+<section id="dswx-hls-pge-py">
+<h3>dswx_hls_pge.py<a class="headerlink" href="#dswx-hls-pge-py" title="Permalink to this heading"></a></h3>
 <p>Module defining the implementation for the Dynamic Surface Water Extent (DSWx)
 from Harmonized Landsat and Sentinel-1 (HLS) PGE.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="opera.pge.dswx_hls.dswx_hls_pge.DSWxHLSExecutor">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">opera.pge.dswx_hls.dswx_hls_pge.</span></span><span class="sig-name descname"><span class="pre">DSWxHLSExecutor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pge_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runconfig_path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/opera/pge/dswx_hls/dswx_hls_pge.html#DSWxHLSExecutor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opera.pge.dswx_hls.dswx_hls_pge.DSWxHLSExecutor" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#opera.pge.dswx_hls.dswx_hls_pge.DSWxHLSPreProcessorMixin" title="opera.pge.dswx_hls.dswx_hls_pge.DSWxHLSPreProcessorMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">opera.pge.dswx_hls.dswx_hls_pge.DSWxHLSPreProcessorMixin</span></code></a>, <a class="reference internal" href="#opera.pge.dswx_hls.dswx_hls_pge.DSWxHLSPostProcessorMixin" title="opera.pge.dswx_hls.dswx_hls_pge.DSWxHLSPostProcessorMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">opera.pge.dswx_hls.dswx_hls_pge.DSWxHLSPostProcessorMixin</span></code></a>, <a class="reference internal" href="opera.pge.base.html#opera.pge.base.base_pge.PgeExecutor" title="opera.pge.base.base_pge.PgeExecutor"><code class="xref py py-class docutils literal notranslate"><span class="pre">opera.pge.base.base_pge.PgeExecutor</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#opera.pge.dswx_hls.dswx_hls_pge.DSWxHLSPreProcessorMixin" title="opera.pge.dswx_hls.dswx_hls_pge.DSWxHLSPreProcessorMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">DSWxHLSPreProcessorMixin</span></code></a>, <a class="reference internal" href="#opera.pge.dswx_hls.dswx_hls_pge.DSWxHLSPostProcessorMixin" title="opera.pge.dswx_hls.dswx_hls_pge.DSWxHLSPostProcessorMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">DSWxHLSPostProcessorMixin</span></code></a>, <a class="reference internal" href="opera.pge.base.html#opera.pge.base.base_pge.PgeExecutor" title="opera.pge.base.base_pge.PgeExecutor"><code class="xref py py-class docutils literal notranslate"><span class="pre">PgeExecutor</span></code></a></p>
 <p>Main class for execution of a DSWx-HLS PGE, including the SAS layer.</p>
 <p>This class essentially rolls up the tailored pre- and post-processors
 while inheriting all other functionality from the base PgeExecutor class.</p>
@@ -117,6 +119,12 @@ while inheriting all other functionality from the base PgeExecutor class.</p>
 </dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="opera.pge.dswx_hls.dswx_hls_pge.DSWxHLSExecutor.PGE_VERSION">
+<span class="sig-name descname"><span class="pre">PGE_VERSION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'1.0.0-rc.2.0'</span></em><a class="headerlink" href="#opera.pge.dswx_hls.dswx_hls_pge.DSWxHLSExecutor.PGE_VERSION" title="Permalink to this definition"></a></dt>
+<dd><p>Version of the PGE (overrides default from base_pge)</p>
+</dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="opera.pge.dswx_hls.dswx_hls_pge.DSWxHLSExecutor.SAS_VERSION">
 <span class="sig-name descname"><span class="pre">SAS_VERSION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'0.1'</span></em><a class="headerlink" href="#opera.pge.dswx_hls.dswx_hls_pge.DSWxHLSExecutor.SAS_VERSION" title="Permalink to this definition"></a></dt>
 <dd><p>Version of the SAS wrapped by this PGE, should be updated as needed with new SAS deliveries</p>
@@ -127,7 +135,7 @@ while inheriting all other functionality from the base PgeExecutor class.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="opera.pge.dswx_hls.dswx_hls_pge.DSWxHLSPostProcessorMixin">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">opera.pge.dswx_hls.dswx_hls_pge.</span></span><span class="sig-name descname"><span class="pre">DSWxHLSPostProcessorMixin</span></span><a class="reference internal" href="_modules/opera/pge/dswx_hls/dswx_hls_pge.html#DSWxHLSPostProcessorMixin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opera.pge.dswx_hls.dswx_hls_pge.DSWxHLSPostProcessorMixin" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="opera.pge.base.html#opera.pge.base.base_pge.PostProcessorMixin" title="opera.pge.base.base_pge.PostProcessorMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">opera.pge.base.base_pge.PostProcessorMixin</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="opera.pge.base.html#opera.pge.base.base_pge.PostProcessorMixin" title="opera.pge.base.base_pge.PostProcessorMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">PostProcessorMixin</span></code></a></p>
 <p>Mixin class responsible for handling all post-processing steps for the
 DSWx-HLS PGE. The post-processing phase is defined as all steps necessary
 after SAS execution has completed.</p>
@@ -153,7 +161,7 @@ validation check prior to staging of the output files.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="opera.pge.dswx_hls.dswx_hls_pge.DSWxHLSPreProcessorMixin">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">opera.pge.dswx_hls.dswx_hls_pge.</span></span><span class="sig-name descname"><span class="pre">DSWxHLSPreProcessorMixin</span></span><a class="reference internal" href="_modules/opera/pge/dswx_hls/dswx_hls_pge.html#DSWxHLSPreProcessorMixin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opera.pge.dswx_hls.dswx_hls_pge.DSWxHLSPreProcessorMixin" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="opera.pge.base.html#opera.pge.base.base_pge.PreProcessorMixin" title="opera.pge.base.base_pge.PreProcessorMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">opera.pge.base.base_pge.PreProcessorMixin</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="opera.pge.base.html#opera.pge.base.base_pge.PreProcessorMixin" title="opera.pge.base.base_pge.PreProcessorMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">PreProcessorMixin</span></code></a></p>
 <p>Mixin class responsible for handling all pre-processing steps for the
 DSWx-HLS PGE. The pre-processing phase is defined as all steps necessary prior
 to SAS execution.</p>
@@ -176,12 +184,12 @@ input files/directories.</p>
 
 </dd></dl>
 
-</div>
-</div>
-<div class="section" id="module-opera.pge.dswx_hls">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-opera.pge.dswx_hls" title="Permalink to this headline"></a></h2>
-</div>
-</div>
+</section>
+</section>
+<section id="module-opera.pge.dswx_hls">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-opera.pge.dswx_hls" title="Permalink to this heading"></a></h2>
+</section>
+</section>
 
 
            </div>
