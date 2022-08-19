@@ -76,7 +76,7 @@ cd $local_dir
 local_testdata_archive=${local_dir}/${TESTDATA}
 local_runconfig=${local_dir}/${RUNCONFIG}
 
-results_html_init="<html>${PGE_NAME} product comparison results<p> \
+results_html_init="<html><b>${PGE_NAME} product comparison results</b><p> \
     <style>* {font-family: sans-serif;} \
     table {border-collapse: collapse;} \
     th,td {padding: 4px 6px; border: thin solid white} \

@@ -78,7 +78,7 @@ cd $local_dir
 local_testdata_archive=${local_dir}/${TESTDATA}
 local_runconfig=${local_dir}/${RUNCONFIG}
 
-results_html_init="<html><b>${PGE_NAME} product comparison results</b> \
+results_html_init="<html><b>${PGE_NAME} product comparison results</b><p> \
     <style>* {font-family: sans-serif;} \
     table {border-collapse: collapse;} \
     th,td {padding: 4px 6px; border: thin solid white} \
@@ -96,6 +96,7 @@ function cleanup {
     echo "Cleaning up before exit. Setting permissions for output files and directories."
     ${DOCKER_RUN} -v ${local_dir}:${local_dir} --entrypoint /usr/bin/find ${PGE_IMAGE}:${TAG} ${local_dir} -type d -exec chmod 775 {} +
     ${DOCKER_RUN} -v ${local_dir}:${local_dir} --entrypoint /usr/bin/find ${PGE_IMAGE}:${TAG} ${local_dir} -type f -exec chmod 664 {} +
+    cd /tmp
     rm -rf ${local_dir}
 }
 
@@ -118,6 +119,7 @@ if [ -f $local_testdata_archive ]; then
     unzip $local_testdata_archive
 
     if [ -d $testdata_dir ]; then
+        rm $local_testdata_archive
         cd $testdata_dir
     else
         echo "The test data archive needs to include a directory named $testdata_dir, but it does not."
@@ -138,7 +140,10 @@ else
     exit 1
 fi
 
-# If any test case fails, this is set to non-zero
+# overall_status values and their meaning
+# 0 - pass
+# 1 - failure to execute some part of this script
+# 2 - product validation failure
 overall_status=0
 
 # For each <data_set> directory, run the Docker image to produce a <data_set>_output directory
