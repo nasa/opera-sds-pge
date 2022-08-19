@@ -25,6 +25,7 @@ from opera.pge import RunConfig
 from opera.pge.dswx_hls.dswx_hls_pge import DSWxHLSExecutor
 from opera.util import PgeLogger
 from opera.util.img_utils import MockGdal
+from opera.util.metadata_utils import get_sensor_from_spacecraft_name
 
 
 class DSWxPgeTestCase(unittest.TestCase):
@@ -293,14 +294,18 @@ class DSWxPgeTestCase(unittest.TestCase):
 
         pge.run()
 
-        image_files = glob.glob(join(pge.runconfig.output_product_path, "*.tif"))
+        image_files = glob.glob(join(pge.runconfig.output_product_path, "*.tiff"))
 
-        for i in range(len(image_files)):
-            file_name = pge._geotiff_filename(image_files[i])
+        for image_file in image_files:
+            file_name = pge._geotiff_filename(image_file)
             md = MockGdal.MockGdalDataset().GetMetadata()
-            file_name_regex = rf"{pge.PROJECT}_{pge.LEVEL}_{md['PRODUCT_TYPE']}_{md['PRODUCT_SOURCE']}_" \
-                              rf"{md['SPACECRAFT_NAME']}_{md['HLS_DATASET'].split('.')[2]}_\d{{8}}T\d{{6}}_" \
-                              rf"{'.'.join(md['HLS_DATASET'].split('.')[-2:])}_\d{{3}}_B\d{{2}}_\w+.tif?"
+            file_name_regex = rf"{pge.PROJECT}_{pge.LEVEL}_" \
+                              rf"{md['PRODUCT_TYPE']}_{md['PRODUCT_SOURCE']}_" \
+                              rf"{md['HLS_DATASET'].split('.')[2]}_" \
+                              rf"\d{{8}}T\d{{6}}Z_\d{{8}}T\d{{6}}Z_" \
+                              rf"{get_sensor_from_spacecraft_name(md['SPACECRAFT_NAME'])}_" \
+                              rf"30_v{md['PRODUCT_VERSION']}_" \
+                              rf"B\d{{2}}_\w+.tiff"
             self.assertEqual(re.match(file_name_regex, file_name).group(), file_name)
 
 

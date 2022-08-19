@@ -12,6 +12,7 @@ import glob
 import json
 import os
 import re
+import shutil
 import tempfile
 import unittest
 from io import StringIO
@@ -112,6 +113,12 @@ class CslcS1PgeTestCase(unittest.TestCase):
             pge.runconfig.output_product_path, pge._catalog_metadata_filename())
         self.assertTrue(os.path.exists(expected_catalog_metadata_file))
 
+        # Check that the ISO metadata file was created (not all placeholders are
+        # expected to be filled in by this test)
+        expected_iso_metadata_file = join(
+            pge.runconfig.output_product_path, pge._iso_metadata_filename())
+        self.assertTrue(os.path.exists(expected_iso_metadata_file))
+
         # Check that the log file was created and moved into the output directory
         expected_log_file = pge.logger.get_file_name()
         self.assertTrue(os.path.exists(expected_log_file))
@@ -165,6 +172,35 @@ class CslcS1PgeTestCase(unittest.TestCase):
 
         self.assertIsNotNone(result)
         self.assertEqual(result.group(), file_name)
+
+    def test_iso_metadata_creation(self):
+        """
+        Test that the ISO metadata template is fully filled out when realistic
+        CSLC JSON metadata is available.
+        """
+        runconfig_path = join(self.data_dir, 'test_cslc_s1_config.yaml')
+
+        pge = CslcS1Executor(pge_name="CslcPgeTest", runconfig_path=runconfig_path)
+
+        # Run only the pre-processor steps to ingest the runconfig and set
+        # up directories
+        pge.run_preprocessor()
+
+        # Copy sample JSON metadata to the output directory of the PGE
+        output_dir = join(os.curdir, "cslc_pge_test/output_dir")
+
+        sample_metadata_file = join(self.data_dir, 't64_135524_iw2_20220501_VV.json')
+
+        shutil.copy(sample_metadata_file, output_dir)
+
+        # Initialize the core filename for the catalog metadata generation step
+        pge._core_filename(inter_filename=sample_metadata_file)
+
+        # Render ISO metadata using the sample metadata
+        iso_metadata = pge._create_iso_metadata()
+
+        # Rendered template should not have any missing placeholders
+        self.assertNotIn('!Not found!', iso_metadata)
 
 
 if __name__ == "__main__":
