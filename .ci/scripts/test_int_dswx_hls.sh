@@ -245,7 +245,8 @@ do
                 compare_result="SKIPPED"
             fi
 
-            echo "<tr><td>${compare_result}</td><td>Output: ${output_file}<br>Expected: ${expected_file}</td><td>${docker_out}</td></tr>" >> $RESULTS_FILE
+            docker_out="${docker_out//$'\n'/<br />}"
+            echo "<tr><td>${compare_result}</td><td><ul><li>Output: ${output_file}</li><li>Expected: ${expected_file}</li></ul></td><td>${docker_out}</td></tr>" >> $RESULTS_FILE
         done
     fi
 done

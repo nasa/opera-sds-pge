@@ -238,9 +238,10 @@ else
             echo "Product validation was successful"
             compare_result="PASS"
         fi
-    fi
 
-    echo "<tr><td>${compare_result}</td><td>${ref_product}<br>${sec_product}<br>${ref_metadata}<br>${sec_metadata}</td><td>${docker_out}</td></tr>" >> $RESULTS_FILE
+        docker_out="${docker_out//$'\n'/<br />}"
+        echo "<tr><td>${compare_result}</td><td><ul><li>${ref_product}</li><li>${sec_product}</li><li>${ref_metadata}</li><li>${sec_metadata}</li></ul></td><td>${docker_out}</td></tr>" >> $RESULTS_FILE
+    fi
 fi
 echo " "
 
