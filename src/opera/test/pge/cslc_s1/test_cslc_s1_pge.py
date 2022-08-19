@@ -15,6 +15,7 @@ import re
 import shutil
 import tempfile
 import unittest
+import yaml
 from io import StringIO
 from os.path import abspath, join
 
@@ -52,13 +53,21 @@ class CslcS1PgeTestCase(unittest.TestCase):
             prefix="test_cslc_s1_pge_", suffix="_temp", dir=os.curdir
         )
 
-        # Create the input dir expected by the test RunConfig and add a
-        # dummy input file
+        # Create the input dir expected by the test RunConfig and add
+        # dummy input files with the names expected by the RunConfig
         input_dir = join(self.working_dir.name, "cslc_pge_test/input_dir")
         os.makedirs(input_dir, exist_ok=True)
 
-        self.input_file = tempfile.NamedTemporaryFile(
-            dir=input_dir, prefix="test_input_", suffix=".tiff"
+        os.system(
+            f"touch {join(input_dir, 'S1A_IW_SLC__1SDV_20220501T015035_20220501T015102_043011_0522A4_42CC.zip')}"
+        )
+
+        os.system(
+            f"touch {join(input_dir, 'S1A_OPER_AUX_POEORB_OPOD_20220521T081912_V20220430T225942_20220502T005942.EOF')}"
+        )
+
+        os.system(
+            f"touch {join(input_dir, 'dem_4326.tiff')}"
         )
 
         os.chdir(self.working_dir.name)
@@ -66,7 +75,6 @@ class CslcS1PgeTestCase(unittest.TestCase):
     def tearDown(self) -> None:
         """Return to starting directory"""
         os.chdir(self.test_dir)
-        self.input_file.close()
         self.working_dir.cleanup()
 
     def test_cslc_s1_pge_execution(self):
@@ -201,6 +209,144 @@ class CslcS1PgeTestCase(unittest.TestCase):
 
         # Rendered template should not have any missing placeholders
         self.assertNotIn('!Not found!', iso_metadata)
+
+    def test_cslc_s1_pge_input_validation(self):
+        """Test the input validation checks made by CslcS1PreProcessorMixin."""
+        runconfig_path = join(self.data_dir, 'test_cslc_s1_config.yaml')
+
+        test_runconfig_path = join(self.data_dir, 'invalid_cslc_s1_runconfig.yaml')
+
+        with open(runconfig_path, 'r', encoding='utf-8') as infile:
+            runconfig_dict = yaml.safe_load(infile)
+
+        input_files_group = runconfig_dict['RunConfig']['Groups']['SAS']['runconfig']['groups']['input_file_group']
+
+        # Test that a non-existent file is detected by pre-processor
+        input_files_group['safe_file_path'] = ['non_existent_file.zip']
+
+        with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+            yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+
+        try:
+            pge = CslcS1Executor(pge_name="CslcS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            # Config validation occurs before the log is fully initialized, but the
+            # initial log file should still exist and contain details of the validation
+            # error
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            # Open the log file, and check that the validation error details were captured
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn(
+                "Could not locate specified input non_existent_file.zip",
+                log_contents
+            )
+
+            # Reload the valid runconfig for next test
+            with open(runconfig_path, 'r', encoding='utf-8') as infile:
+                runconfig_dict = yaml.safe_load(infile)
+
+            input_files_group = runconfig_dict['RunConfig']['Groups']['SAS']['runconfig']['groups']['input_file_group']
+
+            # Test that an unexpected file extension for an existing file is caught
+            new_name = join(input_files_group['safe_file_path'][0].replace('zip', 'tar'))
+            input_files_group['safe_file_path'] = [new_name]
+
+            os.system(f"touch {new_name}")
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+                yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+
+            pge = CslcS1Executor(pge_name="CslcS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn(
+                f"Input file {new_name} does not have an expected file extension.",
+                log_contents
+            )
+        finally:
+            if os.path.exists(test_runconfig_path):
+                os.unlink(test_runconfig_path)
+
+    def test_cslc_s1_output_validation(self):
+        """Test the output validation checks made by CslcS1PostProcessorMixin."""
+        runconfig_path = join(self.data_dir, 'test_cslc_s1_config.yaml')
+
+        test_runconfig_path = join(self.data_dir, 'invalid_cslc_s1_runconfig.yaml')
+
+        with open(runconfig_path, 'r', encoding='utf-8') as infile:
+            runconfig_dict = yaml.safe_load(infile)
+
+        primary_executable_group = runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']
+
+        # Test with a SAS command that does not produce any output file,
+        # post-processor should detect that expected output is missing
+        primary_executable_group['ProgramPath'] = 'echo'
+        primary_executable_group['ProgramOptions'] = ['hello world']
+
+        with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+            yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+
+        try:
+            pge = CslcS1Executor(pge_name="CslcS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn("No SAS output file(s) containing burst ID",
+                          log_contents)
+
+            # Test with a SAS command that produces the expected output file, but
+            # one that is empty (size 0 bytes). Post-processor should detect this
+            # and flag an error
+            primary_executable_group['ProgramPath'] = 'mkdir'
+            primary_executable_group['ProgramOptions'] = [
+                '-p cslc_pge_test/output_dir/t64_iw2_b204/20220501/;',
+                'touch cslc_pge_test/output_dir/t64_iw2_b204/20220501/t64_iw2_b204_20220501_VV.slc'
+            ]
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+                yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+
+            pge = CslcS1Executor(pge_name="CslcS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_output_file = 'cslc_pge_test/output_dir/t64_iw2_b204/20220501/t64_iw2_b204_20220501_VV.slc'
+            self.assertTrue(os.path.exists(expected_output_file))
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn(f"SAS output file {abspath(expected_output_file)} was "
+                          f"created, but is empty", log_contents)
+        finally:
+            if os.path.exists(test_runconfig_path):
+                os.unlink(test_runconfig_path)
 
 
 if __name__ == "__main__":
