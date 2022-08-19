@@ -9,7 +9,8 @@ RunConfig:
 
             InputFilesGroup:
                 InputFilePaths:
-                    - cslc_pge_test/input_dir
+                    - cslc_pge_test/input_dir/S1A_IW_SLC__1SDV_20220501T015035_20220501T015102_043011_0522A4_42CC.zip
+                    - cslc_pge_test/input_dir/S1A_OPER_AUX_POEORB_OPOD_20220521T081912_V20220430T225942_20220502T005942.EOF
 
             DynamicAncillaryFilesGroup:
                 AncillaryFileMap:
@@ -51,16 +52,16 @@ RunConfig:
                     input_file_group:
                         # Required. List of SAFE files (min=1)
                         safe_file_path:
-                            - input_data/S1A_IW_SLC__1SDV_20220501T015035_20220501T015102_043011_0522A4_42CC.zip
+                            - cslc_pge_test/input_dir/S1A_IW_SLC__1SDV_20220501T015035_20220501T015102_043011_0522A4_42CC.zip
                         # Required. List of orbit (EOF) files (min=1)
                         orbit_file_path:
-                            - input_data/S1A_OPER_AUX_POEORB_OPOD_20220521T081912_V20220430T225942_20220502T005942.EOF
+                            - cslc_pge_test/input_dir/S1A_OPER_AUX_POEORB_OPOD_20220521T081912_V20220430T225942_20220502T005942.EOF
                         # Required. The unique burst ID to process
                         burst_id: t64_iw2_b204
 
                     dynamic_ancillary_file_group:
                         # Digital elevation model
-                        dem_file: input_data/dem_4326.tiff
+                        dem_file: cslc_pge_test/input_dir/dem_4326.tiff
 
                     product_path_group:
                         # Directory where PGE will place results
