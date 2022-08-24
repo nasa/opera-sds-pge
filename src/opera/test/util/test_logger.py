@@ -74,7 +74,7 @@ class LoggerTestCase(unittest.TestCase):
 
     def tearDown(self) -> None:
         """Return to starting directory"""
-        os.chdir(self.test_dir)
+        os.chdir(self.starting_dir)
         self.working_dir.cleanup()
 
     def add_backframe(self, back_frames):
