@@ -7,6 +7,7 @@ test_dswx_hls_pge.py
 
 Unit tests for the pge/dswx_hls/dswx_hls_pge.py module.
 """
+import copy
 import glob
 import os
 import re
@@ -25,6 +26,7 @@ from opera.pge import RunConfig
 from opera.pge.dswx_hls.dswx_hls_pge import DSWxHLSExecutor
 from opera.util import PgeLogger
 from opera.util.img_utils import MockGdal
+from opera.util.metadata_utils import get_geographic_boundaries_from_mgrs_tile
 from opera.util.metadata_utils import get_sensor_from_spacecraft_name
 
 
@@ -71,6 +73,7 @@ class DSWxPgeTestCase(unittest.TestCase):
         os.chdir(self.test_dir)
         self.input_file.close()
         self.working_dir.cleanup()
+        opera.util.img_utils.get_geotiff_metadata.cache_clear()
 
     @patch.object(opera.util.img_utils, "gdal", MockGdal)
     def test_dswx_hls_pge_execution(self):
@@ -307,6 +310,59 @@ class DSWxPgeTestCase(unittest.TestCase):
                               rf"30_v{md['PRODUCT_VERSION']}_" \
                               rf"B\d{{2}}_\w+.tiff"
             self.assertEqual(re.match(file_name_regex, file_name).group(), file_name)
+
+    # Custom version of the MockGdal class used to test specific metadata cases
+    # not handled by the canned metadata within the baseline MockGdalDataset class
+    class CustomMockGdal(MockGdal):
+        @staticmethod
+        def Open(filename):
+            gdal_dataset = copy.deepcopy(MockGdal.Open(filename))
+            # Update sensing time to test the specific case where a plus sign is
+            # used to concatenate multiple start times
+            gdal_dataset.dummy_metadata['SENSING_TIME'] = "2022-08-09T14:59:32.840402Z + 2022-08-09T14:59:39.355062Z"
+            return gdal_dataset
+
+    @patch.object(opera.util.img_utils, "gdal", CustomMockGdal)
+    def test_dswx_product_metadata_collection(self):
+        """Test _collect_dswx_product_metadata() method"""
+        runconfig_path = join(self.data_dir, 'test_dswx_hls_config.yaml')
+
+        pge = DSWxHLSExecutor(pge_name="DSWxPgeTest", runconfig_path=runconfig_path)
+        pge.run_preprocessor()
+
+        test_file = join(abspath(pge.runconfig.output_product_path), 'test_file.tif')
+        pge.renamed_files['test_file.tif'] = os.path.basename(test_file)
+        os.system(f'touch {test_file}')
+
+        output_product_metadata = pge._collect_dswx_product_metadata()
+
+        self.assertIsInstance(output_product_metadata, dict)
+
+        # Check that the expected MGRS tile code was parsed from the HLS identifier
+        self.assertEqual(output_product_metadata['tileCode'], 'T22VEQ')
+        self.assertEqual(output_product_metadata['zoneIdentifier'], 'T2')
+
+        # Check that the bounding box was filled in according to the tile code
+        (lat_min,
+         lat_max,
+         lon_min,
+         lon_max) = get_geographic_boundaries_from_mgrs_tile(output_product_metadata['tileCode'])
+
+        self.assertEqual(output_product_metadata['geospatial_lon_min'], lon_min)
+        self.assertEqual(output_product_metadata['geospatial_lon_max'], lon_max)
+        self.assertEqual(output_product_metadata['geospatial_lat_min'], lat_min)
+        self.assertEqual(output_product_metadata['geospatial_lat_max'], lat_max)
+
+        # Check that only the first time from the concatenated list was used for
+        # both the beginning and end times
+        self.assertEqual(output_product_metadata['sensingTimeBegin'], '2022-08-09T14:59:32.840402Z')
+        self.assertEqual(output_product_metadata['sensingTimeEnd'], output_product_metadata['sensingTimeBegin'])
+
+        # Check the hardcoded dimensions
+        self.assertEqual(output_product_metadata['xCoordinates']['size'], 3660)
+        self.assertEqual(output_product_metadata['xCoordinates']['spacing'], 30)
+        self.assertEqual(output_product_metadata['yCoordinates']['size'], 3660)
+        self.assertEqual(output_product_metadata['yCoordinates']['spacing'], 30)
 
 
 if __name__ == "__main__":
