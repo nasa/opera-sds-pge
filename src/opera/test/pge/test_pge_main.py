@@ -14,8 +14,6 @@ import unittest
 from os.path import abspath, join
 from pathlib import Path
 
-from pkg_resources import resource_filename
-
 from opera.pge import PgeExecutor, RunConfig
 from opera.scripts import pge_main
 from opera.scripts.pge_main import get_pge_class
@@ -23,6 +21,8 @@ from opera.scripts.pge_main import load_run_config_file
 from opera.scripts.pge_main import open_log_file
 from opera.scripts.pge_main import pge_start
 from opera.util import PgeLogger
+
+from pkg_resources import resource_filename
 
 
 class PgeMainTestCase(unittest.TestCase):

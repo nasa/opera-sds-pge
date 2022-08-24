@@ -17,13 +17,13 @@ from os.path import abspath, join
 from pathlib import Path
 from unittest.mock import patch
 
-from pkg_resources import resource_filename
-
-import yaml
-
 import opera
 from opera.pge import PgeExecutor, RunConfig
 from opera.util import PgeLogger
+
+from pkg_resources import resource_filename
+
+import yaml
 
 
 class BasePgeTestCase(unittest.TestCase):

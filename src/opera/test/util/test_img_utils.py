@@ -16,14 +16,14 @@ from os.path import abspath, join
 from re import match
 from unittest import skipIf
 
-from pkg_resources import resource_filename
-
 from opera.util.img_utils import get_geotiff_hls_dataset
 from opera.util.img_utils import get_geotiff_metadata
 from opera.util.img_utils import get_geotiff_processing_datetime
 from opera.util.img_utils import get_geotiff_product_version
 from opera.util.img_utils import get_geotiff_spacecraft_name
 from opera.util.img_utils import get_hls_filename_fields
+
+from pkg_resources import resource_filename
 
 
 def gdal_is_available():

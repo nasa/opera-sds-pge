@@ -16,14 +16,14 @@ from io import StringIO
 from os.path import abspath, join
 from unittest.mock import patch
 
-from pkg_resources import resource_filename
-
-import yaml
-
 import opera.util.img_utils
 from opera.pge import DSWxExecutor, RunConfig
 from opera.util import PgeLogger
 from opera.util.img_utils import MockGdal
+
+from pkg_resources import resource_filename
+
+import yaml
 
 
 class DSWxPgeTestCase(unittest.TestCase):

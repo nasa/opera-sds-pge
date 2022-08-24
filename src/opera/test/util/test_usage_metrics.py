@@ -14,9 +14,9 @@ import unittest
 from os.path import abspath, join
 from sys import platform
 
-from pkg_resources import resource_filename
-
 from opera.util.usage_metrics import get_os_metrics
+
+from pkg_resources import resource_filename
 
 
 class UsageMetricsTestCase(unittest.TestCase):

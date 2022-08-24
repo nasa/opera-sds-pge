@@ -15,12 +15,12 @@ import unittest
 from os.path import abspath
 from unittest.mock import patch
 
-from pkg_resources import resource_filename
-
 from opera.util.logger import PgeLogger
 from opera.util.run_utils import create_qa_command_line
 from opera.util.run_utils import create_sas_command_line
 from opera.util.run_utils import time_and_execute
+
+from pkg_resources import resource_filename
 
 
 class RunUtilsTestCase(unittest.TestCase):

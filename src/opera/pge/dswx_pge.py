@@ -21,8 +21,8 @@ from opera.util.img_utils import get_geotiff_processing_datetime
 from opera.util.img_utils import get_geotiff_product_version
 from opera.util.img_utils import get_geotiff_spacecraft_name
 from opera.util.img_utils import get_hls_filename_fields
-from opera.util.metadata_utils import get_sensor_from_spacecraft_name
 from opera.util.metadata_utils import get_geographic_boundaries_from_mgrs_tile
+from opera.util.metadata_utils import get_sensor_from_spacecraft_name
 from opera.util.render_jinja2 import render_jinja2
 from opera.util.time import get_time_for_filename
 

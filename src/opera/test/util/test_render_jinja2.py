@@ -13,10 +13,10 @@ import tempfile
 import unittest
 from os.path import abspath, join
 
-from pkg_resources import resource_filename
-
 from opera.util.logger import PgeLogger
 from opera.util.render_jinja2 import render_jinja2
+
+from pkg_resources import resource_filename
 
 
 class RenderJinja2TestCase(unittest.TestCase):

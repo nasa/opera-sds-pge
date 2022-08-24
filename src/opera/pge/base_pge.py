@@ -10,15 +10,11 @@ Module defining the Base PGE interfaces from which all other PGEs are derived.
 """
 
 import os
-from datetime import datetime
-from functools import lru_cache
 from collections import OrderedDict
+from datetime import datetime
 from fnmatch import fnmatch
+from functools import lru_cache
 from os.path import abspath, basename, exists, join, splitext
-
-from yamale import YamaleError
-
-import yaml
 
 import opera
 from opera.util.error_codes import ErrorCode
@@ -31,6 +27,10 @@ from opera.util.run_utils import get_checksum
 from opera.util.run_utils import time_and_execute
 from opera.util.time import get_catalog_metadata_datetime_str
 from opera.util.time import get_time_for_filename
+
+from yamale import YamaleError
+
+import yaml
 
 from .runconfig import RunConfig
 

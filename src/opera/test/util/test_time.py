@@ -14,12 +14,12 @@ import unittest
 from datetime import datetime
 from os.path import abspath, join
 
-from pkg_resources import resource_filename
-
 from opera.util.time import get_catalog_metadata_datetime_str
 from opera.util.time import get_current_iso_time
 from opera.util.time import get_iso_time
 from opera.util.time import get_time_for_filename
+
+from pkg_resources import resource_filename
 
 
 class TimeTestCase(unittest.TestCase):

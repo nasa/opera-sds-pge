@@ -12,12 +12,12 @@ import tempfile
 import unittest
 from os.path import join
 
+from opera.pge import RunConfig
+from opera.pge.runconfig import ISO_TEMPLATE_DIR
+
 from pkg_resources import resource_filename
 
 from yamale import YamaleError
-
-from opera.pge import RunConfig
-from opera.pge.runconfig import ISO_TEMPLATE_DIR
 
 
 class RunconfigTestCase(unittest.TestCase):

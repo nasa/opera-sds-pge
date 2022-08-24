@@ -20,6 +20,8 @@
 import os
 import sys
 
+import opera
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.pardir, "src")))
 sys.path.insert(0, os.path.abspath(os.path.join(os.pardir, "src", "scripts")))
 
@@ -53,7 +55,6 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-import opera
 
 project = opera.__title__
 copyright = opera.__copyright__

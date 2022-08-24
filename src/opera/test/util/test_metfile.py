@@ -12,9 +12,9 @@ import tempfile
 import unittest
 from os.path import abspath, exists
 
-from pkg_resources import resource_filename
-
 from opera.util.metfile import MetFile
+
+from pkg_resources import resource_filename
 
 
 class MetFileTestCase(unittest.TestCase):

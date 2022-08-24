@@ -1,11 +1,5 @@
 #!/usr/bin/env python3
 
-import csv
-import os
-import pathlib
-import sys
-
-
 """
 ======================
 process_metric_data.py
@@ -14,6 +8,11 @@ process_metric_data.py
 Post process the csv file returned when metric data is collected
 
 """
+
+import csv
+import os
+import pathlib
+import sys
 
 
 def remove_unwanted_lines(csv_file):
@@ -44,6 +43,7 @@ def remove_unwanted_lines(csv_file):
 
 
 def delete_temp_files(file_name):
+    """Delete temporary files"""
     try:
         os.remove(file_name)
         print(f'Removing: {file_name} from {pathlib.Path().absolute()}')
@@ -52,7 +52,7 @@ def delete_temp_files(file_name):
 
 
 def main(csv_file):
-    """ main program in process_metric_data.py"""
+    """Main program in process_metric_data.py"""
     remove_unwanted_lines(csv_file)
     delete_temp_files(csv_file)
 
