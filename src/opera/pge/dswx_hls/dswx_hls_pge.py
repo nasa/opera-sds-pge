@@ -302,6 +302,12 @@ class DSWxHLSPostProcessorMixin(PostProcessorMixin):
         # by semi-colon
         if ';' in sensing_time:
             sensing_time_begin, sensing_time_end = sensing_time.split(';')
+        # Certain L30 datasets have been observed with multiple sensing times
+        # concatenated by a plus sign, for this case just take the first of the
+        # times
+        elif '+' in sensing_time:
+            sensing_time_begin = sensing_time.split('+')[0]
+            sensing_time_end = sensing_time_begin
         # S30 datasets seem to only provide a single sensing time value
         else:
             sensing_time_begin = sensing_time_end = sensing_time
