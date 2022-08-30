@@ -12,6 +12,7 @@ from Harmonized Landsat and Sentinel-1 (HLS) PGE.
 
 import glob
 import os.path
+import re
 from collections import OrderedDict
 from os.path import abspath, basename, exists, isdir, join, splitext
 
@@ -23,8 +24,10 @@ from opera.util.img_utils import get_geotiff_hls_dataset
 from opera.util.img_utils import get_geotiff_metadata
 from opera.util.img_utils import get_geotiff_processing_datetime
 from opera.util.img_utils import get_geotiff_product_version
+from opera.util.img_utils import get_geotiff_sensor_product_id
 from opera.util.img_utils import get_geotiff_spacecraft_name
 from opera.util.img_utils import get_hls_filename_fields
+from opera.util.img_utils import set_geotiff_metadata
 from opera.util.metadata_utils import get_sensor_from_spacecraft_name
 from opera.util.metadata_utils import get_geographic_boundaries_from_mgrs_tile
 from opera.util.render_jinja2 import render_jinja2
@@ -133,6 +136,44 @@ class DSWxHLSPostProcessorMixin(PostProcessorMixin):
 
                 self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
 
+    def _correct_landsat_9_products(self):
+        """
+        Scans the set of output DSWx products to see if the metadata identifies
+        any/all of them to have originated from Landsat-9 data, and if so,
+        make the necessary corrections to the product metadata to remove any
+        references to Landsat-8 that may be erroneously present.
+
+        """
+        self.logger.info(
+            self.name, ErrorCode.UPDATING_PRODUCT_METADATA,
+            f'Scanning DSWx output products for Landsat-9 metadata correction'
+        )
+
+        # Get the list of output products and filter for the images
+        output_products = self.runconfig.get_output_product_filenames()
+
+        # Filter to only images (.tif or .tiff)
+        output_images = filter(lambda product: 'tif' in splitext(product)[-1], output_products)
+
+        for output_image in output_images:
+            sensor_product_id = get_geotiff_sensor_product_id(output_image)
+
+            # Certain HLS products have been observed to have sensor product
+            # ID's that identify them as originating from Landsat-9, but
+            # specify the Landsat-8 as the spacecraft name. To ensure this
+            # error is not propagated to DSWx products, we correct the spacecraft
+            # name within the product metadata here.
+            if re.match(r"L[COTEM]09.*", sensor_product_id):
+                self.logger.info(
+                    self.name, ErrorCode.UPDATING_PRODUCT_METADATA,
+                    f'Correcting SPACECRAFT_NAME field for Landsat-9 based product '
+                    f'{basename(output_image)}'
+                )
+                set_geotiff_metadata(
+                    output_image, scratch_dir=self.runconfig.scratch_path,
+                    SPACECRAFT_NAME="Landsat-9"
+                )
+
     def _core_filename(self, inter_filename=None):
         """
         Returns the core file name component for products produced by the
@@ -177,7 +218,7 @@ class DSWxHLSPostProcessorMixin(PostProcessorMixin):
                    f"First call must provide a filename before result is cached.")
             self.logger.critical(self.name, ErrorCode.FILE_MOVE_FAILED, msg)
 
-        spacecraft_name = get_geotiff_spacecraft_name(inter_filename).upper()
+        spacecraft_name = get_geotiff_spacecraft_name(inter_filename)
         sensor = get_sensor_from_spacecraft_name(spacecraft_name)
         pixel_spacing = "30"  # fixed for HLS-based products
 
@@ -299,7 +340,7 @@ class DSWxHLSPostProcessorMixin(PostProcessorMixin):
         sensing_time = output_product_metadata.pop('SENSING_TIME')
 
         # Sensing time for L30 datasets contain both begin and end times delimited
-        # by semi-colon
+        # by semicolon
         if ';' in sensing_time:
             sensing_time_begin, sensing_time_end = sensing_time.split(';')
         # Certain L30 datasets have been observed with multiple sensing times
@@ -403,8 +444,9 @@ class DSWxHLSPostProcessorMixin(PostProcessorMixin):
         Executes the post-processing steps for DSWx-HLS PGE job completion.
 
         The DSWxHLSPostProcessorMixin version of this function performs the same
-        steps as the base PostProcessorMixin, but inserts the output file
-        validation check prior to staging of the output files.
+        steps as the base PostProcessorMixin, but inserts an output file
+        validation check and Landsat-9 metadata correction step prior to staging
+        of the output files.
 
         Parameters
         ----------
@@ -416,6 +458,7 @@ class DSWxHLSPostProcessorMixin(PostProcessorMixin):
 
         self._run_sas_qa_executable()
         self._validate_output()
+        self._correct_landsat_9_products()
         self._stage_output_files()
 
 
