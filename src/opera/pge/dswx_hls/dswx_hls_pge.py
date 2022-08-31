@@ -477,7 +477,7 @@ class DSWxHLSExecutor(DSWxHLSPreProcessorMixin, DSWxHLSPostProcessorMixin, PgeEx
     LEVEL = "L3"
     """Processing Level for DSWx-HLS Products"""
 
-    PGE_VERSION = "1.0.0-rc.3.0"
+    PGE_VERSION = "1.0.0-rc.4.0"
     """Version of the PGE (overrides default from base_pge)"""
 
     SAS_VERSION = "0.4"  # CalVal release https://github.com/nasa/PROTEUS/releases/tag/v0.4
