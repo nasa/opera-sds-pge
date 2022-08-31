@@ -316,10 +316,15 @@ class DSWxPgeTestCase(unittest.TestCase):
     class CustomMockGdal(MockGdal):
         @staticmethod
         def Open(filename):
-            gdal_dataset = copy.deepcopy(MockGdal.Open(filename))
+            gdal_dataset = MockGdal.MockGdalDataset()
+
             # Update sensing time to test the specific case where a plus sign is
             # used to concatenate multiple start times
             gdal_dataset.dummy_metadata['SENSING_TIME'] = "2022-08-09T14:59:32.840402Z + 2022-08-09T14:59:39.355062Z"
+
+            # Set the sensor product ID to indicate a Landsat-9 derived product
+            gdal_dataset.dummy_metadata['SENSOR_PRODUCT_ID'] = "LC09_L1TP_096013_20220803_20220804_02_T1"
+
             return gdal_dataset
 
     @patch.object(opera.util.img_utils, "gdal", CustomMockGdal)
@@ -363,6 +368,37 @@ class DSWxPgeTestCase(unittest.TestCase):
         self.assertEqual(output_product_metadata['xCoordinates']['spacing'], 30)
         self.assertEqual(output_product_metadata['yCoordinates']['size'], 3660)
         self.assertEqual(output_product_metadata['yCoordinates']['spacing'], 30)
+
+    @patch.object(opera.util.img_utils, "gdal", CustomMockGdal)
+    def test_dswx_landsat_9_correction(self):
+        """Test metadata correction on a DSWx product derived from Landsat-9"""
+        runconfig_path = join(self.data_dir, 'test_dswx_hls_config.yaml')
+
+        pge = DSWxHLSExecutor(pge_name="DSWxPgeTest", runconfig_path=runconfig_path)
+        pge.run_preprocessor()
+
+        test_file = join(abspath(pge.runconfig.output_product_path), 'test_file.tif')
+        os.system(f'touch {test_file}')
+
+        # For this test, we patch the mocked versions of the functions used to
+        # perform the update of the GeoTIFF metadata to ensure that they're
+        # called as expected
+        def _patched_gdal_edit(args):
+            self.assertEqual(len(args), 4)
+            self.assertEqual(args[0], 'gdal_edit.py')
+            self.assertEqual(args[1], '-mo')
+            self.assertEqual(args[2], 'SPACECRAFT_NAME=Landsat-9')
+            self.assertEqual(args[3], test_file)
+            return 0
+
+        def _patched_save_as_cog(filename, scratch_dir='.', logger=None,
+                                 flag_compress=True, resamp_algorithm=None):
+            self.assertEqual(filename, test_file)
+            self.assertEqual(scratch_dir, pge.runconfig.scratch_path)
+
+        with patch.object(opera.util.img_utils, "gdal_edit", _patched_gdal_edit):
+            with patch.object(opera.util.img_utils, "save_as_cog", _patched_save_as_cog):
+                pge._correct_landsat_9_products()
 
 
 if __name__ == "__main__":
