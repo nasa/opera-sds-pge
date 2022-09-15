@@ -2,6 +2,119 @@
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
+parse_build_args()
+{
+  while [[ $# -gt 0 ]]; do
+  case $1 in
+    -h|--help)
+      echo "Usage: $(basename $0) [-h|--help] [-s|--sas-image <image name>] [-t|--tag <tag>] [-w|--workspace <path>]"
+      exit 0
+      ;;
+    -s|--sas-image)
+      SAS_IMAGE=$2
+      shift
+      shift
+      ;;
+    -t|--tag)
+      TAG=$2
+      shift
+      shift
+      ;;
+    -w|--workspace)
+      WORKSPACE=$2
+      shift
+      shift
+      ;;
+    -*|--*)
+      echo "Unknown arguments $1 $2, ignoring..."
+      shift
+      shift
+      ;;
+    *)
+      echo "Unknown argument $1, ignoring..."
+      shift
+      ;;
+  esac
+  done
+}
+
+parse_test_args()
+{
+  while [[ $# -gt 0 ]]; do
+  case $1 in
+    -h|--help)
+      echo "Usage: $(basename $0) [-h|--help] [-t|--tag <tag>] [-w|--workspace <path>]"
+      exit 0
+      ;;
+    -t|--tag)
+      TAG=$2
+      shift
+      shift
+      ;;
+    -w|--workspace)
+      WORKSPACE=$2
+      shift
+      shift
+      ;;
+    -*|--*)
+      echo "Unknown arguments $1 $2, ignoring..."
+      shift
+      shift
+      ;;
+    *)
+      echo "Unknown argument $1, ignoring..."
+      shift
+      ;;
+  esac
+  done
+}
+
+build_script_cleanup() {
+  if [[ -z ${KEEP_TEMP_FILES} ]]; then
+    echo "Cleaning up staging directory ${STAGING_DIR}..."
+    rm -rf ${STAGING_DIR}
+  fi
+}
+
+copy_pge_files() {
+  WORKSPACE=$1
+  STAGING_DIR=$2
+  PGE_NAME=$3
+
+  cp ${WORKSPACE}/src/opera/__init__.py \
+   ${STAGING_DIR}/opera/
+
+  cp ${WORKSPACE}/src/opera/_package.py \
+     ${STAGING_DIR}/opera/
+
+  cp ${WORKSPACE}/src/opera/pge/__init__.py \
+     ${STAGING_DIR}/opera/pge/
+
+  cp -r ${WORKSPACE}/src/opera/pge/base \
+        ${STAGING_DIR}/opera/pge/
+
+  cp -r ${WORKSPACE}/src/opera/pge/${PGE_NAME} \
+        ${STAGING_DIR}/opera/pge/
+
+  cp -r ${WORKSPACE}/src/opera/scripts \
+        ${STAGING_DIR}/opera/
+
+  cp -r ${WORKSPACE}/src/opera/util \
+        ${STAGING_DIR}/opera/
+
+  cp ${WORKSPACE}/COPYING \
+     ${STAGING_DIR}/opera
+
+  cp ${WORKSPACE}/requirements.txt \
+     ${STAGING_DIR}/opera
+
+  cp ${WORKSPACE}/.flake8 \
+     ${STAGING_DIR}/opera
+
+  cp ${WORKSPACE}/.pylintrc \
+     ${STAGING_DIR}/opera
+}
+
 # Start the metrics collection of both docker stats and the miscellaneous os statistics.
 # Parameters:
 #     pge:  pge we are working on
