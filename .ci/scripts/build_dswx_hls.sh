@@ -1,39 +1,13 @@
 #!/bin/bash
 set -e
 
+# Source the build script utility functions
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+
+. "${SCRIPT_DIR}"/util.sh
+
 # Parse args
-while [[ $# -gt 0 ]]; do
-  case $1 in
-    -h|--help)
-      echo "Usage: build_dswx_hls.sh [-h|--help] [-s|--sas-image <image name>] [-t|--tag <tag>] [-w|--workspace <path>]"
-      exit 0
-      ;;
-    -s|--sas-image)
-      SAS_IMAGE=$2
-      shift
-      shift
-      ;;
-    -t|--tag)
-      TAG=$2
-      shift
-      shift
-      ;;
-    -w|--workspace)
-      WORKSPACE=$2
-      shift
-      shift
-      ;;
-    -*|--*)
-      echo "Unknown arguments $1 $2, ignoring..."
-      shift
-      shift
-      ;;
-    *)
-      echo "Unknown argument $1, ignoring..."
-      shift
-      ;;
-  esac
-done
+parse_build_args "$@"
 
 echo '
 =====================================
@@ -80,38 +54,7 @@ trap cleanup EXIT
 # Copy files to the staging area and build the PGE docker image
 mkdir -p ${STAGING_DIR}/opera/pge
 
-cp ${WORKSPACE}/src/opera/__init__.py \
-   ${STAGING_DIR}/opera/
-
-cp ${WORKSPACE}/src/opera/_package.py \
-   ${STAGING_DIR}/opera/
-
-cp ${WORKSPACE}/src/opera/pge/__init__.py \
-   ${STAGING_DIR}/opera/pge/
-
-cp -r ${WORKSPACE}/src/opera/pge/base \
-      ${STAGING_DIR}/opera/pge/
-
-cp -r ${WORKSPACE}/src/opera/pge/${PGE_NAME} \
-      ${STAGING_DIR}/opera/pge/
-
-cp -r ${WORKSPACE}/src/opera/scripts \
-      ${STAGING_DIR}/opera/
-
-cp -r ${WORKSPACE}/src/opera/util \
-      ${STAGING_DIR}/opera/
-
-cp ${WORKSPACE}/COPYING \
-   ${STAGING_DIR}/opera
-
-cp ${WORKSPACE}/requirements.txt \
-   ${STAGING_DIR}/opera
-
-cp ${WORKSPACE}/.flake8 \
-   ${STAGING_DIR}/opera
-
-cp ${WORKSPACE}/.pylintrc \
-   ${STAGING_DIR}/opera
+copy_pge_files $WORKSPACE $STAGING_DIR $PGE_NAME
 
 # Create a VERSION file in the staging area to track version and build time
 printf "pge_version: ${TAG}\npge_build_datetime: ${BUILD_DATE_TIME}\n" \
