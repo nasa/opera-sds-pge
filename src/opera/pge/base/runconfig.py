@@ -214,8 +214,18 @@ class RunConfig:
     # PrimaryExecutable
     @property
     def product_identifier(self) -> str:
-        """Returns the Product Identifier from a Primary Executable Category"""
+        """Returns the Product Identifier from the Primary Executable Category"""
         return self._pge_config['PrimaryExecutable']['ProductIdentifier']
+
+    @property
+    def product_version(self) -> str:
+        """Returns the Product Version from the Primary Executable Category"""
+        return self._pge_config['PrimaryExecutable']['ProductVersion']
+
+    @property
+    def composite_release_id(self) -> str:
+        """Returns the Composite Release ID (CRID) from the Primary Executable Category"""
+        return self._pge_config['PrimaryExecutable']['CompositeReleaseID']
 
     @property
     def sas_program_path(self) -> str:

@@ -20,6 +20,8 @@ RunConfig:
 
             PrimaryExecutable:
                 ProductIdentifier: DSWX_HLS
+                ProductVersion: '7.7'
+                CompositeReleaseID: TestIdDswx
                 ProgramPath: /bin/echo
                 ProgramOptions:
                     - 'hello world > dswx_pge_test/output_dir/dswx_hls_v0.1_B01_WTR.tif;'

@@ -224,12 +224,17 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
         acquisition_time = get_time_for_filename(
             datetime.strptime(cslc_metadata['sensing_start'], '%Y-%m-%d %H:%M:%S.%f')
         )
-        product_version = self.SAS_VERSION  # TODO: may extract from cslc_metadata eventually
+
+        product_version = self.runconfig.product_version
+
+        if not product_version.startswith('v'):
+            product_version = f'v{product_version}'
+
         production_time = get_time_for_filename(self.production_datetime)
 
         self._cached_core_filename = (
             f"{self.PROJECT}_{self.LEVEL}_{self.NAME}_{sensor}_{mode}_{burst_id}_"
-            f"{pol}_{acquisition_time}Z_v{product_version}_{production_time}Z"
+            f"{pol}_{acquisition_time}Z_{product_version}_{production_time}Z"
         )
 
         return self._cached_core_filename

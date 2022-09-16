@@ -22,6 +22,8 @@ RunConfig:
 
       PrimaryExecutable:
         ProductIdentifier: str(required=False)
+        ProductVersion: str(required=False)
+        CompositeReleaseID: str(required=False)
         ProgramPath: str(required=True)
         ProgramOptions: list(str(), min=0, required=False)
         ErrorCodeBase: int(required=True)

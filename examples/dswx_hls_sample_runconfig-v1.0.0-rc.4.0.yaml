@@ -62,6 +62,13 @@ RunConfig:
                 # this PGE
                 ProductIdentifier: DSWX_HLS
 
+                # Product version specific to output products (TODO placeholder value)
+                ProductVersion: '7.7'
+
+                # Rolls up versions of all software/data used to generate versions
+                # from the data products (CRID) (TODO placeholder value)
+                CompositeReleaseID: TestIdDswx
+
                 # Path to the executable to run, path must be reachable from
                 # within the Docker container (i.e. findable with a "which" command)
                 ProgramPath: python3
