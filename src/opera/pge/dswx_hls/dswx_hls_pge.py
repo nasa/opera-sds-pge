@@ -23,7 +23,6 @@ from opera.util.error_codes import ErrorCode
 from opera.util.img_utils import get_geotiff_hls_dataset
 from opera.util.img_utils import get_geotiff_metadata
 from opera.util.img_utils import get_geotiff_processing_datetime
-from opera.util.img_utils import get_geotiff_product_version
 from opera.util.img_utils import get_geotiff_sensor_product_id
 from opera.util.img_utils import get_geotiff_spacecraft_name
 from opera.util.img_utils import get_hls_filename_fields
@@ -239,7 +238,7 @@ class DSWxHLSPostProcessorMixin(PostProcessorMixin):
         if not processing_time.endswith('Z'):
             processing_time = f'{processing_time}Z'
 
-        product_version = get_geotiff_product_version(inter_filename)
+        product_version = self.runconfig.product_version
 
         if not product_version.startswith('v'):
             product_version = f'v{product_version}'

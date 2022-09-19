@@ -307,7 +307,7 @@ class DSWxPgeTestCase(unittest.TestCase):
                               rf"{md['HLS_DATASET'].split('.')[2]}_" \
                               rf"\d{{8}}T\d{{6}}Z_\d{{8}}T\d{{6}}Z_" \
                               rf"{get_sensor_from_spacecraft_name(md['SPACECRAFT_NAME'])}_" \
-                              rf"30_v{md['PRODUCT_VERSION']}_" \
+                              rf"30_v{pge.runconfig.product_version}_" \
                               rf"B\d{{2}}_\w+.tiff"
             self.assertEqual(re.match(file_name_regex, file_name).group(), file_name)
 

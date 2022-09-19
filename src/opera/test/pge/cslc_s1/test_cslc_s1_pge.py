@@ -174,7 +174,7 @@ class CslcS1PgeTestCase(unittest.TestCase):
                           rf"{cslc_metadata['platform_id']}_" \
                           rf"IW_{cslc_metadata['burst_id'].upper().replace('_', '-')}_" \
                           rf"{cslc_metadata['polarization']}_" \
-                          rf"\d{{8}}T\d{{6}}Z_v{pge.SAS_VERSION}_\d{{8}}T\d{{6}}Z.json"
+                          rf"\d{{8}}T\d{{6}}Z_v{pge.runconfig.product_version}_\d{{8}}T\d{{6}}Z.json"
 
         result = re.match(file_name_regex, file_name)
 
