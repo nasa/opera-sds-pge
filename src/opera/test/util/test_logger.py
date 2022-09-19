@@ -59,6 +59,8 @@ class LoggerTestCase(unittest.TestCase):
         cls.monotonic_regex = r'^\d*.\d*$'
         cls.logger = PgeLogger()
 
+        os.chdir(cls.test_dir)
+
     @classmethod
     def tearDownClass(cls) -> None:
         """At completion re-establish starting directory"""
@@ -73,8 +75,8 @@ class LoggerTestCase(unittest.TestCase):
         os.chdir(self.working_dir.name)
 
     def tearDown(self) -> None:
-        """Return to starting directory"""
-        os.chdir(self.starting_dir)
+        """Return to test directory"""
+        os.chdir(self.test_dir)
         self.working_dir.cleanup()
 
     def add_backframe(self, back_frames):

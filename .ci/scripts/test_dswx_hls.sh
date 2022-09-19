@@ -1,37 +1,15 @@
 #!/bin/bash
-# Script to execute tests on OPERA DSWx-HLS PGE Docker image
-#
+# Script to execute unit tests on the OPERA DSWx-HLS PGE Docker image
 
 set -e
 
+# Source the build script utility functions
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+
+. "${SCRIPT_DIR}"/util.sh
+
 # Parse args
-while [[ $# -gt 0 ]]; do
-  case $1 in
-    -h|--help)
-      echo "Usage: test_dswx_hls.sh [-h|--help] [-t|--tag <tag>] [-w|--workspace <path>]"
-      exit 0
-      ;;
-    -t|--tag)
-      TAG=$2
-      shift
-      shift
-      ;;
-    -w|--workspace)
-      WORKSPACE=$2
-      shift
-      shift
-      ;;
-    -*|--*)
-      echo "Unknown arguments $1 $2, ignoring..."
-      shift
-      shift
-      ;;
-    *)
-      echo "Unknown argument $1, ignoring..."
-      shift
-      ;;
-  esac
-done
+parse_build_args "$@"
 
 echo '
 =====================================
