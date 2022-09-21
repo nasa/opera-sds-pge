@@ -74,6 +74,50 @@ class DSWxHLSPreProcessorMixin(PreProcessorMixin):
 
                 self.logger.critical(self.name, ErrorCode.INVALID_INPUT, error_msg)
 
+    def _validate_expected_input_platforms(self):
+        """
+        Scans the input files to make sure that the data comes from expected
+        platforms only.  Currently, Landsat 8/9, or Sentinel 2 A/B.
+        Raises an exception if an unsupported platform is detected.
+        This function assumes that input files have been checked to exist.
+        It also assumes that only files that contain the metadata keys
+        LANDSAT_PRODUCT_ID for Landsat input, and PRODUCT_URI for Sentinel
+        input, need to be checked.
+        """
+        self.logger.info(
+            self.name, ErrorCode.UPDATING_PRODUCT_METADATA,
+            f'Scanning DSWx input datasets for invalid platforms.'
+        )
+
+        # Get a list of input files to check for invalid platform metadata
+        for input_file in self.runconfig.input_files:
+            input_file_path = abspath(input_file)
+            if isdir(input_file_path):
+                list_of_input_tifs = glob.glob(join(input_file_path, '*.tif'))
+            else:
+                list_of_input_tifs = [input_file_path]
+
+        for input_tif in list_of_input_tifs:
+
+            if re.match(r"^HLS\.L30.*", os.path.basename(input_tif)):
+                input_tif_metadata = get_geotiff_metadata(input_tif)
+                if 'LANDSAT_PRODUCT_ID' in input_tif_metadata:
+                    # LANDSAT_PRODUCT_ID can be a list so we don't restrict search to first element
+                    if re.match(r"LC07.*", input_tif_metadata['LANDSAT_PRODUCT_ID']):
+                        error_msg = (f"Input file {input_tif} appears to contain Landsat-7 data, "
+                                     f"LANDSAT_PRODUCT_ID is {input_tif_metadata['LANDSAT_PRODUCT_ID']}.")
+                        self.logger.critical(self.name, ErrorCode.INVALID_INPUT, error_msg)
+
+            if re.match(r"^HLS\.S30.*", os.path.basename(input_tif)):
+                input_tif_metadata = get_geotiff_metadata(input_tif)
+                if 'PRODUCT_URI' in input_tif_metadata:
+                    data_is_S2A = re.match(r"S2A.*", input_tif_metadata['PRODUCT_URI'])
+                    data_is_S2B = re.match(r"S2B.*", input_tif_metadata['PRODUCT_URI'])
+                    if not data_is_S2A and not data_is_S2B:
+                        error_msg = (f"Input file {input_tif} appears to not be Sentinel 2 A/B data, "
+                                     f"metadata PRODUCT_URI is {input_tif_metadata['LANDSAT_PRODUCT_ID']}.")
+                        self.logger.critical(self.name, ErrorCode.INVALID_INPUT, error_msg)
+
     def run_preprocessor(self, **kwargs):
         """
         Executes the pre-processing steps for DSWx-HLS PGE initialization.
@@ -91,6 +135,7 @@ class DSWxHLSPreProcessorMixin(PreProcessorMixin):
         super().run_preprocessor(**kwargs)
 
         self._validate_inputs()
+        self._validate_expected_input_platforms()
 
 
 class DSWxHLSPostProcessorMixin(PostProcessorMixin):
