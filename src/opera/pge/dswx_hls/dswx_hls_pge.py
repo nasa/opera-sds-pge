@@ -115,7 +115,7 @@ class DSWxHLSPreProcessorMixin(PreProcessorMixin):
                     data_is_S2B = re.match(r"S2B.*", input_tif_metadata['PRODUCT_URI'])
                     if not data_is_S2A and not data_is_S2B:
                         error_msg = (f"Input file {input_tif} appears to not be Sentinel 2 A/B data, "
-                                     f"metadata PRODUCT_URI is {input_tif_metadata['LANDSAT_PRODUCT_ID']}.")
+                                     f"metadata PRODUCT_URI is {input_tif_metadata['PRODUCT_URI']}.")
                         self.logger.critical(self.name, ErrorCode.INVALID_INPUT, error_msg)
 
     def run_preprocessor(self, **kwargs):
