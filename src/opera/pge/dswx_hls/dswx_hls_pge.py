@@ -63,7 +63,7 @@ class DSWxHLSPreProcessorMixin(PreProcessorMixin):
 
                 self.logger.critical(self.name, ErrorCode.INPUT_NOT_FOUND, error_msg)
             elif isdir(input_file_path):
-                list_of_input_tifs = glob.glob(join(input_file_path, '*.tif'))
+                list_of_input_tifs = glob.glob(join(input_file_path, '*.tif*'))
 
                 if len(list_of_input_tifs) <= 0:
                     error_msg = f"Input directory {input_file_path} does not contain any tif files"
@@ -90,12 +90,14 @@ class DSWxHLSPreProcessorMixin(PreProcessorMixin):
         )
 
         # Get a list of input files to check for invalid platform metadata
+        list_of_input_tifs = []
         for input_file in self.runconfig.input_files:
             input_file_path = abspath(input_file)
             if isdir(input_file_path):
-                list_of_input_tifs = glob.glob(join(input_file_path, '*.tif'))
+                tifs_in_dir = glob.glob(join(input_file_path, '*.tif*'))
+                list_of_input_tifs.append(tifs_in_dir)
             else:
-                list_of_input_tifs = [input_file_path]
+                list_of_input_tifs.append(input_file_path)
 
         for input_tif in list_of_input_tifs:
 
