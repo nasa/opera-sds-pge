@@ -93,7 +93,7 @@ class CslcS1PreProcessorMixin(PreProcessorMixin):
                 for i in range(len(value)):
                     self._check_input(value[i], valid_extensions=('.EOF',))
             elif key == 'dem_file':
-                self._check_input(value, valid_extensions=('.tif', '.tiff'))
+                self._check_input(value, valid_extensions=('.tif', '.tiff', '.vrt'))
             elif key == 'burst_id':
                 # burst_id is included in the SAS input paths, but is not
                 # actually a file, so skip it

@@ -37,6 +37,7 @@ class DSWxPgeTestCase(unittest.TestCase):
     working_dir = None
     test_dir = None
     input_file = None
+    input_dir = "dswx_pge_test/input_dir"
 
     @classmethod
     def setUpClass(cls) -> None:
@@ -60,11 +61,11 @@ class DSWxPgeTestCase(unittest.TestCase):
 
         # Create the input dir expected by the test RunConfig and add a dummy
         # input file for validation
-        input_dir = join(self.working_dir.name, "dswx_pge_test/input_dir")
-        os.makedirs(input_dir, exist_ok=True)
+        test_input_dir = join(self.working_dir.name, self.input_dir)
+        os.makedirs(test_input_dir, exist_ok=True)
 
         self.input_file = tempfile.NamedTemporaryFile(
-            dir=input_dir, prefix="test_input", suffix=".tif"
+            dir=test_input_dir, prefix="test_input", suffix=".tif"
         )
         os.chdir(self.working_dir.name)
 
@@ -327,6 +328,24 @@ class DSWxPgeTestCase(unittest.TestCase):
 
             return gdal_dataset
 
+    class CustomMockGdal_InvalidLandsat(MockGdal):
+        @staticmethod
+        def Open(filename):
+            gdal_dataset = MockGdal.MockGdalDataset()
+
+            # LC07 is invalid
+            gdal_dataset.dummy_metadata['LANDSAT_PRODUCT_ID'] = "LC07_L1TP_096013_20220803_20220804_02_T1"
+            return gdal_dataset
+
+    class CustomMockGdal_InvalidSentinel(MockGdal):
+        @staticmethod
+        def Open(filename):
+            gdal_dataset = MockGdal.MockGdalDataset()
+
+            # S2C is invalid
+            gdal_dataset.dummy_metadata['PRODUCT_URI'] = "S2C_MSIL1C_20210907T163901_N0301_R126_T15SXR_20210907T202434.SAFE"
+            return gdal_dataset
+
     @patch.object(opera.util.img_utils, "gdal", CustomMockGdal)
     def test_dswx_product_metadata_collection(self):
         """Test _collect_dswx_product_metadata() method"""
@@ -368,6 +387,60 @@ class DSWxPgeTestCase(unittest.TestCase):
         self.assertEqual(output_product_metadata['xCoordinates']['spacing'], 30)
         self.assertEqual(output_product_metadata['yCoordinates']['size'], 3660)
         self.assertEqual(output_product_metadata['yCoordinates']['spacing'], 30)
+
+    @patch.object(opera.util.img_utils, "gdal", CustomMockGdal_InvalidLandsat)
+    def test_dswx_validate_expected_input_platforms_landsat(self):
+        """Test exceptions raised for Landsat 7 input data"""
+
+        # Create a filename that will trigger a metadata check
+        input_file = os.path.join(self.input_dir, "HLS.L30.T22VEQ.2021248T143156.v2.0.VAA.tif")
+        os.system(f"touch {input_file}")
+
+        runconfig_path = join(self.data_dir, 'test_dswx_hls_config.yaml')
+
+        pge = DSWxHLSExecutor(pge_name="DSWxPgeTest", runconfig_path=runconfig_path)
+        with self.assertRaises(Exception) as context:
+            pge.run_preprocessor()
+
+        # Open the log file, and check that the validation error details were captured
+        expected_log_file = pge.logger.get_file_name()
+        self.assertTrue(os.path.exists(expected_log_file))
+
+        with open(expected_log_file, 'r', encoding='utf-8') as infile:
+            log_contents = infile.read()
+
+        # Look for the expected exception message in the log to verify the correct exception was raised.
+        # There is a temporary file name in the path so we only look for the static part.
+        expected_msg = (f"_temp/{input_file} appears to contain Landsat-7 data, "
+                        f"LANDSAT_PRODUCT_ID is LC07_L1TP_096013_20220803_20220804_02_T1.")
+        self.assertIn(expected_msg, log_contents)
+
+    @patch.object(opera.util.img_utils, "gdal", CustomMockGdal_InvalidSentinel)
+    def test_dswx_validate_expected_input_platforms_sentinel(self):
+        """Test exceptions raised for non-Sentinel S2A/B input data"""
+
+        # Create a filename that will trigger a metadata check
+        input_file = os.path.join(self.input_dir, "HLS.S30.T15SXR.2021250T163901.v2.0.SAA.tif")
+        os.system(f"touch {input_file}")
+
+        runconfig_path = join(self.data_dir, 'test_dswx_hls_config.yaml')
+
+        pge = DSWxHLSExecutor(pge_name="DSWxPgeTest", runconfig_path=runconfig_path)
+        with self.assertRaises(Exception) as context:
+            pge.run_preprocessor()
+
+        # Open the log file, and check that the validation error details were captured
+        expected_log_file = pge.logger.get_file_name()
+        self.assertTrue(os.path.exists(expected_log_file))
+
+        with open(expected_log_file, 'r', encoding='utf-8') as infile:
+            log_contents = infile.read()
+
+        # Look for the expected exception message in the log to verify the correct exception was raised.
+        # There is a temporary file name in the path so we only look for the static part.
+        expected_msg = (f"_temp/{input_file} appears to not be Sentinel 2 A/B data, "
+                        f"metadata PRODUCT_URI is S2C_MSIL1C_20210907T163901_N0301_R126_T15SXR_20210907T202434.SAFE.")
+        self.assertIn(expected_msg, log_contents)
 
     @patch.object(opera.util.img_utils, "gdal", CustomMockGdal)
     def test_dswx_landsat_9_correction(self):
