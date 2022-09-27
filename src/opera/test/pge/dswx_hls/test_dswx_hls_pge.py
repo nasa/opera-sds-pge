@@ -402,6 +402,19 @@ class DSWxPgeTestCase(unittest.TestCase):
         with self.assertRaises(Exception) as context:
             pge.run_preprocessor()
 
+        # Open the log file, and check that the validation error details were captured
+        expected_log_file = pge.logger.get_file_name()
+        self.assertTrue(os.path.exists(expected_log_file))
+
+        with open(expected_log_file, 'r', encoding='utf-8') as infile:
+            log_contents = infile.read()
+
+        # Look for the expected exception message in the log to verify the correct exception was raised.
+        # There is a temporary file name in the path so we only look for the static part.
+        expected_msg = (f"_temp/{input_file} appears to contain Landsat-7 data, "
+                        f"LANDSAT_PRODUCT_ID is LC07_L1TP_096013_20220803_20220804_02_T1.")
+        self.assertIn(expected_msg, log_contents)
+
     @patch.object(opera.util.img_utils, "gdal", CustomMockGdal_InvalidSentinel)
     def test_dswx_validate_expected_input_platforms_sentinel(self):
         """Test exceptions raised for non-Sentinel S2A/B input data"""
@@ -415,6 +428,19 @@ class DSWxPgeTestCase(unittest.TestCase):
         pge = DSWxHLSExecutor(pge_name="DSWxPgeTest", runconfig_path=runconfig_path)
         with self.assertRaises(Exception) as context:
             pge.run_preprocessor()
+
+        # Open the log file, and check that the validation error details were captured
+        expected_log_file = pge.logger.get_file_name()
+        self.assertTrue(os.path.exists(expected_log_file))
+
+        with open(expected_log_file, 'r', encoding='utf-8') as infile:
+            log_contents = infile.read()
+
+        # Look for the expected exception message in the log to verify the correct exception was raised.
+        # There is a temporary file name in the path so we only look for the static part.
+        expected_msg = (f"_temp/{input_file} appears to not be Sentinel 2 A/B data, "
+                        f"metadata PRODUCT_URI is S2C_MSIL1C_20210907T163901_N0301_R126_T15SXR_20210907T202434.SAFE.")
+        self.assertIn(expected_msg, log_contents)
 
     @patch.object(opera.util.img_utils, "gdal", CustomMockGdal)
     def test_dswx_landsat_9_correction(self):

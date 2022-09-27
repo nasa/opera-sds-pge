@@ -94,8 +94,7 @@ class DSWxHLSPreProcessorMixin(PreProcessorMixin):
         for input_file in self.runconfig.input_files:
             input_file_path = abspath(input_file)
             if isdir(input_file_path):
-                tifs_in_dir = glob.glob(join(input_file_path, '*.tif*'))
-                list_of_input_tifs.append(tifs_in_dir)
+                list_of_input_tifs = glob.glob(join(input_file_path, '*.tif*'))
             else:
                 list_of_input_tifs.append(input_file_path)
 
