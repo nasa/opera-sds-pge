@@ -7,7 +7,6 @@ test_dswx_hls_pge.py
 
 Unit tests for the pge/dswx_hls/dswx_hls_pge.py module.
 """
-import copy
 import glob
 import os
 import re
@@ -312,11 +311,16 @@ class DSWxPgeTestCase(unittest.TestCase):
                               rf"B\d{{2}}_\w+.tiff"
             self.assertEqual(re.match(file_name_regex, file_name).group(), file_name)
 
-    # Custom version of the MockGdal class used to test specific metadata cases
-    # not handled by the canned metadata within the baseline MockGdalDataset class
     class CustomMockGdal(MockGdal):
+        """
+        Custom version of the MockGdal class used to test specific metadata cases
+        not handled by the canned metadata within the baseline MockGdalDataset class
+
+        """
+
         @staticmethod
         def Open(filename):
+            """Custom Open method for testing"""
             gdal_dataset = MockGdal.MockGdalDataset()
 
             # Update sensing time to test the specific case where a plus sign is
@@ -329,8 +333,11 @@ class DSWxPgeTestCase(unittest.TestCase):
             return gdal_dataset
 
     class CustomMockGdal_InvalidLandsat(MockGdal):
+        """Custom version of the MockGdal class used to test specific Landsat cases"""
+
         @staticmethod
         def Open(filename):
+            """Custom Open method for Landsat testing"""
             gdal_dataset = MockGdal.MockGdalDataset()
 
             # LC07 is invalid
@@ -338,12 +345,16 @@ class DSWxPgeTestCase(unittest.TestCase):
             return gdal_dataset
 
     class CustomMockGdal_InvalidSentinel(MockGdal):
+        """Custom version of the MockGdal class used to test specific Sentinael cases"""
+
         @staticmethod
         def Open(filename):
+            """Custom Open method for Sentinel testing"""
             gdal_dataset = MockGdal.MockGdalDataset()
 
             # S2C is invalid
-            gdal_dataset.dummy_metadata['PRODUCT_URI'] = "S2C_MSIL1C_20210907T163901_N0301_R126_T15SXR_20210907T202434.SAFE"
+            gdal_dataset.dummy_metadata['PRODUCT_URI'] = "S2C_MSIL1C_20210907T163901_N0301_" \
+                                                         "R126_T15SXR_20210907T202434.SAFE"
             return gdal_dataset
 
     @patch.object(opera.util.img_utils, "gdal", CustomMockGdal)
@@ -391,7 +402,6 @@ class DSWxPgeTestCase(unittest.TestCase):
     @patch.object(opera.util.img_utils, "gdal", CustomMockGdal_InvalidLandsat)
     def test_dswx_validate_expected_input_platforms_landsat(self):
         """Test exceptions raised for Landsat 7 input data"""
-
         # Create a filename that will trigger a metadata check
         input_file = os.path.join(self.input_dir, "HLS.L30.T22VEQ.2021248T143156.v2.0.VAA.tif")
         os.system(f"touch {input_file}")
@@ -418,7 +428,6 @@ class DSWxPgeTestCase(unittest.TestCase):
     @patch.object(opera.util.img_utils, "gdal", CustomMockGdal_InvalidSentinel)
     def test_dswx_validate_expected_input_platforms_sentinel(self):
         """Test exceptions raised for non-Sentinel S2A/B input data"""
-
         # Create a filename that will trigger a metadata check
         input_file = os.path.join(self.input_dir, "HLS.S30.T15SXR.2021250T163901.v2.0.SAA.tif")
         os.system(f"touch {input_file}")

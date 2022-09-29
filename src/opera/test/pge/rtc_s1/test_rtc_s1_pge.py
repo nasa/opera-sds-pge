@@ -8,11 +8,7 @@ test_rtc_s1_pge.py
 Unit tests for the pge/rtc_s1/rtc_s1_pge.py module.
 """
 
-import glob
-import json
 import os
-import re
-import shutil
 import tempfile
 import unittest
 from io import StringIO
@@ -26,6 +22,7 @@ from opera.util import PgeLogger
 
 
 class RtcS1PgeTestCase(unittest.TestCase):
+    """Base test class using unittest"""
 
     starting_dir = None
     working_dir = None
