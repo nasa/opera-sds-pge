@@ -10,10 +10,10 @@ Module defining the Base PGE interfaces from which all other PGEs are derived.
 """
 
 import os
-from datetime import datetime
-from functools import lru_cache
 from collections import OrderedDict
+from datetime import datetime
 from fnmatch import fnmatch
+from functools import lru_cache
 from os.path import abspath, basename, exists, join, splitext
 
 from yamale import YamaleError

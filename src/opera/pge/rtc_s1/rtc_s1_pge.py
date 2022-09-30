@@ -74,7 +74,8 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
 
         The core file name component for RTC-S1 products consists of:
 
-        <PROJECT>_<LEVEL>_<PGE NAME>_<SOURCE>_{burst_id}_{acquisition_time}_{production_time}_<SENSOR>_<SPACING>_<PRODUCT VERSION>
+        <PROJECT>_<LEVEL>_<PGE NAME>_<SOURCE>_{burst_id}_{acquisition_time}_
+        {production_time}_<SENSOR>_<SPACING>_<PRODUCT VERSION>
 
         Where {burst_id}, {acquisition_time} and {production_time} are literal
         format-string placeholders and are NOT filled in by this method.

@@ -27,8 +27,8 @@ from opera.util.img_utils import get_geotiff_sensor_product_id
 from opera.util.img_utils import get_geotiff_spacecraft_name
 from opera.util.img_utils import get_hls_filename_fields
 from opera.util.img_utils import set_geotiff_metadata
-from opera.util.metadata_utils import get_sensor_from_spacecraft_name
 from opera.util.metadata_utils import get_geographic_boundaries_from_mgrs_tile
+from opera.util.metadata_utils import get_sensor_from_spacecraft_name
 from opera.util.render_jinja2 import render_jinja2
 from opera.util.time import get_time_for_filename
 
@@ -85,7 +85,7 @@ class DSWxHLSPreProcessorMixin(PreProcessorMixin):
         """
         self.logger.info(
             self.name, ErrorCode.UPDATING_PRODUCT_METADATA,
-            f'Scanning DSWx input datasets for invalid platforms.'
+            'Scanning DSWx input datasets for invalid platforms.'
         )
 
         # Get a list of input files to check for invalid platform metadata
@@ -191,7 +191,7 @@ class DSWxHLSPostProcessorMixin(PostProcessorMixin):
         """
         self.logger.info(
             self.name, ErrorCode.UPDATING_PRODUCT_METADATA,
-            f'Scanning DSWx output products for Landsat-9 metadata correction'
+            'Scanning DSWx output products for Landsat-9 metadata correction'
         )
 
         # Get the list of output products and filter for the images
@@ -226,7 +226,8 @@ class DSWxHLSPostProcessorMixin(PostProcessorMixin):
 
         The core file name component of the DSWx PGE consists of:
 
-        <PROJECT>_<LEVEL>_<PGE NAME>_<SOURCE>_<TILE ID>_<ACQ TIMETAG>_<PROD TIMETAG>_<SENSOR>_<SPACING>_<PRODUCT VERSION>
+        <PROJECT>_<LEVEL>_<PGE NAME>_<SOURCE>_<TILE ID>_<ACQ TIMETAG>_
+        <PROD TIMETAG>_<SENSOR>_<SPACING>_<PRODUCT VERSION>
 
         Callers of this function are responsible for assignment of any other
         product-specific fields, such as the file extension.

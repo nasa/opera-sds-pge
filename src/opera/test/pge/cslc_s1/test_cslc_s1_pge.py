@@ -15,11 +15,12 @@ import re
 import shutil
 import tempfile
 import unittest
-import yaml
 from io import StringIO
 from os.path import abspath, join
 
 from pkg_resources import resource_filename
+
+import yaml
 
 from opera.pge import RunConfig
 from opera.pge.cslc_s1.cslc_s1_pge import CslcS1Executor
@@ -27,6 +28,7 @@ from opera.util import PgeLogger
 
 
 class CslcS1PgeTestCase(unittest.TestCase):
+    """Base test class using unittest"""
 
     starting_dir = None
     working_dir = None

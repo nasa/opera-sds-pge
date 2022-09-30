@@ -9,8 +9,8 @@ Image file utilities for use with OPERA PGEs.
 
 """
 import os
-from copy import deepcopy
 from collections import namedtuple
+from copy import deepcopy
 from datetime import datetime
 from functools import lru_cache
 from os.path import exists
@@ -30,6 +30,7 @@ class MockGdal:  # pragma: no cover
     # pylint: disable=all
     class MockGdalDataset:
         """Mock class for gdal.Dataset objects, as returned from an Open call."""
+
         def __init__(self):
             self.dummy_metadata = {
                 'ACCODE': 'LaSRC', 'CLOUD_COVERAGE': '43', 'DEM_FILE': 'dem.tif',
@@ -78,6 +79,7 @@ def mock_save_as_cog(filename, scratch_dir='.', logger=None,
     """Mock implementation of proteus.core.save_as_cog"""
     return  # pragma: no cover
 
+
 # When running a PGE within a Docker image delivered from ADT, the following imports
 # below should work. When running in a dev environment, the imports will fail,
 # resulting in the mock classes being substituted instead.
@@ -85,13 +87,13 @@ try:
     from osgeo import gdal
     from osgeo_utils.gdal_edit import main as gdal_edit
 except (ImportError, ModuleNotFoundError):  # pragma: no cover
-    gdal = MockGdal                         # pragma: no cover
-    gdal_edit = mock_gdal_edit              # pragma: no cover
+    gdal = MockGdal  # pragma: no cover
+    gdal_edit = mock_gdal_edit  # pragma: no cover
 
 try:
     from proteus.core import save_as_cog
 except (ImportError, ModuleNotFoundError):  # pragma: no cover
-    save_as_cog = mock_save_as_cog          # pragma: no cover
+    save_as_cog = mock_save_as_cog  # pragma: no cover
 
 
 def set_geotiff_metadata(filename, scratch_dir=os.curdir, **kwargs):
