@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera.pge.cslc_s1 package &mdash; opera-sds-pge 2.0.0-er.2.0 documentation</title>
+  <title>opera.pge.cslc_s1 package &mdash; opera-sds-pge 2.0.0-er.3.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -16,6 +16,7 @@
         <script src="_static/underscore.js"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -31,7 +32,7 @@
             <a href="index.html" class="icon icon-home"> opera-sds-pge
           </a>
               <div class="version">
-                2.0.0-er.2.0
+                2.0.0-er.3.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -99,6 +100,7 @@
 <h3>cslc_s1_pge.py<a class="headerlink" href="#cslc-s1-pge-py" title="Permalink to this heading"></a></h3>
 <p>Module defining the implementation for the Co-registered Single Look Complex (CSLC)
 from Sentinel-1 A/B (S1) PGE.</p>
+</section>
 <dl class="py class">
 <dt class="sig sig-object py" id="opera.pge.cslc_s1.cslc_s1_pge.CslcS1Executor">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">opera.pge.cslc_s1.cslc_s1_pge.</span></span><span class="sig-name descname"><span class="pre">CslcS1Executor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pge_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runconfig_path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/opera/pge/cslc_s1/cslc_s1_pge.html#CslcS1Executor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opera.pge.cslc_s1.cslc_s1_pge.CslcS1Executor" title="Permalink to this definition"></a></dt>
@@ -121,7 +123,7 @@ of the SAS from the base PgeExecutor class.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="opera.pge.cslc_s1.cslc_s1_pge.CslcS1Executor.SAS_VERSION">
-<span class="sig-name descname"><span class="pre">SAS_VERSION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'0.1'</span></em><a class="headerlink" href="#opera.pge.cslc_s1.cslc_s1_pge.CslcS1Executor.SAS_VERSION" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">SAS_VERSION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'0.1.2'</span></em><a class="headerlink" href="#opera.pge.cslc_s1.cslc_s1_pge.CslcS1Executor.SAS_VERSION" title="Permalink to this definition"></a></dt>
 <dd><p>Version of the SAS wrapped by this PGE, should be updated as needed</p>
 </dd></dl>
 
@@ -180,7 +182,6 @@ for the inputs defined within the RunConfig.</p>
 
 </dd></dl>
 
-</section>
 </section>
 <section id="module-opera.pge.cslc_s1">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-opera.pge.cslc_s1" title="Permalink to this heading"></a></h2>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera.pge.base.runconfig &mdash; opera-sds-pge 2.0.0-er.2.0 documentation</title>
+  <title>opera.pge.base.runconfig &mdash; opera-sds-pge 2.0.0-er.3.0 documentation</title>
       <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -15,6 +15,7 @@
         <script src="../../../../_static/underscore.js"></script>
         <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/sphinx_highlight.js"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
@@ -28,7 +29,7 @@
             <a href="../../../../index.html" class="icon icon-home"> opera-sds-pge
           </a>
               <div class="version">
-                2.0.0-er.2.0
+                2.0.0-er.3.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
@@ -288,8 +289,18 @@
     <span class="c1"># PrimaryExecutable</span>
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">product_identifier</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns the Product Identifier from a Primary Executable Category&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;Returns the Product Identifier from the Primary Executable Category&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pge_config</span><span class="p">[</span><span class="s1">&#39;PrimaryExecutable&#39;</span><span class="p">][</span><span class="s1">&#39;ProductIdentifier&#39;</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">product_version</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the Product Version from the Primary Executable Category&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pge_config</span><span class="p">[</span><span class="s1">&#39;PrimaryExecutable&#39;</span><span class="p">][</span><span class="s1">&#39;ProductVersion&#39;</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">composite_release_id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the Composite Release ID (CRID) from the Primary Executable Category&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pge_config</span><span class="p">[</span><span class="s1">&#39;PrimaryExecutable&#39;</span><span class="p">][</span><span class="s1">&#39;CompositeReleaseID&#39;</span><span class="p">]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">sas_program_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>

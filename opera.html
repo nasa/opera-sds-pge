@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera package &mdash; opera-sds-pge 2.0.0-er.2.0 documentation</title>
+  <title>opera package &mdash; opera-sds-pge 2.0.0-er.3.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -16,6 +16,7 @@
         <script src="_static/underscore.js"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -31,7 +32,7 @@
             <a href="index.html" class="icon icon-home"> opera-sds-pge
           </a>
               <div class="version">
-                2.0.0-er.2.0
+                2.0.0-er.3.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -128,22 +129,136 @@
 <li class="toctree-l2"><a class="reference internal" href="opera.util.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="opera.util.html#module-opera.util.error_codes">opera.util.error_codes module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="opera.util.html#error-codes-py">error_codes.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="opera.util.html#opera.util.error_codes.CODES_PER_RANGE"><code class="docutils literal notranslate"><span class="pre">CODES_PER_RANGE</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="opera.util.html#opera.util.error_codes.CRITICAL_RANGE_START"><code class="docutils literal notranslate"><span class="pre">CRITICAL_RANGE_START</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="opera.util.html#opera.util.error_codes.DEBUG_RANGE_START"><code class="docutils literal notranslate"><span class="pre">DEBUG_RANGE_START</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode"><code class="docutils literal notranslate"><span class="pre">ErrorCode</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.CATALOG_METADATA_CREATION_FAILED"><code class="docutils literal notranslate"><span class="pre">ErrorCode.CATALOG_METADATA_CREATION_FAILED</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.CLOSING_LOG_FILE"><code class="docutils literal notranslate"><span class="pre">ErrorCode.CLOSING_LOG_FILE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.CONFIGURATION_DETAILS"><code class="docutils literal notranslate"><span class="pre">ErrorCode.CONFIGURATION_DETAILS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.CREATED_SAS_CONFIG"><code class="docutils literal notranslate"><span class="pre">ErrorCode.CREATED_SAS_CONFIG</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.CREATING_CATALOG_METADATA"><code class="docutils literal notranslate"><span class="pre">ErrorCode.CREATING_CATALOG_METADATA</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.CREATING_ISO_METADATA"><code class="docutils literal notranslate"><span class="pre">ErrorCode.CREATING_ISO_METADATA</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.CREATING_OUTPUT_FILE"><code class="docutils literal notranslate"><span class="pre">ErrorCode.CREATING_OUTPUT_FILE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.CREATING_WORKING_DIRECTORY"><code class="docutils literal notranslate"><span class="pre">ErrorCode.CREATING_WORKING_DIRECTORY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.DATE_RANGE_MISSING"><code class="docutils literal notranslate"><span class="pre">ErrorCode.DATE_RANGE_MISSING</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.DIRECTORY_CREATION_FAILED"><code class="docutils literal notranslate"><span class="pre">ErrorCode.DIRECTORY_CREATION_FAILED</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.DIRECTORY_SETUP_COMPLETE"><code class="docutils literal notranslate"><span class="pre">ErrorCode.DIRECTORY_SETUP_COMPLETE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.DYNAMIC_IMPORT_FAILED"><code class="docutils literal notranslate"><span class="pre">ErrorCode.DYNAMIC_IMPORT_FAILED</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.FILENAME_VIOLATES_NAMING_CONVENTION"><code class="docutils literal notranslate"><span class="pre">ErrorCode.FILENAME_VIOLATES_NAMING_CONVENTION</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.FILE_MOVE_FAILED"><code class="docutils literal notranslate"><span class="pre">ErrorCode.FILE_MOVE_FAILED</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.INPUT_FILE"><code class="docutils literal notranslate"><span class="pre">ErrorCode.INPUT_FILE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.INPUT_NOT_FOUND"><code class="docutils literal notranslate"><span class="pre">ErrorCode.INPUT_NOT_FOUND</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.INVALID_CATALOG_METADATA"><code class="docutils literal notranslate"><span class="pre">ErrorCode.INVALID_CATALOG_METADATA</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.INVALID_INPUT"><code class="docutils literal notranslate"><span class="pre">ErrorCode.INVALID_INPUT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.INVALID_OUTPUT"><code class="docutils literal notranslate"><span class="pre">ErrorCode.INVALID_OUTPUT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.ISO_METADATA_CANT_RENDER_ONE_VARIABLE"><code class="docutils literal notranslate"><span class="pre">ErrorCode.ISO_METADATA_CANT_RENDER_ONE_VARIABLE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.ISO_METADATA_GOT_SOME_RENDERING_ERRORS"><code class="docutils literal notranslate"><span class="pre">ErrorCode.ISO_METADATA_GOT_SOME_RENDERING_ERRORS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.ISO_METADATA_RENDER_FAILED"><code class="docutils literal notranslate"><span class="pre">ErrorCode.ISO_METADATA_RENDER_FAILED</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.ISO_METADATA_TEMPLATE_NOT_FOUND"><code class="docutils literal notranslate"><span class="pre">ErrorCode.ISO_METADATA_TEMPLATE_NOT_FOUND</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.LOADING_RUN_CONFIG_FILE"><code class="docutils literal notranslate"><span class="pre">ErrorCode.LOADING_RUN_CONFIG_FILE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.LOGGED_CRITICAL_LINE"><code class="docutils literal notranslate"><span class="pre">ErrorCode.LOGGED_CRITICAL_LINE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.LOGGED_DEBUG_LINE"><code class="docutils literal notranslate"><span class="pre">ErrorCode.LOGGED_DEBUG_LINE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.LOGGED_INFO_LINE"><code class="docutils literal notranslate"><span class="pre">ErrorCode.LOGGED_INFO_LINE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.LOGGED_WARNING_LINE"><code class="docutils literal notranslate"><span class="pre">ErrorCode.LOGGED_WARNING_LINE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.LOGGING_COULD_NOT_INCREMENT_SEVERITY"><code class="docutils literal notranslate"><span class="pre">ErrorCode.LOGGING_COULD_NOT_INCREMENT_SEVERITY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.LOGGING_REQUESTED_SEVERITY_NOT_FOUND"><code class="docutils literal notranslate"><span class="pre">ErrorCode.LOGGING_REQUESTED_SEVERITY_NOT_FOUND</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.LOGGING_RESYNC_FAILED"><code class="docutils literal notranslate"><span class="pre">ErrorCode.LOGGING_RESYNC_FAILED</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.LOGGING_SOURCE_FILE_DOES_NOT_EXIST"><code class="docutils literal notranslate"><span class="pre">ErrorCode.LOGGING_SOURCE_FILE_DOES_NOT_EXIST</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.LOG_FILE_CREATED"><code class="docutils literal notranslate"><span class="pre">ErrorCode.LOG_FILE_CREATED</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.LOG_FILE_CREATION_FAILED"><code class="docutils literal notranslate"><span class="pre">ErrorCode.LOG_FILE_CREATION_FAILED</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.LOG_FILE_INIT_COMPLETE"><code class="docutils literal notranslate"><span class="pre">ErrorCode.LOG_FILE_INIT_COMPLETE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.MOVING_LOG_FILE"><code class="docutils literal notranslate"><span class="pre">ErrorCode.MOVING_LOG_FILE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.MOVING_OUTPUT_FILE"><code class="docutils literal notranslate"><span class="pre">ErrorCode.MOVING_OUTPUT_FILE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.NO_RENAME_FUNCTION_FOR_EXTENSION"><code class="docutils literal notranslate"><span class="pre">ErrorCode.NO_RENAME_FUNCTION_FOR_EXTENSION</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.OUTPUT_NOT_FOUND"><code class="docutils literal notranslate"><span class="pre">ErrorCode.OUTPUT_NOT_FOUND</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.OVERALL_SUCCESS"><code class="docutils literal notranslate"><span class="pre">ErrorCode.OVERALL_SUCCESS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.PGE_NAME"><code class="docutils literal notranslate"><span class="pre">ErrorCode.PGE_NAME</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.PROCESSING_DETAILS"><code class="docutils literal notranslate"><span class="pre">ErrorCode.PROCESSING_DETAILS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.PROCESSING_INPUT_FILE"><code class="docutils literal notranslate"><span class="pre">ErrorCode.PROCESSING_INPUT_FILE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.QA_SAS_PROGRAM_COMPLETED"><code class="docutils literal notranslate"><span class="pre">ErrorCode.QA_SAS_PROGRAM_COMPLETED</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.QA_SAS_PROGRAM_DISABLED"><code class="docutils literal notranslate"><span class="pre">ErrorCode.QA_SAS_PROGRAM_DISABLED</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.QA_SAS_PROGRAM_FAILED"><code class="docutils literal notranslate"><span class="pre">ErrorCode.QA_SAS_PROGRAM_FAILED</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.QA_SAS_PROGRAM_NOT_FOUND"><code class="docutils literal notranslate"><span class="pre">ErrorCode.QA_SAS_PROGRAM_NOT_FOUND</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.QA_SAS_PROGRAM_STARTING"><code class="docutils literal notranslate"><span class="pre">ErrorCode.QA_SAS_PROGRAM_STARTING</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.RENDERING_ISO_METADATA"><code class="docutils literal notranslate"><span class="pre">ErrorCode.RENDERING_ISO_METADATA</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.RUN_CONFIG_FILENAME"><code class="docutils literal notranslate"><span class="pre">ErrorCode.RUN_CONFIG_FILENAME</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.RUN_CONFIG_VALIDATION_FAILED"><code class="docutils literal notranslate"><span class="pre">ErrorCode.RUN_CONFIG_VALIDATION_FAILED</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.SAS_CONFIG_CREATION_FAILED"><code class="docutils literal notranslate"><span class="pre">ErrorCode.SAS_CONFIG_CREATION_FAILED</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.SAS_EXE_COMMAND_LINE"><code class="docutils literal notranslate"><span class="pre">ErrorCode.SAS_EXE_COMMAND_LINE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.SAS_OUTPUT_FILE_HAS_MISSING_DATA"><code class="docutils literal notranslate"><span class="pre">ErrorCode.SAS_OUTPUT_FILE_HAS_MISSING_DATA</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.SAS_PROGRAM_COMPLETED"><code class="docutils literal notranslate"><span class="pre">ErrorCode.SAS_PROGRAM_COMPLETED</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.SAS_PROGRAM_FAILED"><code class="docutils literal notranslate"><span class="pre">ErrorCode.SAS_PROGRAM_FAILED</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.SAS_PROGRAM_NOT_FOUND"><code class="docutils literal notranslate"><span class="pre">ErrorCode.SAS_PROGRAM_NOT_FOUND</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.SAS_PROGRAM_STARTING"><code class="docutils literal notranslate"><span class="pre">ErrorCode.SAS_PROGRAM_STARTING</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.SAS_QA_COMMAND_LINE"><code class="docutils literal notranslate"><span class="pre">ErrorCode.SAS_QA_COMMAND_LINE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.SCHEMA_FILE"><code class="docutils literal notranslate"><span class="pre">ErrorCode.SCHEMA_FILE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.SUMMARY_STATS_MESSAGE"><code class="docutils literal notranslate"><span class="pre">ErrorCode.SUMMARY_STATS_MESSAGE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.UPDATING_PRODUCT_METADATA"><code class="docutils literal notranslate"><span class="pre">ErrorCode.UPDATING_PRODUCT_METADATA</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.USING_CONFIG_FILE"><code class="docutils literal notranslate"><span class="pre">ErrorCode.USING_CONFIG_FILE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.VALIDATING_RUN_CONFIG_FILE"><code class="docutils literal notranslate"><span class="pre">ErrorCode.VALIDATING_RUN_CONFIG_FILE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.error_codes.ErrorCode.describe"><code class="docutils literal notranslate"><span class="pre">ErrorCode.describe()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="opera.util.html#opera.util.error_codes.INFO_RANGE_START"><code class="docutils literal notranslate"><span class="pre">INFO_RANGE_START</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="opera.util.html#opera.util.error_codes.WARNING_RANGE_START"><code class="docutils literal notranslate"><span class="pre">WARNING_RANGE_START</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="opera.util.html#module-opera.util.logger">opera.util.logger module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="opera.util.html#logger-py">logger.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="opera.util.html#opera.util.logger.PgeLogger"><code class="docutils literal notranslate"><span class="pre">PgeLogger</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.logger.PgeLogger.LOGGER_CODE_BASE"><code class="docutils literal notranslate"><span class="pre">PgeLogger.LOGGER_CODE_BASE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.logger.PgeLogger.QA_LOGGER_CODE_BASE"><code class="docutils literal notranslate"><span class="pre">PgeLogger.QA_LOGGER_CODE_BASE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.logger.PgeLogger.append"><code class="docutils literal notranslate"><span class="pre">PgeLogger.append()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.logger.PgeLogger.close_log_stream"><code class="docutils literal notranslate"><span class="pre">PgeLogger.close_log_stream()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.logger.PgeLogger.critical"><code class="docutils literal notranslate"><span class="pre">PgeLogger.critical()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.logger.PgeLogger.debug"><code class="docutils literal notranslate"><span class="pre">PgeLogger.debug()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.logger.PgeLogger.error_code_base"><code class="docutils literal notranslate"><span class="pre">PgeLogger.error_code_base</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.logger.PgeLogger.get_critical_count"><code class="docutils literal notranslate"><span class="pre">PgeLogger.get_critical_count()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.logger.PgeLogger.get_file_name"><code class="docutils literal notranslate"><span class="pre">PgeLogger.get_file_name()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.logger.PgeLogger.get_log_count_by_severity"><code class="docutils literal notranslate"><span class="pre">PgeLogger.get_log_count_by_severity()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.logger.PgeLogger.get_log_count_by_severity_dict"><code class="docutils literal notranslate"><span class="pre">PgeLogger.get_log_count_by_severity_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.logger.PgeLogger.get_stream_object"><code class="docutils literal notranslate"><span class="pre">PgeLogger.get_stream_object()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.logger.PgeLogger.get_warning_count"><code class="docutils literal notranslate"><span class="pre">PgeLogger.get_warning_count()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.logger.PgeLogger.increment_log_count_by_severity"><code class="docutils literal notranslate"><span class="pre">PgeLogger.increment_log_count_by_severity()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.logger.PgeLogger.info"><code class="docutils literal notranslate"><span class="pre">PgeLogger.info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.logger.PgeLogger.log"><code class="docutils literal notranslate"><span class="pre">PgeLogger.log()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.logger.PgeLogger.log_one_metric"><code class="docutils literal notranslate"><span class="pre">PgeLogger.log_one_metric()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.logger.PgeLogger.move"><code class="docutils literal notranslate"><span class="pre">PgeLogger.move()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.logger.PgeLogger.parse_line"><code class="docutils literal notranslate"><span class="pre">PgeLogger.parse_line()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.logger.PgeLogger.warning"><code class="docutils literal notranslate"><span class="pre">PgeLogger.warning()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.logger.PgeLogger.workflow"><code class="docutils literal notranslate"><span class="pre">PgeLogger.workflow</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.logger.PgeLogger.write"><code class="docutils literal notranslate"><span class="pre">PgeLogger.write()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.util.html#opera.util.logger.PgeLogger.write_log_summary"><code class="docutils literal notranslate"><span class="pre">PgeLogger.write_log_summary()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="opera.util.html#opera.util.logger.default_log_file_name"><code class="docutils literal notranslate"><span class="pre">default_log_file_name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="opera.util.html#opera.util.logger.get_severity_from_error_code"><code class="docutils literal notranslate"><span class="pre">get_severity_from_error_code()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="opera.util.html#opera.util.logger.standardize_severity_string"><code class="docutils literal notranslate"><span class="pre">standardize_severity_string()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="opera.util.html#opera.util.logger.write"><code class="docutils literal notranslate"><span class="pre">write()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="opera.util.html#module-opera.util.run_utils">opera.util.run_utils module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="opera.util.html#run-utils-py">run_utils.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="opera.util.html#opera.util.run_utils.create_qa_command_line"><code class="docutils literal notranslate"><span class="pre">create_qa_command_line()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="opera.util.html#opera.util.run_utils.create_sas_command_line"><code class="docutils literal notranslate"><span class="pre">create_sas_command_line()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="opera.util.html#opera.util.run_utils.get_checksum"><code class="docutils literal notranslate"><span class="pre">get_checksum()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="opera.util.html#opera.util.run_utils.get_extension"><code class="docutils literal notranslate"><span class="pre">get_extension()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="opera.util.html#opera.util.run_utils.time_and_execute"><code class="docutils literal notranslate"><span class="pre">time_and_execute()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="opera.util.html#module-opera.util.time">opera.util.time module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="opera.util.html#time-py">time.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="opera.util.html#opera.util.time.get_catalog_metadata_datetime_str"><code class="docutils literal notranslate"><span class="pre">get_catalog_metadata_datetime_str()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="opera.util.html#opera.util.time.get_current_iso_time"><code class="docutils literal notranslate"><span class="pre">get_current_iso_time()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="opera.util.html#opera.util.time.get_iso_time"><code class="docutils literal notranslate"><span class="pre">get_iso_time()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="opera.util.html#opera.util.time.get_time_for_filename"><code class="docutils literal notranslate"><span class="pre">get_time_for_filename()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="opera.util.html#module-opera.util.usage_metrics">opera.util.usage_metrics module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="opera.util.html#usage-metrics-py">usage_metrics.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="opera.util.html#opera.util.usage_metrics.get_os_metrics"><code class="docutils literal notranslate"><span class="pre">get_os_metrics()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="opera.util.html#opera.util.usage_metrics.get_self_peak_vmm_kb"><code class="docutils literal notranslate"><span class="pre">get_self_peak_vmm_kb()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="opera.util.html#module-opera.util">Module contents</a><ul>

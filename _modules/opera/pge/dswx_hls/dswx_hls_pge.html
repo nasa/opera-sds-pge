@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera.pge.dswx_hls.dswx_hls_pge &mdash; opera-sds-pge 2.0.0-er.2.0 documentation</title>
+  <title>opera.pge.dswx_hls.dswx_hls_pge &mdash; opera-sds-pge 2.0.0-er.3.0 documentation</title>
       <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -15,6 +15,7 @@
         <script src="../../../../_static/underscore.js"></script>
         <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/sphinx_highlight.js"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
@@ -28,7 +29,7 @@
             <a href="../../../../index.html" class="icon icon-home"> opera-sds-pge
           </a>
               <div class="version">
-                2.0.0-er.2.0
+                2.0.0-er.3.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
@@ -86,6 +87,7 @@
 
 <span class="kn">import</span> <span class="nn">glob</span>
 <span class="kn">import</span> <span class="nn">os.path</span>
+<span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
 <span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">abspath</span><span class="p">,</span> <span class="n">basename</span><span class="p">,</span> <span class="n">exists</span><span class="p">,</span> <span class="n">isdir</span><span class="p">,</span> <span class="n">join</span><span class="p">,</span> <span class="n">splitext</span>
 
@@ -96,11 +98,12 @@
 <span class="kn">from</span> <span class="nn">opera.util.img_utils</span> <span class="kn">import</span> <span class="n">get_geotiff_hls_dataset</span>
 <span class="kn">from</span> <span class="nn">opera.util.img_utils</span> <span class="kn">import</span> <span class="n">get_geotiff_metadata</span>
 <span class="kn">from</span> <span class="nn">opera.util.img_utils</span> <span class="kn">import</span> <span class="n">get_geotiff_processing_datetime</span>
-<span class="kn">from</span> <span class="nn">opera.util.img_utils</span> <span class="kn">import</span> <span class="n">get_geotiff_product_version</span>
+<span class="kn">from</span> <span class="nn">opera.util.img_utils</span> <span class="kn">import</span> <span class="n">get_geotiff_sensor_product_id</span>
 <span class="kn">from</span> <span class="nn">opera.util.img_utils</span> <span class="kn">import</span> <span class="n">get_geotiff_spacecraft_name</span>
 <span class="kn">from</span> <span class="nn">opera.util.img_utils</span> <span class="kn">import</span> <span class="n">get_hls_filename_fields</span>
-<span class="kn">from</span> <span class="nn">opera.util.metadata_utils</span> <span class="kn">import</span> <span class="n">get_sensor_from_spacecraft_name</span>
+<span class="kn">from</span> <span class="nn">opera.util.img_utils</span> <span class="kn">import</span> <span class="n">set_geotiff_metadata</span>
 <span class="kn">from</span> <span class="nn">opera.util.metadata_utils</span> <span class="kn">import</span> <span class="n">get_geographic_boundaries_from_mgrs_tile</span>
+<span class="kn">from</span> <span class="nn">opera.util.metadata_utils</span> <span class="kn">import</span> <span class="n">get_sensor_from_spacecraft_name</span>
 <span class="kn">from</span> <span class="nn">opera.util.render_jinja2</span> <span class="kn">import</span> <span class="n">render_jinja2</span>
 <span class="kn">from</span> <span class="nn">opera.util.time</span> <span class="kn">import</span> <span class="n">get_time_for_filename</span>
 
@@ -134,7 +137,7 @@
 
                 <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INPUT_NOT_FOUND</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">isdir</span><span class="p">(</span><span class="n">input_file_path</span><span class="p">):</span>
-                <span class="n">list_of_input_tifs</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">input_file_path</span><span class="p">,</span> <span class="s1">&#39;*.tif&#39;</span><span class="p">))</span>
+                <span class="n">list_of_input_tifs</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">input_file_path</span><span class="p">,</span> <span class="s1">&#39;*.tif*&#39;</span><span class="p">))</span>
 
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">list_of_input_tifs</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="n">error_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Input directory </span><span class="si">{</span><span class="n">input_file_path</span><span class="si">}</span><span class="s2"> does not contain any tif files&quot;</span>
@@ -144,6 +147,51 @@
                 <span class="n">error_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Input file </span><span class="si">{</span><span class="n">input_file_path</span><span class="si">}</span><span class="s2"> does not have .tif extension&quot;</span>
 
                 <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INVALID_INPUT</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_validate_expected_input_platforms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Scans the input files to make sure that the data comes from expected</span>
+<span class="sd">        platforms only.  Currently, Landsat 8/9, or Sentinel 2 A/B.</span>
+<span class="sd">        Raises an exception if an unsupported platform is detected.</span>
+<span class="sd">        This function assumes that input files have been checked to exist.</span>
+<span class="sd">        It also assumes that only files that contain the metadata keys</span>
+<span class="sd">        LANDSAT_PRODUCT_ID for Landsat input, and PRODUCT_URI for Sentinel</span>
+<span class="sd">        input, need to be checked.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">UPDATING_PRODUCT_METADATA</span><span class="p">,</span>
+            <span class="s1">&#39;Scanning DSWx input datasets for invalid platforms.&#39;</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Get a list of input files to check for invalid platform metadata</span>
+        <span class="n">list_of_input_tifs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">input_file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">input_files</span><span class="p">:</span>
+            <span class="n">input_file_path</span> <span class="o">=</span> <span class="n">abspath</span><span class="p">(</span><span class="n">input_file</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">isdir</span><span class="p">(</span><span class="n">input_file_path</span><span class="p">):</span>
+                <span class="n">list_of_input_tifs</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">input_file_path</span><span class="p">,</span> <span class="s1">&#39;*.tif*&#39;</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">list_of_input_tifs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">input_file_path</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">input_tif</span> <span class="ow">in</span> <span class="n">list_of_input_tifs</span><span class="p">:</span>
+
+            <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^HLS\.L30.*&quot;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">input_tif</span><span class="p">)):</span>
+                <span class="n">input_tif_metadata</span> <span class="o">=</span> <span class="n">get_geotiff_metadata</span><span class="p">(</span><span class="n">input_tif</span><span class="p">)</span>
+                <span class="k">if</span> <span class="s1">&#39;LANDSAT_PRODUCT_ID&#39;</span> <span class="ow">in</span> <span class="n">input_tif_metadata</span><span class="p">:</span>
+                    <span class="c1"># LANDSAT_PRODUCT_ID can be a list so we don&#39;t restrict search to first element</span>
+                    <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;LC07.*&quot;</span><span class="p">,</span> <span class="n">input_tif_metadata</span><span class="p">[</span><span class="s1">&#39;LANDSAT_PRODUCT_ID&#39;</span><span class="p">]):</span>
+                        <span class="n">error_msg</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Input file </span><span class="si">{</span><span class="n">input_tif</span><span class="si">}</span><span class="s2"> appears to contain Landsat-7 data, &quot;</span>
+                                     <span class="sa">f</span><span class="s2">&quot;LANDSAT_PRODUCT_ID is </span><span class="si">{</span><span class="n">input_tif_metadata</span><span class="p">[</span><span class="s1">&#39;LANDSAT_PRODUCT_ID&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INVALID_INPUT</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^HLS\.S30.*&quot;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">input_tif</span><span class="p">)):</span>
+                <span class="n">input_tif_metadata</span> <span class="o">=</span> <span class="n">get_geotiff_metadata</span><span class="p">(</span><span class="n">input_tif</span><span class="p">)</span>
+                <span class="k">if</span> <span class="s1">&#39;PRODUCT_URI&#39;</span> <span class="ow">in</span> <span class="n">input_tif_metadata</span><span class="p">:</span>
+                    <span class="n">data_is_S2A</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;S2A.*&quot;</span><span class="p">,</span> <span class="n">input_tif_metadata</span><span class="p">[</span><span class="s1">&#39;PRODUCT_URI&#39;</span><span class="p">])</span>
+                    <span class="n">data_is_S2B</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;S2B.*&quot;</span><span class="p">,</span> <span class="n">input_tif_metadata</span><span class="p">[</span><span class="s1">&#39;PRODUCT_URI&#39;</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">data_is_S2A</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">data_is_S2B</span><span class="p">:</span>
+                        <span class="n">error_msg</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Input file </span><span class="si">{</span><span class="n">input_tif</span><span class="si">}</span><span class="s2"> appears to not be Sentinel 2 A/B data, &quot;</span>
+                                     <span class="sa">f</span><span class="s2">&quot;metadata PRODUCT_URI is </span><span class="si">{</span><span class="n">input_tif_metadata</span><span class="p">[</span><span class="s1">&#39;PRODUCT_URI&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INVALID_INPUT</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">)</span>
 
 <div class="viewcode-block" id="DSWxHLSPreProcessorMixin.run_preprocessor"><a class="viewcode-back" href="../../../../opera.pge.dswx_hls.html#opera.pge.dswx_hls.dswx_hls_pge.DSWxHLSPreProcessorMixin.run_preprocessor">[docs]</a>    <span class="k">def</span> <span class="nf">run_preprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -161,7 +209,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">run_preprocessor</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_inputs</span><span class="p">()</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_inputs</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_expected_input_platforms</span><span class="p">()</span></div></div>
 
 
 <div class="viewcode-block" id="DSWxHLSPostProcessorMixin"><a class="viewcode-back" href="../../../../opera.pge.dswx_hls.html#opera.pge.dswx_hls.dswx_hls_pge.DSWxHLSPostProcessorMixin">[docs]</a><span class="k">class</span> <span class="nc">DSWxHLSPostProcessorMixin</span><span class="p">(</span><span class="n">PostProcessorMixin</span><span class="p">):</span>
@@ -207,6 +256,44 @@
 
                 <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INVALID_OUTPUT</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">)</span>
 
+    <span class="k">def</span> <span class="nf">_correct_landsat_9_products</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Scans the set of output DSWx products to see if the metadata identifies</span>
+<span class="sd">        any/all of them to have originated from Landsat-9 data, and if so,</span>
+<span class="sd">        make the necessary corrections to the product metadata to remove any</span>
+<span class="sd">        references to Landsat-8 that may be erroneously present.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">UPDATING_PRODUCT_METADATA</span><span class="p">,</span>
+            <span class="s1">&#39;Scanning DSWx output products for Landsat-9 metadata correction&#39;</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Get the list of output products and filter for the images</span>
+        <span class="n">output_products</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">get_output_product_filenames</span><span class="p">()</span>
+
+        <span class="c1"># Filter to only images (.tif or .tiff)</span>
+        <span class="n">output_images</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">product</span><span class="p">:</span> <span class="s1">&#39;tif&#39;</span> <span class="ow">in</span> <span class="n">splitext</span><span class="p">(</span><span class="n">product</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">output_products</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">output_image</span> <span class="ow">in</span> <span class="n">output_images</span><span class="p">:</span>
+            <span class="n">sensor_product_id</span> <span class="o">=</span> <span class="n">get_geotiff_sensor_product_id</span><span class="p">(</span><span class="n">output_image</span><span class="p">)</span>
+
+            <span class="c1"># Certain HLS products have been observed to have sensor product</span>
+            <span class="c1"># ID&#39;s that identify them as originating from Landsat-9, but</span>
+            <span class="c1"># specify the Landsat-8 as the spacecraft name. To ensure this</span>
+            <span class="c1"># error is not propagated to DSWx products, we correct the spacecraft</span>
+            <span class="c1"># name within the product metadata here.</span>
+            <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;L[COTEM]09.*&quot;</span><span class="p">,</span> <span class="n">sensor_product_id</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">UPDATING_PRODUCT_METADATA</span><span class="p">,</span>
+                    <span class="sa">f</span><span class="s1">&#39;Correcting SPACECRAFT_NAME field for Landsat-9 based product &#39;</span>
+                    <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">basename</span><span class="p">(</span><span class="n">output_image</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
+                <span class="p">)</span>
+                <span class="n">set_geotiff_metadata</span><span class="p">(</span>
+                    <span class="n">output_image</span><span class="p">,</span> <span class="n">scratch_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">scratch_path</span><span class="p">,</span>
+                    <span class="n">SPACECRAFT_NAME</span><span class="o">=</span><span class="s2">&quot;Landsat-9&quot;</span>
+                <span class="p">)</span>
+
     <span class="k">def</span> <span class="nf">_core_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inter_filename</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the core file name component for products produced by the</span>
@@ -214,7 +301,8 @@
 
 <span class="sd">        The core file name component of the DSWx PGE consists of:</span>
 
-<span class="sd">        &lt;PROJECT&gt;_&lt;LEVEL&gt;_&lt;PGE NAME&gt;_&lt;SOURCE&gt;_&lt;TILE ID&gt;_&lt;ACQ TIMETAG&gt;_&lt;PROD TIMETAG&gt;_&lt;SENSOR&gt;_&lt;SPACING&gt;_&lt;PRODUCT VERSION&gt;</span>
+<span class="sd">        &lt;PROJECT&gt;_&lt;LEVEL&gt;_&lt;PGE NAME&gt;_&lt;SOURCE&gt;_&lt;TILE ID&gt;_&lt;ACQ TIMETAG&gt;_</span>
+<span class="sd">        &lt;PROD TIMETAG&gt;_&lt;SENSOR&gt;_&lt;SPACING&gt;_&lt;PRODUCT VERSION&gt;</span>
 
 <span class="sd">        Callers of this function are responsible for assignment of any other</span>
 <span class="sd">        product-specific fields, such as the file extension.</span>
@@ -251,7 +339,7 @@
                    <span class="sa">f</span><span class="s2">&quot;First call must provide a filename before result is cached.&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">FILE_MOVE_FAILED</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
 
-        <span class="n">spacecraft_name</span> <span class="o">=</span> <span class="n">get_geotiff_spacecraft_name</span><span class="p">(</span><span class="n">inter_filename</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+        <span class="n">spacecraft_name</span> <span class="o">=</span> <span class="n">get_geotiff_spacecraft_name</span><span class="p">(</span><span class="n">inter_filename</span><span class="p">)</span>
         <span class="n">sensor</span> <span class="o">=</span> <span class="n">get_sensor_from_spacecraft_name</span><span class="p">(</span><span class="n">spacecraft_name</span><span class="p">)</span>
         <span class="n">pixel_spacing</span> <span class="o">=</span> <span class="s2">&quot;30&quot;</span>  <span class="c1"># fixed for HLS-based products</span>
 
@@ -272,7 +360,7 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">processing_time</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;Z&#39;</span><span class="p">):</span>
             <span class="n">processing_time</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">processing_time</span><span class="si">}</span><span class="s1">Z&#39;</span>
 
-        <span class="n">product_version</span> <span class="o">=</span> <span class="n">get_geotiff_product_version</span><span class="p">(</span><span class="n">inter_filename</span><span class="p">)</span>
+        <span class="n">product_version</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">product_version</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">product_version</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;v&#39;</span><span class="p">):</span>
             <span class="n">product_version</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;v</span><span class="si">{</span><span class="n">product_version</span><span class="si">}</span><span class="s1">&#39;</span>
@@ -373,9 +461,15 @@
         <span class="n">sensing_time</span> <span class="o">=</span> <span class="n">output_product_metadata</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;SENSING_TIME&#39;</span><span class="p">)</span>
 
         <span class="c1"># Sensing time for L30 datasets contain both begin and end times delimited</span>
-        <span class="c1"># by semi-colon</span>
+        <span class="c1"># by semicolon</span>
         <span class="k">if</span> <span class="s1">&#39;;&#39;</span> <span class="ow">in</span> <span class="n">sensing_time</span><span class="p">:</span>
             <span class="n">sensing_time_begin</span><span class="p">,</span> <span class="n">sensing_time_end</span> <span class="o">=</span> <span class="n">sensing_time</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;;&#39;</span><span class="p">)</span>
+        <span class="c1"># Certain L30 datasets have been observed with multiple sensing times</span>
+        <span class="c1"># concatenated by a plus sign, for this case just take the first of the</span>
+        <span class="c1"># times</span>
+        <span class="k">elif</span> <span class="s1">&#39;+&#39;</span> <span class="ow">in</span> <span class="n">sensing_time</span><span class="p">:</span>
+            <span class="n">sensing_time_begin</span> <span class="o">=</span> <span class="n">sensing_time</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;+&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">sensing_time_end</span> <span class="o">=</span> <span class="n">sensing_time_begin</span>
         <span class="c1"># S30 datasets seem to only provide a single sensing time value</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">sensing_time_begin</span> <span class="o">=</span> <span class="n">sensing_time_end</span> <span class="o">=</span> <span class="n">sensing_time</span>
@@ -471,8 +565,9 @@
 <span class="sd">        Executes the post-processing steps for DSWx-HLS PGE job completion.</span>
 
 <span class="sd">        The DSWxHLSPostProcessorMixin version of this function performs the same</span>
-<span class="sd">        steps as the base PostProcessorMixin, but inserts the output file</span>
-<span class="sd">        validation check prior to staging of the output files.</span>
+<span class="sd">        steps as the base PostProcessorMixin, but inserts an output file</span>
+<span class="sd">        validation check and Landsat-9 metadata correction step prior to staging</span>
+<span class="sd">        of the output files.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -484,6 +579,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_run_sas_qa_executable</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_output</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_correct_landsat_9_products</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_stage_output_files</span><span class="p">()</span></div></div>
 
 
@@ -502,10 +598,10 @@
     <span class="n">LEVEL</span> <span class="o">=</span> <span class="s2">&quot;L3&quot;</span>
     <span class="sd">&quot;&quot;&quot;Processing Level for DSWx-HLS Products&quot;&quot;&quot;</span>
 
-    <span class="n">PGE_VERSION</span> <span class="o">=</span> <span class="s2">&quot;1.0.0-rc.2.0&quot;</span>
+    <span class="n">PGE_VERSION</span> <span class="o">=</span> <span class="s2">&quot;1.0.0-rc.4.0&quot;</span>
     <span class="sd">&quot;&quot;&quot;Version of the PGE (overrides default from base_pge)&quot;&quot;&quot;</span>
 
-    <span class="n">SAS_VERSION</span> <span class="o">=</span> <span class="s2">&quot;0.1&quot;</span>
+    <span class="n">SAS_VERSION</span> <span class="o">=</span> <span class="s2">&quot;0.4&quot;</span>  <span class="c1"># CalVal release https://github.com/nasa/PROTEUS/releases/tag/v0.4</span>
     <span class="sd">&quot;&quot;&quot;Version of the SAS wrapped by this PGE, should be updated as needed with new SAS deliveries&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pge_name</span><span class="p">,</span> <span class="n">runconfig_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>

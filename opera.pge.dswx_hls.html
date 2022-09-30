@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera.pge.dswx_hls package &mdash; opera-sds-pge 2.0.0-er.2.0 documentation</title>
+  <title>opera.pge.dswx_hls package &mdash; opera-sds-pge 2.0.0-er.3.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -16,6 +16,7 @@
         <script src="_static/underscore.js"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -31,7 +32,7 @@
             <a href="index.html" class="icon icon-home"> opera-sds-pge
           </a>
               <div class="version">
-                2.0.0-er.2.0
+                2.0.0-er.3.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -99,6 +100,7 @@
 <h3>dswx_hls_pge.py<a class="headerlink" href="#dswx-hls-pge-py" title="Permalink to this heading"></a></h3>
 <p>Module defining the implementation for the Dynamic Surface Water Extent (DSWx)
 from Harmonized Landsat and Sentinel-1 (HLS) PGE.</p>
+</section>
 <dl class="py class">
 <dt class="sig sig-object py" id="opera.pge.dswx_hls.dswx_hls_pge.DSWxHLSExecutor">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">opera.pge.dswx_hls.dswx_hls_pge.</span></span><span class="sig-name descname"><span class="pre">DSWxHLSExecutor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pge_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runconfig_path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/opera/pge/dswx_hls/dswx_hls_pge.html#DSWxHLSExecutor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opera.pge.dswx_hls.dswx_hls_pge.DSWxHLSExecutor" title="Permalink to this definition"></a></dt>
@@ -120,13 +122,13 @@ while inheriting all other functionality from the base PgeExecutor class.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="opera.pge.dswx_hls.dswx_hls_pge.DSWxHLSExecutor.PGE_VERSION">
-<span class="sig-name descname"><span class="pre">PGE_VERSION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'1.0.0-rc.2.0'</span></em><a class="headerlink" href="#opera.pge.dswx_hls.dswx_hls_pge.DSWxHLSExecutor.PGE_VERSION" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">PGE_VERSION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'1.0.0-rc.4.0'</span></em><a class="headerlink" href="#opera.pge.dswx_hls.dswx_hls_pge.DSWxHLSExecutor.PGE_VERSION" title="Permalink to this definition"></a></dt>
 <dd><p>Version of the PGE (overrides default from base_pge)</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="opera.pge.dswx_hls.dswx_hls_pge.DSWxHLSExecutor.SAS_VERSION">
-<span class="sig-name descname"><span class="pre">SAS_VERSION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'0.1'</span></em><a class="headerlink" href="#opera.pge.dswx_hls.dswx_hls_pge.DSWxHLSExecutor.SAS_VERSION" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">SAS_VERSION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'0.4'</span></em><a class="headerlink" href="#opera.pge.dswx_hls.dswx_hls_pge.DSWxHLSExecutor.SAS_VERSION" title="Permalink to this definition"></a></dt>
 <dd><p>Version of the SAS wrapped by this PGE, should be updated as needed with new SAS deliveries</p>
 </dd></dl>
 
@@ -147,8 +149,9 @@ the RunConfig exist and are valid.</p>
 <span class="sig-name descname"><span class="pre">run_postprocessor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/opera/pge/dswx_hls/dswx_hls_pge.html#DSWxHLSPostProcessorMixin.run_postprocessor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opera.pge.dswx_hls.dswx_hls_pge.DSWxHLSPostProcessorMixin.run_postprocessor" title="Permalink to this definition"></a></dt>
 <dd><p>Executes the post-processing steps for DSWx-HLS PGE job completion.</p>
 <p>The DSWxHLSPostProcessorMixin version of this function performs the same
-steps as the base PostProcessorMixin, but inserts the output file
-validation check prior to staging of the output files.</p>
+steps as the base PostProcessorMixin, but inserts an output file
+validation check and Landsat-9 metadata correction step prior to staging
+of the output files.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>**kwargs</strong> (<em>dict</em>) – Any keyword arguments needed by the post-processor</p>
@@ -184,7 +187,6 @@ input files/directories.</p>
 
 </dd></dl>
 
-</section>
 </section>
 <section id="module-opera.pge.dswx_hls">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-opera.pge.dswx_hls" title="Permalink to this heading"></a></h2>

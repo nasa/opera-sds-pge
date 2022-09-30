@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera.util package &mdash; opera-sds-pge 2.0.0-er.2.0 documentation</title>
+  <title>opera.util package &mdash; opera-sds-pge 2.0.0-er.3.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -16,6 +16,7 @@
         <script src="_static/underscore.js"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -31,7 +32,7 @@
             <a href="index.html" class="icon icon-home"> opera-sds-pge
           </a>
               <div class="version">
-                2.0.0-er.2.0
+                2.0.0-er.3.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -97,6 +98,7 @@
 <section id="error-codes-py">
 <h3>error_codes.py<a class="headerlink" href="#error-codes-py" title="Permalink to this heading"></a></h3>
 <p>Error codes for use with OPERA PGEs.</p>
+</section>
 <dl class="py data">
 <dt class="sig sig-object py" id="opera.util.error_codes.CODES_PER_RANGE">
 <span class="sig-prename descclassname"><span class="pre">opera.util.error_codes.</span></span><span class="sig-name descname"><span class="pre">CODES_PER_RANGE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1000</span></em><a class="headerlink" href="#opera.util.error_codes.CODES_PER_RANGE" title="Permalink to this definition"></a></dt>
@@ -428,6 +430,11 @@ the RunConfig to determine the final, logged error code.</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode.UPDATING_PRODUCT_METADATA">
+<span class="sig-name descname"><span class="pre">UPDATING_PRODUCT_METADATA</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">28</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.UPDATING_PRODUCT_METADATA" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode.USING_CONFIG_FILE">
 <span class="sig-name descname"><span class="pre">USING_CONFIG_FILE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">15</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.USING_CONFIG_FILE" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
@@ -459,7 +466,6 @@ integer values.</p>
 </dd></dl>
 
 </section>
-</section>
 <section id="module-opera.util.logger">
 <span id="opera-util-logger-module"></span><h2>opera.util.logger module<a class="headerlink" href="#module-opera.util.logger" title="Permalink to this heading"></a></h2>
 <section id="logger-py">
@@ -468,6 +474,7 @@ integer values.</p>
 <p>This module is adapted for OPERA from the NISAR PGE R2.0.0 util/logger.py
 Original Authors: Alice Stanboli, David White
 Adapted By: Scott Collins, Jim Hofman</p>
+</section>
 <dl class="py class">
 <dt class="sig sig-object py" id="opera.util.logger.PgeLogger">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">opera.util.logger.</span></span><span class="sig-name descname"><span class="pre">PgeLogger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">workflow</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_code_base</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/opera/util/logger.html#PgeLogger"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opera.util.logger.PgeLogger" title="Permalink to this definition"></a></dt>
@@ -826,13 +833,13 @@ the current time is used.</p></li>
 </dd></dl>
 
 </section>
-</section>
 <section id="module-opera.util.run_utils">
 <span id="opera-util-run-utils-module"></span><h2>opera.util.run_utils module<a class="headerlink" href="#module-opera.util.run_utils" title="Permalink to this heading"></a></h2>
 <section id="run-utils-py">
 <h3>run_utils.py<a class="headerlink" href="#run-utils-py" title="Permalink to this heading"></a></h3>
 <p>Contains utility functions for running executable processes within the OPERA PGE
 subsystem.</p>
+</section>
 <dl class="py function">
 <dt class="sig sig-object py" id="opera.util.run_utils.create_qa_command_line">
 <span class="sig-prename descclassname"><span class="pre">opera.util.run_utils.</span></span><span class="sig-name descname"><span class="pre">create_qa_command_line</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qa_program_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qa_program_options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/opera/util/run_utils.html#create_qa_command_line"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opera.util.run_utils.create_qa_command_line" title="Permalink to this definition"></a></dt>
@@ -945,7 +952,6 @@ for production.</p></li>
 </dd></dl>
 
 </section>
-</section>
 <section id="module-opera.util.time">
 <span id="opera-util-time-module"></span><h2>opera.util.time module<a class="headerlink" href="#module-opera.util.time" title="Permalink to this heading"></a></h2>
 <section id="time-py">
@@ -954,6 +960,7 @@ for production.</p></li>
 <p>This module is adapted for OPERA from the NISAR PGE R2.0.0 util/time.py
 Original Author: Alice Stanboli
 Adapted By: Scott Collins</p>
+</section>
 <dl class="py function">
 <dt class="sig sig-object py" id="opera.util.time.get_catalog_metadata_datetime_str">
 <span class="sig-prename descclassname"><span class="pre">opera.util.time.</span></span><span class="sig-name descname"><span class="pre">get_catalog_metadata_datetime_str</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">date_time</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/opera/util/time.html#get_catalog_metadata_datetime_str"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opera.util.time.get_catalog_metadata_datetime_str" title="Permalink to this definition"></a></dt>
@@ -1024,7 +1031,6 @@ use with output filenames.</p>
 </dd></dl>
 
 </section>
-</section>
 <section id="module-opera.util.usage_metrics">
 <span id="opera-util-usage-metrics-module"></span><h2>opera.util.usage_metrics module<a class="headerlink" href="#module-opera.util.usage_metrics" title="Permalink to this heading"></a></h2>
 <section id="usage-metrics-py">
@@ -1033,6 +1039,7 @@ use with output filenames.</p>
 <p>This module is adapted for OPERA from the NISAR PGE R2.0.0 util/usage_metrics.py
 Original Author: David White
 Adapted By: Scott Collins</p>
+</section>
 <dl class="py function">
 <dt class="sig sig-object py" id="opera.util.usage_metrics.get_os_metrics">
 <span class="sig-prename descclassname"><span class="pre">opera.util.usage_metrics.</span></span><span class="sig-name descname"><span class="pre">get_os_metrics</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/opera/util/usage_metrics.html#get_os_metrics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opera.util.usage_metrics.get_os_metrics" title="Permalink to this definition"></a></dt>
@@ -1091,7 +1098,6 @@ this value cannot be obtained for any reason, -1 is returned instead.</p>
 </dl>
 </dd></dl>
 
-</section>
 </section>
 <section id="module-opera.util">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-opera.util" title="Permalink to this heading"></a></h2>

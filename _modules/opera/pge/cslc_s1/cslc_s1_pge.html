@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera.pge.cslc_s1.cslc_s1_pge &mdash; opera-sds-pge 2.0.0-er.2.0 documentation</title>
+  <title>opera.pge.cslc_s1.cslc_s1_pge &mdash; opera-sds-pge 2.0.0-er.3.0 documentation</title>
       <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -15,6 +15,7 @@
         <script src="../../../../_static/underscore.js"></script>
         <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/sphinx_highlight.js"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
@@ -28,7 +29,7 @@
             <a href="../../../../index.html" class="icon icon-home"> opera-sds-pge
           </a>
               <div class="version">
-                2.0.0-er.2.0
+                2.0.0-er.3.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
@@ -167,7 +168,7 @@
                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)):</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_check_input</span><span class="p">(</span><span class="n">value</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">valid_extensions</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;.EOF&#39;</span><span class="p">,))</span>
             <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;dem_file&#39;</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_check_input</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">valid_extensions</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;.tif&#39;</span><span class="p">,</span> <span class="s1">&#39;.tiff&#39;</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_check_input</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">valid_extensions</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;.tif&#39;</span><span class="p">,</span> <span class="s1">&#39;.tiff&#39;</span><span class="p">,</span> <span class="s1">&#39;.vrt&#39;</span><span class="p">))</span>
             <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;burst_id&#39;</span><span class="p">:</span>
                 <span class="c1"># burst_id is included in the SAS input paths, but is not</span>
                 <span class="c1"># actually a file, so skip it</span>
@@ -298,12 +299,17 @@
         <span class="n">acquisition_time</span> <span class="o">=</span> <span class="n">get_time_for_filename</span><span class="p">(</span>
             <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">cslc_metadata</span><span class="p">[</span><span class="s1">&#39;sensing_start&#39;</span><span class="p">],</span> <span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1"> %H:%M:%S.</span><span class="si">%f</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="p">)</span>
-        <span class="n">product_version</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SAS_VERSION</span>  <span class="c1"># TODO: may extract from cslc_metadata eventually</span>
+
+        <span class="n">product_version</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">product_version</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">product_version</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;v&#39;</span><span class="p">):</span>
+            <span class="n">product_version</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;v</span><span class="si">{</span><span class="n">product_version</span><span class="si">}</span><span class="s1">&#39;</span>
+
         <span class="n">production_time</span> <span class="o">=</span> <span class="n">get_time_for_filename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">production_datetime</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_cached_core_filename</span> <span class="o">=</span> <span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">PROJECT</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">LEVEL</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">NAME</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">sensor</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">burst_id</span><span class="si">}</span><span class="s2">_&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">acquisition_time</span><span class="si">}</span><span class="s2">Z_v</span><span class="si">{</span><span class="n">product_version</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">production_time</span><span class="si">}</span><span class="s2">Z&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">acquisition_time</span><span class="si">}</span><span class="s2">Z_</span><span class="si">{</span><span class="n">product_version</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">production_time</span><span class="si">}</span><span class="s2">Z&quot;</span>
         <span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cached_core_filename</span>
@@ -527,7 +533,7 @@
     <span class="n">LEVEL</span> <span class="o">=</span> <span class="s2">&quot;L2&quot;</span>
     <span class="sd">&quot;&quot;&quot;Processing Level for CSLC-S1 Products&quot;&quot;&quot;</span>
 
-    <span class="n">SAS_VERSION</span> <span class="o">=</span> <span class="s2">&quot;0.1&quot;</span>
+    <span class="n">SAS_VERSION</span> <span class="o">=</span> <span class="s2">&quot;0.1.2&quot;</span>  <span class="c1"># https://github.com/opera-adt/COMPASS/releases/tag/v0.1.2</span>
     <span class="sd">&quot;&quot;&quot;Version of the SAS wrapped by this PGE, should be updated as needed&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pge_name</span><span class="p">,</span> <span class="n">runconfig_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
