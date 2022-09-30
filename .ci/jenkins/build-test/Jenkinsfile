@@ -5,7 +5,7 @@ pipeline {
     environment {
         DOCKER_IMAGE_PREFIX = 'opera_pge'
         // TODO: update as newer PGE's are added
-        DOCKER_IMAGE_SUFFIXES = 'dswx_hls,cslc_s1'
+        DOCKER_IMAGE_SUFFIXES = 'dswx_hls,cslc_s1,rtc_s1'
         DOCKER_TAG = """${sh(
                      returnStdout: true,
                      script: 'echo ${GIT_BRANCH##*/}'
