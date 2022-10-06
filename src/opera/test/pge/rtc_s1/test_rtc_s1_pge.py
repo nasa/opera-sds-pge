@@ -9,12 +9,15 @@ Unit tests for the pge/rtc_s1/rtc_s1_pge.py module.
 """
 
 import os
+import shutil
 import tempfile
 import unittest
 from io import StringIO
 from os.path import abspath, join
 
 from pkg_resources import resource_filename
+
+import yaml
 
 from opera.pge import RunConfig
 from opera.pge.rtc_s1.rtc_s1_pge import RtcS1Executor
@@ -127,3 +130,73 @@ class RtcS1PgeTestCase(unittest.TestCase):
             log_contents = infile.read()
 
         self.assertIn(f"RTC-S1 invoked with RunConfig {expected_sas_config_file}", log_contents)
+
+    def test_cslc_s1_pge_input_validation(self):
+        """Test the input validation checks."""
+        runconfig_path = join(self.data_dir, 'test_rtc_s1_config.yaml')
+
+        test_runconfig_path = join(self.data_dir, 'invalid_cslc_s1_runconfig.yaml')
+
+        with open(runconfig_path, 'r', encoding='utf-8') as infile:
+            runconfig_dict = yaml.safe_load(infile)
+
+        input_files_group = runconfig_dict['RunConfig']['Groups']['SAS']['runconfig']['groups']['input_file_group']
+        # Test that a non-existent file is detected by pre-processor
+        input_files_group['safe_file_path'] = ['non_existent_file.zip']
+
+        with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+            yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+
+        try:
+            pge = RtcS1Executor(pge_name="RtcS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            # Config validation occurs before the log is fully initialized, but the
+            # initial log file should still exist and contain details of the validation
+            # error
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            # Open the log file, and check that the validation error details were captured
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn(
+                "Could not locate specified input non_existent_file.zip",
+                log_contents
+            )
+            # Reload the valid runconfig for next test
+            with open(runconfig_path, 'r', encoding='utf-8') as infile:
+                runconfig_dict = yaml.safe_load(infile)
+
+            input_files_group = runconfig_dict['RunConfig']['Groups']['SAS']['runconfig']['groups']['input_file_group']
+
+            # Test that an unexpected file extension for an existing file is caught
+            new_name = join(input_files_group['safe_file_path'][0].replace('zip', 'tar'))
+            input_files_group['safe_file_path'] = [new_name]
+
+            os.system(f"touch {new_name}")
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+                yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+
+            pge = RtcS1Executor(pge_name="RtcS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn(
+                f"Input file {new_name} does not have an expected file extension.",
+                log_contents
+            )
+        finally:
+            if os.path.exists(test_runconfig_path):
+                os.unlink(test_runconfig_path)
