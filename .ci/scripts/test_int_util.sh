@@ -50,80 +50,80 @@ test_int_parse_args()
 
 test_int_setup_results_directory()
 {
-	# Create the test_results directory for the PGE and initialize the HTML output file.
-	#
-	TEST_RESULTS_DIR="${WORKSPACE}/test_results/${PGE_NAME}"
+    # Create the test_results directory for the PGE and initialize the HTML output file.
+    #
+    TEST_RESULTS_DIR="${WORKSPACE}/test_results/${PGE_NAME}"
 
-	echo "Test results output directory: ${TEST_RESULTS_DIR}"
-	mkdir --parents ${TEST_RESULTS_DIR}
-	chmod -R 775 ${TEST_RESULTS_DIR}
-	RESULTS_FILE="${TEST_RESULTS_DIR}/test_int_${PGE_NAME}_results.html"
+    echo "Test results output directory: ${TEST_RESULTS_DIR}"
+    mkdir --parents ${TEST_RESULTS_DIR}
+    chmod -R 775 ${TEST_RESULTS_DIR}
+    RESULTS_FILE="${TEST_RESULTS_DIR}/test_int_${PGE_NAME}_results.html"
 
-	# Add the initial HTML to the results file
-	results_html_init="<html><b>${PGE_NAME} product comparison results</b><p> \
-		<style>* {font-family: sans-serif;} \
-		table {border-collapse: collapse;} \
-		th,td {padding: 4px 6px; border: thin solid white} \
-		tr:nth-child(even) {background-color: whitesmoke;} \
-		</style><table>"
+    # Add the initial HTML to the results file
+    results_html_init="<html><b>${PGE_NAME} product comparison results</b><p> \
+        <style>* {font-family: sans-serif;} \
+        table {border-collapse: collapse;} \
+        th,td {padding: 4px 6px; border: thin solid white} \
+        tr:nth-child(even) {background-color: whitesmoke;} \
+        </style><table>"
     echo "${results_html_init}" > ${RESULTS_FILE}
 }
 
 test_int_setup_data_tmp_directory()
 {
-	# Create a temporary directory to allow Jenkins to write to it and avoid collisions
-	# with other users
-	TMP_DIR=$(mktemp -dp /data/tmp)
-	chmod 775 $TMP_DIR
-	cd $TMP_DIR
+    # Create a temporary directory to allow Jenkins to write to it and avoid collisions
+    # with other users
+    TMP_DIR=$(mktemp -dp /data/tmp)
+    chmod 775 $TMP_DIR
+    cd $TMP_DIR
 }
 
 test_int_setup_test_data()
 {
     # Download test data and extract it
     #
-	local_testdata_archive=${TMP_DIR}/${TESTDATA}
-	local_runconfig=${TMP_DIR}/${RUNCONFIG}
+    local_testdata_archive=${TMP_DIR}/${TESTDATA}
+    local_runconfig=${TMP_DIR}/${RUNCONFIG}
 
-	# Pull in test data and runconfig from S3
-	echo "Downloading test data from s3://operasds-dev-pge/${PGE_NAME}/${TESTDATA} to $local_testdata_archive"
-	aws s3 cp s3://operasds-dev-pge/${PGE_NAME}/${TESTDATA} $local_testdata_archive
-	echo "Downloading runconfig from s3://operasds-dev-pge/${PGE_NAME}/${RUNCONFIG} to $local_runconfig"
-	aws s3 cp s3://operasds-dev-pge/${PGE_NAME}/${RUNCONFIG} $local_runconfig
+    # Pull in test data and runconfig from S3
+    echo "Downloading test data from s3://operasds-dev-pge/${PGE_NAME}/${TESTDATA} to $local_testdata_archive"
+    aws s3 cp s3://operasds-dev-pge/${PGE_NAME}/${TESTDATA} $local_testdata_archive
+    echo "Downloading runconfig from s3://operasds-dev-pge/${PGE_NAME}/${RUNCONFIG} to $local_runconfig"
+    aws s3 cp s3://operasds-dev-pge/${PGE_NAME}/${RUNCONFIG} $local_runconfig
 
     cd ${TMP_DIR}
 
-	# Extract the test data archive to the current directory
-	if [ -f $local_testdata_archive ]; then
+    # Extract the test data archive to the current directory
+    if [ -f $local_testdata_archive ]; then
 
-		# The testdata archive should contain a directory with the same basename
-		testdata_basename=$(basename -- "$local_testdata_archive")
-		testdata_dir="${TMP_DIR}/${testdata_basename%.*}"
+        # The testdata archive should contain a directory with the same basename
+        testdata_basename=$(basename -- "$local_testdata_archive")
+        testdata_dir="${TMP_DIR}/${testdata_basename%.*}"
 
-		echo "Extracting test data from $local_testdata_archive to $(pwd)/"
-		unzip $local_testdata_archive
+        echo "Extracting test data from $local_testdata_archive to $(pwd)/"
+        unzip $local_testdata_archive
 
-		if [ -d $testdata_dir ]; then
-			rm $local_testdata_archive
-			cd $testdata_dir
-		else
-			echo "The test data archive needs to include a directory named $testdata_dir, but it does not."
-			exit 1
-		fi
-	else
-		echo "Unable to find test data file $local_testdata_archive"
-		exit 1
-	fi
+        if [ -d $testdata_dir ]; then
+            rm $local_testdata_archive
+            cd $testdata_dir
+        else
+            echo "The test data archive needs to include a directory named $testdata_dir, but it does not."
+            exit 1
+        fi
+    else
+        echo "Unable to find test data file $local_testdata_archive"
+        exit 1
+    fi
 
-	if [ -f $local_runconfig ]; then
-		echo "Copying runconfig file $local_runconfig to $(pwd)/"
-		cp $local_runconfig .
+    if [ -f $local_runconfig ]; then
+        echo "Copying runconfig file $local_runconfig to $(pwd)/"
+        cp $local_runconfig .
 
-		RUNCONFIG_FILENAME=$(basename -- "$local_runconfig")
-	else
-		echo "Unable to find runconfig file $local_runconfig"
-		exit 1
-	fi
+        RUNCONFIG_FILENAME=$(basename -- "$local_runconfig")
+    else
+        echo "Unable to find runconfig file $local_runconfig"
+        exit 1
+    fi
 }
 
 test_int_trap_cleanup()
