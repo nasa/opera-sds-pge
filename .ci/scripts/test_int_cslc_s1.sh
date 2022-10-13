@@ -33,15 +33,6 @@ test_int_setup_data_tmp_directory
 # Download, extract and cd to test data directory
 test_int_setup_test_data
 
-# Add the initial HTML to the results file
-results_html_init="<html><b>${PGE_NAME} product comparison results</b><p> \
-    <style>* {font-family: sans-serif;} \
-    table {border-collapse: collapse;} \
-    th,td {padding: 4px 6px; border: thin solid white} \
-    tr:nth-child(even) {background-color: whitesmoke;} \
-    </style><table>"
-echo $results_html_init > $RESULTS_FILE
-
 # Setup cleanup on exit
 trap test_int_trap_cleanup EXIT
 
