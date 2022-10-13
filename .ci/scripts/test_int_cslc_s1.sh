@@ -137,7 +137,7 @@ else
             compare_result="PASS"
         fi
 
-        docker_out="${docker_out//$'\n'/<br />}"
+        docker_out="${docker_out//$'\n'/<br>}"
         echo "<tr><td>${compare_result}</td><td><ul><li>${ref_product}</li><li>${sec_product}</li><li>${ref_metadata}</li><li>${sec_metadata}</li></ul></td><td>${docker_out}</td></tr>" >> $RESULTS_FILE
     fi
 fi
