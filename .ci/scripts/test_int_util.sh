@@ -8,6 +8,7 @@ set -e
 umask 002
 
 [ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath $(dirname $(realpath $0))/../..)
+[ -z "${PGE_TAG}" ] && PGE_TAG="${USER}-dev"
 
 test_int_parse_args()
 {
