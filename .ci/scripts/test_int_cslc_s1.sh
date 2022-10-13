@@ -2,44 +2,11 @@
 # Script to execute integration tests on OPERA CSLC_S1 PGE Docker image
 #
 
-set -e
-
-# Allow user group to remove created files.
-umask 002
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+. $SCRIPT_DIR/test_int_util.sh
 
 # Parse args
-while [[ $# -gt 0 ]]; do
-  case $1 in
-    -h|--help)
-      echo "Usage: test_int_cslc_S1.sh [-h|--help] [-t|--tag <tag>] [--testdata <testdata .zip file>] [--runconfig <runconfig .yaml file>]"
-      exit 0
-      ;;
-    -t|--tag)
-      PGE_TAG=$2
-      shift
-      shift
-      ;;
-    --testdata)
-      TESTDATA=$2
-      shift
-      shift
-      ;;
-    --runconfig)
-      RUNCONFIG=$2
-      shift
-      shift
-      ;;
-    -*|--*)
-      echo "Unknown arguments $1 $2, ignoring..."
-      shift
-      shift
-      ;;
-    *)
-      echo "Unknown argument $1, ignoring..."
-      shift
-      ;;
-  esac
-done
+test_int_parse_args "$@"
 
 echo '
 ================================================
@@ -50,99 +17,39 @@ Integration Testing CSLC_S1 PGE docker image...
 PGE_NAME="cslc_s1"
 PGE_IMAGE="opera_pge/${PGE_NAME}"
 
-TEST_RESULTS_REL_DIR="test_results"
-
 # defaults, test data and runconfig files should be updated as-needed to use
 # the latest available as defaults for use with the Jenkins pipeline call
 # TESTDATA should be the name of the test data archive in s3://operasds-dev-pge/cslc_s1/
 # RUNCONFIG should be the name of the runconfig in s3://operasds-dev-pge/cslc_s1/
-[ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath $(dirname $(realpath $0))/../..)
 [ -z "${TESTDATA}" ] && TESTDATA="delivery_cslc_s1_interface_0.1.zip"
 [ -z "${RUNCONFIG}" ] && RUNCONFIG="cslc_s1.yaml"
 
-TEST_RESULTS_DIR="${WORKSPACE}/${TEST_RESULTS_REL_DIR}/${PGE_NAME}"
+# Create the test output directory in the workspace
+test_int_setup_results_directory
 
-echo "Test results output directory: ${TEST_RESULTS_DIR}"
-mkdir --parents ${TEST_RESULTS_DIR}
-chmod -R 775 ${TEST_RESULTS_DIR}
-RESULTS_FILE="${TEST_RESULTS_DIR}/test_int_${PGE_NAME}_results.html"
+# Create a temporary directory to hold test data
+test_int_setup_data_tmp_directory
 
-# Create a temporary directory to allow Jenkins to write to it and avoid collisions
-# with other users
-local_dir=$(mktemp -dp /tmp)
-chmod 775 $local_dir
-cd $local_dir
+# Download, extract and cd to test data directory
+test_int_setup_test_data
 
-local_testdata_archive=${local_dir}/${TESTDATA}
-local_runconfig=${local_dir}/${RUNCONFIG}
-
+# Add the initial HTML to the results file
 results_html_init="<html><b>${PGE_NAME} product comparison results</b><p> \
     <style>* {font-family: sans-serif;} \
     table {border-collapse: collapse;} \
     th,td {padding: 4px 6px; border: thin solid white} \
     tr:nth-child(even) {background-color: whitesmoke;} \
     </style><table>"
-
 echo $results_html_init > $RESULTS_FILE
 
-# Configure a trap to set permissions on exit regardless of whether the testing succeeds
-function cleanup {
-
-    echo "</table></html>" >> $RESULTS_FILE
-    DOCKER_RUN="docker run --rm -u $UID:$(id -g)"
-
-    echo "Cleaning up before exit. Setting permissions for output files and directories."
-    ${DOCKER_RUN} -v ${local_dir}:${local_dir} --entrypoint /usr/bin/find ${PGE_IMAGE}:${PGE_TAG} ${local_dir} -type d -exec chmod 775 {} +
-    ${DOCKER_RUN} -v ${local_dir}:${local_dir} --entrypoint /usr/bin/find ${PGE_IMAGE}:${PGE_TAG} ${local_dir} -type f -exec chmod 664 {} +
-    cd /tmp
-    rm -rf ${local_dir}
-}
-
-trap cleanup EXIT
-
-# Pull in test data and runconfig from S3
-echo "Downloading test data from s3://operasds-dev-pge/${PGE_NAME}/${TESTDATA} to $local_testdata_archive"
-aws s3 cp s3://operasds-dev-pge/${PGE_NAME}/${TESTDATA} $local_testdata_archive
-echo "Downloading runconfig from s3://operasds-dev-pge/${PGE_NAME}/${RUNCONFIG} to $local_runconfig"
-aws s3 cp s3://operasds-dev-pge/${PGE_NAME}/${RUNCONFIG} $local_runconfig
+# Setup cleanup on exit
+trap test_int_trap_cleanup EXIT
 
 # Pull in validation script from S3. This utility doesn't appear to be source-controlled
 # so we have cached the delivery version in S3.
-local_validate_cslc=${local_dir}/validate_cslc.py
+local_validate_cslc=${TMP_DIR}/validate_cslc.py
 echo "Downloading s3://operasds-dev-pge/${PGE_NAME}/validate_cslc.py to $local_validate_cslc"
 aws s3 cp s3://operasds-dev-pge/${PGE_NAME}/validate_cslc.py $local_validate_cslc
-
-# Extract the test data archive to the current directory
-if [ -f $local_testdata_archive ]; then
-
-    # The testdata archive should contain a directory with the same basename
-    testdata_basename=$(basename -- "$local_testdata_archive")
-    testdata_dir="${local_dir}/${testdata_basename%.*}"
-
-    echo "Extracting test data from $local_testdata_archive to $(pwd)/"
-    unzip $local_testdata_archive
-
-    if [ -d $testdata_dir ]; then
-        rm $local_testdata_archive
-        cd $testdata_dir
-    else
-        echo "The test data archive needs to include a directory named $testdata_dir, but it does not."
-        exit 1
-    fi
-else
-    echo "Unable to find test data file $local_testdata_archive"
-    exit 1
-fi
-
-if [ -f $local_runconfig ]; then
-    echo "Copying runconfig file $local_runconfig to $(pwd)/"
-    cp $local_runconfig .
-
-    runconfig_filename=$(basename -- "$local_runconfig")
-else
-    echo "Unable to find runconfig file $local_runconfig"
-    exit 1
-fi
 
 # overall_status values and their meaning
 # 0 - pass
@@ -181,7 +88,7 @@ docker run --rm -u $UID:$(id -g) -w /home/compass_user \
            -v $(pwd)/input_data:/home/compass_user/input_data:ro \
            -v ${output_dir}:/home/compass_user/output_s1_cslc \
            -v ${scratch_dir}:/home/compass_user/scratch_s1_cslc \
-           ${PGE_IMAGE}:${PGE_TAG} --file /home/compass_user/runconfig/$runconfig_filename
+           ${PGE_IMAGE}:${PGE_TAG} --file /home/compass_user/runconfig/$RUNCONFIG_FILENAME
 
 docker_exit_status=$?
 if [ $docker_exit_status -ne 0 ]; then
