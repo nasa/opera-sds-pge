@@ -1,6 +1,8 @@
 #!/bin/bash
 # Script to execute integration tests on OPERA CSLC_S1 PGE Docker image
 #
+set -e
+umask 002
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 . $SCRIPT_DIR/test_int_util.sh
@@ -21,6 +23,8 @@ PGE_IMAGE="opera_pge/${PGE_NAME}"
 # the latest available as defaults for use with the Jenkins pipeline call
 # TESTDATA should be the name of the test data archive in s3://operasds-dev-pge/cslc_s1/
 # RUNCONFIG should be the name of the runconfig in s3://operasds-dev-pge/cslc_s1/
+[ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath $(dirname $(realpath $0))/../..)
+[ -z "${PGE_TAG}" ] && PGE_TAG="${USER}-dev"
 [ -z "${TESTDATA}" ] && TESTDATA="delivery_cslc_s1_interface_0.1.zip"
 [ -z "${RUNCONFIG}" ] && RUNCONFIG="cslc_s1.yaml"
 

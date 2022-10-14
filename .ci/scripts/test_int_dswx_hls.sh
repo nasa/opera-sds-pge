@@ -1,6 +1,9 @@
 #!/bin/bash
 # Script to execute integration tests on OPERA DSWx-HLS PGE Docker image
 #
+set -e
+umask 002
+
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 . $SCRIPT_DIR/test_int_util.sh
@@ -21,6 +24,8 @@ PGE_IMAGE="opera_pge/${PGE_NAME}"
 # the latest available as defaults for use with the Jenkins pipeline call
 # TESTDATA should be the name of the test data archive in s3://operasds-dev-pge/dswx_hls/
 # RUNCONFIG should be the name of the runconfig in s3://operasds-dev-pge/dswx_hls/
+[ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath $(dirname $(realpath $0))/../..)
+[ -z "${PGE_TAG}" ] && PGE_TAG="${USER}-dev"
 [ -z "${TESTDATA}" ] && TESTDATA="delivery_3_cal_val.zip"
 [ -z "${RUNCONFIG}" ] && RUNCONFIG="opera_pge_dswx_hls_delivery_3.0_cal_val_runconfig.yaml"
 
