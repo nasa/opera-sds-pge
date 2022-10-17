@@ -1,45 +1,15 @@
 #!/bin/bash
 # Script to execute integration tests on OPERA DSWx-HLS PGE Docker image
 #
-
 set -e
-
-# Allow user group to remove created files.
 umask 002
 
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+. $SCRIPT_DIR/test_int_util.sh
+
 # Parse args
-while [[ $# -gt 0 ]]; do
-  case $1 in
-    -h|--help)
-      echo "Usage: test_int_dswx_hls.sh [-h|--help] [-t|--tag <tag>] [--testdata <testdata .zip file>] [--runconfig <runconfig .yaml file>]"
-      exit 0
-      ;;
-    -t|--tag)
-      TAG=$2
-      shift
-      shift
-      ;;
-    --testdata)
-      TESTDATA=$2
-      shift
-      shift
-      ;;
-    --runconfig)
-      RUNCONFIG=$2
-      shift
-      shift
-      ;;
-    -*|--*)
-      echo "Unknown arguments $1 $2, ignoring..."
-      shift
-      shift
-      ;;
-    *)
-      echo "Unknown argument $1, ignoring..."
-      shift
-      ;;
-  esac
-done
+test_int_parse_args "$@"
 
 echo '
 ================================================
@@ -49,96 +19,27 @@ Integration Testing DSWx-HLS PGE docker image...
 
 PGE_NAME="dswx_hls"
 PGE_IMAGE="opera_pge/${PGE_NAME}"
-TEST_RESULTS_REL_DIR="test_results"
 
 # defaults, test data and runconfig files should be updated as-needed to use
 # the latest available as defaults for use with the Jenkins pipeline call
 # TESTDATA should be the name of the test data archive in s3://operasds-dev-pge/dswx_hls/
 # RUNCONFIG should be the name of the runconfig in s3://operasds-dev-pge/dswx_hls/
 [ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath $(dirname $(realpath $0))/../..)
+[ -z "${PGE_TAG}" ] && PGE_TAG="${USER}-dev"
 [ -z "${TESTDATA}" ] && TESTDATA="delivery_3_cal_val.zip"
 [ -z "${RUNCONFIG}" ] && RUNCONFIG="opera_pge_dswx_hls_delivery_3.0_cal_val_runconfig.yaml"
 
-TEST_RESULTS_DIR="${WORKSPACE}/${TEST_RESULTS_REL_DIR}/${PGE_NAME}"
+# Create the test output directory in the workspace
+test_int_setup_results_directory
 
-echo "Test results output directory: ${TEST_RESULTS_DIR}"
-mkdir --parents ${TEST_RESULTS_DIR}
-chmod -R 775 ${TEST_RESULTS_DIR}
-RESULTS_FILE="${TEST_RESULTS_DIR}/test_int_${PGE_NAME}_results.html"
+# Create a temporary directory to hold test data
+test_int_setup_data_tmp_directory
 
-# For this version of integration test, an archive has been created which contains
-# the unmodified ADT SAS test data archive and PGE expected output.
+# Download, extract and cd to test data directory
+test_int_setup_test_data
 
-# Create a temporary directory to allow Jenkins to write to it and avoid collisions
-# with other users
-local_dir=$(mktemp -dp /tmp)
-chmod 775 $local_dir
-cd $local_dir
-
-local_testdata_archive=${local_dir}/${TESTDATA}
-local_runconfig=${local_dir}/${RUNCONFIG}
-
-results_html_init="<html><b>${PGE_NAME} product comparison results</b><p> \
-    <style>* {font-family: sans-serif;} \
-    table {border-collapse: collapse;} \
-    th,td {padding: 4px 6px; border: thin solid white} \
-    tr:nth-child(even) {background-color: whitesmoke;} \
-    </style><table>"
-
-echo $results_html_init > $RESULTS_FILE
-
-# Configure a trap to set permissions on exit regardless of whether the testing succeeds
-function cleanup {
-
-    echo "</table></html>" >> $RESULTS_FILE
-    DOCKER_RUN="docker run --rm -u $UID:$(id -g)"
-
-    echo "Cleaning up before exit. Setting permissions for output files and directories."
-    ${DOCKER_RUN} -v ${local_dir}:${local_dir} --entrypoint /usr/bin/find ${PGE_IMAGE}:${TAG} ${local_dir} -type d -exec chmod 775 {} +
-    ${DOCKER_RUN} -v ${local_dir}:${local_dir} --entrypoint /usr/bin/find ${PGE_IMAGE}:${TAG} ${local_dir} -type f -exec chmod 664 {} +
-    cd /tmp
-    rm -rf ${local_dir}
-}
-
-trap cleanup EXIT
-
-# Pull in test data and runconfig from S3
-echo "Downloading test data from s3://operasds-dev-pge/${PGE_NAME}/${TESTDATA} to $local_testdata_archive"
-aws s3 cp s3://operasds-dev-pge/${PGE_NAME}/${TESTDATA} $local_testdata_archive
-echo "Downloading runconfig from s3://operasds-dev-pge/${PGE_NAME}/${RUNCONFIG} to $local_runconfig"
-aws s3 cp s3://operasds-dev-pge/${PGE_NAME}/${RUNCONFIG} $local_runconfig
-
-# Extract the test data archive to the current directory
-if [ -f $local_testdata_archive ]; then
-
-    # The testdata archive should contain a directory with the same basename
-    testdata_basename=$(basename -- "$local_testdata_archive")
-    testdata_dir="${local_dir}/${testdata_basename%.*}"
-
-    echo "Extracting test data from $local_testdata_archive to $(pwd)/"
-    unzip $local_testdata_archive
-
-    if [ -d $testdata_dir ]; then
-        rm $local_testdata_archive
-        cd $testdata_dir
-    else
-        echo "The test data archive needs to include a directory named $testdata_dir, but it does not."
-        exit 1
-    fi
-else
-    echo "Unable to find test data file $local_testdata_archive"
-    exit 1
-fi
-
-if [ -f $local_runconfig ]; then
-    echo "Copying runconfig file $local_runconfig to $(pwd)/"
-    cp $local_runconfig .
-
-    runconfig_filename=$(basename -- "$local_runconfig")
-else
-    echo "Unable to find runconfig file $local_runconfig"
-    exit 1
-fi
+# Setup cleanup on exit
+trap test_int_trap_cleanup EXIT
 
 # overall_status values and their meaning
 # 0 - pass
@@ -170,12 +71,12 @@ do
     mkdir $scratch_dir
 
 
-    echo "Running Docker image ${PGE_IMAGE}:${TAG} for ${data_dir}"
+    echo "Running Docker image ${PGE_IMAGE}:${PGE_TAG} for ${data_dir}"
     docker run --rm -u $UID:$(id -g) -v $(pwd):/home/conda/runconfig:ro \
                      -v $data_dir/input_dir:/home/conda/input_dir:ro \
                      -v $output_dir:/home/conda/output_dir \
                      -v $scratch_dir:/home/conda/scratch_dir \
-                     ${PGE_IMAGE}:${TAG} --file /home/conda/runconfig/$runconfig_filename
+                     ${PGE_IMAGE}:${PGE_TAG} --file /home/conda/runconfig/$RUNCONFIG_FILENAME
 
     docker_exit_status=$?
     if [ $docker_exit_status -ne 0 ]; then
@@ -223,7 +124,7 @@ do
                     docker_out=$(docker run --rm -u conda:conda \
                                             -v ${output_dir}:/out:ro \
                                             -v ${expected_dir}:/exp:ro \
-                                            --entrypoint python3 ${PGE_IMAGE}:${TAG} \
+                                            --entrypoint python3 ${PGE_IMAGE}:${PGE_TAG} \
                                             proteus-0.1/bin/dswx_compare.py \
                                             /out/${output_file} /exp/${expected_file})
                     echo "$docker_out"
@@ -245,7 +146,7 @@ do
                 compare_result="SKIPPED"
             fi
 
-            docker_out="${docker_out//$'\n'/<br />}"
+            docker_out="${docker_out//$'\n'/<br>}"
             echo "<tr><td>${compare_result}</td><td><ul><li>Output: ${output_file}</li><li>Expected: ${expected_file}</li></ul></td><td>${docker_out}</td></tr>" >> $RESULTS_FILE
         done
     fi
