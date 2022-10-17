@@ -213,7 +213,7 @@ class CslcS1PgeTestCase(unittest.TestCase):
         self.assertNotIn('!Not found!', iso_metadata)
 
     def test_cslc_s1_pge_input_validation(self):
-        """Test the input validation checks made by CslcS1PreProcessorMixin."""
+        """Test the input validation checks."""
         runconfig_path = join(self.data_dir, 'test_cslc_s1_config.yaml')
 
         test_runconfig_path = join(self.data_dir, 'invalid_cslc_s1_runconfig.yaml')
