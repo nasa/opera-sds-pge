@@ -2,7 +2,7 @@
 # Main docker entrypoint for testing of OPERA PGE docker containers
 
 DOCKER_ENTRYPOINT_SCRIPT_DIR=$(dirname ${BASH_SOURCE[0]})
-PGE_PROGRAM_DIR=/home/conda
+PGE_PROGRAM_DIR=${PGE_DEST_DIR}
 
 # Python path setup
 export PYTHONPATH=$PYTHONPATH:${PGE_PROGRAM_DIR}

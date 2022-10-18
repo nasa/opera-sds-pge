@@ -20,7 +20,6 @@ RunConfig:
           DEMFile: input/input_dem.vrt
 
       ProductPathGroup:
-        ProductCounter: 005
         OutputProductPath: outputs/
         ScratchPath: temp/
 
@@ -31,7 +30,7 @@ RunConfig:
          - --debug
          - --restart
         ErrorCodeBase: 100000
-        SchemaPath: sample_sas_schema.yaml
+        SchemaPath: test/data/sample_sas_schema.yaml
         IsoTemplatePath: sample_iso_template.xml.jinja2
 
       QAExecutable:

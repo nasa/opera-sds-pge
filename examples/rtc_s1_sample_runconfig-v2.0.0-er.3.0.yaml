@@ -1,0 +1,263 @@
+# Sample RunConfig for use with the RTC-S1 PGE v2.0.0-er.3.0
+# This RunConfig should require minimal changes in order to be used with the
+# OPERA PCM.
+
+RunConfig:
+    # Name for the RunConfig, may be any string
+    Name: OPERA-RTC-S1-PGE-SAMPLE-CONFIG
+
+    Groups:
+        # PGE-specific RunConfig section
+        # This section is only used by the PGE, however, paths to inputs/outputs
+        # should align with the similar sections of the SAS RunConfig
+        PGE:
+            PGENameGroup:
+                # Name of the PGE for use with this RunConfig, should always be
+                # RTC_S1_PGE when using with the RTC-S1 PGE
+                PGEName: RTC_S1_PGE
+
+            InputFilesGroup:
+                # List of input files
+                # Must be a list containing the path to the input SAFE zip file(s),
+                # as well as the path to the Orbit Ephemerides file(s)
+                # Paths must correspond to the file system within the Docker container
+                InputFilePaths:
+                    - /home/rtc_user/input_data/S1B_IW_SLC__1SDV_20180504T104507_20180504T104535_010770_013AEE_919F.zip
+                    - /home/rtc_user/input_data/S1B_OPER_AUX_POEORB_OPOD_20180524T110543_V20180503T225942_20180505T005942.EOF
+
+            DynamicAncillaryFilesGroup:
+                # Map of ancillary file types to paths to the file
+                # Paths must correspond to the file system within the Docker container
+                AncillaryFileMap:
+                    # Path to the Digital Elevation Model
+                    # Must be either a single .tif, or a .vrt that points to one
+                    # or more .tif files
+                    dem_file: /home/rtc_user/input_dir/dem.tif
+
+            ProductPathGroup:
+                # Path to where output products should be stored
+                # Must correspond to the file system within the Docker container,
+                # and must have write permissions for the User/Group used with
+                # the "Docker run" command
+                OutputProductPath: /home/rtc_user/output_dir
+
+                # Path to a scratch directory for the PGE and SAS to store
+                # intermediate files that will not be needed after PGE execution
+                # completes
+                # Must correspond to the file system within the Docker container,
+                # and must have write permissions for the User/Group used with
+                # the "Docker run" command
+                ScratchPath: /home/rtc_user/output_dir/scratch_dir
+
+            PrimaryExecutable:
+                # Identifier for the PGE executable, should always be RTC_S1 for
+                # this PGE
+                ProductIdentifier: RTC_S1
+
+                # Product version specific to output products
+                ProductVersion: 1.0
+
+                # Rolls up versions of all software/data used to generate versions
+                # from the data products (CRID) (TODO placeholder value)
+                CompositeReleaseID: TestIdRtc
+
+                # Path to the executable to run, path must be reachable from
+                # within the Docker container (i.e. findable with a "which" command)
+                ProgramPath: conda
+
+                # List of command-line options to use with ProgramPath
+                ProgramOptions:
+                    - run
+                    - -n
+                    - isce3_rtc
+                    - rtc_s1.py
+
+                # The Error Code base value added to the offset values to make
+                # error codes unique per-PGE
+                ErrorCodeBase: 300000
+
+                # Path to the Yamale schema used to validate the SAS portion
+                # of the RunConfig
+                # Path should correspond to the file system within the Docker
+                # container, and typically should reference a schema file bundled
+                # with the opera_pge installation directory within the container
+                # Consult the Docker image build scripts for more info
+                SchemaPath: /home/rtc_user/opera/pge/rtc_s1/schema/rtc_s1_sas_schema.yaml
+
+                # Path to the Jinja2 template used to generate the ISO xml
+                # metadata file
+                # Path should correspond to the file system within the Docker
+                # container, and typically should reference a template file bundled
+                # with the opera_pge installation directory within the container
+                # Consult the Docker image build scripts for more info
+                # TODO: fill in once available
+                IsoTemplatePath:
+
+            QAExecutable:
+                # Set to True to enable execution of an additional "Quality Assurance"
+                # application after SAS execution has completed
+                Enabled: False
+
+                # Path to the executable to run, path must be reachable from
+                # within the Docker container (i.e. findable with a "which" command)
+                ProgramPath:
+
+                # List of command-line options to use with ProgramPath
+                ProgramOptions: []
+
+            DebugLevelGroup:
+                # Set to True to enable Debug mode (TODO this is currently a no-op)
+                DebugSwitch: False
+
+                # Set to True to have the PGE invoke the SAS/QA executables via
+                # a shell, rather than a Python subprocess
+                # This allows shell-style syntax to be used in ProgramPath and
+                # ProgramOptions, which can be useful for testing
+                ExecuteViaShell: False
+
+        # SAS-specific RunConfig section
+        # Prior to SAS execution by the PGE, the section below starting at "runconfig"
+        # is isolated into its own YAML file for use with the SAS
+        SAS:
+            runconfig:
+                name: rtc_s1_workflow_default
+
+                groups:
+                    pge_name_group:
+                        pge_name: RTC_S1_PGE
+
+                    input_file_group:
+                        # Required. List of SAFE files (min=1)
+                        safe_file_path:
+                            - /home/rtc_user/input_data/S1B_IW_SLC__1SDV_20180504T104507_20180504T104535_010770_013AEE_919F.zip
+                        # Required. List of orbit (EOF) files (min=1)
+                        orbit_file_path:
+                            - r/home/rtc_user/input_data/S1B_OPER_AUX_POEORB_OPOD_20180524T110543_V20180503T225942_20180505T005942.EOF
+                        # Burst to process. Empty to process all bursts
+                        burst_id:
+
+                    # This section should match the DynamicAncillaryFilesGroup of the PGE RunConfig
+                    dynamic_ancillary_file_group:
+                        # Digital elevation model
+                        dem_file: /home/rtc_user/input_dir/dem.tif
+
+                    product_path_group:
+                        # This should match the path used for OutputProductPath
+                        product_path: /home/rtc_user/output_dir
+
+                        # This should match the path used for ScratchPath
+                        scratch_path: /home/rtc_user/output_dir/scratch_dir
+
+                        # This should match the path used for OutputProductPath
+                        output_dir: /home/rtc_user/output_dir
+
+                        # These field determines the intermediate file name used
+                        # by the SAS for its output products. These products will
+                        # be renamed by the PGE to match the OPERA file name conventions.
+                        product_id: rtc_product
+                        mosaic_bursts: False
+
+                        # Output format, should be NETCDF for v2.0.0-er.3.0
+                        output_format: NETCDF
+
+                    primary_executable:
+                        # This should match the value used for ProductIdentifier
+                        product_type: RTC_S1
+
+                    # SLC processing options
+                    # Consult the RTC-S1 SAS User's Guide for more info on each field
+                    processing:
+                        polarization: dual-pol
+
+                        # Apply absolute radiometric correction
+                        apply_absolute_radiometric_correction: True
+
+                        # Apply thermal noise correction
+                        apply_thermal_noise_correction: True
+
+                        # OPTIONAL - Apply RTC
+                        apply_rtc: True
+
+                        # OPTIONAL - to control behavior of RTC module
+                        # (only applicable if geocode.apply_rtc is True)
+                        rtc:
+                            # OPTIONAL - Choices:
+                            # "gamma0" (default)
+                            # "sigma0"
+                            output_type: gamma0
+
+                            # OPTIONAL - Choices:
+                            # "bilinear_distribution" (default)
+                            # "area_projection"
+                            algorithm_type: area_projection
+
+                            # OPTIONAL - Choices:
+                            # "beta0" (default)
+                            # "sigma0"
+                            input_terrain_radiometry: beta0
+
+                            # OPTIONAL - Minimum RTC area factor in dB
+                            rtc_min_value_db:
+
+                            # RTC DEM upsampling
+                            dem_upsampling: 1
+
+                        # OPTIONAL - Mechanism to specify output posting and DEM
+                        geocoding:
+                            # OPTIONAL -
+                            algorithm_type: area_projection
+
+                            # OPTIONAL - Choices: "single_block", "geogrid", "geogrid_radargrid", and "auto" (default)
+                            memory_mode: auto
+
+                            # OPTIONAL - Processing upsampling factor applied to input geogrid
+                            geogrid_upsampling: 1
+
+                            # Save the incidence angle
+                            save_incidence_angle: True
+
+                            # Save the local-incidence angle
+                            save_local_inc_angle: True
+
+                            # Save the projection angle
+                            save_projection_angle: False
+
+                            # Save the RTC ANF computed with the projection angle method
+                            save_rtc_anf_psi: False
+
+                            # Save the range slope angle
+                            save_range_slope: False
+
+                            # Save the number of looks used to compute GCOV
+                            save_nlooks: True
+
+                            # Save the RTC area factor used to compute GCOV
+                            save_rtc_anf: True
+
+                            # Save interpolated DEM used to compute GCOV
+                            save_dem: False
+
+                            # OPTIONAL - Absolute radiometric correction
+                            abs_rad_cal: 1
+
+                            # OPTIONAL - Clip values above threshold
+                            clip_max:
+
+                            # OPTIONAL - Clip values below threshold
+                            clip_min:
+
+                            # OPTIONAL - Double sampling of the radar-grid
+                            # input sampling in the range direction
+                            upsample_radargrid: False
+
+                            output_epsg:
+                            x_posting: 30
+                            y_posting: 30
+                            x_snap: 30
+                            y_snap: 30
+                            top_left:
+                                x:
+                                y:
+                            bottom_right:
+                                x:
+                                y:

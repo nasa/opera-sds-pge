@@ -15,7 +15,6 @@ RunConfig:
           DEMFile: input/input_dem.vrt
 
       ProductPathGroup:
-        ProductCounter: -1 # value must be between 1-999
         OutputProductPath: outputs/
         ScratchPath: temp/
 
@@ -24,7 +23,7 @@ RunConfig:
         #ProgramPath: pybind_opera.workflows.example_workflow  # must be defined
         ProgramOptions: --debug --restart # Not a list
         ErrorCodeBase: 100000
-        SchemaPath: sample_sas_schema.yaml
+        SchemaPath: test/data/sample_sas_schema.yaml
         IsoTemplatePath: sample_iso_template.xml.jinja2
 
       QAExecutable:

@@ -97,9 +97,10 @@ def get_sensor_from_spacecraft_name(spacecraft_name):
     try:
         return {
             'LANDSAT-8': 'L8',
+            'LANDSAT-9': 'L9',
             'SENTINEL-2A': 'S2A',
             'SENTINEL-2B': 'S2B'
-        }[spacecraft_name]
+        }[spacecraft_name.upper()]
     except KeyError:
         raise RuntimeError(f"Unknown spacecraft name '{spacecraft_name}'")
 

@@ -37,7 +37,7 @@ class BasePgeTestCase(unittest.TestCase):
         """Set up class method: set up directories for testing"""
         cls.starting_dir = abspath(os.curdir)
         cls.test_dir = resource_filename(__name__, "")
-        cls.data_dir = join(cls.test_dir, os.pardir, "data")
+        cls.data_dir = join(cls.test_dir, os.pardir, os.pardir, "data")
         os.chdir(cls.test_dir)
 
     @classmethod
@@ -142,7 +142,6 @@ class BasePgeTestCase(unittest.TestCase):
             log_contents = infile.read()
 
         self.assertIn("RunConfig.Groups.PGE.InputFilesGroup.InputFilePaths: 'None' is not a list.", log_contents)
-        self.assertIn("RunConfig.Groups.PGE.ProductPathGroup.ProductCounter: -1 is less than 1", log_contents)
         self.assertIn("RunConfig.Groups.PGE.PrimaryExecutable.ProgramPath: Required field missing", log_contents)
         self.assertIn("RunConfig.Groups.PGE.PrimaryExecutable.ProgramOptions: '--debug --restart' is not a list.",
                       log_contents)
@@ -261,7 +260,7 @@ class BasePgeTestCase(unittest.TestCase):
         pge._load_runconfig()
         name = "TestName.tif"
         file_name = pge._geotiff_filename(name)
-        file_name_regex = rf'{pge.PROJECT}_{pge.LEVEL}_BasePge_\d{{8}}T\d{{6}}_\d{{3}}_{name}{{1,2}}?'
+        file_name_regex = rf'{pge.PROJECT}_{pge.LEVEL}_BasePge_\d{{8}}T\d{{6}}_{name}{{1,2}}?'
         self.assertEqual(re.match(file_name_regex, file_name).group(), file_name)
 
     def _makedirs_mock(self, mode=511, exist_ok=False):
@@ -297,7 +296,7 @@ class BasePgeTestCase(unittest.TestCase):
         """Mock run_util.create_qa_command_line()"""
         raise OSError("Mock OSError from run_utils.create_sas_command_line")
 
-    @patch.object(opera.pge.base_pge, 'create_sas_command_line', create_sas_command_line_mock)
+    @patch.object(opera.pge.base.base_pge, 'create_sas_command_line', create_sas_command_line_mock)
     def test_run_sas_executable_exception(self):
         """Test IOError exception in _run_sas_executable()"""
         runconfig_path = join(self.data_dir, 'test_sas_qa_config.yaml')
@@ -323,7 +322,7 @@ class BasePgeTestCase(unittest.TestCase):
         """Mock function for run_utils.create_qa_command_line that always raises OSError"""
         raise OSError("Mock OSError from run_utils.create_qa_command_line")
 
-    @patch.object(opera.pge.base_pge, 'create_qa_command_line', create_qa_command_line_mock)
+    @patch.object(opera.pge.base.base_pge, 'create_qa_command_line', create_qa_command_line_mock)
     def test_run_sas_qa_executable_exception(self):
         """Test OSError in _run_sas_qa_executable()"""
         runconfig_path = join(self.data_dir, 'test_sas_qa_config.yaml')

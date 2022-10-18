@@ -1,39 +1,13 @@
 #!/bin/bash
 set -e
 
+# Source the build script utility functions
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+
+. "${SCRIPT_DIR}"/util.sh
+
 # Parse args
-while [[ $# -gt 0 ]]; do
-  case $1 in
-    -h|--help)
-      echo "Usage: build_dswx_hls.sh [-h|--help] [-s|--sas-image <image name>] [-t|--tag <tag>] [-w|--workspace <path>]"
-      exit 0
-      ;;
-    -s|--sas-image)
-      SAS_IMAGE=$2
-      shift
-      shift
-      ;;
-    -t|--tag)
-      TAG=$2
-      shift
-      shift
-      ;;
-    -w|--workspace)
-      WORKSPACE=$2
-      shift
-      shift
-      ;;
-    -*|--*)
-      echo "Unknown arguments $1 $2, ignoring..."
-      shift
-      shift
-      ;;
-    *)
-      echo "Unknown argument $1, ignoring..."
-      shift
-      ;;
-  esac
-done
+parse_build_args "$@"
 
 echo '
 =====================================
@@ -50,7 +24,7 @@ BUILD_DATE_TIME=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
 # defaults, SAS image should be updated as necessary for new image releases from ADT
 [ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath $(dirname $(realpath $0))/../..)
 [ -z "${TAG}" ] && TAG="${USER}-dev"
-[ -z "${SAS_IMAGE}" ] && SAS_IMAGE="artifactory-fn.jpl.nasa.gov:16001/gov/nasa/jpl/opera/adt/opera/proteus:mid_may_2022"
+[ -z "${SAS_IMAGE}" ] && SAS_IMAGE="artifactory-fn.jpl.nasa.gov:16001/gov/nasa/jpl/opera/adt/opera/proteus:cal_val_3.1"
 
 echo "WORKSPACE: $WORKSPACE"
 echo "IMAGE: $IMAGE"
@@ -78,20 +52,9 @@ function cleanup {
 trap cleanup EXIT
 
 # Copy files to the staging area and build the PGE docker image
-cp -r ${WORKSPACE}/src/opera \
-      ${STAGING_DIR}/
+mkdir -p ${STAGING_DIR}/opera/pge
 
-cp ${WORKSPACE}/COPYING \
-   ${STAGING_DIR}/opera
-
-cp ${WORKSPACE}/requirements.txt \
-   ${STAGING_DIR}/opera
-
-cp ${WORKSPACE}/.flake8 \
-   ${STAGING_DIR}/opera
-
-cp ${WORKSPACE}/.pylintrc \
-   ${STAGING_DIR}/opera
+copy_pge_files $WORKSPACE $STAGING_DIR $PGE_NAME
 
 # Create a VERSION file in the staging area to track version and build time
 printf "pge_version: ${TAG}\npge_build_datetime: ${BUILD_DATE_TIME}\n" \

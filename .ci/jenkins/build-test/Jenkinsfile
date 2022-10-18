@@ -2,6 +2,15 @@
 
 pipeline {
     agent any
+    environment {
+        DOCKER_IMAGE_PREFIX = 'opera_pge'
+        // TODO: update as newer PGE's are added
+        DOCKER_IMAGE_SUFFIXES = 'dswx_hls,cslc_s1,rtc_s1'
+        DOCKER_TAG = """${sh(
+                     returnStdout: true,
+                     script: 'echo ${GIT_BRANCH##*/}'
+                     ).trim()}"""
+    }
     parameters {
         string(name: 'ART_DOCKER_REGISTRY', defaultValue: 'artifactory-fn.jpl.nasa.gov:16001',
                description: 'Address of Artifactory-FN Docker registry for uploading Docker images.')
@@ -10,15 +19,6 @@ pipeline {
                      credentialType: 'com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl',
                      description: 'Artifactory-FN credentials for account operapgebot. Used to push/pull images from Artifactory during build.',
                      required: true)
-    }
-    environment {
-        DOCKER_IMAGE_PREFIX = 'opera_pge'
-        // TODO: update as newer PGE's are added
-        DOCKER_IMAGE_SUFFIXES = 'dswx_hls'
-        DOCKER_TAG = """${sh(
-                     returnStdout: true,
-                     script: 'echo ${GIT_BRANCH##*/}'
-                     ).trim()}"""
     }
     stages {
         stage('Build OPERA PGE Docker image(s)') {
@@ -39,14 +39,23 @@ pipeline {
                    script: ".ci/scripts/test_all_images.sh $DOCKER_TAG"
                 junit 'test_results/**/*.xml'
                 archiveArtifacts artifacts: 'test_results/**/*.log', fingerprint: true
-                // TODO: this will require rework once we have more than one PGE to deal with
-                publishHTML([allowMissing: true,
-                             alwaysLinkToLastBuild: true,
-                             keepAll: true,
-                             reportDir: 'test_results/dswx_hls/coverage_html',
-                             reportFiles: 'index.html',
-                             reportName: 'Code Coverage',
-                             reportTitles: 'DSWx-HLS Code Coverage'])
+                script {
+                    def indexFiles = []
+                    def reportTitles = []
+
+                    DOCKER_IMAGE_SUFFIXES.tokenize(',').each { DOCKER_IMAGE_SUFFIX ->
+                        indexFiles << "${DOCKER_IMAGE_SUFFIX}/coverage_html/index.html"
+                        reportTitles << "${DOCKER_IMAGE_SUFFIX} Code Coverage"
+                    }
+
+                    publishHTML([allowMissing: true,
+                                 alwaysLinkToLastBuild: true,
+                                 keepAll: true,
+                                 reportDir: "test_results",
+                                 reportFiles: indexFiles.join(','),
+                                 reportName: "Code Coverage",
+                                 reportTitles: reportTitles.join(',')])
+                }
             }
         }
     }

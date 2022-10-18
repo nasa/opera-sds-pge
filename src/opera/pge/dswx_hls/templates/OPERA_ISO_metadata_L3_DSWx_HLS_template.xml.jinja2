@@ -141,9 +141,6 @@
                         <gco:CharacterString>Dynamic Surface Water Extent from Harmonized Landsat-8 and Sentinel-2 A/B Product</gco:CharacterString>
                     </gmd:alternateTitle>
                     <!-- The date/time that data provider created or updated the granule info on data provider's database.-->
-                    <!-- SDS: If ProductCounter is "01" or), use the "creation".
-                         If SDS regenerates a product to increase the "ProductCounter", use the "revision" instead of "creation"
-                         If Creation DateTime is the only file versioning scheme, this record will be always "creation" -->
                     <gmd:date>
                         <gmd:CI_Date>
                             <gmd:date>
@@ -175,7 +172,7 @@
                     <gmd:identifier>
                         <gmd:MD_Identifier>
                             <gmd:code>
-                                <gco:CharacterString>{{ catalog_metadata.PGE_Version }}{# ISO_OPERA_PGEVersionId #}</gco:CharacterString>
+                                <gco:CharacterString>{{ catalog_metadata.PGE_Version|truncate(10, True, '', 0) }}{# ISO_OPERA_PGEVersionId #}</gco:CharacterString>
                             </gmd:code>
                             <gmd:codeSpace>
                                 <gco:CharacterString>gov.nasa.esdis.umm.otherid</gco:CharacterString>
@@ -196,20 +193,6 @@
                             </gmd:codeSpace>
                             <gmd:description>
                                 <gco:CharacterString>OtherId: SASVersionId</gco:CharacterString>
-                            </gmd:description>
-                        </gmd:MD_Identifier>
-                    </gmd:identifier>
-                    <!-- Product Counter -->
-                    <gmd:identifier>
-                        <gmd:MD_Identifier>
-                            <gmd:code>
-                                <gco:CharacterString>{{ run_config.Groups.PGE.ProductPathGroup.ProductCounter }}{# ISO_OPERA_ProductCounter #}</gco:CharacterString>
-                            </gmd:code>
-                            <gmd:codeSpace>
-                                <gco:CharacterString>gov.nasa.esdis.umm.otherid</gco:CharacterString>
-                            </gmd:codeSpace>
-                            <gmd:description>
-                                <gco:CharacterString>OtherId: ProductCounter</gco:CharacterString>
                             </gmd:description>
                         </gmd:MD_Identifier>
                     </gmd:identifier>
@@ -433,7 +416,7 @@
                     <gmd:aggregateDataSetIdentifier>
                         <gmd:MD_Identifier>
                             <gmd:code>
-                                <gco:CharacterString>{{ catalog_metadata.PGE_Version }}{# ISO_OPERA_CollectionVersion #}</gco:CharacterString>
+                                <gco:CharacterString>{{ catalog_metadata.PGE_Version|truncate(10, True, '', 0) }}{# ISO_OPERA_CollectionVersion #}</gco:CharacterString>
                             </gmd:code>
                             <gmd:codeSpace>
                                 <gco:CharacterString>gov.nasa.esdis.umm.collectionversion</gco:CharacterString>
@@ -549,9 +532,9 @@
                         <!--RangeDateTime-->
                         <gmd:EX_TemporalExtent id="boundingTemporalExtent">
                             <gmd:extent>
-                                <gml:TimePeriod gml:id="d11e38">
+                                <gml:TimePeriod gml:id="DSWx_Time_Range">
                                     <gml:beginPosition>{{ product_output.sensingTimeBegin }}{# ISO_OPERA_SensingTimeBegin #}</gml:beginPosition>
-                                    <gml:endPosition>{{ product_output.sensingTimeEnd}}{# ISO_OPERA_SensingTimeEnd #}</gml:endPosition>>
+                                    <gml:endPosition>{{ product_output.sensingTimeEnd}}{# ISO_OPERA_SensingTimeEnd #}</gml:endPosition>
                                 </gml:TimePeriod>
                             </gmd:extent>
                         </gmd:EX_TemporalExtent>
@@ -604,11 +587,80 @@
                                     <eos:reference>
                                         <eos:EOS_AdditionalAttributeDescription>
                                             <eos:type>
+                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
+                                            </eos:type>
+                                            <eos:name>
+                                                <gco:CharacterString>HlsDataset</gco:CharacterString>
+                                            </eos:name>
+                                            <eos:description>
+                                                <gco:CharacterString>Identifier for the HLS dataset used to create the DSWx product(s)</gco:CharacterString>
+                                            </eos:description>
+                                            <eos:dataType>
+                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
+                                            </eos:dataType>
+                                        </eos:EOS_AdditionalAttributeDescription>
+                                    </eos:reference>
+                                    <eos:value>
+                                        <gco:CharacterString>{{ product_output.HLS_DATASET }}{# ISO_OPERA_sensorProductID #}</gco:CharacterString>
+                                    </eos:value>
+                                </eos:AdditionalAttribute>
+                                <eos:AdditionalAttribute>
+                                    <eos:reference>
+                                        <eos:EOS_AdditionalAttributeDescription>
+                                            <eos:type>
+                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="platformInformation">platformInformation</eos:EOS_AdditionalAttributeTypeCode>
+                                            </eos:type>
+                                            <eos:name>
+                                                <gco:CharacterString>SensorProductID</gco:CharacterString>
+                                            </eos:name>
+                                            <eos:description>
+                                                <gco:CharacterString>The Landsat product ID or Sentinel L1C granule URI</gco:CharacterString>
+                                            </eos:description>
+                                            <eos:dataType>
+                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
+                                            </eos:dataType>
+                                        </eos:EOS_AdditionalAttributeDescription>
+                                    </eos:reference>
+                                    <eos:value>
+                                        <gco:CharacterString>{{ product_output.SENSOR_PRODUCT_ID }}{# ISO_OPERA_sensorProductID #}</gco:CharacterString>
+                                    </eos:value>
+                                </eos:AdditionalAttribute>
+                                <eos:AdditionalAttribute>
+                                    <eos:reference>
+                                        <eos:EOS_AdditionalAttributeDescription>
+                                            <eos:type>
+                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="platformInformation">platformInformation</eos:EOS_AdditionalAttributeTypeCode>
+                                            </eos:type>
+                                            <eos:name>
+                                                <gco:CharacterString>Accode</gco:CharacterString>
+                                            </eos:name>
+                                            <eos:description>
+                                                <gco:CharacterString>The version of Land Surface Reflectance Code (LaSRC) used by HLS for L30 or L30 for atmospheric correction</gco:CharacterString>
+                                            </eos:description>
+                                            <eos:dataType>
+                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
+                                            </eos:dataType>
+                                        </eos:EOS_AdditionalAttributeDescription>
+                                    </eos:reference>
+                                    <eos:value>
+                                        <gco:CharacterString>{{ product_output.ACCODE }}{# ISO_OPERA_accode #}</gco:CharacterString>
+                                    </eos:value>
+                                </eos:AdditionalAttribute>
+                                <eos:AdditionalAttribute>
+                                    <eos:reference>
+                                        <eos:EOS_AdditionalAttributeDescription>
+                                            <eos:type>
                                                 <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="geographicIdentifier">geographicIdentifier</eos:EOS_AdditionalAttributeTypeCode>
                                             </eos:type>
                                             <eos:name>
                                                 <gco:CharacterString>MeanSunAzimuthAngle</gco:CharacterString>
                                             </eos:name>
+                                            <eos:description>
+                                                <gco:CharacterString>The mean solar azimuth in the tile</gco:CharacterString>
+                                            </eos:description>
+                                            <eos:parameterUnitsOfMeasure>
+                                                <gco:CharacterString>Degrees</gco:CharacterString>
+                                            </eos:parameterUnitsOfMeasure>
                                             <eos:dataType>
                                                 <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="float">float</eos:EOS_AdditionalAttributeDataTypeCode>
                                             </eos:dataType>
@@ -627,6 +679,12 @@
                                             <eos:name>
                                                 <gco:CharacterString>MeanSunZenithAngle</gco:CharacterString>
                                             </eos:name>
+                                            <eos:description>
+                                                <gco:CharacterString>The mean solar zenith in the tile</gco:CharacterString>
+                                            </eos:description>
+                                            <eos:parameterUnitsOfMeasure>
+                                                <gco:CharacterString>Degrees</gco:CharacterString>
+                                            </eos:parameterUnitsOfMeasure>
                                             <eos:dataType>
                                                 <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="float">float</eos:EOS_AdditionalAttributeDataTypeCode>
                                             </eos:dataType>
@@ -645,6 +703,12 @@
                                             <eos:name>
                                                 <gco:CharacterString>NBAR_SolarZenith</gco:CharacterString>
                                             </eos:name>
+                                            <eos:description>
+                                                <gco:CharacterString>The solar zenith angle used in Nadir Bidirectional Reflectance Distribution Function Adjusted Reflectance (NBAR) derivation</gco:CharacterString>
+                                            </eos:description>
+                                            <eos:parameterUnitsOfMeasure>
+                                                <gco:CharacterString>Degrees</gco:CharacterString>
+                                            </eos:parameterUnitsOfMeasure>
                                             <eos:dataType>
                                                 <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="float">float</eos:EOS_AdditionalAttributeDataTypeCode>
                                             </eos:dataType>
@@ -658,11 +722,17 @@
                                     <eos:reference>
                                         <eos:EOS_AdditionalAttributeDescription>
                                             <eos:type>
-                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="instrumentIdentifier">instrumentIdentifier</eos:EOS_AdditionalAttributeTypeCode>
+                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="geographicIdentifier">geographicIdentifier</eos:EOS_AdditionalAttributeTypeCode>
                                             </eos:type>
                                             <eos:name>
                                                 <gco:CharacterString>MeanViewAzimuthAngle</gco:CharacterString>
                                             </eos:name>
+                                            <eos:description>
+                                                <gco:CharacterString>The mean view azimuth angle</gco:CharacterString>
+                                            </eos:description>
+                                            <eos:parameterUnitsOfMeasure>
+                                                <gco:CharacterString>Degrees</gco:CharacterString>
+                                            </eos:parameterUnitsOfMeasure>
                                             <eos:dataType>
                                                 <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="float">float</eos:EOS_AdditionalAttributeDataTypeCode>
                                             </eos:dataType>
@@ -676,11 +746,17 @@
                                     <eos:reference>
                                         <eos:EOS_AdditionalAttributeDescription>
                                             <eos:type>
-                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="instrumentIdentifier">instrumentIdentifier</eos:EOS_AdditionalAttributeTypeCode>
+                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="geographicIdentifier">geographicIdentifier</eos:EOS_AdditionalAttributeTypeCode>
                                             </eos:type>
                                             <eos:name>
                                                 <gco:CharacterString>MeanViewZenithAngle</gco:CharacterString>
                                             </eos:name>
+                                            <eos:description>
+                                                <gco:CharacterString>The mean view zenith angle</gco:CharacterString>
+                                            </eos:description>
+                                            <eos:parameterUnitsOfMeasure>
+                                                <gco:CharacterString>Degrees</gco:CharacterString>
+                                            </eos:parameterUnitsOfMeasure>
                                             <eos:dataType>
                                                 <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="float">float</eos:EOS_AdditionalAttributeDataTypeCode>
                                             </eos:dataType>
@@ -699,8 +775,11 @@
                                             <eos:name>
                                                 <gco:CharacterString>SpatialCoverage</gco:CharacterString>
                                             </eos:name>
+                                            <eos:description>
+                                                <gco:CharacterString>The area percentage of the tile with data</gco:CharacterString>
+                                            </eos:description>
                                             <eos:dataType>
-                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="float">float</eos:EOS_AdditionalAttributeDataTypeCode>
+                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="int">int</eos:EOS_AdditionalAttributeDataTypeCode>
                                             </eos:dataType>
                                         </eos:EOS_AdditionalAttributeDescription>
                                     </eos:reference>
@@ -717,8 +796,11 @@
                                             <eos:name>
                                                 <gco:CharacterString>PercentCloudCover</gco:CharacterString>
                                             </eos:name>
+                                            <eos:description>
+                                                <gco:CharacterString>The percentage of cloud and cloud shadow in the L3_DSWx_HLS product based on the HLS QA mask</gco:CharacterString>
+                                            </eos:description>
                                             <eos:dataType>
-                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="float">float</eos:EOS_AdditionalAttributeDataTypeCode>
+                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="int">int</eos:EOS_AdditionalAttributeDataTypeCode>
                                             </eos:dataType>
                                         </eos:EOS_AdditionalAttributeDescription>
                                     </eos:reference>
@@ -786,7 +868,7 @@
                                     <gmi:identifier>
                                         <gmd:MD_Identifier>
                                             <gmd:code>
-                                                <gco:CharacterString>PGEName: {{ catalog_metadata.PGE_Name }}{# ISO_OPERA_pgeName #} PGEVersion: {{ catalog_metadata.PGE_Version }}{# ISO_OPERA_PGEVersionId #}</gco:CharacterString>
+                                                <gco:CharacterString>PGEName: {{ catalog_metadata.PGE_Name }}{# ISO_OPERA_pgeName #} PGEVersion: {{ catalog_metadata.PGE_Version|truncate(10, True, '', 0) }}{# ISO_OPERA_PGEVersionId #}</gco:CharacterString>
                                             </gmd:code>
                                             <gmd:codeSpace>
                                                 <gco:CharacterString>gov.nasa.esdis.umm.pgeversionclass</gco:CharacterString>
@@ -841,21 +923,21 @@
                     <gmd:source>
                         <gmd:LI_Source>
                             <gmd:description>
-                                <gco:CharacterString>Reference DEM - {{ product_output.DEM_FILE }}{# ISO_OPERA_digitalElevationModelFile #}</gco:CharacterString>
+                                <gco:CharacterString>Reference DEM - {{ product_output.DEM_SOURCE }}{# ISO_OPERA_digitalElevationModelFile #}</gco:CharacterString>
                             </gmd:description>
                         </gmd:LI_Source>
                     </gmd:source>
                     <gmd:source>
                         <gmd:LI_Source>
                             <gmd:description>
-                                <gco:CharacterString>Worldcover File - {{ product_output.WORLDCOVER_FILE }}{# ISO_OPERA_worldcoverFile #}</gco:CharacterString>
+                                <gco:CharacterString>Worldcover File - {{ product_output.WORLDCOVER_SOURCE }}{# ISO_OPERA_worldcoverFile #}</gco:CharacterString>
                             </gmd:description>
                         </gmd:LI_Source>
                     </gmd:source>
                     <gmd:source>
                         <gmd:LI_Source>
                             <gmd:description>
-                                <gco:CharacterString>Landcover File - {{ product_output.LANDCOVER_FILE }}{# ISO_OPERA_landcoverFile #}</gco:CharacterString>
+                                <gco:CharacterString>Landcover File - {{ product_output.LANDCOVER_SOURCE }}{# ISO_OPERA_landcoverFile #}</gco:CharacterString>
                             </gmd:description>
                         </gmd:LI_Source>
                     </gmd:source>

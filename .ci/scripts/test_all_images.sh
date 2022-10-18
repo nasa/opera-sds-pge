@@ -29,6 +29,8 @@ fi
 # Build all of the Docker images
 BUILD_SCRIPTS_DIR=${WORKSPACE}/.ci/scripts
 ${BUILD_SCRIPTS_DIR}/test_dswx_hls.sh --tag ${TAG} --workspace ${WORKSPACE}
+${BUILD_SCRIPTS_DIR}/test_cslc_s1.sh --tag ${TAG} --workspace ${WORKSPACE}
+${BUILD_SCRIPTS_DIR}/test_rtc_s1.sh --tag ${TAG} --workspace ${WORKSPACE}
 
 echo 'Build Complete'
 

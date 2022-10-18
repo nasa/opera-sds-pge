@@ -8,8 +8,9 @@ img_utils.py
 Image file utilities for use with OPERA PGEs.
 
 """
-
+import os
 from collections import namedtuple
+from copy import deepcopy
 from datetime import datetime
 from functools import lru_cache
 from os.path import exists
@@ -30,15 +31,11 @@ class MockGdal:  # pragma: no cover
     class MockGdalDataset:
         """Mock class for gdal.Dataset objects, as returned from an Open call."""
 
-        def GetMetadata(self):
-            """
-            Returns a subset of dummy metadata expected by the PGE.
-            This function should be updated as needed for requisite metadata fields.
-            """
-            return {
-                'CLOUD_COVERAGE': '43', 'DEM_FILE': 'dem.tif',
+        def __init__(self):
+            self.dummy_metadata = {
+                'ACCODE': 'LaSRC', 'CLOUD_COVERAGE': '43', 'DEM_SOURCE': 'dem.tif',
                 'HLS_DATASET': 'HLS.L30.T22VEQ.2021248T143156.v2.0',
-                'LANDCOVER_FILE': 'landcover.tif', 'LEVEL': '3',
+                'LANDCOVER_SOURCE': 'landcover.tif', 'LEVEL': '3',
                 'MEAN_SUN_AZIMUTH_ANGLE': '145.002203258435',
                 'MEAN_SUN_ZENITH_ANGLE': '30.7162834439185',
                 'MEAN_VIEW_AZIMUTH_ANGLE': '100.089770731169',
@@ -47,11 +44,20 @@ class MockGdal:  # pragma: no cover
                 'PROCESSING_DATETIME': '2022-01-31T21:54:26',
                 'PRODUCT_ID': 'dswx_hls', 'PRODUCT_SOURCE': 'HLS',
                 'PRODUCT_TYPE': 'DSWx', 'PRODUCT_VERSION': '0.1',
-                'PROJECT': 'OPERA', 'WORLDCOVER_FILE': 'worldcover.tif',
+                'PROJECT': 'OPERA',
                 'SENSING_TIME': '2021-09-05T14:31:56.9300799Z; 2021-09-05T14:32:20.8126470Z',
-                'SENSOR': 'MSI', 'SPACECRAFT_NAME': 'SENTINEL-2A',
-                'SPATIAL_COVERAGE': '99'
+                'SENSOR': 'MSI',
+                'SENSOR_PRODUCT_ID': 'S2A_MSIL1C_20210907T163901_N0301_R126_T15SXR_20210907T202434.SAFE',
+                'SPACECRAFT_NAME': 'SENTINEL-2A', 'SPATIAL_COVERAGE': '99',
+                'WORLDCOVER_SOURCE': 'worldcover.tif',
             }
+
+        def GetMetadata(self):
+            """
+            Returns a subset of dummy metadata expected by the PGE.
+            This function should be updated as needed for requisite metadata fields.
+            """
+            return deepcopy(self.dummy_metadata)
 
     @staticmethod
     def Open(filename):
@@ -64,13 +70,94 @@ class MockGdal:  # pragma: no cover
         return MockGdal.MockGdalDataset()
 
 
-# When running a PGE within a Docker image delivered from ADT, the gdal import
-# below should work. When running in a dev environment, the import will fail
-# resulting in the MockGdal class being substituted instead.
+def mock_gdal_edit(args):
+    """Mock implementation of osgeo_utils.gdal_edit that always returns success"""
+    return 0  # pragma: no cover
+
+
+def mock_save_as_cog(filename, scratch_dir='.', logger=None,
+                     flag_compress=True, resamp_algorithm=None):
+    """Mock implementation of proteus.core.save_as_cog"""
+    return  # pragma: no cover
+
+
+# When running a PGE within a Docker image delivered from ADT, the following imports
+# below should work. When running in a dev environment, the imports will fail,
+# resulting in the mock classes being substituted instead.
 try:
     from osgeo import gdal
+    from osgeo_utils.gdal_edit import main as gdal_edit
 except (ImportError, ModuleNotFoundError):  # pragma: no cover
-    gdal = MockGdal                         # pragma: no cover
+    gdal = MockGdal  # pragma: no cover
+    gdal_edit = mock_gdal_edit  # pragma: no cover
+
+try:
+    from proteus.core import save_as_cog
+except (ImportError, ModuleNotFoundError):  # pragma: no cover
+    save_as_cog = mock_save_as_cog  # pragma: no cover
+
+
+def set_geotiff_metadata(filename, scratch_dir=os.curdir, **kwargs):
+    """
+    Updates one or more metadata fields within an existing GeoTIFF file via
+    the gdal_edit utility.
+
+    The updated GeoTIFF is also reconverted to a Cloud-Optimized format,
+    since changing any metadata will invalidate an existing COG.
+
+    Notes
+    -----
+    If this call results in any metadata updates to the GeoTIFF, the LRU cache
+    associated to the get_geotiff_metadata() will be cleared so any new
+    updates can be read back into memory.
+
+    Parameters
+    ----------
+    filename : str
+        Path to the existing GeoTIFF to update metadata for.
+    scratch_dir : str, optional
+        Path to a scratch directory where a temporary file may be written when
+        reconverting the modified GeoTIFF to a Cloud-Optimized-GeoTIFF (COG).
+        Defaults to the current directory.
+    kwargs : dict
+        Key/value pairs of the metadata to be updated within the existing GeoTIFF
+        file. If empty, this function will simply return.
+
+    Raises
+    ------
+    RuntimeError
+        If the call to gdal_edit fails (non-zero return code), or if the
+        reconversion to a COG fails.
+
+    """
+    if len(kwargs) < 1:
+        return
+
+    # gdal_edit expects sys.argv, where first argument should be the script name
+    gdal_edit_args = ['gdal_edit.py']
+
+    for key, value in kwargs.items():
+        gdal_edit_args.append('-mo')
+        gdal_edit_args.append(f'{key}={value}')
+
+    # Last arg should be the filename of the GTiff to modify
+    gdal_edit_args.append(filename)
+
+    result = gdal_edit(gdal_edit_args)
+
+    if result != 0:
+        raise RuntimeError(f'Call to gdal_edit returned non-zero ({result})')
+
+    # Modifying metadata breaks the Cloud-Optimized-Geotiff (COG) format,
+    # so use a function from PROTEUS to restore it
+    try:
+        save_as_cog(filename, scratch_dir=scratch_dir)
+    except Exception as err:
+        raise RuntimeError(f'Call to save_as_cog failed, reason: {str(err)}')
+
+    # Lastly, we need to clear the LRU for get_geotiff_metadata so any updates
+    # made here can be pulled in on the next call
+    get_geotiff_metadata.cache_clear()
 
 
 @lru_cache
@@ -133,6 +220,13 @@ def get_geotiff_product_version(filename):
     metadata = get_geotiff_metadata(filename)
 
     return metadata.get('PRODUCT_VERSION')
+
+
+def get_geotiff_sensor_product_id(filename):
+    """Returns the SENSOR_PRODUCT_ID value from the provided file, if it exists. None otherwise."""
+    metadata = get_geotiff_metadata(filename)
+
+    return metadata.get('SENSOR_PRODUCT_ID')
 
 
 def get_geotiff_spacecraft_name(filename):

@@ -7,6 +7,10 @@ FROM $SAS_IMAGE
 
 ARG PGE_SOURCE_DIR
 ARG PGE_DEST_DIR=/home/conda
+ARG CONDA_ROOT=/opt/conda
+
+ENV PGE_DEST_DIR=$PGE_DEST_DIR
+ENV CONDA_ROOT=$CONDA_ROOT
 
 ARG BUILD_DATE_TIME
 ARG BUILD_VERSION
@@ -15,7 +19,7 @@ ARG BUILD_VERSION
 # the label-schema convention: http://label-schema.org/rc1/
 LABEL org.label-schema.build-date=${BUILD_DATE_TIME} \
   org.label-schema.version=${BUILD_VERSION} \
-  org.label-schema.license="Copyright 2021,\
+  org.label-schema.license="Copyright 2022,\
  by the California Institute of Technology.\
  ALL RIGHTS RESERVED.\
  United States Government sponsorship acknowledged.\
@@ -42,14 +46,14 @@ USER 0:0
 # Install dependencies into existing Conda Env
 RUN set -ex \
     && cd ${PGE_DEST_DIR} \
-    && mkdir -p /opt/conda/bin \
-    && cp ${PGE_DEST_DIR}/opera/scripts/*_entrypoint.sh /opt/conda/bin \
-    && chmod +x /opt/conda/bin/*_entrypoint.sh \
-    && . /opt/conda/bin/activate root \
+    && mkdir -p ${CONDA_ROOT}/bin \
+    && cp ${PGE_DEST_DIR}/opera/scripts/*_entrypoint.sh ${CONDA_ROOT}/bin \
+    && chmod +x ${CONDA_ROOT}/bin/*_entrypoint.sh \
+    && . ${CONDA_ROOT}/bin/activate root \
     && conda install --yes --channel conda-forge --file ${PGE_DEST_DIR}/opera/requirements.txt
 
 # Set the Docker entrypoint and clear the default command
-ENTRYPOINT ["/opt/conda/bin/pge_docker_entrypoint.sh"]
+ENTRYPOINT ["sh", "-c", "exec ${CONDA_ROOT}/bin/pge_docker_entrypoint.sh \"${@}\"", "--"]
 CMD []
 
 # Set the user/group back to the default

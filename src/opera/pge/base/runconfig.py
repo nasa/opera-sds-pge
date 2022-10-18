@@ -23,11 +23,8 @@ import yamale
 import yaml
 
 
-BASE_PGE_SCHEMA = resource_filename('opera', 'schema/base_pge_schema.yaml')
+BASE_PGE_SCHEMA = resource_filename('opera', 'pge/base/schema/base_pge_schema.yaml')
 """Path to the Yamale schema applicable to the PGE portion of each RunConfig"""
-
-ISO_TEMPLATE_DIR = resource_filename('opera', 'pge/templates')
-"""Path to the repository directory containing ISO metadata Jinja2 templates"""
 
 
 class RunConfig:
@@ -122,12 +119,9 @@ class RunConfig:
         # will be used.
         if self.sas_config is not None:
             # Determine the SAS schema file to load from the provided RunConfig
-            sas_schema_filename = self.sas_schema_path
-            sas_schema_filepath = resource_filename('opera', f'schema/{sas_schema_filename}')
+            sas_schema_filepath = self.sas_schema_path
 
             if isfile(sas_schema_filepath):
-                # TODO: better error handling for missing sas schema,
-                #       support for absolute paths as fallback when resource_filename fails?
                 sas_schema = yamale.make_schema(sas_schema_filepath)
 
                 # Link the SAS schema to the PGE as an "include"
@@ -137,8 +131,7 @@ class RunConfig:
             else:
                 raise RuntimeError(
                     f'Can not validate RunConfig {self.name}, as the associated SAS '
-                    f'schema ({sas_schema_filename}) cannot be located within the '
-                    f'schemas directory.'
+                    f'schema ({sas_schema_filepath}) cannot be located.'
                 )
 
         # Yamale expects its own formatting of the parsed config, hence the need
@@ -209,11 +202,6 @@ class RunConfig:
 
     # ProductPathGroup
     @property
-    def product_counter(self) -> int:
-        """Returns the Product Counter from Product Path Group"""
-        return self._pge_config['ProductPathGroup']['ProductCounter']
-
-    @property
     def output_product_path(self) -> str:
         """Returns the Output Product Path from the Product Path Group"""
         return self._pge_config['ProductPathGroup']['OutputProductPath']
@@ -226,8 +214,18 @@ class RunConfig:
     # PrimaryExecutable
     @property
     def product_identifier(self) -> str:
-        """Returns the Product Identifier from a Primary Executable Category"""
+        """Returns the Product Identifier from the Primary Executable Category"""
         return self._pge_config['PrimaryExecutable']['ProductIdentifier']
+
+    @property
+    def product_version(self) -> str:
+        """Returns the Product Version from the Primary Executable Category"""
+        return self._pge_config['PrimaryExecutable']['ProductVersion']
+
+    @property
+    def composite_release_id(self) -> str:
+        """Returns the Composite Release ID (CRID) from the Primary Executable Category"""
+        return self._pge_config['PrimaryExecutable']['CompositeReleaseID']
 
     @property
     def sas_program_path(self) -> str:
@@ -247,7 +245,12 @@ class RunConfig:
     @property
     def sas_schema_path(self) -> str:
         """Returns the path to the Schema file for a Primary Executable"""
-        return self._pge_config['PrimaryExecutable']['SchemaPath']
+        sas_schema_path = self._pge_config['PrimaryExecutable']['SchemaPath']
+        return (
+            sas_schema_path
+            if isabs(sas_schema_path)
+            else resource_filename('opera', sas_schema_path)
+        )
 
     @property
     def iso_template_path(self) -> str:
@@ -256,7 +259,7 @@ class RunConfig:
         return (
             iso_template_path
             if isabs(iso_template_path)
-            else join(ISO_TEMPLATE_DIR, iso_template_path)
+            else resource_filename('opera', iso_template_path)
         )
 
     # QAExecutable
@@ -360,14 +363,23 @@ class RunConfig:
     def get_output_product_filenames(self):
         """
         Returns a sorted list of all product file paths currently written to the
-        output location specified by the RunConfig. Note that only top-level files
-        are returned, this function does not recurse into any directories
-        encountered.
+        output location specified by the RunConfig.
+
+        Any hidden files (starting with ".") are ignored, as well as any files
+        within the designated "scratch" path (if it happens to be defined within
+        the output product directory).
 
         """
         output_product_path = abspath(self.output_product_path)
-        output_products = [join(output_product_path, filename)
-                           for filename in os.listdir(output_product_path)
-                           if isfile(join(output_product_path, filename))]
+        scratch_path = abspath(self.scratch_path)
+
+        output_products = []
+
+        for dirpath, dirnames, filenames in os.walk(output_product_path, topdown=False):
+            for filename in filter(lambda name: not name.startswith('.'), filenames):
+                product_path = os.path.join(dirpath, filename)
+
+                if scratch_path not in product_path:
+                    output_products.append(product_path)
 
         return sorted(output_products)

@@ -15,19 +15,20 @@ RunConfig:
                 AncillaryFileMap: {}
 
             ProductPathGroup:
-                ProductCounter: 001
                 OutputProductPath: dswx_pge_test/output_dir
                 ScratchPath: dswx_pge_test/scratch_dir
 
             PrimaryExecutable:
                 ProductIdentifier: DSWX_HLS
+                ProductVersion: 7.7
+                CompositeReleaseID: TestIdDswx
                 ProgramPath: /bin/echo
                 ProgramOptions:
                     - 'hello world > dswx_pge_test/output_dir/dswx_hls_v0.1_B01_WTR.tif;'
                     - '/bin/echo DSWx-HLS invoked with RunConfig'
                 ErrorCodeBase: 100000
-                SchemaPath: dswx_hls_sas_schema.yaml
-                IsoTemplatePath: OPERA_ISO_metadata_L3_DSWx_HLS_template.xml.jinja2
+                SchemaPath: pge/dswx_hls/schema/dswx_hls_sas_schema.yaml
+                IsoTemplatePath: pge/dswx_hls/templates/OPERA_ISO_metadata_L3_DSWx_HLS_template.xml.jinja2
 
             QAExecutable:
                 Enabled: False
@@ -82,6 +83,7 @@ RunConfig:
                         output_dir: dswx_pge_test/output_dir
                         product_id: dswx_hls
 
+                    processing:
                         save_wtr: True    # Layer 1 - WTR
                         save_bwtr: True   # Layer 2 - BWTR
                         save_conf: True   # Layer 3 - CONF
@@ -99,10 +101,14 @@ RunConfig:
                         # SWIR-1, NIR, and Red reflectance color composition
                         save_infrared_rgb: False
 
+                    browse_image_group:
+                        # Save a browse image PNG of the WTR layer.
+                        save_browse: False
+
                     hls_thresholds:
 
                         # Modified Normalized Difference Wetness Index (MNDWI) Threshold
-                        wigt: 0.0124
+                        wigt: 0.124
 
                         # Automated Water Extent Shadow Threshold
                         awgt: 0.0

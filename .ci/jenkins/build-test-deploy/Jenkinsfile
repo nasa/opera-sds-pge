@@ -2,7 +2,19 @@
 
 pipeline {
     agent any
+    environment {
+        DOCKER_IMAGE_PREFIX = 'opera_pge'
+        DOCKER_TAG = """${sh(
+                     returnStdout: true,
+                     script: 'echo ${GIT_BRANCH##*/}'
+                     ).trim()}"""
+    }
     parameters {
+        // TODO: update default value as newer PGE's are added
+        string(name: 'DOCKER_IMAGE_SUFFIXES', defaultValue: 'dswx_hls,cslc_s1,rtc_s1',
+               description: 'Comma-delimited list of PGE names to include for build/test/deploy')
+        booleanParam(name: 'PUBLISH_DOCS', defaultValue: true,
+                     description: 'Publish sphinx documentation to ghpages')
         string(name: 'ART_URL', defaultValue: 'https://artifactory-fn.jpl.nasa.gov/artifactory',
                description: 'Artifactory-FN URL.')
         string(name: 'ART_TAR_PATH', defaultValue: 'general/gov/nasa/jpl/opera/sds/pge/',
@@ -24,45 +36,50 @@ pipeline {
                     description: 'GitHub OAUTH Token for user collinss-jpl on github.com',
                     required: true)
     }
-    environment {
-        DOCKER_IMAGE_PREFIX = 'opera_pge'
-        // TODO: update as newer PGE's are added
-        DOCKER_IMAGE_SUFFIXES = 'dswx_hls'
-        DOCKER_TAG = """${sh(
-                     returnStdout: true,
-                     script: 'echo ${GIT_BRANCH##*/}'
-                     ).trim()}"""
-    }
     stages {
         stage('Build OPERA PGE Docker image(s)') {
             steps {
                 script {
                     docker.withRegistry ('https://' + params.ART_DOCKER_REGISTRY, params.ART_CREDENTIALS) {
-                        echo "Building ${DOCKER_IMAGE_PREFIX} docker images with tag ${DOCKER_TAG}"
-                        sh label: 'Build all OPERA Docker images',
-                           script: ".ci/scripts/build_all_images.sh $DOCKER_TAG"
+                        DOCKER_IMAGE_SUFFIXES.tokenize(',').each { DOCKER_IMAGE_SUFFIX ->
+                            echo "Building ${DOCKER_IMAGE_PREFIX}/${DOCKER_IMAGE_SUFFIX} docker image with tag ${DOCKER_TAG}"
+                            sh label: "Build ${DOCKER_IMAGE_PREFIX}/${DOCKER_IMAGE_SUFFIX} OPERA Docker image",
+                               script: ".ci/scripts/build_${DOCKER_IMAGE_SUFFIX}.sh --tag $DOCKER_TAG"
+                        }
                     }
                 }
             }
         }
         stage('Test OPERA PGE Docker image(s)') {
             steps {
-                echo "Testing ${DOCKER_IMAGE_PREFIX} docker images with tag ${DOCKER_TAG}"
-                sh label: 'Test all OPERA Docker images',
-                   script: ".ci/scripts/test_all_images.sh $DOCKER_TAG"
-                junit 'test_results/**/*.xml'
-                archiveArtifacts artifacts: 'test_results/**/*.log', fingerprint: true
-                // TODO: this will require rework once we have more than one PGE to deal with
-                publishHTML([allowMissing: true,
+                script {
+                    def indexFiles = []
+                    def reportTitles = []
+
+                    DOCKER_IMAGE_SUFFIXES.tokenize(',').each { DOCKER_IMAGE_SUFFIX ->
+                        echo "Testing ${DOCKER_IMAGE_PREFIX}/${DOCKER_IMAGE_SUFFIX} docker image with tag ${DOCKER_TAG}"
+
+                        sh label: "Test ${DOCKER_IMAGE_PREFIX}/${DOCKER_IMAGE_SUFFIX} OPERA Docker image",
+                           script: ".ci/scripts/test_${DOCKER_IMAGE_SUFFIX}.sh --tag $DOCKER_TAG"
+
+                        indexFiles << "${DOCKER_IMAGE_SUFFIX}/coverage_html/index.html"
+                        reportTitles << "${DOCKER_IMAGE_SUFFIX} Code Coverage"
+                    }
+
+                    publishHTML([allowMissing: true,
                              alwaysLinkToLastBuild: true,
                              keepAll: true,
-                             reportDir: 'test_results/dswx_hls/coverage_html',
-                             reportFiles: 'index.html',
+                             reportDir: 'test_results',
+                             reportFiles: indexFiles.join(','),
                              reportName: 'Code Coverage',
-                             reportTitles: 'DSWx-HLS Code Coverage'])
+                             reportTitles: reportTitles.join(',')])
+                }
+                junit 'test_results/**/*.xml'
+                archiveArtifacts artifacts: 'test_results/**/*.log', fingerprint: true
             }
         }
         stage('Generate OPERA PGE Sphinx Documentation') {
+            when { expression { return params.PUBLISH_DOCS } }
             steps {
                 script {
                     echo "Installing Sphinx Dependencies"
@@ -105,6 +122,7 @@ pipeline {
             }
         }
         stage('Push OPERA PGE HTML documentation to GitHub Pages') {
+            when { expression { return params.PUBLISH_DOCS } }
             steps {
                 git branch: 'gh-pages',
                     changelog: false,
@@ -174,7 +192,7 @@ pipeline {
                         sh "gzip -f ${TAR_FILE_NAME}"
                         TAR_GZ_FILE_NAME = "${TAR_FILE_NAME}.gz"
 
-                        echo "Uploading Docker image tar file to Artifactory-FN"
+                        echo "Uploading ${DOCKER_IMAGE} tar file to Artifactory-FN"
 
                         rtUpload(
                             serverId: "ARTIFACTORY_FN_SERVER",
@@ -183,7 +201,7 @@ pipeline {
                                   "files": [
                                       {
                                           "pattern": "${TAR_GZ_FILE_NAME}",
-                                          "target": "${params.ART_TAR_PATH}"
+                                          "target": "${params.ART_TAR_PATH}${DOCKER_IMAGE_SUFFIX}/"
                                       }
                                   ]
                               }"""
@@ -207,7 +225,7 @@ pipeline {
                     DOCKER_IMAGE_SUFFIXES.tokenize(',').each { DOCKER_IMAGE_SUFFIX ->
                         DOCKER_IMAGE = "${DOCKER_IMAGE_PREFIX}/${DOCKER_IMAGE_SUFFIX}:${DOCKER_TAG}"
                         sh "docker tag ${DOCKER_IMAGE} ${ART_DOCKER_REGISTRY}${ART_DOCKER_PATH}${DOCKER_IMAGE}"
-                        echo "Publishing Docker Image ${DOCKER_IMAGE} to Artifactory FN Docker Registry"
+                        echo "Publishing ${DOCKER_IMAGE} to Artifactory FN Docker Registry"
                         rtDockerPush(
                             serverId: "ARTIFACTORY_FN_DOCKER_REGISTRY",
                             image: "${ART_DOCKER_REGISTRY}${ART_DOCKER_PATH}${DOCKER_IMAGE}",

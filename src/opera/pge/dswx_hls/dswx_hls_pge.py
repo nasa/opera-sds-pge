@@ -1,49 +1,51 @@
 #!/usr/bin/env python3
 
 """
-===========
-dswx_pge.py
-===========
+===============
+dswx_hls_pge.py
+===============
 
-Module defining the implementation for the Dynamic Surface Water Extent (DSWx) PGE.
+Module defining the implementation for the Dynamic Surface Water Extent (DSWx)
+from Harmonized Landsat and Sentinel-1 (HLS) PGE.
 
 """
 
 import glob
 import os.path
+import re
 from collections import OrderedDict
 from os.path import abspath, basename, exists, isdir, join, splitext
 
+from opera.pge.base.base_pge import PgeExecutor
+from opera.pge.base.base_pge import PostProcessorMixin
+from opera.pge.base.base_pge import PreProcessorMixin
 from opera.util.error_codes import ErrorCode
 from opera.util.img_utils import get_geotiff_hls_dataset
 from opera.util.img_utils import get_geotiff_metadata
 from opera.util.img_utils import get_geotiff_processing_datetime
-from opera.util.img_utils import get_geotiff_product_version
+from opera.util.img_utils import get_geotiff_sensor_product_id
 from opera.util.img_utils import get_geotiff_spacecraft_name
 from opera.util.img_utils import get_hls_filename_fields
-from opera.util.metadata_utils import get_sensor_from_spacecraft_name
+from opera.util.img_utils import set_geotiff_metadata
 from opera.util.metadata_utils import get_geographic_boundaries_from_mgrs_tile
+from opera.util.metadata_utils import get_sensor_from_spacecraft_name
 from opera.util.render_jinja2 import render_jinja2
 from opera.util.time import get_time_for_filename
 
-from .base_pge import PgeExecutor
-from .base_pge import PostProcessorMixin
-from .base_pge import PreProcessorMixin
 
-
-class DSWxPreProcessorMixin(PreProcessorMixin):
+class DSWxHLSPreProcessorMixin(PreProcessorMixin):
     """
     Mixin class responsible for handling all pre-processing steps for the
-    DSWx PGE. The pre-processing phase is defined as all steps necessary prior
+    DSWx-HLS PGE. The pre-processing phase is defined as all steps necessary prior
     to SAS execution.
 
     In addition to the base functionality inherited from PreProcessorMixin, this
-    mixin adds a input validation step to ensure that the input(s) defined by
+    mixin adds an input validation step to ensure that the input(s) defined by
     the RunConfig exist and are valid.
 
     """
 
-    _pre_mixin_name = "DSWxPreProcessorMixin"
+    _pre_mixin_name = "DSWxHLSPreProcessorMixin"
 
     def _validate_inputs(self):
         """
@@ -60,7 +62,7 @@ class DSWxPreProcessorMixin(PreProcessorMixin):
 
                 self.logger.critical(self.name, ErrorCode.INPUT_NOT_FOUND, error_msg)
             elif isdir(input_file_path):
-                list_of_input_tifs = glob.glob(join(input_file_path, '*.tif'))
+                list_of_input_tifs = glob.glob(join(input_file_path, '*.tif*'))
 
                 if len(list_of_input_tifs) <= 0:
                     error_msg = f"Input directory {input_file_path} does not contain any tif files"
@@ -71,11 +73,56 @@ class DSWxPreProcessorMixin(PreProcessorMixin):
 
                 self.logger.critical(self.name, ErrorCode.INVALID_INPUT, error_msg)
 
+    def _validate_expected_input_platforms(self):
+        """
+        Scans the input files to make sure that the data comes from expected
+        platforms only.  Currently, Landsat 8/9, or Sentinel 2 A/B.
+        Raises an exception if an unsupported platform is detected.
+        This function assumes that input files have been checked to exist.
+        It also assumes that only files that contain the metadata keys
+        LANDSAT_PRODUCT_ID for Landsat input, and PRODUCT_URI for Sentinel
+        input, need to be checked.
+        """
+        self.logger.info(
+            self.name, ErrorCode.UPDATING_PRODUCT_METADATA,
+            'Scanning DSWx input datasets for invalid platforms.'
+        )
+
+        # Get a list of input files to check for invalid platform metadata
+        list_of_input_tifs = []
+        for input_file in self.runconfig.input_files:
+            input_file_path = abspath(input_file)
+            if isdir(input_file_path):
+                list_of_input_tifs = glob.glob(join(input_file_path, '*.tif*'))
+            else:
+                list_of_input_tifs.append(input_file_path)
+
+        for input_tif in list_of_input_tifs:
+
+            if re.match(r"^HLS\.L30.*", os.path.basename(input_tif)):
+                input_tif_metadata = get_geotiff_metadata(input_tif)
+                if 'LANDSAT_PRODUCT_ID' in input_tif_metadata:
+                    # LANDSAT_PRODUCT_ID can be a list so we don't restrict search to first element
+                    if re.match(r"LC07.*", input_tif_metadata['LANDSAT_PRODUCT_ID']):
+                        error_msg = (f"Input file {input_tif} appears to contain Landsat-7 data, "
+                                     f"LANDSAT_PRODUCT_ID is {input_tif_metadata['LANDSAT_PRODUCT_ID']}.")
+                        self.logger.critical(self.name, ErrorCode.INVALID_INPUT, error_msg)
+
+            if re.match(r"^HLS\.S30.*", os.path.basename(input_tif)):
+                input_tif_metadata = get_geotiff_metadata(input_tif)
+                if 'PRODUCT_URI' in input_tif_metadata:
+                    data_is_S2A = re.match(r"S2A.*", input_tif_metadata['PRODUCT_URI'])
+                    data_is_S2B = re.match(r"S2B.*", input_tif_metadata['PRODUCT_URI'])
+                    if not data_is_S2A and not data_is_S2B:
+                        error_msg = (f"Input file {input_tif} appears to not be Sentinel 2 A/B data, "
+                                     f"metadata PRODUCT_URI is {input_tif_metadata['PRODUCT_URI']}.")
+                        self.logger.critical(self.name, ErrorCode.INVALID_INPUT, error_msg)
+
     def run_preprocessor(self, **kwargs):
         """
-        Executes the pre-processing steps for DSWx PGE initialization.
+        Executes the pre-processing steps for DSWx-HLS PGE initialization.
 
-        The DSWxPreProcessorMixin version of this function performs all actions
+        The DSWxHLSPreProcessorMixin version of this function performs all actions
         of the base PreProcessorMixin class, and adds the validation check for
         input files/directories.
 
@@ -88,21 +135,22 @@ class DSWxPreProcessorMixin(PreProcessorMixin):
         super().run_preprocessor(**kwargs)
 
         self._validate_inputs()
+        self._validate_expected_input_platforms()
 
 
-class DSWxPostProcessorMixin(PostProcessorMixin):
+class DSWxHLSPostProcessorMixin(PostProcessorMixin):
     """
-    Mixin class responsible for handling all post-processing steps for the DSWx
-    PGE. The post-processing phase is defined as all steps necessary after
-    SAS execution has completed.
+    Mixin class responsible for handling all post-processing steps for the
+    DSWx-HLS PGE. The post-processing phase is defined as all steps necessary
+    after SAS execution has completed.
 
     In addition to the base functionality inherited from PostProcessorMixin, this
-    mixin adds a output validation step to ensure that the output file defined by
+    mixin adds an output validation step to ensure that the output file defined by
     the RunConfig exist and are valid.
 
     """
 
-    _post_mixin_name = "DSWxPostProcessorMixin"
+    _post_mixin_name = "DSWxHLSPostProcessorMixin"
     _cached_core_filename = None
 
     def _validate_output(self):
@@ -122,8 +170,8 @@ class DSWxPostProcessorMixin(PostProcessorMixin):
         )
 
         if not output_products:
-            error_msg = f"No SAS output file(s) containing product ID {product_id} " \
-                        f"found within {self.runconfig.output_product_path}"
+            error_msg = (f"No SAS output file(s) containing product ID {product_id} "
+                         f"found within {self.runconfig.output_product_path}")
 
             self.logger.critical(self.name, ErrorCode.OUTPUT_NOT_FOUND, error_msg)
 
@@ -133,6 +181,44 @@ class DSWxPostProcessorMixin(PostProcessorMixin):
 
                 self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
 
+    def _correct_landsat_9_products(self):
+        """
+        Scans the set of output DSWx products to see if the metadata identifies
+        any/all of them to have originated from Landsat-9 data, and if so,
+        make the necessary corrections to the product metadata to remove any
+        references to Landsat-8 that may be erroneously present.
+
+        """
+        self.logger.info(
+            self.name, ErrorCode.UPDATING_PRODUCT_METADATA,
+            'Scanning DSWx output products for Landsat-9 metadata correction'
+        )
+
+        # Get the list of output products and filter for the images
+        output_products = self.runconfig.get_output_product_filenames()
+
+        # Filter to only images (.tif or .tiff)
+        output_images = filter(lambda product: 'tif' in splitext(product)[-1], output_products)
+
+        for output_image in output_images:
+            sensor_product_id = get_geotiff_sensor_product_id(output_image)
+
+            # Certain HLS products have been observed to have sensor product
+            # ID's that identify them as originating from Landsat-9, but
+            # specify the Landsat-8 as the spacecraft name. To ensure this
+            # error is not propagated to DSWx products, we correct the spacecraft
+            # name within the product metadata here.
+            if re.match(r"L[COTEM]09.*", sensor_product_id):
+                self.logger.info(
+                    self.name, ErrorCode.UPDATING_PRODUCT_METADATA,
+                    f'Correcting SPACECRAFT_NAME field for Landsat-9 based product '
+                    f'{basename(output_image)}'
+                )
+                set_geotiff_metadata(
+                    output_image, scratch_dir=self.runconfig.scratch_path,
+                    SPACECRAFT_NAME="Landsat-9"
+                )
+
     def _core_filename(self, inter_filename=None):
         """
         Returns the core file name component for products produced by the
@@ -140,7 +226,8 @@ class DSWxPostProcessorMixin(PostProcessorMixin):
 
         The core file name component of the DSWx PGE consists of:
 
-        <PROJECT>_<LEVEL>_<PGE NAME>_<SOURCE>_<SPACECRAFT_NAME>_<TILE ID>_<TIMETAG>_<PRODUCT VERSION>_<PRODUCT_COUNTER>
+        <PROJECT>_<LEVEL>_<PGE NAME>_<SOURCE>_<TILE ID>_<ACQ TIMETAG>_
+        <PROD TIMETAG>_<SENSOR>_<SPACING>_<PRODUCT VERSION>
 
         Callers of this function are responsible for assignment of any other
         product-specific fields, such as the file extension.
@@ -177,11 +264,24 @@ class DSWxPostProcessorMixin(PostProcessorMixin):
                    f"First call must provide a filename before result is cached.")
             self.logger.critical(self.name, ErrorCode.FILE_MOVE_FAILED, msg)
 
-        spacecraft_name = get_geotiff_spacecraft_name(inter_filename).upper()
+        # Find a representative geotiff file, which should be co-located with
+        # whatever intermediate product name we were handed
+        # they should all have same metadata
+        product_dir = os.path.dirname(inter_filename)
+        geotiff_files = glob.glob(join(product_dir, '*.tif*'))
+
+        if not geotiff_files:
+            msg = (f"Could not find sample output product to derive metadata from "
+                   f"within {product_dir}")
+            self.logger.critical(self.name, ErrorCode.FILE_MOVE_FAILED, msg)
+
+        geotiff_file = geotiff_files[0]
+
+        spacecraft_name = get_geotiff_spacecraft_name(geotiff_file)
         sensor = get_sensor_from_spacecraft_name(spacecraft_name)
         pixel_spacing = "30"  # fixed for HLS-based products
 
-        dataset = get_geotiff_hls_dataset(inter_filename)
+        dataset = get_geotiff_hls_dataset(geotiff_file)
 
         dataset_fields = get_hls_filename_fields(dataset)
 
@@ -192,35 +292,35 @@ class DSWxPostProcessorMixin(PostProcessorMixin):
         if not acquisition_time.endswith('Z'):
             acquisition_time = f'{acquisition_time}Z'
 
-        processing_datetime = get_geotiff_processing_datetime(inter_filename)
+        processing_datetime = get_geotiff_processing_datetime(geotiff_file)
         processing_time = get_time_for_filename(processing_datetime)
 
         if not processing_time.endswith('Z'):
             processing_time = f'{processing_time}Z'
 
-        product_version = get_geotiff_product_version(inter_filename)
+        product_version = str(self.runconfig.product_version)
 
         if not product_version.startswith('v'):
             product_version = f'v{product_version}'
 
         # Assign the core file to the cached class attribute
         self._cached_core_filename = (
-            f"{self.PROJECT}_{self.LEVEL}_{self.NAME}_{source}_{sensor}_{pixel_spacing}_"
-            f"{tile_id}_{acquisition_time}_{processing_time}_{product_version}_"
-            f"{str(self.runconfig.product_counter).zfill(3)}"
+            f"{self.PROJECT}_{self.LEVEL}_{self.NAME}_{source}_{tile_id}_"
+            f"{acquisition_time}_{processing_time}_{sensor}_{pixel_spacing}_"
+            f"{product_version}"
         )
 
         return self._cached_core_filename
 
     def _geotiff_filename(self, inter_filename):
         """
-        Returns the file name to use for GeoTIFF's produced by the DSWx PGE.
+        Returns the file name to use for GeoTIFF's produced by the DSWx-HLS PGE.
 
-        The GeoTIFF filename for the DSWx PGE consists of:
+        The GeoTIFF filename for the DSWx-HLS PGE consists of:
 
-            <Core filename>_<Band Index>_<Band Name>.tif
+            <Core filename>_<Band Index>_<Band Name>.tiff
 
-        Where <Core filename> is returned by DSWxPostProcessorMixin._core_filename()
+        Where <Core filename> is returned by DSWxHLSPostProcessorMixin._core_filename()
         and <Band Index> and <Band Name> are determined from the name of the
         intermediate geotiff file to be renamed.
 
@@ -245,9 +345,36 @@ class DSWxPostProcessorMixin(PostProcessorMixin):
 
         return f"{core_filename}_{band_idx}_{band_name}.tiff"
 
+    def _browse_image_filename(self, inter_filename):
+        """
+        Returns the file name to use for PNG browse image produced by the DSWx-HLS PGE.
+
+        The browse image filename for the DSWx-HLS PGE consists of:
+
+            <Core filename>.png
+
+        Where <Core filename> is returned by DSWxHLSPostProcessorMixin._core_filename().
+
+        Parameters
+        ----------
+        inter_filename : str
+            The intermediate filename of the output browse image to generate
+            a filename for. This parameter may be used to inspect the file
+            in order to derive any necessary components of the returned filename.
+
+        Returns
+        -------
+        geotiff_filename : str
+            The file name to assign to GeoTIFF product(s) created by this PGE.
+
+        """
+        core_filename = self._core_filename(inter_filename)
+
+        return f"{core_filename}.png"
+
     def _collect_dswx_product_metadata(self):
         """
-        Gathers the available metadata from a sample output DSWx product for
+        Gathers the available metadata from a sample output DSWx-HLS product for
         use in filling out the ISO metadata template for the DSWx-HLS PGE.
 
         Returns
@@ -263,11 +390,10 @@ class DSWxPostProcessorMixin(PostProcessorMixin):
         representative_product = None
 
         for output_product in output_products:
-            if basename(output_product) in self.renamed_files.values():
-                # TODO: kludge for avoiding output products that are missing expected metadata
-                if get_geotiff_hls_dataset(output_product) is not None:
-                    representative_product = output_product
-                    break
+            if (basename(output_product) in self.renamed_files.values() and
+                    basename(output_product).endswith("tiff")):
+                representative_product = output_product
+                break
         else:
             msg = (f"Could not find sample output product to derive metadata from "
                    f"within {self.runconfig.output_product_path}")
@@ -301,9 +427,15 @@ class DSWxPostProcessorMixin(PostProcessorMixin):
         sensing_time = output_product_metadata.pop('SENSING_TIME')
 
         # Sensing time for L30 datasets contain both begin and end times delimited
-        # by semi-colon
+        # by semicolon
         if ';' in sensing_time:
             sensing_time_begin, sensing_time_end = sensing_time.split(';')
+        # Certain L30 datasets have been observed with multiple sensing times
+        # concatenated by a plus sign, for this case just take the first of the
+        # times
+        elif '+' in sensing_time:
+            sensing_time_begin = sensing_time.split('+')[0]
+            sensing_time_end = sensing_time_begin
         # S30 datasets seem to only provide a single sensing time value
         else:
             sensing_time_begin = sensing_time_end = sensing_time
@@ -343,7 +475,7 @@ class DSWxPostProcessorMixin(PostProcessorMixin):
         custom_metadata = {
             'ISO_OPERA_FilePackageName': self._core_filename(),
             'ISO_OPERA_ProducerGranuleId': self._core_filename(),
-            'MetadataProviderAction': "revision" if int(self.runconfig.product_counter) > 1 else "creation",
+            'MetadataProviderAction': "creation",
             'GranuleFilename': self._core_filename(),
             'ISO_OPERA_ProjectKeywords': ['OPERA', 'JPL', 'DSWx', 'Dynamic', 'Surface', 'Water', 'Extent'],
             'ISO_OPERA_PlatformKeywords': ['HLS'],
@@ -396,11 +528,12 @@ class DSWxPostProcessorMixin(PostProcessorMixin):
 
     def run_postprocessor(self, **kwargs):
         """
-        Executes the post-processing steps for DSWx PGE job completion.
+        Executes the post-processing steps for DSWx-HLS PGE job completion.
 
-        The DSWxPostProcessorMixin version of this function performs the same
-        steps as the base PostProcessorMixin, but inserts the output file
-        validation check prior to staging of the output files.
+        The DSWxHLSPostProcessorMixin version of this function performs the same
+        steps as the base PostProcessorMixin, but inserts an output file
+        validation check and Landsat-9 metadata correction step prior to staging
+        of the output files.
 
         Parameters
         ----------
@@ -412,25 +545,29 @@ class DSWxPostProcessorMixin(PostProcessorMixin):
 
         self._run_sas_qa_executable()
         self._validate_output()
+        self._correct_landsat_9_products()
         self._stage_output_files()
 
 
-class DSWxExecutor(DSWxPreProcessorMixin, DSWxPostProcessorMixin, PgeExecutor):
+class DSWxHLSExecutor(DSWxHLSPreProcessorMixin, DSWxHLSPostProcessorMixin, PgeExecutor):
     """
-    Main class for execution of a DSWx PGE, including the SAS layer.
+    Main class for execution of a DSWx-HLS PGE, including the SAS layer.
 
-    This class essentially rolls up the DSWx-tailored pre- and post-processors
+    This class essentially rolls up the tailored pre- and post-processors
     while inheriting all other functionality from the base PgeExecutor class.
 
     """
 
     NAME = "DSWx"
-    """Short name for the DSWx PGE"""
+    """Short name for the DSWx-HLS PGE"""
 
     LEVEL = "L3"
-    """Processing Level for DSWx Products"""
+    """Processing Level for DSWx-HLS Products"""
 
-    SAS_VERSION = "0.1"
+    PGE_VERSION = "1.0.0-rc.5.0"
+    """Version of the PGE (overrides default from base_pge)"""
+
+    SAS_VERSION = "0.5"  # CalVal release 3.1 https://github.com/nasa/PROTEUS/releases/tag/v0.5
     """Version of the SAS wrapped by this PGE, should be updated as needed with new SAS deliveries"""
 
     def __init__(self, pge_name, runconfig_path, **kwargs):
@@ -438,6 +575,7 @@ class DSWxExecutor(DSWxPreProcessorMixin, DSWxPostProcessorMixin, PgeExecutor):
 
         self.rename_by_pattern_map = OrderedDict(
             {
-                'dswx_hls_*.tif*': self._geotiff_filename
+                'dswx_hls_*.tif*': self._geotiff_filename,
+                'dswx_hls_*.png': self._browse_image_filename
             }
         )
