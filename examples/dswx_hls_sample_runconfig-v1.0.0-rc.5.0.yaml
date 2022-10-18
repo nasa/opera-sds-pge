@@ -1,4 +1,4 @@
-# Sample RunConfig for use with the DSWx-HLS PGE v1.0.0-rc.4.0
+# Sample RunConfig for use with the DSWx-HLS PGE v1.0.0-rc.5.0
 # This RunConfig should require minimal changes in order to be used with the
 # OPERA PCM.
 
@@ -62,8 +62,8 @@ RunConfig:
                 # this PGE
                 ProductIdentifier: DSWX_HLS
 
-                # Product version specific to output products (TODO placeholder value)
-                ProductVersion: '7.7'
+                # Product version specific to output products
+                ProductVersion: 1.0
 
                 # Rolls up versions of all software/data used to generate versions
                 # from the data products (CRID) (TODO placeholder value)
@@ -137,11 +137,15 @@ RunConfig:
                         input_file_path:
                             - /home/conda/input_dir
 
-                    # This section should match the DynamicAncillaryFilesGroup of the PGE RunConfig
+                    # This section should match the paths used in the
+                    # DynamicAncillaryFilesGroup section of the PGE RunConfig
                     dynamic_ancillary_file_group:
                         dem_file: /home/conda/input_dir/dem.vrt
+                        dem_description: Copernicus DEM GLO-30 2021 WGS84
                         landcover_file: /home/conda/input_dir/landcover.tif
+                        landcover_description: Land Cover 100m - collection 3 - epoch 2019 discrete classification map
                         worldcover_file: /home/conda/input_dir/worldcover.vrt
+                        worldcover_description: ESA WorldCover 10m 2020 v1.0
 
                     primary_executable:
                         # This should match the value used for ProductIdentifier
@@ -162,18 +166,31 @@ RunConfig:
                         # will be used instead
                         output_dir: /home/conda/output_dir
                         product_id: dswx_hls
+                        product_version: 1.0
 
-                        # Toggles to control which bands are output by the SAS
-                        save_wtr: True     # Layer 1 - WTR
-                        save_bwtr: True    # Layer 2 - BWTR
-                        save_conf: True    # Layer 3 - CONF
-                        save_diag: True    # Layer 4 - DIAG
+                    processing:
+                        # Use terrain-masking based on the Otsu method
+                        flag_use_otsu_terrain_masking: False
+
+                        # Minimum slope angle in degrees for terrain masking
+                        min_slope_angle: -5
+
+                        # Maximum sun local-incidence angle in degrees for terrain masking
+                        max_sun_local_inc_angle: 40
+
+                        # Define how areas adjacent to cloud/cloud-shadow should be handled
+                        mask_adjacent_to_cloud_mode: 'mask'
+
+                        save_wtr: True    # Layer 1 - WTR
+                        save_bwtr: True   # Layer 2 - BWTR
+                        save_conf: True   # Layer 3 - CONF
+                        save_diag: True   # Layer 4 - DIAG
                         save_wtr_1: True   # Layer 5 - WTR-1
                         save_wtr_2: True   # Layer 6 - WTR-2
-                        save_land: True    # Layer 7 - LAND
-                        save_shad: True    # Layer 8 - SHAD
-                        save_cloud: True   # Layer 9 - CLOUD
-                        save_dem: True     # Layer 10 - DEM
+                        save_land: True   # Layer 7 - LAND
+                        save_shad: True   # Layer 8 - SHAD
+                        save_cloud: True  # Layer 9 - CLOUD
+                        save_dem: True    # Layer 10 - DEM
 
                         # Reflectance RGB color composition
                         save_rgb: False
@@ -181,11 +198,27 @@ RunConfig:
                         # SWIR-1, NIR, and Red reflectance color composition
                         save_infrared_rgb: False
 
+                    # Settings for saving browse image PNG of the WTR layer.
+                    browse_image_group:
+                        # Save a browse image PNG of the WTR layer.
+                        save_browse: True
+
+                        # Setting `browse_image_height` and `browse_image_width` equal
+                        # will maintain this original HLS and DSWx-HLS aspect ratio
+                        # of 3660 pixels x 3660 pixels.
+                        # If these fields are left empty, 1024 x 1024 will be used.
+
+                        # Height in pixels
+                        browse_image_height: 1024
+
+                        # Width in pixels
+                        browse_image_width: 1024
+
                     # HLS processing options
                     # Consult the DSWx-HLS SAS User's Guide for more info on each field
                     hls_thresholds:
                         # Modified Normalized Difference Wetness Index (MNDWI) Threshold
-                        wigt: 0.0124
+                        wigt: 0.124
 
                         # Automated Water Extent Shadow Threshold
                         awgt: 0.0
@@ -216,3 +249,6 @@ RunConfig:
 
                         # Partial Surface Water Test-2 SWIR2 Threshold
                         pswt_2_swir2: 1000
+
+                        # Land Cover Mask based test Near Infrared
+                        lcmask_nir: 1200
