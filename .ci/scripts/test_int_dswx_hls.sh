@@ -26,8 +26,8 @@ PGE_IMAGE="opera_pge/${PGE_NAME}"
 # RUNCONFIG should be the name of the runconfig in s3://operasds-dev-pge/dswx_hls/
 [ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath $(dirname $(realpath $0))/../..)
 [ -z "${PGE_TAG}" ] && PGE_TAG="${USER}-dev"
-[ -z "${TESTDATA}" ] && TESTDATA="delivery_3_cal_val.zip"
-[ -z "${RUNCONFIG}" ] && RUNCONFIG="opera_pge_dswx_hls_delivery_3.0_cal_val_runconfig.yaml"
+[ -z "${TESTDATA}" ] && TESTDATA="delivery_cal_val_3.1.zip"
+[ -z "${RUNCONFIG}" ] && RUNCONFIG="opera_pge_dswx_hls_delivery_3.1_cal_val_runconfig.yaml"
 
 # Create the test output directory in the workspace
 test_int_setup_results_directory
