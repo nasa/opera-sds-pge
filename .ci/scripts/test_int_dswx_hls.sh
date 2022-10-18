@@ -99,7 +99,7 @@ do
 
             elif [[ "${output_file##*/}" == *.tif* ]]
             then
-                for potential_product in B01_WTR B02_BWTR B03_CONF B04_DIAG B05_WTR-1 B06_WTR-2 B08_SHAD B09_CLOUD B10_DEM
+                for potential_product in B01_WTR B02_BWTR B03_CONF B04_DIAG B05_WTR-1 B06_WTR-2 B07_LAND B08_SHAD B09_CLOUD B10_DEM
                 do
                     if [[ "$output_file" == *"$potential_product"* ]]; then
                         product=$potential_product
