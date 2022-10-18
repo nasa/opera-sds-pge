@@ -21,7 +21,7 @@ RunConfig:
 
             PrimaryExecutable:
                 ProductIdentifier: RTC_S1
-                ProductVersion: '1.0'
+                ProductVersion: 1.0
                 CompositeReleaseID: TestIdRtc
                 ProgramPath: mkdir
                 ProgramOptions:

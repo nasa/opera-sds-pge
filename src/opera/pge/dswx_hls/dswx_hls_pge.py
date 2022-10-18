@@ -285,7 +285,7 @@ class DSWxHLSPostProcessorMixin(PostProcessorMixin):
         if not processing_time.endswith('Z'):
             processing_time = f'{processing_time}Z'
 
-        product_version = self.runconfig.product_version
+        product_version = str(self.runconfig.product_version)
 
         if not product_version.startswith('v'):
             product_version = f'v{product_version}'

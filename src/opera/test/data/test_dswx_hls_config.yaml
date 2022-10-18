@@ -20,7 +20,7 @@ RunConfig:
 
             PrimaryExecutable:
                 ProductIdentifier: DSWX_HLS
-                ProductVersion: '7.7'
+                ProductVersion: 7.7
                 CompositeReleaseID: TestIdDswx
                 ProgramPath: /bin/echo
                 ProgramOptions:
@@ -83,6 +83,7 @@ RunConfig:
                         output_dir: dswx_pge_test/output_dir
                         product_id: dswx_hls
 
+                    processing:
                         save_wtr: True    # Layer 1 - WTR
                         save_bwtr: True   # Layer 2 - BWTR
                         save_conf: True   # Layer 3 - CONF
@@ -100,10 +101,14 @@ RunConfig:
                         # SWIR-1, NIR, and Red reflectance color composition
                         save_infrared_rgb: False
 
+                    browse_image_group:
+                        # Save a browse image PNG of the WTR layer.
+                        save_browse: False
+
                     hls_thresholds:
 
                         # Modified Normalized Difference Wetness Index (MNDWI) Threshold
-                        wigt: 0.0124
+                        wigt: 0.124
 
                         # Automated Water Extent Shadow Threshold
                         awgt: 0.0

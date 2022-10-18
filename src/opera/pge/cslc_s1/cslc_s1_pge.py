@@ -162,7 +162,7 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
             datetime.strptime(cslc_metadata['sensing_start'], '%Y-%m-%d %H:%M:%S.%f')
         )
 
-        product_version = self.runconfig.product_version
+        product_version = str(self.runconfig.product_version)
 
         if not product_version.startswith('v'):
             product_version = f'v{product_version}'

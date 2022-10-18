@@ -22,7 +22,7 @@ RunConfig:
 
             PrimaryExecutable:
                 ProductIdentifier: CSLC_S1
-                ProductVersion: '8.8'
+                ProductVersion: 8.8
                 CompositeReleaseID: TestIdCslc
                 ProgramPath: mkdir
                 ProgramOptions:

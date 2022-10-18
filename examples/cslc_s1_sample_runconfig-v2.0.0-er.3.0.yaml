@@ -54,8 +54,8 @@ RunConfig:
                 # this PGE
                 ProductIdentifier: CSLC_S1
 
-                # Product version specific to output products (TODO placeholder value)
-                ProductVersion: '8.8'
+                # Product version specific to output products
+                ProductVersion: 1.0
 
                 # Rolls up versions of all software/data used to generate versions
                 # from the data products (CRID) (TODO placeholder value)

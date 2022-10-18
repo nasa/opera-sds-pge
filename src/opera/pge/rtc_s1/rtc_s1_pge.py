@@ -110,7 +110,7 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
         if self._cached_core_filename is not None:
             return self._cached_core_filename
 
-        product_version = self.runconfig.product_version
+        product_version = str(self.runconfig.product_version)
 
         if not product_version.startswith('v'):
             product_version = f'v{product_version}'
@@ -190,7 +190,7 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
 
         """
         production_time = get_time_for_filename(self.production_datetime)
-        product_version = self.runconfig.product_version
+        product_version = str(self.runconfig.product_version)
 
         if not product_version.startswith('v'):
             product_version = f'v{product_version}'
