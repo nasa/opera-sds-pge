@@ -53,10 +53,10 @@ pipeline {
                             unstable "Product comparison failure detected. Setting stage result to unstable."
                         }
                         else if (statusCode != 0) {
-                            currentStage.result = 'FAILURE'
+                            currentBuild.result = 'FAILURE'
                         }
                         else if (statusCode == 0) {
-                            currentStage.result = 'SUCCESS'
+                            currentBuild.result = 'SUCCESS'
                         }
 
                         htmlFiles << "${DOCKER_IMAGE_SUFFIX}/test_int_${DOCKER_IMAGE_SUFFIX}_results.html"
