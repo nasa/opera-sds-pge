@@ -365,8 +365,8 @@ class DSWxPgeTestCase(unittest.TestCase):
         pge = DSWxHLSExecutor(pge_name="DSWxPgeTest", runconfig_path=runconfig_path)
         pge.run_preprocessor()
 
-        test_file = join(abspath(pge.runconfig.output_product_path), 'test_file.tif')
-        pge.renamed_files['test_file.tif'] = os.path.basename(test_file)
+        test_file = join(abspath(pge.runconfig.output_product_path), 'test_file.tiff')
+        pge.renamed_files['test_file.tiff'] = os.path.basename(test_file)
         os.system(f'touch {test_file}')
 
         output_product_metadata = pge._collect_dswx_product_metadata()

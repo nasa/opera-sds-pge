@@ -264,11 +264,24 @@ class DSWxHLSPostProcessorMixin(PostProcessorMixin):
                    f"First call must provide a filename before result is cached.")
             self.logger.critical(self.name, ErrorCode.FILE_MOVE_FAILED, msg)
 
-        spacecraft_name = get_geotiff_spacecraft_name(inter_filename)
+        # Find a representative geotiff file, which should be co-located with
+        # whatever intermediate product name we were handed
+        # they should all have same metadata
+        product_dir = os.path.dirname(inter_filename)
+        geotiff_files = glob.glob(join(product_dir, '*.tif*'))
+
+        if not geotiff_files:
+            msg = (f"Could not find sample output product to derive metadata from "
+                   f"within {product_dir}")
+            self.logger.critical(self.name, ErrorCode.FILE_MOVE_FAILED, msg)
+
+        geotiff_file = geotiff_files[0]
+
+        spacecraft_name = get_geotiff_spacecraft_name(geotiff_file)
         sensor = get_sensor_from_spacecraft_name(spacecraft_name)
         pixel_spacing = "30"  # fixed for HLS-based products
 
-        dataset = get_geotiff_hls_dataset(inter_filename)
+        dataset = get_geotiff_hls_dataset(geotiff_file)
 
         dataset_fields = get_hls_filename_fields(dataset)
 
@@ -279,7 +292,7 @@ class DSWxHLSPostProcessorMixin(PostProcessorMixin):
         if not acquisition_time.endswith('Z'):
             acquisition_time = f'{acquisition_time}Z'
 
-        processing_datetime = get_geotiff_processing_datetime(inter_filename)
+        processing_datetime = get_geotiff_processing_datetime(geotiff_file)
         processing_time = get_time_for_filename(processing_datetime)
 
         if not processing_time.endswith('Z'):
@@ -332,6 +345,33 @@ class DSWxHLSPostProcessorMixin(PostProcessorMixin):
 
         return f"{core_filename}_{band_idx}_{band_name}.tiff"
 
+    def _browse_image_filename(self, inter_filename):
+        """
+        Returns the file name to use for PNG browse image produced by the DSWx-HLS PGE.
+
+        The browse image filename for the DSWx-HLS PGE consists of:
+
+            <Core filename>.png
+
+        Where <Core filename> is returned by DSWxHLSPostProcessorMixin._core_filename().
+
+        Parameters
+        ----------
+        inter_filename : str
+            The intermediate filename of the output browse image to generate
+            a filename for. This parameter may be used to inspect the file
+            in order to derive any necessary components of the returned filename.
+
+        Returns
+        -------
+        geotiff_filename : str
+            The file name to assign to GeoTIFF product(s) created by this PGE.
+
+        """
+        core_filename = self._core_filename(inter_filename)
+
+        return f"{core_filename}.png"
+
     def _collect_dswx_product_metadata(self):
         """
         Gathers the available metadata from a sample output DSWx-HLS product for
@@ -350,7 +390,8 @@ class DSWxHLSPostProcessorMixin(PostProcessorMixin):
         representative_product = None
 
         for output_product in output_products:
-            if basename(output_product) in self.renamed_files.values():
+            if (basename(output_product) in self.renamed_files.values() and
+                    basename(output_product).endswith("tiff")):
                 representative_product = output_product
                 break
         else:
@@ -523,10 +564,10 @@ class DSWxHLSExecutor(DSWxHLSPreProcessorMixin, DSWxHLSPostProcessorMixin, PgeEx
     LEVEL = "L3"
     """Processing Level for DSWx-HLS Products"""
 
-    PGE_VERSION = "1.0.0-rc.4.0"
+    PGE_VERSION = "1.0.0-rc.5.0"
     """Version of the PGE (overrides default from base_pge)"""
 
-    SAS_VERSION = "0.4"  # CalVal release https://github.com/nasa/PROTEUS/releases/tag/v0.4
+    SAS_VERSION = "0.5"  # CalVal release 3.1 https://github.com/nasa/PROTEUS/releases/tag/v0.5
     """Version of the SAS wrapped by this PGE, should be updated as needed with new SAS deliveries"""
 
     def __init__(self, pge_name, runconfig_path, **kwargs):
@@ -534,6 +575,7 @@ class DSWxHLSExecutor(DSWxHLSPreProcessorMixin, DSWxHLSPostProcessorMixin, PgeEx
 
         self.rename_by_pattern_map = OrderedDict(
             {
-                'dswx_hls_*.tif*': self._geotiff_filename
+                'dswx_hls_*.tif*': self._geotiff_filename,
+                'dswx_hls_*.png': self._browse_image_filename
             }
         )
