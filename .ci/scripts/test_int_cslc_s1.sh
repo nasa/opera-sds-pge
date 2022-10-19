@@ -69,7 +69,7 @@ RESULTS_FILE="${TEST_RESULTS_DIR}/test_int_${PGE_NAME}_results.html"
 
 # Create a temporary directory to allow Jenkins to write to it and avoid collisions
 # with other users
-local_dir=$(mktemp -dp /tmp)
+local_dir=$(mktemp -dp data/tmp)
 chmod 775 $local_dir
 cd $local_dir
 
