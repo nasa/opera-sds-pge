@@ -69,7 +69,7 @@ RESULTS_FILE="${TEST_RESULTS_DIR}/test_int_${PGE_NAME}_results.html"
 
 # Create a temporary directory to allow Jenkins to write to it and avoid collisions
 # with other users
-local_dir=$(mktemp -dp data/tmp)
+local_dir=$(mktemp -dp /data/tmp)
 chmod 775 $local_dir
 cd $local_dir
 
@@ -94,7 +94,7 @@ function cleanup {
     echo "Cleaning up before exit. Setting permissions for output files and directories."
     ${DOCKER_RUN} -v ${local_dir}:${local_dir} --entrypoint /usr/bin/find ${PGE_IMAGE}:${PGE_TAG} ${local_dir} -type d -exec chmod 775 {} +
     ${DOCKER_RUN} -v ${local_dir}:${local_dir} --entrypoint /usr/bin/find ${PGE_IMAGE}:${PGE_TAG} ${local_dir} -type f -exec chmod 664 {} +
-    cd /tmp
+    cd /data/tmp
     rm -rf ${local_dir}
 }
 
