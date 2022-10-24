@@ -426,19 +426,20 @@ class DSWxHLSPostProcessorMixin(PostProcessorMixin):
         # Split the sensing time into the beginning/end portions
         sensing_time = output_product_metadata.pop('SENSING_TIME')
 
-        # Sensing time for L30 datasets contain both begin and end times delimited
-        # by semicolon
+        # Sensing time can contain multiple times delimited by semicolon,
+        # just take the first one
         if ';' in sensing_time:
-            sensing_time_begin, sensing_time_end = sensing_time.split(';')
-        # Certain L30 datasets have been observed with multiple sensing times
+            sensing_time = sensing_time.split(';', maxsplit=1)[0]
+
+        # Certain datasets have been observed with multiple sensing times
         # concatenated by a plus sign, for this case just take the first of the
         # times
-        elif '+' in sensing_time:
-            sensing_time_begin = sensing_time.split('+')[0]
-            sensing_time_end = sensing_time_begin
-        # S30 datasets seem to only provide a single sensing time value
-        else:
-            sensing_time_begin = sensing_time_end = sensing_time
+        if '+' in sensing_time:
+            sensing_time = sensing_time.split('+', maxsplit=1)[0]
+
+        # Set beginning and end time to single time parsed, since ISO metadata
+        # requires both
+        sensing_time_begin = sensing_time_end = sensing_time
 
         output_product_metadata['sensingTimeBegin'] = sensing_time_begin.strip()
         output_product_metadata['sensingTimeEnd'] = sensing_time_end.strip()
