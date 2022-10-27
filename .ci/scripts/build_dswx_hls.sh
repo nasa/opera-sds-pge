@@ -66,8 +66,19 @@ if [[ ! -z ${EXISTING_IMAGE_ID} ]]; then
   docker rmi ${EXISTING_IMAGE_ID}
 fi
 
+# Select the appropriate platform to target the container for.
+# This is to support Apple M1 builds, which will default to (very slow) emulation
+# if the incorrect platform is specified.
+# Note that currently, the container build process on Apple M1 is significantly
+# slower than for other architectures.
+if [[ `uname -m` == "arm64" ]]; then
+  PLATFORM='--platform linux/arm64'
+else
+  PLATFORM='--platform linux/amd64'
+fi
+
 # Build the PGE docker image
-docker build --rm --force-rm -t ${IMAGE}:${TAG} \
+docker build ${PLATFORM} --rm --force-rm -t ${IMAGE}:${TAG} \
     --build-arg SAS_IMAGE=${SAS_IMAGE} \
     --build-arg BUILD_DATE_TIME=${BUILD_DATE_TIME} \
     --build-arg BUILD_VERSION=${TAG} \
