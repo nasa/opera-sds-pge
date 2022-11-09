@@ -10,6 +10,7 @@ Unit tests for the util/metadata_utils.py module.
 """
 
 import h5py
+import tempfile
 import numpy as np
 import os
 import unittest
@@ -62,7 +63,7 @@ class MetadataUtilsTestCase(unittest.TestCase):
 
     def test_get_rtc_s1_product_metadata(self):
         """Test retrieval of product metadata from HDF5 files"""
-        file_name = '/data/tmp/t_metadata_utils.hdf5'
+        file_name = os.path.join(tempfile.gettempdir(), "test_metadata_file.hdf5")
         with h5py.File(file_name, 'w') as f:
 
             # create some metadata to be retrieved
@@ -85,19 +86,21 @@ class MetadataUtilsTestCase(unittest.TestCase):
             identification_grp = f.create_group("/science/CSAR/identification")
             trackNumber_dset = identification_grp.create_dataset("trackNumber", data=147170, dtype='int64')
 
-        product_output = get_rtc_s1_product_metadata(file_name)
+        try:
+            product_output = get_rtc_s1_product_metadata(file_name)
 
-        self.assertAlmostEqual(product_output['frequencyA']['centerFrequency'], 5405000454.33435)
-        self.assertEqual(product_output['orbit']['orbitType'], "POE")
-        self.assertEqual(product_output['processingInformation']['inputs']['demFiles'], ['dem.tif'])
-        for po,eo in zip(product_output['processingInformation']['inputs']['auxcalFiles'],
-                         ['calibration-s1b-iw1-slc-vv-20180504t104508-20180504t104533-010770-013aee-004.xml',
-                          'noise-s1b-iw1-slc-vv-20180504t104508-20180504t104533-010770-013aee-004.xml']):
-            self.assertEqual(po, eo)
-        self.assertEqual(product_output['processingInformation']['algorithms']['geocoding'], 'area_projection')
-        self.assertEqual(product_output['identification']['trackNumber'], 147170)
+            self.assertAlmostEqual(product_output['frequencyA']['centerFrequency'], 5405000454.33435)
+            self.assertEqual(product_output['orbit']['orbitType'], "POE")
+            self.assertEqual(product_output['processingInformation']['inputs']['demFiles'], ['dem.tif'])
+            for po,eo in zip(product_output['processingInformation']['inputs']['auxcalFiles'],
+                             ['calibration-s1b-iw1-slc-vv-20180504t104508-20180504t104533-010770-013aee-004.xml',
+                              'noise-s1b-iw1-slc-vv-20180504t104508-20180504t104533-010770-013aee-004.xml']):
+                self.assertEqual(po, eo)
+            self.assertEqual(product_output['processingInformation']['algorithms']['geocoding'], 'area_projection')
+            self.assertEqual(product_output['identification']['trackNumber'], 147170)
 
-        os.remove(file_name)
+        finally:
+            os.remove(file_name)
 
 if __name__ == "__main__":
     unittest.main()

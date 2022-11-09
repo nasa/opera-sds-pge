@@ -12,11 +12,7 @@ ISO metadata utilities for use with OPERA PGEs.
 from functools import lru_cache
 import h5py
 import numpy as np
-try:
-    import mgrs
-except (ImportError, ModuleNotFoundError):  # pragma: no cover
-    # Mock implementation is not available at this time.
-    print("import mgrs failed. Module is not available in runtime environment.")
+import mgrs
 
 class MockOsr:  # pragma: no cover
     """
@@ -203,7 +199,7 @@ def get_hdf5_group_as_dict(file_name, group_path):
     Parameters
     ----------
     file_name : str
-        filestystem path and filename for the HDF5 file to use.
+        file system path and filename for the HDF5 file to use.
     group_path : str
         group path within the HDF5 file.
 
@@ -215,6 +211,9 @@ def get_hdf5_group_as_dict(file_name, group_path):
     group_dict = {}
     with h5py.File(file_name, 'r') as hf:
         group_object = hf.get(group_path)
+        if group_object is None:
+            raise RuntimeError(f"An error occurred retrieving group '{group_path}' from file '{file_name}'.")
+
         group_dict = convert_h5py_group_to_dict(group_object)
 
     return group_dict
@@ -242,21 +241,20 @@ def convert_h5py_group_to_dict(group_object):
     converted_dict = {}
     for key,val in group_object.items():
 
-        if isinstance(val, h5py._hl.dataset.Dataset):
+        if isinstance(val, h5py.Dataset):
             if type(val[()]) is np.ndarray:
-                if isinstance(val[0], bytes) or isinstance(val[0], np.bytes_):
+                if isinstance(val[0], (bytes, np.bytes_)):
                     # decode bytes to str
-                    converted_dict[key] = val[()].astype(str)
+                    converted_dict[key] = val.asstr()[()]
                 else:
                     converted_dict[key] = val[()]
             else:
-                scalar_var = val[()]
-                if isinstance(scalar_var, bytes) or isinstance(scalar_var, np.bytes_):
+                if isinstance(val[()], (bytes, np.bytes_)):
                     # decode bytes to str
-                    converted_dict[key] = scalar_var.decode()
+                    converted_dict[key] = val.asstr()[()]
                 else:
-                    converted_dict[key] = scalar_var
-        elif isinstance(val, h5py._hl.group.Group):
+                    converted_dict[key] = val[()]
+        elif isinstance(val, h5py.Group):
             converted_dict[key] = convert_h5py_group_to_dict(val)
 
     return converted_dict
@@ -269,7 +267,8 @@ def get_rtc_s1_product_metadata(file_name):
 
     Parameters
     ----------
-    file_name : the RTC-S1 product file to obtain metadata from.
+    file_name : str
+        the RTC-S1 product file to obtain metadata from.
 
     Returns
     -------
