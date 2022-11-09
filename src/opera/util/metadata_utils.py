@@ -225,6 +225,8 @@ def convert_h5py_group_to_dict(group_object):
     Returns HDF5 group variable data as a python dict for a given h5py group object.
     Recursively calls itself to process sub-groups.
     Group attributes are not included.
+    Byte sequences are converted to python strings which will probably cause issues
+    with non-text data.
 
     Parameters
     ----------
@@ -236,8 +238,6 @@ def convert_h5py_group_to_dict(group_object):
     converted_dict : dict
         python dict containing variable data from the group object.
         data is copied from the h5py group object to a python dict.
-        byte strings are converted python strings which will cause issues
-        with non-text data.
     """
     converted_dict = {}
     for key,val in group_object.items():

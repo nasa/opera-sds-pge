@@ -18,6 +18,7 @@ from unittest import skipIf
 from opera.util.metadata_utils import get_geographic_boundaries_from_mgrs_tile
 from opera.util.metadata_utils import get_rtc_s1_product_metadata
 
+
 def osr_is_available():
     """
     Helper function to check for a local installation of the Python bindings for
