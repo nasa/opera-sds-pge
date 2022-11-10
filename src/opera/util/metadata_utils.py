@@ -13,6 +13,7 @@ from functools import lru_cache
 import h5py
 import numpy as np
 import mgrs
+from mgrs.core import MGRSError
 
 class MockOsr:  # pragma: no cover
     """
