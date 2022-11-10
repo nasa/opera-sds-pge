@@ -9,9 +9,11 @@ ISO metadata utilities for use with OPERA PGEs.
 
 """
 
+from functools import lru_cache
+import h5py
+import numpy as np
 import mgrs
 from mgrs.core import MGRSError
-
 
 class MockOsr:  # pragma: no cover
     """
@@ -187,3 +189,99 @@ def get_geographic_boundaries_from_mgrs_tile(mgrs_tile_name):
                 lon_max = lon
 
     return lat_min, lat_max, lon_min, lon_max
+
+
+@lru_cache
+def get_hdf5_group_as_dict(file_name, group_path):
+    """
+    Returns HDF5 group variable data as a python dict for a given file and group path.
+    Group attributes are not included.
+
+    Parameters
+    ----------
+    file_name : str
+        file system path and filename for the HDF5 file to use.
+    group_path : str
+        group path within the HDF5 file.
+
+    Returns
+    -------
+    group_dict : dict
+        python dict containing variable data from the group path location.
+    """
+    group_dict = {}
+    with h5py.File(file_name, 'r') as hf:
+        group_object = hf.get(group_path)
+        if group_object is None:
+            raise RuntimeError(f"An error occurred retrieving group '{group_path}' from file '{file_name}'.")
+
+        group_dict = convert_h5py_group_to_dict(group_object)
+
+    return group_dict
+
+
+def convert_h5py_group_to_dict(group_object):
+    """
+    Returns HDF5 group variable data as a python dict for a given h5py group object.
+    Recursively calls itself to process sub-groups.
+    Group attributes are not included.
+    Byte sequences are converted to python strings which will probably cause issues
+    with non-text data.
+
+    Parameters
+    ----------
+    group_object : h5py._hl.group.Group
+        h5py Group object to be converted to a dict.
+
+    Returns
+    -------
+    converted_dict : dict
+        python dict containing variable data from the group object.
+        data is copied from the h5py group object to a python dict.
+    """
+    converted_dict = {}
+    for key,val in group_object.items():
+
+        if isinstance(val, h5py.Dataset):
+            if type(val[()]) is np.ndarray:
+                if isinstance(val[0], (bytes, np.bytes_)):
+                    # decode bytes to str
+                    converted_dict[key] = val.asstr()[()]
+                else:
+                    converted_dict[key] = val[()]
+            else:
+                if isinstance(val[()], (bytes, np.bytes_)):
+                    # decode bytes to str
+                    converted_dict[key] = val.asstr()[()]
+                else:
+                    converted_dict[key] = val[()]
+        elif isinstance(val, h5py.Group):
+            converted_dict[key] = convert_h5py_group_to_dict(val)
+
+    return converted_dict
+
+
+def get_rtc_s1_product_metadata(file_name):
+    """
+    Returns a python dict containing the RTC-S1 product_output metadata
+    which will be used with the ISO metadata template.
+
+    Parameters
+    ----------
+    file_name : str
+        the RTC-S1 product file to obtain metadata from.
+
+    Returns
+    -------
+    product_output : dict
+        python dict containing the HDF5 file metadata which is used in the
+        ISO template.
+    """
+    product_output = {
+        'frequencyA' : get_hdf5_group_as_dict(file_name, "/science/CSAR/RTC/grids/frequencyA"),
+        'processingInformation' : get_hdf5_group_as_dict(file_name, "/science/CSAR/RTC/metadata/processingInformation"),
+        'orbit' : get_hdf5_group_as_dict(file_name, "/science/CSAR/RTC/metadata/orbit"),
+        'identification' : get_hdf5_group_as_dict(file_name, "/science/CSAR/identification")
+    }
+
+    return product_output
