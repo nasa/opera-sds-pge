@@ -9,7 +9,6 @@ Unit tests for the pge/rtc_s1/rtc_s1_pge.py module.
 """
 
 import os
-import shutil
 import tempfile
 import unittest
 from io import StringIO
@@ -201,6 +200,7 @@ class RtcS1PgeTestCase(unittest.TestCase):
             if os.path.exists(test_runconfig_path):
                 os.unlink(test_runconfig_path)
 
+    # rtc_s1_pge._output_validation() is tested in the following 3 tests
     def test_rtc_s1_pge_output_validation_bad_extension(self):
         """Test the output validation checks made by RtcS1PostProcessorMixin."""
         runconfig_path = join(self.data_dir, 'test_rtc_s1_config.yaml')
@@ -244,6 +244,7 @@ class RtcS1PgeTestCase(unittest.TestCase):
 
     def test_rtc_s1_pge_output_validation_empty_dir(self):
         """Test the output validation for an empty directory made by RtcS1PostProcessorMixin."""
+        output_dir = 'rtc_s1_test/output_dir/t069_147170_iw1'
         runconfig_path = join(self.data_dir, 'test_rtc_s1_config.yaml')
 
         test_runconfig_path = join(self.data_dir, 'invalid_rtc_s1_runconfig.yaml')
@@ -253,7 +254,7 @@ class RtcS1PgeTestCase(unittest.TestCase):
 
         primary_executable_group = runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']
 
-        primary_executable_group['ProgramOptions'] = ['-p rtc_s1_test/output_dir/t069_147170_iw1/;',
+        primary_executable_group['ProgramOptions'] = [f'-p {output_dir}/;',
                                                       '/bin/echo RTC-S1 invoked with RunConfig']
 
         with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
@@ -272,7 +273,7 @@ class RtcS1PgeTestCase(unittest.TestCase):
                 log_contents = infile.read()
 
             self.assertIn(
-                f"Empty SAS output directory:",
+                f"Empty SAS output directory: {output_dir}",
                 log_contents
             )
         finally:
@@ -315,7 +316,7 @@ class RtcS1PgeTestCase(unittest.TestCase):
                 log_contents = infile.read()
 
             self.assertIn(
-                f"SAS output file {file_name} was created, but is empty",
+                f"SAS output file {file_name} exists, but is empty",
                 log_contents
             )
         finally:
