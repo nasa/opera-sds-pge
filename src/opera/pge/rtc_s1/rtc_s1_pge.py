@@ -12,10 +12,13 @@ from Sentinel-1 A/B (S1) PGE.
 
 import os.path
 from pathlib import Path
+from os import walk
+from os.path import basename, getsize
 
 from opera.pge.base.base_pge import PgeExecutor
 from opera.pge.base.base_pge import PostProcessorMixin
 from opera.pge.base.base_pge import PreProcessorMixin
+from opera.util.error_codes import ErrorCode
 from opera.util.input_validation import validate_slc_s1_inputs
 from opera.util.time import get_time_for_filename
 
@@ -202,6 +205,48 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
 
         return ancillary_filename
 
+    def _validate_output(self):
+        """
+        Evaluates the output file(s) generated from SAS execution to ensure
+        the existence of a directory for each burst containing a single output
+        file.  Verify each output file exists, is named with the proper extension,
+        and is non-zero in size.
+
+        """
+
+        out_dir_walk_dict = {}
+
+        output_dir = self.runconfig.output_product_path
+
+        # from 'output_dir' make a dictionary of {sub_dir_name: [file1, file2,...]}
+        for path, dirs, files in walk(output_dir):
+            if not dirs:  # Ignore files in 'output_dir'
+                out_dir_walk_dict[basename(path)] = files
+
+        output_format = self.runconfig.sas_config['runconfig']['groups']['product_path_group']['output_format']
+        if output_format == 'NETCDF':
+            expected_ext = ['nc']
+        elif output_format == 'GTiff' or output_format == 'COG':
+            expected_ext = ['tiff', 'tif']
+
+        # Verify: files in subdirectories, file length, and proper extension.
+        for dir_name_key, file_names in out_dir_walk_dict.items():
+            if len(file_names) == 0:
+                error_msg = f"Empty SAS output directory: {'/'.join((output_dir, dir_name_key))}"
+
+                self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
+
+            for file_name in file_names:
+                if not getsize('/'.join((output_dir, dir_name_key, file_name))):
+                    error_msg = f"SAS output file {file_name} was created, but is empty"
+
+                    self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
+
+                if file_name.split('.')[-1] not in expected_ext:
+                    error_msg = f"SAS output file {file_name} extension error:  expected {[i for i in expected_ext]}"
+
+                    self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
+
     def _catalog_metadata_filename(self):
         """
         Returns the file name to use for Catalog Metadata produced by the RTC-S1 PGE.
@@ -282,7 +327,7 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
         The RtcS1PostProcessorMixin version of this method performs the same
         steps as the base PostProcessorMixin, but inserts a step to perform
         output product validation prior to staging and renaming of the output
-        files. (TODO)
+        files.
 
         Parameters
         ----------
@@ -290,11 +335,11 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
             Any keyword arguments needed by the post-processo
 
         """
-        super().run_postprocessor(**kwargs)
+        print(f'Running postprocessor for {self._post_mixin_name}')
 
-        # TODO replace super().run_postprocessor() call with reimplementation
-        #      that invokes the output validation step in-between the SAS QA and
-        #      output file staging steps inherited from the base PGE
+        self._run_sas_qa_executable()
+        self._validate_output()
+        self._stage_output_files()
 
 
 class RtcS1Executor(RtcS1PreProcessorMixin, RtcS1PostProcessorMixin, PgeExecutor):
