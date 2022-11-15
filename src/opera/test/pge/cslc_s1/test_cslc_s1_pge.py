@@ -172,7 +172,7 @@ class CslcS1PgeTestCase(unittest.TestCase):
         # to a regex which should match each component of the final filename
         file_name = pge._json_metadata_filename(inter_filename='')
 
-        file_name_regex = rf"{pge.PROJECT}_{pge.LEVEL}_{pge.NAME}_" \
+        file_name_regex = rf"{pge.PROJECT}_{pge.LEVEL}_{pge.NAME}-" \
                           rf"{cslc_metadata['platform_id']}_" \
                           rf"IW_{cslc_metadata['burst_id'].upper().replace('_', '-')}_" \
                           rf"{cslc_metadata['polarization']}_" \

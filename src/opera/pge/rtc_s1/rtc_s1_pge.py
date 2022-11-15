@@ -117,7 +117,7 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
 
         # Assign the core file to the cached class attribute
         self._cached_core_filename = (
-            f"{self.PROJECT}_{self.LEVEL}_{self.NAME}_{self.SOURCE}_"
+            f"{self.PROJECT}_{self.LEVEL}_{self.NAME}-{self.SOURCE}_"
             "{burst_id}_{acquisition_time}Z_{production_time}Z_"  # To be filled in per-product
             f"{self.SENSOR}_{self.SPACING}_{product_version}"
         )

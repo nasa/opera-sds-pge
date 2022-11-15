@@ -346,7 +346,7 @@ class PostProcessorMixin:
         """
         time_tag = get_time_for_filename(self.production_datetime)
 
-        return f"{self.PROJECT}_{self.LEVEL}_{self.NAME}_{time_tag}"
+        return f"{self.PROJECT}_{self.LEVEL}_{self.NAME}-{time_tag}"
 
     def _geotiff_filename(self, inter_filename):
         """
