@@ -303,7 +303,7 @@ class DSWxPgeTestCase(unittest.TestCase):
             file_name = pge._geotiff_filename(image_file)
             md = MockGdal.MockGdalDataset().GetMetadata()
             file_name_regex = rf"{pge.PROJECT}_{pge.LEVEL}_" \
-                              rf"{md['PRODUCT_TYPE']}_{md['PRODUCT_SOURCE']}_" \
+                              rf"{md['PRODUCT_TYPE']}-{md['PRODUCT_SOURCE']}_" \
                               rf"{md['HLS_DATASET'].split('.')[2]}_" \
                               rf"\d{{8}}T\d{{6}}Z_\d{{8}}T\d{{6}}Z_" \
                               rf"{get_sensor_from_spacecraft_name(md['SPACECRAFT_NAME'])}_" \

@@ -170,7 +170,7 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
         production_time = get_time_for_filename(self.production_datetime)
 
         self._cached_core_filename = (
-            f"{self.PROJECT}_{self.LEVEL}_{self.NAME}_{sensor}_{mode}_{burst_id}_"
+            f"{self.PROJECT}_{self.LEVEL}_{self.NAME}-{sensor}_{mode}_{burst_id}_"
             f"{pol}_{acquisition_time}Z_{product_version}_{production_time}Z"
         )
 

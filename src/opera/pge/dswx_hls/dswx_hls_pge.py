@@ -305,7 +305,7 @@ class DSWxHLSPostProcessorMixin(PostProcessorMixin):
 
         # Assign the core file to the cached class attribute
         self._cached_core_filename = (
-            f"{self.PROJECT}_{self.LEVEL}_{self.NAME}_{source}_{tile_id}_"
+            f"{self.PROJECT}_{self.LEVEL}_{self.NAME}-{source}_{tile_id}_"
             f"{acquisition_time}_{processing_time}_{sensor}_{pixel_spacing}_"
             f"{product_version}"
         )
