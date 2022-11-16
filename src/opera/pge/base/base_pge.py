@@ -473,7 +473,7 @@ class PostProcessorMixin:
         for file_pattern, rename_function in self.rename_by_pattern_map.items():
             if fnmatch(file_name, file_pattern):
                 final_filename = rename_function(input_filepath)
-                self.renamed_files[file_name] = final_filename
+                self.renamed_files[input_filepath] = final_filename
                 break
         else:
             msg = f'No rename function configured for file "{basename(input_filepath)}", skipping assignment'
