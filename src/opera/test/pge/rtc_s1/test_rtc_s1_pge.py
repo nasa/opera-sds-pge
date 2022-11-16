@@ -23,8 +23,8 @@ import yaml
 from opera.pge import RunConfig
 from opera.pge.rtc_s1.rtc_s1_pge import RtcS1Executor
 from opera.util import PgeLogger
+from opera.util.metadata_utils import create_test_rtc_nc_product
 from opera.util.metadata_utils import get_rtc_s1_product_metadata
-from opera.test.util.test_metadata_utils import create_test_rtc_nc_product
 
 
 class RtcS1PgeTestCase(unittest.TestCase):
