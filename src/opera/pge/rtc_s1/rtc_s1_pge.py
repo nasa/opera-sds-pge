@@ -11,6 +11,7 @@ from Sentinel-1 A/B (S1) PGE.
 """
 
 import os.path
+from datetime import datetime
 from os import walk
 from os.path import basename, getsize
 from pathlib import Path
@@ -121,13 +122,7 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
 
         The core file name component for RTC-S1 products consists of:
 
-        <PROJECT>_<LEVEL>_<PGE NAME>_<SOURCE>_{burst_id}_{acquisition_time}_
-        {production_time}_<SENSOR>_<SPACING>_<PRODUCT VERSION>
-
-        Where {burst_id}, {acquisition_time} and {production_time} are literal
-        format-string placeholders and are NOT filled in by this method.
-        Callers are responsible for assignment of these fields product-specific
-        fields via a format() call.
+        <PROJECT>_<LEVEL>_<PGE NAME>-<SOURCE>
 
         Notes
         -----
@@ -156,16 +151,9 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
         if self._cached_core_filename is not None:
             return self._cached_core_filename
 
-        product_version = str(self.runconfig.product_version)
-
-        if not product_version.startswith('v'):
-            product_version = f'v{product_version}'
-
         # Assign the core file to the cached class attribute
         self._cached_core_filename = (
-            f"{self.PROJECT}_{self.LEVEL}_{self.NAME}-{self.SOURCE}_"
-            "{burst_id}_{acquisition_time}Z_{production_time}Z_"  # To be filled in per-product
-            f"{self.SENSOR}_{self.SPACING}_{product_version}"
+            f"{self.PROJECT}_{self.LEVEL}_{self.NAME}-{self.SOURCE}"
         )
 
         return self._cached_core_filename
@@ -176,7 +164,7 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
 
         The filename for the RTC PGE consists of:
 
-            <Core filename>.<ext>
+            <Core filename>_<BURST ID>_<ACQUISITION TIME>_<PRODUCTION TIME>_<SENSOR>_<SPACING>_<PRODUCT VERSION>.<ext>
 
         Where <Core filename> is returned by RtcS1PostProcessorMixin._core_filename()
         and <ext> is the file extension carried over from inter_filename
@@ -196,22 +184,40 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
         """
         core_filename = self._core_filename(inter_filename)
 
+        product_metadata = get_rtc_s1_product_metadata(inter_filename)
+
         # Each RTC product is stored in a directory named for the corresponding burst ID
         burst_id = Path(os.path.dirname(inter_filename)).parts[-1]
+        burst_id = burst_id.upper().replace('_', '-')
 
         ext = os.path.splitext(inter_filename)[-1]
 
-        # TODO: this will come from product metadata eventually
         production_time = get_time_for_filename(self.production_datetime)
 
-        # TODO: this needs to be parsed from input SAFE file
-        acquisition_time = production_time
+        # Use doppler start time as the acq time and convert it to our format
+        # used for file naming
+        acquisition_time = product_metadata['identification']['zeroDopplerStartTime']
+        acquisition_time = get_time_for_filename(
+            datetime.strptime(acquisition_time, "%Y-%m-%dT%H:%M:%S.%f")
+        )
 
-        rtc_filename = core_filename.format(
-            burst_id=burst_id,
-            acquisition_time=acquisition_time,
-            production_time=production_time
-        ) + ext
+        # Get the sensor (should be either S1A or S1B)
+        sensor = product_metadata['identification']['missionId']
+
+        # Spacing is assumed to be identical in both X and Y direction
+        spacing = int(product_metadata['frequencyA']['xCoordinateSpacing'])
+
+        product_version = str(self.runconfig.product_version)
+
+        if not product_version.startswith('v'):
+            product_version = f'v{product_version}'
+
+        rtc_file_components = (
+            f"{burst_id}_{acquisition_time}Z_{production_time}Z_{sensor}_"
+            f"{spacing}_{product_version}"
+        )
+
+        rtc_filename = "_".join([core_filename, rtc_file_components]) + ext
 
         return rtc_filename
 
@@ -223,7 +229,7 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
 
         The core file name component for RTC-S1 ancillary products consists of:
 
-        <PROJECT>_<LEVEL>_<PGE NAME>_<SOURCE>_<PRODUCTION TIME>_<SENSOR>_<SPACING>_<PRODUCT VERSION>
+        <PROJECT>_<LEVEL>_<PGE NAME>-<SOURCE>_<PRODUCTION TIME>_<SENSOR>_<SPACING>_<PRODUCT VERSION>
 
         Since these files are not specific to any particular burst processed
         for an RTC job, fields such as burst ID and acquisition time are omitted
@@ -235,6 +241,14 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
             The file name component to assign to ancillary products created by this PGE.
 
         """
+        product_metadata = self._collect_rtc_product_metadata()
+
+        # Get the sensor (should be either S1A or S1B)
+        sensor = product_metadata['identification']['missionId']
+
+        # Spacing is assumed to be identical in both X and Y direction
+        spacing = int(product_metadata['frequencyA']['xCoordinateSpacing'])
+
         production_time = get_time_for_filename(self.production_datetime)
         product_version = str(self.runconfig.product_version)
 
@@ -242,8 +256,8 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
             product_version = f'v{product_version}'
 
         ancillary_filename = (
-            f"{self.PROJECT}_{self.LEVEL}_{self.NAME}_{self.SOURCE}_"
-            f"{production_time}Z_{self.SENSOR}_{self.SPACING}_{product_version}"
+            f"{self.PROJECT}_{self.LEVEL}_{self.NAME}-{self.SOURCE}_"
+            f"{production_time}Z_{sensor}_{spacing}_{product_version}"
         )
 
         return ancillary_filename
@@ -487,11 +501,7 @@ class RtcS1Executor(RtcS1PreProcessorMixin, RtcS1PostProcessorMixin, PgeExecutor
     SAS_VERSION = "0.1"  # Interface release https://github.com/opera-adt/RTC/releases/tag/v0.1
     """Version of the SAS wrapped by this PGE, should be updated as needed"""
 
-    # TODO: these are hardcoded for now, need to determine if they will come
-    #       from product metadata
     SOURCE = "S1"
-    SENSOR = "S1A"
-    SPACING = "30"
 
     def __init__(self, pge_name, runconfig_path, **kwargs):
         super().__init__(pge_name, runconfig_path, **kwargs)
