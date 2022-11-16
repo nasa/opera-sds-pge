@@ -9,7 +9,6 @@ Unit tests for the pge/rtc_s1/rtc_s1_pge.py module.
 """
 
 import os
-import shutil
 import tempfile
 import unittest
 from io import StringIO
@@ -131,11 +130,11 @@ class RtcS1PgeTestCase(unittest.TestCase):
 
         self.assertIn(f"RTC-S1 invoked with RunConfig {expected_sas_config_file}", log_contents)
 
-    def test_cslc_s1_pge_input_validation(self):
+    def test_rtc_s1_pge_input_validation(self):
         """Test the input validation checks."""
         runconfig_path = join(self.data_dir, 'test_rtc_s1_config.yaml')
 
-        test_runconfig_path = join(self.data_dir, 'invalid_cslc_s1_runconfig.yaml')
+        test_runconfig_path = join(self.data_dir, 'invalid_rtc_s1_runconfig.yaml')
 
         with open(runconfig_path, 'r', encoding='utf-8') as infile:
             runconfig_dict = yaml.safe_load(infile)
@@ -195,6 +194,129 @@ class RtcS1PgeTestCase(unittest.TestCase):
 
             self.assertIn(
                 f"Input file {new_name} does not have an expected file extension.",
+                log_contents
+            )
+        finally:
+            if os.path.exists(test_runconfig_path):
+                os.unlink(test_runconfig_path)
+
+    # rtc_s1_pge._output_validation() is tested in the following 3 tests
+    def test_rtc_s1_pge_output_validation_bad_extension(self):
+        """Test the output validation checks made by RtcS1PostProcessorMixin."""
+        runconfig_path = join(self.data_dir, 'test_rtc_s1_config.yaml')
+
+        test_runconfig_path = join(self.data_dir, 'invalid_rtc_s1_runconfig.yaml')
+
+        with open(runconfig_path, 'r', encoding='utf-8') as infile:
+            runconfig_dict = yaml.safe_load(infile)
+
+        file_name = 'rtc_product.bad'
+
+        primary_executable_group = runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']
+
+        primary_executable_group['ProgramOptions'] = [
+            '-p rtc_s1_test/output_dir/t069_147170_iw1/;',
+            f'/bin/echo hello world > rtc_s1_test/output_dir/t069_147170_iw1/{file_name};',
+            '/bin/echo RTC-S1 invoked with RunConfig']
+
+        with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+            yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+
+        try:
+            pge = RtcS1Executor(pge_name="RtcS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn(
+                f"SAS output file {file_name} extension error:",
+                log_contents
+            )
+        finally:
+            if os.path.exists(test_runconfig_path):
+                os.unlink(test_runconfig_path)
+
+    def test_rtc_s1_pge_output_validation_empty_dir(self):
+        """Test the output validation for an empty directory made by RtcS1PostProcessorMixin."""
+        output_dir = 'rtc_s1_test/output_dir/t069_147170_iw1'
+        runconfig_path = join(self.data_dir, 'test_rtc_s1_config.yaml')
+
+        test_runconfig_path = join(self.data_dir, 'invalid_rtc_s1_runconfig.yaml')
+
+        with open(runconfig_path, 'r', encoding='utf-8') as infile:
+            runconfig_dict = yaml.safe_load(infile)
+
+        primary_executable_group = runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']
+
+        primary_executable_group['ProgramOptions'] = [f'-p {output_dir}/;',
+                                                      '/bin/echo RTC-S1 invoked with RunConfig']
+
+        with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+            yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+
+        try:
+            pge = RtcS1Executor(pge_name="RtcS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn(
+                f"Empty SAS output directory: {output_dir}",
+                log_contents
+            )
+        finally:
+            if os.path.exists(test_runconfig_path):
+                os.unlink(test_runconfig_path)
+
+    def test_rtc_s1_pge_output_validation_empty_file(self):
+        """Test the output validation for an empty output file made by RtcS1PostProcessorMixin."""
+        runconfig_path = join(self.data_dir, 'test_rtc_s1_config.yaml')
+
+        test_runconfig_path = join(self.data_dir, 'invalid_rtc_s1_runconfig.yaml')
+
+        with open(runconfig_path, 'r', encoding='utf-8') as infile:
+            runconfig_dict = yaml.safe_load(infile)
+
+        file_name = 'rtc_product_empty.nc'
+        # output_dir = join(self.working_dir.name, 'rtc_s1_test/output_dir/t069_147170_iw2')
+        # os.makedirs(output_dir, exist_ok=True)
+
+        primary_executable_group = runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']
+
+        primary_executable_group['ProgramOptions'] = [
+            '-p rtc_s1_test/output_dir/t069_147170_iw1/;',
+            f'/bin/echo -n > rtc_s1_test/output_dir/t069_147170_iw1/{file_name};',
+            '/bin/echo RTC-S1 invoked with RunConfig']
+
+        with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+            yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+
+        try:
+            pge = RtcS1Executor(pge_name="RtcS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn(
+                f"SAS output file {file_name} exists, but is empty",
                 log_contents
             )
         finally:
