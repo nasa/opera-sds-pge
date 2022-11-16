@@ -21,6 +21,7 @@ import yaml
 from opera.pge import RunConfig
 from opera.pge.rtc_s1.rtc_s1_pge import RtcS1Executor
 from opera.util import PgeLogger
+from opera.test.util.test_metadata_utils import create_test_rtc_nc_product
 
 
 class RtcS1PgeTestCase(unittest.TestCase):
@@ -129,6 +130,37 @@ class RtcS1PgeTestCase(unittest.TestCase):
             log_contents = infile.read()
 
         self.assertIn(f"RTC-S1 invoked with RunConfig {expected_sas_config_file}", log_contents)
+
+    def test_iso_metadata_creation(self):
+        """
+        Test that the ISO metadata template is fully filled out when realistic
+        RTC metadata is available
+        """
+        runconfig_path = join(self.data_dir, 'test_rtc_s1_config.yaml')
+
+        pge = RtcS1Executor(pge_name="RtcS1PgeTest", runconfig_path=runconfig_path)
+
+        # Run only the pre-processor steps to ingest the runconfig and set up
+        # directories
+        pge.run_preprocessor()
+
+        output_product_dir = join(os.curdir, "rtc_s1_test/output_dir/t069_147170_iw1")
+
+        os.makedirs(output_product_dir, exist_ok=True)
+
+        # Create a dummy RTC product
+        rtc_file_path = join(output_product_dir, "rtc_product.nc")
+
+        create_test_rtc_nc_product(rtc_file_path)
+
+        # Initialize the core filename for the catalog metadata generation step
+        pge._core_filename(inter_filename=rtc_file_path)
+
+        # Render ISO metadata using the sample metadata
+        iso_metadata = pge._create_iso_metadata()
+
+        # Rendered template should not have any missing placeholders
+        self.assertNotIn('!Not found!', iso_metadata)
 
     def test_rtc_s1_pge_input_validation(self):
         """Test the input validation checks."""

@@ -26,11 +26,11 @@ RunConfig:
                 ProgramPath: mkdir
                 ProgramOptions:
                     - '-p rtc_s1_test/output_dir/t069_147170_iw1/;'
-                    - '/bin/echo hello world > rtc_s1_test/output_dir/t069_147170_iw1/rtc_product.nc;'
+                    - 'python3 -c "from opera.test.util.test_metadata_utils import create_test_rtc_nc_product; create_test_rtc_nc_product(\"rtc_s1_test/output_dir/t069_147170_iw1/rtc_product.nc\")";'
                     - '/bin/echo RTC-S1 invoked with RunConfig'
                 ErrorCodeBase: 300000
                 SchemaPath: pge/rtc_s1/schema/rtc_s1_sas_schema.yaml
-                IsoTemplatePath:
+                IsoTemplatePath: pge/rtc_s1/templates/OPERA_ISO_metadata_L2_RTC_S1_template.xml.jinja2
 
             QAExecutable:
                 Enabled: False
