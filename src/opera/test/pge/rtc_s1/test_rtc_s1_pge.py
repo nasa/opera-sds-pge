@@ -8,7 +8,9 @@ test_rtc_s1_pge.py
 Unit tests for the pge/rtc_s1/rtc_s1_pge.py module.
 """
 
+import glob
 import os
+import re
 import tempfile
 import unittest
 from io import StringIO
@@ -21,6 +23,8 @@ import yaml
 from opera.pge import RunConfig
 from opera.pge.rtc_s1.rtc_s1_pge import RtcS1Executor
 from opera.util import PgeLogger
+from opera.util.metadata_utils import create_test_rtc_nc_product
+from opera.util.metadata_utils import get_rtc_s1_product_metadata
 
 
 class RtcS1PgeTestCase(unittest.TestCase):
@@ -119,8 +123,7 @@ class RtcS1PgeTestCase(unittest.TestCase):
 
         # Lastly, check that the dummy output product(s) were created and renamed
         expected_output_file = join(
-            pge.runconfig.output_product_path,
-            pge._rtc_filename(inter_filename='rtc_s1_test/output_dir/t069_147170_iw1/rtc_product.nc')
+            pge.runconfig.output_product_path, list(pge.renamed_files.values())[0]
         )
         self.assertTrue(os.path.exists(expected_output_file))
 
@@ -129,6 +132,67 @@ class RtcS1PgeTestCase(unittest.TestCase):
             log_contents = infile.read()
 
         self.assertIn(f"RTC-S1 invoked with RunConfig {expected_sas_config_file}", log_contents)
+
+    def test_filename_application(self):
+        """Test the filename convention applied to CSLC output products"""
+        runconfig_path = join(self.data_dir, 'test_rtc_s1_config.yaml')
+
+        pge = RtcS1Executor(pge_name="RtcPgeTest", runconfig_path=runconfig_path)
+
+        pge.run()
+
+        # Grab the metadata generated from the PGE run, as it is used to generate
+        # the final filename for output products
+        output_files = glob.glob(join(pge.runconfig.output_product_path, "*.nc"))
+
+        self.assertEqual(len(output_files), 1)
+
+        output_file = output_files[0]
+
+        rtc_metadata = get_rtc_s1_product_metadata(output_file)
+
+        file_name_regex = rf"{pge.PROJECT}_{pge.LEVEL}_{pge.NAME}-{pge.SOURCE}_" \
+                          rf"\w{{4}}-\w{{6}}-\w{{3}}_" \
+                          rf"\d{{8}}T\d{{6}}Z_\d{{8}}T\d{{6}}Z_" \
+                          rf"{rtc_metadata['identification']['missionId']}_" \
+                          rf"{int(rtc_metadata['frequencyA']['xCoordinateSpacing'])}_" \
+                          rf"v{pge.runconfig.product_version}.nc"
+
+        result = re.match(file_name_regex, os.path.basename(output_file))
+
+        self.assertIsNotNone(result)
+        self.assertEqual(result.group(), os.path.basename(output_file))
+
+    def test_iso_metadata_creation(self):
+        """
+        Test that the ISO metadata template is fully filled out when realistic
+        RTC metadata is available
+        """
+        runconfig_path = join(self.data_dir, 'test_rtc_s1_config.yaml')
+
+        pge = RtcS1Executor(pge_name="RtcS1PgeTest", runconfig_path=runconfig_path)
+
+        # Run only the pre-processor steps to ingest the runconfig and set up
+        # directories
+        pge.run_preprocessor()
+
+        output_product_dir = join(os.curdir, "rtc_s1_test/output_dir/t069_147170_iw1")
+
+        os.makedirs(output_product_dir, exist_ok=True)
+
+        # Create a dummy RTC product
+        rtc_file_path = join(output_product_dir, "rtc_product.nc")
+
+        create_test_rtc_nc_product(rtc_file_path)
+
+        # Initialize the core filename for the catalog metadata generation step
+        pge._core_filename(inter_filename=rtc_file_path)
+
+        # Render ISO metadata using the sample metadata
+        iso_metadata = pge._create_iso_metadata()
+
+        # Rendered template should not have any missing placeholders
+        self.assertNotIn('!Not found!', iso_metadata)
 
     def test_rtc_s1_pge_input_validation(self):
         """Test the input validation checks."""

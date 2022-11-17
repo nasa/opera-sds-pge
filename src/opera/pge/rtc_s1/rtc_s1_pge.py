@@ -11,6 +11,7 @@ from Sentinel-1 A/B (S1) PGE.
 """
 
 import os.path
+from datetime import datetime
 from os import walk
 from os.path import basename, getsize
 from pathlib import Path
@@ -20,6 +21,8 @@ from opera.pge.base.base_pge import PostProcessorMixin
 from opera.pge.base.base_pge import PreProcessorMixin
 from opera.util.error_codes import ErrorCode
 from opera.util.input_validation import validate_slc_s1_inputs
+from opera.util.metadata_utils import get_rtc_s1_product_metadata
+from opera.util.render_jinja2 import render_jinja2
 from opera.util.time import get_time_for_filename
 
 
@@ -119,13 +122,7 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
 
         The core file name component for RTC-S1 products consists of:
 
-        <PROJECT>_<LEVEL>_<PGE NAME>_<SOURCE>_{burst_id}_{acquisition_time}_
-        {production_time}_<SENSOR>_<SPACING>_<PRODUCT VERSION>
-
-        Where {burst_id}, {acquisition_time} and {production_time} are literal
-        format-string placeholders and are NOT filled in by this method.
-        Callers are responsible for assignment of these fields product-specific
-        fields via a format() call.
+        <PROJECT>_<LEVEL>_<PGE NAME>-<SOURCE>
 
         Notes
         -----
@@ -154,16 +151,9 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
         if self._cached_core_filename is not None:
             return self._cached_core_filename
 
-        product_version = str(self.runconfig.product_version)
-
-        if not product_version.startswith('v'):
-            product_version = f'v{product_version}'
-
         # Assign the core file to the cached class attribute
         self._cached_core_filename = (
-            f"{self.PROJECT}_{self.LEVEL}_{self.NAME}-{self.SOURCE}_"
-            "{burst_id}_{acquisition_time}Z_{production_time}Z_"  # To be filled in per-product
-            f"{self.SENSOR}_{self.SPACING}_{product_version}"
+            f"{self.PROJECT}_{self.LEVEL}_{self.NAME}-{self.SOURCE}"
         )
 
         return self._cached_core_filename
@@ -174,7 +164,7 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
 
         The filename for the RTC PGE consists of:
 
-            <Core filename>.<ext>
+            <Core filename>_<BURST ID>_<ACQUISITION TIME>_<PRODUCTION TIME>_<SENSOR>_<SPACING>_<PRODUCT VERSION>.<ext>
 
         Where <Core filename> is returned by RtcS1PostProcessorMixin._core_filename()
         and <ext> is the file extension carried over from inter_filename
@@ -194,22 +184,40 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
         """
         core_filename = self._core_filename(inter_filename)
 
+        product_metadata = get_rtc_s1_product_metadata(inter_filename)
+
         # Each RTC product is stored in a directory named for the corresponding burst ID
         burst_id = Path(os.path.dirname(inter_filename)).parts[-1]
+        burst_id = burst_id.upper().replace('_', '-')
 
         ext = os.path.splitext(inter_filename)[-1]
 
-        # TODO: this will come from product metadata eventually
         production_time = get_time_for_filename(self.production_datetime)
 
-        # TODO: this needs to be parsed from input SAFE file
-        acquisition_time = production_time
+        # Use doppler start time as the acq time and convert it to our format
+        # used for file naming
+        acquisition_time = product_metadata['identification']['zeroDopplerStartTime']
+        acquisition_time = get_time_for_filename(
+            datetime.strptime(acquisition_time, "%Y-%m-%dT%H:%M:%S.%f")
+        )
 
-        rtc_filename = core_filename.format(
-            burst_id=burst_id,
-            acquisition_time=acquisition_time,
-            production_time=production_time
-        ) + ext
+        # Get the sensor (should be either S1A or S1B)
+        sensor = product_metadata['identification']['missionId']
+
+        # Spacing is assumed to be identical in both X and Y direction
+        spacing = int(product_metadata['frequencyA']['xCoordinateSpacing'])
+
+        product_version = str(self.runconfig.product_version)
+
+        if not product_version.startswith('v'):
+            product_version = f'v{product_version}'
+
+        rtc_file_components = (
+            f"{burst_id}_{acquisition_time}Z_{production_time}Z_{sensor}_"
+            f"{spacing}_{product_version}"
+        )
+
+        rtc_filename = "_".join([core_filename, rtc_file_components]) + ext
 
         return rtc_filename
 
@@ -221,7 +229,7 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
 
         The core file name component for RTC-S1 ancillary products consists of:
 
-        <PROJECT>_<LEVEL>_<PGE NAME>_<SOURCE>_<PRODUCTION TIME>_<SENSOR>_<SPACING>_<PRODUCT VERSION>
+        <PROJECT>_<LEVEL>_<PGE NAME>-<SOURCE>_<PRODUCTION TIME>_<SENSOR>_<SPACING>_<PRODUCT VERSION>
 
         Since these files are not specific to any particular burst processed
         for an RTC job, fields such as burst ID and acquisition time are omitted
@@ -233,6 +241,14 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
             The file name component to assign to ancillary products created by this PGE.
 
         """
+        product_metadata = self._collect_rtc_product_metadata()
+
+        # Get the sensor (should be either S1A or S1B)
+        sensor = product_metadata['identification']['missionId']
+
+        # Spacing is assumed to be identical in both X and Y direction
+        spacing = int(product_metadata['frequencyA']['xCoordinateSpacing'])
+
         production_time = get_time_for_filename(self.production_datetime)
         product_version = str(self.runconfig.product_version)
 
@@ -240,8 +256,8 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
             product_version = f'v{product_version}'
 
         ancillary_filename = (
-            f"{self.PROJECT}_{self.LEVEL}_{self.NAME}_{self.SOURCE}_"
-            f"{production_time}Z_{self.SENSOR}_{self.SPACING}_{product_version}"
+            f"{self.PROJECT}_{self.LEVEL}_{self.NAME}-{self.SOURCE}_"
+            f"{production_time}Z_{sensor}_{spacing}_{product_version}"
         )
 
         return ancillary_filename
@@ -319,6 +335,131 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
         """
         return self._ancillary_filename() + ".qa.log"
 
+    def _collect_rtc_product_metadata(self):
+        """
+        Gathers the available metadata from a representative RTC product created by
+        the RTC-S1 SAS. This metadata is then formatted for use with filling in
+        the ISO metadata template for the RTC-S1 PGE.
+
+        Returns
+        -------
+        output_product_metadata : dict
+            Dictionary containing RTC-S1 output product metadata, formatted for
+            use with the ISO metadata Jinja2 template.
+
+        """
+        output_products = self.runconfig.get_output_product_filenames()
+
+        # TODO: will need to support GeoTIFF/COG for later versions of SAS
+        nc_product = None
+
+        for output_product in output_products:
+            if output_product.endswith('.nc'):
+                nc_product = output_product
+                break
+        else:
+            msg = (f"Could not find a NetCDF format RTC product to extract "
+                   f"metadata from within {self.runconfig.output_product_path}")
+            self.logger.critical(self.name, ErrorCode.ISO_METADATA_RENDER_FAILED, msg)
+
+        output_product_metadata = get_rtc_s1_product_metadata(nc_product)
+
+        # Fill in some additional fields expected within the ISO
+        output_product_metadata['frequencyA']['frequencyAWidth'] = len(output_product_metadata['frequencyA']['xCoordinates'])
+        output_product_metadata['frequencyA']['frequencyALength'] = len(output_product_metadata['frequencyA']['yCoordinates'])
+
+        # TODO: the following fields seems to be missing in the interface delivery products,
+        #       but are documented, remove these kludges once they are actually available
+        if 'burst_polygon' not in output_product_metadata:
+            output_product_metadata['burst_polygon'] = "POLYGON ((399015 3859970, 398975 3860000, ..., 399015 3859970))"
+
+        if 'azimuthBandwidth' not in output_product_metadata['frequencyA']:
+            output_product_metadata['frequencyA']['azimuthBandwidth'] = 12345678.9
+
+        if 'noiseCorrectionFlag' not in output_product_metadata['frequencyA']:
+            output_product_metadata['frequencyA']['noiseCorrectionFlag'] = False
+
+        if 'productVersion' not in output_product_metadata['identification']:
+            output_product_metadata['identification']['productVersion'] = '1.0'
+
+        if 'plannedDatatakeId' not in output_product_metadata['identification']:
+            output_product_metadata['identification']['plannedDatatakeId'] = ['datatake1', 'datatake2']
+
+        if 'plannedObservationId' not in output_product_metadata['identification']:
+            output_product_metadata['identification']['plannedObservationId'] = ['obs1', 'obs2']
+        # TODO: end kludges
+
+        return output_product_metadata
+
+    def _create_custom_metadata(self):
+        """
+        Creates the "custom data" dictionary used with the ISO metadata rendering.
+
+        Custom data contains all metadata information needed for the ISO template
+        that is not found within any of the other metadata sources (such as the
+        RunConfig, output product(s), or catalog metadata).
+
+        Returns
+        -------
+        custom_metadata : dict
+            Dictionary containing the custom metadata as expected by the ISO
+            metadata Jinja2 template.
+
+        """
+        custom_metadata = {
+            'ISO_OPERA_FilePackageName': self._ancillary_filename(),
+            'ISO_OPERA_ProducerGranuleId': self._ancillary_filename(),
+            'MetadataProviderAction': "creation",
+            'GranuleFilename': self._ancillary_filename(),
+            'ISO_OPERA_ProjectKeywords': ['OPERA', 'JPL', 'RTC', 'Radiometric', 'Terrain', 'Corrected'],
+            'ISO_OPERA_PlatformKeywords': ['S1'],
+            'ISO_OPERA_InstrumentKeywords': ['Sentinel 1 A/B']
+        }
+
+        return custom_metadata
+
+    def _create_iso_metadata(self):
+        """
+        Creates a rendered version of the ISO metadata template for RTC-S1
+        output products using metadata from the following locations:
+
+            * RunConfig (in dictionary form)
+            * Output products (dictionaries extracted from NetCDF format)
+            * Catalog metadata
+            * "Custom" metadata (all metadata not found anywhere else)
+
+        Returns
+        -------
+        rendered_template : str
+            The ISO metadata template for RTC-S1 filled in with values from the
+            sourced metadata dictionaries.
+
+        """
+        runconfig_dict = self.runconfig.asdict()
+
+        product_output_dict = self._collect_rtc_product_metadata()
+
+        catalog_metadata_dict = self._create_catalog_metadata().asdict()
+
+        custom_data_dict = self._create_custom_metadata()
+
+        iso_metadata = {
+            'run_config': runconfig_dict,
+            'product_output': product_output_dict,
+            'catalog_metadata': catalog_metadata_dict,
+            'custom_data': custom_data_dict
+        }
+
+        iso_template_path = os.path.abspath(self.runconfig.iso_template_path)
+
+        if not os.path.exists(iso_template_path):
+            msg = f"Could not load ISO template {iso_template_path}, file does not exist"
+            self.logger.critical(self.name, ErrorCode.ISO_METADATA_TEMPLATE_NOT_FOUND, msg)
+
+        rendered_template = render_jinja2(iso_template_path, iso_metadata, self.logger)
+
+        return rendered_template
+
     def run_postprocessor(self, **kwargs):
         """
         Executes the post-processing steps for the RTC-S1 PGE.
@@ -360,11 +501,7 @@ class RtcS1Executor(RtcS1PreProcessorMixin, RtcS1PostProcessorMixin, PgeExecutor
     SAS_VERSION = "0.1"  # Interface release https://github.com/opera-adt/RTC/releases/tag/v0.1
     """Version of the SAS wrapped by this PGE, should be updated as needed"""
 
-    # TODO: these are hardcoded for now, need to determine if they will come
-    #       from product metadata
     SOURCE = "S1"
-    SENSOR = "S1A"
-    SPACING = "30"
 
     def __init__(self, pge_name, runconfig_path, **kwargs):
         super().__init__(pge_name, runconfig_path, **kwargs)
