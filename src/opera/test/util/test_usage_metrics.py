@@ -102,9 +102,9 @@ class UsageMetricsTestCase(unittest.TestCase):
             self.assertEqual(str(metrics['os.max_rss_kb.largest_child_process']), re.match(int_regex,
                              str(metrics['os.max_rss_kb.largest_child_process'])).group())
             # Verify that the User process times are greater than the kernel process times
-            self.assertGreater(metrics['os.cpu.seconds.user'], metrics['os.cpu.seconds.sys'])
+            self.assertGreaterEqual(metrics['os.cpu.seconds.user'], metrics['os.cpu.seconds.sys'])
             # Verify that the main process, takes more RAM than the child process
-            self.assertGreater(metrics['os.max_rss_kb.main_process'], metrics['os.max_rss_kb.largest_child_process'])
+            self.assertGreaterEqual(metrics['os.max_rss_kb.main_process'], metrics['os.max_rss_kb.largest_child_process'])
 
             # Testing peak_vmm_kb requires the test to run in a Linux environment,
             # otherwise we expect -1 back, so test both
