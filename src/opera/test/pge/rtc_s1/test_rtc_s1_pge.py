@@ -337,7 +337,7 @@ class RtcS1PgeTestCase(unittest.TestCase):
                 log_contents = infile.read()
 
             self.assertIn(
-                f"Empty SAS output directory: {output_dir}",
+                f"Empty SAS output directory: {os.path.abspath(output_dir)}",
                 log_contents
             )
         finally:
