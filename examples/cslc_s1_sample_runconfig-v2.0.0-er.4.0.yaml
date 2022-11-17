@@ -1,4 +1,4 @@
-# Sample RunConfig for use with the CSLC-S1 PGE v2.0.0-er.3.0
+# Sample RunConfig for use with the CSLC-S1 PGE v2.0.0-er.4.0
 # This RunConfig should require minimal changes in order to be used with the
 # OPERA PCM.
 
@@ -22,8 +22,8 @@ RunConfig:
                 # as well as the path to the Orbit Ephemerides file(s)
                 # Paths must correspond to the file system within the Docker container
                 InputFilePaths:
-                    - /home/compass_user/input_data/S1A_IW_SLC__1SDV_20220501T015035_20220501T015102_043011_0522A4_42CC.zip
-                    - /home/compass_user/input_data/S1A_OPER_AUX_POEORB_OPOD_20220521T081912_V20220430T225942_20220502T005942.EOF
+                    - /home/compass_user/input_dir/S1A_IW_SLC__1SDV_20220501T015035_20220501T015102_043011_0522A4_42CC.zip
+                    - /home/compass_user/input_dir/S1A_OPER_AUX_POEORB_OPOD_20220521T081912_V20220430T225942_20220502T005942.EOF
 
             DynamicAncillaryFilesGroup:
                 # Map of ancillary file types to paths to the file
@@ -32,7 +32,7 @@ RunConfig:
                     # Path to the Digital Elevation Model
                     # Must be either a single .tif, or a .vrt that points to one
                     # or more .tif files
-                    dem_file: /home/compass_user/input_data/dem_4326.tiff
+                    dem_file: /home/compass_user/input_dir/dem_4326.tiff
 
             ProductPathGroup:
                 # Path to where output products should be stored
@@ -56,10 +56,6 @@ RunConfig:
 
                 # Product version specific to output products
                 ProductVersion: 1.0
-
-                # Rolls up versions of all software/data used to generate versions
-                # from the data products (CRID) (TODO placeholder value)
-                CompositeReleaseID: TestIdCslc
 
                 # Path to the executable to run, path must be reachable from
                 # within the Docker container (i.e. findable with a "which" command)
@@ -128,18 +124,18 @@ RunConfig:
                     input_file_group:
                         # Required, list of SLC SAFE files (min=1)
                         safe_file_path:
-                            - /home/compass_user/input_data/S1A_IW_SLC__1SDV_20220501T015035_20220501T015102_043011_0522A4_42CC.zip
+                            - /home/compass_user/input_dir/S1A_IW_SLC__1SDV_20220501T015035_20220501T015102_043011_0522A4_42CC.zip
 
                         # Required, list of Orbit Ephemerides (EOF) files (min=1)
                         orbit_file_path:
-                            - /home/compass_user/input_data/S1A_OPER_AUX_POEORB_OPOD_20220521T081912_V20220430T225942_20220502T005942.EOF
+                            - /home/compass_user/input_dir/S1A_OPER_AUX_POEORB_OPOD_20220521T081912_V20220430T225942_20220502T005942.EOF
 
                         # Required. The unique burst ID to process
                         burst_id: t64_135524_iw2
 
                     # This section should match the DynamicAncillaryFilesGroup of the PGE RunConfig
                     dynamic_ancillary_file_group:
-                        dem_file: /home/compass_user/input_data/dem_4326.tiff
+                        dem_file: /home/compass_user/input_dir/dem_4326.tiff
 
                     product_path_group:
                         # This should match the path used for OutputProductPath

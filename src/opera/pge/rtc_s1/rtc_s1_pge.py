@@ -84,11 +84,12 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
         """
         out_dir_walk_dict = {}
 
-        output_dir = self.runconfig.output_product_path
+        output_dir = os.path.abspath(self.runconfig.output_product_path)
+        scratch_dir = os.path.abspath(self.runconfig.scratch_path)
 
         # from 'output_dir' make a dictionary of {sub_dir_name: [file1, file2,...]}
         for path, dirs, files in walk(output_dir):
-            if not dirs:  # Ignore files in 'output_dir'
+            if not dirs and scratch_dir not in path:  # Ignore files in 'output_dir' and scratch directory
                 out_dir_walk_dict[basename(path)] = files
 
         output_format = self.runconfig.sas_config['runconfig']['groups']['product_path_group']['output_format']
