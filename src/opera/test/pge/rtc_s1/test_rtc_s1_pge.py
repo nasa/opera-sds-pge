@@ -134,7 +134,7 @@ class RtcS1PgeTestCase(unittest.TestCase):
         self.assertIn(f"RTC-S1 invoked with RunConfig {expected_sas_config_file}", log_contents)
 
     def test_filename_application(self):
-        """Test the filename convention applied to CSLC output products"""
+        """Test the filename convention applied to RTC output products"""
         runconfig_path = join(self.data_dir, 'test_rtc_s1_config.yaml')
 
         pge = RtcS1Executor(pge_name="RtcPgeTest", runconfig_path=runconfig_path)
