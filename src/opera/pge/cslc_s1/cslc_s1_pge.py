@@ -109,7 +109,7 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
 
         The core file name component of the CSLC-S1 PGE consists of:
 
-        <PROJECT>_<LEVEL>_<PGE NAME>_<SENSOR>_<MODE>_<BURST ID>_<POL>_<ACQ TIMETAG>_<PRODUCT VER>_<PROD TIMETAG>
+        <PROJECT>_<LEVEL>_<PGE NAME>
 
         Callers of this function are responsible for assignment of any other
         product-specific fields, such as the file extension.
@@ -141,50 +141,26 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
         if self._cached_core_filename is not None:
             return self._cached_core_filename
 
-        if not inter_filename:
-            msg = (f"No filename provided to {self.__class__.__name__}._core_filename(), "
-                   f"First call must provide a filename before result is cached.")
-            self.logger.critical(self.name, ErrorCode.FILE_MOVE_FAILED, msg)
-
-        # CSLC-S1 SAS produces two output files: the image and a separate
-        # json metadata file, each with the same base filename.
-        # We use that here to always locate and read the json metadata file.
-        metadata_filename = os.path.splitext(inter_filename)[0] + '.json'
-
-        with open(metadata_filename, 'r') as infile:
-            cslc_metadata = json.load(infile)
-
-        sensor = cslc_metadata['platform_id']
-        mode = 'IW'  # fixed for all S1-based CSLC products
-        burst_id = cslc_metadata['burst_id'].upper().replace('_', '-')
-        pol = cslc_metadata['polarization']
-        acquisition_time = get_time_for_filename(
-            datetime.strptime(cslc_metadata['sensing_start'], '%Y-%m-%d %H:%M:%S.%f')
-        )
-
-        product_version = str(self.runconfig.product_version)
-
-        if not product_version.startswith('v'):
-            product_version = f'v{product_version}'
-
-        production_time = get_time_for_filename(self.production_datetime)
-
+        # Assign the core file name to the cached class attribute
         self._cached_core_filename = (
-            f"{self.PROJECT}_{self.LEVEL}_{self.NAME}-{sensor}_{mode}_{burst_id}_"
-            f"{pol}_{acquisition_time}Z_{product_version}_{production_time}Z"
+            f"{self.PROJECT}_{self.LEVEL}_{self.NAME}"
         )
 
         return self._cached_core_filename
 
-    def _geotiff_filename(self, inter_filename):
+    def _cslc_filename(self, inter_filename):
         """
-        Returns the file name to use for GeoTIFF's produced by the CSLC-S1 PGE.
+        Returns the file name to use for burst-based CSLC products produced by this PGE.
 
-        The GeoTIFF filename for the CSLC-S1 PGE consists of:
+        The filename for the CSLC-S1 burst products consists of:
 
-            <Core filename>.tiff
+            <Core filename>-<SENSOR>_<MODE>_<BURST ID>_<POL>_<ACQ TIMETAG>_<PRODUCT VER>_<PROD TIMETAG>
 
         Where <Core filename> is returned by CslcS1PostProcessorMixin._core_filename()
+
+        Also note that this does not include a file extension, which should be
+        added to the return value of this method by any callers to distinguish
+        different file formats that are produced for each burst in an input SLC.
 
         Parameters
         ----------
@@ -201,7 +177,56 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
         """
         core_filename = self._core_filename(inter_filename)
 
-        return f"{core_filename}.tiff"
+        cslc_metadata = self._collect_cslc_product_metadata()
+
+        sensor = cslc_metadata['platform_id']
+        mode = 'IW'  # fixed to Interferometric Wide (IW) for all S1-based CSLC products
+        burst_id = cslc_metadata['burst_id'].upper().replace('_', '-')
+        pol = cslc_metadata['polarization']
+        acquisition_time = get_time_for_filename(
+            datetime.strptime(cslc_metadata['sensing_start'], '%Y-%m-%d %H:%M:%S.%f')
+        )
+
+        product_version = str(self.runconfig.product_version)
+
+        if not product_version.startswith('v'):
+            product_version = f'v{product_version}'
+
+        production_time = get_time_for_filename(self.production_datetime)
+
+        cslc_file_components = (
+            f"{core_filename}-{sensor}_{mode}_{burst_id}_{pol}_"
+            f"{acquisition_time}Z_{product_version}_{production_time}Z"
+        )
+
+        return cslc_file_components
+
+    def _geotiff_filename(self, inter_filename):
+        """
+        Returns the file name to use for GeoTIFF's produced by the CSLC-S1 PGE.
+
+        The GeoTIFF filename for the CSLC-S1 PGE consists of:
+
+            <CSLC filename>.tiff
+
+        Where <CSLC filename> is returned by CslcS1PostProcessorMixin._cslc_filename()
+
+        Parameters
+        ----------
+        inter_filename : str
+            The intermediate filename of the output GeoTIFF to generate a
+            filename for. This parameter may be used to inspect the file in order
+            to derive any necessary components of the returned filename.
+
+        Returns
+        -------
+        geotiff_filename : str
+            The file name to assign to GeoTIFF product(s) created by this PGE.
+
+        """
+        cslc_filename = self._cslc_filename(inter_filename)
+
+        return f"{cslc_filename}.tiff"
 
     def _json_metadata_filename(self, inter_filename):
         """
@@ -210,9 +235,9 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
 
         The JSON metadata filename for the CSLC-S1 PGE consists of:
 
-            <Core filename>.json
+            <CSLC filename>.json
 
-        Where <Core filename> is returned by CslcS1PostProcessorMixin._core_filename()
+        Where <CSLC filename> is returned by CslcS1PostProcessorMixin._cslc_filename()
 
         Parameters
         ----------
@@ -227,9 +252,126 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
             The file name to assign to JSON metadata product(s) created by this PGE.
 
         """
-        core_filename = self._core_filename(inter_filename)
+        cslc_filename = self._cslc_filename(inter_filename)
 
-        return f"{core_filename}.json"
+        return f"{cslc_filename}.json"
+
+    def _ancillary_filename(self):
+        """
+        Helper method to derive the core component of the file names for the
+        ancillary products associated to a PGE job (catalog metadata, log file,
+        etc...).
+
+        The core file name component for CSLC-S1 ancillary products consists of:
+
+        <PROJECT>_<LEVEL>_<PGE NAME>-<SENSOR>_<MODE>_<POL>_<PRODUCT VER>_<PROD TIMETAG>
+
+        Since these files are not specific to any particular burst processed for
+        a CSLC job, fields such as burst ID and acquisition time are omitted from
+        this file pattern.
+
+        Also note that this does not include a file extension, which should be
+        added to the return value of this method by any callers to distinguish
+        the different formats of ancillary outputs produced by this PGE.
+
+        Returns
+        -------
+        ancillary_filename : str
+            The file name component to assign to ancillary products created by this PGE.
+
+        """
+        cslc_metadata = self._collect_cslc_product_metadata()
+
+        sensor = cslc_metadata['platform_id']
+        mode = 'IW'  # fixed for all S1-based CSLC products
+        pol = cslc_metadata['polarization']
+
+        product_version = str(self.runconfig.product_version)
+
+        if not product_version.startswith('v'):
+            product_version = f'v{product_version}'
+
+        production_time = get_time_for_filename(self.production_datetime)
+
+        ancillary_filename = (
+            f"{self.PROJECT}_{self.LEVEL}_{self.NAME}-{sensor}_{mode}_{pol}_"
+            f"{product_version}_{production_time}Z"
+        )
+
+        return ancillary_filename
+
+    def _catalog_metadata_filename(self):
+        """
+        Returns the file name to use for Catalog Metadata produced by the CSLC-S1 PGE.
+
+        The Catalog Metadata file name for the CSLC-S1 PGE consists of:
+
+            <Ancillary filename>.catalog.json
+
+        Where <Ancillary filename> is returned by CslcPostProcessorMixin._ancillary_filename()
+
+        Returns
+        -------
+        catalog_metadata_filename : str
+            The file name to assign to the Catalog Metadata product created by this PGE.
+
+        """
+        return self._ancillary_filename() + ".catalog.json"
+
+    def _iso_metadata_filename(self):
+        """
+        Returns the file name to use for ISO Metadata produced by the CSLC-S1 PGE.
+
+        The ISO Metadata file name for the CSLC-S1 PGE consists of:
+
+            <Ancillary filename>.iso.xml
+
+        Where <Ancillary filename> is returned by CslcS1PostProcessorMixin._ancillary_filename()
+
+        Returns
+        -------
+        iso_metadata_filename : str
+            The file name to assign to the ISO Metadata product created by this PGE.
+
+        """
+        return self._ancillary_filename() + ".iso.xml"
+
+    def _log_filename(self):
+        """
+        Returns the file name to use for the PGE/SAS log file produced by the CSLC-S1 PGE.
+
+        The log file name for the CSLC-S1 PGE consists of:
+
+            <Ancillary filename>.log
+
+        Where <Ancillary filename> is returned by CslcS1PostProcessorMixin._ancillary_filename()
+
+        Returns
+        -------
+        log_filename : str
+            The file name to assign to the PGE/SAS log created by this PGE.
+
+        """
+        return self._ancillary_filename() + ".log"
+
+    def _qa_log_filename(self):
+        """
+        Returns the file name to use for the Quality Assurance application log
+        file produced by the CSLC-S1 PGE.
+
+        The log file name for the CSLC-S1 PGE consists of:
+
+            <Ancillary filename>.qa.log
+
+        Where <Ancillary filename> is returned by CslcS1PostProcessorMixin._ancillary_filename()
+
+        Returns
+        -------
+        log_filename : str
+            The file name to assign to the QA log created by this PGE.
+
+        """
+        return self._ancillary_filename() + ".qa.log"
 
     def _collect_cslc_product_metadata(self):
         """
