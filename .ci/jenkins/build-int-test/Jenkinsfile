@@ -6,7 +6,7 @@ pipeline {
         DOCKER_IMAGE_PREFIX = 'opera_pge'
         DOCKER_TAG = """${sh(
                      returnStdout: true,
-                     script: 'echo ${GIT_BRANCH##*/}'
+                     script: 'echo ${GIT_BRANCH##*/}-build-int-test-$$'
                      ).trim()}"""
     }
     parameters {
