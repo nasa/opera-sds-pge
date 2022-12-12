@@ -127,7 +127,7 @@ RunConfig:
                             - /home/rtc_user/input_dir/S1B_IW_SLC__1SDV_20180504T104507_20180504T104535_010770_013AEE_919F.zip
                         # Required. List of orbit (EOF) files (min=1)
                         orbit_file_path:
-                            - r/home/rtc_user/input_dir/S1B_OPER_AUX_POEORB_OPOD_20180524T110543_V20180503T225942_20180505T005942.EOF
+                            - /home/rtc_user/input_dir/S1B_OPER_AUX_POEORB_OPOD_20180524T110543_V20180503T225942_20180505T005942.EOF
                         # Burst to process. Empty to process all bursts
                         burst_id:
 

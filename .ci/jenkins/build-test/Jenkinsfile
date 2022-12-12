@@ -8,7 +8,7 @@ pipeline {
         DOCKER_IMAGE_SUFFIXES = 'dswx_hls,cslc_s1,rtc_s1'
         DOCKER_TAG = """${sh(
                      returnStdout: true,
-                     script: 'echo ${GIT_BRANCH##*/}'
+                     script: 'echo ${GIT_BRANCH##*/}-build-test-$$'
                      ).trim()}"""
     }
     parameters {
