@@ -19,6 +19,7 @@ Integration Testing DSWx-HLS PGE docker image...
 
 PGE_NAME="dswx_hls"
 PGE_IMAGE="opera_pge/${PGE_NAME}"
+SAMPLE_TIME=5
 
 # defaults, test data and runconfig files should be updated as-needed to use
 # the latest available as defaults for use with the Jenkins pipeline call
@@ -28,6 +29,8 @@ PGE_IMAGE="opera_pge/${PGE_NAME}"
 [ -z "${PGE_TAG}" ] && PGE_TAG="${USER}-dev"
 [ -z "${TESTDATA}" ] && TESTDATA="delivery_cal_val_3.1.zip"
 [ -z "${RUNCONFIG}" ] && RUNCONFIG="opera_pge_dswx_hls_delivery_3.1_cal_val_runconfig.yaml"
+
+metrics_collection_start "$PGE_NAME" "$PGE_IMAGE" "$SAMPLE_TIME"
 
 # Create the test output directory in the workspace
 test_int_setup_results_directory
@@ -70,6 +73,8 @@ do
     echo "Creating scratch directory $scratch_dir."
     mkdir $scratch_dir
 
+    # Start metrics collection
+    metrics_collection_start "$PGE" "$IMAGE_NAME" "$SAMPLE_TIME"
 
     echo "Running Docker image ${PGE_IMAGE}:${PGE_TAG} for ${data_dir}"
     docker run --rm -u $UID:$(id -g) -v $(pwd):/home/conda/runconfig:ro \

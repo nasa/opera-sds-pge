@@ -208,6 +208,7 @@ def main():
     container_info = sys.argv[1]
     stats_file = sys.argv[2]
     misc_file = sys.argv[3]
+    output_dir = sys.argv[4]  # in the form <local_dir>/output_dir:/home/conda/output_dir
 
     temp_stats = "temp_opera_docker_stats.csv"
     temp_misc = "temp_opera_misc_stats.csv"
@@ -218,9 +219,16 @@ def main():
 
     current_time = datetime.datetime.today().strftime('%Y%m%d_%H%M%S')
 
+    # Get the proper output directory
+    output_dir = output_dir.split(':')
+    if sys.platform == 'darwin':
+        output_path = output_dir[0]
+    else:
+        output_path = output_dir[1]
+
     # For now make two formatted files
-    docker_report_file = f"docker_metrics_{container_info}_{current_time}.csv"
-    misc_report_file = f"misc_metrics_{container_info}_{current_time}.csv"
+    docker_report_file = f"{output_path}/docker_metrics_{container_info}_{current_time}.csv"
+    misc_report_file = f"{output_path}/misc_metrics_{container_info}_{current_time}.csv"
 
     # read files into lists
     stats_list = make_lists(temp_stats)
@@ -228,9 +236,7 @@ def main():
 
     # Write out the docker stats file
     docker_columns = "SECONDS, Name, PIDs, CPU, Memory, MemoryP, NetSend, NetRecv, DiskRead, DiskWrite"
-    # Todo - used to convert non-string data to numbers
-    # convert = {'SECONDS': int(), 'Name': str(), 'PIDs': int(), 'CPU': float(), 'Memory': float(), 'MemoryP': float(),
-    #            'NetSend': float(), 'NetRecv': float(), 'DiskRead': float(), 'DiskWrite': float()}
+
     with open(docker_report_file, 'w') as out_file:
         out_file.write(f"{docker_columns}\n")
         for stats_row in stats_list:

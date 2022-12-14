@@ -118,17 +118,15 @@ copy_pge_files() {
 # Start the metrics collection of both docker stats and the miscellaneous os statistics.
 # Parameters:
 #     pge:  pge we are working on
-#     container_info:  the name of the docker file from which to gather statistics
+#     container_info:  the name and tag of the docker file.  (e.g. opera/proteus:cal_val_3.1)
 #     sample_time:  The time between sampling of the statistics.
 metrics_collection_start()
 {
+    echo "Start Metrics Collection"
     local pge=$1
     # Split seconds argument into docker name and tag
-    local cont_name="$(echo "$2" | cut -d':' -f1)"
+    local image_name="$(echo "$2" | cut -d':' -f1)"
     local container_tag="$(echo "$2" | cut -d':' -f2)"
-    # TODO: cont_info should always contain pge_docker_tag, PGE, and runconfig (at a minimum)
-    # container_info="${pge}_${cont_name}_${container_tag}"
-    local container_info="$pge"
 
     # If no sample_time value is passed - default to a value of 1
     if [[ -z "$3" ]]
@@ -140,8 +138,8 @@ metrics_collection_start()
 
     echo "Using sample time of: $sample_time"
     # Initialize output files and statistics format
-    metrics_stats="${container_info}_metrics_stats.csv"
-    metrics_misc="${container_info}_metrics_misc.csv"
+    metrics_stats="${pge}_metrics_stats.csv"
+    metrics_misc="${pge}_metrics_misc.csv"
 
     stat_format="{{.Name}},CPU,{{.CPUPerc}},MEM,{{.MemUsage}},MEM %,{{.MemPerc}},NET,{{.NetIO}},BLOCK,{{.BlockIO}},PIDS,{{.PIDs}}"
 
@@ -149,10 +147,10 @@ metrics_collection_start()
     METRICS_START_SECONDS=$SECONDS
     echo "SECONDS,$stat_format" > "$metrics_stats"
 
-    # start the background processes to monitor docker stats
-    { while true; do ds=$(docker stats --no-stream --format "${stat_format}" "${pge}" 2>/dev/null); \
+    # start the background processes to collect docker stats
+    { while true; do ds=$(docker stats --no-stream --format "${stat_format}" 2>/dev/null); \
     echo "$(metrics_seconds)","$ds" >> "${metrics_stats}"; sleep "$sample_time"; done } & \
-    echo "$!" > "${container_info}_metrics_stats_bg_pid.txt"
+    echo "$!" > "${pge}_metrics_stats_bg_pid.txt"
 
     # Miscellaneous Statistics
 
@@ -192,37 +190,37 @@ metrics_collection_start()
     { while true; do dus=$(eval "$block_space_cmd"); swu=$(eval "$swap_space_cmd"); ths=$(eval "$sys_threads_cmd"); \
     lll=$(eval "$lll_cmd"); echo "$(metrics_seconds), $dus, $swu, $ths, $lll" >> "${metrics_misc}"; \
     sleep "$sample_time"; done } & \
-    echo "$!" >> "${container_info}_metrics_misc_bg_pid.txt"
+    echo "$!" >> "${pge}_metrics_misc_bg_pid.txt"
 }
 
 # End the metrics collection of both docker stats and the miscellaneous os statistics.
 # Parameters:
-#     container_info: basic container information (TODO: right now this is incomplete)
+#     pge: basic container information
 #     exit_code:  Exit code from Docker run (0 = success, non-zero = failure).
+#     output_dir: parameter given to the docker run command (e.g. "${DATA_DIR}"/output_dir:/home/conda/output_dir)
+#                 this is split on ':' to give different output_dirs for mac or linux.
+
 metrics_collection_end()
 {
-    local container_info=$1
+    local pge=$1
     local exit_code=$2
-    # TODO The variables below will be used in the future.
-    # mce_pge=$3
-    # mce_runconfig=$4
+    local output_dir=$3
 
-    local metrics_stats="${container_info}_metrics_stats.csv"
-    local metrics_misc="${container_info}_metrics_misc.csv"
+    local metrics_stats="${pge}_metrics_stats.csv"
+    local metrics_misc="${pge}_metrics_misc.csv"
 
     # kill the background tasks (the pid number is stored in the file below)
-    kill "$(cat "${container_info}_metrics_stats_bg_pid.txt")"
-    rm "${container_info}"_metrics_stats_bg_pid.txt
-    kill "$(cat "${container_info}_metrics_misc_bg_pid.txt")"
-    rm "${container_info}"_metrics_misc_bg_pid.txt
+    kill "$(cat "${pge}_metrics_stats_bg_pid.txt")"
+    rm "${pge}"_metrics_stats_bg_pid.txt
+    kill "$(cat "${pge}_metrics_misc_bg_pid.txt")"
+    rm "${pge}"_metrics_misc_bg_pid.txt
 
     if [[ $exit_code == 0 ]]
     then
-        python3 "$SCRIPT_DIR"/process_metric_data.py "$container_info" "$metrics_stats" "$metrics_misc"
+        python3 "$SCRIPT_DIR"/process_metric_data.py "$pge" "$metrics_stats" "$metrics_misc" "$output_dir"
         process_metrics_exit_code=$?
         if [[ $process_metrics_exit_code == 0 ]]
         then
-            echo "Remove temporary gathering files."
             rm "$metrics_stats"
             rm "$metrics_misc"
         fi
