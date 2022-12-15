@@ -318,7 +318,7 @@ class DSWxHLSPostProcessorMixin(PostProcessorMixin):
 
         The GeoTIFF filename for the DSWx-HLS PGE consists of:
 
-            <Core filename>_<Band Index>_<Band Name>.tiff
+            <Core filename>_<Band Index>_<Band Name>.tif
 
         Where <Core filename> is returned by DSWxHLSPostProcessorMixin._core_filename()
         and <Band Index> and <Band Name> are determined from the name of the
@@ -343,7 +343,7 @@ class DSWxHLSPostProcessorMixin(PostProcessorMixin):
         # of the filename before the extension, delimited by underscores
         band_idx, band_name = splitext(inter_filename)[0].split("_")[-2:]
 
-        return f"{core_filename}_{band_idx}_{band_name}.tiff"
+        return f"{core_filename}_{band_idx}_{band_name}.tif"
 
     def _browse_image_filename(self, inter_filename):
         """
@@ -391,7 +391,7 @@ class DSWxHLSPostProcessorMixin(PostProcessorMixin):
 
         for output_product in output_products:
             if (basename(output_product) in self.renamed_files.values() and
-                    basename(output_product).endswith("tiff")):
+                    basename(output_product).endswith("tif")):
                 representative_product = output_product
                 break
         else:

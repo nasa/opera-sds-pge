@@ -136,7 +136,7 @@ class DSWxPgeTestCase(unittest.TestCase):
         self.assertTrue(os.path.exists(expected_log_file))
 
         # Lastly, check that at least one "image" file was created
-        image_files = glob.glob(join(pge.runconfig.output_product_path, "*.tiff"))
+        image_files = glob.glob(join(pge.runconfig.output_product_path, "*.tif"))
         self.assertGreater(len(image_files), 0)
 
         # Open and read the log
@@ -297,7 +297,7 @@ class DSWxPgeTestCase(unittest.TestCase):
 
         pge.run()
 
-        image_files = glob.glob(join(pge.runconfig.output_product_path, "*.tiff"))
+        image_files = glob.glob(join(pge.runconfig.output_product_path, "*.tif"))
 
         for image_file in image_files:
             file_name = pge._geotiff_filename(image_file)
@@ -308,7 +308,7 @@ class DSWxPgeTestCase(unittest.TestCase):
                               rf"\d{{8}}T\d{{6}}Z_\d{{8}}T\d{{6}}Z_" \
                               rf"{get_sensor_from_spacecraft_name(md['SPACECRAFT_NAME'])}_" \
                               rf"30_v{pge.runconfig.product_version}_" \
-                              rf"B\d{{2}}_\w+.tiff"
+                              rf"B\d{{2}}_\w+.tif"
             self.assertEqual(re.match(file_name_regex, file_name).group(), file_name)
 
     class CustomMockGdal(MockGdal):
@@ -365,8 +365,8 @@ class DSWxPgeTestCase(unittest.TestCase):
         pge = DSWxHLSExecutor(pge_name="DSWxPgeTest", runconfig_path=runconfig_path)
         pge.run_preprocessor()
 
-        test_file = join(abspath(pge.runconfig.output_product_path), 'test_file.tiff')
-        pge.renamed_files['test_file.tiff'] = os.path.basename(test_file)
+        test_file = join(abspath(pge.runconfig.output_product_path), 'test_file.tif')
+        pge.renamed_files['test_file.tif'] = os.path.basename(test_file)
         os.system(f'touch {test_file}')
 
         output_product_metadata = pge._collect_dswx_product_metadata()
