@@ -74,7 +74,6 @@ pipeline {
                     ]
                 }
                 archiveArtifacts artifacts: 'test_results/**/test_int_*_results.html'
-                archiveArtifacts artifacts: 'output_dir/*_metrics_DSWX_HLS_PGE_*.csv'
             }
         }
     }
