@@ -74,12 +74,12 @@ pipeline {
                     ]
                 }
                 archiveArtifacts artifacts: 'test_results/**/test_int_*_results.html'
+                archiveArtifacts artifacts: 'output_dir/*_metrics_DSWX_HLS_PGE_*.csv'
             }
         }
     }
     post {
         always {
-            archiveArtifacts artifacts: 'output_dir/*_metrics_DSWX_HLS_PGE_*.csv'
             echo "Cleaning up Docker images from local host"
             sh ".ci/scripts/cleanup.sh ${DOCKER_TAG}"
             deleteDir()
