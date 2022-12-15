@@ -118,6 +118,8 @@ copy_pge_files() {
 # Start the metrics collection of both docker stats and the miscellaneous os statistics.
 # Parameters:
 #     pge:  pge we are working on
+#     pge_image: pge image name (e.g. opera/proteus)
+#     pge_tag: pge tag (e.g cal_cal_3.1)
 #     container_info:  the name and tag of the docker file.  (e.g. opera/proteus:cal_val_3.1)
 #     sample_time:  The time between sampling of the statistics.
 metrics_collection_start()
@@ -125,15 +127,15 @@ metrics_collection_start()
     echo "Start Metrics Collection"
     local pge=$1
     # Split seconds argument into docker name and tag
-    local image_name="$(echo "$2" | cut -d':' -f1)"
-    local container_tag="$(echo "$2" | cut -d':' -f2)"
+#    local image_name="$(echo "$2" | cut -d':' -f1)"
+#    local container_tag="$(echo "$2" | cut -d':' -f2)"
 
     # If no sample_time value is passed - default to a value of 1
-    if [[ -z "$3" ]]
+    if [[ -z "$2" ]]
     then
         local sample_time=1
     else
-        local sample_time=$3
+        local sample_time=$2
     fi
 
     echo "Using sample time of: $sample_time"
@@ -195,10 +197,10 @@ metrics_collection_start()
 
 # End the metrics collection of both docker stats and the miscellaneous os statistics.
 # Parameters:
-#     pge: basic container information
+#     pge: pge name
 #     exit_code:  Exit code from Docker run (0 = success, non-zero = failure).
 #     output_dir: parameter given to the docker run command (e.g. "${DATA_DIR}"/output_dir:/home/conda/output_dir)
-#                 this is split on ':' to give different output_dirs for mac or linux.
+#                 passed through to process_metrics_data.py where the it is split on ':'
 
 metrics_collection_end()
 {

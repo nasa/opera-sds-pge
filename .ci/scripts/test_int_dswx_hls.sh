@@ -7,6 +7,7 @@ umask 002
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 . $SCRIPT_DIR/test_int_util.sh
+. $SCRIPT_DIR/util.sh
 
 # Parse args
 test_int_parse_args "$@"
@@ -29,8 +30,6 @@ SAMPLE_TIME=5
 [ -z "${PGE_TAG}" ] && PGE_TAG="${USER}-dev"
 [ -z "${TESTDATA}" ] && TESTDATA="delivery_cal_val_3.1.zip"
 [ -z "${RUNCONFIG}" ] && RUNCONFIG="opera_pge_dswx_hls_delivery_3.1_cal_val_runconfig.yaml"
-
-metrics_collection_start "$PGE_NAME" "$PGE_IMAGE" "$SAMPLE_TIME"
 
 # Create the test output directory in the workspace
 test_int_setup_results_directory
@@ -74,7 +73,7 @@ do
     mkdir $scratch_dir
 
     # Start metrics collection
-    metrics_collection_start "$PGE" "$IMAGE_NAME" "$SAMPLE_TIME"
+    metrics_collection_start "$PGE_NAME" "$SAMPLE_TIME"
 
     echo "Running Docker image ${PGE_IMAGE}:${PGE_TAG} for ${data_dir}"
     docker run --rm -u $UID:$(id -g) -v $(pwd):/home/conda/runconfig:ro \
@@ -88,6 +87,9 @@ do
         echo "$data_dir docker exit indicates failure: ${docker_exit_status}"
         overall_status=1
     else
+        # End metrics collection
+        full_output_dir="${output_dir}":/home/conda/output_dir  # used to distinguish between local and system runs
+        metrics_collection_end "$PGE_NAME" "$docker_run_exit_code" "$full_output_dir"
         # Compare output files against expected files
         for output_file in $output_dir/*
         do
