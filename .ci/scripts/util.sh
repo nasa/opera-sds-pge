@@ -126,33 +126,37 @@ metrics_collection_start()
 {
     echo "Start Metrics Collection"
     local pge=$1
-    # Split seconds argument into docker name and tag
-#    local image_name="$(echo "$2" | cut -d':' -f1)"
-#    local container_tag="$(echo "$2" | cut -d':' -f2)"
+    local container_name=$2
+    local results_dir=$3
 
     # If no sample_time value is passed - default to a value of 1
-    if [[ -z "$2" ]]
+    if [[ -z "$4" ]]
     then
         local sample_time=1
     else
-        local sample_time=$2
+        local sample_time=$4
     fi
 
     echo "Using sample time of: $sample_time"
-    # Initialize output files and statistics format
-    metrics_stats="${pge}_metrics_stats.csv"
-    metrics_misc="${pge}_metrics_misc.csv"
 
-    column_titles="{{.Name}},CPU,{{.CPUPerc}},MEM,{{.MemUsage}},MEM %,{{.MemPerc}},NET,{{.NetIO}},BLOCK,{{.BlockIO}},PIDS,{{.PIDs}}"
+    # Initialize output files and statistics format
+    metrics_stats="${results_dir}/${pge}_metrics_stats.csv"
+    metrics_misc="${results_dir}/${pge}_metrics_misc.csv"
+    stats_pid_file="${results_dir}/${pge}_metrics_stats_bg_pid.txt"
+    misc_pid_file="${results_dir}/${pge}_metrics_misc_bg_pid.txt"
+
+    column_titles="{{.Name}},CPU,{{.CPUPerc}},MEM,{{.MemUsage}},MEM_PERC,{{.MemPerc}},NET,{{.NetIO}},BLOCK,{{.BlockIO}},PIDS,{{.PIDs}}"
 
     # initialize start seconds and the rest of the csv file's column titles
     METRICS_START_SECONDS=$SECONDS
     echo "SECONDS,$column_titles" > "$metrics_stats"
 
+    ds="docker stats --no-stream --format ${column_titles} ${container_name}";
+
     # start the background processes to collect docker stats
-    { while true; do ds=$(docker stats --no-stream --format "${column_titles}" 2>/dev/null); \
-    echo "$(metrics_seconds)","$ds" >> "${metrics_stats}"; sleep "$sample_time"; done } & \
-    echo "$!" > "${pge}_metrics_stats_bg_pid.txt"
+    { while true; do sleep "$sample_time"; \
+      echo "$(metrics_seconds)",`$ds` >> "${metrics_stats}"; done } & \
+    echo "$!" > "$stats_pid_file"
 
     # Miscellaneous Statistics
 
@@ -182,17 +186,13 @@ metrics_collection_start()
         swap_space_cmd='echo "N/A"'
     fi
 
-    # Set directory fo the log file
-    last_log_line_dir='pwd'
+    dus="eval $block_space_cmd"
+    swu="eval $swap_space_cmd"
+    ths="eval $sys_threads_cmd"
 
-    lll_file="last_log_line.txt"
-    find ${last_log_line_dir} -name ${lll_file} -exec rm {} \; 2>/dev/null
-    lll_cmd="echo $(find ${last_log_line_dir} -name ${lll_file} -exec rm {} \; 2>/dev/null)"
-
-    { while true; do dus=$(eval "$block_space_cmd"); swu=$(eval "$swap_space_cmd"); ths=$(eval "$sys_threads_cmd"); \
-    lll=$(eval "$lll_cmd"); echo "$(metrics_seconds), $dus, $swu, $ths, $lll" >> "${metrics_misc}"; \
-    sleep "$sample_time"; done } & \
-    echo "$!" >> "${pge}_metrics_misc_bg_pid.txt"
+    { while true; do sleep "$sample_time"; \
+      echo "$(metrics_seconds)", `$dus`, `$swu`, `$ths` >> "${metrics_misc}"; done } & \
+    echo "$!" >> "${misc_pid_file}"
 }
 
 # End the metrics collection of both docker stats and the miscellaneous os statistics.
@@ -206,26 +206,30 @@ metrics_collection_end()
 {
     local pge=$1
     local exit_code=$2
-    local output_dir=$3
+    local results_dir=$3
 
-    local metrics_stats="${pge}_metrics_stats.csv"
-    local metrics_misc="${pge}_metrics_misc.csv"
+    local metrics_stats="${results_dir}/${pge}_metrics_stats.csv"
+    local metrics_misc="${results_dir}/${pge}_metrics_misc.csv"
+    local stats_pid_file="${results_dir}/${pge}_metrics_stats_bg_pid.txt"
+    local misc_pid_file="${results_dir}/${pge}_metrics_misc_bg_pid.txt"
 
     # kill the background tasks (the pid number is stored in the file below)
-    kill "$(cat "${pge}_metrics_stats_bg_pid.txt")"
-    rm "${pge}"_metrics_stats_bg_pid.txt
-    kill "$(cat "${pge}_metrics_misc_bg_pid.txt")"
-    rm "${pge}"_metrics_misc_bg_pid.txt
+    kill "$(cat "${stats_pid_file}")"
+    rm "${stats_pid_file}"
+    kill "$(cat "${misc_pid_file}")"
+    rm "${misc_pid_file}"
 
     if [[ $exit_code == 0 ]]
     then
-        python3 "$SCRIPT_DIR"/process_metric_data.py "$pge" "$metrics_stats" "$metrics_misc" "$output_dir"
+        python3 "$SCRIPT_DIR"/process_metric_data.py "$pge" "$metrics_stats" "$metrics_misc" "$results_dir"
         process_metrics_exit_code=$?
+
         if [[ $process_metrics_exit_code == 0 ]]
         then
             rm "$metrics_stats"
             rm "$metrics_misc"
         fi
+
         echo "metrics_collection has completed."
     else
         echo "Docker exited with an error: metrics will not be processed or uploaded."

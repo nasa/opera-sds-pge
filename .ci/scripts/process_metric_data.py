@@ -212,7 +212,7 @@ def main():
     container_info = sys.argv[1]
     stats_file = sys.argv[2]
     misc_file = sys.argv[3]
-    output_dir = sys.argv[4]  # in the form <local_dir>/output_dir:/home/conda/output_dir
+    output_dir = sys.argv[4]
 
     temp_stats = "temp_opera_docker_stats.csv"
     temp_misc = "temp_opera_misc_stats.csv"
@@ -223,12 +223,9 @@ def main():
 
     current_time = datetime.datetime.today().strftime('%Y%m%d_%H%M%S')
 
-    # Get the proper output directory
-    output_path = output_dir.split(':')[0]
-
     # For now make two formatted files
-    docker_report_file = f"{output_path}/docker_metrics_{container_info}_{current_time}.csv"
-    misc_report_file = f"{output_path}/misc_metrics_{container_info}_{current_time}.csv"
+    docker_report_file = f"{output_dir}/docker_metrics_{container_info}_{current_time}.csv"
+    misc_report_file = f"{output_dir}/misc_metrics_{container_info}_{current_time}.csv"
 
     # read files into lists
     stats_list = make_lists(temp_stats)

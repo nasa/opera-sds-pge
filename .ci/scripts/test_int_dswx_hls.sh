@@ -2,6 +2,7 @@
 # Script to execute integration tests on OPERA DSWx-HLS PGE Docker image
 #
 set -e
+set -x
 umask 002
 
 
@@ -56,47 +57,57 @@ do
     expected_dir="$(pwd)/${data_set}/expected_output_dir"
     data_dir=$(pwd)/${data_set}
     echo -e "\nTest data directory: ${data_dir}"
+
     output_dir="$(pwd)/${data_set}_output"
     echo "Checking if $output_dir exists (it shouldn't)."
+
     if [ -d $output_dir ]; then
         echo "Output directory $output_dir already exists (and should not). Exiting."
         exit 1
     fi
+
     echo "Creating output directory $output_dir."
     mkdir $output_dir
     scratch_dir="$(pwd)/${data_set}_scratch"
+
     if [ -d $scratch_dir ]; then
         echo "Scratch directory $scratch_dir already exists (and should not). Exiting."
         exit 1
     fi
+
     echo "Creating scratch directory $scratch_dir."
     mkdir $scratch_dir
 
+    container_name="${PGE_NAME}-${data_set}"
+
     # Start metrics collection
-    metrics_collection_start "$PGE_NAME" "$SAMPLE_TIME"
+    metrics_collection_start "$PGE_NAME" "$container_name" "$TEST_RESULTS_DIR" "$SAMPLE_TIME"
+
     echo "PWD: " ${PWD}
     echo "Running Docker image ${PGE_IMAGE}:${PGE_TAG} for ${data_dir}"
-    docker run --rm -u $UID:$(id -g) -v $(pwd):/home/conda/runconfig:ro \
-                     -v $data_dir/input_dir:/home/conda/input_dir:ro \
-                     -v $output_dir:/home/conda/output_dir \
-                     -v $scratch_dir:/home/conda/scratch_dir \
-                     ${PGE_IMAGE}:${PGE_TAG} --file /home/conda/runconfig/$RUNCONFIG_FILENAME
+    docker run --rm -u $UID:$(id -g) --name $container_name  \
+                -v $(pwd):/home/conda/runconfig:ro \
+                -v $data_dir/input_dir:/home/conda/input_dir:ro \
+                -v $output_dir:/home/conda/output_dir \
+                -v $scratch_dir:/home/conda/scratch_dir \
+                ${PGE_IMAGE}:${PGE_TAG} --file /home/conda/runconfig/$RUNCONFIG_FILENAME
 
     docker_exit_status=$?
+
+    # End metrics collection
+    metrics_collection_end "$PGE_NAME" "$docker_exit_status" "$TEST_RESULTS_DIR"
+
     if [ $docker_exit_status -ne 0 ]; then
         echo "$data_dir docker exit indicates failure: ${docker_exit_status}"
         overall_status=1
     else
-        # End metrics collection
-        full_output_dir="${output_dir}":/home/conda/output_dir  # used to distinguish between local and system runs
-        echo "FULL OUTPUT DIR: " ${full_output_dir}
-        metrics_collection_end "$PGE_NAME" "$docker_run_exit_code" "$full_output_dir"
         # Compare output files against expected files
         for output_file in $output_dir/*
         do
             docker_out="N/A"
             compare_result="N/A"
             expected_file="N/A"
+
             echo "output_file $output_file"
             output_file=$(basename -- "$output_file")
 
@@ -114,7 +125,9 @@ do
                         break
                     fi
                 done
+
                 echo "product is $product"
+
                 for potential_file in $expected_dir/*.tif*
                 do
                     if [[ "$potential_file" == *"$product"* ]]; then
@@ -123,6 +136,7 @@ do
                         break
                     fi
                 done
+
                 if [ ! -f $expected_file ]; then
                     echo "No expected file found for product $product in expected directory $expected_dir"
                     overall_status=1
@@ -136,6 +150,7 @@ do
                                             proteus-0.1/bin/dswx_compare.py \
                                             /out/${output_file} /exp/${expected_file})
                     echo "$docker_out"
+
                     if [[ "$docker_out" == *"[FAIL]"* ]]; then
                         echo "File comparison failed. Output and expected files differ for ${output_file}"
                         compare_result="FAIL"
