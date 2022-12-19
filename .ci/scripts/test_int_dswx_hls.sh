@@ -88,6 +88,7 @@ do
         overall_status=1
     else
         # End metrics collection
+        echo "Will be trying to save in: " ${PWD}
 #        full_output_dir="${output_dir}":/home/conda/output_dir  # used to distinguish between local and system runs
 #        metrics_collection_end "$PGE_NAME" "$docker_run_exit_code" "$full_output_dir"
         # Compare output files against expected files
