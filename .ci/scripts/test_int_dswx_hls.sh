@@ -73,7 +73,7 @@ do
     mkdir $scratch_dir
 
     # Start metrics collection
-    metrics_collection_start "$PGE_NAME" "$SAMPLE_TIME"
+#    metrics_collection_start "$PGE_NAME" "$SAMPLE_TIME"
 
     echo "Running Docker image ${PGE_IMAGE}:${PGE_TAG} for ${data_dir}"
     docker run --rm -u $UID:$(id -g) -v $(pwd):/home/conda/runconfig:ro \
@@ -88,8 +88,8 @@ do
         overall_status=1
     else
         # End metrics collection
-        full_output_dir="${output_dir}":/home/conda/output_dir  # used to distinguish between local and system runs
-        metrics_collection_end "$PGE_NAME" "$docker_run_exit_code" "$full_output_dir"
+#        full_output_dir="${output_dir}":/home/conda/output_dir  # used to distinguish between local and system runs
+#        metrics_collection_end "$PGE_NAME" "$docker_run_exit_code" "$full_output_dir"
         # Compare output files against expected files
         for output_file in $output_dir/*
         do

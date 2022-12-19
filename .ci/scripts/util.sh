@@ -143,14 +143,14 @@ metrics_collection_start()
     metrics_stats="${pge}_metrics_stats.csv"
     metrics_misc="${pge}_metrics_misc.csv"
 
-    stat_format="{{.Name}},CPU,{{.CPUPerc}},MEM,{{.MemUsage}},MEM %,{{.MemPerc}},NET,{{.NetIO}},BLOCK,{{.BlockIO}},PIDS,{{.PIDs}}"
+    column_titles="{{.Name}},CPU,{{.CPUPerc}},MEM,{{.MemUsage}},MEM %,{{.MemPerc}},NET,{{.NetIO}},BLOCK,{{.BlockIO}},PIDS,{{.PIDs}}"
 
-    # initialize start seconds and csv file contents - put on first line of each file
+    # initialize start seconds and the rest of the csv file's column titles
     METRICS_START_SECONDS=$SECONDS
-    echo "SECONDS,$stat_format" > "$metrics_stats"
+    echo "SECONDS,$column_titles" > "$metrics_stats"
 
     # start the background processes to collect docker stats
-    { while true; do ds=$(docker stats --no-stream --format "${stat_format}" 2>/dev/null); \
+    { while true; do ds=$(docker stats --no-stream --format "${column_titles}" 2>/dev/null); \
     echo "$(metrics_seconds)","$ds" >> "${metrics_stats}"; sleep "$sample_time"; done } & \
     echo "$!" > "${pge}_metrics_stats_bg_pid.txt"
 
