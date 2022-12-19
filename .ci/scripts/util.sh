@@ -226,11 +226,11 @@ metrics_collection_end()
             rm "$metrics_stats"
             rm "$metrics_misc"
         fi
+        echo "metrics_collection has completed."
     else
-        echo "Docker exited with an error and so metrics will not be processed or uploaded (csv files will be saved)."git
+        echo "Docker exited with an error: metrics will not be processed or uploaded."
     fi
 
-    echo "metrics_collection has completed."
 }
 
 metrics_seconds()
