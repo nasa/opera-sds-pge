@@ -79,7 +79,7 @@ fi
 echo "Creating scratch directory $scratch_dir."
 mkdir $scratch_dir
 
-container_name="${PGE_NAME}-${data_set}"
+container_name="${PGE_NAME}"
 
 # Start metrics collection
 metrics_collection_start "$PGE_NAME" "$container_name" "$TEST_RESULTS_DIR" "$SAMPLE_TIME"
