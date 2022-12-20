@@ -68,6 +68,7 @@ do
 
     echo "Creating output directory $output_dir."
     mkdir $output_dir
+
     scratch_dir="$(pwd)/${data_set}_scratch"
 
     if [ -d $scratch_dir ]; then

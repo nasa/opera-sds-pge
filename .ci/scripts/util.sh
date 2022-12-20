@@ -174,11 +174,7 @@ metrics_collection_start()
 
     # Use 'df' command to capture the amount of space on the '/dev/vda1' file system (-B sets block size (1K)
     # the line represent Filesystem  1K-blocks  Used Blocks Available Blocks %Used Mounted_On
-    block_space_cmd='df -B 1024 | grep "/System/Volumes/VM"'
-
-    df='df -B 1024'
-
-    echo `$df`
+    block_space_cmd='df -B 1024 | grep "/dev/xvdf"'
 
     # Get the number of system threads
     sys_threads_cmd='ps -elf | wc -l'

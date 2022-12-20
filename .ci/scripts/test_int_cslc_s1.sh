@@ -62,10 +62,12 @@ expected_dir="$(pwd)/expected_output"
 output_dir="$(pwd)/output_s1_cslc"
 rmdir ${output_dir}
 echo "Checking if $output_dir exists (it shouldn't)."
+
 if [ -d $output_dir ]; then
     echo "Output directory $output_dir already exists (and should not). Exiting."
     exit 1
 fi
+
 echo "Creating output directory $output_dir."
 mkdir $output_dir
 
