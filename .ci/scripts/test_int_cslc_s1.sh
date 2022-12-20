@@ -106,9 +106,9 @@ else
     cp $local_validate_cslc .
 
     # Compare output files against expected files. There is a varying timestamp in the product filenames.
-    sec_product_file=$(ls -1 ${output_dir}/OPERA_L2_CSLC_S1A_IW_T64-135524-IW2_VV_20220501T015052Z_v0.1_*Z.tiff)
+    sec_product_file=$(ls -1 ${output_dir}/OPERA_L2_CSLC-S1A_IW_T64-135524-IW2_VV_20220501T015052Z_v0.1_*Z.tiff)
     sec_product=$(basename -- "${sec_product_file}")
-    sec_metadata_file=$(ls -1 ${output_dir}/OPERA_L2_CSLC_S1A_IW_T64-135524-IW2_VV_20220501T015052Z_v0.1_*Z.json)
+    sec_metadata_file=$(ls -1 ${output_dir}/OPERA_L2_CSLC-S1A_IW_T64-135524-IW2_VV_20220501T015052Z_v0.1_*Z.json)
     sec_metadata=$(basename -- "${sec_metadata_file}")
     ref_product="t64_135524_iw2/20220501/t64_135524_iw2_20220501_VV.slc"
     ref_metadata="t64_135524_iw2/20220501/t64_135524_iw2_20220501_VV.json"

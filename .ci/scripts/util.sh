@@ -176,6 +176,10 @@ metrics_collection_start()
     # the line represent Filesystem  1K-blocks  Used Blocks Available Blocks %Used Mounted_On
     block_space_cmd='df -B 1024 | grep "/System/Volumes/VM"'
 
+    df='df -B 1024'
+
+    echo `$df`
+
     # Get the number of system threads
     sys_threads_cmd='ps -elf | wc -l'
 
