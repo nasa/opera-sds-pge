@@ -2,10 +2,12 @@
 # Script to execute integration tests on OPERA CSLC_S1 PGE Docker image
 #
 set -e
+set -x
 umask 002
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 . $SCRIPT_DIR/test_int_util.sh
+. $SCRIPT_DIR/util.sh
 
 # Parse args
 test_int_parse_args "$@"
@@ -18,6 +20,7 @@ Integration Testing CSLC_S1 PGE docker image...
 
 PGE_NAME="cslc_s1"
 PGE_IMAGE="opera_pge/${PGE_NAME}"
+SAMPLE_TIME=5
 
 # defaults, test data and runconfig files should be updated as-needed to use
 # the latest available as defaults for use with the Jenkins pipeline call
@@ -76,6 +79,11 @@ fi
 echo "Creating scratch directory $scratch_dir."
 mkdir $scratch_dir
 
+container_name="${PGE_NAME}-${data_set}"
+
+# Start metrics collection
+metrics_collection_start "$PGE_NAME" "$container_name" "$TEST_RESULTS_DIR" "$SAMPLE_TIME"
+
 echo "Running Docker image ${PGE_IMAGE}:${PGE_TAG}"
 
 docker run --rm -u $UID:$(id -g) -w /home/compass_user \
@@ -86,6 +94,10 @@ docker run --rm -u $UID:$(id -g) -w /home/compass_user \
            ${PGE_IMAGE}:${PGE_TAG} --file /home/compass_user/runconfig/$RUNCONFIG_FILENAME
 
 docker_exit_status=$?
+
+# End metrics collection
+metrics_collection_end "$PGE_NAME" "$docker_exit_status" "$TEST_RESULTS_DIR"
+
 if [ $docker_exit_status -ne 0 ]; then
     echo "docker exit indicates failure: ${docker_exit_status}"
     overall_status=1

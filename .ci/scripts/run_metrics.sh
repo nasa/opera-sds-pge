@@ -2,7 +2,7 @@
 
 # run_metrics()
 # This script wraps a "docker run" command within metrics_collection_start() and
-# metrics_collection_end() function calls.
+# metrics_collection_end() function calls.  It is to test the calls on local machines.
 #
 # usage:
 #     run_metrics.sh <pge> <run config_fn> (file name only) <data_dir> (full path) <image name>
@@ -10,8 +10,8 @@
 #
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
-echo "Script_dir: ${SCRIPT_DIR}"
-. "${SCRIPT_DIR}"/util.sh
+. $SCRIPT_DIR/test_int_util.sh
+. "$SCRIPT_DIR"/util.sh
 
 PGE_NAME=$1     # PGE name
 RUNCONFIG=$2    # Runconfig file name (not full path)
@@ -20,6 +20,22 @@ DATA_SET=$4     # Currently we have 2 datasets for dswx_hls 'l30_greenland' and 
 PGE_IMAGE=$5    # Name of the docker image to run stats on
 PGE_TAG=$6      # Name of the docker tag
 SAMPLE_TIME=$7  # Amount of time between samples (seconds)
+
+container_name="${PGE_NAME}-${PGE_IMAGE}"
+echo " TEST_RESULTS_DIR from test_int_setup_results_directory(): " ${TEST_RESULTS_DIR}
+
+if [[ $OSTYPE == "darwin"* ]]; then
+    # During Jenkins runs this directory comes from test_int_setup_results_directory() in test_int_util.sh
+    # This creates a directory called /test_results/<PGE-NAME> however that area is read-only on the MAC
+    TEST_RESULTS_DIR="/Users/jehofman/Documents/OPERA/dswx_cal_val_3.1/test_datasets/output_dir"
+else
+    # Create the test output directory in the workspace
+    test_int_setup_results_directory
+fi
+
+# Start metrics collection
+metrics_collection_start "$PGE_NAME" "$container_name" "$TEST_RESULTS_DIR" "$SAMPLE_TIME"
+
 
 #metrics_collection_start "$PGE_NAME" "$PGE_IMAGE" "$PGE_TAG" "$SAMPLE_TIME"
 metrics_collection_start "$PGE_NAME" "$SAMPLE_TIME"

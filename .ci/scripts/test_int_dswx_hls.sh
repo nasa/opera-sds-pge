@@ -83,7 +83,6 @@ do
     # Start metrics collection
     metrics_collection_start "$PGE_NAME" "$container_name" "$TEST_RESULTS_DIR" "$SAMPLE_TIME"
 
-    echo "PWD: " ${PWD}
     echo "Running Docker image ${PGE_IMAGE}:${PGE_TAG} for ${data_dir}"
     docker run --rm -u $UID:$(id -g) --name $container_name  \
                 -v $(pwd):/home/conda/runconfig:ro \
