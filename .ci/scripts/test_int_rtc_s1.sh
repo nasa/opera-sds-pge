@@ -65,9 +65,14 @@ scratch_dir="$(pwd)/scratch_rtc_s1"
 echo "Creating scratch directory $scratch_dir."
 mkdir $scratch_dir
 
+container_name="${PGE_NAME}"
+
+# Start metrics collection
+metrics_collection_start "$PGE_NAME" "$container_name" "$TEST_RESULTS_DIR" "$SAMPLE_TIME"
+
 echo "Running Docker image ${PGE_IMAGE}:${PGE_TAG}"
 
-docker run --rm -u $UID:$(id -g) -w /home/rtc_user \
+docker run --rm -u $UID:$(id -g) -w /home/rtc_user --name $container_name\
            -v $(pwd):/home/rtc_user/runconfig:ro \
            -v $(pwd)/peru:/home/rtc_user/input_dir:ro \
            -v ${output_dir}:/home/rtc_user/output_dir \
@@ -75,6 +80,10 @@ docker run --rm -u $UID:$(id -g) -w /home/rtc_user \
            ${PGE_IMAGE}:${PGE_TAG} --file /home/rtc_user/runconfig/${RUNCONFIG}
 
 docker_exit_status=$?
+
+# End metrics collection
+metrics_collection_end "$PGE_NAME" "$docker_exit_status" "$TEST_RESULTS_DIR"
+
 if [ $docker_exit_status -ne 0 ]; then
     echo "docker exit indicates failure: ${docker_exit_status}"
     overall_status=1
