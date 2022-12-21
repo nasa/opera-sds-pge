@@ -2,10 +2,12 @@
 # Script to execute integration tests on OPERA RTC-S1 PGE Docker image
 #
 set -e
+set -x
 umask 002
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 . $SCRIPT_DIR/test_int_util.sh
+. $SCRIPT_DIR/util.sh
 
 # Parse args
 test_int_parse_args "$@"
@@ -18,6 +20,7 @@ Integration Testing RTC-S1 PGE docker image...
 
 PGE_NAME="rtc_s1"
 PGE_IMAGE="opera_pge/${PGE_NAME}"
+SAMPLE_TIME=5
 
 # defaults, test data and runconfig files should be updated as-needed to use
 # the latest available as defaults for use with the Jenkins pipeline call
