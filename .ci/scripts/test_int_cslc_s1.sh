@@ -88,7 +88,7 @@ metrics_collection_start "$PGE_NAME" "$container_name" "$TEST_RESULTS_DIR" "$SAM
 
 echo "Running Docker image ${PGE_IMAGE}:${PGE_TAG}"
 
-docker run --rm -u $UID:$(id -g) -w /home/compass_user --name $container_name\
+docker run --rm -u $UID:$(id -g) -n $container_name -w /home/compass_user \
            -v $(pwd):/home/compass_user/runconfig:ro \
            -v $(pwd)/input_data:/home/compass_user/input_data:ro \
            -v ${output_dir}:/home/compass_user/output_s1_cslc \
@@ -130,8 +130,8 @@ else
         compare_result="N/A"
 
         echo "OUTPUT DIRECTORY"
-        cmd="ls ${output_dir}"
-        echo `cmd`
+        cmd=`ls ${output_dir}`
+        echo "OUTPUT DIRECTORY CONTENTS: ${cmd}"
 
         # Run validation script on output files
         docker_out=$(docker run --rm -u compass_user:compass_user \

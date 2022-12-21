@@ -75,7 +75,7 @@ metrics_collection_start "$PGE_NAME" "$container_name" "$TEST_RESULTS_DIR" "$SAM
 
 echo "Running Docker image ${PGE_IMAGE}:${PGE_TAG}"
 
-docker run --rm -u $UID:$(id -g) -w /home/rtc_user --name $container_name\
+docker run --rm -u $UID:$(id -g) -n $container_name -w /home/rtc_user\
            -v $(pwd):/home/rtc_user/runconfig:ro \
            -v $(pwd)/peru:/home/rtc_user/input_dir:ro \
            -v ${output_dir}:/home/rtc_user/output_dir \
