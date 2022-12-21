@@ -128,6 +128,10 @@ else
         docker_out="N/A"
         compare_result="N/A"
 
+        echo "OUTPUT DIRECTORY"
+        cmd="ls ${output_dir}"
+        echo `cmd`
+
         # Run validation script on output files
         docker_out=$(docker run --rm -u compass_user:compass_user \
                                 -v $(pwd):/working:ro \
