@@ -151,10 +151,11 @@ metrics_collection_start()
     echo "SECONDS,$column_titles" > "$metrics_stats"
 
     ds="docker stats --no-stream --format ${column_titles} ${container_name}";
-    sleep 5
+
     # start the background processes to collect docker stats
     { while true; do sleep "$sample_time"; \
-      echo "$(metrics_seconds)","`$ds`" >> "${metrics_stats}"; done } & \
+      echo "$(metrics_seconds)","`$ds`" >> "${metrics_stats}";
+      sample_time=5; done } & \
     echo "$!" > "$stats_pid_file"
 
     # Miscellaneous Statistics
