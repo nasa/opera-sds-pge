@@ -90,7 +90,7 @@ docker run --rm -u $UID:"$(id -g)" -w /home/rtc_user -name $container_name \
            -v "$(pwd)":/home/rtc_user/runconfig:ro \
            -v "$(pwd)"/peru:/home/rtc_user/input_dir:ro \
            -v "${output_dir}":/home/rtc_user/output_dir \
-           -v "${scratch_dir}":/home/rtc_user/scratch_dir \
+            -v "${scratch_dir}":/home/rtc_user/scratch_dir \
            ${PGE_IMAGE}:"${PGE_TAG}" --file /home/rtc_user/runconfig/${RUNCONFIG}
 
 docker_exit_status=$?
