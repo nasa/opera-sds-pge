@@ -159,6 +159,7 @@ metrics_collection_start()
             running=1
         else
             echo "Waiting for docker run to start."
+            sleep 2
         fi
     done
 
