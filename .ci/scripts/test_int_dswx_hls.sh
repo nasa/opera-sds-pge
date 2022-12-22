@@ -7,8 +7,8 @@ umask 002
 
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
-. $SCRIPT_DIR/test_int_util.sh
-. $SCRIPT_DIR/util.sh
+. "$SCRIPT_DIR"/test_int_util.sh
+. "$SCRIPT_DIR"/util.sh
 
 # Parse args
 test_int_parse_args "$@"
@@ -27,7 +27,7 @@ SAMPLE_TIME=5
 # the latest available as defaults for use with the Jenkins pipeline call
 # TESTDATA should be the name of the test data archive in s3://operasds-dev-pge/dswx_hls/
 # RUNCONFIG should be the name of the runconfig in s3://operasds-dev-pge/dswx_hls/
-[ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath $(dirname $(realpath $0))/../..)
+[ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath "$(dirname "$(realpath "$0")")"/../..)
 [ -z "${PGE_TAG}" ] && PGE_TAG="${USER}-dev"
 [ -z "${TESTDATA}" ] && TESTDATA="delivery_cal_val_3.1.zip"
 [ -z "${RUNCONFIG}" ] && RUNCONFIG="opera_pge_dswx_hls_delivery_3.1_cal_val_runconfig.yaml"
@@ -85,12 +85,12 @@ do
     metrics_collection_start "$PGE_NAME" "$container_name" "$TEST_RESULTS_DIR" "$SAMPLE_TIME"
 
     echo "Running Docker image ${PGE_IMAGE}:${PGE_TAG} for ${data_dir}"
-    docker run --rm -u $UID:$(id -g) --name $container_name  \
-                -v $(pwd):/home/conda/runconfig:ro \
-                -v $data_dir/input_dir:/home/conda/input_dir:ro \
-                -v $output_dir:/home/conda/output_dir \
-                -v $scratch_dir:/home/conda/scratch_dir \
-                ${PGE_IMAGE}:${PGE_TAG} --file /home/conda/runconfig/$RUNCONFIG_FILENAME
+    docker run --rm -u $UID:"$(id -g)" --name $container_name  \
+                -v "$(pwd)":/home/conda/runconfig:ro \
+                -v "$data_dir"/input_dir:/home/conda/input_dir:ro \
+                -v "$output_dir":/home/conda/output_dir \
+                -v "$scratch_dir":/home/conda/scratch_dir \
+                ${PGE_IMAGE}:"${PGE_TAG}" --file /home/conda/runconfig/"$RUNCONFIG_FILENAME"
 
     docker_exit_status=$?
 
@@ -102,7 +102,7 @@ do
         overall_status=1
     else
         # Compare output files against expected files
-        for output_file in $output_dir/*
+        for output_file in "$output_dir"/*
         do
             docker_out="N/A"
             compare_result="N/A"
@@ -128,7 +128,7 @@ do
 
                 echo "product is $product"
 
-                for potential_file in $expected_dir/*.tif*
+                for potential_file in "$expected_dir"/*.tif*
                 do
                     if [[ "$potential_file" == *"$product"* ]]; then
                         echo "expected file is $potential_file"
@@ -137,18 +137,18 @@ do
                     fi
                 done
 
-                if [ ! -f $expected_file ]; then
+                if [ ! -f "$expected_file" ]; then
                     echo "No expected file found for product $product in expected directory $expected_dir"
                     overall_status=1
                 else
                     # compare output and expected files
                     expected_file=$(basename -- "$expected_file")
                     docker_out=$(docker run --rm -u conda:conda \
-                                            -v ${output_dir}:/out:ro \
-                                            -v ${expected_dir}:/exp:ro \
-                                            --entrypoint python3 ${PGE_IMAGE}:${PGE_TAG} \
+                                            -v "${output_dir}":/out:ro \
+                                            -v "${expected_dir}":/exp:ro \
+                                            --entrypoint python3 ${PGE_IMAGE}:"${PGE_TAG}" \
                                             proteus-0.1/bin/dswx_compare.py \
-                                            /out/${output_file} /exp/${expected_file})
+                                            /out/"${output_file}" /exp/"${expected_file}")
                     echo "$docker_out"
 
                     if [[ "$docker_out" == *"[FAIL]"* ]]; then
@@ -170,7 +170,7 @@ do
             fi
 
             docker_out="${docker_out//$'\n'/<br>}"
-            echo "<tr><td>${compare_result}</td><td><ul><li>Output: ${output_file}</li><li>Expected: ${expected_file}</li></ul></td><td>${docker_out}</td></tr>" >> $RESULTS_FILE
+            echo "<tr><td>${compare_result}</td><td><ul><li>Output: ${output_file}</li><li>Expected: ${expected_file}</li></ul></td><td>${docker_out}</td></tr>" >> "$RESULTS_FILE"
         done
     fi
 done
