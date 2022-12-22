@@ -60,17 +60,24 @@ do
 
     # the testdata reference metadata contains this path so we use it here
     output_dir="$(pwd)/output_rtc_s1"
-    # make sure no output directory already exissts
-    rmdir ${output_dir}
+    # make sure no output directory already exists
+    if [ -d "$output_dir" ]; then
+        echo "Output directory $output_dir already exists (and should not). Removing directory"
+        rmdir "${output_dir}"
+    fi
+
     echo "Creating output directory $output_dir."
-    mkdir $output_dir
+    mkdir "$output_dir"
 
     # the testdata reference metadata contains this path so we use it here
     scratch_dir="$(pwd)/scratch_rtc_s1"
-    # make sure no scratch directory already exissts
-    rmdir ${scratch_dir}
+    # make sure no scratch directory already exists
+    if [ -d "$scratch_dir" ]; then
+        echo "Scratch directory $scratch_dir already exists (and should not). Removing directory."
+        rmdir "${scratch_dir}"
+    fi
     echo "Creating scratch directory $scratch_dir."
-    mkdir $scratch_dir
+    mkdir "$scratch_dir"
 
     container_name="${PGE_NAME}-${data_set}"
 
