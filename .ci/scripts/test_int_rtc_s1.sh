@@ -60,11 +60,15 @@ expected_dir="$(pwd)/peru/expected_output_dir"
 
 # the testdata reference metadata contains this path so we use it here
 output_dir="$(pwd)/output_rtc_s1"
+# make sure no output directory already exissts
+rmdir ${output_dir}
 echo "Creating output directory $output_dir."
 mkdir $output_dir
 
 # the testdata reference metadata contains this path so we use it here
 scratch_dir="$(pwd)/scratch_rtc_s1"
+# make sure no scratch directory already exissts
+rmdir ${scratch_dir}
 echo "Creating scratch directory $scratch_dir."
 mkdir $scratch_dir
 

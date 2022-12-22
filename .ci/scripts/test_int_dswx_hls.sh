@@ -58,24 +58,17 @@ do
     data_dir=$(pwd)/${data_set}
     echo -e "\nTest data directory: ${data_dir}"
 
-    output_dir="$(pwd)/${data_set}_output"
-    echo "Checking if $output_dir exists (it shouldn't)."
-
-    if [ -d $output_dir ]; then
-        echo "Output directory $output_dir already exists (and should not). Exiting."
-        exit 1
-    fi
-
+    # the testdata reference metadata contains this path so we use it here
+    output_dir="$(pwd)/output_rtc_s1"
+    # make sure no output directory already exissts
+    rmdir ${output_dir}
     echo "Creating output directory $output_dir."
     mkdir $output_dir
 
-    scratch_dir="$(pwd)/${data_set}_scratch"
-
-    if [ -d $scratch_dir ]; then
-        echo "Scratch directory $scratch_dir already exists (and should not). Exiting."
-        exit 1
-    fi
-
+    # the testdata reference metadata contains this path so we use it here
+    scratch_dir="$(pwd)/scratch_rtc_s1"
+    # make sure no scratch directory already exissts
+    rmdir ${scratch_dir}
     echo "Creating scratch directory $scratch_dir."
     mkdir $scratch_dir
 
