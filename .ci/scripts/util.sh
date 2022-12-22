@@ -175,7 +175,7 @@ metrics_collection_start()
     # the line represent Filesystem  1K-blocks  Used Blocks Available Blocks %Used Mounted_On
     if [[ $os == "linux" ]]; then
         block_space_cmd='df -B 1024 | grep "/dev/xvdf"'
-    esle
+    else
         block_space_cmd=`df -B 1024 | grep "/System/Volumes/VM"`
     fi
 
