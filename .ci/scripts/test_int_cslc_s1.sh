@@ -65,7 +65,6 @@ if [ -d "$output_dir" ]; then
     echo "Output directory $output_dir already exists (and should not). Removing directory"
     rmdir "${output_dir}"
 fi
-
 echo "Creating output directory $output_dir."
 mkdir "$output_dir"
 
@@ -89,8 +88,8 @@ echo "Running Docker image ${PGE_IMAGE}:${PGE_TAG}"
 docker run --rm -u $UID:$(id -g) -n $container_name -w /home/compass_user \
            -v $(pwd):/home/compass_user/runconfig:ro \
            -v $(pwd)/input_data:/home/compass_user/input_data:ro \
-           -v ${output_dir}:/home/compass_user/output_s1_cslc \
-           -v ${scratch_dir}:/home/compass_user/scratch_s1_cslc \
+           -v "${output_dir}":/home/compass_user/output_s1_cslc \
+           -v "${scratch_dir}":/home/compass_user/scratch_s1_cslc \
            ${PGE_IMAGE}:${PGE_TAG} --file /home/compass_user/runconfig/$RUNCONFIG_FILENAME
 
 docker_exit_status=$?

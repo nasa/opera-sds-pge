@@ -155,7 +155,7 @@ metrics_collection_start()
 
     # start the background processes to collect docker stats
     { while true; do sleep "$sample_time"; \
-      echo "$(metrics_seconds)",`$ds` >> "${metrics_stats}"; done } & \
+      echo "$(metrics_seconds)","`$ds`" >> "${metrics_stats}"; done } & \
     echo "$!" > "$stats_pid_file"
 
     # Miscellaneous Statistics
@@ -191,7 +191,7 @@ metrics_collection_start()
     ths="eval $sys_threads_cmd"
 
     { while true; do sleep "$sample_time"; \
-      echo "$(metrics_seconds)", `$dus`, `$swu`, `$ths` >> "${metrics_misc}"; done } & \
+      echo "$(metrics_seconds)", "`$dus`", "`$swu`", "`$ths`" >> "${metrics_misc}"; done } & \
     echo "$!" >> "${misc_pid_file}"
 }
 
