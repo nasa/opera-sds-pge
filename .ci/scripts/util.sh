@@ -150,6 +150,18 @@ metrics_collection_start()
     METRICS_START_SECONDS=$SECONDS
     echo "SECONDS,$column_titles" > "$metrics_stats"
 
+    # Wait for docker run to start so the container_name is valid
+    running=0
+    while [ $running -eq 0 ];
+    do
+        if [ "$( docker ps -a -f name="${container_name}" | wc -l )" -eq 2 ]; then
+            echo "${container_name} is running: start gathering metrics."
+            running=0
+        else
+            echo "Waiting for docker run to start."
+        fi
+    done
+
     ds="docker stats --no-stream --format ${column_titles} ${container_name}";
 
     # start the background processes to collect docker stats
