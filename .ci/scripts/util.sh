@@ -114,7 +114,7 @@ copy_pge_files() {
   cp ${WORKSPACE}/.pylintrc \
      ${STAGING_DIR}/opera
 }
-metrics_collection_start "$PGE_NAME" "$container_name" "$TEST_RESULTS_DIR" "$SAMPLE_TIME"
+
 # Start the metrics collection of both docker stats and the miscellaneous os statistics.
 # Parameters:
 #     pge:  pge we are working on
