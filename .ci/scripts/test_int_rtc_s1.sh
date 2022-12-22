@@ -62,8 +62,8 @@ expected_dir="$(pwd)/peru/expected_output_dir"
 output_dir="$(pwd)/output_rtc_s1"
 # make sure no output directory already exists
 if [ -d "$output_dir" ]; then
-    echo "Output directory $output_dir already exists (and should not). Exiting."
-    exit 1
+    echo "Output directory $output_dir already exists (and should not). Remove directory."
+    rm -rf "${output_dir}"
 fi
 
 echo "Creating output directory $output_dir."
@@ -73,8 +73,8 @@ mkdir "$output_dir"
 scratch_dir="$(pwd)/scratch_rtc_s1"
 # make sure no scratch directory already exists
 if [ -d "$scratch_dir" ]; then
-    echo "Scratch directory $scratch_dir already exists (and should not). Exiting."
-    exit 1
+    echo "Scratch directory $scratch_dir already exists (and should not). Remove directory."
+    rm -rf "${scratch_dir}"
 fi
 echo "Creating scratch directory $scratch_dir."
 mkdir "$scratch_dir"
@@ -86,7 +86,7 @@ metrics_collection_start "$PGE_NAME" "$container_name" "$TEST_RESULTS_DIR" "$SAM
 
 echo "Running Docker image ${PGE_IMAGE}:${PGE_TAG}"
 
-docker run --rm -u $UID:"$(id -g)" -w /home/rtc_user -name $container_name \
+docker run --rm -u $UID:"$(id -g)" -w /home/rtc_user --name $container_name \
            -v "$(pwd)":/home/rtc_user/runconfig:ro \
            -v "$(pwd)"/peru:/home/rtc_user/input_dir:ro \
            -v "${output_dir}":/home/rtc_user/output_dir \

@@ -158,6 +158,8 @@ metrics_collection_start()
       sample_time=5; done } & \
     echo "$!" > "$stats_pid_file"
 
+    echo "sample time: ${sample_time} "
+
     # Miscellaneous Statistics
 
     # test for operating system

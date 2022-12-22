@@ -62,8 +62,8 @@ expected_dir="$(pwd)/expected_output"
 output_dir="$(pwd)/output_rtc_s1"
 # make sure no output directory already exists
 if [ -d "$output_dir" ]; then
-    echo "Output directory $output_dir already exists (and should not). Exitting."
-    exit 1
+    echo "Output directory $output_dir already exists (and should not). Remove directory."
+    rm -rf "${output_dir}"
 fi
 echo "Creating output directory $output_dir."
 mkdir "$output_dir"
@@ -72,8 +72,8 @@ mkdir "$output_dir"
 scratch_dir="$(pwd)/scratch_rtc_s1"
 # make sure no scratch directory already exists
 if [ -d "$scratch_dir" ]; then
-    echo "Scratch directory $scratch_dir already exists (and should not). Exitting."
-    exit 1
+    echo "Scratch directory $scratch_dir already exists (and should not). Remove directory."
+    rm -rf "${scratch_dir}"
 fi
 echo "Creating scratch directory $scratch_dir."
 mkdir "$scratch_dir"
