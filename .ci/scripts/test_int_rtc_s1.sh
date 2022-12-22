@@ -6,8 +6,8 @@ set -x
 umask 002
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
-. $SCRIPT_DIR/test_int_util.sh
-. $SCRIPT_DIR/util.sh
+. "$SCRIPT_DIR"/test_int_util.sh
+. "$SCRIPT_DIR"/util.sh
 
 # Parse args
 test_int_parse_args "$@"
@@ -26,7 +26,7 @@ SAMPLE_TIME=5
 # the latest available as defaults for use with the Jenkins pipeline call
 # TESTDATA should be the name of the test data archive in s3://operasds-dev-pge/${PGE_NAME}/
 # RUNCONFIG should be the name of the runconfig in s3://operasds-dev-pge/${PGE_NAME}/
-[ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath $(dirname $(realpath $0))/../..)
+[ -z "${WORKSPACE}" ] && WORKSPACE="$(realpath "$(dirname "$(realpath "$0")")"/../..)"
 [ -z "${PGE_TAG}" ] && PGE_TAG="${USER}-dev"
 [ -z "${TESTDATA}" ] && TESTDATA="delivery_1_interface_0.1.zip"
 [ -z "${RUNCONFIG}" ] && RUNCONFIG="rtc_s1.yaml"
@@ -47,7 +47,7 @@ trap test_int_trap_cleanup EXIT
 compare_script=rtc_compare.py
 local_compare_script=${TMP_DIR}/${compare_script}
 echo "Downloading s3://operasds-dev-pge/${PGE_NAME}/${compare_script} to ${local_compare_script}"
-aws s3 cp s3://operasds-dev-pge/${PGE_NAME}/${compare_script} ${local_compare_script}
+aws s3 cp s3://operasds-dev-pge/${PGE_NAME}/${compare_script} "${local_compare_script}"
 
 # overall_status values and their meaning
 # 0 - pass
@@ -132,17 +132,17 @@ else
                            "t069_147179_iw2"
                            "t069_147179_iw3")
 
-    echo "<tr><th>Compare Result</th><th><ul><li>Expected file</li><li>Output file</li></ul></th><th>rtc_compare.py output</th></tr>" >> $RESULTS_FILE
+    echo "<tr><th>Compare Result</th><th><ul><li>Expected file</li><li>Output file</li></ul></th><th>rtc_compare.py output</th></tr>" >> "$RESULTS_FILE"
     for burst_id in "${burst_ids[@]}"; do
         echo "Comparing results for $burst_id"
 
         burst_id_uppercase=${burst_id^^}
         burst_id_replace_underscores=${burst_id_uppercase//_/-}
         burst_id_pattern="*_${burst_id_replace_underscores}_*.nc"
-        output_file=$(ls $output_dir/$burst_id_pattern)
-        echo $output_file
+        output_file=$(ls "$output_dir"/"$burst_id_pattern")
+        echo "$output_file"
         expected_file=${expected_dir}/${burst_id}/rtc_product.nc
-        compare_output=$(python3 ${local_compare_script} ${expected_file} ${output_file})
+        compare_output=$(python3 "${local_compare_script}" "${expected_file}" "${output_file}")
 
         echo "$compare_output"
         if [[ "$compare_output" != *"FAILED"* ]]; then
@@ -155,10 +155,10 @@ else
         fi
 
         # remove ansi colors from string
-        compare_output=$(echo "$compare_output" | sed -e 's/\x1b\[[0-9;]*m//g')
+        compare_output="$(echo "$compare_output" | sed -e 's/\x1b\[[0-9;]*m//g')"
         # add html breaks to newlines
         compare_output=${compare_output//$'\n'/<br>$'\n'}
-        echo "<tr><td>${compare_result}</td><td><ul><li>${expected_file}</li><li>${output_file}</li></ul></td><td>${compare_output}</td></tr>" >> $RESULTS_FILE
+        echo "<tr><td>${compare_result}</td><td><ul><li>${expected_file}</li><li>${output_file}</li></ul></td><td>${compare_output}</td></tr>" >> "$RESULTS_FILE"
     done
 
 fi

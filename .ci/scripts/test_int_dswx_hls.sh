@@ -7,8 +7,8 @@ umask 002
 
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
-. "$SCRIPT_DIR"/test_int_util.sh
-. "$SCRIPT_DIR"/util.sh
+. $SCRIPT_DIR/test_int_util.sh
+. $SCRIPT_DIR/util.sh
 
 # Parse args
 test_int_parse_args "$@"
@@ -32,7 +32,7 @@ SAMPLE_TIME=5
 [ -z "${TESTDATA}" ] && TESTDATA="delivery_cal_val_3.1.zip"
 [ -z "${RUNCONFIG}" ] && RUNCONFIG="opera_pge_dswx_hls_delivery_3.1_cal_val_runconfig.yaml"
 
-# Create the test output directory in the workspace
+# Create the test output directory in the work space
 test_int_setup_results_directory
 
 # Create a temporary directory to hold test data

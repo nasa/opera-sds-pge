@@ -114,13 +114,12 @@ copy_pge_files() {
   cp ${WORKSPACE}/.pylintrc \
      ${STAGING_DIR}/opera
 }
-
+metrics_collection_start "$PGE_NAME" "$container_name" "$TEST_RESULTS_DIR" "$SAMPLE_TIME"
 # Start the metrics collection of both docker stats and the miscellaneous os statistics.
 # Parameters:
 #     pge:  pge we are working on
-#     pge_image: pge image name (e.g. opera/proteus)
-#     pge_tag: pge tag (e.g cal_cal_3.1)
-#     container_info:  the name and tag of the docker file.  (e.g. opera/proteus:cal_val_3.1)
+#     container_name: Name given to the container when it is run via --name argument
+#     results_dir: Directory where all files will be stored.
 #     sample_time:  The time between sampling of the statistics.
 metrics_collection_start()
 {
@@ -172,9 +171,12 @@ metrics_collection_start()
     # Output the column titles
     echo "SECONDS, disk_used, swap_used, total_threads, last_line" > "$metrics_misc"
 
-    # Use 'df' command to capture the amount of space on the '/dev/vda1' file system (-B sets block size (1K)
+    # Use 'df' command to capture the amount of space on the filesystem (-B sets block size (1K)
     # the line represent Filesystem  1K-blocks  Used Blocks Available Blocks %Used Mounted_On
-    block_space_cmd='df -B 1024 | grep "/dev/xvdf"'
+    if [[ $os == "linux" ]]; then
+        block_space_cmd='df -B 1024 | grep "/dev/xvdf"'
+    esle
+        block_space_cmd=`df -B 1024 | grep "/System/Volumes/VM"`
 
     # Get the number of system threads
     sys_threads_cmd='ps -elf | wc -l'
@@ -199,9 +201,8 @@ metrics_collection_start()
 # Parameters:
 #     pge: pge name
 #     exit_code:  Exit code from Docker run (0 = success, non-zero = failure).
-#     output_dir: parameter given to the docker run command (e.g. "${DATA_DIR}"/output_dir:/home/conda/output_dir)
-#                 passed through to process_metrics_data.py where the it is split on ':'
-
+#     results_dir: the directory all files will be written to during the metrics collection.
+#                  These intermediate file will be processed written to .csv files and deleted.
 metrics_collection_end()
 {
     local pge=$1
