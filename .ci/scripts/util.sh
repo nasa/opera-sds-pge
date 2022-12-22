@@ -177,6 +177,7 @@ metrics_collection_start()
         block_space_cmd='df -B 1024 | grep "/dev/xvdf"'
     esle
         block_space_cmd=`df -B 1024 | grep "/System/Volumes/VM"`
+    fi
 
     # Get the number of system threads
     sys_threads_cmd='ps -elf | wc -l'
