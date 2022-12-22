@@ -20,7 +20,7 @@ Integration Testing CSLC_S1 PGE docker image...
 
 PGE_NAME="cslc_s1"
 PGE_IMAGE="opera_pge/${PGE_NAME}"
-SAMPLE_TIME=5
+SAMPLE_TIME=15
 
 # defaults, test data and runconfig files should be updated as-needed to use
 # the latest available as defaults for use with the Jenkins pipeline call
