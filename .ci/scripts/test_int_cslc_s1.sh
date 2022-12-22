@@ -2,12 +2,11 @@
 # Script to execute integration tests on OPERA CSLC_S1 PGE Docker image
 #
 set -e
-set -x
 umask 002
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
-. $SCRIPT_DIR/test_int_util.sh
-. $SCRIPT_DIR/util.sh
+. "$SCRIPT_DIR"/test_int_util.sh
+. "$SCRIPT_DIR"/util.sh
 
 # Parse args
 test_int_parse_args "$@"
@@ -20,7 +19,7 @@ Integration Testing CSLC_S1 PGE docker image...
 
 PGE_NAME="cslc_s1"
 PGE_IMAGE="opera_pge/${PGE_NAME}"
-SAMPLE_TIME=5
+SAMPLE_TIME=15
 
 # defaults, test data and runconfig files should be updated as-needed to use
 # the latest available as defaults for use with the Jenkins pipeline call
@@ -59,7 +58,7 @@ overall_status=0
 expected_dir="$(pwd)/expected_output"
 
 # the testdata reference metadata contains this path so we use it here
-output_dir="$(pwd)/output_rtc_s1"
+output_dir="$(pwd)/output_cslc_s1"
 # make sure no output directory already exists
 if [ -d "$output_dir" ]; then
     echo "Output directory $output_dir already exists (and should not). Remove directory."
@@ -69,7 +68,7 @@ echo "Creating output directory $output_dir."
 mkdir "$output_dir"
 
 # the testdata reference metadata contains this path so we use it here
-scratch_dir="$(pwd)/scratch_rtc_s1"
+scratch_dir="$(pwd)/scratch_cslc_s1"
 # make sure no scratch directory already exists
 if [ -d "$scratch_dir" ]; then
     echo "Scratch directory $scratch_dir already exists (and should not). Remove directory."

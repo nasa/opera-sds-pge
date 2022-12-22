@@ -152,13 +152,10 @@ metrics_collection_start()
 
     ds="docker stats --no-stream --format ${column_titles} ${container_name}";
 
-    sample_start=15
     # start the background processes to collect docker stats
-    { while true; do sleep "$sample_start"; \
-      echo "$(metrics_seconds)","`$ds`" >> "${metrics_stats}";
-      sample_start=$sample_time; done } & \
+    { while true; do sleep "$sample_time"; \
+      echo "$(metrics_seconds)","`$ds`" >> "${metrics_stats}"; done } & \
     echo "$!" > "$stats_pid_file"
-
     echo "sample time: ${sample_time} "
 
     # Miscellaneous Statistics
@@ -180,7 +177,8 @@ metrics_collection_start()
     if [[ $os == "linux" ]]; then
         block_space_cmd='df -B 1024 | grep "/dev/xvdf"'
     else
-        block_space_cmd=`df -B 1024 | grep "/System/Volumes/VM"`
+        # shellcheck disable=SC2089
+        block_space_cmd='df -B 1024 | grep "/System/Volumes/VM"'
     fi
 
     # Get the number of system threads
@@ -190,6 +188,7 @@ metrics_collection_start()
         # Use 'free' to get the total amount of Swap space available
         swap_space_cmd='free -g | grep Swap'
     else
+        # shellcheck disable=SC2089
         swap_space_cmd='echo "N/A"'
     fi
 
