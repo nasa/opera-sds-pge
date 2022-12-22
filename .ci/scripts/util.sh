@@ -156,7 +156,7 @@ metrics_collection_start()
     do
         if [ "$( docker ps -a -f name="${container_name}" | wc -l )" -eq 2 ]; then
             echo "${container_name} is running: start gathering metrics."
-            running=0
+            running=1
         else
             echo "Waiting for docker run to start."
         fi
