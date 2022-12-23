@@ -2,7 +2,6 @@
 # Script to execute integration tests on OPERA RTC-S1 PGE Docker image
 #
 set -e
-set -x
 umask 002
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
@@ -30,9 +29,6 @@ SAMPLE_TIME=15
 [ -z "${PGE_TAG}" ] && PGE_TAG="${USER}-dev"
 [ -z "${TESTDATA}" ] && TESTDATA="delivery_1_interface_0.1.zip"
 [ -z "${RUNCONFIG}" ] && RUNCONFIG="rtc_s1.yaml"
-
-# Create the test output directory in the workspace
-test_int_setup_results_directory
 
 # Create a temporary directory to hold test data
 test_int_setup_data_tmp_directory
@@ -102,7 +98,6 @@ if [ $docker_exit_status -ne 0 ]; then
     echo "docker exit indicates failure: ${docker_exit_status}"
     overall_status=1
 else
-
     declare -a burst_ids=( "t069_147170_iw1"
                            "t069_147170_iw3"
                            "t069_147171_iw1"

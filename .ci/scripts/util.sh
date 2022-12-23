@@ -156,7 +156,6 @@ metrics_collection_start()
     { while true; do sleep "$sample_time"; \
       echo "$(metrics_seconds)","`$ds`" >> "${metrics_stats}"; done } & \
     echo "$!" > "$stats_pid_file"
-    echo "sample time: ${sample_time} "
 
     # Miscellaneous Statistics
 
@@ -239,7 +238,6 @@ metrics_collection_end()
     else
         echo "Docker exited with an error: metrics will not be processed or uploaded."
     fi
-
 }
 
 metrics_seconds()

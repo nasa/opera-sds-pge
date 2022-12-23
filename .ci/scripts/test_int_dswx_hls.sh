@@ -64,7 +64,6 @@ do
         echo "Output directory $output_dir already exists (and should not). Remove directory."
         rm -rf "${output_dir}"
     fi
-
     echo "Creating output directory $output_dir."
     mkdir "$output_dir"
 
