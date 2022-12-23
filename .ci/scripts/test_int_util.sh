@@ -46,8 +46,8 @@ test_int_parse_args()
 
 test_int_setup_results_directory()
 {
+  if []
     # Create the test_results directory for the PGE and initialize the HTML output file.
-    #
     TEST_RESULTS_DIR="${WORKSPACE}/test_results/${PGE_NAME}"
 
     echo "Test results output directory: ${TEST_RESULTS_DIR}"

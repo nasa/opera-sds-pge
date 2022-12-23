@@ -4,7 +4,6 @@
 ===========
 _package.py
 ===========
-
 Package information for the OPERA PGE repository.
 """
 
