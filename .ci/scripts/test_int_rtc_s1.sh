@@ -51,14 +51,14 @@ aws s3 cp s3://operasds-dev-pge/${PGE_NAME}/${compare_script} "${local_compare_s
 # 2 - product validation failure
 overall_status=0
 
-# There is only 1 expected output directory for RTC-S1 
+# There is only 1 expected output directory for RTC-S1
 expected_dir="$(pwd)/peru/expected_output_dir"
 
 # the testdata reference metadata contains this path so we use it here
 output_dir="$(pwd)/output_rtc_s1"
 # make sure no output directory already exists
 if [ -d "$output_dir" ]; then
-    echo "Output directory $output_dir already exists (and should not). Remove directory."
+    echo "Output directory $output_dir already exists (and should not). Removing directory..."
     rm -rf "${output_dir}"
 fi
 
@@ -69,7 +69,7 @@ mkdir "$output_dir"
 scratch_dir="$(pwd)/scratch_rtc_s1"
 # make sure no scratch directory already exists
 if [ -d "$scratch_dir" ]; then
-    echo "Scratch directory $scratch_dir already exists (and should not). Remove directory."
+    echo "Scratch directory $scratch_dir already exists (and should not). Removing directory..."
     rm -rf "${scratch_dir}"
 fi
 echo "Creating scratch directory $scratch_dir."

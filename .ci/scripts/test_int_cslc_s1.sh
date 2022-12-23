@@ -61,7 +61,7 @@ expected_dir="$(pwd)/expected_output"
 output_dir="$(pwd)/output_cslc_s1"
 # make sure no output directory already exists
 if [ -d "$output_dir" ]; then
-    echo "Output directory $output_dir already exists (and should not). Remove directory."
+    echo "Output directory $output_dir already exists (and should not). Removing directory."
     rm -rf "${output_dir}"
 fi
 echo "Creating output directory $output_dir."
@@ -71,7 +71,7 @@ mkdir "$output_dir"
 scratch_dir="$(pwd)/scratch_cslc_s1"
 # make sure no scratch directory already exists
 if [ -d "$scratch_dir" ]; then
-    echo "Scratch directory $scratch_dir already exists (and should not). Remove directory."
+    echo "Scratch directory $scratch_dir already exists (and should not). Removing directory."
     rm -rf "${scratch_dir}"
 fi
 echo "Creating scratch directory $scratch_dir."
@@ -113,7 +113,7 @@ else
     ref_metadata="t64_135524_iw2/20220501/t64_135524_iw2_20220501_VV.json"
 
     if [ ! -f "${output_dir}"/"${sec_product}" ] || [ ! -f "${output_dir}"/"${sec_metadata}" ] ||
-       [ ! -f "${expected_dir}"/${ref_product} ] || [ ! -f "${expected_dir}"/${ref_metadata} ]
+       [ ! -f "${expected_dir}"/"${ref_product}" ] || [ ! -f "${expected_dir}"/"${ref_metadata}" ]
     then
         echo "One or more output files or expected files are missing."
         ls "${output_dir}"/"${sec_product}"

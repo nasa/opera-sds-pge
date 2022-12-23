@@ -61,7 +61,7 @@ do
     output_dir="$(pwd)/output_dswx_hls"
     # make sure no output directory already exists
     if [ -d "$output_dir" ]; then
-        echo "Output directory $output_dir already exists (and should not). Remove directory."
+        echo "Output directory $output_dir already exists (and should not). Removing directory."
         rm -rf "${output_dir}"
     fi
     echo "Creating output directory $output_dir."
@@ -71,7 +71,7 @@ do
     scratch_dir="$(pwd)/scratch_dswx_hls"
     # make sure no scratch directory already exists
     if [ -d "$scratch_dir" ]; then
-        echo "Scratch directory $scratch_dir already exists (and should not). Remove directory.."
+        echo "Scratch directory $scratch_dir already exists (and should not). Removing directory.."
         rm -rf "${scratch_dir}"
     fi
     echo "Creating scratch directory $scratch_dir."

@@ -83,12 +83,12 @@ def get_mem_gb(mem_str):
 
 
 def get_disk_gb(d_str):
-    if d_str == ' ':
+    """Convert 1K block values into GB."""
+    if not d_str.strip():
         print("Disk used was not properly collected.")
         return d_str
     else:
-        """Convert 1K block values into GB."""
-        return float(d_str.split()[2])*1024/1000000000
+        return float(d_str.split()[2]) * 1024 / 1000000000
 
 
 def conv_to_gb(meas_str):
