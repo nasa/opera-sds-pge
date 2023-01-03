@@ -209,6 +209,11 @@ def get_geotiff_processing_datetime(filename):
     metadata = get_geotiff_metadata(filename)
     processing_datetime = metadata.get('PROCESSING_DATETIME')
 
+    # Strip tailing "Z" from datetime to maintain backwards compatibility with
+    # previous SAS versions
+    if processing_datetime.endswith('Z'):
+        processing_datetime = processing_datetime[:-1]
+
     if processing_datetime:
         processing_datetime = datetime.strptime(processing_datetime, '%Y-%m-%dT%H:%M:%S')
 
