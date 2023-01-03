@@ -76,12 +76,15 @@ class DSWxHLSPreProcessorMixin(PreProcessorMixin):
     def _validate_expected_input_platforms(self):
         """
         Scans the input files to make sure that the data comes from expected
-        platforms only.  Currently, Landsat 8/9, or Sentinel 2 A/B.
+        platforms only. Currently, Landsat 8/9, or Sentinel 2 A/B.
+
         Raises an exception if an unsupported platform is detected.
+
         This function assumes that input files have been checked to exist.
         It also assumes that only files that contain the metadata keys
         LANDSAT_PRODUCT_ID for Landsat input, and PRODUCT_URI for Sentinel
         input, need to be checked.
+
         """
         self.logger.info(
             self.name, ErrorCode.UPDATING_PRODUCT_METADATA,
@@ -226,7 +229,7 @@ class DSWxHLSPostProcessorMixin(PostProcessorMixin):
 
         The core file name component of the DSWx PGE consists of:
 
-        <PROJECT>_<LEVEL>_<PGE NAME>_<SOURCE>_<TILE ID>_<ACQ TIMETAG>_
+        <PROJECT>_<LEVEL>_<PGE NAME>-<SOURCE>_<TILE ID>_<ACQ TIMETAG>_
         <PROD TIMETAG>_<SENSOR>_<SPACING>_<PRODUCT VERSION>
 
         Callers of this function are responsible for assignment of any other
@@ -351,9 +354,11 @@ class DSWxHLSPostProcessorMixin(PostProcessorMixin):
 
         The browse image filename for the DSWx-HLS PGE consists of:
 
-            <Core filename>.png
+            <Core filename>_BROWSE.<ext>
 
-        Where <Core filename> is returned by DSWxHLSPostProcessorMixin._core_filename().
+        Where <Core filename> is returned by DSWxHLSPostProcessorMixin._core_filename(),
+        and <ext> is the file extension from inter_filename (should be either
+        .tif or .png).
 
         Parameters
         ----------
@@ -364,13 +369,14 @@ class DSWxHLSPostProcessorMixin(PostProcessorMixin):
 
         Returns
         -------
-        geotiff_filename : str
-            The file name to assign to GeoTIFF product(s) created by this PGE.
+        browse_image_filename : str
+            The file name to assign to browse image product(s) created by this PGE.
 
         """
         core_filename = self._core_filename(inter_filename)
+        file_extension = splitext(inter_filename)[-1]
 
-        return f"{core_filename}.png"
+        return f"{core_filename}_BROWSE{file_extension}"
 
     def _collect_dswx_product_metadata(self):
         """
@@ -565,10 +571,10 @@ class DSWxHLSExecutor(DSWxHLSPreProcessorMixin, DSWxHLSPostProcessorMixin, PgeEx
     LEVEL = "L3"
     """Processing Level for DSWx-HLS Products"""
 
-    PGE_VERSION = "1.0.0-rc.5.0"
+    PGE_VERSION = "1.0.0-rc.6.0"
     """Version of the PGE (overrides default from base_pge)"""
 
-    SAS_VERSION = "0.5"  # CalVal release 3.1 https://github.com/nasa/PROTEUS/releases/tag/v0.5
+    SAS_VERSION = "0.5.1"  # CalVal release 3.2 https://github.com/nasa/PROTEUS/releases/tag/v0.5.1
     """Version of the SAS wrapped by this PGE, should be updated as needed with new SAS deliveries"""
 
     def __init__(self, pge_name, runconfig_path, **kwargs):
@@ -576,7 +582,8 @@ class DSWxHLSExecutor(DSWxHLSPreProcessorMixin, DSWxHLSPostProcessorMixin, PgeEx
 
         self.rename_by_pattern_map = OrderedDict(
             {
-                'dswx_hls_*.tif*': self._geotiff_filename,
-                'dswx_hls_*.png': self._browse_image_filename
+                # Note: ordering matters here!
+                'dswx_hls_*BROWSE*': self._browse_image_filename,
+                'dswx_hls_*.tif*': self._geotiff_filename
             }
         )
