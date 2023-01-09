@@ -72,6 +72,10 @@ class CslcS1PgeTestCase(unittest.TestCase):
             f"touch {join(input_dir, 'dem_4326.tiff')}"
         )
 
+        os.system(
+            f"touch {join(input_dir, 'burst_database.db')}"
+        )
+
         os.chdir(self.working_dir.name)
 
     def tearDown(self) -> None:
@@ -315,7 +319,7 @@ class CslcS1PgeTestCase(unittest.TestCase):
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
 
-            self.assertIn("No SAS output file(s) containing burst ID",
+            self.assertIn("No SAS output file(s) found",
                           log_contents)
 
             # Test with a SAS command that produces the expected output file, but

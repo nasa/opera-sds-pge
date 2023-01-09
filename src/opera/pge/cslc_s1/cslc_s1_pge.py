@@ -81,19 +81,12 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
         """
         output_product_path = self.runconfig.output_product_path
 
-        # Get the burst ID of the job
-        burst_id = self.runconfig.sas_config['runconfig']['groups']['input_file_group']['burst_id']
-
         output_products = list(
-            filter(
-                lambda filename: burst_id in filename,
-                self.runconfig.get_output_product_filenames()
-            )
+            self.runconfig.get_output_product_filenames()
         )
 
         if not output_products:
-            error_msg = (f"No SAS output file(s) containing burst ID {burst_id} "
-                         f"found within {output_product_path}")
+            error_msg = f"No SAS output file(s) found within {output_product_path}"
             self.logger.critical(self.name, ErrorCode.OUTPUT_NOT_FOUND, error_msg)
 
         for output_product in output_products:
