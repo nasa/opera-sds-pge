@@ -23,7 +23,7 @@ import yaml
 from opera.pge import RunConfig
 from opera.pge.rtc_s1.rtc_s1_pge import RtcS1Executor
 from opera.util import PgeLogger
-from opera.util.metadata_utils import create_test_rtc_nc_product
+from opera.util.metadata_utils import create_test_rtc_metadata_product
 from opera.util.metadata_utils import get_rtc_s1_product_metadata
 
 
@@ -143,7 +143,7 @@ class RtcS1PgeTestCase(unittest.TestCase):
 
         # Grab the metadata generated from the PGE run, as it is used to generate
         # the final filename for output products
-        output_files = glob.glob(join(pge.runconfig.output_product_path, "*.nc"))
+        output_files = glob.glob(join(pge.runconfig.output_product_path, "*.h5"))
 
         self.assertEqual(len(output_files), 1)
 
@@ -156,12 +156,25 @@ class RtcS1PgeTestCase(unittest.TestCase):
                           rf"\d{{8}}T\d{{6}}Z_\d{{8}}T\d{{6}}Z_" \
                           rf"{rtc_metadata['identification']['missionId']}_" \
                           rf"{int(rtc_metadata['frequencyA']['xCoordinateSpacing'])}_" \
-                          rf"v{pge.runconfig.product_version}.nc"
+                          rf"v{pge.runconfig.product_version}.h5"
 
         result = re.match(file_name_regex, os.path.basename(output_file))
 
         self.assertIsNotNone(result)
         self.assertEqual(result.group(), os.path.basename(output_file))
+
+        # Check that the output tif files also had the convention applied
+        core_filename = os.path.splitext(os.path.basename(output_file))[0]
+
+        output_files = glob.glob(join(pge.runconfig.output_product_path, f"{core_filename}*.tif"))
+
+        self.assertEqual(len(output_files), 2)
+
+        output_files = list(map(os.path.basename, output_files))
+
+        self.assertIn(f"{core_filename}_VV.tif", output_files)
+        self.assertIn(f"{core_filename}_VH.tif", output_files)
+
 
     def test_iso_metadata_creation(self):
         """
@@ -181,15 +194,17 @@ class RtcS1PgeTestCase(unittest.TestCase):
         os.makedirs(output_product_dir, exist_ok=True)
 
         # Create a dummy RTC product
-        rtc_file_path = join(output_product_dir, "rtc_product.nc")
+        rtc_metadata_file_path = join(output_product_dir, "rtc_product_v1.0.h5")
 
-        create_test_rtc_nc_product(rtc_file_path)
+        create_test_rtc_metadata_product(rtc_metadata_file_path)
+
+        rtc_metadata = pge._collect_rtc_product_metadata(rtc_metadata_file_path)
 
         # Initialize the core filename for the catalog metadata generation step
-        pge._core_filename(inter_filename=rtc_file_path)
+        pge._core_filename(inter_filename=rtc_metadata_file_path)
 
         # Render ISO metadata using the sample metadata
-        iso_metadata = pge._create_iso_metadata()
+        iso_metadata = pge._create_iso_metadata(rtc_metadata)
 
         # Rendered template should not have any missing placeholders
         self.assertNotIn('!Not found!', iso_metadata)

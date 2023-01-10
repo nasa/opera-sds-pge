@@ -22,11 +22,14 @@ RunConfig:
             PrimaryExecutable:
                 ProductIdentifier: RTC_S1
                 ProductVersion: 1.0
-                CompositeReleaseID: TestIdRtc
                 ProgramPath: mkdir
                 ProgramOptions:
                     - '-p rtc_s1_test/output_dir/t069_147170_iw1/;'
-                    - 'python3 -c "from opera.util.metadata_utils import create_test_rtc_nc_product; create_test_rtc_nc_product(\"rtc_s1_test/output_dir/t069_147170_iw1/rtc_product.nc\")";'
+                    - 'python3 -c "from opera.util.metadata_utils import create_test_rtc_metadata_product; create_test_rtc_metadata_product(\"rtc_s1_test/output_dir/t069_147170_iw1/rtc_product_v1.0.h5\")";'
+                    - 'touch rtc_s1_test/output_dir/t069_147170_iw1/rtc_product_v1.0_VH.tif;'
+                    - 'touch rtc_s1_test/output_dir/t069_147170_iw1/rtc_product_v1.0_VV.tif;'
+                    - 'dd if=/dev/urandom of=rtc_s1_test/output_dir/t069_147170_iw1/rtc_product_v1.0_VH.tif bs=1M count=1;'
+                    - 'dd if=/dev/urandom of=rtc_s1_test/output_dir/t069_147170_iw1/rtc_product_v1.0_VV.tif bs=1M count=1;'
                     - '/bin/echo RTC-S1 invoked with RunConfig'
                 ErrorCodeBase: 300000
                 SchemaPath: pge/rtc_s1/schema/rtc_s1_sas_schema.yaml
@@ -50,117 +53,63 @@ RunConfig:
                         pge_name: RTC_S1_PGE
 
                     input_file_group:
-                        # Required. List of SAFE files (min=1)
                         safe_file_path:
                             - rtc_s1_test/input_dir/SAFE.zip
-                        # Required. List of orbit (EOF) files (min=1)
                         orbit_file_path:
                             - rtc_s1_test/input_dir/ORBIT.EOF
-                        # Burst to process. Empty to process all bursts
                         burst_id:
                             - t069_147170_iw1
 
                     dynamic_ancillary_file_group:
-                        # Digital elevation model
                         dem_file: rtc_s1_test/input_dir/dem.tif
 
-                    product_path_group:
-                        # Directory where PGE will place results
-                        product_path: rtc_s1_test/output_dir
-                        # Directory where SAS writes temporary data
-                        scratch_path: rtc_s1_test/scratch_dir
-                        # Intermediate file name. SAS writes the output to this file.
-                        # PGE may rename the product according to file naming convention
-                        output_dir: rtc_s1_test/output_dir
-                        product_id: rtc_product
-                        mosaic_bursts: False
-                        output_format: NETCDF
+                    static_ancillary_file_group:
+
+                        burst_database_file: rtc_s1_test/input_dir/db.sqlite
 
                     primary_executable:
                         product_type: RTC_S1
 
+                    product_group:
+                        processing_type: NOMINAL
+                        product_version: 1.0
+                        product_path: rtc_s1_test/output_dir
+                        scratch_path: rtc_s1_test/scratch_dir
+                        output_dir: rtc_s1_test/output_dir
+                        product_id: rtc_product
+                        save_bursts: True
+                        save_mosaics: False
+                        output_imagery_format: COG
+
                     processing:
+                        check_ancillary_inputs_coverage: True
                         polarization: dual-pol
-
-                        # Apply absolute radiometric correction
                         apply_absolute_radiometric_correction: True
-
-                        # Apply thermal noise correction
                         apply_thermal_noise_correction: True
-
-                        # OPTIONAL - Apply RTC
                         apply_rtc: True
 
-                        # OPTIONAL - to control behavior of RTC module
-                        # (only applicable if geocode.apply_rtc is True)
                         rtc:
-                            # OPTIONAL - Choices:
-                            # "gamma0" (default)
-                            # "sigma0"
                             output_type: gamma0
-
-                            # OPTIONAL - Choices:
-                            # "bilinear_distribution" (default)
-                            # "area_projection"
                             algorithm_type: area_projection
-
-                            # OPTIONAL - Choices:
-                            # "beta0" (default)
-                            # "sigma0"
                             input_terrain_radiometry: beta0
-
-                            # OPTIONAL - Minimum RTC area factor in dB
                             rtc_min_value_db:
-
-                            # RTC DEM upsampling
                             dem_upsampling: 1
 
-                        # OPTIONAL - Mechanism to specify output posting and DEM
                         geocoding:
-                            # OPTIONAL -
                             algorithm_type: area_projection
-
-                            # OPTIONAL - Choices: "single_block", "geogrid", "geogrid_radargrid", and "auto" (default)
                             memory_mode: auto
-
-                            # OPTIONAL - Processing upsampling factor applied to input geogrid
                             geogrid_upsampling: 1
-
-                            # Save the incidence angle
                             save_incidence_angle: True
-
-                            # Save the local-incidence angle
                             save_local_inc_angle: True
-
-                            # Save the projection angle
                             save_projection_angle: False
-
-                            # Save the RTC ANF computed with the projection angle method
                             save_rtc_anf_psi: False
-
-                            # Save the range slope angle
                             save_range_slope: False
-
-                            # Save the number of looks used to compute GCOV
                             save_nlooks: True
-
-                            # Save the RTC area factor used to compute GCOV
                             save_rtc_anf: True
-
-                            # Save interpolated DEM used to compute GCOV
                             save_dem: False
-
-                            # OPTIONAL - Absolute radiometric correction
                             abs_rad_cal: 1
-
-                            # OPTIONAL - Clip values above threshold
                             clip_max:
-
-                            # OPTIONAL - Clip values below threshold
                             clip_min:
-
-                            # OPTIONAL - Double sampling of the radar-grid
-                            # input sampling in the range direction
                             upsample_radargrid: False
 
                             output_epsg:
