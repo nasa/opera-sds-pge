@@ -73,7 +73,7 @@ class CslcS1PgeTestCase(unittest.TestCase):
         )
 
         os.system(
-            f"touch {join(input_dir, 'burst_database.db')}"
+            f"touch {join(input_dir, 'burst_database.sqlite3')}"
         )
 
         os.chdir(self.working_dir.name)
