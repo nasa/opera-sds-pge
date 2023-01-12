@@ -84,9 +84,9 @@ def validate_slc_s1_inputs(runconfig, logger, name):
                 _check_input(value[i], logger, name, valid_extensions=('.EOF',))
         elif key == 'dem_file':
             _check_input(value, logger, name, valid_extensions=('.tif', '.tiff', '.vrt'))
-        elif key == 'burst_id':
-            # burst_id is included in the SAS input paths, but is not
-            # actually a file, so skip it
+        elif key in ('burst_id', 'dem_description'):
+            # these fields are included in the SAS input paths, but are not
+            # actually file paths, so skip them
             continue
         else:
             error_msg = f"Unexpected input: {key}: {value}"

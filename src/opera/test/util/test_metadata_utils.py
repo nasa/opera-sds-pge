@@ -14,7 +14,7 @@ import os
 import unittest
 from unittest import skipIf
 
-from opera.util.metadata_utils import create_test_rtc_nc_product
+from opera.util.metadata_utils import create_test_rtc_metadata_product
 from opera.util.metadata_utils import get_geographic_boundaries_from_mgrs_tile
 from opera.util.metadata_utils import get_rtc_s1_product_metadata
 
@@ -63,14 +63,14 @@ class MetadataUtilsTestCase(unittest.TestCase):
     def test_get_rtc_s1_product_metadata(self):
         """Test retrieval of product metadata from HDF5 files"""
         file_name = os.path.join(tempfile.gettempdir(), "test_metadata_file.hdf5")
-        create_test_rtc_nc_product(file_name)
+        create_test_rtc_metadata_product(file_name)
 
         try:
             product_output = get_rtc_s1_product_metadata(file_name)
 
             self.assertAlmostEqual(product_output['frequencyA']['centerFrequency'], 5405000454.33435)
             self.assertEqual(product_output['orbit']['orbitType'], "POE")
-            self.assertEqual(product_output['processingInformation']['inputs']['demFiles'], ['dem.tif'])
+            self.assertEqual(product_output['processingInformation']['inputs']['demSource'], 'dem.tif')
             for po,eo in zip(product_output['processingInformation']['inputs']['auxcalFiles'],
                              ['calibration-s1b-iw1-slc-vv-20180504t104508-20180504t104533-010770-013aee-004.xml',
                               'noise-s1b-iw1-slc-vv-20180504t104508-20180504t104533-010770-013aee-004.xml']):

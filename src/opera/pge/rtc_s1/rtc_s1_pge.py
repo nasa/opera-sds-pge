@@ -13,8 +13,7 @@ from Sentinel-1 A/B (S1) PGE.
 import os.path
 from datetime import datetime
 from os import walk
-from os.path import basename, getsize
-from pathlib import Path
+from os.path import basename, getsize, join
 
 from opera.pge.base.base_pge import PgeExecutor
 from opera.pge.base.base_pge import PostProcessorMixin
@@ -73,6 +72,8 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
 
     _post_mixin_name = "RtcS1PostProcessorMixin"
     _cached_core_filename = None
+    _burst_metadata_cache = {}
+    _burst_filename_cache = {}
 
     def _validate_output(self):
         """
@@ -83,6 +84,7 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
 
         """
         out_dir_walk_dict = {}
+        expected_ext = []
 
         output_dir = os.path.abspath(self.runconfig.output_product_path)
         scratch_dir = os.path.abspath(self.runconfig.scratch_path)
@@ -92,11 +94,14 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
             if not dirs and scratch_dir not in path:  # Ignore files in 'output_dir' and scratch directory
                 out_dir_walk_dict[basename(path)] = files
 
-        output_format = self.runconfig.sas_config['runconfig']['groups']['product_path_group']['output_format']
+        output_format = self.runconfig.sas_config['runconfig']['groups']['product_group']['output_imagery_format']
+
         if output_format == 'NETCDF':
             expected_ext = ['nc']
-        elif output_format == 'GTiff' or output_format == 'COG':
-            expected_ext = ['tiff', 'tif']
+        elif output_format == 'HDF5':
+            expected_ext = ['h5']
+        elif output_format in ('GTiff', 'COG', 'ENVI'):
+            expected_ext = ['tiff', 'tif', 'h5']
 
         # Verify: files in subdirectories, file length, and proper extension.
         for dir_name_key, file_names in out_dir_walk_dict.items():
@@ -106,13 +111,13 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
                 self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
 
             for file_name in file_names:
-                if not getsize('/'.join((output_dir, dir_name_key, file_name))):
+                if not getsize(os.path.join(output_dir, dir_name_key, file_name)):
                     error_msg = f"SAS output file {file_name} exists, but is empty"
 
                     self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
 
                 if file_name.split('.')[-1] not in expected_ext:
-                    error_msg = f"SAS output file {file_name} extension error:  expected {[i for i in expected_ext]}"
+                    error_msg = f"SAS output file {file_name} extension error: expected one of {expected_ext}"
 
                     self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
 
@@ -161,14 +166,13 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
 
     def _rtc_filename(self, inter_filename):
         """
-        Returns the file name to use for RTC products produced by this PGE.
+        Returns the base file name to use for RTC products produced by this PGE.
 
-        The filename for the RTC PGE consists of:
+        The base filename for the RTC PGE consists of:
 
-            <Core filename>_<BURST ID>_<ACQUISITION TIME>_<PRODUCTION TIME>_<SENSOR>_<SPACING>_<PRODUCT VERSION>.<ext>
+            <Core filename>_<BURST ID>_<ACQUISITION TIME>_<PRODUCTION TIME>_<SENSOR>_<SPACING>_<PRODUCT VERSION>
 
-        Where <Core filename> is returned by RtcS1PostProcessorMixin._core_filename()
-        and <ext> is the file extension carried over from inter_filename
+        Where <Core filename> is returned by RtcS1PostProcessorMixin._core_filename().
 
         Parameters
         ----------
@@ -185,13 +189,32 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
         """
         core_filename = self._core_filename(inter_filename)
 
-        product_metadata = get_rtc_s1_product_metadata(inter_filename)
+        product_dir = os.path.dirname(inter_filename)
 
         # Each RTC product is stored in a directory named for the corresponding burst ID
-        burst_id = Path(os.path.dirname(inter_filename)).parts[-1]
+        burst_id = os.path.basename(product_dir)
         burst_id = burst_id.upper().replace('_', '-')
 
-        ext = os.path.splitext(inter_filename)[-1]
+        if burst_id in self._burst_metadata_cache:
+            product_metadata = self._burst_metadata_cache[burst_id]
+        else:
+            metadata_product = None
+
+            # Locate the HDF5 product which contains the RTC metadata
+            for output_product in os.listdir(product_dir):
+                if output_product.endswith('.nc') or output_product.endswith('.h5'):
+                    metadata_product = output_product
+                    break
+            else:
+                msg = (f"Could not find a NetCDF format RTC product to extract "
+                       f"metadata from within {self.runconfig.output_product_path}")
+                self.logger.critical(self.name, ErrorCode.FILE_MOVE_FAILED, msg)
+
+            product_metadata = self._collect_rtc_product_metadata(
+                os.path.join(product_dir, metadata_product)
+            )
+
+            self._burst_metadata_cache[burst_id] = product_metadata
 
         production_time = get_time_for_filename(self.production_datetime)
 
@@ -218,9 +241,80 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
             f"{spacing}_{product_version}"
         )
 
-        rtc_filename = "_".join([core_filename, rtc_file_components]) + ext
+        rtc_filename = "_".join([core_filename, rtc_file_components])
+
+        # Cache the file name for this burst ID, so it can be used with the ISO
+        # metadata later
+        self._burst_filename_cache[burst_id] = rtc_filename
 
         return rtc_filename
+
+    def _rtc_geotiff_filename(self, inter_filename):
+        """
+        Returns the file name to use for GeoTIFF format RTC products produced
+        by this PGE.
+
+        The filename for GeoTIFF RTC products consists of:
+
+            <RTC filename>_<POLARIZATION>.tif
+
+        Where <RTC filename> is returned by RtcS1PostProcessorMixin._rtc_filename(),
+        and <POLARIZATION> is the polarization value of the GeoTIFF, as extracted from
+        inter_filename.
+
+        Parameters
+        ----------
+        inter_filename : str
+            The intermediate filename of the output product to generate
+            a filename for. This parameter may be used to inspect the file
+            in order to derive any necessary components of the returned filename.
+
+        Returns
+        -------
+        rtc_geotiff_filename : str
+            The file name to assign to RTC GeoTIFF product(s) created by this PGE.
+
+        """
+        filename, ext = os.path.splitext(basename(inter_filename))
+
+        # For geotiff products, the last field should be the polarization, which
+        # needs to be carried over to the applied filename
+        polarization = filename.split('_')[-1]
+
+        rtc_filename = self._rtc_filename(inter_filename)
+
+        return f"{rtc_filename}_{polarization}.tif"
+
+    def _rtc_metadata_filename(self, inter_filename):
+        """
+        Returns the file name to use for RTC metadata products produced by this PGE.
+
+        The filename for RTC metadata products consists of:
+
+            <RTC filename>.<ext>
+
+        Where <RTC filename> is returned by RtcS1PostProcessorMixin._rtc_filename(),
+        and <ext> is the file extension carried over from inter_filename (usually
+        .h5 or .nc).
+
+        Parameters
+        ----------
+        inter_filename : str
+            The intermediate filename of the output product to generate
+            a filename for. This parameter may be used to inspect the file
+            in order to derive any necessary components of the returned filename.
+
+        Returns
+        -------
+        rtc_metadata_filename : str
+            The file name to assign to RTC metadata product(s) created by this PGE.
+
+        """
+        ext = os.path.splitext(inter_filename)[-1]
+
+        rtc_filename = self._rtc_filename(inter_filename)
+
+        return f"{rtc_filename}{ext}"
 
     def _ancillary_filename(self):
         """
@@ -242,7 +336,10 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
             The file name component to assign to ancillary products created by this PGE.
 
         """
-        product_metadata = self._collect_rtc_product_metadata()
+        # Metadata fields we need for ancillary file name should be equivalent
+        # across all bursts, so just take the first set of cached metadata as
+        # a representative
+        product_metadata = list(self._burst_metadata_cache.values())[0]
 
         # Get the sensor (should be either S1A or S1B)
         sensor = product_metadata['identification']['missionId']
@@ -281,15 +378,21 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
         """
         return self._ancillary_filename() + ".catalog.json"
 
-    def _iso_metadata_filename(self):
+    def _iso_metadata_filename(self, burst_id):
         """
         Returns the file name to use for ISO Metadata produced by the RTC-S1 PGE.
 
         The ISO Metadata file name for the RTC-S1 PGE consists of:
 
-            <Ancillary filename>.iso.xml
+            <RTC filename>.iso.xml
 
-        Where <Ancillary filename> is returned by RtcS1PostProcessorMixin._ancillary_filename()
+        Where <RTC filename> is returned by RtcS1PostProcessorMixin._rtc_filename()
+
+        Parameters
+        ----------
+        burst_id : str
+            The burst identifier used to look up the corresponding cached RTC
+            filename.
 
         Returns
         -------
@@ -297,7 +400,12 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
             The file name to assign to the ISO Metadata product created by this PGE.
 
         """
-        return self._ancillary_filename() + ".iso.xml"
+        if not burst_id in self._burst_filename_cache:
+            raise RuntimeError(f"No file name cached for burst ID {burst_id}")
+
+        iso_metadata_filename = self._burst_filename_cache[burst_id]
+
+        return iso_metadata_filename + ".iso.xml"
 
     def _log_filename(self):
         """
@@ -336,11 +444,16 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
         """
         return self._ancillary_filename() + ".qa.log"
 
-    def _collect_rtc_product_metadata(self):
+    def _collect_rtc_product_metadata(self, metadata_product):
         """
-        Gathers the available metadata from a representative RTC product created by
+        Gathers the available metadata from an HDF5 product created by
         the RTC-S1 SAS. This metadata is then formatted for use with filling in
         the ISO metadata template for the RTC-S1 PGE.
+
+        Parameters
+        ----------
+        metadata_product : str
+            Path the HDF5/NETCDF metadata product to collect metadata from.
 
         Returns
         -------
@@ -349,21 +462,7 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
             use with the ISO metadata Jinja2 template.
 
         """
-        output_products = self.runconfig.get_output_product_filenames()
-
-        # TODO: will need to support GeoTIFF/COG for later versions of SAS
-        nc_product = None
-
-        for output_product in output_products:
-            if output_product.endswith('.nc'):
-                nc_product = output_product
-                break
-        else:
-            msg = (f"Could not find a NetCDF format RTC product to extract "
-                   f"metadata from within {self.runconfig.output_product_path}")
-            self.logger.critical(self.name, ErrorCode.ISO_METADATA_RENDER_FAILED, msg)
-
-        output_product_metadata = get_rtc_s1_product_metadata(nc_product)
+        output_product_metadata = get_rtc_s1_product_metadata(metadata_product)
 
         # Fill in some additional fields expected within the ISO
         output_product_metadata['frequencyA']['frequencyAWidth'] = len(output_product_metadata['frequencyA']['xCoordinates'])
@@ -371,17 +470,11 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
 
         # TODO: the following fields seems to be missing in the interface delivery products,
         #       but are documented, remove these kludges once they are actually available
-        if 'burst_polygon' not in output_product_metadata:
-            output_product_metadata['burst_polygon'] = "POLYGON ((399015 3859970, 398975 3860000, ..., 399015 3859970))"
-
         if 'azimuthBandwidth' not in output_product_metadata['frequencyA']:
             output_product_metadata['frequencyA']['azimuthBandwidth'] = 12345678.9
 
         if 'noiseCorrectionFlag' not in output_product_metadata['frequencyA']:
             output_product_metadata['frequencyA']['noiseCorrectionFlag'] = False
-
-        if 'productVersion' not in output_product_metadata['identification']:
-            output_product_metadata['identification']['productVersion'] = '1.0'
 
         if 'plannedDatatakeId' not in output_product_metadata['identification']:
             output_product_metadata['identification']['plannedDatatakeId'] = ['datatake1', 'datatake2']
@@ -419,15 +512,21 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
 
         return custom_metadata
 
-    def _create_iso_metadata(self):
+    def _create_iso_metadata(self, burst_metadata):
         """
         Creates a rendered version of the ISO metadata template for RTC-S1
         output products using metadata from the following locations:
 
             * RunConfig (in dictionary form)
-            * Output products (dictionaries extracted from NetCDF format)
+            * Output product (dictionary extracted from HDF5 product, per-burst)
             * Catalog metadata
             * "Custom" metadata (all metadata not found anywhere else)
+
+        Parameters
+        ----------
+        burst_metadata : dict
+            The product metadata corresponding to a specific burst product to
+            be included as the "product_output" metadata in the rendered ISO xml.
 
         Returns
         -------
@@ -438,7 +537,7 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
         """
         runconfig_dict = self.runconfig.asdict()
 
-        product_output_dict = self._collect_rtc_product_metadata()
+        product_output_dict = burst_metadata
 
         catalog_metadata_dict = self._create_catalog_metadata().asdict()
 
@@ -461,6 +560,86 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
 
         return rendered_template
 
+    def _stage_output_files(self):
+        """
+        Ensures that all output products produced by both the SAS and this PGE
+        are staged to the output location defined by the RunConfig. This includes
+        reassignment of file names to meet the file-naming conventions required
+        by the PGE.
+
+        This version of the method performs the same steps as the base PGE
+        implementation, except that an ISO xml metadata file is rendered for
+        each burst product created from the input SLC, since each burst can
+        have specific metadata fields, such as the bounding polygon.
+
+        """
+        # Gather the list of output files produced by the SAS
+        output_products = self.runconfig.get_output_product_filenames()
+
+        # For each output file name, assign the final file name matching the
+        # expected conventions
+        for output_product in output_products:
+            self._assign_filename(output_product, self.runconfig.output_product_path)
+
+        # Write the catalog metadata to disk with the appropriate filename
+        catalog_metadata = self._create_catalog_metadata()
+
+        if not catalog_metadata.validate(catalog_metadata.get_schema_file_path()):
+            msg = f"Failed to create valid catalog metadata, reason(s):\n {catalog_metadata.get_error_msg()}"
+            self.logger.critical(self.name, ErrorCode.INVALID_CATALOG_METADATA, msg)
+
+        cat_meta_filename = self._catalog_metadata_filename()
+        cat_meta_filepath = join(self.runconfig.output_product_path, cat_meta_filename)
+
+        self.logger.info(self.name, ErrorCode.CREATING_CATALOG_METADATA,
+                         f"Writing Catalog Metadata to {cat_meta_filepath}")
+
+        try:
+            catalog_metadata.write(cat_meta_filepath)
+        except OSError as err:
+            msg = f"Failed to write catalog metadata file {cat_meta_filepath}, reason: {str(err)}"
+            self.logger.critical(self.name, ErrorCode.CATALOG_METADATA_CREATION_FAILED, msg)
+
+        # Generate the ISO metadata for use with product submission to DAAC(s)
+        # For RTC-S1, each burst-based product gets its own ISO xml
+        for burst_id, burst_metadata in self._burst_metadata_cache.items():
+            iso_metadata = self._create_iso_metadata(burst_metadata)
+
+            iso_meta_filename = self._iso_metadata_filename(burst_id)
+            iso_meta_filepath = join(self.runconfig.output_product_path, iso_meta_filename)
+
+            if iso_metadata:
+                self.logger.info(self.name, ErrorCode.RENDERING_ISO_METADATA,
+                                 f"Writing ISO Metadata to {iso_meta_filepath}")
+                with open(iso_meta_filepath, 'w', encoding='utf-8') as outfile:
+                    outfile.write(iso_metadata)
+
+        # Write the QA application log to disk with the appropriate filename,
+        # if necessary
+        if self.runconfig.qa_enabled:
+            qa_log_filename = self._qa_log_filename()
+            qa_log_filepath = join(self.runconfig.output_product_path, qa_log_filename)
+            self.qa_logger.move(qa_log_filepath)
+
+            try:
+                self._finalize_log(self.qa_logger)
+            except OSError as err:
+                msg = f"Failed to write QA log file to {qa_log_filepath}, reason: {str(err)}"
+                self.logger.critical(self.name, ErrorCode.LOG_FILE_CREATION_FAILED, msg)
+
+        # Lastly, write the combined PGE/SAS log to disk with the appropriate filename
+        log_filename = self._log_filename()
+        log_filepath = join(self.runconfig.output_product_path, log_filename)
+        self.logger.move(log_filepath)
+
+        try:
+            self._finalize_log(self.logger)
+        except OSError as err:
+            msg = f"Failed to write log file to {log_filepath}, reason: {str(err)}"
+
+            # Log stream might be closed by this point so raise an Exception instead
+            raise RuntimeError(msg)
+
     def run_postprocessor(self, **kwargs):
         """
         Executes the post-processing steps for the RTC-S1 PGE.
@@ -473,7 +652,7 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
         Parameters
         ----------
         **kwargs: dict
-            Any keyword arguments needed by the post-processo
+            Any keyword arguments needed by the post-processor
 
         """
         print(f'Running postprocessor for {self._post_mixin_name}')
@@ -499,7 +678,7 @@ class RtcS1Executor(RtcS1PreProcessorMixin, RtcS1PostProcessorMixin, PgeExecutor
     LEVEL = "L2"
     """Processing Level for RTC-S1 Products"""
 
-    SAS_VERSION = "0.1"  # Interface release https://github.com/opera-adt/RTC/releases/tag/v0.1
+    SAS_VERSION = "0.2"  # Beta release https://github.com/opera-adt/RTC/releases/tag/v0.2
     """Version of the SAS wrapped by this PGE, should be updated as needed"""
 
     SOURCE = "S1"
@@ -508,5 +687,7 @@ class RtcS1Executor(RtcS1PreProcessorMixin, RtcS1PostProcessorMixin, PgeExecutor
         super().__init__(pge_name, runconfig_path, **kwargs)
 
         self.rename_by_pattern_map = {
-            "*.nc": self._rtc_filename
+            "*.tif": self._rtc_geotiff_filename,
+            "*.h5": self._rtc_metadata_filename,
+            "*.nc": self._rtc_metadata_filename
         }
