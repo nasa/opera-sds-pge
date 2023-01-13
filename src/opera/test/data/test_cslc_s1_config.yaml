@@ -66,8 +66,7 @@ RunConfig:
                         dem_file: cslc_pge_test/input_dir/dem_4326.tiff
 
                     static_ancillary_file_group:
-                        # burst database sqlite file
-                        burst_database_file: cslc_pge_test/input_dir/burst_database.sqlite3
+                        burst_database_file: cslc_pge_test/input_dir/db.sqlite3
 
                     product_path_group:
                         # Directory where PGE will place results

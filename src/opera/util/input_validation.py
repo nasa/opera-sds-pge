@@ -73,17 +73,13 @@ def validate_slc_s1_inputs(runconfig, logger, name):
     # Retrieve the dynamic_ancillary_file_group from the run config file
     dynamic_ancillary_file_group_dict = runconfig.sas_config['runconfig']['groups']['dynamic_ancillary_file_group']
 
-    if name == 'CLSC':
-        # Retrieve the static_ancillary_file_group from the run config file
-        static_ancillary_file_group_dict = runconfig.sas_config['runconfig']['groups']['static_ancillary_file_group']
+    # Retrieve the static_ancillary_file_group from the run config file
+    static_ancillary_file_group_dict = runconfig.sas_config['runconfig']['groups']['static_ancillary_file_group']
 
-        # Merge the dictionaries
-        input_file_group_dict = {**input_file_group_dict,
-                                 **dynamic_ancillary_file_group_dict,
-                                 **static_ancillary_file_group_dict}
-    else:
-        # Merge the dictionaries
-        input_file_group_dict = {**input_file_group_dict, **dynamic_ancillary_file_group_dict}
+    # Merge the dictionaries
+    input_file_group_dict = {**input_file_group_dict,
+                             **dynamic_ancillary_file_group_dict,
+                             **static_ancillary_file_group_dict}
 
     for key, value in input_file_group_dict.items():
         if key == 'safe_file_path':

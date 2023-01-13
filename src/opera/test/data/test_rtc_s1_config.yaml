@@ -64,8 +64,7 @@ RunConfig:
                         dem_file: rtc_s1_test/input_dir/dem.tif
 
                     static_ancillary_file_group:
-
-                        burst_database_file: rtc_s1_test/input_dir/db.sqlite
+                        burst_database_file: rtc_s1_test/input_dir/db.sqlite3
 
                     primary_executable:
                         product_type: RTC_S1

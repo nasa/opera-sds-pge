@@ -65,6 +65,8 @@ class RtcS1PgeTestCase(unittest.TestCase):
 
         os.system(f"touch {join(input_dir, 'dem.tif')}")
 
+        os.system(f"touch {join(input_dir, 'db.sqlite3')}")
+
         os.chdir(self.working_dir.name)
 
     def tearDown(self) -> None:
