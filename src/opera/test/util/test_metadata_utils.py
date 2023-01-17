@@ -64,7 +64,7 @@ class MetadataUtilsTestCase(unittest.TestCase):
 
     def test_get_rtc_s1_product_metadata(self):
         """Test retrieval of product metadata from HDF5 files"""
-        file_name = os.path.join(tempfile.gettempdir(), "test_metadata_file.hdf5")
+        file_name = os.path.join(tempfile.gettempdir(), "test_rtc_metadata_file.hdf5")
         create_test_rtc_metadata_product(file_name)
 
         try:
@@ -85,7 +85,7 @@ class MetadataUtilsTestCase(unittest.TestCase):
 
     def test_get_cslc_s1_product_metadata(self):
         """Test retrieval of product metadata from HDF5 files"""
-        file_name = os.path.join(tempfile.gettempdir(), "test_metadata_file.hdf5")
+        file_name = os.path.join(tempfile.gettempdir(), "test_cslc_metadata_file.hdf5")
         create_test_cslc_metadata_product(file_name)
 
         try:
