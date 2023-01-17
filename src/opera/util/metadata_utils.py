@@ -355,3 +355,60 @@ def create_test_rtc_nc_product(file_path):
         trackNumber_dset = identification_grp.create_dataset("trackNumber", data=147170, dtype='int64')
         zeroDopplerEndTime_dset = identification_grp.create_dataset("zeroDopplerEndTime", data=b'2018-05-04T10:45:11.501279')
         zeroDopplerStartTime_dset = identification_grp.create_dataset("zeroDopplerStartTime", data=b'2018-05-04T10:45:08.436445')
+
+def get_cslc_s1_product_metadata(file_name):
+    """
+    Returns a python dict containing the CSLC S1 metadata
+    which will be used with the ISO metadata template.
+
+    Parameters
+    ----------
+    file_name : str
+        the CSLC S1 metadata file.
+
+    Returns
+    -------
+    cslc_metadata : dict
+        python dict containing the HDF5 file metadata which is used in the
+        ISO template.
+    """
+    cslc_metadata = {
+        'identification' : get_hdf5_group_as_dict(file_name, "/science/SENTINEL1/identification"),
+        'grids' : get_hdf5_group_as_dict(file_name, "/science/SENTINEL1/CSLC/grids"),
+        'corrections' : get_hdf5_group_as_dict(file_name, "/science/SENTINEL1/CSLC/corrections"),
+        'processing_information' : get_hdf5_group_as_dict(file_name, "/science/SENTINEL1/CSLC/metadata/processing_information"),
+        'orbit' : get_hdf5_group_as_dict(file_name, "/science/SENTINEL1/CSLC/metadata/orbit")
+    }
+
+    return cslc_metadata
+
+def create_test_cslc_h5_product(file_path):
+    """
+    Creates a dummy CSLC h5 metadata file with expected groups and datasets.
+    This function is intended for use with unit tests, but is included in this
+    module, so it will be importable from within a built container.
+
+    Parameters
+    ----------
+    file_path : str
+        Full path to write the dummy CSLC H5 metadata file to.
+
+    """
+    with h5py.File(file_path, 'w') as outfile:
+        identification_grp = outfile.create_group("/science/SENTINEL1/identification")
+        absolute_orbit_number_dset = identification_grp.create_dataset("absolute_orbit_number", data=43011, dtype='int64')
+        burst_id_dset = identification_grp.create_dataset("burst_id", data=np.string_("t064_135518_iw1"))
+
+        grids_grp = outfile.create_group("/science/SENTINEL1/CSLC/grids")
+        projection_dset = grids_grp.create_dataset("projection", data=32611, dtype='int32')
+        y_spacing_dset = grids_grp.create_dataset("y_spacing", data=-10.0, dtype='float64')
+
+        corrections_grp = outfile.create_group("/science/SENTINEL1/CSLC/corrections")
+        zero_doppler_time_spacing_dset = corrections_grp.create_dataset("zero_doppler_time_spacing", data=0.027999999991152436, dtype='float64')
+
+        processing_information_grp = outfile.create_group("/science/SENTINEL1/CSLC/metadata/processing_information")
+        algorithms_grp = outfile.create_group("/science/SENTINEL1/CSLC/metadata/processing_information/algorithms")
+        COMPASS_version_dset = algorithms_grp.create_dataset("COMPASS_version", data=np.string_("0.1.3"))
+
+        orbit_grp = outfile.create_group("/science/SENTINEL1/CSLC/metadata/orbit")
+        orbit_direction_dset = orbit_grp.create_dataset("orbit_direction", data=np.string_("Ascending"))

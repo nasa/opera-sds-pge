@@ -14,7 +14,9 @@ import os
 import unittest
 from unittest import skipIf
 
+from opera.util.metadata_utils import create_test_cslc_h5_product
 from opera.util.metadata_utils import create_test_rtc_nc_product
+from opera.util.metadata_utils import get_cslc_s1_product_metadata
 from opera.util.metadata_utils import get_geographic_boundaries_from_mgrs_tile
 from opera.util.metadata_utils import get_rtc_s1_product_metadata
 
@@ -77,6 +79,25 @@ class MetadataUtilsTestCase(unittest.TestCase):
                 self.assertEqual(po, eo)
             self.assertEqual(product_output['processingInformation']['algorithms']['geocoding'], 'area_projection')
             self.assertEqual(product_output['identification']['trackNumber'], 147170)
+
+        finally:
+            os.remove(file_name)
+
+    def test_get_cslc_s1_product_metadata(self):
+        """Test retrieval of product metadata from HDF5 files"""
+        file_name = os.path.join(tempfile.gettempdir(), "test_metadata_file.hdf5")
+        create_test_cslc_h5_product(file_name)
+
+        try:
+            product_metadata = get_cslc_s1_product_metadata(file_name)
+
+            self.assertEqual(product_metadata['identification']['absolute_orbit_number'], 43011)
+            self.assertEqual(product_metadata['identification']['burst_id'], 't064_135518_iw1')
+            self.assertEqual(product_metadata['grids']['projection'], 32611)
+            self.assertAlmostEqual(product_metadata['grids']['y_spacing'], -10.0)
+            self.assertAlmostEqual(product_metadata['corrections']['zero_doppler_time_spacing'], 0.027999999991152436)
+            self.assertEqual(product_metadata['processing_information']['algorithms']['COMPASS_version'], '0.1.3')
+            self.assertEqual(product_metadata['orbit']['orbit_direction'], 'Ascending')
 
         finally:
             os.remove(file_name)
