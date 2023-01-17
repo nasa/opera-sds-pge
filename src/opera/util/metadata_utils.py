@@ -15,6 +15,10 @@ import numpy as np
 import mgrs
 from mgrs.core import MGRSError
 
+S1_SLC_HDF5_PREFIX = "/science/SENTINEL1"
+"""Prefix used to index metadata within SLC-based HDF5 products"""
+
+
 class MockOsr:  # pragma: no cover
     """
     Mock class for the osgeo.osr module.
@@ -278,35 +282,36 @@ def get_rtc_s1_product_metadata(file_name):
         ISO template.
     """
     product_output = {
-        'frequencyA' : get_hdf5_group_as_dict(file_name, "/science/CSAR/RTC/grids/frequencyA"),
-        'processingInformation' : get_hdf5_group_as_dict(file_name, "/science/CSAR/RTC/metadata/processingInformation"),
-        'orbit' : get_hdf5_group_as_dict(file_name, "/science/CSAR/RTC/metadata/orbit"),
-        'identification' : get_hdf5_group_as_dict(file_name, "/science/CSAR/identification")
+        'frequencyA' : get_hdf5_group_as_dict(file_name, f"{S1_SLC_HDF5_PREFIX}/RTC/grids/frequencyA"),
+        'processingInformation' : get_hdf5_group_as_dict(file_name, f"{S1_SLC_HDF5_PREFIX}/RTC/metadata/processingInformation"),
+        'orbit' : get_hdf5_group_as_dict(file_name, f"{S1_SLC_HDF5_PREFIX}/RTC/metadata/orbit"),
+        'identification' : get_hdf5_group_as_dict(file_name, f"{S1_SLC_HDF5_PREFIX}/identification")
     }
 
     return product_output
 
 
-def create_test_rtc_nc_product(file_path):
+def create_test_rtc_metadata_product(file_path):
     """
-    Creates a dummy RTC NetCDF product with expected metadata fields.
+    Creates a dummy RTC HDF5 product with expected metadata fields.
     This function is intended for use with unit tests, but is included in this
     module, so it will be importable from within a built container.
 
     Parameters
     ----------
     file_path : str
-        Full path to write the dummy RTC NetCDF product to.
+        Full path to write the dummy RTC HDF5 product to.
 
     """
     with h5py.File(file_path, 'w') as outfile:
-        frequencyA_grp = outfile.create_group("/science/CSAR/RTC/grids/frequencyA")
+        frequencyA_grp = outfile.create_group(f"{S1_SLC_HDF5_PREFIX}/RTC/grids/frequencyA")
         centerFrequency_dset = frequencyA_grp.create_dataset("centerFrequency", data=5405000454.33435, dtype='float64')
         centerFrequency_dset.attrs['description'] = np.string_("Center frequency of the processed image in Hz")
         xCoordinateSpacing_dset = frequencyA_grp.create_dataset("xCoordinateSpacing", data=30.0, dtype='float64')
         xCoordinates_dset = frequencyA_grp.create_dataset("xCoordinates", data=np.zeros((10,)), dtype='float64')
         yCoordinateSpacing_dset = frequencyA_grp.create_dataset("yCoordinateSpacing", data=30.0, dtype='float64')
         yCoordinates_dset = frequencyA_grp.create_dataset("yCoordinates", data=np.zeros((10,)), dtype='float64')
+        projection_dset = frequencyA_grp.create_dataset("projection", data=b'1234')
         listOfPolarizations_dset = frequencyA_grp.create_dataset("listOfPolarizations", data=np.array([b'VV', b'VH']))
         rangeBandwidth_dset = frequencyA_grp.create_dataset('rangeBandwidth', data=56500000.0, dtype='float64')
         azimuthBandwidth_dset = frequencyA_grp.create_dataset('azimuthBandwidth', data=56500000.0, dtype='float64')
@@ -317,11 +322,13 @@ def create_test_rtc_nc_product(file_path):
         polarizationOrientationFlag_dset = frequencyA_grp.create_dataset('polarizationOrientationFlag', data=True, dtype='bool')
         radiometricTerrainCorrectionFlag_dset = frequencyA_grp.create_dataset('radiometricTerrainCorrectionFlag', data=True, dtype='bool')
 
-        orbit_grp = outfile.create_group("/science/CSAR/RTC/metadata/orbit")
+        orbit_grp = outfile.create_group(f"{S1_SLC_HDF5_PREFIX}/RTC/metadata/orbit")
         orbitType_dset = orbit_grp.create_dataset("orbitType", data=b'POE')
+        interpMethod_dest = orbit_grp.create_dataset("interpMethod", data=b'Hermite')
+        referenceEpoch_dset = orbit_grp.create_dataset("referenceEpoch", data=b'2018-05-02T10:45:07.581333000')
 
-        processingInformation_inputs_grp = outfile.create_group("/science/CSAR/RTC/metadata/processingInformation/inputs")
-        demFiles_dset = processingInformation_inputs_grp.create_dataset("demFiles", data=np.array([b'dem.tif']))
+        processingInformation_inputs_grp = outfile.create_group(f"{S1_SLC_HDF5_PREFIX}/RTC/metadata/processingInformation/inputs")
+        demSource_dset = processingInformation_inputs_grp.create_dataset("demSource", data=b'dem.tif')
         auxcalFiles = np.array([b'calibration-s1b-iw1-slc-vv-20180504t104508-20180504t104533-010770-013aee-004.xml',
                                 b'noise-s1b-iw1-slc-vv-20180504t104508-20180504t104533-010770-013aee-004.xml'])
         auxcalFiles_dset = processingInformation_inputs_grp.create_dataset("auxcalFiles", data=auxcalFiles)
@@ -332,14 +339,18 @@ def create_test_rtc_nc_product(file_path):
         orbitFiles_dset = processingInformation_inputs_grp.create_dataset("orbitFiles", data=orbitFiles)
 
         processingInformation_algorithms_grp = outfile.create_group(
-            "/science/CSAR/RTC/metadata/processingInformation/algorithms")
+            f"{S1_SLC_HDF5_PREFIX}/RTC/metadata/processingInformation/algorithms")
         demInterpolation_dset = processingInformation_algorithms_grp.create_dataset("demInterpolation", data=b'biquintic')
         geocoding_dset = processingInformation_algorithms_grp.create_dataset("geocoding", data=b'area_projection')
         radiometricTerrainCorrection_dset = processingInformation_algorithms_grp.create_dataset("radiometricTerrainCorrection", data=b'area_projection')
+        rtcVersion_dset = processingInformation_algorithms_grp.create_dataset("RTCVersion", data=b'0.2')
         isceVersion_dset = processingInformation_algorithms_grp.create_dataset("ISCEVersion", data=b'0.8.0-dev')
+        s1ReaderVersion_dset = processingInformation_algorithms_grp.create_dataset("S1ReaderVersion", data=b'1.2.3')
 
-        identification_grp = outfile.create_group("/science/CSAR/identification")
+        identification_grp = outfile.create_group(f"{S1_SLC_HDF5_PREFIX}/identification")
         absoluteOrbitNumber_dset = identification_grp.create_dataset("absoluteOrbitNumber", data=10770, dtype='int64')
+        boundingPolygon_dset = identification_grp.create_dataset("boundingPolygon", data=b'POLYGON ((399015 3859970, 398975 3860000, ..., 399015 3859970))')
+        burstID_dset = identification_grp.create_dataset("burstID", data=b't069_147170_iw1')
         diagnosticModeFlag_dset = identification_grp.create_dataset("diagnosticModeFlag", data=False, dtype='bool')
         isGeocodedFlag = identification_grp.create_dataset("isGeocoded", data=True, dtype='bool')
         isUrgentObservation_dset = identification_grp.create_dataset("isUrgentObservation", data=np.array([False, True]), dtype='bool')
@@ -382,7 +393,7 @@ def get_cslc_s1_product_metadata(file_name):
 
     return cslc_metadata
 
-def create_test_cslc_h5_product(file_path):
+def create_test_cslc_metadata_product(file_path):
     """
     Creates a dummy CSLC h5 metadata file with expected groups and datasets.
     This function is intended for use with unit tests, but is included in this

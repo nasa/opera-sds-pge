@@ -58,12 +58,16 @@ RunConfig:
                         # Required. List of orbit (EOF) files (min=1)
                         orbit_file_path:
                             - cslc_pge_test/input_dir/S1A_OPER_AUX_POEORB_OPOD_20220521T081912_V20220430T225942_20220502T005942.EOF
-                        # Required. The unique burst ID to process
-                        burst_id: t64_iw2_b204
+                        # Not required. The unique burst ID to process
+                        burst_id:  [t64_iw2_b204]
 
                     dynamic_ancillary_file_group:
                         # Digital elevation model
                         dem_file: cslc_pge_test/input_dir/dem_4326.tiff
+
+                    static_ancillary_file_group:
+                        # burst database sqlite file
+                        burst_database_file: cslc_pge_test/input_dir/burst_database.db
 
                     product_path_group:
                         # Directory where PGE will place results
