@@ -125,13 +125,11 @@ RunConfig:
                         # Required, list of SLC SAFE files (min=1)
                         safe_file_path:
                             - /home/compass_user/input_dir/S1A_IW_SLC__1SDV_20220501T015035_20220501T015102_043011_0522A4_42CC.zip
-
                         # Required, list of Orbit Ephemerides (EOF) files (min=1)
                         orbit_file_path:
                             - /home/compass_user/input_dir/S1A_OPER_AUX_POEORB_OPOD_20220521T081912_V20220430T225942_20220502T005942.EOF
-
-                        # The burst ID list to process
-                        burst_id: [t64_135524_iw2]
+                        # Burst IDs to process. Leave empty to process all bursts.
+                        burst_id: []
 
                     # This section should match the DynamicAncillaryFilesGroup of the PGE RunConfig
                     dynamic_ancillary_file_group:
