@@ -87,17 +87,10 @@ RunConfig:
                             flatten: True
                             # Dem margin (in units of input DEM)
                             lines_per_block: 1000
-                            output_epsg: 32611
                             x_posting: 5
                             y_posting: 10
                             x_snap:
                             y_snap:
-                            top_left:
-                                x: 393220.0
-                                y: 3897270.0
-                            bottom_right:
-                                x: 498265.0
-                                y: 3935210.0
                         geo2rdr:
                             lines_per_block: 1000
                             threshold: 1.0e-8
