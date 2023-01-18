@@ -87,6 +87,7 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
 
         if not output_products:
             error_msg = f"No SAS output file(s) found within {output_product_path}"
+
             self.logger.critical(self.name, ErrorCode.OUTPUT_NOT_FOUND, error_msg)
 
         for output_product in output_products:

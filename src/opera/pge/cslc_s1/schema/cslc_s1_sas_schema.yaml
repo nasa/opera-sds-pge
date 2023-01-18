@@ -63,7 +63,7 @@ processing_options:
 geocoding_options:
   # Format of output file
   output_format: enum('ENVI', 'GTiff', 'COG', required=False)
-  # Boolean flag to enable/disable flattenin
+  # Boolean flag to enable/disable flattening
   flatten: bool(required=False)
   # Number of lines to process in batch
   lines_per_block: int(min=1, required=False)

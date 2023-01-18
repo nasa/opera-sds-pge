@@ -128,13 +128,17 @@ RunConfig:
                         # Required. List of orbit (EOF) files (min=1)
                         orbit_file_path:
                             - /home/rtc_user/input_dir/S1B_OPER_AUX_POEORB_OPOD_20180524T110543_V20180503T225942_20180505T005942.EOF
-                        # Burst to process. Empty to process all bursts
-                        burst_id:
+                        # Burst IDs to process. Leave empty to process all bursts.
+                        burst_id: []
 
                     # This section should match the DynamicAncillaryFilesGroup of the PGE RunConfig
                     dynamic_ancillary_file_group:
                         # Digital elevation model
                         dem_file: /home/rtc_user/input_dir/dem.tif
+
+                    static_ancillary_file_group:
+                        # burst database sqlite file
+                        burst_database_file: /home/rtc_user/input_dir/burst_database.sqlite3
 
                     product_path_group:
                         # This should match the path used for OutputProductPath
