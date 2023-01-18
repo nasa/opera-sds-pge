@@ -384,11 +384,11 @@ def get_cslc_s1_product_metadata(file_name):
         ISO template.
     """
     cslc_metadata = {
-        'identification' : get_hdf5_group_as_dict(file_name, "/science/SENTINEL1/identification"),
-        'grids' : get_hdf5_group_as_dict(file_name, "/science/SENTINEL1/CSLC/grids"),
-        'corrections' : get_hdf5_group_as_dict(file_name, "/science/SENTINEL1/CSLC/corrections"),
-        'processing_information' : get_hdf5_group_as_dict(file_name, "/science/SENTINEL1/CSLC/metadata/processing_information"),
-        'orbit' : get_hdf5_group_as_dict(file_name, "/science/SENTINEL1/CSLC/metadata/orbit")
+        'identification' : get_hdf5_group_as_dict(file_name, f"{S1_SLC_HDF5_PREFIX}/identification"),
+        'grids' : get_hdf5_group_as_dict(file_name, f"{S1_SLC_HDF5_PREFIX}/CSLC/grids"),
+        'corrections' : get_hdf5_group_as_dict(file_name, f"{S1_SLC_HDF5_PREFIX}/CSLC/corrections"),
+        'processing_information' : get_hdf5_group_as_dict(file_name, f"{S1_SLC_HDF5_PREFIX}/CSLC/metadata/processing_information"),
+        'orbit' : get_hdf5_group_as_dict(file_name, f"{S1_SLC_HDF5_PREFIX}/CSLC/metadata/orbit")
     }
 
     return cslc_metadata
@@ -406,20 +406,20 @@ def create_test_cslc_metadata_product(file_path):
 
     """
     with h5py.File(file_path, 'w') as outfile:
-        identification_grp = outfile.create_group("/science/SENTINEL1/identification")
+        identification_grp = outfile.create_group(f"{S1_SLC_HDF5_PREFIX}/identification")
         absolute_orbit_number_dset = identification_grp.create_dataset("absolute_orbit_number", data=43011, dtype='int64')
         burst_id_dset = identification_grp.create_dataset("burst_id", data=np.string_("t064_135518_iw1"))
 
-        grids_grp = outfile.create_group("/science/SENTINEL1/CSLC/grids")
+        grids_grp = outfile.create_group(f"{S1_SLC_HDF5_PREFIX}/CSLC/grids")
         projection_dset = grids_grp.create_dataset("projection", data=32611, dtype='int32')
         y_spacing_dset = grids_grp.create_dataset("y_spacing", data=-10.0, dtype='float64')
 
-        corrections_grp = outfile.create_group("/science/SENTINEL1/CSLC/corrections")
+        corrections_grp = outfile.create_group(f"{S1_SLC_HDF5_PREFIX}/CSLC/corrections")
         zero_doppler_time_spacing_dset = corrections_grp.create_dataset("zero_doppler_time_spacing", data=0.027999999991152436, dtype='float64')
 
-        processing_information_grp = outfile.create_group("/science/SENTINEL1/CSLC/metadata/processing_information")
-        algorithms_grp = outfile.create_group("/science/SENTINEL1/CSLC/metadata/processing_information/algorithms")
+        processing_information_grp = outfile.create_group(f"{S1_SLC_HDF5_PREFIX}/CSLC/metadata/processing_information")
+        algorithms_grp = outfile.create_group(f"{S1_SLC_HDF5_PREFIX}/CSLC/metadata/processing_information/algorithms")
         COMPASS_version_dset = algorithms_grp.create_dataset("COMPASS_version", data=np.string_("0.1.3"))
 
-        orbit_grp = outfile.create_group("/science/SENTINEL1/CSLC/metadata/orbit")
+        orbit_grp = outfile.create_group(f"{S1_SLC_HDF5_PREFIX}/CSLC/metadata/orbit")
         orbit_direction_dset = orbit_grp.create_dataset("orbit_direction", data=np.string_("Ascending"))
