@@ -1,4 +1,4 @@
-# Sample RunConfig for use with the CSLC-S1 PGE v2.0.0-er.4.0
+# Sample RunConfig for use with the CSLC-S1 PGE v2.0.0-er.5.0
 # This RunConfig should require minimal changes in order to be used with the
 # OPERA PCM.
 
@@ -33,6 +33,9 @@ RunConfig:
                     # Must be either a single .tif, or a .vrt that points to one
                     # or more .tif files
                     dem_file: /home/compass_user/input_dir/dem_4326.tiff
+
+                    # Burst database, must be an .sqlite3 file
+                    burst_database_file: /home/compass_user/input_dir/opera_burst_database_deploy_2022_1212.sqlite3
 
             ProductPathGroup:
                 # Path to where output products should be stored
@@ -137,7 +140,7 @@ RunConfig:
 
                     static_ancillary_file_group:
                         # burst database sqlite file
-                        burst_database_file: /home/compass_user/input_dir/burst_database.sqlite3
+                        burst_database_file: /home/compass_user/input_dir/opera_burst_database_deploy_2022_1212.sqlite3
 
                     product_path_group:
                         # This should match the path used for OutputProductPath
@@ -147,7 +150,7 @@ RunConfig:
                         scratch_path: /home/compass_user/output_dir/scratch_dir
 
                         # Intermediate file name, this field is currently unused
-                        sas_output_file: output.slc
+                        sas_output_file: /home/compass_user/output_dir
 
                     primary_executable:
                         # This should match the value used for ProductIdentifier
@@ -160,19 +163,9 @@ RunConfig:
                         geocoding:
                             output_format: GTiff
                             flatten: True
-                            # Dem margin (in units of input DEM)
                             lines_per_block: 1000
-                            output_epsg: 32611
                             x_posting: 5
                             y_posting: 10
-                            x_snap:
-                            y_snap:
-                            top_left:
-                                x: 393220.0
-                                y: 3897270.0
-                            bottom_right:
-                                x: 498265.0
-                                y: 3935210.0
                         geo2rdr:
                             lines_per_block: 1000
                             threshold: 1.0e-8
