@@ -25,7 +25,8 @@ import yaml
 from opera.pge import RunConfig
 from opera.pge.cslc_s1.cslc_s1_pge import CslcS1Executor
 from opera.util import PgeLogger
-
+from opera.util.metadata_utils import create_test_cslc_metadata_product
+from opera.util.metadata_utils import get_cslc_s1_product_metadata
 
 class CslcS1PgeTestCase(unittest.TestCase):
     """Base test class using unittest"""
@@ -127,25 +128,16 @@ class CslcS1PgeTestCase(unittest.TestCase):
             pge.runconfig.output_product_path, pge._catalog_metadata_filename())
         self.assertTrue(os.path.exists(expected_catalog_metadata_file))
 
-        # Check that the ISO metadata file was created (not all placeholders are
-        # expected to be filled in by this test)
-        expected_iso_metadata_file = join(
-            pge.runconfig.output_product_path, pge._iso_metadata_filename())
-        self.assertTrue(os.path.exists(expected_iso_metadata_file))
-
         # Check that the log file was created and moved into the output directory
         expected_log_file = pge.logger.get_file_name()
         self.assertTrue(os.path.exists(expected_log_file))
 
-        # Lastly, check that the dummy output products were created and renamed
+        # Lastly, check that the dummy output product was created and renamed
         expected_image_file = join(
-            pge.runconfig.output_product_path, pge._geotiff_filename(inter_filename=''))
-        self.assertTrue(os.path.exists(expected_image_file))
-
-        expected_image_metadata_file = join(
-            pge.runconfig.output_product_path, pge._json_metadata_filename(inter_filename='')
+            pge.runconfig.output_product_path,
+            pge._h5_filename(inter_filename='cslc_pge_test/output_dir/t064_135518_iw1/20220501/t064_135518_iw1_20220501_VV.h5')
         )
-        self.assertTrue(os.path.exists(expected_image_metadata_file))
+        self.assertTrue(os.path.exists(expected_image_file))
 
         # Open and read the log
         with open(expected_log_file, 'r', encoding='utf-8') as infile:
@@ -163,24 +155,26 @@ class CslcS1PgeTestCase(unittest.TestCase):
 
         # Grab the metadata generated from the PGE run, as it is used to generate
         # the final filename for output products
-        metadata_files = glob.glob(join(pge.runconfig.output_product_path, "*Z.json"))
+        metadata_files = glob.glob(join(pge.runconfig.output_product_path, "*.h5"))
 
         self.assertEqual(len(metadata_files), 1)
 
         metadata_file = metadata_files[0]
 
-        with open(metadata_file, 'r') as infile:
-            cslc_metadata = json.load(infile)
+        cslc_metadata = get_cslc_s1_product_metadata(metadata_file)
+        burst_metadata = cslc_metadata['processing_information']['s1_burst_metadata']
 
         # Compare the filename returned by the PGE for JSON metadata files
         # to a regex which should match each component of the final filename
-        file_name = pge._json_metadata_filename(inter_filename='')
+        file_name = pge._h5_filename(
+            inter_filename='cslc_pge_test/output_dir/t064_135518_iw1/20220501/t064_135518_iw1_20220501_VV.h5'
+        )
 
         file_name_regex = rf"{pge.PROJECT}_{pge.LEVEL}_{pge.NAME}-" \
-                          rf"{cslc_metadata['platform_id']}_" \
-                          rf"IW_{cslc_metadata['burst_id'].upper().replace('_', '-')}_" \
-                          rf"{cslc_metadata['polarization']}_" \
-                          rf"\d{{8}}T\d{{6}}Z_v{pge.runconfig.product_version}_\d{{8}}T\d{{6}}Z.json"
+                          rf"{burst_metadata['platform_id']}_IW_" \
+                          rf"{cslc_metadata['identification']['burst_id'].upper().replace('_', '-')}_" \
+                          rf"{burst_metadata['polarization']}_" \
+                          rf"\d{{8}}T\d{{6}}Z_v{pge.runconfig.product_version}_\d{{8}}T\d{{6}}Z.h5"
 
         result = re.match(file_name_regex, file_name)
 
@@ -200,18 +194,20 @@ class CslcS1PgeTestCase(unittest.TestCase):
         # up directories
         pge.run_preprocessor()
 
-        # Copy sample JSON metadata to the output directory of the PGE
+        # Create a sample metadata file within the output directory of the PGE
         output_dir = join(os.curdir, "cslc_pge_test/output_dir")
 
-        sample_metadata_file = join(self.data_dir, 't64_135524_iw2_20220501_VV.json')
+        cslc_metadata_path = join(output_dir, 't064_135518_iw1_20220501_VV.h5')
 
-        shutil.copy(sample_metadata_file, output_dir)
+        create_test_cslc_metadata_product(cslc_metadata_path)
+
+        cslc_metadata = pge._collect_cslc_product_metadata(cslc_metadata_path)
 
         # Initialize the core filename for the catalog metadata generation step
-        pge._core_filename(inter_filename=sample_metadata_file)
+        pge._core_filename(inter_filename=cslc_metadata_path)
 
         # Render ISO metadata using the sample metadata
-        iso_metadata = pge._create_iso_metadata()
+        iso_metadata = pge._create_iso_metadata(cslc_metadata)
 
         # Rendered template should not have any missing placeholders
         self.assertNotIn('!Not found!', iso_metadata)
@@ -328,7 +324,7 @@ class CslcS1PgeTestCase(unittest.TestCase):
             primary_executable_group['ProgramPath'] = 'mkdir'
             primary_executable_group['ProgramOptions'] = [
                 '-p cslc_pge_test/output_dir/t64_iw2_b204/20220501/;',
-                'touch cslc_pge_test/output_dir/t64_iw2_b204/20220501/t64_iw2_b204_20220501_VV.slc'
+                'touch cslc_pge_test/output_dir/t64_iw2_b204/20220501/t64_iw2_b204_20220501_VV.h5'
             ]
 
             with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
@@ -339,7 +335,7 @@ class CslcS1PgeTestCase(unittest.TestCase):
             with self.assertRaises(RuntimeError):
                 pge.run()
 
-            expected_output_file = 'cslc_pge_test/output_dir/t64_iw2_b204/20220501/t64_iw2_b204_20220501_VV.slc'
+            expected_output_file = 'cslc_pge_test/output_dir/t64_iw2_b204/20220501/t64_iw2_b204_20220501_VV.h5'
             self.assertTrue(os.path.exists(expected_output_file))
 
             expected_log_file = pge.logger.get_file_name()
@@ -348,8 +344,8 @@ class CslcS1PgeTestCase(unittest.TestCase):
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
 
-            self.assertIn(f"SAS output file {abspath(expected_output_file)} was "
-                          f"created, but is empty", log_contents)
+            self.assertIn(f"SAS output file {os.path.basename(expected_output_file)} "
+                          f"exists, but is empty", log_contents)
         finally:
             if os.path.exists(test_runconfig_path):
                 os.unlink(test_runconfig_path)
