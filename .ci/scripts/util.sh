@@ -219,8 +219,11 @@ metrics_collection_end()
 
     # kill the background tasks (the pid number is stored in the file below)
     kill "$(cat "${stats_pid_file}")"
+    wait "$(cat "${stats_pid_file}")" 2> /dev/null || true
     rm "${stats_pid_file}"
+
     kill "$(cat "${misc_pid_file}")"
+    wait "$(cat "${misc_pid_file}")" 2> /dev/null || true
     rm "${misc_pid_file}"
 
     if [[ $exit_code == 0 ]]
