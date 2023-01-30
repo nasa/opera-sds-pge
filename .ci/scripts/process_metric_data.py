@@ -248,7 +248,6 @@ def main():
         with open(misc_report_file, 'w') as out_file:
             out_file.write(f"{misc_columns}\n")
             for stats_row in misc_list:
-                print(stats_row)
                 row = format_out_row_misc(stats_row)
                 out_file.write(f"{row}\n")
     else:
