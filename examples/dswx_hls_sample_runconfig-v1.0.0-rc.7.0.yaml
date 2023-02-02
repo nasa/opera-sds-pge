@@ -1,4 +1,4 @@
-# Sample RunConfig for use with the DSWx-HLS PGE v1.0.0-rc.6.0
+# Sample RunConfig for use with the DSWx-HLS PGE v1.0.0-rc.7.0
 # This RunConfig should require minimal changes in order to be used with the
 # OPERA PCM.
 
@@ -42,6 +42,11 @@ RunConfig:
                     # or more .tif files
                     worldcover_file: /home/conda/input_dir/worldcover.vrt
 
+                    # Path to the Shoreline shapefile
+                    # Must be a .shp file that is co-located with the corresponding
+                    # .dbf, .prj, and .shx files
+                    shoreline_shapefile: /home/conda/input_dir/GSHHS_f_L1.shp
+
             ProductPathGroup:
                 # Path to where output products should be stored
                 # Must correspond to the file system within the Docker container,
@@ -71,7 +76,7 @@ RunConfig:
 
                 # List of command-line options to use with ProgramPath
                 ProgramOptions:
-                    - /home/conda/proteus-0.5.1/bin/dswx_hls.py
+                    - /home/conda/proteus-0.5.2/bin/dswx_hls.py
                     - --full-log-format
 
                 # The Error Code base value added to the offset values to make
@@ -137,11 +142,16 @@ RunConfig:
                     # DynamicAncillaryFilesGroup section of the PGE RunConfig
                     dynamic_ancillary_file_group:
                         dem_file: /home/conda/input_dir/dem.vrt
-                        dem_description: Copernicus DEM GLO-30 2021
+                        dem_file_description: Copernicus DEM GLO-30 2021
+
                         landcover_file: /home/conda/input_dir/landcover.tif
-                        landcover_description: Land Cover 100m - collection 3 - epoch 2019 discrete classification map
+                        landcover_file_description: Land Cover 100m - collection 3 - epoch 2019 discrete classification map
+
                         worldcover_file: /home/conda/input_dir/worldcover.vrt
-                        worldcover_description: ESA WorldCover 10m 2020 v1.0
+                        worldcover_file_description: ESA WorldCover 10m 2020 v1.0
+
+                        shoreline_shapefile: /home/conda/input_dir/GSHHS_f_L1.shp
+                        shoreline_shapefile_description: NOAA GSHHS Level 1 resolution f - GSHHS_f_L1
 
                     primary_executable:
                         # This should match the value used for ProductIdentifier
@@ -182,6 +192,9 @@ RunConfig:
 
                         # Copernicus CGLS Land Cover 100m forest classes
                         copernicus_forest_classes: [ 20, 111, 113, 115, 116, 121, 123, 125, 126 ]
+
+                        # Ocean masking distance from shoreline in km
+                        ocean_masking_shoreline_distance_km: 1.0
 
                         save_wtr: True    # Layer 1 - WTR
                         save_bwtr: True   # Layer 2 - BWTR
