@@ -16,6 +16,7 @@ import re
 from collections import OrderedDict
 from os.path import abspath, basename, exists, isdir, join, splitext
 
+import opera.util.input_validation as input_validation
 from opera.pge.base.base_pge import PgeExecutor
 from opera.pge.base.base_pge import PostProcessorMixin
 from opera.pge.base.base_pge import PreProcessorMixin
@@ -72,6 +73,48 @@ class DSWxHLSPreProcessorMixin(PreProcessorMixin):
                 error_msg = f"Input file {input_file_path} does not have .tif extension"
 
                 self.logger.critical(self.name, ErrorCode.INVALID_INPUT, error_msg)
+
+    def _validate_ancillary_inputs(self):
+        """
+        Evaluates the list of ancillary inputs from the RunConfig to ensure they
+        are exist and have an expected file extension.
+
+        For the shoreline shapefile, this method also checks to ensure a full
+        set of expected shapefiles were provided alongside the .shp file configured
+        by the RunConfig.
+
+        """
+        dynamic_ancillary_file_group_dict = self.runconfig.sas_config['runconfig']['groups']['dynamic_ancillary_file_group']
+
+        for key, value in dynamic_ancillary_file_group_dict.items():
+            if key in ('dem_file', 'worldcover_file'):
+                input_validation.check_input(
+                    value, self.logger, self.name, valid_extensions=('.tif', '.tiff', '.vrt')
+                )
+            elif key in ('landcover_file',):
+                input_validation.check_input(
+                    value, self.logger, self.name, valid_extensions=('.tif', '.tiff')
+                )
+            elif key in ('shoreline_shapefile',):
+                input_validation.check_input(
+                    value, self.logger, self.name, valid_extensions=('.shp',)
+                )
+
+                # Only the .shp file is configured in the runconfig, but we
+                # need to ensure the other required files are co-located with it
+                for extension in ('.dbf', '.prj', '.shx'):
+                    additional_shapefile = splitext(value)[0] + extension
+
+                    if not exists(abspath(additional_shapefile)):
+                        error_msg = f"Additional shapefile {additional_shapefile} could not be located"
+
+                        self.logger.critical(self.name, ErrorCode.INVALID_INPUT, error_msg)
+
+            elif key in ('dem_file_description', 'landcover_file_description',
+                         'worldcover_file_description', 'shoreline_shapefile_description'):
+                # these fields are included in the SAS input paths, but are not
+                # actually file paths, so skip them
+                continue
 
     def _validate_expected_input_platforms(self):
         """
@@ -138,6 +181,7 @@ class DSWxHLSPreProcessorMixin(PreProcessorMixin):
         super().run_preprocessor(**kwargs)
 
         self._validate_inputs()
+        self._validate_ancillary_inputs()
         self._validate_expected_input_platforms()
 
 
