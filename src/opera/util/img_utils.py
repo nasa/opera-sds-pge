@@ -33,22 +33,24 @@ class MockGdal:  # pragma: no cover
 
         def __init__(self):
             self.dummy_metadata = {
-                'ACCODE': 'LaSRC', 'CLOUD_COVERAGE': '43', 'DEM_SOURCE': 'dem.tif',
+                'ACCODE': 'LaSRC', 'AREA_OR_POINT': 'Area',
+                'CLOUD_COVERAGE': '43', 'DEM_SOURCE': 'dem.tif',
                 'HLS_DATASET': 'HLS.L30.T22VEQ.2021248T143156.v2.0',
-                'LANDCOVER_SOURCE': 'landcover.tif', 'LEVEL': '3',
+                'LANDCOVER_SOURCE': 'landcover.tif',
                 'MEAN_SUN_AZIMUTH_ANGLE': '145.002203258435',
                 'MEAN_SUN_ZENITH_ANGLE': '30.7162834439185',
                 'MEAN_VIEW_AZIMUTH_ANGLE': '100.089770731169',
                 'MEAN_VIEW_ZENITH_ANGLE': '4.6016561116873',
                 'NBAR_SOLAR_ZENITH': '31.7503071022442',
                 'PROCESSING_DATETIME': '2022-01-31T21:54:26',
-                'PRODUCT_ID': 'dswx_hls', 'PRODUCT_SOURCE': 'HLS',
-                'PRODUCT_TYPE': 'DSWx', 'PRODUCT_VERSION': '0.1',
-                'PROJECT': 'OPERA',
+                'PRODUCT_ID': 'dswx_hls', 'PRODUCT_LEVEL': '3',
+                'PRODUCT_SOURCE': 'HLS', 'PRODUCT_TYPE': 'DSWx-HLS',
+                'PRODUCT_VERSION': '0.1', 'PROJECT': 'OPERA',
                 'SENSING_TIME': '2021-09-05T14:31:56.9300799Z; 2021-09-05T14:32:20.8126470Z',
                 'SENSOR': 'MSI',
                 'SENSOR_PRODUCT_ID': 'S2A_MSIL1C_20210907T163901_N0301_R126_T15SXR_20210907T202434.SAFE',
-                'SPACECRAFT_NAME': 'SENTINEL-2A', 'SPATIAL_COVERAGE': '99',
+                'SHORELINE_SOURCE': 'shoreline.shp', 'SOFTWARE_VERSION': '0.1',
+                'SPACECRAFT_NAME': 'Sentinel-2A', 'SPATIAL_COVERAGE': '99',
                 'WORLDCOVER_SOURCE': 'worldcover.tif',
             }
 

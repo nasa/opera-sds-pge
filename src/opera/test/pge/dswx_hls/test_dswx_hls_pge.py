@@ -66,6 +66,15 @@ class DSWxPgeTestCase(unittest.TestCase):
         self.input_file = tempfile.NamedTemporaryFile(
             dir=test_input_dir, prefix="test_input", suffix=".tif"
         )
+
+        # Create dummy versions of the expected ancillary inputs
+        for ancillary_file in ('dem.tif', 'landcover.tif', 'worldcover.vrt',
+                               'shoreline.shp', 'shoreline.dbf', 'shoreline.prj',
+                               'shoreline.shx'):
+            os.system(
+                f"touch {join(test_input_dir, ancillary_file)}"
+            )
+
         os.chdir(self.working_dir.name)
 
     def tearDown(self) -> None:
@@ -223,6 +232,91 @@ class DSWxPgeTestCase(unittest.TestCase):
             if os.path.exists(test_runconfig_path):
                 os.unlink(test_runconfig_path)
 
+    def test_dswx_pge_ancillary_input_validation(self):
+        """Test validation checks made on the set of ancillary input files"""
+        runconfig_path = join(self.data_dir, 'test_dswx_hls_config.yaml')
+        test_runconfig_path = join(self.data_dir, 'invalid_dswx_runconfig.yaml')
+
+        with open(runconfig_path, 'r', encoding='utf-8') as stream:
+            runconfig_dict = yaml.safe_load(stream)
+
+        ancillary_file_group_dict = runconfig_dict['RunConfig']['Groups']['SAS']['runconfig']['groups']['dynamic_ancillary_file_group']
+
+        # Test an invalid (missing) ancillary file
+        ancillary_file_group_dict['dem_file'] = 'non_existent_dem.tif'
+
+        with open(test_runconfig_path, 'w', encoding='utf-8') as input_path:
+            yaml.safe_dump(runconfig_dict, input_path, sort_keys=False)
+
+        try:
+            pge = DSWxHLSExecutor(pge_name="DSWxPgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            # Config validation occurs before the log is fully initialized, but the
+            # initial log file should still exist and contain details of the validation
+            # error
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            # Open the log file, and check that the validation error details were captured
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn("Could not locate specified input non_existent_dem.tif.", log_contents)
+
+            # Reset to valid dem path
+            ancillary_file_group_dict['dem_file'] = 'dswx_pge_test/input_dir/dem.tif'
+
+            # Test with an unexpected file extension
+            os.system("touch dswx_pge_test/input_dir/landcover.vrt")
+            ancillary_file_group_dict['landcover_file'] = 'dswx_pge_test/input_dir/landcover.vrt'
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as input_path:
+                yaml.safe_dump(runconfig_dict, input_path, sort_keys=False)
+
+            pge = DSWxHLSExecutor(pge_name="DSWxPgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            # Open the log file, and check that the validation error details were captured
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn(f"Input file dswx_pge_test/input_dir/landcover.vrt "
+                          f"does not have an expected file extension.", log_contents)
+
+            # Reset to valid landcover path
+            ancillary_file_group_dict['landcover_file'] = 'dswx_pge_test/input_dir/landcover.tif'
+
+            # Test with incomplete shoreline shapefile set
+            os.system("touch dswx_pge_test/input_dir/missing_shoreline.shp")
+            ancillary_file_group_dict['shoreline_shapefile'] = 'dswx_pge_test/input_dir/missing_shoreline.shp'
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as input_path:
+                yaml.safe_dump(runconfig_dict, input_path, sort_keys=False)
+
+            pge = DSWxHLSExecutor(pge_name="DSWxPgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            # Open the log file, and check that the validation error details were captured
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn("Additional shapefile dswx_pge_test/input_dir/missing_shoreline.dbf "
+                          "could not be located", log_contents)
+        finally:
+            if os.path.exists(test_runconfig_path):
+                os.unlink(test_runconfig_path)
+
     def test_dswx_pge_output_validation(self):
         """Test the output validation checks made by DSWxPostProcessorMixin."""
         runconfig_path = join(self.data_dir, 'test_dswx_hls_config.yaml')
@@ -303,7 +397,7 @@ class DSWxPgeTestCase(unittest.TestCase):
             file_name = pge._geotiff_filename(image_file)
             md = MockGdal.MockGdalDataset().GetMetadata()
             file_name_regex = rf"{pge.PROJECT}_{pge.LEVEL}_" \
-                              rf"{md['PRODUCT_TYPE']}-{md['PRODUCT_SOURCE']}_" \
+                              rf"{md['PRODUCT_TYPE']}_" \
                               rf"{md['HLS_DATASET'].split('.')[2]}_" \
                               rf"\d{{8}}T\d{{6}}Z_\d{{8}}T\d{{6}}Z_" \
                               rf"{get_sensor_from_spacecraft_name(md['SPACECRAFT_NAME'])}_" \

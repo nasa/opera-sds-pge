@@ -12,7 +12,11 @@ RunConfig:
                     - dswx_pge_test/input_dir
 
             DynamicAncillaryFilesGroup:
-                AncillaryFileMap: {}
+                AncillaryFileMap:
+                    dem_file: dswx_pge_test/input_dir/dem.tif
+                    landcover_file: dswx_pge_test/input_dir/landcover.tif
+                    worldcover_file: dswx_pge_test/input_dir/worldcover.vrt
+                    shoreline_shapefile: dswx_pge_test/input_dir/shoreline.shp
 
             ProductPathGroup:
                 OutputProductPath: dswx_pge_test/output_dir
@@ -20,8 +24,7 @@ RunConfig:
 
             PrimaryExecutable:
                 ProductIdentifier: DSWX_HLS
-                ProductVersion: 7.7
-                CompositeReleaseID: TestIdDswx
+                ProductVersion: 1.0
                 ProgramPath: /bin/echo
                 ProgramOptions:
                     - 'hello world > dswx_pge_test/output_dir/dswx_hls_v0.1_B01_WTR.tif;'
@@ -53,14 +56,10 @@ RunConfig:
                             - dswx_pge_test/input_dir
 
                     dynamic_ancillary_file_group:
-                        # Digital elevation model
-                        dem_file:
-
-                        # Copernicus Global Land Service (CGLS) Land Cover Layer file
-                        landcover_file:
-
-                        # ESA WorldCover map file
-                        worldcover_file:
+                        dem_file: dswx_pge_test/input_dir/dem.tif
+                        landcover_file: dswx_pge_test/input_dir/landcover.tif
+                        worldcover_file: dswx_pge_test/input_dir/worldcover.vrt
+                        shoreline_shapefile: dswx_pge_test/input_dir/shoreline.shp
 
                     primary_executable:
                         product_type: DSWX_HLS
