@@ -47,4 +47,4 @@ docker run --rm -w "${CONTAINER_HOME}" -u $UID:$(id -g) --name="${container_name
 docker_run_exit_code=$?
 echo "Docker run exited with code: " $docker_run_exit_code
 
-metrics_collection_end "$PGE_NAME" "$docker_run_exit_code" "$TEST_RESULTS_DIR"
+metrics_collection_end "$PGE_NAME" "$container_name" "$docker_run_exit_code" "$TEST_RESULTS_DIR"

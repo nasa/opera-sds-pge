@@ -23,12 +23,13 @@ SAMPLE_TIME=15
 
 # defaults, test data and runconfig files should be updated as-needed to use
 # the latest available as defaults for use with the Jenkins pipeline call
-# TESTDATA should be the name of the test data archive in s3://operasds-dev-pge/${PGE_NAME}/
+# INPUT/OUTPUT_DATA should be the name of the test data archive in s3://operasds-dev-pge/${PGE_NAME}/
 # RUNCONFIG should be the name of the runconfig in s3://operasds-dev-pge/${PGE_NAME}/
 [ -z "${WORKSPACE}" ] && WORKSPACE="$(realpath "$(dirname "$(realpath "$0")")"/../..)"
 [ -z "${PGE_TAG}" ] && PGE_TAG="${USER}-dev"
-[ -z "${TESTDATA}" ] && TESTDATA="delivery_1_interface_0.1.zip"
-[ -z "${RUNCONFIG}" ] && RUNCONFIG="rtc_s1.yaml"
+[ -z "${INPUT_DATA}}" ] && INPUT_DADA="rtc_s1_delivery_2_beta_0.2_expected_input.zip"
+[ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="rtc_s1_delivery_2_beta_0.2_expected_output.zip"
+[ -z "${RUNCONFIG}" ] && RUNCONFIG="rtc_s1_delivery_2_beta_0.2_runconfig.yaml"
 
 # Create a temporary directory to hold test data
 test_int_setup_data_tmp_directory
@@ -40,10 +41,9 @@ test_int_setup_test_data
 trap test_int_trap_cleanup EXIT
 
 # Pull in product compare script from S3.
-compare_script=rtc_compare.py
-local_compare_script=${TMP_DIR}/${compare_script}
-echo "Downloading s3://operasds-dev-pge/${PGE_NAME}/${compare_script} to ${local_compare_script}"
-aws s3 cp s3://operasds-dev-pge/${PGE_NAME}/${compare_script} "${local_compare_script}"
+local_compare_script=${TMP_DIR}/rtc_compare.py
+echo "Downloading s3://operasds-dev-pge/${PGE_NAME}/rtc_compare.py to ${local_compare_script}"
+aws s3 cp s3://operasds-dev-pge/${PGE_NAME}/rtc_compare.py "${local_compare_script}"
 
 # overall_status values and their meaning
 # 0 - pass
@@ -51,11 +51,19 @@ aws s3 cp s3://operasds-dev-pge/${PGE_NAME}/${compare_script} "${local_compare_s
 # 2 - product validation failure
 overall_status=0
 
-# There is only 1 expected output directory for RTC-S1
-expected_dir="$(pwd)/peru/expected_output_dir"
+data_set = 'peru'
+input_data_basename=$(basename -- "$INPUT_DATA")
+input_data_dir="${TMP_DIR}/${input_data_basename%.*}/${data_set}/input_dir"
+
+expected_data_basename=$(basename -- "$EXPECTED_DATA")
+expected_data_dir="${TMP_DIR}/${expected_data_basename%.*}/${data_set}/expected_output_dir"
+
+echo "Input data directory: ${input_data_dir}"
+echo "Expected data directory: ${expected_data_dir}"
 
 # the testdata reference metadata contains this path so we use it here
-output_dir="$(pwd)/output_rtc_s1"
+output_dir="${TMP_DIR}/rtc_s1_output/${data_set}/output_dir"
+
 # make sure no output directory already exists
 if [ -d "$output_dir" ]; then
     echo "Output directory $output_dir already exists (and should not). Removing directory..."
@@ -63,36 +71,35 @@ if [ -d "$output_dir" ]; then
 fi
 
 echo "Creating output directory $output_dir."
-mkdir "$output_dir"
+mkdir -p "$output_dir"
 
 # the testdata reference metadata contains this path so we use it here
-scratch_dir="$(pwd)/scratch_rtc_s1"
+scratch_dir="${TMP_DIR}/scratch_rtc_s1/${data_set}/scratch_dir"
 # make sure no scratch directory already exists
 if [ -d "$scratch_dir" ]; then
     echo "Scratch directory $scratch_dir already exists (and should not). Removing directory..."
     rm -rf "${scratch_dir}"
 fi
 echo "Creating scratch directory $scratch_dir."
-mkdir "$scratch_dir"
+mkdir -p --mode=777 "scratch_dir"
 
-container_name="${PGE_NAME}"
+container_name="${PGE_NAME}-${data_set}"
 
 # Start metrics collection
 metrics_collection_start "$PGE_NAME" "$container_name" "$TEST_RESULTS_DIR" "$SAMPLE_TIME"
 
-echo "Running Docker image ${PGE_IMAGE}:${PGE_TAG}"
-
+echo "Running Docker image ${PGE_IMAGE}:${PGE_TAG} for ${input_data_dir}"
 docker run --rm -u $UID:"$(id -g)" -w /home/rtc_user --name $container_name \
-           -v "$(pwd)":/home/rtc_user/runconfig:ro \
-           -v "$(pwd)"/peru:/home/rtc_user/input_dir:ro \
-           -v "${output_dir}":/home/rtc_user/output_dir \
-            -v "${scratch_dir}":/home/rtc_user/scratch_dir \
+           -v "${TMP_DIR}/runconfig":/home/rtc_user/runconfig:ro \
+           -v "$input_data_dir"/:/home/rtc_user/input_dir:ro \
+           -v "$output_dir":/home/rtc_user/output_dir \
+           -v "$scratch_dir":/home/rtc_user/scratch_dir \
            ${PGE_IMAGE}:"${PGE_TAG}" --file /home/rtc_user/runconfig/${RUNCONFIG}
 
 docker_exit_status=$?
 
 # End metrics collection
-metrics_collection_end "$PGE_NAME" "$docker_exit_status" "$TEST_RESULTS_DIR"
+metrics_collection_end "$PGE_NAME" "$container_name" "$docker_exit_status" "$TEST_RESULTS_DIR"
 
 if [ $docker_exit_status -ne 0 ]; then
     echo "docker exit indicates failure: ${docker_exit_status}"
@@ -129,17 +136,17 @@ else
 
     echo "<tr><th>Compare Result</th><th><ul><li>Expected file</li><li>Output file</li></ul></th><th>rtc_compare.py output</th></tr>" >> "$RESULTS_FILE"
     for burst_id in "${burst_ids[@]}"; do
-        echo "Comparing results for $burst_id"
+        echo "Comparing results for: $burst_id"
 
         burst_id_uppercase=${burst_id^^}
         burst_id_replace_underscores=${burst_id_uppercase//_/-}
         burst_id_pattern="*_${burst_id_replace_underscores}_*.nc"
         output_file=$(ls "$output_dir"/"$burst_id_pattern")
-        echo "$output_file"
-        expected_file=${expected_dir}/${burst_id}/rtc_product.nc
+        echo "output file: $output_file"
+        expected_file=${expected_data_dir}/${burst_id}/rtc_product.nc
         compare_output=$(python3 "${local_compare_script}" "${expected_file}" "${output_file}")
 
-        echo "$compare_output"
+        echo "Results of compare: $compare_output"
         if [[ "$compare_output" != *"FAILED"* ]]; then
             echo "Product validation was successful for $output_file"
             compare_result="PASS"

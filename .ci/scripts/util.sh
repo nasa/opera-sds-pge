@@ -209,8 +209,9 @@ metrics_collection_start()
 metrics_collection_end()
 {
     local pge=$1
-    local exit_code=$2
-    local results_dir=$3
+    local container=$2
+    local exit_code=$3
+    local results_dir=$4
 
     local metrics_stats="${results_dir}/${pge}_metrics_stats.csv"
     local metrics_misc="${results_dir}/${pge}_metrics_misc.csv"
@@ -228,7 +229,7 @@ metrics_collection_end()
 
     if [[ $exit_code == 0 ]]
     then
-        python3 "$SCRIPT_DIR"/process_metric_data.py "$pge" "$metrics_stats" "$metrics_misc" "$results_dir"
+        python3 "$SCRIPT_DIR"/process_metric_data.py "$pge" "$container" "$metrics_stats" "$metrics_misc" "$results_dir"
         process_metrics_exit_code=$?
 
         if [[ $process_metrics_exit_code == 0 ]]

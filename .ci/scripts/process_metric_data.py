@@ -203,9 +203,10 @@ def make_lists(csv_file):
 def main():
     """Main program in process_metric_data.py"""
     container_info = sys.argv[1]
-    stats_file = sys.argv[2]
-    misc_file = sys.argv[3]
-    output_dir = sys.argv[4]
+    container_name = sys.argv[2]
+    stats_file = sys.argv[3]
+    misc_file = sys.argv[4]
+    output_dir = sys.argv[5]
 
     temp_stats = "temp_opera_docker_stats.csv"
     temp_misc = "temp_opera_misc_stats.csv"
@@ -217,8 +218,8 @@ def main():
     current_time = datetime.datetime.today().strftime('%Y%m%d_%H%M%S')
 
     # For now make two formatted files
-    docker_report_file = f"{output_dir}/docker_metrics_{container_info}_{current_time}.csv"
-    misc_report_file = f"{output_dir}/misc_metrics_{container_info}_{current_time}.csv"
+    docker_report_file = f"{output_dir}/docker_metrics_{container_info}_{container_name}_{current_time}.csv"
+    misc_report_file = f"{output_dir}/misc_metrics_{container_info}_{container_name}_{current_time}.csv"
 
     # read files into lists
     stats_list = make_lists(temp_stats)
