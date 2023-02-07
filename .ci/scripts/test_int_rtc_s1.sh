@@ -27,9 +27,10 @@ SAMPLE_TIME=15
 # RUNCONFIG should be the name of the runconfig in s3://operasds-dev-pge/${PGE_NAME}/
 [ -z "${WORKSPACE}" ] && WORKSPACE="$(realpath "$(dirname "$(realpath "$0")")"/../..)"
 [ -z "${PGE_TAG}" ] && PGE_TAG="${USER}-dev"
-[ -z "${INPUT_DATA}}" ] && INPUT_DADA="rtc_s1_delivery_2_beta_0.2_expected_input.zip"
+[ -z "${INPUT_DATA}" ] && INPUT_DADA="rtc_s1_delivery_2_beta_0.2_expected_input.zip"
 [ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="rtc_s1_delivery_2_beta_0.2_expected_output.zip"
 [ -z "${RUNCONFIG}" ] && RUNCONFIG="rtc_s1_delivery_2_beta_0.2_runconfig.yaml"
+[ -z "${TMP_ROOT}" ] && TMP_ROOT="$DEFAULT_TMP_ROOT"
 
 # Create a temporary directory to hold test data
 test_int_setup_data_tmp_directory
@@ -43,7 +44,7 @@ trap test_int_trap_cleanup EXIT
 # Pull in product compare script from S3.
 local_compare_script=${TMP_DIR}/rtc_compare.py
 echo "Downloading s3://operasds-dev-pge/${PGE_NAME}/rtc_compare.py to ${local_compare_script}"
-aws s3 cp s3://operasds-dev-pge/${PGE_NAME}/rtc_compare.py "${local_compare_script}"
+aws s3 cp s3://operasds-dev-pge/${PGE_NAME}/rtc_compare.py "$local_compare_script"
 
 # overall_status values and their meaning
 # 0 - pass
@@ -51,18 +52,19 @@ aws s3 cp s3://operasds-dev-pge/${PGE_NAME}/rtc_compare.py "${local_compare_scri
 # 2 - product validation failure
 overall_status=0
 
-data_set = 'peru'
+# only one data set in rtc-s1 (peru)
+data_set='peru'
 input_data_basename=$(basename -- "$INPUT_DATA")
-input_data_dir="${TMP_DIR}/${input_data_basename%.*}/${data_set}/input_dir"
+input_data_dir="${TMP_DIR}/${input_data_basename%.*}/input_dir"
 
 expected_data_basename=$(basename -- "$EXPECTED_DATA")
-expected_data_dir="${TMP_DIR}/${expected_data_basename%.*}/${data_set}/expected_output_dir"
+expected_data_dir="${TMP_DIR}/${expected_data_basename%.*}/expected_output_dir"
 
 echo "Input data directory: ${input_data_dir}"
 echo "Expected data directory: ${expected_data_dir}"
 
 # the testdata reference metadata contains this path so we use it here
-output_dir="${TMP_DIR}/rtc_s1_output/${data_set}/output_dir"
+output_dir="${TMP_DIR}/rtc_s1_output/output_dir"
 
 # make sure no output directory already exists
 if [ -d "$output_dir" ]; then
@@ -74,7 +76,7 @@ echo "Creating output directory $output_dir."
 mkdir -p "$output_dir"
 
 # the testdata reference metadata contains this path so we use it here
-scratch_dir="${TMP_DIR}/scratch_rtc_s1/${data_set}/scratch_dir"
+scratch_dir="${TMP_DIR}/scratch_rtc_s1"
 # make sure no scratch directory already exists
 if [ -d "$scratch_dir" ]; then
     echo "Scratch directory $scratch_dir already exists (and should not). Removing directory..."
