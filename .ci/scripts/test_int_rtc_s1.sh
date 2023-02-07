@@ -32,6 +32,9 @@ SAMPLE_TIME=15
 [ -z "${RUNCONFIG}" ] && RUNCONFIG="rtc_s1_delivery_2_beta_0.2_runconfig.yaml"
 [ -z "${TMP_ROOT}" ] && TMP_ROOT="$DEFAULT_TMP_ROOT"
 
+# Create the test output directory in the work space
+test_int_setup_results_directory
+
 # Create a temporary directory to hold test data
 test_int_setup_data_tmp_directory
 
