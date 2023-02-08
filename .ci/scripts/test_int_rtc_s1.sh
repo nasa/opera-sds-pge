@@ -20,7 +20,7 @@ Integration Testing RTC-S1 PGE docker image...
 PGE_NAME="rtc_s1"
 PGE_IMAGE="opera_pge/${PGE_NAME}"
 SAMPLE_TIME=15
-q
+
 # defaults, test data and runconfig files should be updated as-needed to use
 # the latest available as defaults for use with the Jenkins pipeline call
 # INPUT/OUTPUT_DATA should be the name of the test data archive in s3://operasds-dev-pge/${PGE_NAME}/
