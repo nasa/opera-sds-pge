@@ -1,6 +1,7 @@
 #!/bin/bash
 # Script to execute integration tests on OPERA CSLC_S1 PGE Docker image
 #
+set -e
 umask 002
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
@@ -52,7 +53,7 @@ aws s3 cp s3://operasds-dev-pge/${PGE_NAME}/validate_cslc.py "$local_validate_cs
 # 0 - pass
 # 1 - failure to execute some part of this script
 # 2 - product validation failure
-overall_status=1
+overall_status=0
 
 # There is only 1 expected output directory for CSLC_S1
 expected_dir="${TMP_DIR}/${EXPECTED_DATA%.*}/expected_output_dir"
@@ -102,8 +103,6 @@ if [ $docker_exit_status -ne 0 ]; then
     echo "docker exit indicates failure: ${docker_exit_status}"
     overall_status=1
 else
-    overall_status=0
-
     echo "<tr><th>Compare Result</th><th><ul><li>Expected file</li><li>Output file</li></ul></th><th>validate_cslc.py output</th></tr>" >> "$RESULTS_FILE"
     declare -a burst_ids=(  "t064_135518_iw1"
                             "t064_135518_iw2"
@@ -154,7 +153,7 @@ else
                                 ${PGE_IMAGE}:"${PGE_TAG}" \
                                 /working/validate_cslc.py \
                                 --ref-product ${ref_product} \
-                                --sec-product ${sec_product} 2>&1)
+                                --sec-product ${sec_product} 2>&1) || docker_exit_status=$?
 
         echo "$docker_out"
         if [[ "$docker_out" != *"All CSLC product checks have passed"* ]]; then
