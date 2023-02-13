@@ -55,26 +55,19 @@ aws s3 cp s3://operasds-dev-pge/${PGE_NAME}/rtc_compare.py "$local_compare_scrip
 # 2 - product validation failure
 overall_status=0
 
-# only one data set in rtc-s1 (peru)
-data_set='peru'
-input_data_basename=$(basename -- "$INPUT_DATA")
-input_data_dir="${TMP_DIR}/${input_data_basename%.*}/input_dir"
 
-expected_data_basename=$(basename -- "$EXPECTED_DATA")
-expected_data_dir="${TMP_DIR}/${expected_data_basename%.*}/expected_output_dir"
-
-echo "Input data directory: ${input_data_dir}"
-echo "Expected data directory: ${expected_data_dir}"
+# There is only 1 expected output directory RTC-S1
+expected_dir="${TMP_DIR}/${EXPECTED_DATA%.*}/expected_output_dir"
+input_dir="${TMP_DIR}/${INPUT_DATA%.*}/input_data"
+runconfig_dir="${TMP_DIR}/runconfig"
 
 # the testdata reference metadata contains this path so we use it here
-output_dir="${TMP_DIR}/rtc_s1_output/output_dir"
-
+output_dir="${TMP_DIR}/output_cslc_s1"
 # make sure no output directory already exists
 if [ -d "$output_dir" ]; then
-    echo "Output directory $output_dir already exists (and should not). Removing directory..."
+    echo "Output directory $output_dir already exists (and should not). Removing directory."
     rm -rf "${output_dir}"
 fi
-
 echo "Creating output directory $output_dir."
 mkdir -p "$output_dir"
 
