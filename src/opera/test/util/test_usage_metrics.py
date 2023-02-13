@@ -105,7 +105,8 @@ class UsageMetricsTestCase(unittest.TestCase):
             self.assertGreater(metrics['os.cpu.seconds.user'], metrics['os.cpu.seconds.sys'])
             # Verify that the main process, takes more RAM than the child process
             # TODO: still need to determine why this is equalling out for the RTC-S1 PGE
-            self.assertGreaterEqual(metrics['os.max_rss_kb.main_process'], metrics['os.max_rss_kb.largest_child_process'])
+            self.assertGreaterEqual(metrics['os.max_rss_kb.main_process'],
+                                    metrics['os.max_rss_kb.largest_child_process'])
 
             # Testing peak_vmm_kb requires the test to run in a Linux environment,
             # otherwise we expect -1 back, so test both

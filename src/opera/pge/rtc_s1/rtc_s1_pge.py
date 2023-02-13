@@ -400,7 +400,7 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
             The file name to assign to the ISO Metadata product created by this PGE.
 
         """
-        if not burst_id in self._burst_filename_cache:
+        if burst_id not in self._burst_filename_cache:
             raise RuntimeError(f"No file name cached for burst ID {burst_id}")
 
         iso_metadata_filename = self._burst_filename_cache[burst_id]
@@ -465,8 +465,10 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
         output_product_metadata = get_rtc_s1_product_metadata(metadata_product)
 
         # Fill in some additional fields expected within the ISO
-        output_product_metadata['frequencyA']['frequencyAWidth'] = len(output_product_metadata['frequencyA']['xCoordinates'])
-        output_product_metadata['frequencyA']['frequencyALength'] = len(output_product_metadata['frequencyA']['yCoordinates'])
+        output_product_metadata['frequencyA']['frequencyAWidth'] = len(output_product_metadata['frequencyA']
+                                                                       ['xCoordinates'])
+        output_product_metadata['frequencyA']['frequencyALength'] = len(output_product_metadata['frequencyA']
+                                                                        ['yCoordinates'])
 
         # TODO: the following fields seems to be missing in the interface delivery products,
         #       but are documented, remove these kludges once they are actually available

@@ -417,7 +417,7 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
             If there is no file name cached for the provided burst ID.
 
         """
-        if not burst_id in self._burst_filename_cache:
+        if burst_id not in self._burst_filename_cache:
             raise RuntimeError(f"No file name cached for burst ID {burst_id}")
 
         iso_metadata_filename = self._burst_filename_cache[burst_id]
