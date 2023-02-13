@@ -14,9 +14,9 @@ from os.path import exists, splitext
 from opera.util.error_codes import ErrorCode
 
 
-def _check_input(input_object, logger, name, valid_extensions):
+def check_input(input_object, logger, name, valid_extensions):
     """
-    Called by _validate_inputs() to check individual files.
+    Validation checks for individual files.
     The input object is checked for existence and that it ends with
     a valid file extension.
 
@@ -71,23 +71,31 @@ def validate_slc_s1_inputs(runconfig, logger, name):
     input_file_group_dict = runconfig.sas_config['runconfig']['groups']['input_file_group']
 
     # Retrieve the dynamic_ancillary_file_group from the run config file
-    ancillary_file_group_dict = runconfig.sas_config['runconfig']['groups']['dynamic_ancillary_file_group']
+    dynamic_ancillary_file_group_dict = runconfig.sas_config['runconfig']['groups']['dynamic_ancillary_file_group']
 
-    # Merge the 2 dictionaries
-    input_file_group_dict = {**input_file_group_dict, **ancillary_file_group_dict}
+    # Retrieve the static_ancillary_file_group from the run config file
+    static_ancillary_file_group_dict = runconfig.sas_config['runconfig']['groups']['static_ancillary_file_group']
+
+    # Merge the dictionaries
+    input_file_group_dict = {**input_file_group_dict,
+                             **dynamic_ancillary_file_group_dict,
+                             **static_ancillary_file_group_dict}
+
     for key, value in input_file_group_dict.items():
         if key == 'safe_file_path':
             for i in range(len(value)):
-                _check_input(value[i], logger, name,  valid_extensions=('.zip',))
+                check_input(value[i], logger, name, valid_extensions=('.zip',))
         elif key == 'orbit_file_path':
             for i in range(len(value)):
-                _check_input(value[i], logger, name, valid_extensions=('.EOF',))
+                check_input(value[i], logger, name, valid_extensions=('.EOF',))
         elif key == 'dem_file':
-            _check_input(value, logger, name, valid_extensions=('.tif', '.tiff', '.vrt'))
-        elif key == 'burst_id':
-            # burst_id is included in the SAS input paths, but is not
-            # actually a file, so skip it
+            check_input(value, logger, name, valid_extensions=('.tif', '.tiff', '.vrt'))
+        elif key in ('burst_id', 'dem_description'):
+            # these fields are included in the SAS input paths, but are not
+            # actually file paths, so skip them
             continue
+        elif key == 'burst_database_file':
+            check_input(value, logger, name, valid_extensions=('.sqlite3',))
         else:
             error_msg = f"Unexpected input: {key}: {value}"
             logger.critical(name, ErrorCode.INVALID_INPUT, error_msg)

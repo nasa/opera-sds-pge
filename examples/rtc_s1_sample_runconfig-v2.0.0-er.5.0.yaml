@@ -1,4 +1,4 @@
-# Sample RunConfig for use with the RTC-S1 PGE v2.0.0-er.4.0
+# Sample RunConfig for use with the RTC-S1 PGE v2.0.0-er.5.0
 # This RunConfig should require minimal changes in order to be used with the
 # OPERA PCM.
 
@@ -34,6 +34,9 @@ RunConfig:
                     # or more .tif files
                     dem_file: /home/rtc_user/input_dir/dem.tif
 
+                    # Burst database, must be an .sqlite3 file
+                    burst_database_file: /home/rtc_user/input_dir/opera_burst_database_deploy_2022_1212.sqlite3
+
             ProductPathGroup:
                 # Path to where output products should be stored
                 # Must correspond to the file system within the Docker container,
@@ -47,7 +50,7 @@ RunConfig:
                 # Must correspond to the file system within the Docker container,
                 # and must have write permissions for the User/Group used with
                 # the "Docker run" command
-                ScratchPath: /home/rtc_user/scratch_dir
+                ScratchPath: /home/rtc_user/output_dir/scratch_dir
 
             PrimaryExecutable:
                 # Identifier for the PGE executable, should always be RTC_S1 for
@@ -64,8 +67,9 @@ RunConfig:
                 # List of command-line options to use with ProgramPath
                 ProgramOptions:
                     - run
+                    - --no-capture-output
                     - -n
-                    - isce3_rtc
+                    - RTC
                     - rtc_s1.py
 
                 # The Error Code base value added to the offset values to make
@@ -128,20 +132,28 @@ RunConfig:
                         # Required. List of orbit (EOF) files (min=1)
                         orbit_file_path:
                             - /home/rtc_user/input_dir/S1B_OPER_AUX_POEORB_OPOD_20180524T110543_V20180503T225942_20180505T005942.EOF
-                        # Burst to process. Empty to process all bursts
-                        burst_id:
+                        # Burst IDs to process. Leave empty to process all bursts.
+                        burst_id: []
 
                     # This section should match the DynamicAncillaryFilesGroup of the PGE RunConfig
                     dynamic_ancillary_file_group:
                         # Digital elevation model
                         dem_file: /home/rtc_user/input_dir/dem.tif
 
-                    product_path_group:
+                    static_ancillary_file_group:
+                        # burst database sqlite file
+                        burst_database_file: /home/rtc_user/input_dir/opera_burst_database_deploy_2022_1212.sqlite3
+
+                    product_group:
+                        processing_type: 'NOMINAL'
+
+                        product_version: 1.0
+
                         # This should match the path used for OutputProductPath
                         product_path: /home/rtc_user/output_dir
 
                         # This should match the path used for ScratchPath
-                        scratch_path: /home/rtc_user/scratch_dir
+                        scratch_path: /home/rtc_user/output_dir/scratch_dir
 
                         # This should match the path used for OutputProductPath
                         output_dir: /home/rtc_user/output_dir
@@ -150,10 +162,12 @@ RunConfig:
                         # by the SAS for its output products. These products will
                         # be renamed by the PGE to match the OPERA file name conventions.
                         product_id: rtc_product
-                        mosaic_bursts: False
 
-                        # Output format, should be NETCDF for v2.0.0-er.4.0
-                        output_format: NETCDF
+                        save_bursts: True
+                        save_mosaics: False
+                        output_imagery_format: COG
+                        output_imagery_compression: ZSTD
+                        output_imagery_nbits: 16
 
                     primary_executable:
                         # This should match the value used for ProductIdentifier
@@ -162,7 +176,21 @@ RunConfig:
                     # SLC processing options
                     # Consult the RTC-S1 SAS User's Guide for more info on each field
                     processing:
+
+                        # Check if ancillary input covers entirely output products
+                        check_ancillary_inputs_coverage: True
+
                         polarization: dual-pol
+
+                        # Options to run geo2rdr
+                        geo2rdr:
+                            threshold: 1.0e-7
+                            numiter: 50
+
+                        # Options to run rdr2geo
+                        rdr2geo:
+                            threshold: 1.0e-7
+                            numiter: 25
 
                         # Apply absolute radiometric correction
                         apply_absolute_radiometric_correction: True
@@ -172,6 +200,12 @@ RunConfig:
 
                         # OPTIONAL - Apply RTC
                         apply_rtc: True
+
+                        # Apply bistatic delay correction
+                        apply_bistatic_delay_correction: True
+
+                        # Apply dry tropospheric delay correction
+                        apply_dry_tropospheric_delay_correction: True
 
                         # OPTIONAL - to control behavior of RTC module
                         # (only applicable if geocode.apply_rtc is True)
@@ -195,7 +229,7 @@ RunConfig:
                             rtc_min_value_db:
 
                             # RTC DEM upsampling
-                            dem_upsampling: 1
+                            dem_upsampling: 2
 
                         # OPTIONAL - Mechanism to specify output posting and DEM
                         geocoding:
@@ -209,10 +243,10 @@ RunConfig:
                             geogrid_upsampling: 1
 
                             # Save the incidence angle
-                            save_incidence_angle: True
+                            save_incidence_angle: False
 
                             # Save the local-incidence angle
-                            save_local_inc_angle: True
+                            save_local_inc_angle: False
 
                             # Save the projection angle
                             save_projection_angle: False
@@ -224,13 +258,16 @@ RunConfig:
                             save_range_slope: False
 
                             # Save the number of looks used to compute GCOV
-                            save_nlooks: True
+                            save_nlooks: False
 
                             # Save the RTC area factor used to compute GCOV
-                            save_rtc_anf: True
+                            save_rtc_anf: False
 
                             # Save interpolated DEM used to compute GCOV
                             save_dem: False
+
+                            # Save layover shadow mask
+                            save_layover_shadow_mask: True
 
                             # OPTIONAL - Absolute radiometric correction
                             abs_rad_cal: 1

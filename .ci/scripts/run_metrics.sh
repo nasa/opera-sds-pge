@@ -2,42 +2,49 @@
 
 # run_metrics()
 # This script wraps a "docker run" command within metrics_collection_start() and
-# metrics_collection_end() function calls.
+# metrics_collection_end() function calls.  It is to test the calls on local machines.
 #
 # usage:
-#     run_metrics.sh <pge> <run config_fn> (file name only) <data_dir> (full path) <image name>
-#     Eg. bash run_metrics  DSWX_HLS_PGE  dswx_hls.yaml  /Users/..../l30_greenland  opera/proteus:mid_may_2022 5
-#
+#     run_metrics.sh <pge_name> <runconfig> <data_dir> <container home> <image name> <image tag> <sample time>
+#     Eg. bash run_metrics.sh  DSWX_HLS_PGE  dswx_hls.yaml  /Users/..../test_datasets  /home/conda  opera/proteus cal_val_3.1 5
 #
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+. "$SCRIPT_DIR"/test_int_util.sh
+. "$SCRIPT_DIR"/util.sh
 
-. "${SCRIPT_DIR}"/util.sh
+# TODO: validate number of provided arguments matches expected,
+#       and print help usage (or set defaults) if wrong
+PGE_NAME=$1        # PGE name
+RUNCONFIG=$2       # Runconfig file path
+DATA_DIR=$3        # Directory to get input and write output from PGE
+CONTAINER_HOME=$4  # The path of the home directory is within the container
+PGE_IMAGE=$5       # Name of the docker image to run stats on
+PGE_TAG=$6         # Name of the docker tag
+SAMPLE_TIME=$7     # Amount of time between samples (seconds)
 
-PGE=$1          # pge to run in docker
-RUNCONFIG=$2    # runconfig file name (not full path)
-DATA_DIR=$3     # data directory for input and output to the docker run command
-IMAGE_NAME=$4   # name of the docker image to run stats on, ex: opera_pge/dswx_hls:jehofman-dev
-SAMPLE_TIME=$5  # Amount of time between samples (seconds)
+container_name="${PGE_NAME}-${PGE_IMAGE}"
 
-# will add the docker tag in a future version
-# container_name="${pge_docker_tag}_${PGE}_${RUNCONFIG}"
+# Create the test output directory in the workspace
+[ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath "$(dirname "$(realpath "$0")")"/../..)
+test_int_setup_results_directory
 
-container_name="$PGE"
+# Start metrics collection
+metrics_collection_start "$PGE_NAME" "$container_name" "$TEST_RESULTS_DIR" "$SAMPLE_TIME"
 
-metrics_collection_start "$container_name" "$IMAGE_NAME" "$SAMPLE_TIME"
-
-echo "Running pge '{$PGE}' (image $IMAGE_NAME) using run config '$RUNCONFIG'"
+echo "Running pge '$PGE_NAME' (image $PGE_IMAGE, tag $PGE_TAG) using run config '$RUNCONFIG'"
 echo "Sending 'docker run' command"
 
-docker run --rm --name "${container_name}" -u $UID:$(id -g)\
-  -v "${DATA_DIR}"/runconfig:/home/conda/runconfig:ro \
-  -v "${DATA_DIR}"/input_dir:/home/conda/input_dir:ro \
-  -v "${DATA_DIR}"/output_dir:/home/conda/output_dir \
-  -i --tty "${IMAGE_NAME}" \
-  --file /home/conda/runconfig/"${RUNCONFIG}"
+FULL_IMAGE_NAME="${PGE_IMAGE}:${PGE_TAG}"
+RUNCONFIG_FILENAME=$(basename -- "$RUNCONFIG")
+
+docker run --rm -w "${CONTAINER_HOME}" -u $UID:$(id -g) --name="${container_name}" \
+  -v "${DATA_DIR}"/runconfig:"${CONTAINER_HOME}"/runconfig:ro \
+  -v "${DATA_DIR}"/input_dir:"${CONTAINER_HOME}"/input_dir:ro \
+  -v "${DATA_DIR}"/output_dir:"${CONTAINER_HOME}"/output_dir \
+  -i --tty "${FULL_IMAGE_NAME}" --file "${CONTAINER_HOME}/${RUNCONFIG_FILENAME}"
 
 docker_run_exit_code=$?
 echo "Docker run exited with code: " $docker_run_exit_code
 
-metrics_collection_end "$container_name" $docker_run_exit_code "$PGE" "$RUNCONFIG"
+metrics_collection_end "$PGE_NAME" "$docker_run_exit_code" "$TEST_RESULTS_DIR"

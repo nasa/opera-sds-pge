@@ -1,4 +1,4 @@
-# Sample RunConfig for use with the DSWx-HLS PGE v1.0.0-rc.5.0
+# Sample RunConfig for use with the DSWx-HLS PGE v1.0.0-rc.7.0
 # This RunConfig should require minimal changes in order to be used with the
 # OPERA PCM.
 
@@ -42,6 +42,11 @@ RunConfig:
                     # or more .tif files
                     worldcover_file: /home/conda/input_dir/worldcover.vrt
 
+                    # Path to the Shoreline shapefile
+                    # Must be a .shp file that is co-located with the corresponding
+                    # .dbf, .prj, and .shx files
+                    shoreline_shapefile: /home/conda/input_dir/GSHHS_f_L1.shp
+
             ProductPathGroup:
                 # Path to where output products should be stored
                 # Must correspond to the file system within the Docker container,
@@ -65,17 +70,13 @@ RunConfig:
                 # Product version specific to output products
                 ProductVersion: 1.0
 
-                # Rolls up versions of all software/data used to generate versions
-                # from the data products (CRID) (TODO placeholder value)
-                CompositeReleaseID: TestIdDswx
-
                 # Path to the executable to run, path must be reachable from
                 # within the Docker container (i.e. findable with a "which" command)
                 ProgramPath: python3
 
                 # List of command-line options to use with ProgramPath
                 ProgramOptions:
-                    - /home/conda/proteus-0.1/bin/dswx_hls.py
+                    - /home/conda/proteus-0.5.2/bin/dswx_hls.py
                     - --full-log-format
 
                 # The Error Code base value added to the offset values to make
@@ -141,11 +142,16 @@ RunConfig:
                     # DynamicAncillaryFilesGroup section of the PGE RunConfig
                     dynamic_ancillary_file_group:
                         dem_file: /home/conda/input_dir/dem.vrt
-                        dem_description: Copernicus DEM GLO-30 2021 WGS84
+                        dem_file_description: Copernicus DEM GLO-30 2021
+
                         landcover_file: /home/conda/input_dir/landcover.tif
-                        landcover_description: Land Cover 100m - collection 3 - epoch 2019 discrete classification map
+                        landcover_file_description: Land Cover 100m - collection 3 - epoch 2019 discrete classification map
+
                         worldcover_file: /home/conda/input_dir/worldcover.vrt
-                        worldcover_description: ESA WorldCover 10m 2020 v1.0
+                        worldcover_file_description: ESA WorldCover 10m 2020 v1.0
+
+                        shoreline_shapefile: /home/conda/input_dir/GSHHS_f_L1.shp
+                        shoreline_shapefile_description: NOAA GSHHS Level 1 resolution f - GSHHS_f_L1
 
                     primary_executable:
                         # This should match the value used for ProductIdentifier
@@ -169,8 +175,11 @@ RunConfig:
                         product_version: 1.0
 
                     processing:
-                        # Use terrain-masking based on the Otsu method
-                        flag_use_otsu_terrain_masking: False
+                        # Check if ancillary inputs cover entirely the output product
+                        check_ancillary_inputs_coverage: True
+
+                        # Select shadow masking algorithm
+                        shadow_masking_algorithm: sun_local_inc_angle
 
                         # Minimum slope angle in degrees for terrain masking
                         min_slope_angle: -5
@@ -180,6 +189,12 @@ RunConfig:
 
                         # Define how areas adjacent to cloud/cloud-shadow should be handled
                         mask_adjacent_to_cloud_mode: 'mask'
+
+                        # Copernicus CGLS Land Cover 100m forest classes
+                        copernicus_forest_classes: [ 20, 111, 113, 115, 116, 121, 123, 125, 126 ]
+
+                        # Ocean masking distance from shoreline in km
+                        ocean_masking_shoreline_distance_km: 1.0
 
                         save_wtr: True    # Layer 1 - WTR
                         save_bwtr: True   # Layer 2 - BWTR
@@ -198,21 +213,53 @@ RunConfig:
                         # SWIR-1, NIR, and Red reflectance color composition
                         save_infrared_rgb: False
 
-                    # Settings for saving browse image PNG of the WTR layer.
+                    # Settings for saving browse image GeoTIFF/PNG of the WTR layer.
                     browse_image_group:
-                        # Save a browse image PNG of the WTR layer.
+                        # Save a full-res Cloud-Optimized GEOTIFF DSWx-HLS browse image and
+                        # a modified-resolution PNG of the browse image for DSWx-HLS
                         save_browse: True
 
                         # Setting `browse_image_height` and `browse_image_width` equal
                         # will maintain this original HLS and DSWx-HLS aspect ratio
-                        # of 3660 pixels x 3660 pixels.
+                        # of 3660 pixels x 3660 pixels for the PNG browse image.
                         # If these fields are left empty, 1024 x 1024 will be used.
 
-                        # Height in pixels
+                        # Height in pixels for the PNG browse image
                         browse_image_height: 1024
 
-                        # Width in pixels
+                        # Width in pixels for the PNG browse image
                         browse_image_width: 1024
+
+                        # Flag to exclude the Partial Surface Water Aggressive (PSW-Agg)
+                        # class in the browse image. If True, PSW-Agg pixels will
+                        # appear as Not Water. If False, this class will be displayed
+                        # in the browse image, same as in WTR. Default is False.
+                        exclude_psw_aggressive_in_browse: False
+
+                        # Define how Not Water (e.g. land) appears in the browse image.
+                        # Defaults to 'white'.
+                        # Options are: 'white', 'nodata'
+                        #   'white'         : Not Water pixels will be white
+                        #   'nodata'        : Not Water pixels will be marked as not having
+                        #                     valid data, and will be fully transparent
+                        not_water_in_browse: 'white'
+
+                        # Define how cloud appears in the browse image.
+                        # Defaults to 'gray'.
+                        # Options are: 'gray', 'nodata'
+                        #   'gray'          : cloud pixels will be opaque gray
+                        #   'nodata'        : cloud pixels will be marked as not having
+                        #                     valid data, and will be fully transparent
+                        cloud_in_browse: 'gray'
+
+                        # Define how snow appears in the browse image.
+                        # Defaults to 'cyan'.
+                        # Options are: 'cyan', 'gray', 'nodata'
+                        #   'cyan'          : snow will be opaque cyan
+                        #   'gray'          : snow will be opaque gray
+                        #   'nodata'        : snow pixels will be marked as not having
+                        #                     valid data, and will be fully transparent
+                        snow_in_browse: 'cyan'
 
                     # HLS processing options
                     # Consult the DSWx-HLS SAS User's Guide for more info on each field

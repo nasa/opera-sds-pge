@@ -11,4 +11,5 @@ Contributors
 ------------
 
 * Jim Hofman <James.E.Hofman@jpl.nasa.gov>
-* Drew Meyers <drewm@mit.edu>
+* David Inglish <david.j.inglish@jpl.nasa.gov>
+* Drew Meyers <drew.meyers@jpl.nasa.gov>

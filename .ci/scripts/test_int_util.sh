@@ -5,6 +5,9 @@
 # Library of common shell routines for PGE integration testing.
 #
 
+# Base temp directory to use for file staging
+DEFAULT_TMP_ROOT="/data/tmp"
+
 test_int_parse_args()
 {
     # Parse command line arguments and set global variables to be used in calling script
@@ -12,22 +15,31 @@ test_int_parse_args()
     while [[ $# -gt 0 ]]; do
     case $1 in
       -h|--help)
-        echo "Usage: $(basename $0) [-h|--help] [-t|--tag <tag>] [--testdata <testdata .zip file>] [--runconfig <runconfig .yaml file>]"
+        echo "Usage: $(basename $0) [-h|--help] [-t|--tag <tag>] [-i|--input-data <zip file>] [-e|--expected-data <zip file>] [--runconfig <runconfig .yaml file>] [--temp-root <path>]"
         exit 0
         ;;
       -t|--tag)
         PGE_TAG=$2
-        echo "PGE_TAG is $PGE_TAG"
         shift
         shift
         ;;
-      --testdata)
-        TESTDATA=$2
+      -i|--input-data)
+        INPUT_DATA=$2
+        shift
+        shift
+        ;;
+      -e|--expected-data)
+        EXPECTED_DATA=$2
         shift
         shift
         ;;
       --runconfig)
         RUNCONFIG=$2
+        shift
+        shift
+        ;;
+      --temp-root)
+        TMP_ROOT=$2
         shift
         shift
         ;;
@@ -47,7 +59,6 @@ test_int_parse_args()
 test_int_setup_results_directory()
 {
     # Create the test_results directory for the PGE and initialize the HTML output file.
-    #
     TEST_RESULTS_DIR="${WORKSPACE}/test_results/${PGE_NAME}"
 
     echo "Test results output directory: ${TEST_RESULTS_DIR}"
@@ -69,53 +80,59 @@ test_int_setup_data_tmp_directory()
 {
     # Create a temporary directory to allow Jenkins to write to it and avoid collisions
     # with other users
-    TMP_DIR=$(mktemp -dp /data/tmp)
+    TMP_DIR=$(mktemp -dp ${TMP_ROOT})
     chmod 775 $TMP_DIR
-    cd $TMP_DIR
 }
 
 test_int_setup_test_data()
 {
     # Download test data and extract it
     #
-    local_testdata_archive=${TMP_DIR}/${TESTDATA}
+    local_input_data_archive=${TMP_DIR}/${INPUT_DATA}
+    local_expected_data_archive=${TMP_DIR}/${EXPECTED_DATA}
     local_runconfig=${TMP_DIR}/${RUNCONFIG}
 
     # Pull in test data and runconfig from S3
-    echo "Downloading test data from s3://operasds-dev-pge/${PGE_NAME}/${TESTDATA} to $local_testdata_archive"
-    aws s3 cp s3://operasds-dev-pge/${PGE_NAME}/${TESTDATA} $local_testdata_archive --no-progress
+    echo "Downloading input data from s3://operasds-dev-pge/${PGE_NAME}/${INPUT_DATA} to $local_input_data_archive"
+    aws s3 cp s3://operasds-dev-pge/${PGE_NAME}/${INPUT_DATA} $local_input_data_archive --no-progress
+
+    echo "Downloading expected outputs from s3://operasds-dev-pge/${PGE_NAME}/${EXPECTED_DATA} to $local_expected_data_archive"
+    aws s3 cp s3://operasds-dev-pge/${PGE_NAME}/${EXPECTED_DATA} $local_expected_data_archive --no-progress
+
     echo "Downloading runconfig from s3://operasds-dev-pge/${PGE_NAME}/${RUNCONFIG} to $local_runconfig"
-    aws s3 cp s3://operasds-dev-pge/${PGE_NAME}/${RUNCONFIG} $local_runconfig
+    aws s3 cp s3://operasds-dev-pge/${PGE_NAME}/${RUNCONFIG} $local_runconfig --no-progress
 
-    cd ${TMP_DIR}
+    for local_testdata_archive in $local_input_data_archive $local_expected_data_archive
+    do
+        # Extract the test data archive to the current directory
+        if [ -f $local_testdata_archive ]; then
+            # The testdata archive should contain a directory with the same basename
+            testdata_basename=$(basename -- "$local_testdata_archive")
+            testdata_dir="${TMP_DIR}/${testdata_basename%.*}"
 
-    # Extract the test data archive to the current directory
-    if [ -f $local_testdata_archive ]; then
+            echo "Extracting test data from $local_testdata_archive to ${TMP_DIR}/"
+            unzip -qq $local_testdata_archive -d ${TMP_DIR}
 
-        # The testdata archive should contain a directory with the same basename
-        testdata_basename=$(basename -- "$local_testdata_archive")
-        testdata_dir="${TMP_DIR}/${testdata_basename%.*}"
-
-        echo "Extracting test data from $local_testdata_archive to $(pwd)/"
-        unzip $local_testdata_archive
-
-        if [ -d $testdata_dir ]; then
-            rm $local_testdata_archive
-            cd $testdata_dir
+            if [ -d $testdata_dir ]; then
+                rm -f $local_testdata_archive
+            else
+                echo "The test data archive needs to include a directory named $testdata_dir, but it does not."
+                exit 1
+            fi
         else
-            echo "The test data archive needs to include a directory named $testdata_dir, but it does not."
+            echo "Unable to find test data file $local_testdata_archive"
             exit 1
         fi
-    else
-        echo "Unable to find test data file $local_testdata_archive"
-        exit 1
-    fi
+    done
 
     if [ -f $local_runconfig ]; then
-        echo "Copying runconfig file $local_runconfig to $(pwd)/"
-        cp $local_runconfig .
+        runconfig_dir="${TMP_DIR}/runconfig"
+        mkdir --parents $runconfig_dir
 
-        RUNCONFIG_FILENAME=$(basename -- "$local_runconfig")
+        echo "Copying runconfig file $local_runconfig to $runconfig_dir/"
+        cp $local_runconfig $runconfig_dir
+
+        rm -f $local_runconfig
     else
         echo "Unable to find runconfig file $local_runconfig"
         exit 1
@@ -133,6 +150,6 @@ test_int_trap_cleanup()
     echo "Cleaning up before exit. Setting permissions for output files and directories."
     ${DOCKER_RUN} -v ${TMP_DIR}:${TMP_DIR} --entrypoint /usr/bin/find ${PGE_IMAGE}:${PGE_TAG} ${TMP_DIR} -type d -exec chmod 775 {} +
     ${DOCKER_RUN} -v ${TMP_DIR}:${TMP_DIR} --entrypoint /usr/bin/find ${PGE_IMAGE}:${PGE_TAG} ${TMP_DIR} -type f -exec chmod 664 {} +
-    cd /data/tmp
+    cd ${TMP_ROOT}
     rm -rf ${TMP_DIR}
 }

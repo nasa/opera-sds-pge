@@ -16,6 +16,7 @@ import re
 from collections import OrderedDict
 from os.path import abspath, basename, exists, isdir, join, splitext
 
+import opera.util.input_validation as input_validation
 from opera.pge.base.base_pge import PgeExecutor
 from opera.pge.base.base_pge import PostProcessorMixin
 from opera.pge.base.base_pge import PreProcessorMixin
@@ -73,15 +74,60 @@ class DSWxHLSPreProcessorMixin(PreProcessorMixin):
 
                 self.logger.critical(self.name, ErrorCode.INVALID_INPUT, error_msg)
 
+    def _validate_ancillary_inputs(self):
+        """
+        Evaluates the list of ancillary inputs from the RunConfig to ensure they
+        are exist and have an expected file extension.
+
+        For the shoreline shapefile, this method also checks to ensure a full
+        set of expected shapefiles were provided alongside the .shp file configured
+        by the RunConfig.
+
+        """
+        dynamic_ancillary_file_group_dict = self.runconfig.sas_config['runconfig']['groups']['dynamic_ancillary_file_group']
+
+        for key, value in dynamic_ancillary_file_group_dict.items():
+            if key in ('dem_file', 'worldcover_file'):
+                input_validation.check_input(
+                    value, self.logger, self.name, valid_extensions=('.tif', '.tiff', '.vrt')
+                )
+            elif key in ('landcover_file',):
+                input_validation.check_input(
+                    value, self.logger, self.name, valid_extensions=('.tif', '.tiff')
+                )
+            elif key in ('shoreline_shapefile',):
+                input_validation.check_input(
+                    value, self.logger, self.name, valid_extensions=('.shp',)
+                )
+
+                # Only the .shp file is configured in the runconfig, but we
+                # need to ensure the other required files are co-located with it
+                for extension in ('.dbf', '.prj', '.shx'):
+                    additional_shapefile = splitext(value)[0] + extension
+
+                    if not exists(abspath(additional_shapefile)):
+                        error_msg = f"Additional shapefile {additional_shapefile} could not be located"
+
+                        self.logger.critical(self.name, ErrorCode.INVALID_INPUT, error_msg)
+
+            elif key in ('dem_file_description', 'landcover_file_description',
+                         'worldcover_file_description', 'shoreline_shapefile_description'):
+                # these fields are included in the SAS input paths, but are not
+                # actually file paths, so skip them
+                continue
+
     def _validate_expected_input_platforms(self):
         """
         Scans the input files to make sure that the data comes from expected
-        platforms only.  Currently, Landsat 8/9, or Sentinel 2 A/B.
+        platforms only. Currently, Landsat 8/9, or Sentinel 2 A/B.
+
         Raises an exception if an unsupported platform is detected.
+
         This function assumes that input files have been checked to exist.
         It also assumes that only files that contain the metadata keys
         LANDSAT_PRODUCT_ID for Landsat input, and PRODUCT_URI for Sentinel
         input, need to be checked.
+
         """
         self.logger.info(
             self.name, ErrorCode.UPDATING_PRODUCT_METADATA,
@@ -135,6 +181,7 @@ class DSWxHLSPreProcessorMixin(PreProcessorMixin):
         super().run_preprocessor(**kwargs)
 
         self._validate_inputs()
+        self._validate_ancillary_inputs()
         self._validate_expected_input_platforms()
 
 
@@ -226,7 +273,7 @@ class DSWxHLSPostProcessorMixin(PostProcessorMixin):
 
         The core file name component of the DSWx PGE consists of:
 
-        <PROJECT>_<LEVEL>_<PGE NAME>_<SOURCE>_<TILE ID>_<ACQ TIMETAG>_
+        <PROJECT>_<LEVEL>_<PGE NAME>-<SOURCE>_<TILE ID>_<ACQ TIMETAG>_
         <PROD TIMETAG>_<SENSOR>_<SPACING>_<PRODUCT VERSION>
 
         Callers of this function are responsible for assignment of any other
@@ -351,9 +398,11 @@ class DSWxHLSPostProcessorMixin(PostProcessorMixin):
 
         The browse image filename for the DSWx-HLS PGE consists of:
 
-            <Core filename>.png
+            <Core filename>_BROWSE.<ext>
 
-        Where <Core filename> is returned by DSWxHLSPostProcessorMixin._core_filename().
+        Where <Core filename> is returned by DSWxHLSPostProcessorMixin._core_filename(),
+        and <ext> is the file extension from inter_filename (should be either
+        .tif or .png).
 
         Parameters
         ----------
@@ -364,13 +413,14 @@ class DSWxHLSPostProcessorMixin(PostProcessorMixin):
 
         Returns
         -------
-        geotiff_filename : str
-            The file name to assign to GeoTIFF product(s) created by this PGE.
+        browse_image_filename : str
+            The file name to assign to browse image product(s) created by this PGE.
 
         """
         core_filename = self._core_filename(inter_filename)
+        file_extension = splitext(inter_filename)[-1]
 
-        return f"{core_filename}.png"
+        return f"{core_filename}_BROWSE{file_extension}"
 
     def _collect_dswx_product_metadata(self):
         """
@@ -565,10 +615,10 @@ class DSWxHLSExecutor(DSWxHLSPreProcessorMixin, DSWxHLSPostProcessorMixin, PgeEx
     LEVEL = "L3"
     """Processing Level for DSWx-HLS Products"""
 
-    PGE_VERSION = "1.0.0-rc.5.0"
+    PGE_VERSION = "1.0.0-rc.7.0"
     """Version of the PGE (overrides default from base_pge)"""
 
-    SAS_VERSION = "0.5"  # CalVal release 3.1 https://github.com/nasa/PROTEUS/releases/tag/v0.5
+    SAS_VERSION = "0.5.2"  # CalVal release 3.3 https://github.com/nasa/PROTEUS/releases/tag/v0.5.2
     """Version of the SAS wrapped by this PGE, should be updated as needed with new SAS deliveries"""
 
     def __init__(self, pge_name, runconfig_path, **kwargs):
@@ -576,7 +626,8 @@ class DSWxHLSExecutor(DSWxHLSPreProcessorMixin, DSWxHLSPostProcessorMixin, PgeEx
 
         self.rename_by_pattern_map = OrderedDict(
             {
-                'dswx_hls_*.tif*': self._geotiff_filename,
-                'dswx_hls_*.png': self._browse_image_filename
+                # Note: ordering matters here!
+                'dswx_hls_*BROWSE*': self._browse_image_filename,
+                'dswx_hls_*.tif*': self._geotiff_filename
             }
         )

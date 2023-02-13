@@ -10,17 +10,19 @@ from Sentinel-1 A/B (S1) PGE.
 
 """
 
-import json
 import os.path
 import re
 from datetime import datetime
-from os.path import exists, getsize, splitext
+from os import walk
+from os.path import getsize, join
+from pathlib import Path
 
 from opera.pge.base.base_pge import PgeExecutor
 from opera.pge.base.base_pge import PostProcessorMixin
 from opera.pge.base.base_pge import PreProcessorMixin
 from opera.util.error_codes import ErrorCode
 from opera.util.input_validation import validate_slc_s1_inputs
+from opera.util.metadata_utils import get_cslc_s1_product_metadata
 from opera.util.render_jinja2 import render_jinja2
 from opera.util.time import get_time_for_filename
 
@@ -72,6 +74,8 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
 
     _post_mixin_name = "CslcS1PostProcessorMixin"
     _cached_core_filename = None
+    _burst_metadata_cache = {}
+    _burst_filename_cache = {}
 
     def _validate_output(self):
         """
@@ -79,28 +83,47 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
         existence, also validate that the file(s) contains some content
         (size is greater than 0).
         """
-        output_product_path = self.runconfig.output_product_path
+        out_dir_walk_dict = {}
+        expected_ext = []
 
-        # Get the burst ID of the job
-        burst_id = self.runconfig.sas_config['runconfig']['groups']['input_file_group']['burst_id']
+        output_dir = os.path.abspath(self.runconfig.output_product_path)
+        scratch_dir = os.path.abspath(self.runconfig.scratch_path)
 
-        output_products = list(
-            filter(
-                lambda filename: burst_id in filename,
-                self.runconfig.get_output_product_filenames()
-            )
-        )
+        # from 'output_dir' make a dictionary of {sub_dir_name: [file1, file2,...]}
+        for path, dirs, files in walk(output_dir):
+            if not dirs and scratch_dir not in path:  # Ignore files in 'output_dir' and scratch directory
+                dir_key = path.replace(output_dir, "")
+                if dir_key.startswith('/'):
+                    dir_key = dir_key[1:]
+                out_dir_walk_dict[dir_key] = files
 
-        if not output_products:
-            error_msg = (f"No SAS output file(s) containing burst ID {burst_id} "
-                         f"found within {output_product_path}")
+        if not out_dir_walk_dict:
+            error_msg = f"No SAS output file(s) found within {output_dir}"
+
             self.logger.critical(self.name, ErrorCode.OUTPUT_NOT_FOUND, error_msg)
 
-        for output_product in output_products:
-            if not getsize(output_product):
-                error_msg = f"SAS output file {output_product} was created, but is empty"
+        output_format = self.runconfig.sas_config['runconfig']['groups']['processing']['geocoding']['output_format']
+
+        if output_format in ('GTiff', 'COG', 'ENVI'):
+            expected_ext = ['tiff', 'tif', 'h5']
+
+        # Verify: files in subdirectories, file length, and proper extension.
+        for dir_name_key, file_names in out_dir_walk_dict.items():
+            if len(file_names) == 0:
+                error_msg = f"Empty SAS output directory: {'/'.join((output_dir, dir_name_key))}"
 
                 self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
+
+            for file_name in file_names:
+                if not getsize(os.path.join(output_dir, dir_name_key, file_name)):
+                    error_msg = f"SAS output file {file_name} exists, but is empty"
+
+                    self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
+
+                if file_name.split('.')[-1] not in expected_ext:
+                    error_msg = f"SAS output file {file_name} extension error: expected one of {expected_ext}"
+
+                    self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
 
     def _core_filename(self, inter_filename=None):
         """
@@ -171,20 +194,33 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
 
         Returns
         -------
-        geotiff_filename : str
-            The file name to assign to GeoTIFF product(s) created by this PGE.
+        cslc_filename : str
+            The file name to assign to CSLC product(s) created by this PGE.
 
         """
         core_filename = self._core_filename(inter_filename)
 
-        cslc_metadata = self._collect_cslc_product_metadata()
+        # The burst ID should be included within the file path for each
+        # output directory, extract it and prepare it for use within the
+        # final filename
+        burst_id = Path(os.path.dirname(inter_filename)).parts[-2]
+        burst_id = burst_id.upper().replace('_', '-')
 
-        sensor = cslc_metadata['platform_id']
+        if burst_id in self._burst_metadata_cache:
+            cslc_metadata = self._burst_metadata_cache[burst_id]
+        else:
+            # Collect the metadata from the HDF5 output product
+            cslc_metadata = self._collect_cslc_product_metadata(inter_filename)
+
+            self._burst_metadata_cache[burst_id] = cslc_metadata
+
+        burst_metadata = cslc_metadata['processing_information']['s1_burst_metadata']
+
+        sensor = burst_metadata['platform_id']
         mode = 'IW'  # fixed to Interferometric Wide (IW) for all S1-based CSLC products
-        burst_id = cslc_metadata['burst_id'].upper().replace('_', '-')
-        pol = cslc_metadata['polarization']
+        pol = burst_metadata['polarization']
         acquisition_time = get_time_for_filename(
-            datetime.strptime(cslc_metadata['sensing_start'], '%Y-%m-%d %H:%M:%S.%f')
+            datetime.strptime(burst_metadata['sensing_start'], '%Y-%m-%d %H:%M:%S.%f')
         )
 
         product_version = str(self.runconfig.product_version)
@@ -194,12 +230,43 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
 
         production_time = get_time_for_filename(self.production_datetime)
 
-        cslc_file_components = (
+        cslc_filename = (
             f"{core_filename}-{sensor}_{mode}_{burst_id}_{pol}_"
             f"{acquisition_time}Z_{product_version}_{production_time}Z"
         )
 
-        return cslc_file_components
+        # Cache the file name for this burst ID, so it can be used with the
+        # ISO metadata later
+        self._burst_filename_cache[burst_id] = cslc_filename
+
+        return cslc_filename
+
+    def _h5_filename(self, inter_filename):
+        """
+        Returns the file name to use for HDF5 products produced by the CSLC-S1 PGE.
+
+        The HDF5 filename for the CSLC-S1 PGE consists of:
+
+            <CSLC filename>.h5
+
+        Where <CSLC filename> is returned by CslcS1PostProcessorMixin._cslc_filename()
+
+        Parameters
+        ----------
+        inter_filename : str
+            The intermediate filename of the output HDF5 to generate a
+            filename for. This parameter may be used to inspect the file in order
+            to derive any necessary components of the returned filename.
+
+        Returns
+        -------
+        h5_filename : str
+            The file name to assign to HDF5 product(s) created by this PGE.
+
+        """
+        cslc_filename = self._cslc_filename(inter_filename)
+
+        return f"{cslc_filename}.h5"
 
     def _geotiff_filename(self, inter_filename):
         """
@@ -207,7 +274,7 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
 
         The GeoTIFF filename for the CSLC-S1 PGE consists of:
 
-            <CSLC filename>.tiff
+            <CSLC filename>.tif
 
         Where <CSLC filename> is returned by CslcS1PostProcessorMixin._cslc_filename()
 
@@ -226,7 +293,7 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
         """
         cslc_filename = self._cslc_filename(inter_filename)
 
-        return f"{cslc_filename}.tiff"
+        return f"{cslc_filename}.tif"
 
     def _json_metadata_filename(self, inter_filename):
         """
@@ -280,11 +347,16 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
             The file name component to assign to ancillary products created by this PGE.
 
         """
-        cslc_metadata = self._collect_cslc_product_metadata()
+        # Metadata fields we need for ancillary file name should be equivalent
+        # across all bursts, so just take the first set of cached metadata as
+        # a representative
+        cslc_metadata = list(self._burst_metadata_cache.values())[0]
 
-        sensor = cslc_metadata['platform_id']
+        burst_metadata = cslc_metadata['processing_information']['s1_burst_metadata']
+
+        sensor = burst_metadata['platform_id']
         mode = 'IW'  # fixed for all S1-based CSLC products
-        pol = cslc_metadata['polarization']
+        pol = burst_metadata['polarization']
 
         product_version = str(self.runconfig.product_version)
 
@@ -318,23 +390,39 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
         """
         return self._ancillary_filename() + ".catalog.json"
 
-    def _iso_metadata_filename(self):
+    def _iso_metadata_filename(self, burst_id):
         """
         Returns the file name to use for ISO Metadata produced by the CSLC-S1 PGE.
 
         The ISO Metadata file name for the CSLC-S1 PGE consists of:
 
-            <Ancillary filename>.iso.xml
+            <CSLC filename>.iso.xml
 
-        Where <Ancillary filename> is returned by CslcS1PostProcessorMixin._ancillary_filename()
+        Where <CSLC filename> is returned by CslcS1PostProcessorMixin._cslc_filename()
+
+        Parameters
+        ----------
+        burst_id : str
+            The burst identifier used to look up the corresponding cached
+            CSLC filename.
 
         Returns
         -------
         iso_metadata_filename : str
             The file name to assign to the ISO Metadata product created by this PGE.
 
+        Raises
+        ------
+        RuntimeError
+            If there is no file name cached for the provided burst ID.
+
         """
-        return self._ancillary_filename() + ".iso.xml"
+        if not burst_id in self._burst_filename_cache:
+            raise RuntimeError(f"No file name cached for burst ID {burst_id}")
+
+        iso_metadata_filename = self._burst_filename_cache[burst_id]
+
+        return iso_metadata_filename + ".iso.xml"
 
     def _log_filename(self):
         """
@@ -373,11 +461,16 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
         """
         return self._ancillary_filename() + ".qa.log"
 
-    def _collect_cslc_product_metadata(self):
+    def _collect_cslc_product_metadata(self, metadata_product):
         """
-        Gathers the available metadata from the JSON metadata product created by
-        the CSLC-S1 SAS. This metadata is then formatted for use with filling in
+        Gathers the available metadata from the HDF5 product created by the
+        CSLC-S1 SAS. This metadata is then formatted for use with filling in
         the ISO metadata template for the CSLC-S1 PGE.
+
+        Parameters
+        ----------
+        metadata_product : str
+            Path the HDF5/NETCDF metadata product to collect metadata from.
 
         Returns
         -------
@@ -386,39 +479,29 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
             use with the ISO metadata Jinja2 template.
 
         """
-        # Gather the output products produced by the SAS to locate the JSON file
-        # containing the product metadata
-        output_products = self.runconfig.get_output_product_filenames()
-        json_metadata_product = None
+        output_product_metadata = get_cslc_s1_product_metadata(metadata_product)
 
-        for output_product in output_products:
-            if output_product.endswith('.json') and not output_product.endswith('.catalog.json'):
-                json_metadata_product = output_product
-                break
-        else:
-            msg = (f"Could not find the JSON metadata output product within "
-                   f"{self.runconfig.output_product_path}")
-            self.logger.critical(self.name, ErrorCode.ISO_METADATA_RENDER_FAILED, msg)
+        # Fill in some additional fields expected within the ISO
+        output_product_metadata['grids']['width'] = len(output_product_metadata['grids']['x_coordinates'])
+        output_product_metadata['grids']['length'] = len(output_product_metadata['grids']['y_coordinates'])
 
-        # Read the output product metadata
-        with open(json_metadata_product, 'r') as infile:
-            output_product_metadata = json.load(infile)
+        # Remove some of the larger arrays from the metadata so we don't use
+        # too much memory when caching the metadata for each burst
+        for key in ['VV', 'VH', 'x_coordinates', 'y_coordinates']:
+            array = output_product_metadata['grids'].pop(key, None)
+
+            if array is not None:
+                del array
 
         # Parse the burst center coordinate to conform with gml schema
-        # sample: "POINT (441737.4292702299 3877557.760490343)"
-        burst_center_str = output_product_metadata['center']
-        burst_center_pattern = r"POINT\s*\(\s*(.+)\s*\)"
-        result = re.match(burst_center_pattern, burst_center_str)
-
-        if not result:
-            msg = f'Failed to parse burst center from string "{burst_center_str}"'
-            self.logger.critical(self.name, ErrorCode.ISO_METADATA_RENDER_FAILED, msg)
-
-        output_product_metadata['burst_center'] = result.groups()[0]
+        # sample: {ndarray: (2,)} [-118.30363047, 33.8399832]
+        burst_center = output_product_metadata['processing_information']['s1_burst_metadata']['center']
+        burst_center_str = f"{burst_center[0]} {burst_center[1]}"
+        output_product_metadata['burst_center'] = burst_center_str
 
         # Parse the burst polygon coordinates to conform with gml
         # sample: "POLYGON ((399015 3859970, 398975 3860000, ..., 399015 3859970))"
-        burst_polygon_str = output_product_metadata['border']
+        burst_polygon_str = output_product_metadata['identification']['bounding_polygon']
         burst_polygon_pattern = r"POLYGON\s*\(\((.+)\)\)"
         result = re.match(burst_polygon_pattern, burst_polygon_str)
 
@@ -457,15 +540,21 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
 
         return custom_metadata
 
-    def _create_iso_metadata(self):
+    def _create_iso_metadata(self, burst_metadata):
         """
         Creates a rendered version of the ISO metadata template for CSLC-S1
         output products using metadata from the following locations:
 
             * RunConfig (in dictionary form)
-            * Output products (particularly the json metadata file)
+            * Output product (dictionary extracted from HDF5 product, per-burst)
             * Catalog metadata
             * "Custom" metadata (all metadata not found anywhere else)
+
+        Parameters
+        ----------
+        burst_metadata : dict
+            The product metadata corresponding to a specific burst product to
+            be included as the "product_output" metadata in the rendered ISO xml.
 
         Returns
         -------
@@ -476,7 +565,7 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
         """
         runconfig_dict = self.runconfig.asdict()
 
-        product_output_dict = self._collect_cslc_product_metadata()
+        product_output_dict = burst_metadata
 
         catalog_metadata_dict = self._create_catalog_metadata().asdict()
 
@@ -498,6 +587,86 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
         rendered_template = render_jinja2(iso_template_path, iso_metadata, self.logger)
 
         return rendered_template
+
+    def _stage_output_files(self):
+        """
+        Ensures that all output products produced by both the SAS and this PGE
+        are staged to the output location defined by the RunConfig. This includes
+        reassignment of file names to meet the file-naming conventions required
+        by the PGE.
+
+        This version of the method performs the same steps as the base PGE
+        implementation, except that an ISO xml metadata file is rendered for
+        each burst product created from the input SLC, since each burst can
+        have specific metadata fields, such as the bounding polygon.
+
+        """
+        # Gather the list of output files produced by the SAS
+        output_products = self.runconfig.get_output_product_filenames()
+
+        # For each output file name, assign the final file name matching the
+        # expected conventions
+        for output_product in output_products:
+            self._assign_filename(output_product, self.runconfig.output_product_path)
+
+        # Write the catalog metadata to disk with the appropriate filename
+        catalog_metadata = self._create_catalog_metadata()
+
+        if not catalog_metadata.validate(catalog_metadata.get_schema_file_path()):
+            msg = f"Failed to create valid catalog metadata, reason(s):\n {catalog_metadata.get_error_msg()}"
+            self.logger.critical(self.name, ErrorCode.INVALID_CATALOG_METADATA, msg)
+
+        cat_meta_filename = self._catalog_metadata_filename()
+        cat_meta_filepath = join(self.runconfig.output_product_path, cat_meta_filename)
+
+        self.logger.info(self.name, ErrorCode.CREATING_CATALOG_METADATA,
+                         f"Writing Catalog Metadata to {cat_meta_filepath}")
+
+        try:
+            catalog_metadata.write(cat_meta_filepath)
+        except OSError as err:
+            msg = f"Failed to write catalog metadata file {cat_meta_filepath}, reason: {str(err)}"
+            self.logger.critical(self.name, ErrorCode.CATALOG_METADATA_CREATION_FAILED, msg)
+
+        # Generate the ISO metadata for use with product submission to DAAC(s)
+        # For CSLC-S1, each burst-based product gets its own ISO xml
+        for burst_id, burst_metadata in self._burst_metadata_cache.items():
+            iso_metadata = self._create_iso_metadata(burst_metadata)
+
+            iso_meta_filename = self._iso_metadata_filename(burst_id)
+            iso_meta_filepath = join(self.runconfig.output_product_path, iso_meta_filename)
+
+            if iso_metadata:
+                self.logger.info(self.name, ErrorCode.RENDERING_ISO_METADATA,
+                                 f"Writing ISO Metadata to {iso_meta_filepath}")
+                with open(iso_meta_filepath, 'w', encoding='utf-8') as outfile:
+                    outfile.write(iso_metadata)
+
+        # Write the QA application log to disk with the appropriate filename,
+        # if necessary
+        if self.runconfig.qa_enabled:
+            qa_log_filename = self._qa_log_filename()
+            qa_log_filepath = join(self.runconfig.output_product_path, qa_log_filename)
+            self.qa_logger.move(qa_log_filepath)
+
+            try:
+                self._finalize_log(self.qa_logger)
+            except OSError as err:
+                msg = f"Failed to write QA log file to {qa_log_filepath}, reason: {str(err)}"
+                self.logger.critical(self.name, ErrorCode.LOG_FILE_CREATION_FAILED, msg)
+
+        # Lastly, write the combined PGE/SAS log to disk with the appropriate filename
+        log_filename = self._log_filename()
+        log_filepath = join(self.runconfig.output_product_path, log_filename)
+        self.logger.move(log_filepath)
+
+        try:
+            self._finalize_log(self.logger)
+        except OSError as err:
+            msg = f"Failed to write log file to {log_filepath}, reason: {str(err)}"
+
+            # Log stream might be closed by this point so raise an Exception instead
+            raise RuntimeError(msg)
 
     def run_postprocessor(self, **kwargs):
         """
@@ -537,13 +706,14 @@ class CslcS1Executor(CslcS1PreProcessorMixin, CslcS1PostProcessorMixin, PgeExecu
     LEVEL = "L2"
     """Processing Level for CSLC-S1 Products"""
 
-    SAS_VERSION = "0.1.2"  # https://github.com/opera-adt/COMPASS/releases/tag/v0.1.2
+    SAS_VERSION = "0.1.3"  # Beta release https://github.com/opera-adt/COMPASS/releases/tag/v0.1.3
     """Version of the SAS wrapped by this PGE, should be updated as needed"""
 
     def __init__(self, pge_name, runconfig_path, **kwargs):
         super().__init__(pge_name, runconfig_path, **kwargs)
 
         self.rename_by_pattern_map = {
+            '*.h5': self._h5_filename,
             '*.slc': self._geotiff_filename,
             '*.tif*': self._geotiff_filename,
             '*.json': self._json_metadata_filename
