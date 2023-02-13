@@ -21,14 +21,15 @@ PGE_NAME="cslc_s1"
 PGE_IMAGE="opera_pge/${PGE_NAME}"
 SAMPLE_TIME=15
 
-# defaults, test data and runconfig files should be updated as-needed to use
-# the latest available as defaults for use with the Jenkins pipeline call
-# TESTDATA should be the name of the test data archive in s3://operasds-dev-pge/cslc_s1/
-# RUNCONFIG should be the name of the runconfig in s3://operasds-dev-pge/cslc_s1/
+# Defaults, test data and runconfig files should be updated as-needed to use
+# the latest available as defaults for use with the Jenkins pipeline call.
+# Test data should be uploaded to  s3://operasds-dev-pge/${PGE_NAME}/
 [ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath "$(dirname "$(realpath "$0")")"/../..)
 [ -z "${PGE_TAG}" ] && PGE_TAG="${USER}-dev"
-[ -z "${TESTDATA}" ] && TESTDATA="delivery_cslc_s1_interface_0.1.zip"
-[ -z "${RUNCONFIG}" ] && RUNCONFIG="cslc_s1.yaml"
+[ -z "${INPUT_DATA}" ] && INPUT_DATA="delivery_cslc_s1_beta_0.1_input_data.zip"
+[ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="delivery_cslc_s1_beta_0.1_expected_output_dir.zip"
+[ -z "${RUNCONFIG}" ] && RUNCONFIG="delivery_cslc_s1_beta_0.1_runconfig.yaml"
+[ -z "${TMP_ROOT}" ] && TMP_ROOT="$DEFAULT_TMP_ROOT"
 
 # Create the test output directory in the workspace
 test_int_setup_results_directory
@@ -42,8 +43,8 @@ test_int_setup_test_data
 # Setup cleanup on exit
 trap test_int_trap_cleanup EXIT
 
-# Pull in validation script from S3. This utility doesn't appear to be source-controlled
-# so we have cached the delivery version in S3.
+# Pull in validation script from S3.
+# Current source is https://raw.githubusercontent.com/opera-adt/COMPASS/c77b1a681e85d44c19baf2cf1eaf88f901b12bc9/src/compass/utils/validate_cslc.py
 local_validate_cslc=${TMP_DIR}/validate_cslc.py
 echo "Downloading s3://operasds-dev-pge/${PGE_NAME}/validate_cslc.py to $local_validate_cslc"
 aws s3 cp s3://operasds-dev-pge/${PGE_NAME}/validate_cslc.py "$local_validate_cslc"
@@ -55,27 +56,29 @@ aws s3 cp s3://operasds-dev-pge/${PGE_NAME}/validate_cslc.py "$local_validate_cs
 overall_status=0
 
 # There is only 1 expected output directory for CSLC_S1
-expected_dir="$(pwd)/expected_output"
+expected_dir="${TMP_DIR}/${EXPECTED_DATA%.*}/expected_output_dir"
+input_dir="${TMP_DIR}/${INPUT_DATA%.*}/input_data"
+runconfig_dir="${TMP_DIR}/runconfig"
 
 # the testdata reference metadata contains this path so we use it here
-output_dir="$(pwd)/output_cslc_s1"
+output_dir="${TMP_DIR}/output_cslc_s1"
 # make sure no output directory already exists
 if [ -d "$output_dir" ]; then
     echo "Output directory $output_dir already exists (and should not). Removing directory."
     rm -rf "${output_dir}"
 fi
 echo "Creating output directory $output_dir."
-mkdir "$output_dir"
+mkdir -p "$output_dir"
 
 # the testdata reference metadata contains this path so we use it here
-scratch_dir="$(pwd)/scratch_cslc_s1"
+scratch_dir="${TMP_DIR}/scratch_cslc_s1"
 # make sure no scratch directory already exists
 if [ -d "$scratch_dir" ]; then
     echo "Scratch directory $scratch_dir already exists (and should not). Removing directory."
     rm -rf "${scratch_dir}"
 fi
 echo "Creating scratch directory $scratch_dir."
-mkdir "$scratch_dir"
+mkdir -p --mode=777 "$scratch_dir"
 
 container_name="${PGE_NAME}"
 
@@ -85,11 +88,11 @@ metrics_collection_start "$PGE_NAME" "$container_name" "$TEST_RESULTS_DIR" "$SAM
 echo "Running Docker image ${PGE_IMAGE}:${PGE_TAG}"
 
 docker run --rm -u $UID:"$(id -g)" -w /home/compass_user --name $container_name \
-           -v "$(pwd)":/home/compass_user/runconfig:ro \
-           -v "$(pwd)"/input_data:/home/compass_user/input_data:ro \
-           -v "${output_dir}":/home/compass_user/output_s1_cslc \
+           -v "${runconfig_dir}":/home/compass_user/runconfig:ro \
+           -v "${input_dir}":/home/compass_user/input_dir:ro \
+           -v "${output_dir}":/home/compass_user/output_dir \
            -v "${scratch_dir}":/home/compass_user/scratch_s1_cslc \
-           ${PGE_IMAGE}:"${PGE_TAG}" --file /home/compass_user/runconfig/"$RUNCONFIG_FILENAME"
+           ${PGE_IMAGE}:"${PGE_TAG}" --file /home/compass_user/runconfig/"$RUNCONFIG"
 
 docker_exit_status=$?
 
@@ -100,43 +103,57 @@ if [ $docker_exit_status -ne 0 ]; then
     echo "docker exit indicates failure: ${docker_exit_status}"
     overall_status=1
 else
-    # Prepare to validate output products
-    cp "$local_validate_cslc" .
+    echo "<tr><th>Compare Result</th><th><ul><li>Expected file</li><li>Output file</li></ul></th><th>validate_cslc.py output</th></tr>" >> "$RESULTS_FILE"
+    declare -a burst_ids=(  "t064_135518_iw1"
+                            "t064_135518_iw2"
+                            "t064_135518_iw3"
+                            "t064_135519_iw1"
+                            "t064_135519_iw2"
+                            "t064_135519_iw3"
+                            "t064_135520_iw1"
+                            "t064_135520_iw2"
+                            "t064_135520_iw3"
+                            "t064_135521_iw1"
+                            "t064_135521_iw2"
+                            "t064_135521_iw3"
+                            "t064_135522_iw1"
+                            "t064_135522_iw2"
+                            "t064_135522_iw3"
+                            "t064_135523_iw1"
+                            "t064_135523_iw2"
+                            "t064_135523_iw3"
+                            "t064_135524_iw1"
+                            "t064_135524_iw2"
+                            "t064_135524_iw3"
+                            "t064_135525_iw1"
+                            "t064_135525_iw2"
+                            "t064_135525_iw3"
+                            "t064_135526_iw1"
+                            "t064_135526_iw2"
+                            "t064_135526_iw3"
+                            "t064_135527_iw1")
 
-    # Compare output files against expected files.
-    # Note there are varying timestamp and product version in the product filenames.
-    sec_product_file=$(ls -1 "${output_dir}"/OPERA_L2_CSLC-S1A_IW_T64-135524-IW2_VV_20220501T015052Z_*Z.tiff)
-    sec_product=$(basename -- "${sec_product_file}")
-    sec_metadata_file=$(ls -1 "${output_dir}"/OPERA_L2_CSLC-S1A_IW_T64-135524-IW2_VV_20220501T015052Z_*Z.json)
-    sec_metadata=$(basename -- "${sec_metadata_file}")
-    ref_product="t64_135524_iw2/20220501/t64_135524_iw2_20220501_VV.slc"
-    ref_metadata="t64_135524_iw2/20220501/t64_135524_iw2_20220501_VV.json"
+    for burst_id in "${burst_ids[@]}"; do
+        compare_result="PENDING"
+        echo "-------------------------------------"
+        echo "Comparing results for burst id ${burst_id}"
+        burst_id_uppercase=${burst_id^^}
+        burst_id_replace_underscores=${burst_id_uppercase//_/-}
+        burst_id_pattern="*_${burst_id_replace_underscores}_*.h5"
+        output_file=`ls $output_dir/$burst_id_pattern`
+        echo "Ouput file matching burst id is $output_file"
 
-    if [ ! -f "${output_dir}"/"${sec_product}" ] || [ ! -f "${output_dir}"/"${sec_metadata}" ] ||
-       [ ! -f "${expected_dir}"/"${ref_product}" ] || [ ! -f "${expected_dir}"/"${ref_metadata}" ]
-    then
-        echo "One or more output files or expected files are missing."
-        ls "${output_dir}"/"${sec_product}"
-        ls "${output_dir}"/"${sec_metadata}"
-        ls "${expected_dir}"/${ref_product}
-        ls "${expected_dir}"/${ref_metadata}
-        overall_status=1
-    else
-        docker_out="N/A"
-        compare_result="N/A"
-
-        # Run validation script on output files
+        ref_product="/exp/${burst_id}/20220501/${burst_id}_20220501_VV.h5"
+        sec_product="/out/$(basename ${output_file})"
         docker_out=$(docker run --rm -u compass_user:compass_user \
-                                -v "$(pwd)":/working:ro \
+                                -v "${TMP_DIR}":/working:ro \
                                 -v "${output_dir}":/out:ro \
                                 -v "${expected_dir}":/exp:ro \
                                 --entrypoint /home/compass_user/miniconda3/envs/COMPASS/bin/python3 \
                                 ${PGE_IMAGE}:"${PGE_TAG}" \
                                 /working/validate_cslc.py \
-                                --ref-product /exp/"${ref_product}" \
-                                --sec-product /out/"${sec_product}" \
-                                --ref-metadata /exp/"${ref_metadata}" \
-                                --sec-metadata /out/"${sec_metadata}")
+                                --ref-product ${ref_product} \
+                                --sec-product ${sec_product} 2>&1) || docker_exit_status=$?
 
         echo "$docker_out"
         if [[ "$docker_out" != *"All CSLC product checks have passed"* ]]; then
@@ -153,8 +170,8 @@ else
         fi
 
         docker_out="${docker_out//$'\n'/<br>}"
-        echo "<tr><td>${compare_result}</td><td><ul><li>${ref_product}</li><li>${sec_product}</li><li>${ref_metadata}</li><li>${sec_metadata}</li></ul></td><td>${docker_out}</td></tr>" >> "$RESULTS_FILE"
-    fi
+        echo "<tr><td>${compare_result}</td><td><ul><li>${ref_product}</li><li>${sec_product}</li></ul></td><td>${docker_out}</td></tr>" >> "$RESULTS_FILE"
+    done
 fi
 echo " "
 
