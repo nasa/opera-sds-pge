@@ -55,8 +55,8 @@ aws s3 cp s3://operasds-dev-pge/${PGE_NAME}/rtc_compare.py "$local_compare_scrip
 # 2 - product validation failure
 overall_status=0
 
-
 # There is only 1 expected output directory RTC-S1
+
 expected_dir="${TMP_DIR}/${EXPECTED_DATA%.*}/expected_output_dir"
 input_dir="${TMP_DIR}/${INPUT_DATA%.*}/input_data"
 runconfig_dir="${TMP_DIR}/runconfig"
@@ -81,17 +81,17 @@ fi
 echo "Creating scratch directory $scratch_dir."
 mkdir -p --mode=777 "scratch_dir"
 
-container_name="${PGE_NAME}-${data_set}"
+container_name="${PGE_NAME}"
 
 # Start metrics collection
 metrics_collection_start "$PGE_NAME" "$container_name" "$TEST_RESULTS_DIR" "$SAMPLE_TIME"
 
-echo "Running Docker image ${PGE_IMAGE}:${PGE_TAG} for ${input_data_dir}"
+echo "Running Docker image ${PGE_IMAGE}:${PGE_TAG} for ${input_dir}"
 docker run --rm -u $UID:"$(id -g)" -w /home/rtc_user --name $container_name \
-           -v "${TMP_DIR}/runconfig":/home/rtc_user/runconfig:ro \
-           -v "$input_data_dir"/:/home/rtc_user/input_dir:ro \
-           -v "$output_dir":/home/rtc_user/output_dir \
-           -v "$scratch_dir":/home/rtc_user/scratch_dir \
+           -v "${runconfig_dir}":/home/rtc_user/runconfig:ro \
+           -v "${input_dir}"/:/home/rtc_user/input_dir:ro \
+           -v "${output_dir}":/home/rtc_user/output_dir \
+           -v "${scratch_dir}":/home/rtc_user/scratch_dir \
            ${PGE_IMAGE}:"${PGE_TAG}" --file /home/rtc_user/runconfig/${RUNCONFIG}
 
 docker_exit_status=$?
@@ -141,7 +141,7 @@ else
         burst_id_pattern="*_${burst_id_replace_underscores}_*.nc"
         output_file=$(ls "$output_dir"/"$burst_id_pattern")
         echo "output file: $output_file"
-        expected_file=${expected_data_dir}/${burst_id}/rtc_product.nc
+        expected_file=${expected_dir}/${burst_id}/rtc_product.nc
         compare_output=$(python3 "${local_compare_script}" "${expected_file}" "${output_file}")
 
         echo "Results of compare: $compare_output"
