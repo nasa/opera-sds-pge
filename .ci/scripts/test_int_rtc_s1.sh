@@ -58,7 +58,9 @@ overall_status=0
 # There is only 1 expected output directory RTC-S1
 
 expected_dir="${TMP_DIR}/${EXPECTED_DATA%.*}/expected_output_dir"
-input_dir="${TMP_DIR}/${INPUT_DATA%.*}/input_data"
+# Perhaps the unzipping accounts for the input_data directory?
+# input_dir="${TMP_DIR}/${INPUT_DATA%.*}/input_data"
+input_dir="${TMP_DIR}/${INPUT_DATA%.*}"
 runconfig_dir="${TMP_DIR}/runconfig"
 
 # the testdata reference metadata contains this path so we use it here
