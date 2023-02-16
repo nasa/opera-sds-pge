@@ -58,9 +58,7 @@ overall_status=0
 # There is only 1 expected output directory RTC-S1
 
 expected_dir="${TMP_DIR}/${EXPECTED_DATA%.*}/expected_output_dir"
-# Perhaps the unzipping accounts for the input_data directory?
-# input_dir="${TMP_DIR}/${INPUT_DATA%.*}/input_data"
-input_dir="${TMP_DIR}/${INPUT_DATA%.*}"
+input_dir="${TMP_DIR}/${INPUT_DATA%.*}/input_dir"
 runconfig_dir="${TMP_DIR}/runconfig"
 
 # the testdata reference metadata contains this path so we use it here
@@ -140,10 +138,10 @@ else
 
         burst_id_uppercase=${burst_id^^}
         burst_id_replace_underscores=${burst_id_uppercase//_/-}
-        burst_id_pattern="*_${burst_id_replace_underscores}_*.nc"
+        burst_id_pattern="*_${burst_id_replace_underscores}_*.h5"
         output_file=$(ls "$output_dir"/"$burst_id_pattern")
         echo "output file: $output_file"
-        expected_file=${expected_dir}/${burst_id}/rtc_product.nc
+        expected_file=${expected_dir}/${burst_id}/rtc_product_v0.2.h5
         compare_output=$(python3 "${local_compare_script}" "${expected_file}" "${output_file}")
 
         echo "Results of compare: $compare_output"
