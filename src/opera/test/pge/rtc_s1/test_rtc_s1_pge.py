@@ -177,7 +177,6 @@ class RtcS1PgeTestCase(unittest.TestCase):
         self.assertIn(f"{core_filename}_VV.tif", output_files)
         self.assertIn(f"{core_filename}_VH.tif", output_files)
 
-
     def test_iso_metadata_creation(self):
         """
         Test that the ISO metadata template is fully filled out when realistic

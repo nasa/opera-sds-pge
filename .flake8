@@ -2,6 +2,7 @@
 format = pylint
 output-file = flake8.log
 max-line-length = 120
+per-file-ignores = metadata_utils.py: F841
 ignore =
     # 1 blank line required between summary line and description
     D205
