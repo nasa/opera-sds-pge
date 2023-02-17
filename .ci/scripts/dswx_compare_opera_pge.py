@@ -3,7 +3,8 @@ import numpy as np
 import os
 import sys
 
-COMPARE_DSWX_HLS_PRODUCTS_ERROR_TOLERANCE = 1e-6
+COMPARE_DSWX_HLS_PRODUCTS_ERROR_TOLERANCE_ATOL = 1e-6
+COMPARE_DSWX_HLS_PRODUCTS_ERROR_TOLERANCE_RTOL = 1e-5
 
 def _get_prefix_str(flag_same, flag_all_ok):
     flag_all_ok[0] = flag_all_ok[0] and flag_same
@@ -44,19 +45,47 @@ def compare_dswx_hls_products(file_1, file_2):
 
     # compare array values
     print('Comparing DSWx bands...')
+    total_image_differences = 0
+    min_difference = 0
+    max_difference = 0
     for b in range(1, nbands_1 + 1):
         gdal_band_1 = layer_gdal_dataset_1.GetRasterBand(b)
         gdal_band_2 = layer_gdal_dataset_2.GetRasterBand(b)
         image_1 = gdal_band_1.ReadAsArray()
         image_2 = gdal_band_2.ReadAsArray()
-        flag_bands_are_equal = np.allclose(
-            image_1, image_2, atol=COMPARE_DSWX_HLS_PRODUCTS_ERROR_TOLERANCE)
+        is_close_result = np.isclose(image_1, image_2,
+                                     atol=COMPARE_DSWX_HLS_PRODUCTS_ERROR_TOLERANCE_ATOL,
+                                     rtol=COMPARE_DSWX_HLS_PRODUCTS_ERROR_TOLERANCE_RTOL)
+        num_image_differences = np.sum(~is_close_result)
+        if num_image_differences > 0:
+            flag_bands_are_equal = False
+            # Find the min and max differences using the numpy.isclose function
+            # 0 <= (atol + rtol * absolute(b)) - absolute(a-b)
+            a1 = image_1[~is_close_result]
+            b2 = image_2[~is_close_result]
+            atol = COMPARE_DSWX_HLS_PRODUCTS_ERROR_TOLERANCE_ATOL
+            rtol = COMPARE_DSWX_HLS_PRODUCTS_ERROR_TOLERANCE_RTOL
+            is_close_differences = abs((atol + rtol * abs(b2)) - abs(a1 - b2))
+            max_difference_band = np.max(is_close_differences)
+            if max_difference_band > max_difference:
+                max_difference = max_difference_band
+            min_difference_band = np.min(is_close_differences)
+            if min_difference_band < min_difference:
+                min_difference = min_difference_band
+        else:
+            flag_bands_are_equal = True
+
+        total_image_differences += num_image_differences
+
         flag_bands_are_equal_str = _get_prefix_str(flag_bands_are_equal,
                                                    flag_all_ok)
         print(f'{flag_bands_are_equal_str}     Band {b} -'
               f' {gdal_band_1.GetDescription()}"')
         if not flag_bands_are_equal:
             _print_first_value_diff(image_1, image_2, prefix)
+
+    if total_image_differences > 0:
+        _print_image_differences(total_image_differences, min_difference, max_difference, prefix)
 
     # compare geotransforms
     flag_same_geotransforms = np.array_equal(geotransform_1, geotransform_2)
@@ -146,8 +175,9 @@ def _print_first_value_diff(image_1, image_2, prefix):
     flag_error_found = False
     for i in range(image_1.shape[0]):
         for j in range(image_1.shape[1]):
+            # absolute(a-b) <= (atol + rtol * absolute(b))
             if (abs(image_1[i, j] - image_2[i, j]) <=
-                    COMPARE_DSWX_HLS_PRODUCTS_ERROR_TOLERANCE):
+                    (COMPARE_DSWX_HLS_PRODUCTS_ERROR_TOLERANCE_ATOL + COMPARE_DSWX_HLS_PRODUCTS_ERROR_TOLERANCE_RTOL * abs(image_2[i, j]))):
                 continue
             print(prefix + f'     * input 1 has value'
                   f' "{image_1[i, j]}" in position'
@@ -158,6 +188,25 @@ def _print_first_value_diff(image_1, image_2, prefix):
             break
         if flag_error_found:
             break
+
+def _print_image_differences(total_image_differences, min_difference, max_difference, prefix):
+    """
+    Print the number of image differences and the min/max differences.
+        Parameters
+        ----------
+        total_image_differences : int
+            Number of image elements that fail to meet numpy.isclose criteria.
+        min_difference : float
+            Minimum numpy.isclose difference between reference and test images.
+        max_difference : float
+            Maximum numpy.isclose difference between reference and test images.
+        prefix : str
+            Prefix t othe message printed to the user.
+    """
+    print(prefix + f"     * total image differences is {total_image_differences} "
+          f"with maximum difference of {max_difference} and minimum difference of "
+          f"{min_difference}.")
+
 
 if __name__ == "__main__":
 
