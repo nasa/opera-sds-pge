@@ -62,7 +62,7 @@ input_dir="${TMP_DIR}/${INPUT_DATA%.*}/input_dir"
 runconfig_dir="${TMP_DIR}/runconfig"
 
 # the testdata reference metadata contains this path so we use it here
-output_dir="${TMP_DIR}/output_cslc_s1"
+output_dir="${TMP_DIR}/output_rtc_s1"
 # make sure no output directory already exists
 if [ -d "$output_dir" ]; then
     echo "Output directory $output_dir already exists (and should not). Removing directory."
