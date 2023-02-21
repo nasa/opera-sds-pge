@@ -1,11 +1,5 @@
 #!/usr/bin/env python3
 
-import csv
-import datetime
-import os
-import sys
-
-
 """
 ======================
 process_metric_data.py
@@ -14,6 +8,11 @@ process_metric_data.py
 Post process the csv file returned when metric data is collected
 
 """
+
+import csv
+import datetime
+import os
+import sys
 
 prior_log_line = None
 
@@ -69,10 +68,10 @@ def get_mem_gb(mem_str):
     mem_val = mem_str.split(' ')[0]
     if "KiB" in mem_val:
         mem_val = mem_val.replace("KiB", "")
-        mem_val = float(mem_val)/1000000
+        mem_val = float(mem_val) / 1000000
     elif "MiB" in mem_val:
         mem_val = mem_val.replace("MiB", "")
-        mem_val = float(mem_val)/1000
+        mem_val = float(mem_val) / 1000
     elif "GiB" in mem_val:
         mem_val = float(mem_val.replace("GiB", ""))
     elif mem_val.startswith("0B"):
@@ -139,7 +138,6 @@ def format_out_row_misc(misc_row):
     formatted, comma separated string
 
     """
-
     secs = misc_row['SECONDS']
     disk = get_disk_gb(misc_row[' disk_used'])
     if sys.platform == 'darwin':
@@ -172,9 +170,7 @@ def format_out_row_docker(stats_row):
     Returns
     -------
     formatted, comma separated string
-
     """
-
     secs = stats_row['SECONDS']
     name = stats_row['{{.Name}}']
     pids = stats_row['{{.PIDs}}']
@@ -199,16 +195,13 @@ def make_lists(csv_file):
     -------
     csv_to_list : list
         List that is now ready to be formatted
-
     """
-
     with open(csv_file) as csv_handle:
         return [row for row in csv.DictReader(csv_handle)]
 
 
 def main():
-    """ main program in process_metric_data.py"""
-
+    """Main program in process_metric_data.py"""
     container_info = sys.argv[1]
     stats_file = sys.argv[2]
     misc_file = sys.argv[3]

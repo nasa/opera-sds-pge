@@ -84,7 +84,8 @@ class DSWxHLSPreProcessorMixin(PreProcessorMixin):
         by the RunConfig.
 
         """
-        dynamic_ancillary_file_group_dict = self.runconfig.sas_config['runconfig']['groups']['dynamic_ancillary_file_group']
+        dynamic_ancillary_file_group_dict = \
+            self.runconfig.sas_config['runconfig']['groups']['dynamic_ancillary_file_group']
 
         for key, value in dynamic_ancillary_file_group_dict.items():
             if key in ('dem_file', 'worldcover_file'):
@@ -440,8 +441,7 @@ class DSWxHLSPostProcessorMixin(PostProcessorMixin):
         representative_product = None
 
         for output_product in output_products:
-            if (basename(output_product) in self.renamed_files.values() and
-                    basename(output_product).endswith("tif")):
+            if basename(output_product) in self.renamed_files.values() and basename(output_product).endswith("tif"):
                 representative_product = output_product
                 break
         else:

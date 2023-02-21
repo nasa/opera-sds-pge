@@ -103,9 +103,7 @@ class RunconfigTestCase(unittest.TestCase):
         self.assertIsNone(runconfig.sas_config)
 
     def test_strict_mode_validation(self):
-        """
-        Test validation of a RunConfig with strict_mode both enabled and disabled
-        """
+        """Test validation of a RunConfig with strict_mode both enabled and disabled"""
         # Parse a valid runconfig, but modify it with fields not in the base
         # PGE schema
         runconfig = RunConfig(self.valid_config_extra_fields)

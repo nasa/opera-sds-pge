@@ -240,7 +240,8 @@ class DSWxPgeTestCase(unittest.TestCase):
         with open(runconfig_path, 'r', encoding='utf-8') as stream:
             runconfig_dict = yaml.safe_load(stream)
 
-        ancillary_file_group_dict = runconfig_dict['RunConfig']['Groups']['SAS']['runconfig']['groups']['dynamic_ancillary_file_group']
+        ancillary_file_group_dict = \
+            runconfig_dict['RunConfig']['Groups']['SAS']['runconfig']['groups']['dynamic_ancillary_file_group']
 
         # Test an invalid (missing) ancillary file
         ancillary_file_group_dict['dem_file'] = 'non_existent_dem.tif'
@@ -287,8 +288,8 @@ class DSWxPgeTestCase(unittest.TestCase):
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
 
-            self.assertIn(f"Input file dswx_pge_test/input_dir/landcover.vrt "
-                          f"does not have an expected file extension.", log_contents)
+            self.assertIn("Input file dswx_pge_test/input_dir/landcover.vrt "
+                          "does not have an expected file extension.", log_contents)
 
             # Reset to valid landcover path
             ancillary_file_group_dict['landcover_file'] = 'dswx_pge_test/input_dir/landcover.tif'
@@ -503,7 +504,7 @@ class DSWxPgeTestCase(unittest.TestCase):
         runconfig_path = join(self.data_dir, 'test_dswx_hls_config.yaml')
 
         pge = DSWxHLSExecutor(pge_name="DSWxPgeTest", runconfig_path=runconfig_path)
-        with self.assertRaises(Exception) as context:
+        with self.assertRaises(Exception) as context:   # noqa F481
             pge.run_preprocessor()
 
         # Open the log file, and check that the validation error details were captured
@@ -529,7 +530,7 @@ class DSWxPgeTestCase(unittest.TestCase):
         runconfig_path = join(self.data_dir, 'test_dswx_hls_config.yaml')
 
         pge = DSWxHLSExecutor(pge_name="DSWxPgeTest", runconfig_path=runconfig_path)
-        with self.assertRaises(Exception) as context:
+        with self.assertRaises(Exception) as context:   # noqa F481
             pge.run_preprocessor()
 
         # Open the log file, and check that the validation error details were captured

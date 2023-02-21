@@ -9,10 +9,8 @@ Unit tests for the pge/cslc_s1/cslc_s1_pge.py module.
 """
 
 import glob
-import json
 import os
 import re
-import shutil
 import tempfile
 import unittest
 from io import StringIO
@@ -27,6 +25,7 @@ from opera.pge.cslc_s1.cslc_s1_pge import CslcS1Executor
 from opera.util import PgeLogger
 from opera.util.metadata_utils import create_test_cslc_metadata_product
 from opera.util.metadata_utils import get_cslc_s1_product_metadata
+
 
 class CslcS1PgeTestCase(unittest.TestCase):
     """Base test class using unittest"""
@@ -135,7 +134,8 @@ class CslcS1PgeTestCase(unittest.TestCase):
         # Lastly, check that the dummy output product was created and renamed
         expected_image_file = join(
             pge.runconfig.output_product_path,
-            pge._h5_filename(inter_filename='cslc_pge_test/output_dir/t064_135518_iw1/20220501/t064_135518_iw1_20220501_VV.h5')
+            pge._h5_filename(
+                inter_filename='cslc_pge_test/output_dir/t064_135518_iw1/20220501/t064_135518_iw1_20220501_VV.h5')
         )
         self.assertTrue(os.path.exists(expected_image_file))
 
