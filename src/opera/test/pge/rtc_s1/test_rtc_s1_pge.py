@@ -413,8 +413,8 @@ class RtcS1PgeTestCase(unittest.TestCase):
                 os.unlink(test_runconfig_path)
 
     def test_expected_extension(self):
-        """for code coverage right now"""
-        # TODO when we get .nc and hdf5 files this test will go away
+        """Code coverage only right now"""
+        # TODO when we get .nc and .h5 files this test will need to be modified
         runconfig_path = join(self.data_dir, 'test_rtc_s1_config.yaml')
         test_runconfig_path = join(self.data_dir, 'invalid_rtc_s1_config.yaml')
 
@@ -429,7 +429,6 @@ class RtcS1PgeTestCase(unittest.TestCase):
 
         try:
             pge = RtcS1Executor(pge_name="RtcPgeTest", runconfig_path=test_runconfig_path)
-
             with self.assertRaises(RuntimeError):
                 pge.run()
 
@@ -479,7 +478,7 @@ class RtcS1PgeTestCase(unittest.TestCase):
             pge._iso_metadata_filename("bad_burst")
 
     def test_bad_iso_metadata_template(self):
-        # Verify code when the QA application is enabled
+        """Verify code when the QA application is enabled"""
         runconfig_path = join(self.data_dir, 'test_rtc_s1_config.yaml')
         test_runconfig_path = join(self.data_dir, 'invalid_rtc_s1_config.yaml')
 
