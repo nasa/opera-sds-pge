@@ -11,6 +11,7 @@ Unit tests for the pge/cslc_s1/cslc_s1_pge.py module.
 import glob
 import os
 import re
+import stat
 import tempfile
 import unittest
 from io import StringIO
@@ -76,6 +77,16 @@ class CslcS1PgeTestCase(unittest.TestCase):
             f"touch {join(input_dir, 'db.sqlite3')}"
         )
 
+        os.system(
+            f"touch {join(input_dir, 'test_qa.py')}"
+        )
+        os.chmod(f"{join(input_dir, 'test_qa.py')}", stat.S_IRWXU)   # Set to read, write, execute by owner
+
+        os.system(
+            f"touch {join(input_dir, 'test_qa_1.py')}"
+        )
+        os.chmod(f"{join(input_dir, 'test_qa_1.py')}", stat.S_IREAD)  # Set to read by owner
+
         os.chdir(self.working_dir.name)
 
     def tearDown(self) -> None:
@@ -134,8 +145,8 @@ class CslcS1PgeTestCase(unittest.TestCase):
         # Lastly, check that the dummy output product was created and renamed
         expected_image_file = join(
             pge.runconfig.output_product_path,
-            pge._h5_filename(
-                inter_filename='cslc_pge_test/output_dir/t064_135518_iw1/20220501/t064_135518_iw1_20220501_VV.h5')
+            pge._h5_filename(inter_filename='cslc_pge_test/output_dir/t064_135518_iw1/20220501/'
+                                            't064_135518_iw1_20220501_VV.h5')
         )
         self.assertTrue(os.path.exists(expected_image_file))
 
@@ -211,6 +222,35 @@ class CslcS1PgeTestCase(unittest.TestCase):
 
         # Rendered template should not have any missing placeholders
         self.assertNotIn('!Not found!', iso_metadata)
+
+        # Test bad iso_template_path
+        test_runconfig_path = join(self.data_dir, 'invalid_cslc_s1_runconfig.yaml')
+
+        with open(runconfig_path, 'r', encoding='utf-8') as infile:
+            runconfig_dict = yaml.safe_load(infile)
+
+        primary_executable = runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']
+        primary_executable['IsoTemplatePath'] = "pge/cslc_s1/templates/OPERA_ISO_metadata_L2_CSLC_S1_template.xml"
+
+        with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+            yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+
+        try:
+            pge = CslcS1Executor(pge_name="CslcPgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn("Could not load ISO template", log_contents)
+        finally:
+            if os.path.exists(test_runconfig_path):
+                os.unlink(test_runconfig_path)
 
     def test_cslc_s1_pge_input_validation(self):
         """Test the input validation checks."""
@@ -346,6 +386,72 @@ class CslcS1PgeTestCase(unittest.TestCase):
 
             self.assertIn(f"SAS output file {os.path.basename(expected_output_file)} "
                           f"exists, but is empty", log_contents)
+
+        finally:
+            if os.path.exists(test_runconfig_path):
+                os.unlink(test_runconfig_path)
+
+    def test_geotiff_json_filenames(self):
+        """Test that tiff and json filenames are properly returned."""
+        runconfig_path = join(self.data_dir, 'test_cslc_s1_config.yaml')
+        pge = CslcS1Executor(pge_name="CslcPgeTest", runconfig_path=runconfig_path)
+        pge.run()
+        inner_fname = 'cslc_pge_test/output_dir/t064_135518_iw1/20220501/t064_135518_iw1_20220501_VV.tiff'
+        pge._geotiff_filename(inner_fname)
+        inner_fname = 'cslc_pge_test/output_dir/t064_135518_iw1/20220501/t064_135518_iw1_20220501_VV.json'
+        pge._json_metadata_filename(inner_fname)
+        pge._qa_log_filename()
+
+    def test_qa_enabled(self):
+        """Test the staging of the qa.log files."""
+        # Verify code when the QA application is enabled
+        runconfig_path = join(self.data_dir, 'test_cslc_s1_config.yaml')
+        test_runconfig_path = join(self.data_dir, 'invalid_cslc_s1_config.yaml')
+
+        with open(runconfig_path, 'r', encoding='utf-8') as infile:
+            runconfig_dict = yaml.safe_load(infile)
+
+        qa_executable = runconfig_dict['RunConfig']['Groups']['PGE']['QAExecutable']
+        qa_executable['Enabled'] = True
+
+        qa_executable['ProgramPath'] = 'cslc_pge_test/input_dir/test_qa.py'
+
+        with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+            yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+
+        try:
+            pge = CslcS1Executor(pge_name="CslcPgeTest", runconfig_path=test_runconfig_path)
+
+            pge.run()
+
+            # Verify error conditions
+            runconfig_path = join(self.data_dir, 'test_cslc_s1_config.yaml')
+            test_runconfig_path = join(self.data_dir, 'invalid_cslc_s1_config.yaml')
+
+            with open(runconfig_path, 'r', encoding='utf-8') as infile:
+                runconfig_dict = yaml.safe_load(infile)
+
+            qa_executable = runconfig_dict['RunConfig']['Groups']['PGE']['QAExecutable']
+            qa_executable['Enabled'] = True
+
+            qa_executable['ProgramPath'] = 'cslc_pge_test/input_dir/test_qa_1.py'
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+                yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+
+            pge = CslcS1Executor(pge_name="CslcPgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+            self.assertIn("Requested QA program path cslc_pge_test/input_dir/test_qa_1.py exists, but "
+                          "does not have execute permissions.", log_contents)
+
         finally:
             if os.path.exists(test_runconfig_path):
                 os.unlink(test_runconfig_path)
