@@ -156,7 +156,7 @@ do
                                      -v "${output_dir}":/out:ro \
                                      -v "${expected_data_dir}":/exp:ro \
                                      --entrypoint python3 ${PGE_IMAGE}:"${PGE_TAG}" \
-                                     proteus-0.5.2/bin/dswx_compare.py \
+                                     proteus-0.5.3/bin/dswx_compare.py \
                                      /out/"${output_file}" /exp/"${expected_file}")
                     echo "$docker_out"
 
