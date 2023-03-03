@@ -61,6 +61,8 @@ class CslcS1PgeTestCase(unittest.TestCase):
         input_dir = join(self.working_dir.name, "cslc_pge_test/input_dir")
         os.makedirs(input_dir, exist_ok=True)
 
+        # Use empty files for testing the existence of required input files
+
         os.system(
             f"touch {join(input_dir, 'S1A_IW_SLC__1SDV_20220501T015035_20220501T015102_043011_0522A4_42CC.zip')}"
         )
@@ -73,19 +75,22 @@ class CslcS1PgeTestCase(unittest.TestCase):
             f"touch {join(input_dir, 'dem_4326.tiff')}"
         )
 
+        # 'db.sqlite3' simulates the burst_id database file
         os.system(
             f"touch {join(input_dir, 'db.sqlite3')}"
         )
 
+        # When the [QAExecutable] is enabled, a python script (specified in [QAExecutable][ProgramPath] is executed.
+        # The empty files below simulate a script with proper permissions, and a script with improper permissions.
         os.system(
-            f"touch {join(input_dir, 'test_qa.py')}"
+            f"touch {join(input_dir, 'test_qa_rwx.py')}"  # rwx - read, write, execute
         )
-        os.chmod(f"{join(input_dir, 'test_qa.py')}", stat.S_IRWXU)   # Set to read, write, execute by owner
+        os.chmod(f"{join(input_dir, 'test_qa_rwx.py')}", stat.S_IRWXU)   # Set to read, write, execute by owner
 
         os.system(
-            f"touch {join(input_dir, 'test_qa_1.py')}"
+            f"touch {join(input_dir, 'test_qa_ro.py')}"   # r0 - read only
         )
-        os.chmod(f"{join(input_dir, 'test_qa_1.py')}", stat.S_IREAD)  # Set to read by owner
+        os.chmod(f"{join(input_dir, 'test_qa_ro.py')}", stat.S_IREAD)  # Set to read by owner
 
         os.chdir(self.working_dir.name)
 
@@ -392,15 +397,18 @@ class CslcS1PgeTestCase(unittest.TestCase):
                 os.unlink(test_runconfig_path)
 
     def test_geotiff_json_filenames(self):
-        """Test that tiff and json filenames are properly returned."""
+        """Test that tiff and json filenames are properly returned. Code coverage only."""
         runconfig_path = join(self.data_dir, 'test_cslc_s1_config.yaml')
         pge = CslcS1Executor(pge_name="CslcPgeTest", runconfig_path=runconfig_path)
         pge.run()
         inner_fname = 'cslc_pge_test/output_dir/t064_135518_iw1/20220501/t064_135518_iw1_20220501_VV.tiff'
-        pge._geotiff_filename(inner_fname)
-        inner_fname = 'cslc_pge_test/output_dir/t064_135518_iw1/20220501/t064_135518_iw1_20220501_VV.json'
-        pge._json_metadata_filename(inner_fname)
-        pge._qa_log_filename()
+        try:
+            pge._geotiff_filename(inner_fname)
+            inner_fname = 'cslc_pge_test/output_dir/t064_135518_iw1/20220501/t064_135518_iw1_20220501_VV.json'
+            pge._json_metadata_filename(inner_fname)
+            pge._qa_log_filename()
+        except ValueError:
+            self.fail()
 
     def test_qa_enabled(self):
         """Test the staging of the qa.log files."""
@@ -414,7 +422,7 @@ class CslcS1PgeTestCase(unittest.TestCase):
         qa_executable = runconfig_dict['RunConfig']['Groups']['PGE']['QAExecutable']
         qa_executable['Enabled'] = True
 
-        qa_executable['ProgramPath'] = 'cslc_pge_test/input_dir/test_qa.py'
+        qa_executable['ProgramPath'] = 'cslc_pge_test/input_dir/test_qa_rwx.py'
 
         with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
             yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
@@ -434,7 +442,7 @@ class CslcS1PgeTestCase(unittest.TestCase):
             qa_executable = runconfig_dict['RunConfig']['Groups']['PGE']['QAExecutable']
             qa_executable['Enabled'] = True
 
-            qa_executable['ProgramPath'] = 'cslc_pge_test/input_dir/test_qa_1.py'
+            qa_executable['ProgramPath'] = 'cslc_pge_test/input_dir/test_qa_ro.py'
 
             with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
                 yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
@@ -449,7 +457,7 @@ class CslcS1PgeTestCase(unittest.TestCase):
 
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
-            self.assertIn("Requested QA program path cslc_pge_test/input_dir/test_qa_1.py exists, but "
+            self.assertIn("Requested QA program path cslc_pge_test/input_dir/test_qa_ro.py exists, but "
                           "does not have execute permissions.", log_contents)
 
         finally:

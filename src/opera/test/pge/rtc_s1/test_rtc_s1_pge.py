@@ -60,21 +60,26 @@ class RtcS1PgeTestCase(unittest.TestCase):
         input_dir = join(self.working_dir.name, "rtc_s1_test/input_dir")
         os.makedirs(input_dir, exist_ok=True)
 
+        # Use empty files for testing the existence of required input files
+
         os.system(f"touch {join(input_dir, 'SAFE.zip')}")
 
         os.system(f"touch {join(input_dir, 'ORBIT.EOF')}")
 
         os.system(f"touch {join(input_dir, 'dem.tif')}")
 
+        # 'db.sqlite3' simulates the burst_id database file
         os.system(f"touch {join(input_dir, 'db.sqlite3')}")
 
-        os.system(f"touch {join(input_dir, 'test_qa.py')}"
-                  )
-        os.chmod(f"{join(input_dir, 'test_qa.py')}", stat.S_IRWXU)  # Set to read, write, execute by owner
+        # When the [QAExecutable] is enabled, a python script (specified in [QAExecutable][ProgramPath] is executed.
+        # The empty files below simulate a script with proper permissions, and a script with improper permissions.
+        os.system(f"touch {join(input_dir, 'test_qa_rwx.py')}")  # rwx - read, write, execute
 
-        os.system(f"touch {join(input_dir, 'test_qa_1.py')}")
+        os.chmod(f"{join(input_dir, 'test_qa_rwx.py')}", stat.S_IRWXU)  # Set to read, write, execute by owner
 
-        os.chmod(f"{join(input_dir, 'test_qa_1.py')}", stat.S_IREAD)  # Set to read by owner
+        os.system(f"touch {join(input_dir, 'test_qa_ro.py')}")  # r0 - read only
+
+        os.chmod(f"{join(input_dir, 'test_qa_ro.py')}", stat.S_IREAD)  # Set to read by owner
 
         os.chdir(self.working_dir.name)
 
@@ -520,7 +525,7 @@ class RtcS1PgeTestCase(unittest.TestCase):
         qa_executable = runconfig_dict['RunConfig']['Groups']['PGE']['QAExecutable']
         qa_executable['Enabled'] = True
 
-        qa_executable['ProgramPath'] = 'rtc_s1_test/input_dir/test_qa.py'
+        qa_executable['ProgramPath'] = 'rtc_s1_test/input_dir/test_qa_rwx.py'
 
         with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
             yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
@@ -540,7 +545,7 @@ class RtcS1PgeTestCase(unittest.TestCase):
             qa_executable = runconfig_dict['RunConfig']['Groups']['PGE']['QAExecutable']
             qa_executable['Enabled'] = True
 
-            qa_executable['ProgramPath'] = 'rtc_s1_test/input_dir/test_qa_1.py'
+            qa_executable['ProgramPath'] = 'rtc_s1_test/input_dir/test_qa_ro.py'
 
             with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
                 yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
@@ -555,7 +560,7 @@ class RtcS1PgeTestCase(unittest.TestCase):
 
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
-            self.assertIn("Requested QA program path rtc_s1_test/input_dir/test_qa_1.py exists, but "
+            self.assertIn("Requested QA program path rtc_s1_test/input_dir/test_qa_ro.py exists, but "
                           "does not have execute permissions.", log_contents)
         finally:
             if os.path.exists(test_runconfig_path):

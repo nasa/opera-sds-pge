@@ -470,6 +470,21 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
         output_product_metadata['frequencyA']['frequencyALength'] = len(output_product_metadata['frequencyA']
                                                                         ['yCoordinates'])
 
+        # TODO: the following fields seems to be missing in the interface delivery products,
+        #       but are documented, remove these kludges once they are actually available
+        if 'azimuthBandwidth' not in output_product_metadata['frequencyA']:
+            output_product_metadata['frequencyA']['azimuthBandwidth'] = 12345678.9
+
+        if 'noiseCorrectionFlag' not in output_product_metadata['frequencyA']:
+            output_product_metadata['frequencyA']['noiseCorrectionFlag'] = False
+
+        if 'plannedDatatakeId' not in output_product_metadata['identification']:
+            output_product_metadata['identification']['plannedDatatakeId'] = ['datatake1', 'datatake2']
+
+        if 'plannedObservationId' not in output_product_metadata['identification']:
+            output_product_metadata['identification']['plannedObservationId'] = ['obs1', 'obs2']
+        # TODO: end kludges
+
         return output_product_metadata
 
     def _create_custom_metadata(self):
