@@ -103,34 +103,34 @@ if [ $docker_exit_status -ne 0 ]; then
     echo "docker exit indicates failure: ${docker_exit_status}"
     overall_status=1
 else
-    declare -a burst_ids=( "t069_147170_iw1"
-                           "t069_147170_iw3"
-                           "t069_147171_iw1"
-                           "t069_147171_iw2"
-                           "t069_147171_iw3"
-                           "t069_147172_iw1"
-                           "t069_147172_iw2"
-                           "t069_147172_iw3"
-                           "t069_147173_iw1"
-                           "t069_147173_iw2"
-                           "t069_147173_iw3"
-                           "t069_147174_iw1"
-                           "t069_147174_iw2"
-                           "t069_147174_iw3"
-                           "t069_147175_iw1"
-                           "t069_147175_iw2"
-                           "t069_147175_iw3"
-                           "t069_147176_iw1"
-                           "t069_147176_iw2"
-                           "t069_147176_iw3"
-                           "t069_147177_iw1"
-                           "t069_147177_iw2"
-                           "t069_147177_iw3"
-                           "t069_147178_iw1"
-                           "t069_147178_iw2"
-                           "t069_147178_iw3"
-                           "t069_147179_iw2"
-                           "t069_147179_iw3")
+    declare -a burst_ids=("t069_147169_iw3"
+                          "t069_147170_iw1"
+                          "t069_147170_iw2"
+                          "t069_147170_iw3"
+                          "t069_147171_iw1"
+                          "t069_147171_iw2"
+                          "t069_147171_iw3"
+                          "t069_147172_iw1"
+                          "t069_147172_iw2"
+                          "t069_147172_iw3"
+                          "t069_147173_iw1"
+                          "t069_147173_iw2"
+                          "t069_147173_iw3"
+                          "t069_147174_iw1"
+                          "t069_147174_iw2"
+                          "t069_147174_iw3"
+                          "t069_147175_iw1"
+                          "t069_147175_iw2"
+                          "t069_147175_iw3"
+                          "t069_147176_iw1"
+                          "t069_147176_iw2"
+                          "t069_147176_iw3"
+                          "t069_147177_iw1"
+                          "t069_147177_iw2"
+                          "t069_147177_iw3"
+                          "t069_147178_iw1"
+                          "t069_147178_iw2"
+                          "t069_147178_iw3")
 
     echo "<tr><th>Compare Result</th><th><ul><li>Expected file</li><li>Output file</li></ul></th><th>rtc_compare.py output</th></tr>" >> "$RESULTS_FILE"
     for burst_id in "${burst_ids[@]}"; do
@@ -139,7 +139,10 @@ else
         burst_id_uppercase=${burst_id^^}
         burst_id_replace_underscores=${burst_id_uppercase//_/-}
         burst_id_pattern="*_${burst_id_replace_underscores}_*.h5"
-        output_file=$(ls "$output_dir"/"$burst_id_pattern")
+
+        # shellcheck disable=SC2086
+        output_file=$(ls $output_dir/$burst_id_pattern)
+
         echo "output file: $output_file"
         expected_file=${expected_dir}/${burst_id}/rtc_product_v0.2.h5
         compare_output=$(python3 "${local_compare_script}" "${expected_file}" "${output_file}")
