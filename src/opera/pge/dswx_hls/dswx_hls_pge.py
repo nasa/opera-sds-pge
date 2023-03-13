@@ -54,6 +54,7 @@ class DSWxHLSPreProcessorMixin(PreProcessorMixin):
         For directories, this means checking for directory existence, and that
         at least one .tif file resides within the directory. For files,
         each file is checked for existence and that it has a .tif extension.
+
         """
         for input_file in self.runconfig.input_files:
             input_file_path = abspath(input_file)
@@ -206,6 +207,7 @@ class DSWxHLSPostProcessorMixin(PostProcessorMixin):
         Evaluates the output file(s) generated from SAS execution to ensure
         existence, and that the file(s) contains some content (size is greater than
         0).
+
         """
         # Get the product ID that the SAS should have used to tag all output images
         product_id = self.runconfig.sas_config['runconfig']['groups']['product_path_group']['product_id']
