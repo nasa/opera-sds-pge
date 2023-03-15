@@ -132,7 +132,7 @@ RunConfig:
                         orbit_file_path:
                             - /home/compass_user/input_dir/S1A_OPER_AUX_POEORB_OPOD_20220521T081912_V20220430T225942_20220502T005942.EOF
                         # Burst IDs to process. Leave empty to process all bursts.
-                        burst_id: []
+                        burst_id:
 
                     # This section should match the DynamicAncillaryFilesGroup of the PGE RunConfig
                     dynamic_ancillary_file_group:
