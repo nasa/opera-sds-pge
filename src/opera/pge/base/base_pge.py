@@ -69,6 +69,19 @@ class PreProcessorMixin:
             self.logger.info(self.name, ErrorCode.LOG_FILE_CREATED,
                              f'Log file passed from pge_main: {self.logger.get_file_name()}')
 
+    def _initialize_qa_logger(self):
+        """
+        Creates the qa logger object used by the PGE when QA is enabled.
+
+        The logger is created using a default name, as the proper filename
+        cannot be determined until the RunConfig is parsed and validated.
+        """
+        if self.runconfig.qa_enabled:
+            self.qa_logger = PgeLogger(
+                workflow="qa_logger", error_code_base=PgeLogger.QA_LOGGER_CODE_BASE)
+            self.logger.info(self.name, ErrorCode.LOG_FILE_CREATED,
+                             f'New QA Log file initialized to {self.qa_logger.get_file_name()}')
+
     def _load_runconfig(self):
         """
         Loads the RunConfig file provided to the PGE into an in-memory
@@ -158,6 +171,12 @@ class PreProcessorMixin:
         self.logger.info(self.name, ErrorCode.LOG_FILE_INIT_COMPLETE,
                          'Log file configuration complete')
 
+        if self.runconfig.qa_enabled:
+            self.qa_logger.move(join(self.runconfig.output_product_path, default_log_file_name()))
+
+            self.qa_logger.info(self.name, ErrorCode.LOG_FILE_INIT_COMPLETE,
+                                'Log file configuration complete')
+
     def run_preprocessor(self, **kwargs):  # pylint: disable=unused-argument
         """
         Executes the pre-processing steps for PGE initialization.
@@ -177,6 +196,7 @@ class PreProcessorMixin:
         self._initialize_logger()
         self._load_runconfig()
         self._validate_runconfig()
+        self._initialize_qa_logger()
         self._setup_directories()
         self._configure_logger()
 
@@ -644,9 +664,6 @@ class PgeExecutor(PreProcessorMixin, PostProcessorMixin):
         self.runconfig_path = runconfig_path
         self.runconfig = None
         self.logger = kwargs.get('logger')
-        self.qa_logger = PgeLogger(
-            workflow="qa_logger", error_code_base=PgeLogger.QA_LOGGER_CODE_BASE
-        )
         self.production_datetime = datetime.now()
 
         # Mapping of unix-style file name patterns to function pointers
