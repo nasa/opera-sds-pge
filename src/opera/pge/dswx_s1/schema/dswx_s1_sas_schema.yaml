@@ -1,0 +1,39 @@
+#
+# Yamale schema for the CSLC-S1 SAS Configuration
+#
+
+runconfig:
+    name: str()
+
+    groups:
+        pge_name_group:
+           pge_name: enum('DSWx_S1_PGE')
+
+        input_file_group:
+            # REQUIRED - Single HLS dataset (directory or files)
+            input_file_path: list(str(), min=1)
+
+        dynamic_ancillary_file_group:
+            # Digital Elevation Model.
+            dem_file: str(required=False)
+
+        product_path_group:
+            # Directory where PGE will place results
+            product_path: str()
+            # Directory where SAS can write temporary data
+            scratch_path: str()
+            # Intermediate file name. SAS writes the output to this file.
+            # PGE may rename the product according to file naming convention
+            sas_output_file: str()
+
+        primary_executable:
+            product_type: enum('DSWX_S1')
+
+        # This section includes parameters to tweak the workflow
+        processing: include('processing_options', required=False)
+
+---
+# Group of processing options
+processing_options:
+  # Placeholder for now: Check if ancillary inputs cover entirely the output product
+  check_ancillary_inputs_coverage: bool(required=False)

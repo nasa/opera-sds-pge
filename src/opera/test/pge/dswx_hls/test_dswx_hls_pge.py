@@ -29,14 +29,14 @@ from opera.util.metadata_utils import get_geographic_boundaries_from_mgrs_tile
 from opera.util.metadata_utils import get_sensor_from_spacecraft_name
 
 
-class DSWxPgeTestCase(unittest.TestCase):
+class DSWxHLSPgeTestCase(unittest.TestCase):
     """Base test class using unittest"""
 
     starting_dir = None
     working_dir = None
     test_dir = None
     input_file = None
-    input_dir = "dswx_pge_test/input_dir"
+    input_dir = "dswx_hls_pge_test/input_dir"
 
     @classmethod
     def setUpClass(cls) -> None:
@@ -97,7 +97,7 @@ class DSWxPgeTestCase(unittest.TestCase):
         pge = DSWxHLSExecutor(pge_name="DSWxHLSPgeTest", runconfig_path=runconfig_path)
 
         # Check that basic attributes were initialized
-        self.assertEqual(pge.name, "DSWx")
+        self.assertEqual(pge.name, "DSWx-HLS")
         self.assertEqual(pge.pge_name, "DSWxHLSPgeTest")
         self.assertEqual(pge.runconfig_path, runconfig_path)
 
@@ -154,10 +154,10 @@ class DSWxPgeTestCase(unittest.TestCase):
 
         self.assertIn(f"DSWx-HLS invoked with RunConfig {expected_sas_config_file}", log_contents)
 
-    def test_dswx_pge_input_validation(self):
-        """Test the input validation checks made by DSWxPreProcessorMixin."""
+    def test_dswx_hls_pge_input_validation(self):
+        """Test the input validation checks made by DSWxHLSPreProcessorMixin."""
         runconfig_path = join(self.data_dir, 'test_dswx_hls_config.yaml')
-        test_runconfig_path = join(self.data_dir, 'invalid_dswx_runconfig.yaml')
+        test_runconfig_path = join(self.data_dir, 'invalid_dswx_hls_runconfig.yaml')
 
         with open(runconfig_path, 'r', encoding='utf-8') as stream:
             runconfig_dict = yaml.safe_load(stream)
@@ -171,7 +171,7 @@ class DSWxPgeTestCase(unittest.TestCase):
             yaml.safe_dump(runconfig_dict, input_path, sort_keys=False)
 
         try:
-            pge = DSWxHLSExecutor(pge_name="DSWxPgeTest", runconfig_path=test_runconfig_path)
+            pge = DSWxHLSExecutor(pge_name="DSWxHLSPgeTest", runconfig_path=test_runconfig_path)
 
             with self.assertRaises(RuntimeError):
                 pge.run()
@@ -190,12 +190,12 @@ class DSWxPgeTestCase(unittest.TestCase):
                           f"{abspath('non_existent_file.tif')}", log_contents)
 
             # Test that an input directory with no .tif files is caught
-            input_files_group['InputFilePaths'] = ['dswx_pge_test/scratch_dir']
+            input_files_group['InputFilePaths'] = ['dswx_hls_pge_test/scratch_dir']
 
             with open(test_runconfig_path, 'w', encoding='utf-8') as out_file:
                 yaml.safe_dump(runconfig_dict, out_file, sort_keys=False)
 
-            pge = DSWxHLSExecutor(pge_name="DSWxPgeTest", runconfig_path=test_runconfig_path)
+            pge = DSWxHLSExecutor(pge_name="DSWxHLSPgeTest", runconfig_path=test_runconfig_path)
 
             with self.assertRaises(RuntimeError):
                 pge.run()
@@ -206,7 +206,7 @@ class DSWxPgeTestCase(unittest.TestCase):
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
 
-            self.assertIn(f"Input directory {abspath('dswx_pge_test/scratch_dir')} "
+            self.assertIn(f"Input directory {abspath('dswx_hls_pge_test/scratch_dir')} "
                           f"does not contain any tif files", log_contents)
 
             # Lastly, check that a file that exists but is not a tif is caught
@@ -215,7 +215,7 @@ class DSWxPgeTestCase(unittest.TestCase):
             with open(test_runconfig_path, 'w', encoding='utf-8') as runconfig_fh:
                 yaml.safe_dump(runconfig_dict, runconfig_fh, sort_keys=False)
 
-            pge = DSWxHLSExecutor(pge_name="DSWxPgeTest", runconfig_path=test_runconfig_path)
+            pge = DSWxHLSExecutor(pge_name="DSWxHLSPgeTest", runconfig_path=test_runconfig_path)
 
             with self.assertRaises(RuntimeError):
                 pge.run()
@@ -232,10 +232,10 @@ class DSWxPgeTestCase(unittest.TestCase):
             if os.path.exists(test_runconfig_path):
                 os.unlink(test_runconfig_path)
 
-    def test_dswx_pge_ancillary_input_validation(self):
+    def test_dswx_hls_pge_ancillary_input_validation(self):
         """Test validation checks made on the set of ancillary input files"""
         runconfig_path = join(self.data_dir, 'test_dswx_hls_config.yaml')
-        test_runconfig_path = join(self.data_dir, 'invalid_dswx_runconfig.yaml')
+        test_runconfig_path = join(self.data_dir, 'invalid_dswx_hls_runconfig.yaml')
 
         with open(runconfig_path, 'r', encoding='utf-8') as stream:
             runconfig_dict = yaml.safe_load(stream)
@@ -250,7 +250,7 @@ class DSWxPgeTestCase(unittest.TestCase):
             yaml.safe_dump(runconfig_dict, input_path, sort_keys=False)
 
         try:
-            pge = DSWxHLSExecutor(pge_name="DSWxPgeTest", runconfig_path=test_runconfig_path)
+            pge = DSWxHLSExecutor(pge_name="DSWxHLSPgeTest", runconfig_path=test_runconfig_path)
 
             with self.assertRaises(RuntimeError):
                 pge.run()
@@ -268,16 +268,16 @@ class DSWxPgeTestCase(unittest.TestCase):
             self.assertIn("Could not locate specified input non_existent_dem.tif.", log_contents)
 
             # Reset to valid dem path
-            ancillary_file_group_dict['dem_file'] = 'dswx_pge_test/input_dir/dem.tif'
+            ancillary_file_group_dict['dem_file'] = 'dswx_hls_pge_test/input_dir/dem.tif'
 
             # Test with an unexpected file extension
-            os.system("touch dswx_pge_test/input_dir/landcover.vrt")
-            ancillary_file_group_dict['landcover_file'] = 'dswx_pge_test/input_dir/landcover.vrt'
+            os.system("touch dswx_hls_pge_test/input_dir/landcover.vrt")
+            ancillary_file_group_dict['landcover_file'] = 'dswx_hls_pge_test/input_dir/landcover.vrt'
 
             with open(test_runconfig_path, 'w', encoding='utf-8') as input_path:
                 yaml.safe_dump(runconfig_dict, input_path, sort_keys=False)
 
-            pge = DSWxHLSExecutor(pge_name="DSWxPgeTest", runconfig_path=test_runconfig_path)
+            pge = DSWxHLSExecutor(pge_name="DSWxHLSPgeTest", runconfig_path=test_runconfig_path)
 
             with self.assertRaises(RuntimeError):
                 pge.run()
@@ -288,20 +288,20 @@ class DSWxPgeTestCase(unittest.TestCase):
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
 
-            self.assertIn("Input file dswx_pge_test/input_dir/landcover.vrt "
+            self.assertIn("Input file dswx_hls_pge_test/input_dir/landcover.vrt "
                           "does not have an expected file extension.", log_contents)
 
             # Reset to valid landcover path
-            ancillary_file_group_dict['landcover_file'] = 'dswx_pge_test/input_dir/landcover.tif'
+            ancillary_file_group_dict['landcover_file'] = 'dswx_hls_pge_test/input_dir/landcover.tif'
 
             # Test with incomplete shoreline shapefile set
-            os.system("touch dswx_pge_test/input_dir/missing_shoreline.shp")
-            ancillary_file_group_dict['shoreline_shapefile'] = 'dswx_pge_test/input_dir/missing_shoreline.shp'
+            os.system("touch dswx_hls_pge_test/input_dir/missing_shoreline.shp")
+            ancillary_file_group_dict['shoreline_shapefile'] = 'dswx_hls_pge_test/input_dir/missing_shoreline.shp'
 
             with open(test_runconfig_path, 'w', encoding='utf-8') as input_path:
                 yaml.safe_dump(runconfig_dict, input_path, sort_keys=False)
 
-            pge = DSWxHLSExecutor(pge_name="DSWxPgeTest", runconfig_path=test_runconfig_path)
+            pge = DSWxHLSExecutor(pge_name="DSWxHLSPgeTest", runconfig_path=test_runconfig_path)
 
             with self.assertRaises(RuntimeError):
                 pge.run()
@@ -312,16 +312,16 @@ class DSWxPgeTestCase(unittest.TestCase):
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
 
-            self.assertIn("Additional shapefile dswx_pge_test/input_dir/missing_shoreline.dbf "
+            self.assertIn("Additional shapefile dswx_hls_pge_test/input_dir/missing_shoreline.dbf "
                           "could not be located", log_contents)
         finally:
             if os.path.exists(test_runconfig_path):
                 os.unlink(test_runconfig_path)
 
-    def test_dswx_pge_output_validation(self):
-        """Test the output validation checks made by DSWxPostProcessorMixin."""
+    def test_dswx_hls_pge_output_validation(self):
+        """Test the output validation checks made by DSWxHLSPostProcessorMixin."""
         runconfig_path = join(self.data_dir, 'test_dswx_hls_config.yaml')
-        test_runconfig_path = join(self.data_dir, 'invalid_dswx_runconfig.yaml')
+        test_runconfig_path = join(self.data_dir, 'invalid_dswx_hls_runconfig.yaml')
 
         with open(runconfig_path, 'r', encoding='utf-8') as stream:
             runconfig_dict = yaml.safe_load(stream)
@@ -337,12 +337,12 @@ class DSWxPgeTestCase(unittest.TestCase):
             yaml.safe_dump(runconfig_dict, config_fh, sort_keys=False)
 
         try:
-            pge = DSWxHLSExecutor(pge_name="DSWxPgeTest", runconfig_path=test_runconfig_path)
+            pge = DSWxHLSExecutor(pge_name="DSWxHLSPgeTest", runconfig_path=test_runconfig_path)
 
             with self.assertRaises(RuntimeError):
                 pge.run()
 
-            expected_output_file = 'dswx_pge_test/output_dir/missing_dswx_hls.tif'
+            expected_output_file = 'dswx_hls_pge_test/output_dir/missing_dswx_hls.tif'
             self.assertFalse(os.path.exists(expected_output_file))
 
             expected_log_file = pge.logger.get_file_name()
@@ -358,17 +358,17 @@ class DSWxPgeTestCase(unittest.TestCase):
             # one that is empty (size 0 bytes). Post-processor should detect this
             # and flag an error
             primary_executable_group['ProgramPath'] = 'touch'
-            primary_executable_group['ProgramOptions'] = ['dswx_pge_test/output_dir/empty_dswx_hls.tif']
+            primary_executable_group['ProgramOptions'] = ['dswx_hls_pge_test/output_dir/empty_dswx_hls.tif']
 
             with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
                 yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
 
-            pge = DSWxHLSExecutor(pge_name="DSWxPgeTest", runconfig_path=test_runconfig_path)
+            pge = DSWxHLSExecutor(pge_name="DSWxHLSPgeTest", runconfig_path=test_runconfig_path)
 
             with self.assertRaises(RuntimeError):
                 pge.run()
 
-            expected_output_file = 'dswx_pge_test/output_dir/empty_dswx_hls.tif'
+            expected_output_file = 'dswx_hls_pge_test/output_dir/empty_dswx_hls.tif'
             self.assertTrue(os.path.exists(expected_output_file))
 
             expected_log_file = pge.logger.get_file_name()
@@ -388,7 +388,7 @@ class DSWxPgeTestCase(unittest.TestCase):
         """Test _geotiff_filename() method"""
         runconfig_path = join(self.data_dir, 'test_dswx_hls_config.yaml')
 
-        pge = DSWxHLSExecutor(pge_name="DSWxPgeTest", runconfig_path=runconfig_path)
+        pge = DSWxHLSExecutor(pge_name="DSWxHLSPgeTest", runconfig_path=runconfig_path)
 
         pge.run()
 
@@ -453,18 +453,18 @@ class DSWxPgeTestCase(unittest.TestCase):
             return gdal_dataset
 
     @patch.object(opera.util.img_utils, "gdal", CustomMockGdal)
-    def test_dswx_product_metadata_collection(self):
-        """Test _collect_dswx_product_metadata() method"""
+    def test_dswx_hls_product_metadata_collection(self):
+        """Test _collect_dswx_hls_product_metadata() method"""
         runconfig_path = join(self.data_dir, 'test_dswx_hls_config.yaml')
 
-        pge = DSWxHLSExecutor(pge_name="DSWxPgeTest", runconfig_path=runconfig_path)
+        pge = DSWxHLSExecutor(pge_name="DSWxHLSPgeTest", runconfig_path=runconfig_path)
         pge.run_preprocessor()
 
         test_file = join(abspath(pge.runconfig.output_product_path), 'test_file.tif')
         pge.renamed_files['test_file.tif'] = os.path.basename(test_file)
         os.system(f'touch {test_file}')
 
-        output_product_metadata = pge._collect_dswx_product_metadata()
+        output_product_metadata = pge._collect_dswx_hls_product_metadata()
 
         self.assertIsInstance(output_product_metadata, dict)
 
@@ -495,7 +495,7 @@ class DSWxPgeTestCase(unittest.TestCase):
         self.assertEqual(output_product_metadata['yCoordinates']['spacing'], 30)
 
     @patch.object(opera.util.img_utils, "gdal", CustomMockGdal_InvalidLandsat)
-    def test_dswx_validate_expected_input_platforms_landsat(self):
+    def test_dswx_hls_validate_expected_input_platforms_landsat(self):
         """Test exceptions raised for Landsat 7 input data"""
         # Create a filename that will trigger a metadata check
         input_file = os.path.join(self.input_dir, "HLS.L30.T22VEQ.2021248T143156.v2.0.VAA.tif")
@@ -503,7 +503,7 @@ class DSWxPgeTestCase(unittest.TestCase):
 
         runconfig_path = join(self.data_dir, 'test_dswx_hls_config.yaml')
 
-        pge = DSWxHLSExecutor(pge_name="DSWxPgeTest", runconfig_path=runconfig_path)
+        pge = DSWxHLSExecutor(pge_name="DSWxHLSPgeTest", runconfig_path=runconfig_path)
         with self.assertRaises(Exception) as context:   # noqa F481
             pge.run_preprocessor()
 
@@ -521,7 +521,7 @@ class DSWxPgeTestCase(unittest.TestCase):
         self.assertIn(expected_msg, log_contents)
 
     @patch.object(opera.util.img_utils, "gdal", CustomMockGdal_InvalidSentinel)
-    def test_dswx_validate_expected_input_platforms_sentinel(self):
+    def test_dswx_hls_validate_expected_input_platforms_sentinel(self):
         """Test exceptions raised for non-Sentinel S2A/B input data"""
         # Create a filename that will trigger a metadata check
         input_file = os.path.join(self.input_dir, "HLS.S30.T15SXR.2021250T163901.v2.0.SAA.tif")
@@ -529,7 +529,7 @@ class DSWxPgeTestCase(unittest.TestCase):
 
         runconfig_path = join(self.data_dir, 'test_dswx_hls_config.yaml')
 
-        pge = DSWxHLSExecutor(pge_name="DSWxPgeTest", runconfig_path=runconfig_path)
+        pge = DSWxHLSExecutor(pge_name="DSWxHLSPgeTest", runconfig_path=runconfig_path)
         with self.assertRaises(Exception) as context:   # noqa F481
             pge.run_preprocessor()
 
@@ -547,11 +547,11 @@ class DSWxPgeTestCase(unittest.TestCase):
         self.assertIn(expected_msg, log_contents)
 
     @patch.object(opera.util.img_utils, "gdal", CustomMockGdal)
-    def test_dswx_landsat_9_correction(self):
-        """Test metadata correction on a DSWx product derived from Landsat-9"""
+    def test_dswx_hls_landsat_9_correction(self):
+        """Test metadata correction on a DSWx-HLS product derived from Landsat-9"""
         runconfig_path = join(self.data_dir, 'test_dswx_hls_config.yaml')
 
-        pge = DSWxHLSExecutor(pge_name="DSWxPgeTest", runconfig_path=runconfig_path)
+        pge = DSWxHLSExecutor(pge_name="DSWxHLSPgeTest", runconfig_path=runconfig_path)
         pge.run_preprocessor()
 
         test_file = join(abspath(pge.runconfig.output_product_path), 'test_file.tif')

@@ -9,25 +9,25 @@ RunConfig:
 
             InputFilesGroup:
                 InputFilePaths:
-                    - dswx_pge_test/input_dir
+                    - dswx_hls_pge_test/input_dir
 
             DynamicAncillaryFilesGroup:
                 AncillaryFileMap:
-                    dem_file: dswx_pge_test/input_dir/dem.tif
-                    landcover_file: dswx_pge_test/input_dir/landcover.tif
-                    worldcover_file: dswx_pge_test/input_dir/worldcover.vrt
-                    shoreline_shapefile: dswx_pge_test/input_dir/shoreline.shp
+                    dem_file: dswx_hls_pge_test/input_dir/dem.tif
+                    landcover_file: dswx_hls_pge_test/input_dir/landcover.tif
+                    worldcover_file: dswx_hls_pge_test/input_dir/worldcover.vrt
+                    shoreline_shapefile: dswx_hls_pge_test/input_dir/shoreline.shp
 
             ProductPathGroup:
-                OutputProductPath: dswx_pge_test/output_dir
-                ScratchPath: dswx_pge_test/scratch_dir
+                OutputProductPath: dswx_hls_pge_test/output_dir
+                ScratchPath: dswx_hls_pge_test/scratch_dir
 
             PrimaryExecutable:
                 ProductIdentifier: DSWX_HLS
                 ProductVersion: 1.0
                 ProgramPath: /bin/echo
                 ProgramOptions:
-                    - 'hello world > dswx_pge_test/output_dir/dswx_hls_v0.1_B01_WTR.tif;'
+                    - 'hello world > dswx_hls_pge_test/output_dir/dswx_hls_v0.1_B01_WTR.tif;'
                     - '/bin/echo DSWx-HLS invoked with RunConfig'
                 ErrorCodeBase: 100000
                 SchemaPath: pge/dswx_hls/schema/dswx_hls_sas_schema.yaml
@@ -53,23 +53,23 @@ RunConfig:
                     input_file_group:
                         # REQUIRED - Single HLS dataset (directory or files)
                         input_file_path:
-                            - dswx_pge_test/input_dir
+                            - dswx_hls_pge_test/input_dir
 
                     dynamic_ancillary_file_group:
-                        dem_file: dswx_pge_test/input_dir/dem.tif
-                        landcover_file: dswx_pge_test/input_dir/landcover.tif
-                        worldcover_file: dswx_pge_test/input_dir/worldcover.vrt
-                        shoreline_shapefile: dswx_pge_test/input_dir/shoreline.shp
+                        dem_file: dswx_hls_pge_test/input_dir/dem.tif
+                        landcover_file: dswx_hls_pge_test/input_dir/landcover.tif
+                        worldcover_file: dswx_hls_pge_test/input_dir/worldcover.vrt
+                        shoreline_shapefile: dswx_hls_pge_test/input_dir/shoreline.shp
 
                     primary_executable:
                         product_type: DSWX_HLS
 
                     product_path_group:
                         # Directory where PGE will place results
-                        product_path: dswx_pge_test/output_dir
+                        product_path: dswx_hls_pge_test/output_dir
 
                         # Directory where SAS can write temporary data
-                        scratch_path: dswx_pge_test/scratch_dir
+                        scratch_path: dswx_hls_pge_test/scratch_dir
 
                         # SAS writes DSWx-HLS products as a set of GeoTIFF layers
                         # All files are saved within the output_directory following
@@ -79,7 +79,7 @@ RunConfig:
                         # the product version that it generates.
                         # If the field product_id is left empty, the prefix "dswx_hls"
                         # will be used instead
-                        output_dir: dswx_pge_test/output_dir
+                        output_dir: dswx_hls_pge_test/output_dir
                         product_id: dswx_hls
 
                     processing:
