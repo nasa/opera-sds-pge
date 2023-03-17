@@ -1,17 +1,33 @@
-from osgeo import gdal
+import argparse
 import numpy as np
 import os
+from osgeo import gdal
 import sys
 
 COMPARE_DSWX_HLS_PRODUCTS_ERROR_TOLERANCE_ATOL = 1e-6
 COMPARE_DSWX_HLS_PRODUCTS_ERROR_TOLERANCE_RTOL = 1e-5
+
+DEFAULT_METADATA_EXCLUDE_LIST = ['PROCESSING_DATETIME', 'DEM_SOURCE', 'LANDCOVER_SOURCE', 'WORLDCOVER_SOURCE']
+PREFIX = ' ' * 7
 
 def _get_prefix_str(flag_same, flag_all_ok):
     flag_all_ok[0] = flag_all_ok[0] and flag_same
     return '[OK]   ' if flag_same else '[FAIL] '
 
 
-def compare_dswx_hls_products(file_1, file_2):
+def compare_dswx_hls_products(file_1, file_2, metadata_exclude_list=[]):
+    """
+    Compare DSWx-HLS products in various ways
+       Parameters
+       ----------
+       file_1: str
+            Input 1 filename including path
+       file_2: str
+            Input 2 filename including path
+       metadata_exclude_list: list
+            Metadata keys to ignore for purposes of determining comparison ok or fail status
+    """
+
     if not os.path.isfile(file_1):
         print(f'ERROR file not found: {file_1}')
         return False
@@ -19,6 +35,9 @@ def compare_dswx_hls_products(file_1, file_2):
     if not os.path.isfile(file_2):
         print(f'ERROR file not found: {file_2}')
         return False
+
+    print(f'input 1 is {file_1}')
+    print(f'input 2 is {file_2}')
 
     flag_all_ok = [True]
 
@@ -36,7 +55,7 @@ def compare_dswx_hls_products(file_1, file_2):
     # compare number of bands
     flag_same_nbands =  nbands_1 == nbands_2
     flag_same_nbands_str = _get_prefix_str(flag_same_nbands, flag_all_ok)
-    prefix = ' ' * 7
+    prefix = PREFIX
     print(f'{flag_same_nbands_str}Comparing number of bands')
     if not flag_same_nbands:
         print(prefix + f'Input 1 has {nbands_1} bands and input 2'
@@ -55,15 +74,6 @@ def compare_dswx_hls_products(file_1, file_2):
             num_image_differences = np.sum(~is_close_result)
             if num_image_differences > 0:
                 flag_bands_are_equal = False
-                '''
-                # Find the min and max differences using the numpy.isclose function
-                # 0 <= (atol + rtol * absolute(b)) - absolute(a-b)
-                a1 = image_1[~is_close_result]
-                b2 = image_2[~is_close_result]
-                atol = COMPARE_DSWX_HLS_PRODUCTS_ERROR_TOLERANCE_ATOL
-                rtol = COMPARE_DSWX_HLS_PRODUCTS_ERROR_TOLERANCE_RTOL
-                is_close_differences = abs((atol + rtol * abs(b2)) - abs(a1 - b2))
-                '''
                 is_close_differences = abs( image_1[~is_close_result] - image_2[~is_close_result])
                 max_difference_band = np.max(is_close_differences)
                 min_difference_band = np.min(is_close_differences)
@@ -73,7 +83,7 @@ def compare_dswx_hls_products(file_1, file_2):
                       f"{min_difference_band}.")
                 differing_indices = np.where(~is_close_result)
                 i, j = differing_indices[0][0], differing_indices[1][0]
-                print(prefix + f'     * image band {b}, input 1 has value'
+                print(prefix + f'     * e.g. image band {b} input 1 has value'
                                   f' "{image_1[i, j]}" in position'
                                   f' (i: {i}, j: {j})'
                                   f' whereas input 2 has value "{image_2[i, j]}"'
@@ -100,7 +110,7 @@ def compare_dswx_hls_products(file_1, file_2):
 
     # compare metadata
     metadata_error_message, flag_same_metadata = \
-        _compare_dswx_hls_metadata(metadata_1, metadata_2)
+        _compare_dswx_hls_metadata(metadata_1, metadata_2, metadata_exclude_list=metadata_exclude_list)
 
     flag_same_metadata_str = _get_prefix_str(flag_same_metadata,
                                              flag_all_ok)
@@ -112,7 +122,7 @@ def compare_dswx_hls_products(file_1, file_2):
     return flag_all_ok[0]
 
 
-def _compare_dswx_hls_metadata(metadata_1, metadata_2):
+def _compare_dswx_hls_metadata(metadata_1, metadata_2, metadata_exclude_list=[]):
     """
     Compare DSWx-HLS products' metadata
        Parameters
@@ -121,21 +131,28 @@ def _compare_dswx_hls_metadata(metadata_1, metadata_2):
             Metadata of the first DSWx-HLS product
        metadata_2: dict
             Metadata of the second
+       metadata_exclude_list: list
+            Metadata keys to ignore for purposes of determining comparison ok or fail status
     """
     flag_same_metadata = True
     metadata_error_message = ""
     for k2, v2, in metadata_2.items():
         if k2 not in metadata_1.keys():
-            flag_same_metadata = False
-            metadata_error_message += (
-                f'* the metadata key {k2} is present in input 2'
-                ' but it is not present in input 1\n')
+            msg = f'* the metadata key {k2} is present in input 2 but it is not present in input 1'
+            if k2 in metadata_exclude_list:
+                print(f'[INFO] {msg}')
+            else:
+                flag_same_metadata = False
+                metadata_error_message += msg + '\n' + PREFIX
     for k1, v1, in metadata_1.items():
         if k1 not in metadata_2.keys():
-            flag_same_metadata = False
-            metadata_error_message += (
-                f'* the metadata key {k1} is present in input 1'
-                ' but it is not present in input 2\n')
+            msg = f'* the metadata key {k1} is present in input 1 but it is not present in input 2'
+            if k1 in metadata_exclude_list:
+                # We will just print the difference in the output
+                print(f'[INFO] {msg}')
+            else:
+                flag_same_metadata = False
+                metadata_error_message += msg + '\n' + PREFIX
         else:
             # Currently these are string values otherwise the comparison below would need to change for floating point.
             if metadata_2[k1] != v1:
@@ -143,23 +160,31 @@ def _compare_dswx_hls_metadata(metadata_1, metadata_2):
                        f' input 1 has value "{v1}" whereas the same key in'
                        f' input 2 metadata has value "{metadata_2[k1]}"')
                 # Don't fail for metadata fields that are not required to be the same
-                if k1 in ['PROCESSING_DATETIME', 'DEM_SOURCE', 'LANDCOVER_SOURCE',
-                          'WORLDCOVER_SOURCE', 'TIFFTAG_YRESOLUTION']:
+                if k1 in metadata_exclude_list:
                     # We will just print the difference in the output
-                    print(msg)
+                    print(f'[INFO] {msg}')
                 else:
                     flag_same_metadata = False
-                    metadata_error_message += msg + '\n'
+                    metadata_error_message += msg + '\n' + PREFIX
 
     return metadata_error_message, flag_same_metadata
 
 
 if __name__ == "__main__":
 
-    file_1 = sys.argv[1]
-    file_2 = sys.argv[2]
+    desc = "Compare two DSWx-HLS product files."
+    parser = argparse.ArgumentParser(description=desc)
+    parser.add_argument('files', nargs=2, help="Product filenames to be compared.")
+    parser.add_argument('--metadata_exclude_list', nargs='+', help="Metadata field names to ignore for purposes of determining comparison success or failure.")
+    args = parser.parse_args()
+    file_1 = args.files[0]
+    file_2 = args.files[1]
+
+    metadata_exclude_list = DEFAULT_METADATA_EXCLUDE_LIST
+    if args.metadata_exclude_list:
+        metadata_exclude_list += args.metadata_exclude_list
    
-    result = compare_dswx_hls_products(file_1, file_2) 
+    result = compare_dswx_hls_products(file_1, file_2, metadata_exclude_list=metadata_exclude_list)
 
     if result is True:
         print("Comparison succeeded")
