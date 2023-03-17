@@ -421,6 +421,33 @@ class BasePgeTestCase(unittest.TestCase):
             log_contents
         )
 
+    def test_qa_logger(self):
+        """Test that log file is saved despite RuntimeError"""
+        runconfig_path = join(self.data_dir, 'test_sas_qa_config.yaml')
+        test_runconfig_path = join(self.data_dir, 'invalid_sas_qa_config.yaml')
+
+        with open(runconfig_path, 'r', encoding='utf-8') as infile:
+            runconfig_dict = yaml.safe_load(infile)
+
+        qa_executable = runconfig_dict['RunConfig']['Groups']['PGE']['QAExecutable']
+
+        qa_executable['ProgramPath'] = 'non_existent/test_qa.py'
+
+        with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+            yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+
+        pge = PgeExecutor(pge_name="PgeQATest", runconfig_path=test_runconfig_path)
+
+        with self.assertRaises(RuntimeError):
+            pge.run()
+
+        expected_log_file = pge.qa_logger.get_file_name()
+        self.assertTrue(os.path.exists(expected_log_file))
+
+        with open(expected_log_file, 'r', encoding='utf-8') as infile:
+            log_contents = infile.read()
+        self.assertIn("Starting SAS QA executable", log_contents)
+
 
 if __name__ == "__main__":
     unittest.main()
