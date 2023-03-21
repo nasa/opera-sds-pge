@@ -267,7 +267,7 @@ RunConfig:
                             save_dem: False
 
                             # Save layover shadow mask
-                            save_layover_shadow_mask: True
+                            save_layover_shadow_mask: False
 
                             # OPTIONAL - Absolute radiometric correction
                             abs_rad_cal: 1
