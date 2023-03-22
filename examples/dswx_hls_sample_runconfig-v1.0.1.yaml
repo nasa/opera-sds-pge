@@ -1,4 +1,4 @@
-# Sample RunConfig for use with the DSWx-HLS PGE v1.0.0
+# Sample RunConfig for use with the DSWx-HLS PGE v1.0.1
 # This RunConfig should require minimal changes in order to be used with the
 # OPERA PCM.
 
@@ -71,7 +71,7 @@ RunConfig:
 
                 # List of command-line options to use with ProgramPath
                 ProgramOptions:
-                    - /home/conda/proteus-1.0.0/bin/dswx_hls.py
+                    - /home/conda/proteus-1.0.1/bin/dswx_hls.py
                     - --full-log-format
 
                 # The Error Code base value added to the offset values to make
