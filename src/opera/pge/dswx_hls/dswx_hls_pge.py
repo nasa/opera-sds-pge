@@ -616,10 +616,10 @@ class DSWxHLSExecutor(DSWxHLSPreProcessorMixin, DSWxHLSPostProcessorMixin, PgeEx
     LEVEL = "L3"
     """Processing Level for DSWx-HLS Products"""
 
-    PGE_VERSION = "1.0.0-rc.7.1"
+    PGE_VERSION = "1.0.1"
     """Version of the PGE (overrides default from base_pge)"""
 
-    SAS_VERSION = "0.5.3"  # CalVal release 3.3 https://github.com/nasa/PROTEUS/releases/tag/v0.5.3
+    SAS_VERSION = "1.0.1"  # Final release 4.1 https://github.com/nasa/PROTEUS/releases/tag/v1.0.1
     """Version of the SAS wrapped by this PGE, should be updated as needed with new SAS deliveries"""
 
     def __init__(self, pge_name, runconfig_path, **kwargs):
