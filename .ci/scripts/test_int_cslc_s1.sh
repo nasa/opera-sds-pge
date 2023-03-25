@@ -97,7 +97,7 @@ docker run --rm -u $UID:"$(id -g)" -w /home/compass_user --name $container_name 
 docker_exit_status=$?
 
 # End metrics collection
-metrics_collection_end "$PGE_NAME" "$docker_exit_status" "$TEST_RESULTS_DIR"
+metrics_collection_end "$PGE_NAME" "$container_name" "$docker_exit_status" "$TEST_RESULTS_DIR"
 
 if [ $docker_exit_status -ne 0 ]; then
     echo "docker exit indicates failure: ${docker_exit_status}"

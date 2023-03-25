@@ -54,6 +54,7 @@ class DSWxHLSPreProcessorMixin(PreProcessorMixin):
         For directories, this means checking for directory existence, and that
         at least one .tif file resides within the directory. For files,
         each file is checked for existence and that it has a .tif extension.
+
         """
         for input_file in self.runconfig.input_files:
             input_file_path = abspath(input_file)
@@ -84,7 +85,8 @@ class DSWxHLSPreProcessorMixin(PreProcessorMixin):
         by the RunConfig.
 
         """
-        dynamic_ancillary_file_group_dict = self.runconfig.sas_config['runconfig']['groups']['dynamic_ancillary_file_group']
+        dynamic_ancillary_file_group_dict = \
+            self.runconfig.sas_config['runconfig']['groups']['dynamic_ancillary_file_group']
 
         for key, value in dynamic_ancillary_file_group_dict.items():
             if key in ('dem_file', 'worldcover_file'):
@@ -131,7 +133,7 @@ class DSWxHLSPreProcessorMixin(PreProcessorMixin):
         """
         self.logger.info(
             self.name, ErrorCode.UPDATING_PRODUCT_METADATA,
-            'Scanning DSWx input datasets for invalid platforms.'
+            'Scanning DSWx-HLS input datasets for invalid platforms.'
         )
 
         # Get a list of input files to check for invalid platform metadata
@@ -205,6 +207,7 @@ class DSWxHLSPostProcessorMixin(PostProcessorMixin):
         Evaluates the output file(s) generated from SAS execution to ensure
         existence, and that the file(s) contains some content (size is greater than
         0).
+
         """
         # Get the product ID that the SAS should have used to tag all output images
         product_id = self.runconfig.sas_config['runconfig']['groups']['product_path_group']['product_id']
@@ -230,7 +233,7 @@ class DSWxHLSPostProcessorMixin(PostProcessorMixin):
 
     def _correct_landsat_9_products(self):
         """
-        Scans the set of output DSWx products to see if the metadata identifies
+        Scans the set of output DSWx-HLS products to see if the metadata identifies
         any/all of them to have originated from Landsat-9 data, and if so,
         make the necessary corrections to the product metadata to remove any
         references to Landsat-8 that may be erroneously present.
@@ -238,7 +241,7 @@ class DSWxHLSPostProcessorMixin(PostProcessorMixin):
         """
         self.logger.info(
             self.name, ErrorCode.UPDATING_PRODUCT_METADATA,
-            'Scanning DSWx output products for Landsat-9 metadata correction'
+            'Scanning DSWx-HLS output products for Landsat-9 metadata correction'
         )
 
         # Get the list of output products and filter for the images
@@ -253,7 +256,7 @@ class DSWxHLSPostProcessorMixin(PostProcessorMixin):
             # Certain HLS products have been observed to have sensor product
             # ID's that identify them as originating from Landsat-9, but
             # specify the Landsat-8 as the spacecraft name. To ensure this
-            # error is not propagated to DSWx products, we correct the spacecraft
+            # error is not propagated to DSWx-HLS products, we correct the spacecraft
             # name within the product metadata here.
             if re.match(r"L[COTEM]09.*", sensor_product_id):
                 self.logger.info(
@@ -269,11 +272,11 @@ class DSWxHLSPostProcessorMixin(PostProcessorMixin):
     def _core_filename(self, inter_filename=None):
         """
         Returns the core file name component for products produced by the
-        DSWx PGE.
+        DSWx-HLS PGE.
 
-        The core file name component of the DSWx PGE consists of:
+        The core file name component of the DSWx-HLS PGE consists of:
 
-        <PROJECT>_<LEVEL>_<PGE NAME>-<SOURCE>_<TILE ID>_<ACQ TIMETAG>_
+        <PROJECT>_<LEVEL>_<PGE NAME>_<TILE ID>_<ACQ TIMETAG>_
         <PROD TIMETAG>_<SENSOR>_<SPACING>_<PRODUCT VERSION>
 
         Callers of this function are responsible for assignment of any other
@@ -332,7 +335,6 @@ class DSWxHLSPostProcessorMixin(PostProcessorMixin):
 
         dataset_fields = get_hls_filename_fields(dataset)
 
-        source = dataset_fields['product']
         tile_id = dataset_fields['tile_id']
         acquisition_time = dataset_fields['acquisition_time']
 
@@ -352,7 +354,7 @@ class DSWxHLSPostProcessorMixin(PostProcessorMixin):
 
         # Assign the core file to the cached class attribute
         self._cached_core_filename = (
-            f"{self.PROJECT}_{self.LEVEL}_{self.NAME}-{source}_{tile_id}_"
+            f"{self.PROJECT}_{self.LEVEL}_{self.NAME}_{tile_id}_"
             f"{acquisition_time}_{processing_time}_{sensor}_{pixel_spacing}_"
             f"{product_version}"
         )
@@ -422,7 +424,7 @@ class DSWxHLSPostProcessorMixin(PostProcessorMixin):
 
         return f"{core_filename}_BROWSE{file_extension}"
 
-    def _collect_dswx_product_metadata(self):
+    def _collect_dswx_hls_product_metadata(self):
         """
         Gathers the available metadata from a sample output DSWx-HLS product for
         use in filling out the ISO metadata template for the DSWx-HLS PGE.
@@ -440,8 +442,7 @@ class DSWxHLSPostProcessorMixin(PostProcessorMixin):
         representative_product = None
 
         for output_product in output_products:
-            if (basename(output_product) in self.renamed_files.values() and
-                    basename(output_product).endswith("tif")):
+            if basename(output_product) in self.renamed_files.values() and basename(output_product).endswith("tif"):
                 representative_product = output_product
                 break
         else:
@@ -554,7 +555,7 @@ class DSWxHLSPostProcessorMixin(PostProcessorMixin):
         """
         runconfig_dict = self.runconfig.asdict()
 
-        product_output_dict = self._collect_dswx_product_metadata()
+        product_output_dict = self._collect_dswx_hls_product_metadata()
 
         catalog_metadata_dict = self._create_catalog_metadata().asdict()
 
@@ -609,16 +610,16 @@ class DSWxHLSExecutor(DSWxHLSPreProcessorMixin, DSWxHLSPostProcessorMixin, PgeEx
 
     """
 
-    NAME = "DSWx"
+    NAME = "DSWx-HLS"
     """Short name for the DSWx-HLS PGE"""
 
     LEVEL = "L3"
     """Processing Level for DSWx-HLS Products"""
 
-    PGE_VERSION = "1.0.0-rc.7.0"
+    PGE_VERSION = "1.0.1"
     """Version of the PGE (overrides default from base_pge)"""
 
-    SAS_VERSION = "0.5.2"  # CalVal release 3.3 https://github.com/nasa/PROTEUS/releases/tag/v0.5.2
+    SAS_VERSION = "1.0.1"  # Final release 4.1 https://github.com/nasa/PROTEUS/releases/tag/v1.0.1
     """Version of the SAS wrapped by this PGE, should be updated as needed with new SAS deliveries"""
 
     def __init__(self, pge_name, runconfig_path, **kwargs):

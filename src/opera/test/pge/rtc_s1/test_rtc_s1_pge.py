@@ -11,6 +11,7 @@ Unit tests for the pge/rtc_s1/rtc_s1_pge.py module.
 import glob
 import os
 import re
+import stat
 import tempfile
 import unittest
 from io import StringIO
@@ -59,13 +60,26 @@ class RtcS1PgeTestCase(unittest.TestCase):
         input_dir = join(self.working_dir.name, "rtc_s1_test/input_dir")
         os.makedirs(input_dir, exist_ok=True)
 
+        # Use empty files for testing the existence of required input files
+
         os.system(f"touch {join(input_dir, 'SAFE.zip')}")
 
         os.system(f"touch {join(input_dir, 'ORBIT.EOF')}")
 
         os.system(f"touch {join(input_dir, 'dem.tif')}")
 
+        # 'db.sqlite3' simulates the burst_id database file
         os.system(f"touch {join(input_dir, 'db.sqlite3')}")
+
+        # When the [QAExecutable] is enabled, a python script (specified in [QAExecutable][ProgramPath] is executed.
+        # The empty files below simulate a script with proper permissions, and a script with improper permissions.
+        os.system(f"touch {join(input_dir, 'test_qa_rwx.py')}")  # rwx - read, write, execute
+
+        os.chmod(f"{join(input_dir, 'test_qa_rwx.py')}", stat.S_IRWXU)  # Set to read, write, execute by owner
+
+        os.system(f"touch {join(input_dir, 'test_qa_ro.py')}")  # r0 - read only
+
+        os.chmod(f"{join(input_dir, 'test_qa_ro.py')}", stat.S_IREAD)  # Set to read by owner
 
         os.chdir(self.working_dir.name)
 
@@ -176,7 +190,6 @@ class RtcS1PgeTestCase(unittest.TestCase):
 
         self.assertIn(f"{core_filename}_VV.tif", output_files)
         self.assertIn(f"{core_filename}_VH.tif", output_files)
-
 
     def test_iso_metadata_creation(self):
         """
@@ -403,3 +416,156 @@ class RtcS1PgeTestCase(unittest.TestCase):
         finally:
             if os.path.exists(test_runconfig_path):
                 os.unlink(test_runconfig_path)
+
+    def test_expected_extension(self):
+        """Code coverage only right now"""
+        # TODO when we get .nc and .h5 files this test will need to be modified
+        runconfig_path = join(self.data_dir, 'test_rtc_s1_config.yaml')
+        test_runconfig_path = join(self.data_dir, 'invalid_rtc_s1_config.yaml')
+
+        with open(runconfig_path, 'r', encoding='utf-8') as infile:
+            runconfig_dict = yaml.safe_load(infile)
+
+        product_group = runconfig_dict['RunConfig']['Groups']['SAS']['runconfig']['groups']['product_group']
+        product_group['output_imagery_format'] = "NETCDF"
+
+        with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+            yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+
+        try:
+            pge = RtcS1Executor(pge_name="RtcPgeTest", runconfig_path=test_runconfig_path)
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+            self.assertIn(" extension error: expected one of ['nc']", log_contents)
+
+            # Do the same thing again except with hdf5
+            runconfig_path = join(self.data_dir, 'test_rtc_s1_config.yaml')
+            test_runconfig_path = join(self.data_dir, 'invalid_rtc_s1_config.yaml')
+
+            with open(runconfig_path, 'r', encoding='utf-8') as infile:
+                runconfig_dict = yaml.safe_load(infile)
+
+            product_group = runconfig_dict['RunConfig']['Groups']['SAS']['runconfig']['groups']['product_group']
+            product_group['output_imagery_format'] = "HDF5"
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+                yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+
+            pge = RtcS1Executor(pge_name="RtcPgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+            self.assertIn(" extension error: expected one of ['h5']", log_contents)
+
+        finally:
+            if os.path.exists(test_runconfig_path):
+                os.unlink(test_runconfig_path)
+
+    def test_no_burst_id(self):
+        """Test _iso_metadata_filename with bad burst_id"""
+        runconfig_path = join(self.data_dir, 'test_rtc_s1_config.yaml')
+        pge = RtcS1Executor(pge_name="RtcPgeTest", runconfig_path=runconfig_path)
+        pge.run()
+
+        with self.assertRaises(RuntimeError):
+            pge._iso_metadata_filename("bad_burst")
+
+    def test_bad_iso_metadata_template(self):
+        """Verify code when the QA application is enabled"""
+        runconfig_path = join(self.data_dir, 'test_rtc_s1_config.yaml')
+        test_runconfig_path = join(self.data_dir, 'invalid_rtc_s1_config.yaml')
+
+        with open(runconfig_path, 'r', encoding='utf-8') as infile:
+            runconfig_dict = yaml.safe_load(infile)
+
+        primary_executable = runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']
+        primary_executable['IsoTemplatePath'] = 'pge/rtc_s1/templates/OPERA_ISO_metadata_L2_RTC_S1_template.xml'
+
+        with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+            yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+
+        try:
+            pge = RtcS1Executor(pge_name="RtcPgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+            self.assertIn("Could not load ISO template", log_contents)
+
+        finally:
+            if os.path.exists(test_runconfig_path):
+                os.unlink(test_runconfig_path)
+
+    def test_qa_enabled(self):
+        """Test the staging of the qa.log files."""
+        # Verify code when the QA application is enabled
+        runconfig_path = join(self.data_dir, 'test_rtc_s1_config.yaml')
+        test_runconfig_path = join(self.data_dir, 'invalid_rtc_s1_config.yaml')
+
+        with open(runconfig_path, 'r', encoding='utf-8') as infile:
+            runconfig_dict = yaml.safe_load(infile)
+
+        qa_executable = runconfig_dict['RunConfig']['Groups']['PGE']['QAExecutable']
+        qa_executable['Enabled'] = True
+
+        qa_executable['ProgramPath'] = 'rtc_s1_test/input_dir/test_qa_rwx.py'
+
+        with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+            yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+
+        try:
+            pge = RtcS1Executor(pge_name="RtcS1PgeTest", runconfig_path=test_runconfig_path)
+
+            pge.run()
+
+            # Verify error conditions
+            runconfig_path = join(self.data_dir, 'test_rtc_s1_config.yaml')
+            test_runconfig_path = join(self.data_dir, 'invalid_rtc_s1_config.yaml')
+
+            with open(runconfig_path, 'r', encoding='utf-8') as infile:
+                runconfig_dict = yaml.safe_load(infile)
+
+            qa_executable = runconfig_dict['RunConfig']['Groups']['PGE']['QAExecutable']
+            qa_executable['Enabled'] = True
+
+            qa_executable['ProgramPath'] = 'rtc_s1_test/input_dir/test_qa_ro.py'
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+                yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+
+            pge = RtcS1Executor(pge_name="RtcS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+            self.assertIn("Requested QA program path rtc_s1_test/input_dir/test_qa_ro.py exists, but "
+                          "does not have execute permissions.", log_contents)
+        finally:
+            if os.path.exists(test_runconfig_path):
+                os.unlink(test_runconfig_path)
+
+
+if __name__ == "__main__":
+    unittest.main()

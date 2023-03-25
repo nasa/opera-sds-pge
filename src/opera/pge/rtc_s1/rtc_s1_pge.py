@@ -400,7 +400,7 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
             The file name to assign to the ISO Metadata product created by this PGE.
 
         """
-        if not burst_id in self._burst_filename_cache:
+        if burst_id not in self._burst_filename_cache:
             raise RuntimeError(f"No file name cached for burst ID {burst_id}")
 
         iso_metadata_filename = self._burst_filename_cache[burst_id]
@@ -465,8 +465,10 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
         output_product_metadata = get_rtc_s1_product_metadata(metadata_product)
 
         # Fill in some additional fields expected within the ISO
-        output_product_metadata['frequencyA']['frequencyAWidth'] = len(output_product_metadata['frequencyA']['xCoordinates'])
-        output_product_metadata['frequencyA']['frequencyALength'] = len(output_product_metadata['frequencyA']['yCoordinates'])
+        output_product_metadata['frequencyA']['frequencyAWidth'] = len(output_product_metadata['frequencyA']
+                                                                       ['xCoordinates'])
+        output_product_metadata['frequencyA']['frequencyALength'] = len(output_product_metadata['frequencyA']
+                                                                        ['yCoordinates'])
 
         # TODO: the following fields seems to be missing in the interface delivery products,
         #       but are documented, remove these kludges once they are actually available
@@ -678,7 +680,10 @@ class RtcS1Executor(RtcS1PreProcessorMixin, RtcS1PostProcessorMixin, PgeExecutor
     LEVEL = "L2"
     """Processing Level for RTC-S1 Products"""
 
-    SAS_VERSION = "0.2"  # Beta release https://github.com/opera-adt/RTC/releases/tag/v0.2
+    PGE_VERSION = "2.0.0-er.5.1"
+    """Version of the PGE (overrides default from base_pge)"""
+
+    SAS_VERSION = "0.2.1"  # Beta release https://github.com/opera-adt/RTC/releases/tag/v0.2.1
     """Version of the SAS wrapped by this PGE, should be updated as needed"""
 
     SOURCE = "S1"

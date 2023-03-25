@@ -28,9 +28,9 @@ SAMPLE_TIME=15
 # RUNCONFIG should be the name of the runconfig in s3://operasds-dev-pge/dswx_hls/
 [ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath "$(dirname "$(realpath "$0")")"/../..)
 [ -z "${PGE_TAG}" ] && PGE_TAG="${USER}-dev"
-[ -z "${INPUT_DATA}" ] && INPUT_DATA="dswx_hls_cal_val_3.3_expected_input.zip"
-[ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="dswx_hls_cal_val_3.3_expected_output.zip"
-[ -z "${RUNCONFIG}" ] && RUNCONFIG="opera_pge_dswx_hls_delivery_3.3_cal_val_runconfig.yaml"
+[ -z "${INPUT_DATA}" ] && INPUT_DATA="dswx_hls_final_4.1_expected_input.zip"
+[ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="dswx_hls_final_4.1_expected_output.zip"
+[ -z "${RUNCONFIG}" ] && RUNCONFIG="opera_pge_dswx_hls_delivery_4.1_final_runconfig.yaml"
 [ -z "${TMP_ROOT}" ] && TMP_ROOT="$DEFAULT_TMP_ROOT"
 
 # Create the test output directory in the work space
@@ -104,7 +104,7 @@ do
     docker_exit_status=$?
 
     # End metrics collection
-    metrics_collection_end "$PGE_NAME" "$docker_exit_status" "$TEST_RESULTS_DIR"
+    metrics_collection_end "$PGE_NAME" "$container_name" "$docker_exit_status" "$TEST_RESULTS_DIR"
 
     if [ $docker_exit_status -ne 0 ]; then
         echo "docker exit indicates failure: ${docker_exit_status}"
@@ -156,7 +156,7 @@ do
                                      -v "${output_dir}":/out:ro \
                                      -v "${expected_data_dir}":/exp:ro \
                                      --entrypoint python3 ${PGE_IMAGE}:"${PGE_TAG}" \
-                                     proteus-0.5.2/bin/dswx_compare.py \
+                                     proteus-1.0.1/bin/dswx_compare.py \
                                      /out/"${output_file}" /exp/"${expected_file}")
                     echo "$docker_out"
 
