@@ -140,24 +140,17 @@ metrics_collection_start()
 
     # Initialize output files and statistics format
     metrics_stats="${results_dir}/${pge}_metrics_stats.csv"
-    metrics_misc="${results_dir}/${pge}_metrics_misc.csv"
     stats_pid_file="${results_dir}/${pge}_metrics_stats_bg_pid.txt"
-    misc_pid_file="${results_dir}/${pge}_metrics_misc_bg_pid.txt"
 
-    column_titles="{{.Name}},CPU,{{.CPUPerc}},MEM,{{.MemUsage}},MEM_PERC,{{.MemPerc}},NET,{{.NetIO}},BLOCK,{{.BlockIO}},PIDS,{{.PIDs}}"
 
     # initialize start seconds and the rest of the csv file's column titles
     METRICS_START_SECONDS=$SECONDS
-    echo "SECONDS,$column_titles" > "$metrics_stats"
 
-    ds="docker stats --no-stream --format ${column_titles} ${container_name}";
+    docker_stats_columns="{{.Name}},CPU,{{.CPUPerc}},MEM,{{.MemUsage}},MEM_PERC,{{.MemPerc}},NET,{{.NetIO}},BLOCK,{{.BlockIO}},PIDS,{{.PIDs}}"
+    ds="docker stats --no-stream --format ${docker_stats_columns} ${container_name}";
 
-    # start the background processes to collect docker stats
-    { while true; do sleep "$sample_time"; \
-      echo "$(metrics_seconds)","`$ds`" >> "${metrics_stats}"; done } & \
-    echo "$!" > "$stats_pid_file"
-
-    # Miscellaneous Statistics
+    # Output the column titles
+    echo "SECONDS,${docker_stats_columns},disk_used,swap_used,total_threads,last_line" > "$metrics_stats"
 
     # test for operating system
     if [[ $OSTYPE == "darwin"* ]]; then
@@ -167,9 +160,6 @@ metrics_collection_start()
         echo "Linux Operating system: $OSTYPE"
         os="linux"
     fi
-
-    # Output the column titles
-    echo "SECONDS, disk_used, swap_used, total_threads, last_line" > "$metrics_misc"
 
     # Use 'df' command to capture the amount of space on the filesystem (-B sets block size (1K)
     # the line represent Filesystem  1K-blocks  Used Blocks Available Blocks %Used Mounted_On
@@ -196,8 +186,8 @@ metrics_collection_start()
     ths="eval $sys_threads_cmd"
 
     { while true; do sleep "$sample_time"; \
-      echo "$(metrics_seconds)", "`$dus`", "`$swu`", "`$ths`" >> "${metrics_misc}"; done } & \
-    echo "$!" >> "${misc_pid_file}"
+      echo "$(metrics_seconds)", "`$ds`", "`$dus`", "`$swu`", "`$ths`" >> "${metrics_stats}"; done } & \
+    echo "$!" >> "${stats_pid_file}"
 }
 
 # End the metrics collection of both docker stats and the miscellaneous os statistics.
@@ -214,28 +204,21 @@ metrics_collection_end()
     local results_dir=$4
 
     local metrics_stats="${results_dir}/${pge}_metrics_stats.csv"
-    local metrics_misc="${results_dir}/${pge}_metrics_misc.csv"
     local stats_pid_file="${results_dir}/${pge}_metrics_stats_bg_pid.txt"
-    local misc_pid_file="${results_dir}/${pge}_metrics_misc_bg_pid.txt"
 
     # kill the background tasks (the pid number is stored in the file below)
     kill "$(cat "${stats_pid_file}")"
     wait "$(cat "${stats_pid_file}")" 2> /dev/null || true
     rm "${stats_pid_file}"
 
-    kill "$(cat "${misc_pid_file}")"
-    wait "$(cat "${misc_pid_file}")" 2> /dev/null || true
-    rm "${misc_pid_file}"
-
     if [[ $exit_code == 0 ]]
     then
-        python3 "$SCRIPT_DIR"/process_metric_data.py "$pge" "$container" "$metrics_stats" "$metrics_misc" "$results_dir"
+        python3 "$SCRIPT_DIR"/process_metric_data.py "$pge" "$container" "$metrics_stats" "$results_dir"
         process_metrics_exit_code=$?
 
         if [[ $process_metrics_exit_code == 0 ]]
         then
             rm "$metrics_stats"
-            rm "$metrics_misc"
         fi
 
         echo "metrics_collection has completed."

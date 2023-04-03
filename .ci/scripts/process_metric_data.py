@@ -124,40 +124,6 @@ def get_disk_read_write(block_str):
     return r, w
 
 
-def format_out_row_misc(misc_row):
-    """
-    Return a formatted, comma separated row of docker miscellaneous data.
-
-    Parameters
-    ----------
-    misc_row : dictionary
-        row from the data collection of miscellaneous stats
-
-    Returns
-    -------
-    formatted, comma separated string
-
-    """
-    secs = misc_row['SECONDS']
-    disk = get_disk_gb(misc_row[' disk_used'])
-    if sys.platform == 'darwin':
-        swap = 'N/A'
-    else:
-        swap = misc_row[' swap_used'].split()[2]
-    threads = misc_row[' total_threads'].strip()
-    # Todo fix this code so we get the last line stuff: right now it's blank
-    # only update last line if it has changed
-    global prior_log_line
-    if prior_log_line is not None and misc_row[' last_line'] == prior_log_line:
-        last_line = "N/A"
-    else:
-        last_line = misc_row[' last_line']
-        prior_log_line = last_line
-        # Temp until this is fixed
-        last_line = 'N/A'
-    return f"{secs},{disk},{swap},{threads},{last_line}"
-
-
 def format_out_row_docker(stats_row):
     """
     Return a formatted, comma separated row of docker stats data.
@@ -179,7 +145,25 @@ def format_out_row_docker(stats_row):
     mem_p = stats_row['{{.MemPerc}}'].replace("%", "")
     net_s, net_r = get_net_send_recv(stats_row['{{.NetIO}}'])
     disk_r, disk_w = get_disk_read_write(stats_row['{{.BlockIO}}'])
-    return f"{secs},{name},{pids},{cpu},{mem},{mem_p},{net_s},{net_r},{disk_r},{disk_w}"
+
+    disk = get_disk_gb(stats_row['disk_used'])
+    if sys.platform == 'darwin':
+        swap = 'N/A'
+    else:
+        swap = stats_row['swap_used'].split()[2]
+    threads = stats_row['total_threads'].strip()
+    # Todo fix this code so we get the last line stuff: right now it's blank
+    # only update last line if it has changed
+    global prior_log_line
+    if prior_log_line is not None and stats_row['last_line'] == prior_log_line:
+        last_line = "N/A"
+    else:
+        last_line = stats_row['last_line']
+        prior_log_line = last_line
+        # Temp until this is fixed
+        last_line = 'N/A'
+
+    return f"{secs},{name},{pids},{cpu},{mem},{mem_p},{net_s},{net_r},{disk_r},{disk_w},{disk},{swap},{threads},{last_line}"
 
 
 def make_lists(csv_file):
@@ -205,29 +189,24 @@ def main():
     container_info = sys.argv[1]
     container_name = sys.argv[2]
     stats_file = sys.argv[3]
-    misc_file = sys.argv[4]
-    output_dir = sys.argv[5]
+    output_dir = sys.argv[4]
 
     temp_stats = "temp_opera_docker_stats.csv"
-    temp_misc = "temp_opera_misc_stats.csv"
 
     # Remove lines that may have been recorded before Docker stated.
     remove_unwanted_lines(stats_file, temp_stats)
-    remove_unwanted_lines(misc_file, temp_misc)
 
     current_time = datetime.datetime.today().strftime('%Y%m%d_%H%M%S')
 
     # For now make two formatted files
     docker_report_file = f"{output_dir}/docker_metrics_{container_info}_{container_name}_{current_time}.csv"
-    misc_report_file = f"{output_dir}/misc_metrics_{container_info}_{container_name}_{current_time}.csv"
 
     # read files into lists
     stats_list = make_lists(temp_stats)
-    misc_list = make_lists(temp_misc)
 
     if stats_list:
         # Write out the docker stats file
-        docker_columns = "Seconds, Name, PIDs, CPU, Memory, MemoryP, NetSend, NetRecv, DiskRead, DiskWrite"
+        docker_columns = "Seconds, Name, PIDs, CPU, Memory, MemoryP, NetSend, NetRecv, DiskRead, DiskWrite, Disk, Swap, Threads, LastLogLine"
         with open(docker_report_file, 'w') as out_file:
             out_file.write(f"{docker_columns}\n")
             for stats_row in stats_list:
@@ -236,21 +215,8 @@ def main():
     else:
         print("ERROR: No docker statistics were collected.")
 
-    if misc_list:
-        # Write out the miscellaneous file
-        misc_columns = "Seconds, Disk, Swap, Threads, LastLogLine"
-        with open(misc_report_file, 'w') as out_file:
-            out_file.write(f"{misc_columns}\n")
-            for stats_row in misc_list:
-                row = format_out_row_misc(stats_row)
-                out_file.write(f"{row}\n")
-    else:
-        print("ERROR: No miscellaneous statistics were collected.")
-
     # Remove temporary files
     os.remove(temp_stats)
-    os.remove(temp_misc)
-
 
 if __name__ == "__main__":
     main()
