@@ -9,7 +9,7 @@ Module defining the implementation for the Co-registered Single Look Complex (CS
 from Sentinel-1 A/B (S1) PGE.
 
 """
-
+import glob
 import os.path
 import re
 from datetime import datetime
@@ -84,7 +84,6 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
         (size is greater than 0).
         """
         out_dir_walk_dict = {}
-        expected_ext = []
 
         output_dir = os.path.abspath(self.runconfig.output_product_path)
         scratch_dir = os.path.abspath(self.runconfig.scratch_path)
@@ -102,10 +101,7 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
 
             self.logger.critical(self.name, ErrorCode.OUTPUT_NOT_FOUND, error_msg)
 
-        output_format = self.runconfig.sas_config['runconfig']['groups']['processing']['geocoding']['output_format']
-
-        if output_format in ('GTiff', 'COG', 'ENVI'):
-            expected_ext = ['tiff', 'tif', 'h5']
+        expected_ext = ['tiff', 'tif', 'h5', 'png']
 
         # Verify: files in subdirectories, file length, and proper extension.
         for dir_name_key, file_names in out_dir_walk_dict.items():
@@ -203,14 +199,23 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
         # The burst ID should be included within the file path for each
         # output directory, extract it and prepare it for use within the
         # final filename
-        burst_id = Path(os.path.dirname(inter_filename)).parts[-2]
-        burst_id = burst_id.upper().replace('_', '-')
+        burst_id_dir = Path(os.path.dirname(inter_filename)).parts[-2]
+        burst_id = burst_id_dir.upper().replace('_', '-')
 
         if burst_id in self._burst_metadata_cache:
             cslc_metadata = self._burst_metadata_cache[burst_id]
         else:
             # Collect the metadata from the HDF5 output product
-            cslc_metadata = self._collect_cslc_product_metadata(inter_filename)
+            cslc_h5_product_pattern = join(os.path.dirname(inter_filename), f"{burst_id_dir}*.h5")
+
+            # Find the main .h5 product path based on location of the current file
+            # and burst ID
+            cslc_h5_product_paths = glob.glob(cslc_h5_product_pattern)
+
+            if len(cslc_h5_product_paths) != 1:
+                raise RuntimeError(f'Got unexpected number of CSLC .h5 paths: {cslc_h5_product_paths}')
+
+            cslc_metadata = self._collect_cslc_product_metadata(cslc_h5_product_paths[0])
 
             self._burst_metadata_cache[burst_id] = cslc_metadata
 
@@ -267,6 +272,65 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
         cslc_filename = self._cslc_filename(inter_filename)
 
         return f"{cslc_filename}.h5"
+
+    def _static_layers_filename(self, inter_filename):
+        """
+        Returns the file name to use for the static layers product produced by
+        the CSLC-S1 PGE.
+
+        The HDF5 filename for the CSLC-S1 PGE consists of:
+
+            <CSLC filename>_static_layers.h5
+
+        Where <CSLC filename> is returned by CslcS1PostProcessorMixin._cslc_filename()
+
+        Parameters
+        ----------
+        inter_filename : str
+            The intermediate filename of the output HDF5 product containing all
+            the output static layers. This parameter is used to derive the
+            core CSLC file name component, to which "_static_layers" will be
+            appended to denote the file type.
+
+        Returns
+        -------
+        static_layers_filename : str
+            The file name to assign to static layers product(s) created by this PGE.
+
+        """
+        cslc_filename = self._cslc_filename(inter_filename)
+
+        static_layers_filename = f"{cslc_filename}_static_layers.h5"
+
+        return static_layers_filename
+
+    def _browse_filename(self, inter_filename):
+        """
+        Returns the file name to use for the PNG browse image produced by
+        the CSLC-S1 PGE.
+
+        The browse image filename for the CSLC-S1 PGE consists of:
+
+            <CSLC filename>_BROWSE.png
+
+        Where <CSLC filename> is returned by CslcS1PostProcessorMixin._cslc_filename()
+
+        Parameters
+        ----------
+        inter_filename : str
+            The intermediate filename of the output browse image to generate a
+            filename for. This parameter may be used to inspect the file in order
+            to derive any necessary components of the returned filename.
+
+        Returns
+        -------
+        browse_image_filename : str
+            The file name to assign to browse image created by this PGE.
+
+        """
+        cslc_filename = self._cslc_filename(inter_filename)
+
+        return f"{cslc_filename}_BROWSE.png"
 
     def _geotiff_filename(self, inter_filename):
         """
@@ -485,9 +549,9 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
         output_product_metadata['grids']['width'] = len(output_product_metadata['grids']['x_coordinates'])
         output_product_metadata['grids']['length'] = len(output_product_metadata['grids']['y_coordinates'])
 
-        # Remove some of the larger arrays from the metadata so we don't use
+        # Remove some of the larger arrays from the metadata, so we don't use
         # too much memory when caching the metadata for each burst
-        for key in ['VV', 'VH', 'x_coordinates', 'y_coordinates']:
+        for key in ['VV', 'VH', 'HH', 'HV', 'x_coordinates', 'y_coordinates']:
             array = output_product_metadata['grids'].pop(key, None)
 
             if array is not None:
@@ -716,7 +780,9 @@ class CslcS1Executor(CslcS1PreProcessorMixin, CslcS1PostProcessorMixin, PgeExecu
         super().__init__(pge_name, runconfig_path, **kwargs)
 
         self.rename_by_pattern_map = {
-            '*.h5': self._h5_filename,
+            't*.h5': self._h5_filename,
+            'static_layers*.h5': self._static_layers_filename,
+            '*.png': self._browse_filename,
             '*.slc': self._geotiff_filename,
             '*.tif*': self._geotiff_filename,
             '*.json': self._json_metadata_filename
