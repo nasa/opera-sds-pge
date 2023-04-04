@@ -706,7 +706,10 @@ class CslcS1Executor(CslcS1PreProcessorMixin, CslcS1PostProcessorMixin, PgeExecu
     LEVEL = "L2"
     """Processing Level for CSLC-S1 Products"""
 
-    SAS_VERSION = "0.1.3"  # Beta release https://github.com/opera-adt/COMPASS/releases/tag/v0.1.3
+    PGE_VERSION = "2.0.0-rc.1.0"
+    """Version of the PGE (overrides default from base_pge)"""
+
+    SAS_VERSION = "0.1.4"  # Gamma release https://github.com/opera-adt/COMPASS/releases/tag/v0.1.4
     """Version of the SAS wrapped by this PGE, should be updated as needed"""
 
     def __init__(self, pge_name, runconfig_path, **kwargs):
