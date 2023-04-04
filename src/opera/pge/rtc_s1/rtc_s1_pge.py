@@ -21,6 +21,7 @@ from opera.pge.base.base_pge import PreProcessorMixin
 from opera.util.error_codes import ErrorCode
 from opera.util.input_validation import validate_slc_s1_inputs
 from opera.util.metadata_utils import get_rtc_s1_product_metadata
+from opera.util.metadata_utils import get_sensor_from_spacecraft_name
 from opera.util.render_jinja2 import render_jinja2
 from opera.util.time import get_time_for_filename
 
@@ -94,7 +95,8 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
             if not dirs and scratch_dir not in path:  # Ignore files in 'output_dir' and scratch directory
                 out_dir_walk_dict[basename(path)] = files
 
-        output_format = self.runconfig.sas_config['runconfig']['groups']['product_group']['output_imagery_format']
+        sas_product_group = self.runconfig.sas_config['runconfig']['groups']['product_group']
+        output_format = sas_product_group['output_imagery_format']
 
         if output_format == 'NETCDF':
             expected_ext = ['nc']
@@ -102,6 +104,11 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
             expected_ext = ['h5']
         elif output_format in ('GTiff', 'COG', 'ENVI'):
             expected_ext = ['tiff', 'tif', 'h5']
+
+        save_browse = sas_product_group['save_browse']
+
+        if save_browse:
+            expected_ext.append('png')
 
         # Verify: files in subdirectories, file length, and proper extension.
         for dir_name_key, file_names in out_dir_walk_dict.items():
@@ -221,12 +228,16 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
         # Use doppler start time as the acq time and convert it to our format
         # used for file naming
         acquisition_time = product_metadata['identification']['zeroDopplerStartTime']
+
+        if not acquisition_time.endswith('Z'):
+            acquisition_time += 'Z'
+
         acquisition_time = get_time_for_filename(
-            datetime.strptime(acquisition_time, "%Y-%m-%dT%H:%M:%S.%f")
+            datetime.strptime(acquisition_time, "%Y-%m-%dT%H:%M:%S.%fZ")
         )
 
         # Get the sensor (should be either S1A or S1B)
-        sensor = product_metadata['identification']['missionId']
+        sensor = get_sensor_from_spacecraft_name(product_metadata['identification']['platform'])
 
         # Spacing is assumed to be identical in both X and Y direction
         spacing = int(product_metadata['frequencyA']['xCoordinateSpacing'])
@@ -248,6 +259,54 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
         self._burst_filename_cache[burst_id] = rtc_filename
 
         return rtc_filename
+
+    def _static_layer_filename(self, inter_filename):
+        """
+        Returns the final file name for the static layer RTC product which
+        may be optionally produced by this PGE. There are currently 5 static layer
+        products which may be produced by this PGE, each identified by a
+        static layer name appended to the end of the intermediate filename.
+
+        The filename for static layer RTC products consists of:
+
+            <RTC filename>_<Static layer name>.tif
+
+        Where <RTC filename> is returned by RtcS1PostProcessorMixin._rtc_filename(),
+        and <Static layer name> is the identifier for the specific static layer
+        as parsed from the intermediate filename.
+
+        Parameters
+        ----------
+        inter_filename : str
+            The intermediate filename of the static layer output product to generate
+            a filename for. This parameter may is used to derive the core RTC
+            file name component, to which the particular static layer name (nlooks,
+            shadow_mask, etc...) is appended to denote the type.
+
+        Returns
+        -------
+        static_layer_filename : str
+            The file name to assign to static layer GeoTIFF product(s) created
+            by this PGE.
+
+        """
+        filename, ext = os.path.splitext(basename(inter_filename))
+
+        # The name of the static layer should always follow the product version
+        # within the intermediate filename
+        sas_product_group = self.runconfig.sas_config['runconfig']['groups']['product_group']
+        product_version = str(sas_product_group['product_version'])
+
+        if not product_version.startswith('v'):
+            product_version = f"v{product_version}"
+
+        static_layer_name = filename.split(product_version)[-1]
+
+        rtc_filename = self._rtc_filename(inter_filename)
+
+        static_layer_filename = f"{rtc_filename}{static_layer_name}.tif"
+
+        return static_layer_filename
 
     def _rtc_geotiff_filename(self, inter_filename):
         """
@@ -284,6 +343,36 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
         rtc_filename = self._rtc_filename(inter_filename)
 
         return f"{rtc_filename}_{polarization}.tif"
+
+    def _browse_filename(self, inter_filename):
+        """
+        Returns the final file name of the PNG browse image product which may
+        be optionally produced by this PGE.
+
+        The filename for RTC metadata products consists of:
+
+            <RTC filename>_BROWSE.png
+
+        Where <RTC filename> is returned by RtcS1PostProcessorMixin._rtc_filename().
+
+        Parameters
+        ----------
+        inter_filename : str
+            The intermediate filename of the output product to generate
+            a filename for. This parameter may be used to inspect the file
+            in order to derive any necessary components of the returned filename.
+
+        Returns
+        -------
+        browse_filename : str
+            The file name to assign to browse product created by this PGE.
+
+        """
+        rtc_filename = self._rtc_filename(inter_filename)
+
+        browse_filename = f"{rtc_filename}_BROWSE.png"
+
+        return browse_filename
 
     def _rtc_metadata_filename(self, inter_filename):
         """
@@ -342,7 +431,7 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
         product_metadata = list(self._burst_metadata_cache.values())[0]
 
         # Get the sensor (should be either S1A or S1B)
-        sensor = product_metadata['identification']['missionId']
+        sensor = get_sensor_from_spacecraft_name(product_metadata['identification']['platform'])
 
         # Spacing is assumed to be identical in both X and Y direction
         spacing = int(product_metadata['frequencyA']['xCoordinateSpacing'])
@@ -692,7 +781,14 @@ class RtcS1Executor(RtcS1PreProcessorMixin, RtcS1PostProcessorMixin, PgeExecutor
         super().__init__(pge_name, runconfig_path, **kwargs)
 
         self.rename_by_pattern_map = {
-            "*.tif": self._rtc_geotiff_filename,
+            "*_VV.tif": self._rtc_geotiff_filename,
+            "*_VH.tif": self._rtc_geotiff_filename,
+            "*_rtc_anf.tif": self._static_layer_filename,
+            "*_nlooks.tif": self._static_layer_filename,
+            "*_local_incidence_angle.tif": self._static_layer_filename,
+            "*_layover_shadow_mask.tif": self._static_layer_filename,
+            "*_incidence_angle.tif": self._static_layer_filename,
+            "*.png": self._browse_filename,
             "*.h5": self._rtc_metadata_filename,
             "*.nc": self._rtc_metadata_filename
         }

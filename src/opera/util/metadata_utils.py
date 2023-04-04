@@ -84,8 +84,8 @@ except (ImportError, ModuleNotFoundError):  # pragma: no cover
 
 def get_sensor_from_spacecraft_name(spacecraft_name):
     """
-    Returns the HLS sensor short name from the full spacecraft name.
-    The short name is used with output file naming conventions for DSWx-HLS
+    Returns the sensor short name from the full spacecraft name.
+    The short name is used with output file naming conventions for PGE
     products
 
     Parameters
@@ -108,6 +108,8 @@ def get_sensor_from_spacecraft_name(spacecraft_name):
         return {
             'LANDSAT-8': 'L8',
             'LANDSAT-9': 'L9',
+            'SENTINEL-1A': 'S1A',
+            'SENTINEL-1B': 'S1B',
             'SENTINEL-2A': 'S2A',
             'SENTINEL-2B': 'S2B'
         }[spacecraft_name.upper()]
