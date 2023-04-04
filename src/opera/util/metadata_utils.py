@@ -322,14 +322,9 @@ def create_test_rtc_metadata_product(file_path):
         projection_dset = frequencyA_grp.create_dataset("projection", data=b'1234')
         listOfPolarizations_dset = frequencyA_grp.create_dataset("listOfPolarizations", data=np.array([b'VV', b'VH']))
         rangeBandwidth_dset = frequencyA_grp.create_dataset('rangeBandwidth', data=56500000.0, dtype='float64')
-        azimuthBandwidth_dset = frequencyA_grp.create_dataset('azimuthBandwidth', data=56500000.0, dtype='float64')
         slantRangeSpacing_dset = frequencyA_grp.create_dataset('slantRangeSpacing', data=2.32956, dtype='float64')
         zeroDopplerTimeSpacing_dset = frequencyA_grp.create_dataset('zeroDopplerTimeSpacing',
                                                                     data=0.002055, dtype='float64')
-        faradayRotationFlag_dset = frequencyA_grp.create_dataset('faradayRotationFlag', data=True, dtype='bool')
-        noiseCorrectionFlag_dset = frequencyA_grp.create_dataset('noiseCorrectionFlag', data=True, dtype='bool')
-        polarizationOrientationFlag_dset = frequencyA_grp.create_dataset('polarizationOrientationFlag',
-                                                                         data=True, dtype='bool')
         radiometricTerrainCorrectionFlag_dset = frequencyA_grp.create_dataset('radiometricTerrainCorrectionFlag',
                                                                               data=True, dtype='bool')
 
@@ -341,12 +336,12 @@ def create_test_rtc_metadata_product(file_path):
         processingInformation_inputs_grp = outfile.create_group(f"{S1_SLC_HDF5_PREFIX}"
                                                                 f"/RTC/metadata/processingInformation/inputs")
         demSource_dset = processingInformation_inputs_grp.create_dataset("demSource", data=b'dem.tif')
-        auxcalFiles = np.array([b'calibration-s1b-iw1-slc-vv-20180504t104508-20180504t104533-010770-013aee-004.xml',
-                                b'noise-s1b-iw1-slc-vv-20180504t104508-20180504t104533-010770-013aee-004.xml'])
-        auxcalFiles_dset = processingInformation_inputs_grp.create_dataset("auxcalFiles", data=auxcalFiles)
+        annotationFiles = np.array([b'calibration-s1b-iw1-slc-vv-20180504t104508-20180504t104533-010770-013aee-004.xml',
+                                    b'noise-s1b-iw1-slc-vv-20180504t104508-20180504t104533-010770-013aee-004.xml'])
+        annotationFiles_dset = processingInformation_inputs_grp.create_dataset("annotationFiles", data=annotationFiles)
         configFiles_dset = processingInformation_inputs_grp.create_dataset("configFiles", data=b'rtc_s1.yaml')
         l1SlcGranules = np.array([b'S1B_IW_SLC__1SDV_20180504T104507_20180504T104535_010770_013AEE_919F.zip'])
-        l1SlcGranules_dset = processingInformation_inputs_grp.create_dataset("l1SlcGranules", data=l1SlcGranules)
+        l1SlcGranules_dset = processingInformation_inputs_grp.create_dataset("l1SLCGranules", data=l1SlcGranules)
         orbitFiles = np.array([b'S1B_OPER_AUX_POEORB_OPOD_20180524T110543_V20180503T225942_20180505T005942.EOF'])
         orbitFiles_dset = processingInformation_inputs_grp.create_dataset("orbitFiles", data=orbitFiles)
 
@@ -357,12 +352,13 @@ def create_test_rtc_metadata_product(file_path):
         geocoding_dset = processingInformation_algorithms_grp.create_dataset("geocoding", data=b'area_projection')
         radiometricTerrainCorrection_dset = processingInformation_algorithms_grp.create_dataset(
             "radiometricTerrainCorrection", data=b'area_projection')
-        rtcVersion_dset = processingInformation_algorithms_grp.create_dataset("RTCVersion", data=b'0.2')
         isceVersion_dset = processingInformation_algorithms_grp.create_dataset("ISCEVersion", data=b'0.8.0-dev')
         s1ReaderVersion_dset = processingInformation_algorithms_grp.create_dataset("S1ReaderVersion", data=b'1.2.3')
 
         identification_grp = outfile.create_group(f"{S1_SLC_HDF5_PREFIX}/identification")
         absoluteOrbitNumber_dset = identification_grp.create_dataset("absoluteOrbitNumber", data=10770, dtype='int64')
+        acquisitionMode_dset = identification_grp.create_dataset("acquisitionMode", data=np.string_('Interferometric Wide (IW)'))
+        beamID_dset = identification_grp.create_dataset("beamID", data=np.string_('iw1'))
         boundingPolygon_dset = identification_grp.create_dataset(
             "boundingPolygon", data=b'POLYGON ((399015 3859970, 398975 3860000, ..., 399015 3859970))')
         burstID_dset = identification_grp.create_dataset("burstID", data=b't069_147170_iw1')
@@ -372,12 +368,9 @@ def create_test_rtc_metadata_product(file_path):
                                                                      data=np.array([False, True]), dtype='bool')
         lookDirection_dset = identification_grp.create_dataset("lookDirection", data=b'Right')
         listOfFrequencies_dset = identification_grp.create_dataset("listOfFrequencies", data=np.array([b'A']))
-        missionId_dest = identification_grp.create_dataset("missionId", data=b'S1B')
         orbitPassDirection_dset = identification_grp.create_dataset("orbitPassDirection", data=b'Descending')
-        plannedDatatakeId_dset = identification_grp.create_dataset("plannedDatatakeId",
-                                                                   data=np.array([b'datatake1', b'datatake2']))
-        plannedObservationId_dset = identification_grp.create_dataset("plannedObservationId",
-                                                                      data=np.array([b'obs1', b'obs2']))
+        platform_dset = identification_grp.create_dataset("platform", data=b'Sentinel-1B')
+        processingDateTime_dset = identification_grp.create_dataset("processingDateTime", data=np.string_('2023-03-23T20:32:18.962836Z'))
         processingType_dset = identification_grp.create_dataset("processingType", data=b'UNDEFINED')
         productType_dset = identification_grp.create_dataset("productType", data=b'SLC')
         productVersion_dset = identification_grp.create_dataset("productVersion", data=b'1.0')
