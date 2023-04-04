@@ -75,6 +75,10 @@ class CslcS1PgeTestCase(unittest.TestCase):
             f"touch {join(input_dir, 'dem_4326.tiff')}"
         )
 
+        os.system(
+            f"touch {join(input_dir, 'jplg1210.22i')}"
+        )
+
         # 'db.sqlite3' simulates the burst_id database file
         os.system(
             f"touch {join(input_dir, 'db.sqlite3')}"
@@ -171,7 +175,7 @@ class CslcS1PgeTestCase(unittest.TestCase):
 
         # Grab the metadata generated from the PGE run, as it is used to generate
         # the final filename for output products
-        metadata_files = glob.glob(join(pge.runconfig.output_product_path, "*.h5"))
+        metadata_files = glob.glob(join(pge.runconfig.output_product_path, "*Z.h5"))
 
         self.assertEqual(len(metadata_files), 1)
 
@@ -183,7 +187,7 @@ class CslcS1PgeTestCase(unittest.TestCase):
         # Compare the filename returned by the PGE for JSON metadata files
         # to a regex which should match each component of the final filename
         file_name = pge._h5_filename(
-            inter_filename='cslc_pge_test/output_dir/t064_135518_iw1/20220501/t064_135518_iw1_20220501_VV.h5'
+            inter_filename='cslc_pge_test/output_dir/t064_135518_iw1/20220501/t064_135518_iw1_20220501.h5'
         )
 
         file_name_regex = rf"{pge.PROJECT}_{pge.LEVEL}_{pge.NAME}-" \
@@ -191,6 +195,36 @@ class CslcS1PgeTestCase(unittest.TestCase):
                           rf"{cslc_metadata['identification']['burst_id'].upper().replace('_', '-')}_" \
                           rf"{burst_metadata['polarization']}_" \
                           rf"\d{{8}}T\d{{6}}Z_v{pge.runconfig.product_version}_\d{{8}}T\d{{6}}Z.h5"
+
+        result = re.match(file_name_regex, file_name)
+
+        self.assertIsNotNone(result)
+        self.assertEqual(result.group(), file_name)
+
+        file_name = pge._static_layers_filename(
+            inter_filename='cslc_pge_test/output_dir/t064_135518_iw1/20220501/static_layers_t064_135518_iw1.h5'
+        )
+
+        file_name_regex = rf"{pge.PROJECT}_{pge.LEVEL}_{pge.NAME}-" \
+                          rf"{burst_metadata['platform_id']}_IW_" \
+                          rf"{cslc_metadata['identification']['burst_id'].upper().replace('_', '-')}_" \
+                          rf"{burst_metadata['polarization']}_" \
+                          rf"\d{{8}}T\d{{6}}Z_v{pge.runconfig.product_version}_\d{{8}}T\d{{6}}Z_static_layers.h5"
+
+        result = re.match(file_name_regex, file_name)
+
+        self.assertIsNotNone(result)
+        self.assertEqual(result.group(), file_name)
+
+        file_name = pge._browse_filename(
+            inter_filename='cslc_pge_test/output_dir/t064_135518_iw1/20220501/t064_135518_iw1_20220501.png'
+        )
+
+        file_name_regex = rf"{pge.PROJECT}_{pge.LEVEL}_{pge.NAME}-" \
+                          rf"{burst_metadata['platform_id']}_IW_" \
+                          rf"{cslc_metadata['identification']['burst_id'].upper().replace('_', '-')}_" \
+                          rf"{burst_metadata['polarization']}_" \
+                          rf"\d{{8}}T\d{{6}}Z_v{pge.runconfig.product_version}_\d{{8}}T\d{{6}}Z_BROWSE.png"
 
         result = re.match(file_name_regex, file_name)
 
@@ -213,7 +247,7 @@ class CslcS1PgeTestCase(unittest.TestCase):
         # Create a sample metadata file within the output directory of the PGE
         output_dir = join(os.curdir, "cslc_pge_test/output_dir")
 
-        cslc_metadata_path = join(output_dir, 't064_135518_iw1_20220501_VV.h5')
+        cslc_metadata_path = join(output_dir, 't064_135518_iw1_20220501.h5')
 
         create_test_cslc_metadata_product(cslc_metadata_path)
 
@@ -227,6 +261,8 @@ class CslcS1PgeTestCase(unittest.TestCase):
 
         # Rendered template should not have any missing placeholders
         self.assertNotIn('!Not found!', iso_metadata)
+
+        os.unlink(cslc_metadata_path)
 
         # Test bad iso_template_path
         test_runconfig_path = join(self.data_dir, 'invalid_cslc_s1_runconfig.yaml')
