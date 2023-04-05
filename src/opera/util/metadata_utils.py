@@ -406,6 +406,10 @@ def get_cslc_s1_product_metadata(file_name):
         'identification': get_hdf5_group_as_dict(file_name, f"{S1_SLC_HDF5_PREFIX}/identification"),
         'grids': get_hdf5_group_as_dict(file_name, f"{S1_SLC_HDF5_PREFIX}/CSLC/grids"),
         'corrections': get_hdf5_group_as_dict(file_name, f"{S1_SLC_HDF5_PREFIX}/CSLC/corrections"),
+        'calibration_information': get_hdf5_group_as_dict(file_name,
+                                                          f"{S1_SLC_HDF5_PREFIX}/CSLC/metadata/calibration_information"),
+        'noise_information': get_hdf5_group_as_dict(file_name,
+                                                    f"{S1_SLC_HDF5_PREFIX}/CSLC/metadata/noise_information"),
         'processing_information': get_hdf5_group_as_dict(file_name,
                                                          f"{S1_SLC_HDF5_PREFIX}/CSLC/metadata/processing_information"),
         'orbit': get_hdf5_group_as_dict(file_name, f"{S1_SLC_HDF5_PREFIX}/CSLC/metadata/orbit")
@@ -433,11 +437,9 @@ def create_test_cslc_metadata_product(file_path):
         bounding_polygon_dset = identification_grp.create_dataset(
             "bounding_polygon", data=np.string_("POLYGON ((-118.77 33.67, -118.72 33.68, ..., -118.77 33.67))"))
         burst_id_dset = identification_grp.create_dataset("burst_id", data=np.string_("t064_135518_iw1"))
-        diagnostic_mode_flag_dset = identification_grp.create_dataset('diagnostic_mode_flag', data=False, dtype='bool')
         is_geocoded_flag_dset = identification_grp.create_dataset("is_geocoded", data=True, dtype='bool')
         is_urgent_observation_dset = identification_grp.create_dataset("is_urgent_observation",
                                                                        data=False, dtype='bool')
-        list_of_frequencies_dset = identification_grp.create_dataset("list_of_frequencies", data=np.array([b'A']))
         look_direction_dset = identification_grp.create_dataset("look_direction", data=np.string_("Right"))
         mission_id_dset = identification_grp.create_dataset("mission_id", data=np.string_("S1A"))
         orbit_pass_direction_dset = identification_grp.create_dataset("orbit_pass_direction",
@@ -461,10 +463,18 @@ def create_test_cslc_metadata_product(file_path):
         zero_doppler_time_spacing_dset = corrections_grp.create_dataset("zero_doppler_time_spacing",
                                                                         data=0.027999999991152436, dtype='float64')
 
+        calibration_information_grp = outfile.create_group(f"{S1_SLC_HDF5_PREFIX}/CSLC/metadata/calibration_information")
+        cal_basename_dset = calibration_information_grp.create_dataset("basename",
+                                                                       data=np.string_('calibration-s1a-iw1-slc-vv-20220501t015035-20220501t015102-043011-0522a4-004.xml'))
+
+        noise_information_grp = outfile.create_group(f"{S1_SLC_HDF5_PREFIX}/CSLC/metadata/noise_information")
+        noise_basename_dset = noise_information_grp.create_dataset("basename",
+                                                                   data=np.string_('noise-s1a-iw1-slc-vv-20220501t015035-20220501t015102-043011-0522a4-004.xml'))
+
         processing_information_grp = outfile.create_group(f"{S1_SLC_HDF5_PREFIX}/CSLC/metadata/processing_information")
         algorithms_grp = outfile.create_group(f"{S1_SLC_HDF5_PREFIX}/CSLC/metadata/processing_information/algorithms")
         COMPASS_version_dset = algorithms_grp.create_dataset("COMPASS_version", data=np.string_("0.1.3"))
-        ISCE_version_dset = algorithms_grp.create_dataset("ISCE_version", data=np.string_("0.9.0"))
+        ISCE3_version_dset = algorithms_grp.create_dataset("ISCE3_version", data=np.string_("0.9.0"))
         dem_interpolation_dset = algorithms_grp.create_dataset("dem_interpolation", data=np.string_("biquintic"))
         geocoding_interpolator_dset = algorithms_grp.create_dataset("geocoding_interpolator",
                                                                     data=np.string_("sinc interpolation"))

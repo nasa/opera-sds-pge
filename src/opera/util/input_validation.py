@@ -90,6 +90,12 @@ def validate_slc_s1_inputs(runconfig, logger, name):
                 check_input(value[i], logger, name, valid_extensions=('.EOF',))
         elif key == 'dem_file':
             check_input(value, logger, name, valid_extensions=('.tif', '.tiff', '.vrt'))
+        elif key == 'tec_file':
+            check_input(value, logger, name, valid_extensions=('.22i',))
+        elif key == 'weather_model_file':
+            # TODO: this might be utilized as an ancillary with later deliveries,
+            #       but no example available currently
+            continue
         elif key in ('burst_id', 'dem_description'):
             # these fields are included in the SAS input paths, but are not
             # actually file paths, so skip them

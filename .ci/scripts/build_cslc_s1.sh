@@ -24,7 +24,7 @@ BUILD_DATE_TIME=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
 # defaults, SAS image should be updated as necessary for new image releases from ADT
 [ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath $(dirname $(realpath $0))/../..)
 [ -z "${TAG}" ] && TAG="${USER}-dev"
-[ -z "${SAS_IMAGE}" ] && SAS_IMAGE="artifactory-fn.jpl.nasa.gov:16001/gov/nasa/jpl/opera/adt/opera/cslc_s1:beta_0.1"
+[ -z "${SAS_IMAGE}" ] && SAS_IMAGE="artifactory-fn.jpl.nasa.gov:16001/gov/nasa/jpl/opera/adt/opera/cslc_s1:gamma_0.1"
 
 echo "WORKSPACE: $WORKSPACE"
 echo "IMAGE: $IMAGE"
