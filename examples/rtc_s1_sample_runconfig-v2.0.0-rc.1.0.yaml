@@ -1,4 +1,4 @@
-# Sample RunConfig for use with the RTC-S1 PGE v2.0.0-er.5.0
+# Sample RunConfig for use with the RTC-S1 PGE v2.0.0-rc.1.0
 # This RunConfig should require minimal changes in order to be used with the
 # OPERA PCM.
 
@@ -139,14 +139,13 @@ RunConfig:
                     dynamic_ancillary_file_group:
                         # Digital elevation model
                         dem_file: /home/rtc_user/input_dir/dem.tif
+                        dem_description: Digital Elevation Model (DEM) for the NASA OPERA project (v1.0) based on the Copernicus DEM 30-m and Copernicus 90-m referenced to the WGS84 ellipsoid
 
                     static_ancillary_file_group:
                         # burst database sqlite file
                         burst_database_file: /home/rtc_user/input_dir/opera_burst_database_deploy_2022_1212.sqlite3
 
                     product_group:
-                        processing_type: 'NOMINAL'
-
                         product_version: 1.0
 
                         # This should match the path used for OutputProductPath
@@ -161,13 +160,30 @@ RunConfig:
                         # These field determines the intermediate file name used
                         # by the SAS for its output products. These products will
                         # be renamed by the PGE to match the OPERA file name conventions.
-                        product_id: rtc_product
+                        product_id: OPERA_L2_RTC-S1_T{burst_id}
 
+                        # RTC-S1 imagery
                         save_bursts: True
+
+                        # Save mosaic of RTC-S1 bursts
                         save_mosaics: False
+
+                        # Save browse image(s)
+                        save_browse: True
+
                         output_imagery_format: COG
                         output_imagery_compression: ZSTD
                         output_imagery_nbits: 16
+
+                        # Optional. Save secondary layers (e.g., inc. angle) within
+                        # the HDF5 file
+                        save_secondary_layers_as_hdf5: False
+
+                        # Save RTC-S1 metadata in the HDF5 format
+                        # Optional for `output_imagery_format` equal to 'ENVI', 'GTiff', or
+                        # 'COG', and enabled by default for `output_imagery_format` equal
+                        # to 'HDF5' or 'NETCDF' or `save_secondary_layers_as_hdf5` is True
+                        save_metadata: True
 
                     primary_executable:
                         # This should match the value used for ProductIdentifier
@@ -180,6 +196,7 @@ RunConfig:
                         # Check if ancillary input covers entirely output products
                         check_ancillary_inputs_coverage: True
 
+                        # Polarization channels to process.
                         polarization: dual-pol
 
                         # Options to run geo2rdr
@@ -191,6 +208,9 @@ RunConfig:
                         rdr2geo:
                             threshold: 1.0e-7
                             numiter: 25
+
+                        # DEM interpolation method
+                        dem_interpolation_method: biquintic
 
                         # Apply absolute radiometric correction
                         apply_absolute_radiometric_correction: True
@@ -208,7 +228,6 @@ RunConfig:
                         apply_dry_tropospheric_delay_correction: True
 
                         # OPTIONAL - to control behavior of RTC module
-                        # (only applicable if geocode.apply_rtc is True)
                         rtc:
                             # OPTIONAL - Choices:
                             # "gamma0" (default)
@@ -226,27 +245,40 @@ RunConfig:
                             input_terrain_radiometry: beta0
 
                             # OPTIONAL - Minimum RTC area factor in dB
-                            rtc_min_value_db:
+                            rtc_min_value_db: -30
 
                             # RTC DEM upsampling
                             dem_upsampling: 2
 
+                        # OPTIONAL - to provide the number of processes when processing the bursts in parallel
+                        # "0" means that the number will be automatically decided based on
+                        # the number of cores, `OMP_NUM_THREADS` in environment setting,
+                        # and the number of burst to process in runconfig
+                        num_workers: 0
+
                         # OPTIONAL - Mechanism to specify output posting and DEM
                         geocoding:
-                            # OPTIONAL -
+                            # OPTIONAL - Apply RSLC metadata valid-samples sub-swath masking
+                            apply_valid_samples_sub_swath_masking: True
+
+                            # OPTIONAL - Apply shadow masking
+                            apply_shadow_masking: True
+
+                            # OPTIONAL - Algorithm type, area projection or
+                            # interpolation: sinc, bilinear, bicubic, nearest, and biquintic
                             algorithm_type: area_projection
 
-                            # OPTIONAL - Choices: "single_block", "geogrid", "geogrid_radargrid", and "auto" (default)
+                            # OPTIONAL - Choices: "single_block", "geogrid", "geogrid_and_radargrid", and "auto" (default)
                             memory_mode: auto
 
                             # OPTIONAL - Processing upsampling factor applied to input geogrid
                             geogrid_upsampling: 1
 
                             # Save the incidence angle
-                            save_incidence_angle: False
+                            save_incidence_angle: True
 
                             # Save the local-incidence angle
-                            save_local_inc_angle: False
+                            save_local_inc_angle: True
 
                             # Save the projection angle
                             save_projection_angle: False
@@ -258,16 +290,16 @@ RunConfig:
                             save_range_slope: False
 
                             # Save the number of looks used to compute GCOV
-                            save_nlooks: False
+                            save_nlooks: True
 
                             # Save the RTC area factor used to compute GCOV
-                            save_rtc_anf: False
+                            save_rtc_anf: True
 
                             # Save interpolated DEM used to compute GCOV
                             save_dem: False
 
                             # Save layover shadow mask
-                            save_layover_shadow_mask: False
+                            save_layover_shadow_mask: True
 
                             # OPTIONAL - Absolute radiometric correction
                             abs_rad_cal: 1
@@ -278,18 +310,32 @@ RunConfig:
                             # OPTIONAL - Clip values below threshold
                             clip_min:
 
-                            # OPTIONAL - Double sampling of the radar-grid
-                            # input sampling in the range direction
+                            # Double SLC sampling in the range direction
                             upsample_radargrid: False
 
-                            output_epsg:
-                            x_posting: 30
-                            y_posting: 30
-                            x_snap: 30
-                            y_snap: 30
                             top_left:
                                 x:
                                 y:
                             bottom_right:
                                 x:
                                 y:
+
+                        browse_image_group:
+
+                            # If neither height or width parameters are provided, the browse
+                            # image is generated with the same pixel spacing of the RTC-S1
+                            # imagery (burst or mosaic).
+
+                            # If the height parameter is provided but the width is not provided,
+                            # a new width is assigned in order to keep the aspect ratio
+                            # of the RTC-S1 geographic grid.
+
+                            # Conversely, if the width parameter is provided but the height is not,
+                            # a new height is assigned in order to keep the aspect ratio
+                            # of the RTC-S1 geographic grid.
+
+                            # Height in pixels for the PNG browse image of RTC-S1 bursts.
+                            browse_image_burst_height: 1024
+
+                            # Height in pixels for the PNG browse image of RTC-S1 mosaics.
+                            browse_image_mosaic_height: 1024

@@ -28,8 +28,14 @@ RunConfig:
                     - 'python3 -c "from opera.util.metadata_utils import create_test_rtc_metadata_product; create_test_rtc_metadata_product(\"rtc_s1_test/output_dir/t069_147170_iw1/rtc_product_v1.0.h5\")";'
                     - 'touch rtc_s1_test/output_dir/t069_147170_iw1/rtc_product_v1.0_VH.tif;'
                     - 'touch rtc_s1_test/output_dir/t069_147170_iw1/rtc_product_v1.0_VV.tif;'
+                    - 'touch rtc_s1_test/output_dir/t069_147170_iw1/rtc_product_v1.0.png;'
+                    - 'touch rtc_s1_test/output_dir/t069_147170_iw1/rtc_product_v1.0_nlooks.tif;'
+                    - 'touch rtc_s1_test/output_dir/t069_147170_iw1/rtc_product_v1.0_layover_shadow_mask.tif;'
                     - 'dd if=/dev/urandom of=rtc_s1_test/output_dir/t069_147170_iw1/rtc_product_v1.0_VH.tif bs=1M count=1;'
                     - 'dd if=/dev/urandom of=rtc_s1_test/output_dir/t069_147170_iw1/rtc_product_v1.0_VV.tif bs=1M count=1;'
+                    - 'dd if=/dev/urandom of=rtc_s1_test/output_dir/t069_147170_iw1/rtc_product_v1.0.png bs=1M count=1;'
+                    - 'dd if=/dev/urandom of=rtc_s1_test/output_dir/t069_147170_iw1/rtc_product_v1.0_nlooks.tif bs=1M count=1;'
+                    - 'dd if=/dev/urandom of=rtc_s1_test/output_dir/t069_147170_iw1/rtc_product_v1.0_layover_shadow_mask.tif bs=1M count=1;'
                     - '/bin/echo RTC-S1 invoked with RunConfig'
                 ErrorCodeBase: 300000
                 SchemaPath: pge/rtc_s1/schema/rtc_s1_sas_schema.yaml
@@ -78,6 +84,7 @@ RunConfig:
                         product_id: rtc_product
                         save_bursts: True
                         save_mosaics: False
+                        save_browse: True
                         output_imagery_format: COG
 
                     processing:
