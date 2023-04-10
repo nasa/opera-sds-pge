@@ -18,11 +18,18 @@ RunConfig:
 
             InputFilesGroup:
                 # List of input files/directories
-                # Must be either a top-level directory containing one or more HLS
-                # .tif files, or a list of all HLS .tif files for use with the job
-                # Paths must correspond to the file system within the Docker container
-                InputFilePaths:
-                    - /home/conda/input_dir
+                # Must be a list of directories, each containing data from a single RTC burst
+                # For each burst there will be .tif file/s and an associated .h5 metadata file.
+
+                InputFilePaths: [
+                  /home/conda/input_data/rtc_data/t047_100908_iw3,
+                  /home/conda/input_data/rtc_data/t047_100909_iw1,
+                  /home/conda/input_data/rtc_data/t047_100909_iw2,
+                  /home/conda/input_data/rtc_data/t047_100909_iw3,
+                  /home/conda/input_data/rtc_data/t047_100910_iw1,
+                  /home/conda/input_data/rtc_data/t047_100910_iw2,
+                  /home/conda/input_data/rtc_data/t047_100910_iw3
+                ]
 
             DynamicAncillaryFilesGroup:
                 # Map of ancillary file types to paths to the file
@@ -39,7 +46,7 @@ RunConfig:
 
                     reference_water_file: /home/conda/input_dir/reference_water.tif
 
-                    worldcover: /home/conda/input_dir/worldcover.tif
+                    world_cover: /home/conda/input_dir/worldcover.tif
 
 
             ProductPathGroup:
@@ -71,8 +78,8 @@ RunConfig:
 
                 # List of command-line options to use with ProgramPath
                 ProgramOptions:
-                    - /home/conda/dswx-s1-1.0.1/bin/dswx_s1.py
-                    - --full-log-format
+                    - /home/conda/dswx-s1-0.1.0/src/dswx_sar/dswx_s1.py
+#                    - --full-log-format
 
                 # The Error Code base value added to the offset values to make
                 # error codes unique per-PGE
@@ -92,7 +99,8 @@ RunConfig:
                 # container, and typically should reference a template file bundled
                 # with the opera_pge installation directory within the container
                 # Consult the Docker image build scripts for more info
-                IsoTemplatePath: /home/conda/opera/pge/dswx_s1/templates/OPERA_ISO_metadata_L3_DSWx_S1_template.xml.jinja2
+                # TODO - This template does not exist yet, so the field is left blank
+                IsoTemplatePath:
 
             QAExecutable:
                 # Set to True to enable execution of an additional "Quality Assurance"
@@ -133,13 +141,13 @@ RunConfig:
                 #            hdf5 metadata and rtc geotiff (directory or files)
                 #            for open water
                 input_file_path: [
-                  input_data/rtc_data/t047_100908_iw3,
-                  input_data/rtc_data/t047_100909_iw1,
-                  input_data/rtc_data/t047_100909_iw2,
-                  input_data/rtc_data/t047_100909_iw3,
-                  input_data/rtc_data/t047_100910_iw1,
-                  input_data/rtc_data/t047_100910_iw2,
-                  input_data/rtc_data/t047_100910_iw3,
+                  /home/conda/input_data/rtc_data/t047_100908_iw3,
+                  /home/conda/input_data/rtc_data/t047_100909_iw1,
+                  /home/conda/input_data/rtc_data/t047_100909_iw2,
+                  /home/conda/input_data/rtc_data/t047_100909_iw3,
+                  /home/conda/input_data/rtc_data/t047_100910_iw1,
+                  /home/conda/input_data/rtc_data/t047_100910_iw2,
+                  /home/conda/input_data/rtc_data/t047_100910_iw3
                 ]
               dynamic_ancillary_file_group:
                 # Digital elevation model (Required)
