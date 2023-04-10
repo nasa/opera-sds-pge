@@ -155,9 +155,10 @@ do
                     docker_out=$(docker run --rm -u conda:conda \
                                      -v "${output_dir}":/out:ro \
                                      -v "${expected_data_dir}":/exp:ro \
+                                     -v "$SCRIPT_DIR":/scripts \
                                      --entrypoint python3 ${PGE_IMAGE}:"${PGE_TAG}" \
-                                     proteus-1.0.1/bin/dswx_compare.py \
-                                     /out/"${output_file}" /exp/"${expected_file}")
+                                     /scripts/dswx_compare_opera_pge.py \
+                                     /out/"${output_file}" /exp/"${expected_file}" --metadata_exclude_list PRODUCT_VERSION)
                     echo "$docker_out"
 
                     if [[ "$docker_out" == *"[FAIL]"* ]]; then
