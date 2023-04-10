@@ -186,7 +186,7 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
         different file formats that are produced for each burst in an input SLC.
 
         Parameters
-        ----------pwd
+        ----------
         inter_filename : str
             The intermediate filename of the output GeoTIFF to generate a
             filename for. This parameter may be used to inspect the file in order
