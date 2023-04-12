@@ -42,6 +42,8 @@ class DSWxS1PreProcessorMixin(PreProcessorMixin):
         """
         super().run_preprocessor(**kwargs)
 
+        # _validate_parameters_config(self.runconfig, self.logger, self.name)
+
 
 class DSWxS1PostProcessorMixin(PostProcessorMixin):
     """

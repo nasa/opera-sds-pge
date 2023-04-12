@@ -29,6 +29,7 @@ RunConfig:
         ErrorCodeBase: int(required=True)
         SchemaPath: str(required=True)
         IsoTemplatePath: str(required=False)
+        ParametersSchemaPath: str(required=False)
 
       QAExecutable:
         Enabled: bool(required=True)
