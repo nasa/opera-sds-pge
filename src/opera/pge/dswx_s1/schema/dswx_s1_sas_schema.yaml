@@ -34,7 +34,7 @@ runconfig:
             hand_file_description: str(required=False)
 
             # ESA WorldCover map file
-            worldcover_file: str(required=False)
+            world_file: str(required=False)
 
             # ESA WorldCover map description
             worldcover_file_description: str(required=False)
