@@ -31,6 +31,7 @@ BUILD_SCRIPTS_DIR=${WORKSPACE}/.ci/scripts
 ${BUILD_SCRIPTS_DIR}/build_dswx_hls.sh --tag ${TAG} --workspace ${WORKSPACE}
 ${BUILD_SCRIPTS_DIR}/build_cslc_s1.sh --tag ${TAG} --workspace ${WORKSPACE}
 ${BUILD_SCRIPTS_DIR}/build_rtc_s1.sh --tag ${TAG} --workspace ${WORKSPACE}
+${BUILD_SCRIPTS_DIR}/build_dswx_s1.sh --tag ${TAG} --workspace ${WORKSPACE}
 
 echo 'Build Complete'
 
