@@ -27,9 +27,9 @@ SAMPLE_TIME=15
 # RUNCONFIG should be the name of the runconfig in s3://operasds-dev-pge/${PGE_NAME}/
 [ -z "${WORKSPACE}" ] && WORKSPACE="$(realpath "$(dirname "$(realpath "$0")")"/../..)"
 [ -z "${PGE_TAG}" ] && PGE_TAG="${USER}-dev"
-[ -z "${INPUT_DATA}" ] && INPUT_DATA="rtc_s1_delivery_2_beta_0.2_expected_input.zip"
-[ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="rtc_s1_delivery_2_beta_0.2_expected_output.zip"
-[ -z "${RUNCONFIG}" ] && RUNCONFIG="rtc_s1_delivery_2_beta_0.2_runconfig.yaml"
+[ -z "${INPUT_DATA}" ] && INPUT_DATA="rtc_s1_delivery_3_gamma_0.3_expected_input.zip"
+[ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="rtc_s1_delivery_3_gamma_0.3_expected_output.zip"
+[ -z "${RUNCONFIG}" ] && RUNCONFIG="rtc_s1_sample_runconfig-v2.0.0-rc.1.0.yaml"
 [ -z "${TMP_ROOT}" ] && TMP_ROOT="$DEFAULT_TMP_ROOT"
 
 # Create the test output directory in the work space
@@ -45,6 +45,7 @@ test_int_setup_test_data
 trap test_int_trap_cleanup EXIT
 
 # Pull in product compare script from S3.
+# Current source is https://raw.githubusercontent.com/opera-adt/RTC/main/app/rtc_compare.py
 local_compare_script=${TMP_DIR}/rtc_compare.py
 echo "Downloading s3://operasds-dev-pge/${PGE_NAME}/rtc_compare.py to ${local_compare_script}"
 aws s3 cp s3://operasds-dev-pge/${PGE_NAME}/rtc_compare.py "$local_compare_script"
@@ -138,13 +139,19 @@ else
 
         burst_id_uppercase=${burst_id^^}
         burst_id_replace_underscores=${burst_id_uppercase//_/-}
+        burst_id_remove_T=${burst_id_replace_underscores//T/}
         burst_id_pattern="*_${burst_id_replace_underscores}_*.h5"
+        expected_burst_id_pattern="*_${burst_id_remove_T}_*.h5"
 
         # shellcheck disable=SC2086
-        output_file=$(ls $output_dir/$burst_id_pattern)
+        output_file=$(ls ${output_dir}/${burst_id_pattern})
+
+        # shellcheck disable=SC2086
+        expected_file=$(ls ${expected_dir}/${burst_id}/${expected_burst_id_pattern})
 
         echo "output file: $output_file"
-        expected_file=${expected_dir}/${burst_id}/rtc_product_v0.2.h5
+        echo "expected_file: $expected_file"
+
         compare_output=$(python3 "${local_compare_script}" "${expected_file}" "${output_file}")
 
         echo "Results of compare: $compare_output"
@@ -159,6 +166,7 @@ else
 
         # remove ansi colors from string
         compare_output="$(echo "$compare_output" | sed -e 's/\x1b\[[0-9;]*m//g')"
+
         # add html breaks to newlines
         compare_output=${compare_output//$'\n'/<br>$'\n'}
         echo "<tr><td>${compare_result}</td><td><ul><li>${expected_file}</li><li>${output_file}</li></ul></td><td>${compare_output}</td></tr>" >> "$RESULTS_FILE"

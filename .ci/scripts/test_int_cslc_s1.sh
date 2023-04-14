@@ -26,9 +26,9 @@ SAMPLE_TIME=15
 # Test data should be uploaded to  s3://operasds-dev-pge/${PGE_NAME}/
 [ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath "$(dirname "$(realpath "$0")")"/../..)
 [ -z "${PGE_TAG}" ] && PGE_TAG="${USER}-dev"
-[ -z "${INPUT_DATA}" ] && INPUT_DATA="delivery_cslc_s1_beta_0.1_input_data.zip"
-[ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="delivery_cslc_s1_beta_0.1_expected_output_dir.zip"
-[ -z "${RUNCONFIG}" ] && RUNCONFIG="delivery_cslc_s1_beta_0.1_runconfig.yaml"
+[ -z "${INPUT_DATA}" ] && INPUT_DATA="delivery_cslc_s1_gamma_0.1_input_data.zip"
+[ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="delivery_cslc_s1_gamma_0.1_expected_output.zip"
+[ -z "${RUNCONFIG}" ] && RUNCONFIG="cslc_s1_sample_runconfig-v2.0.0-rc.1.0.yaml"
 [ -z "${TMP_ROOT}" ] && TMP_ROOT="$DEFAULT_TMP_ROOT"
 
 # Create the test output directory in the workspace
@@ -44,10 +44,10 @@ test_int_setup_test_data
 trap test_int_trap_cleanup EXIT
 
 # Pull in validation script from S3.
-# Current source is https://raw.githubusercontent.com/opera-adt/COMPASS/c77b1a681e85d44c19baf2cf1eaf88f901b12bc9/src/compass/utils/validate_cslc.py
-local_validate_cslc=${TMP_DIR}/validate_cslc.py
-echo "Downloading s3://operasds-dev-pge/${PGE_NAME}/validate_cslc.py to $local_validate_cslc"
-aws s3 cp s3://operasds-dev-pge/${PGE_NAME}/validate_cslc.py "$local_validate_cslc"
+# Current source is https://raw.githubusercontent.com/opera-adt/COMPASS/main/src/compass/utils/validate_product.py
+local_validate_script=${TMP_DIR}/validate_product.py
+echo "Downloading s3://operasds-dev-pge/${PGE_NAME}/validate_product.py to $local_validate_script"
+aws s3 cp s3://operasds-dev-pge/${PGE_NAME}/validate_product.py "$local_validate_script"
 
 # overall_status values and their meanings
 # 0 - pass
@@ -87,7 +87,7 @@ metrics_collection_start "$PGE_NAME" "$container_name" "$TEST_RESULTS_DIR" "$SAM
 
 echo "Running Docker image ${PGE_IMAGE}:${PGE_TAG}"
 
-docker run --rm -u $UID:"$(id -g)" -w /home/compass_user --name $container_name \
+docker run --rm -u $UID:"$(id -g)" -w /home/compass_user/output_dir --name $container_name \
            -v "${runconfig_dir}":/home/compass_user/runconfig:ro \
            -v "${input_dir}":/home/compass_user/input_dir:ro \
            -v "${output_dir}":/home/compass_user/output_dir \
@@ -103,7 +103,7 @@ if [ $docker_exit_status -ne 0 ]; then
     echo "docker exit indicates failure: ${docker_exit_status}"
     overall_status=1
 else
-    echo "<tr><th>Compare Result</th><th><ul><li>Expected file</li><li>Output file</li></ul></th><th>validate_cslc.py output</th></tr>" >> "$RESULTS_FILE"
+    echo "<tr><th>Compare Result</th><th><ul><li>Expected file</li><li>Output file</li></ul></th><th>validate_product.py output</th></tr>" >> "$RESULTS_FILE"
     declare -a burst_ids=(  "t064_135518_iw1"
                             "t064_135518_iw2"
                             "t064_135518_iw3"
@@ -141,17 +141,18 @@ else
         burst_id_replace_underscores=${burst_id_uppercase//_/-}
         burst_id_pattern="*_${burst_id_replace_underscores}_*.h5"
         output_file=`ls $output_dir/$burst_id_pattern`
-        echo "Ouput file matching burst id is $output_file"
+        echo "Output file matching burst id is $output_file"
 
-        ref_product="/exp/${burst_id}/20220501/${burst_id}_20220501_VV.h5"
+        ref_product="/exp/${burst_id}/20220501/${burst_id}_20220501.h5"
         sec_product="/out/$(basename ${output_file})"
+        # TODO: add additional call to validate static layers
         docker_out=$(docker run --rm -u compass_user:compass_user \
                                 -v "${TMP_DIR}":/working:ro \
                                 -v "${output_dir}":/out:ro \
                                 -v "${expected_dir}":/exp:ro \
                                 --entrypoint /home/compass_user/miniconda3/envs/COMPASS/bin/python3 \
                                 ${PGE_IMAGE}:"${PGE_TAG}" \
-                                /working/validate_cslc.py \
+                                /working/validate_product.py \
                                 --ref-product ${ref_product} \
                                 --sec-product ${sec_product} 2>&1) || docker_exit_status=$?
 
