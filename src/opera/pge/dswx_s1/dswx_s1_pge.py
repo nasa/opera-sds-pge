@@ -8,9 +8,14 @@ Module defining the implementation for the Dynamic Surface Water Extent (DSWx)
 from Sentinel-1 A/B (S1) PGE.
 """
 
+from os.path import isfile
+
+import yamale
+
 from opera.pge.base.base_pge import PgeExecutor
 from opera.pge.base.base_pge import PostProcessorMixin
 from opera.pge.base.base_pge import PreProcessorMixin
+from opera.pge.base.runconfig import RunConfig
 
 
 class DSWxS1PreProcessorMixin(PreProcessorMixin):
@@ -27,6 +32,46 @@ class DSWxS1PreProcessorMixin(PreProcessorMixin):
 
     _pre_mixin_name = "DSWxS1PreProcessorMixin"
 
+    def _validate_algorithm_parameters_config(self):
+        """
+        The DSWx-S1 interface SAS uses two runconfig files; one for the main SAS,
+        and another for algorithm parameters.  This allows for independent modification
+        of algorithm parameters within it's own runconfig file. This method performs validation
+        of the 'algorithm parameters' runconfig file against its associated schema file. The SAS
+        section of the main runconfig defines the location within the container of the 'algorithm
+        parameters' runconfig file, under ['dynamic_ancillary_file_group']['algorithm_parameters'].
+        The schema file for the 'algorithm parameters' runconfig file is referenced under
+        ['PrimaryExecutable']['ParametersSchemaPath'] in the PGE section of the runconfig file.
+
+        """
+        self.runconfig = RunConfig(self.runconfig_path)
+
+        # Get the path to the 'algorithm_parameters_s1.schema.yaml' file
+        algorithm_parameters_schema_file_path = self.runconfig.algorithm_parameters_schema_path
+        if isfile(algorithm_parameters_schema_file_path):
+            # Load the 'algorithm parameters' schema
+            algorithm_parameters_schema = yamale.make_schema(algorithm_parameters_schema_file_path)
+        else:
+            raise RuntimeError(
+                f'Can not validate algorithm_parameters schema file.  '
+                f'File: ({algorithm_parameters_schema_file_path}) not found.'
+            )
+
+        # Get the 'algorithm parameters' runconfig file
+        self.algorithm_parameters_runconfig = self.runconfig.algorithm_parameters_config_path
+        if isfile(self.algorithm_parameters_runconfig):
+            # Load the 'algorithm parameters' runconfig file
+            algorithm_parameters_config_data = yamale.make_data(self.algorithm_parameters_runconfig)
+            pass
+        else:
+            raise RuntimeError(
+                f'Can not validate algorithm_parameters config file.  '
+                f'File: {self.algorithm_parameters_runconfig} not found.'
+            )
+
+        # Validate the algorithm parameter Runconfig against its schema file
+        yamale.validate(algorithm_parameters_schema, algorithm_parameters_config_data, strict=True)
+
     def run_preprocessor(self, **kwargs):
         """
         Executes the pre-processing steps for DSWx-S1 PGE initialization.
@@ -42,7 +87,7 @@ class DSWxS1PreProcessorMixin(PreProcessorMixin):
         """
         super().run_preprocessor(**kwargs)
 
-        # _validate_parameters_config(self.runconfig, self.logger, self.name)
+        self._validate_algorithm_parameters_config()
 
 
 class DSWxS1PostProcessorMixin(PostProcessorMixin):

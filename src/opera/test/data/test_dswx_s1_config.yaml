@@ -13,7 +13,10 @@ RunConfig:
 
             DynamicAncillaryFilesGroup:
                 AncillaryFileMap:
-                    dem_file: dswx_s1_pge_test/input_dir/dem_4326.tiff
+                    dem_file: dswx_s1_pge_test/input_dir/dem.tiff
+                    hand_file: dswx_s1_pge_test/input_data/ancillary_data/hand.tif
+                    reference_water_file: dswx_s1_pge_test/input_data/ancillary_data/reference_water.tif
+                    world_cover: dswx_s1_pge_test/input_data/ancillary_data/worldcover.tif
 
             ProductPathGroup:
                 OutputProductPath: dswx_s1_pge_test/output_dir
@@ -25,8 +28,9 @@ RunConfig:
                 ProgramOptions:
                     - 'hello world > dswx_s1_pge_test/output_dir/dswx_s1_test.txt;'
                     - '/bin/echo DSWx-S1 invoked with RunConfig'
-                ErrorCodeBase: 200000
+                ErrorCodeBase: 100000
                 SchemaPath: pge/dswx_s1/schema/dswx_s1_sas_schema.yaml
+                AlgorithmParametersSchemaPath: pge/dswx_s1/schema/algorithm_parameters_s1_schema.yaml
                 IsoTemplatePath:
 
             QAExecutable:
@@ -44,29 +48,35 @@ RunConfig:
 
                 groups:
                     pge_name_group:
-                        pge_name: DSWx_S1_PGE
+                        pge_name: DSWX_S1_PGE
 
                     input_file_group:
                         # Required. List of SAFE files (min=1)
                         input_file_path:
-                            - dswx_pge_test/input_dir
+                            - dswx_s1_pge_test/input_data
 
                     dynamic_ancillary_file_group:
                         # Digital elevation model
-                        dem_file: input_data/dem_4326.tiff
+                        dem_file: dswx_s1_pge_test/input_data/dem_4326.tiff
+                        # Reference water body map (Required)
+                        # https://global-surface-water.appspot.com/download
+                        reference_water_file: dswx_s1_pge_test/input_data/ancillary_data/reference_water.tif
+                        # Height Above Nearest Drainage (optional)
+                        hand_file: dswx_s1_pge_test/input_data/ancillary_data/hand.tif
+                        # Separate runconfig file for algorithm parameters
+                        algorithm_parameters: test/data/test_algorithm_parameters_s1.yaml
+
+                    primary_executable:
+                        product_type: dswx_s1
 
                     product_path_group:
                         # Directory where PGE will place results
-                        product_path: output_dir
+                        product_path: dswx_s1_pge_test/output_dir
                         # Directory where SAS writes temporary data
-                        scratch_path: output_dir/scratch_dir
+                        scratch_path: dswx_s1_pge_test/output_dir/scratch_dir
                         # Intermediate file name. SAS writes the output to this file.
                         # PGE may rename the product according to file naming convention
-                        sas_output_file: output_s1_dswx
+                        sas_output_path: dswx_s1_pge_test/output_dir
 
-                    primary_executable:
-                        product_type: DSWX_S1
+                    log_file: dswx_s1_pge_test/output_dir/test_log.log
 
-                    processing:
-                        # Placeholder for now: Check if ancillary inputs cover entirely the output product
-                        check_ancillary_inputs_coverage: False

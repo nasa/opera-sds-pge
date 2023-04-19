@@ -79,7 +79,8 @@ RunConfig:
                 # List of command-line options to use with ProgramPath
                 ProgramOptions:
                     - /home/conda/dswx-s1-0.1.0/src/dswx_sar/dswx_s1.py
-#                    - --full-log-format
+                # TODO - the comment below will be removed when the option becomes available
+                #    - --full-log-format
 
                 # The Error Code base value added to the offset values to make
                 # error codes unique per-PGE
@@ -92,6 +93,8 @@ RunConfig:
                 # with the opera_pge installation directory within the container
                 # Consult the Docker image build scripts for more info
                 SchemaPath: /home/conda/opera/pge/dswx_s1/schema/dswx_s1_sas_schema.yaml
+
+                AlgorithmParametersSchemaPath: /home/conda/opera/pge/dswx_s1/schema/algorithm_parameters_s1_schema.yaml
 
                 # Path to the Jinja2 template used to generate the ISO xml
                 # metadata file
@@ -182,6 +185,7 @@ RunConfig:
                 # NOAA GSHHS shapefile description
                 shoreline_shapefile_description:
 
+                # Separate runconfig file for algorithm parameters
                 algorithm_parameters: input_data/ancillary_data/algorithm_parameter_s1.yaml
 
               primary_executable:
@@ -205,4 +209,4 @@ RunConfig:
 
                 product_version: 0.1
 
-              log_file: None
+              log_file:
