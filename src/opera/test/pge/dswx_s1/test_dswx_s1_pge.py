@@ -175,8 +175,9 @@ class DswxS1PgeTestCase(unittest.TestCase):
 
     def test_dswx_s1_pge_bad_algorithm_parameters_schema_path(self):
         """
-        Test for invalid path in 'AlgorithmParametersSchemaPath' in the PGE
-        section of the runconfig file
+        Test for invalid path in the optional 'AlgorithmParametersSchemaPath'
+        section of in the PGE runconfig file.
+        section of the runconfig file.  Also test for no AlgorithmParametersSchemaPath
         """
         runconfig_path = join(self.data_dir, 'test_dswx_s1_config.yaml')
         test_runconfig_path = join(self.data_dir, 'invalid_dswx_s1_config.yaml')
@@ -200,6 +201,34 @@ class DswxS1PgeTestCase(unittest.TestCase):
             if exists(test_runconfig_path):
                 os.unlink(test_runconfig_path)
 
+        # Verify that None is returned if 'AlgorithmParametersSchemaPath' is None
+        with open(runconfig_path, 'r', encoding='utf-8') as infile:
+            runconfig_dict = yaml.safe_load(infile)
+
+        runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']['AlgorithmParametersSchemaPath'] = None
+
+        with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+            yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+
+        try:
+            pge = DSWxS1Executor(pge_name="DswxS1PgeTest", runconfig_path=test_runconfig_path)
+
+            pge.run()
+
+            # Check that the log file was created and moved into the output directory
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(exists(expected_log_file))
+
+            # Open and read the log
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn("No algorithm_parameters_schema_path provided in runconfig file", log_contents)
+
+        finally:
+            if exists(test_runconfig_path):
+                os.unlink(test_runconfig_path)
+
     def test_dswx_s1_pge_bad_algorithm_parameters_path(self):
         """Test for invalid path to 'algorithm_parameters' in SAS runconfig file"""
         runconfig_path = join(self.data_dir, 'test_dswx_s1_config.yaml')
@@ -209,7 +238,7 @@ class DswxS1PgeTestCase(unittest.TestCase):
             runconfig_dict = yaml.safe_load(infile)
 
         runconfig_dict['RunConfig']['Groups']['SAS']['runconfig']['groups']['dynamic_ancillary_file_group']\
-                      ['algorithm_parameters'] = 'test/data/test_algorithm_parameters_non_existent.yaml'
+                      ['algorithm_parameters'] = 'test/data/test_algorithm_parameters_non_existent.yaml' # noqa E211
 
         with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
             yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)

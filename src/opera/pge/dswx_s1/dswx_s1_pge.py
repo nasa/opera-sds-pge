@@ -15,7 +15,7 @@ import yamale
 from opera.pge.base.base_pge import PgeExecutor
 from opera.pge.base.base_pge import PostProcessorMixin
 from opera.pge.base.base_pge import PreProcessorMixin
-from opera.pge.base.runconfig import RunConfig
+from opera.util.error_codes import ErrorCode
 
 
 class DSWxS1PreProcessorMixin(PreProcessorMixin):
@@ -41,19 +41,23 @@ class DSWxS1PreProcessorMixin(PreProcessorMixin):
         section of the main runconfig defines the location within the container of the 'algorithm
         parameters' runconfig file, under ['dynamic_ancillary_file_group']['algorithm_parameters'].
         The schema file for the 'algorithm parameters' runconfig file is referenced under
-        ['PrimaryExecutable']['ParametersSchemaPath'] in the PGE section of the runconfig file.
+        ['PrimaryExecutable']['AlgorithmParametersSchemaPath'] in the PGE section of the runconfig file.
+        For compatibility with the other PGE 'AlgorithmParametersSchemaPath' is optional.
 
         """
-        self.runconfig = RunConfig(self.runconfig_path)
-
-        # Get the path to the 'algorithm_parameters_s1.schema.yaml' file
+        # Get the path to the optional 'algorithm_parameters_s1.schema.yaml' file
         algorithm_parameters_schema_file_path = self.runconfig.algorithm_parameters_schema_path
-        if isfile(algorithm_parameters_schema_file_path):
+        #  If it was decided not to provide a path to the schema file, validation is impossible.
+        if algorithm_parameters_schema_file_path is None:
+            error_msg = "No algorithm_parameters_schema_path provided in runconfig file."
+            self.logger.info(self.name, ErrorCode.NO_ALGO_PARAM_SCHEMA_PATH, error_msg)
+            return
+        elif isfile(algorithm_parameters_schema_file_path):
             # Load the 'algorithm parameters' schema
             algorithm_parameters_schema = yamale.make_schema(algorithm_parameters_schema_file_path)
         else:
             raise RuntimeError(
-                f'Can not validate algorithm_parameters schema file.  '
+                f'Schema error: Could not validate algorithm_parameters schema file.  '
                 f'File: ({algorithm_parameters_schema_file_path}) not found.'
             )
 

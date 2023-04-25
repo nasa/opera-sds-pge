@@ -282,24 +282,30 @@ class RunConfig:
 
     @property
     def algorithm_parameters_schema_path(self) -> str:
-        """Returns the path to the algorithm parameter Schema file for DSWX-S1"""
+        """Returns the path to the optional algorithm parameter Schema file for DSWX-S1"""
         algorithm_parameters_schema_path = self._pge_config['PrimaryExecutable']['AlgorithmParametersSchemaPath']
-        return (
-            algorithm_parameters_schema_path
-            if isabs(algorithm_parameters_schema_path)
-            else resource_filename('opera', algorithm_parameters_schema_path)
-        )
+        if algorithm_parameters_schema_path is None:
+            return None
+        else:
+            return (
+                algorithm_parameters_schema_path
+                if isabs(algorithm_parameters_schema_path)
+                else resource_filename('opera', algorithm_parameters_schema_path)
+            )
 
     @property
     def algorithm_parameters_config_path(self) -> str:
-        """Returns the path to the optional algorithm_parameter run configuration file for DSWX-S1"""
-        algorithm_parameters_config_path = \
-            self._sas_config['runconfig']['groups']['dynamic_ancillary_file_group']['algorithm_parameters']
-        return (
-            algorithm_parameters_config_path
-            if isabs(algorithm_parameters_config_path)
-            else resource_filename('opera', algorithm_parameters_config_path)
-        )
+        """Returns the path to the algorithm_parameter run configuration file for DSWX-S1"""
+        try:
+            algorithm_parameters_config_path = \
+                self._sas_config['runconfig']['groups']['dynamic_ancillary_file_group']['algorithm_parameters']
+            return (
+                algorithm_parameters_config_path
+                if isabs(algorithm_parameters_config_path)
+                else resource_filename('opera', algorithm_parameters_config_path)
+            )
+        except KeyError:
+            return None
 
     @property
     def iso_template_path(self) -> str:

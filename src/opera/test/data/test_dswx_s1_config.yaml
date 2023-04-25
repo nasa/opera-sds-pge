@@ -28,7 +28,7 @@ RunConfig:
                 ProgramOptions:
                     - 'hello world > dswx_s1_pge_test/output_dir/dswx_s1_test.txt;'
                     - '/bin/echo DSWx-S1 invoked with RunConfig'
-                ErrorCodeBase: 100000
+                ErrorCodeBase: 400000
                 SchemaPath: pge/dswx_s1/schema/dswx_s1_sas_schema.yaml
                 AlgorithmParametersSchemaPath: pge/dswx_s1/schema/algorithm_parameters_s1_schema.yaml
                 IsoTemplatePath:

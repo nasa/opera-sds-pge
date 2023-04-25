@@ -65,4 +65,4 @@ runconfig:
 
             product_version: num(required=False)
 
-        log_file: str()
+        log_file: str(required=False)
