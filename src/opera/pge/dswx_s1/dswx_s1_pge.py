@@ -66,7 +66,6 @@ class DSWxS1PreProcessorMixin(PreProcessorMixin):
         if isfile(self.algorithm_parameters_runconfig):
             # Load the 'algorithm parameters' runconfig file
             algorithm_parameters_config_data = yamale.make_data(self.algorithm_parameters_runconfig)
-            pass
         else:
             raise RuntimeError(
                 f'Can not validate algorithm_parameters config file.  '
