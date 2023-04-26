@@ -357,7 +357,8 @@ def create_test_rtc_metadata_product(file_path):
 
         identification_grp = outfile.create_group(f"{S1_SLC_HDF5_PREFIX}/identification")
         absoluteOrbitNumber_dset = identification_grp.create_dataset("absoluteOrbitNumber", data=10770, dtype='int64')
-        acquisitionMode_dset = identification_grp.create_dataset("acquisitionMode", data=np.string_('Interferometric Wide (IW)'))
+        acquisitionMode_dset = identification_grp.create_dataset("acquisitionMode",
+                                                                 data=np.string_('Interferometric Wide (IW)'))
         beamID_dset = identification_grp.create_dataset("beamID", data=np.string_('iw1'))
         boundingPolygon_dset = identification_grp.create_dataset(
             "boundingPolygon", data=b'POLYGON ((399015 3859970, 398975 3860000, ..., 399015 3859970))')
@@ -370,7 +371,8 @@ def create_test_rtc_metadata_product(file_path):
         listOfFrequencies_dset = identification_grp.create_dataset("listOfFrequencies", data=np.array([b'A']))
         orbitPassDirection_dset = identification_grp.create_dataset("orbitPassDirection", data=b'Descending')
         platform_dset = identification_grp.create_dataset("platform", data=b'Sentinel-1B')
-        processingDateTime_dset = identification_grp.create_dataset("processingDateTime", data=np.string_('2023-03-23T20:32:18.962836Z'))
+        processingDateTime_dset = identification_grp.create_dataset("processingDateTime",
+                                                                    data=np.string_('2023-03-23T20:32:18.962836Z'))
         processingType_dset = identification_grp.create_dataset("processingType", data=b'UNDEFINED')
         productType_dset = identification_grp.create_dataset("productType", data=b'SLC')
         productVersion_dset = identification_grp.create_dataset("productVersion", data=b'1.0')

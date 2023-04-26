@@ -28,6 +28,7 @@ RunConfig:
         ProgramOptions: list(str(), min=0, required=False)
         ErrorCodeBase: int(required=True)
         SchemaPath: str(required=True)
+        AlgorithmParametersSchemaPath: str(required=False)
         IsoTemplatePath: str(required=False)
 
       QAExecutable:

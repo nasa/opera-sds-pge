@@ -66,6 +66,7 @@ class ErrorCode(IntEnum):
     CLOSING_LOG_FILE = auto()
     LOGGED_INFO_LINE = auto()
     UPDATING_PRODUCT_METADATA = auto()
+    NO_ALGO_PARAM_SCHEMA_PATH = auto()
 
     # Debug - 1000 – 1999
     CONFIGURATION_DETAILS = DEBUG_RANGE_START
