@@ -14,7 +14,7 @@ from os.path import exists, splitext
 from opera.util.error_codes import ErrorCode
 
 
-def check_input(input_object, logger, name, valid_extensions):
+def check_input(input_object, logger, name, valid_extensions=None):
     """
     Validation checks for individual files.
     The input object is checked for existence and that it ends with
@@ -28,19 +28,21 @@ def check_input(input_object, logger, name, valid_extensions):
         Logger passed by PGE
     name: str
         pge name
-    valid_extensions : iterable
-        Expected file extensions of the file being validated.
+    valid_extensions : iterable, optional
+        Expected file extensions of the file being validated. If not provided,
+        no extension checking will take place.
 
     """
     if not exists(input_object):
         error_msg = f"Could not locate specified input {input_object}."
         logger.critical(name, ErrorCode.INPUT_NOT_FOUND, error_msg)
 
-    ext = splitext(input_object)[-1]
+    if valid_extensions:
+        ext = splitext(input_object)[-1]
 
-    if ext not in valid_extensions:
-        error_msg = f"Input file {input_object} does not have an expected file extension."
-        logger.critical(name, ErrorCode.INVALID_INPUT, error_msg)
+        if ext not in valid_extensions:
+            error_msg = f"Input file {input_object} does not have an expected file extension."
+            logger.critical(name, ErrorCode.INVALID_INPUT, error_msg)
 
 
 def validate_slc_s1_inputs(runconfig, logger, name):
@@ -91,7 +93,7 @@ def validate_slc_s1_inputs(runconfig, logger, name):
         elif key == 'dem_file':
             check_input(value, logger, name, valid_extensions=('.tif', '.tiff', '.vrt'))
         elif key == 'tec_file':
-            check_input(value, logger, name, valid_extensions=('.22i',))
+            check_input(value, logger, name)
         elif key == 'weather_model_file':
             # TODO: this might be utilized as an ancillary with later deliveries,
             #       but no example available currently
