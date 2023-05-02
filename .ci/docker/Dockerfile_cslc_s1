@@ -44,7 +44,7 @@ COPY --chown=compass_user:compass_user ${PGE_SOURCE_DIR} ${PGE_DEST_DIR}
 USER 0:0
 
 # Install dependencies into existing Conda Env
-# TODO: remove last chmod once permissions are set correctly on /home/compass_user for delivered containers
+# TODO: remove last chmods once permissions are set correctly on /home/compass_user for delivered containers
 RUN set -ex \
     && cd ${PGE_DEST_DIR} \
     && mkdir -p ${CONDA_ROOT}/bin \
@@ -52,7 +52,8 @@ RUN set -ex \
     && chmod +x ${CONDA_ROOT}/bin/*_entrypoint.sh \
     && . ${CONDA_ROOT}/bin/activate root \
     && conda install --yes --channel conda-forge --file ${PGE_DEST_DIR}/opera/requirements.txt \
-    && chmod 755 ${PGE_DEST_DIR}
+    && chmod 755 ${PGE_DEST_DIR} \
+    && chmod 777 ${PGE_DEST_DIR}/scratch
 
 # Set the Docker entrypoint and clear the default command
 ENTRYPOINT ["sh", "-c", "exec ${CONDA_ROOT}/bin/pge_docker_entrypoint.sh \"${@}\"", "--"]
