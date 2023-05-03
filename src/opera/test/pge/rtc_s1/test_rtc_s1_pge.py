@@ -186,12 +186,16 @@ class RtcS1PgeTestCase(unittest.TestCase):
 
         output_files = glob.glob(join(pge.runconfig.output_product_path, f"{core_filename}*.tif"))
 
-        self.assertEqual(len(output_files), 4)
+        self.assertEqual(len(output_files), 8)
 
         output_files = list(map(os.path.basename, output_files))
 
         self.assertIn(f"{core_filename}_VV.tif", output_files)
         self.assertIn(f"{core_filename}_VH.tif", output_files)
+        self.assertIn(f"{core_filename}_HH.tif", output_files)
+        self.assertIn(f"{core_filename}_HV.tif", output_files)
+        self.assertIn(f"{core_filename}_VV+VH.tif", output_files)
+        self.assertIn(f"{core_filename}_HH+HV.tif", output_files)
         self.assertIn(f"{core_filename}_nlooks.tif", output_files)
         self.assertIn(f"{core_filename}_layover_shadow_mask.tif", output_files)
 

@@ -768,6 +768,10 @@ class RtcS1Executor(RtcS1PreProcessorMixin, RtcS1PostProcessorMixin, PgeExecutor
         self.rename_by_pattern_map = {
             "*_VV.tif": self._rtc_geotiff_filename,
             "*_VH.tif": self._rtc_geotiff_filename,
+            "*_HH.tif": self._rtc_geotiff_filename,
+            "*_HV.tif": self._rtc_geotiff_filename,
+            "*_VV+VH.tif": self._rtc_geotiff_filename,
+            "*_HH+HV.tif": self._rtc_geotiff_filename,
             "*_rtc_anf.tif": self._static_layer_filename,
             "*_nlooks.tif": self._static_layer_filename,
             "*_local_incidence_angle.tif": self._static_layer_filename,
