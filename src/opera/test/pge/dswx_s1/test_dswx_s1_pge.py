@@ -29,7 +29,9 @@ class DswxS1PgeTestCase(unittest.TestCase):
     starting_dir = None
     working_dir = None
     test_dir = None
-    input_file = None
+    input_tif_file = None
+    input_h5_file = None
+    input_dir = "dswx_s1_pge_test/input_dir"
 
     @classmethod
     def setUpClass(cls) -> None:
@@ -52,22 +54,26 @@ class DswxS1PgeTestCase(unittest.TestCase):
         )
 
         # Create the input directories expected by the test Runconfig file
-        input_dir = join(self.working_dir.name, "dswx_s1_pge_test/input_dir")
-        os.makedirs(input_dir, exist_ok=True)
+        test_input_dir = join(self.working_dir.name, "dswx_s1_pge_test/input_dir")
+        os.makedirs(test_input_dir, exist_ok=True)
 
         ancillary_data_dir = join(self.working_dir.name, "dswx_s1_pge_test/input_dir/ancillary_data")
         os.makedirs(ancillary_data_dir, exist_ok=True)
 
-        self.input_file = tempfile.NamedTemporaryFile(
-            dir=input_dir, prefix="test_input_", suffix=".tiff"
+        self.input_tif_file = tempfile.NamedTemporaryFile(
+            dir=test_input_dir, prefix="test_input", suffix=".tiff"
         )
+
+        # Create dummy versions of the expected .h5 file
+        input_h5_file = 'test_h5_file.h5'
+        os.system(f"touch {join(test_input_dir, input_h5_file)}")
 
         os.chdir(self.working_dir.name)
 
     def tearDown(self) -> None:
         """Return to starting directory"""
         os.chdir(self.test_dir)
-        self.input_file.close()
+        self.input_tif_file.close()
         self.working_dir.cleanup()
 
     def _compare_algorithm_parameters_runconfig_to_expected(self, runconfig):
@@ -251,6 +257,107 @@ class DswxS1PgeTestCase(unittest.TestCase):
 
         finally:
             if exists(test_runconfig_path):
+                os.unlink(test_runconfig_path)
+
+    def test_dswx_s1_pge_input_validation(self):
+        """Test the input validation checks made by DSWxS1PreProcessorMixin."""
+        runconfig_path = join(self.data_dir, 'test_dswx_s1_config.yaml')
+        test_runconfig_path = join(self.data_dir, 'invalid_dswx_s1_runconfig.yaml')
+
+        with open(runconfig_path, 'r', encoding='utf-8') as stream:
+            runconfig_dict = yaml.safe_load(stream)
+
+        input_files_group = runconfig_dict['RunConfig']['Groups']['PGE']['InputFilesGroup']
+
+        # Test that a non-existent file is detected by pre-processor
+        input_files_group['InputFilePaths'] = ['non_existent_file.tif']
+
+        with open(test_runconfig_path, 'w', encoding='utf-8') as input_path:
+            yaml.safe_dump(runconfig_dict, input_path, sort_keys=False)
+
+        try:
+            pge = DSWxS1Executor(pge_name="DSWxS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            # Config validation occurs before the log is fully initialized, but the
+            # initial log file should still exist and contain details of the validation
+            # error
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            # Open the log file, and check that the validation error details were captured
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn(f"Could not locate specified input file/directory "
+                          f"{abspath('non_existent_file.tif')}", log_contents)
+
+            # Test that an input directory with no .tif files is caught
+            input_files_group['InputFilePaths'] = ['dswx_s1_pge_test/scratch_dir']
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as out_file:
+                yaml.safe_dump(runconfig_dict, out_file, sort_keys=False)
+
+            pge = DSWxS1Executor(pge_name="DSWxS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn(f"Input directory {abspath('dswx_s1_pge_test/scratch_dir')} "
+                          f"does not contain any tif files", log_contents)
+
+            # Test that an input directory with no .h5 files is caught
+            input_files_group['InputFilePaths'] = ['dswx_s1_pge_test/scratch_dir']
+
+            os.system(f"touch {abspath('dswx_s1_pge_test/scratch_dir/test.tif')}")
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as out_file:
+                yaml.safe_dump(runconfig_dict, out_file, sort_keys=False)
+
+            pge = DSWxS1Executor(pge_name="DSWxS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn(f"Input directory {abspath('dswx_s1_pge_test/scratch_dir')} "
+                          f"does not contain any h5 files", log_contents)
+
+            # Lastly, check that a file that exists but is not a tif or an h5 is caught
+            input_files_group['InputFilePaths'] = [runconfig_path]
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as runconfig_fh:
+                yaml.safe_dump(runconfig_dict, runconfig_fh, sort_keys=False)
+
+            pge = DSWxS1Executor(pge_name="DSWxS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn(f"Input file {abspath(runconfig_path)} does not have "
+                          f".tif or .h5 extension", log_contents)
+
+        finally:
+            if os.path.exists(test_runconfig_path):
                 os.unlink(test_runconfig_path)
 
 

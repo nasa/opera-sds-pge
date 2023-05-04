@@ -12,6 +12,7 @@ from os.path import isfile
 
 import yamale
 
+import opera.util.input_validation as input_validation
 from opera.pge.base.base_pge import PgeExecutor
 from opera.pge.base.base_pge import PostProcessorMixin
 from opera.pge.base.base_pge import PreProcessorMixin
@@ -91,6 +92,7 @@ class DSWxS1PreProcessorMixin(PreProcessorMixin):
         super().run_preprocessor(**kwargs)
 
         self._validate_algorithm_parameters_config()
+        input_validation.validate_dswx_inputs(self.runconfig, self.logger, self.runconfig.pge_name)
 
 
 class DSWxS1PostProcessorMixin(PostProcessorMixin):

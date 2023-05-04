@@ -9,7 +9,8 @@ Common code used by some PGEs for input validation.
 
 """
 
-from os.path import exists, splitext
+import glob
+from os.path import abspath, exists, isdir, join, splitext
 
 from opera.util.error_codes import ErrorCode
 
@@ -47,15 +48,6 @@ def check_input(input_object, logger, name, valid_extensions=None):
 
 def validate_slc_s1_inputs(runconfig, logger, name):
     """
-    Parameters
-    ----------
-    runconfig: file
-        Runconfig file passed by the calling PGE
-    logger: PgeLogger
-        Logger passed by the calling PGE
-    name:  str
-        pge name
-
     This function is shared by the RTC-S1 and CLSC-S1 PGEs:
     Evaluates the list of inputs from the RunConfig to ensure they are valid.
     There are 2 required categories defined in the 'input_file_group':
@@ -67,6 +59,15 @@ def validate_slc_s1_inputs(runconfig, logger, name):
 
     There is also an ancillary file contained in the input_dir
         - dem_file : str
+
+    Parameters
+    ----------
+    runconfig: file
+        Runconfig file passed by the calling PGE
+    logger: PgeLogger
+        Logger passed by the calling PGE
+    name:  str
+        pge name
 
     """
     # Retrieve the input_file_group from the run config file
@@ -107,3 +108,59 @@ def validate_slc_s1_inputs(runconfig, logger, name):
         else:
             error_msg = f"Unexpected input: {key}: {value}"
             logger.critical(name, ErrorCode.INVALID_INPUT, error_msg)
+
+
+def validate_dswx_inputs(runconfig, logger, name):
+    """
+    This function is shared by the DSWX-HLS and DSWX-S1 PGEs:
+    Evaluates the list of main inputs from the RunConfig to ensure they are valid.
+    DSWX-S1 ancillary input validation is performed by the DSWX-S1 pge.
+
+    For directories, this means checking for directory existence, and that
+    at least one file of each required type resides within the directory. For files,
+    each file is checked for existence and that it has an appropriate extension.
+
+    Expected file extensions in the input_dir
+        - dswx-hls : .tif (min=1)
+        - dswx-s1 : .tif (min=1), .h5 (min-1)
+
+    Parameters
+    ----------
+    runconfig: file
+        Runconfig file passed by the calling PGE
+    logger: PgeLogger
+        Logger passed by the calling PGE
+    name:  str
+        pge name
+
+    """
+    for input_file in runconfig.input_files:
+        input_file_path = abspath(input_file)
+
+        if not exists(input_file_path):
+            error_msg = f"Could not locate specified input file/directory {input_file_path}"
+
+            logger.critical(name, ErrorCode.INPUT_NOT_FOUND, error_msg)
+        elif isdir(input_file_path):
+            list_of_input_tifs = glob.glob(join(input_file_path, '*.tif*'))
+            if len(list_of_input_tifs) <= 0:
+                error_msg = f"Input directory {input_file_path} does not contain any tif files"
+
+                logger.critical(name, ErrorCode.INPUT_NOT_FOUND, error_msg)
+            if name == "DSWX_S1_PGE":
+                list_of_input_h5 = glob.glob(join(input_file_path, '*.h5'))
+                if len(list_of_input_h5) <= 0:
+                    error_msg = f"{name} Input directory {input_file_path} does not contain any h5 files"
+
+                    logger.critical(name, ErrorCode.INPUT_NOT_FOUND, error_msg)
+
+        elif not input_file_path.endswith(".tif") and name == "DSWX_HLS_PGE":
+            error_msg = f"{name} Input file {input_file_path} does not have .tif extension."
+
+            logger.critical(name, ErrorCode.INVALID_INPUT, error_msg)
+
+        elif not input_file_path.endswith(".tif") or not input_file_path.endswith(".h5") and name == "DSWX_S1_PGE":
+            error_msg = f"{name} Input file {input_file_path} does not have .tif or .h5 extension."
+
+            logger.critical(name, ErrorCode.INVALID_INPUT, error_msg)
+

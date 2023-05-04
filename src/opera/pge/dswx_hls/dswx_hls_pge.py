@@ -33,7 +33,6 @@ from opera.util.metadata_utils import get_sensor_from_spacecraft_name
 from opera.util.render_jinja2 import render_jinja2
 from opera.util.time import get_time_for_filename
 
-
 class DSWxHLSPreProcessorMixin(PreProcessorMixin):
     """
     Mixin class responsible for handling all pre-processing steps for the
@@ -182,7 +181,8 @@ class DSWxHLSPreProcessorMixin(PreProcessorMixin):
         """
         super().run_preprocessor(**kwargs)
 
-        self._validate_inputs()
+        input_validation.validate_dswx_inputs(self.runconfig, self.logger, self.runconfig.pge_name)
+        # self._validate_inputs()
         self._validate_ancillary_inputs()
         self._validate_expected_input_platforms()
 

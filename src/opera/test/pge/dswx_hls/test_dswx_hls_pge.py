@@ -228,6 +228,7 @@ class DSWxHLSPgeTestCase(unittest.TestCase):
 
             self.assertIn(f"Input file {abspath(runconfig_path)} does not have "
                           f".tif extension", log_contents)
+
         finally:
             if os.path.exists(test_runconfig_path):
                 os.unlink(test_runconfig_path)
