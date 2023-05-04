@@ -15,6 +15,8 @@ RunConfig:
             DynamicAncillaryFilesGroup:
                 AncillaryFileMap:
                     dem_file: cslc_pge_test/input_dir/dem_4326.tiff
+                    tec_file: cslc_pge_test/input_dir/jplg1210.22i
+                    burst_database_file: cslc_pge_test/input_dir/opera_burst_database_deploy_2022_1212.sqlite3
 
             ProductPathGroup:
                 OutputProductPath: cslc_pge_test/output_dir
@@ -26,7 +28,11 @@ RunConfig:
                 ProgramPath: mkdir
                 ProgramOptions:
                     - '-p cslc_pge_test/output_dir/t064_135518_iw1/20220501/;'
-                    - 'python3 -c "from opera.util.metadata_utils import create_test_cslc_metadata_product; create_test_cslc_metadata_product(\"cslc_pge_test/output_dir/t064_135518_iw1/20220501/t064_135518_iw1_20220501_VV.h5\")";'
+                    - 'touch cslc_pge_test/output_dir/t064_135518_iw1/20220501/static_layers_t064_135518_iw1.h5;'
+                    - 'touch cslc_pge_test/output_dir/t064_135518_iw1/20220501/t064_135518_iw1_20220501.png;'
+                    - 'dd if=/dev/urandom of=cslc_pge_test/output_dir/t064_135518_iw1/20220501/t064_135518_iw1_20220501.png bs=1M count=1;'
+                    - 'dd if=/dev/urandom of=cslc_pge_test/output_dir/t064_135518_iw1/20220501/static_layers_t064_135518_iw1.h5 bs=1M count=1;'
+                    - 'python3 -c "from opera.util.metadata_utils import create_test_cslc_metadata_product; create_test_cslc_metadata_product(\"cslc_pge_test/output_dir/t064_135518_iw1/20220501/t064_135518_iw1_20220501.h5\")";'
                     - '/bin/echo CSLC-S1 invoked with RunConfig'
                 ErrorCodeBase: 200000
                 SchemaPath: pge/cslc_s1/schema/cslc_s1_sas_schema.yaml
@@ -59,6 +65,7 @@ RunConfig:
 
                     dynamic_ancillary_file_group:
                         dem_file: cslc_pge_test/input_dir/dem_4326.tiff
+                        tec_file: cslc_pge_test/input_dir/jplg1210.22i
 
                     static_ancillary_file_group:
                         burst_database_file: cslc_pge_test/input_dir/db.sqlite3
@@ -67,26 +74,7 @@ RunConfig:
                         product_path: output_dir
                         scratch_path: output_dir/scratch_dir
                         sas_output_file: output_s1_cslc
+                        product_version: 1.0
 
                     primary_executable:
                         product_type: CSLC_S1
-
-                    processing:
-                        polarization: co-pol
-                        geocoding:
-                            output_format: GTiff
-                            flatten: True
-                            lines_per_block: 1000
-                            x_posting: 5
-                            y_posting: 10
-                            x_snap:
-                            y_snap:
-                        geo2rdr:
-                            lines_per_block: 1000
-                            threshold: 1.0e-8
-                            numiter: 25
-
-                    worker:
-                        internet_access: False
-                        gpu_enabled: False
-                        gpu_id: 0

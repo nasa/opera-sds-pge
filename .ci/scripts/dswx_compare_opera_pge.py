@@ -198,7 +198,7 @@ def _compare_dswx_hls_metadata(metadata_1, metadata_2, metadata_exclude_list=[])
                 else:
                     msg = f'* (fail) {msg}'
                     flag_same_metadata = False
-                    metadata_compare_message += msg + '\n' + PREFIX
+                metadata_compare_message += msg + '\n' + PREFIX
 
     return metadata_compare_message, flag_same_metadata
 

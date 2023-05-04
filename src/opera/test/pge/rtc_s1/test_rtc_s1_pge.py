@@ -26,6 +26,7 @@ from opera.pge.rtc_s1.rtc_s1_pge import RtcS1Executor
 from opera.util import PgeLogger
 from opera.util.metadata_utils import create_test_rtc_metadata_product
 from opera.util.metadata_utils import get_rtc_s1_product_metadata
+from opera.util.metadata_utils import get_sensor_from_spacecraft_name
 
 
 class RtcS1PgeTestCase(unittest.TestCase):
@@ -166,11 +167,12 @@ class RtcS1PgeTestCase(unittest.TestCase):
         output_file = output_files[0]
 
         rtc_metadata = get_rtc_s1_product_metadata(output_file)
+        sensor = get_sensor_from_spacecraft_name(rtc_metadata['identification']['platform'])
 
         file_name_regex = rf"{pge.PROJECT}_{pge.LEVEL}_{pge.NAME}-{pge.SOURCE}_" \
                           rf"\w{{4}}-\w{{6}}-\w{{3}}_" \
                           rf"\d{{8}}T\d{{6}}Z_\d{{8}}T\d{{6}}Z_" \
-                          rf"{rtc_metadata['identification']['missionId']}_" \
+                          rf"{sensor}_" \
                           rf"{int(rtc_metadata['frequencyA']['xCoordinateSpacing'])}_" \
                           rf"v{pge.runconfig.product_version}.h5"
 
@@ -184,12 +186,27 @@ class RtcS1PgeTestCase(unittest.TestCase):
 
         output_files = glob.glob(join(pge.runconfig.output_product_path, f"{core_filename}*.tif"))
 
-        self.assertEqual(len(output_files), 2)
+        self.assertEqual(len(output_files), 8)
 
         output_files = list(map(os.path.basename, output_files))
 
         self.assertIn(f"{core_filename}_VV.tif", output_files)
         self.assertIn(f"{core_filename}_VH.tif", output_files)
+        self.assertIn(f"{core_filename}_HH.tif", output_files)
+        self.assertIn(f"{core_filename}_HV.tif", output_files)
+        self.assertIn(f"{core_filename}_VV+VH.tif", output_files)
+        self.assertIn(f"{core_filename}_HH+HV.tif", output_files)
+        self.assertIn(f"{core_filename}_nlooks.tif", output_files)
+        self.assertIn(f"{core_filename}_layover_shadow_mask.tif", output_files)
+
+        # Finally, ensure file name was applied to the png browse image
+        output_files = glob.glob(join(pge.runconfig.output_product_path, f"{core_filename}*.png"))
+
+        self.assertEqual(len(output_files), 1)
+
+        output_files = list(map(os.path.basename, output_files))
+
+        self.assertIn(f"{core_filename}_BROWSE.png", output_files)
 
     def test_iso_metadata_creation(self):
         """
@@ -428,6 +445,7 @@ class RtcS1PgeTestCase(unittest.TestCase):
 
         product_group = runconfig_dict['RunConfig']['Groups']['SAS']['runconfig']['groups']['product_group']
         product_group['output_imagery_format'] = "NETCDF"
+        product_group['save_browse'] = False  # Don't check for the .png browse image
 
         with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
             yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
@@ -453,6 +471,7 @@ class RtcS1PgeTestCase(unittest.TestCase):
 
             product_group = runconfig_dict['RunConfig']['Groups']['SAS']['runconfig']['groups']['product_group']
             product_group['output_imagery_format'] = "HDF5"
+            product_group['save_browse'] = False  # Don't check for the .png browse image
 
             with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
                 yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)

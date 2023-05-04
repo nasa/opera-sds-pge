@@ -85,6 +85,34 @@ class RunConfig:
                 f'Unable to parse {yaml_filename}, expected top-level RunConfig entry'
             ) from key_error
 
+    @staticmethod
+    def _parse_algorithm_parameters_run_config_file(yaml_filename):
+        """
+        Loads an algorithm parameter run configuration YAML file.
+        Returns the loaded data as a Python object.
+
+        Parameters
+        ----------
+        yaml_filename : str
+            Path to the runconfig YAML file to parse.
+
+
+        Raises
+        ------
+        RuntimeError
+            If the parsed config does not define a top-level "runconfig" entry
+
+        """
+        with open(yaml_filename, 'r', encoding='utf-8') as stream:
+            dictionary = yaml.safe_load(stream)
+
+        try:
+            return dictionary['runconfig']
+        except KeyError as key_error:
+            raise RuntimeError(
+                f'Unable to parse {yaml_filename}, expected top-level runconfig entry'
+            ) from key_error
+
     def validate(self, pge_schema_file=BASE_PGE_SCHEMA, strict_mode=True):
         """
         Validates the RunConfig using a combination of the base PGE schema,
@@ -251,6 +279,33 @@ class RunConfig:
             if isabs(sas_schema_path)
             else resource_filename('opera', sas_schema_path)
         )
+
+    @property
+    def algorithm_parameters_schema_path(self) -> str:
+        """Returns the path to the optional algorithm parameter Schema file for DSWX-S1"""
+        algorithm_parameters_schema_path = self._pge_config['PrimaryExecutable']['AlgorithmParametersSchemaPath']
+        if algorithm_parameters_schema_path is None:
+            return None
+        else:
+            return (
+                algorithm_parameters_schema_path
+                if isabs(algorithm_parameters_schema_path)
+                else resource_filename('opera', algorithm_parameters_schema_path)
+            )
+
+    @property
+    def algorithm_parameters_config_path(self) -> str:
+        """Returns the path to the algorithm_parameter run configuration file for DSWX-S1"""
+        try:
+            algorithm_parameters_config_path = \
+                self._sas_config['runconfig']['groups']['dynamic_ancillary_file_group']['algorithm_parameters']
+            return (
+                algorithm_parameters_config_path
+                if isabs(algorithm_parameters_config_path)
+                else resource_filename('opera', algorithm_parameters_config_path)
+            )
+        except KeyError:
+            return None
 
     @property
     def iso_template_path(self) -> str:

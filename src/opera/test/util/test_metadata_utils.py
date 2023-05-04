@@ -73,7 +73,7 @@ class MetadataUtilsTestCase(unittest.TestCase):
             self.assertAlmostEqual(product_output['frequencyA']['centerFrequency'], 5405000454.33435)
             self.assertEqual(product_output['orbit']['orbitType'], "POE")
             self.assertEqual(product_output['processingInformation']['inputs']['demSource'], 'dem.tif')
-            for po, eo in zip(product_output['processingInformation']['inputs']['auxcalFiles'],
+            for po, eo in zip(product_output['processingInformation']['inputs']['annotationFiles'],
                               ['calibration-s1b-iw1-slc-vv-20180504t104508-20180504t104533-010770-013aee-004.xml',
                                'noise-s1b-iw1-slc-vv-20180504t104508-20180504t104533-010770-013aee-004.xml']):
                 self.assertEqual(po, eo)

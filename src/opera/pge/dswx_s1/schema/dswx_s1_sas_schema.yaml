@@ -1,5 +1,5 @@
 #
-# Yamale schema for the CSLC-S1 SAS Configuration
+# Yamale schema for the DSWx-S1 SAS Configuration
 #
 
 runconfig:
@@ -7,33 +7,62 @@ runconfig:
 
     groups:
         pge_name_group:
-           pge_name: enum('DSWx_S1_PGE')
+            pge_name: enum('DSWX_S1_PGE')
 
         input_file_group:
-            # REQUIRED - Single HLS dataset (directory or files)
+            # REQUIRED - list of RTC products (directory or files)
             input_file_path: list(str(), min=1)
 
         dynamic_ancillary_file_group:
-            # Digital Elevation Model.
-            dem_file: str(required=False)
+            # Digital elevation model
+            dem_file: str(required=True)
+
+            # Digital elevation model description
+            dem_file_description: str(required=False)
+
+            # Reference water body map (Required)
+            # https://global-surface-water.appspot.com/download
+            reference_water_file: str(required=True)
+
+            # Pekel's water description
+            reference_water_file_description: str(required=False)
+
+            # Height Above Nearest Drainage (optional)
+            hand_file: str(required=True)
+
+            # HAND description
+            hand_file_description: str(required=False)
+
+            # ESA WorldCover map file
+            world_file: str(required=False)
+
+            # ESA WorldCover map description
+            worldcover_file_description: str(required=False)
+
+            # NOAA GSHHS shapefile
+            shoreline_shapefile: str(required=False)
+
+            # NOAA GSHHS shapefile description
+            shoreline_shapefile_description: str(required=False)
+
+            # algorithm parameter
+            algorithm_parameters: str(required=True)
+
+        primary_executable:
+            product_type: enum('dswx_s1', 'twele')
 
         product_path_group:
             # Directory where PGE will place results
             product_path: str()
+
             # Directory where SAS can write temporary data
             scratch_path: str()
-            # Intermediate file name. SAS writes the output to this file.
-            # PGE may rename the product according to file naming convention
-            sas_output_file: str()
 
-        primary_executable:
-            product_type: enum('DSWX_S1')
+            # Intermediate file name.  SAS writes the output product to the following file.
+            # After the SAS completes, the PGE wrapper renames the product file
+            # according to proper file naming conventions.
+            sas_output_path: str()
 
-        # This section includes parameters to tweak the workflow
-        processing: include('processing_options', required=False)
+            product_version: num(required=False)
 
----
-# Group of processing options
-processing_options:
-  # Placeholder for now: Check if ancillary inputs cover entirely the output product
-  check_ancillary_inputs_coverage: bool(required=False)
+        log_file: str(required=False)

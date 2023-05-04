@@ -1,4 +1,4 @@
-# Dockerfile to produce the production CSLC-S1 PGE Docker image for OPERA
+# Dockerfile to produce the production DSWx-S1 PGE Docker image for OPERA
 # Author: Scott Collins
 
 # Default SAS image path, must be provided by the docker build call via --build-arg
@@ -6,8 +6,8 @@ ARG SAS_IMAGE
 FROM $SAS_IMAGE
 
 ARG PGE_SOURCE_DIR
-ARG PGE_DEST_DIR=/home/compass_user
-ARG CONDA_ROOT=/home/compass_user/miniconda3
+ARG PGE_DEST_DIR=/home/conda
+ARG CONDA_ROOT=/opt/conda
 
 ENV PGE_DEST_DIR=$PGE_DEST_DIR
 ENV CONDA_ROOT=$CONDA_ROOT
@@ -37,28 +37,24 @@ LABEL org.label-schema.build-date=${BUILD_DATE_TIME} \
   maintainer="California Institute of Technology"
 
 # Copy the OPERA PGE software into the container
-# the base container has a default user "compass_user" with UID/GID 1000/1000
-COPY --chown=compass_user:compass_user ${PGE_SOURCE_DIR} ${PGE_DEST_DIR}
+# the base container has a default user "conda" with UID/GID 1000/1000
+COPY --chown=conda:conda ${PGE_SOURCE_DIR} ${PGE_DEST_DIR}
 
 # Switch to root for installing into Conda Env
 USER 0:0
 
 # Install dependencies into existing Conda Env
-# TODO: remove last chmods once permissions are set correctly on /home/compass_user for delivered containers
 RUN set -ex \
     && cd ${PGE_DEST_DIR} \
     && mkdir -p ${CONDA_ROOT}/bin \
     && cp ${PGE_DEST_DIR}/opera/scripts/*_entrypoint.sh ${CONDA_ROOT}/bin \
     && chmod +x ${CONDA_ROOT}/bin/*_entrypoint.sh \
     && . ${CONDA_ROOT}/bin/activate root \
-    && conda install --yes --channel conda-forge --file ${PGE_DEST_DIR}/opera/requirements.txt \
-    && chmod 755 ${PGE_DEST_DIR} \
-    && chmod 777 ${PGE_DEST_DIR}/scratch
+    && conda install --yes --channel conda-forge --file ${PGE_DEST_DIR}/opera/requirements.txt
 
 # Set the Docker entrypoint and clear the default command
 ENTRYPOINT ["sh", "-c", "exec ${CONDA_ROOT}/bin/pge_docker_entrypoint.sh \"${@}\"", "--"]
 CMD []
 
 # Set the user/group back to the default
-USER compass_user:compass_user
-
+USER conda:conda
