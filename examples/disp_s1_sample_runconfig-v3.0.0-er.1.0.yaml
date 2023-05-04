@@ -43,7 +43,7 @@ RunConfig:
 
             DebugLevelGroup:
                 DebugSwitch: False
-                ExecuteViaShell: True  # Must be set to True for test to work
+                ExecuteViaShell: False
 
 
         # SAS-specific RunConfig section

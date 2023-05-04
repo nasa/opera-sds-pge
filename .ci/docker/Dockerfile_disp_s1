@@ -37,7 +37,7 @@ LABEL org.label-schema.build-date=${BUILD_DATE_TIME} \
   maintainer="California Institute of Technology"
 
 # Copy the OPERA PGE software into the container
-# the base container has a default user "compass_user" with UID/GID 1000/1000
+# the base container has a default user "mamba" with UID/GID 1000/1000
 COPY --chown=mamba:mamba ${PGE_SOURCE_DIR} ${PGE_DEST_DIR}
 
 # Switch to root for installing into Conda Env

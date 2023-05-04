@@ -57,4 +57,4 @@ runconfig:
             # GDAL creation options for GeoTIFF files.
             gtiff_creation_options: list()
         # Name of the subdataset to use in the input NetCDF files.
-        subdataset: science/SENTINEL1/CSLC/grids/VV
+        subdataset: str()
