@@ -3,13 +3,18 @@ import matplotlib.pyplot as plt
 import pandas
 import sys
 
-def main():
+def generate_plots_from_csv_file(metrics_csv_file, metrics_plot_file):
     """Generate plots of the metrics collected in the .csv file
+
+    Parameters
+    ----------
+    metrics_csv_file: str
+        Path to input csv file.
+    metrics_plot_file: str
+        Path to output plot file. Matplotlib will use the extension to determine saved format.
     """
 
-    metrics_csv_file = sys.argv[1]
-
-    columns = "SECONDS,Name,PIDs,CPU,Memory,MemoryP,NetSend,NetRecv,DiskRead,DiskWrite,Disk,Swap,Threads/"
+    columns = "SECONDS,Name,PIDs,CPU,Memory,MemoryP,NetSend,NetRecv,DiskRead,DiskWrite,Disk,Swap,Threads"
     convert = {'SECONDS':int(),'Name':str(),'PIDs':int(),'CPU':float(),'Memory':float(),
                'MemoryP':float(),'NetSend':float(),'NetRecv':float(),'DiskRead':float(),
                'DiskWrite':float(),'Disk':int(),'Swap':int(),'Threads':int()}
@@ -17,7 +22,7 @@ def main():
     # read in the new data and make lists out of the columns for analysis
     colnames = columns.split(',')
 
-    data = pandas.read_csv(metrics_csv_file, header=0, names=colnames, converters=convert)
+    data = pandas.read_csv(metrics_csv_file, header=1, names=colnames, converters=convert)
 
     # convert non-string data to numbers
     data = data.apply(pandas.to_numeric, errors='coerce')
@@ -129,20 +134,21 @@ def main():
     fig, axs = plt.subplots(len(pl), figsize=(plot_width, plot_height*(len(pl))))
     fig.suptitle(metrics_csv_file)
     x = secs
-    # limit how often log messages are shown to avoid overlapped text
-    skip_after_log = int(len(x) / (plot_width*3))
+
     for i in range(len(pl)):
         y = pl[i]['y']
         axs[i].set_title(pl[i]['title'])
         axs[i].grid(True)
-        for j,xj in enumerate(x):
         axs[i].plot(x,y,'.-')
         axs[i].set(xlabel=pl[i]['xlabel'],ylabel=pl[i]['ylabel'])
 
-    img_name = metrics_csv_file.replace("csv", "png")
     plt.tight_layout(rect=[0, 0.03, 1, 0.95])
-    plt.savefig(img_name)
+    plt.savefig(metrics_plot_file)
 
 
 if __name__ == "__main__":
-    main()
+
+    metrics_csv_file = sys.argv[1]
+    metrics_plot_file = sys.argv[2]
+
+    generate_plots_from_csv_file(metrics_csv_file, metrics_plot_file)

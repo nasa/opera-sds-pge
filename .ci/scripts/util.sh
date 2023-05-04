@@ -164,7 +164,7 @@ metrics_collection_start()
     # Use 'df' command to capture the amount of space on the filesystem (-B sets block size (1K)
     # the line represent Filesystem  1K-blocks  Used Blocks Available Blocks %Used Mounted_On
     if [[ $os == "linux" ]]; then
-        block_space_cmd='df -B 1024 | grep "/dev/xvdf"'
+        block_space_cmd='df -B 1024 | grep /data'
     else
         # shellcheck disable=SC2089
         block_space_cmd='df -B 1024 | grep "/System/Volumes/VM"'
@@ -213,12 +213,23 @@ metrics_collection_end()
 
     if [[ $exit_code == 0 ]]
     then
-        python3 "$SCRIPT_DIR"/process_metric_data.py "$pge" "$container" "$metrics_stats" "$results_dir"
+        timestamp=$(date -u +'%Y%m%dT%H%M%SZ')
+        processed_csv_file="${results_dir}/docker_metrics_${pge}_${container}_${timestamp}.csv"
+        python3 "$SCRIPT_DIR"/process_metric_data.py "$pge" "$container" "$metrics_stats" "$processed_csv_file"
         process_metrics_exit_code=$?
-
         if [[ $process_metrics_exit_code == 0 ]]
         then
-            rm "$metrics_stats"
+            metrics_plot_file="${results_dir}/docker_metrics_${pge}_${container}_${timestamp}.png"
+            python3 "$SCRIPT_DIR"/plot_metric_data.py "$processed_csv_file" "$metrics_plot_file"
+            plot_metrics_exit_code=$?
+			if [[ $plot_metrics_exit_code == 0 ]]
+			then
+                rm "$metrics_stats"
+            else
+                echo "An error occurred in plot_metric_data.py"
+            fi
+        else
+            echo "An error occurred in process_metric_data.py"
         fi
 
         echo "metrics_collection has completed."

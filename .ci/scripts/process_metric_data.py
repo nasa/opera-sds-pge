@@ -177,7 +177,7 @@ def main():
     container_info = sys.argv[1]
     container_name = sys.argv[2]
     stats_file = sys.argv[3]
-    output_dir = sys.argv[4]
+    output_file = sys.argv[4]
 
     temp_stats = "temp_opera_docker_stats.csv"
 
@@ -189,16 +189,13 @@ def main():
 
     current_time = datetime.datetime.today().strftime('%Y%m%d_%H%M%S')
 
-    # For now make formatted file
-    docker_report_file = f"{output_dir}/docker_metrics_{container_info}_{container_name}_{current_time}.csv"
-
     # read files into lists
     stats_list = make_lists(temp_stats)
 
     if stats_list:
         # Write out the docker stats file
         output_columns = "Seconds, Name, PIDs, CPU, Memory, MemoryP, NetSend, NetRecv, DiskRead, DiskWrite, Disk, Swap, Threads, LastLogLine"
-        with open(docker_report_file, 'w') as out_file:
+        with open(output_file, 'w') as out_file:
             out_file.write(f"{output_columns}\n")
             for stats_row in stats_list:
                 row = format_out_row_docker(stats_row)
