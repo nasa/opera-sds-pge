@@ -14,10 +14,8 @@ import datetime
 import os
 import sys
 
-prior_log_line = None
 
-
-def remove_unwanted_lines(csv_file, file_name):
+def remove_unwanted_lines(csv_file, file_name, expected_column_count):
     """
     Remove all lines without data from docker stats
     Write results to a new file and delete the old file (cvs_file)
@@ -37,7 +35,7 @@ def remove_unwanted_lines(csv_file, file_name):
     with open(csv_file) as file_obj:
         reader_obj = csv.reader(file_obj, delimiter=",")
         for row in reader_obj:
-            if len(row) >> 2:
+            if len(row) == expected_column_count:
                 new_data.append(row)
 
     # Write 'new_data' to temp file
@@ -152,18 +150,8 @@ def format_out_row_docker(stats_row):
     else:
         swap = stats_row['swap_used'].split()[2]
     threads = stats_row['total_threads'].strip()
-    # Todo fix this code so we get the last line stuff: right now it's blank
-    # only update last line if it has changed
-    global prior_log_line
-    if prior_log_line is not None and stats_row['last_line'] == prior_log_line:
-        last_line = "N/A"
-    else:
-        last_line = stats_row['last_line']
-        prior_log_line = last_line
-        # Temp until this is fixed
-        last_line = 'N/A'
 
-    return f"{secs},{name},{pids},{cpu},{mem},{mem_p},{net_s},{net_r},{disk_r},{disk_w},{disk},{swap},{threads},{last_line}"
+    return f"{secs},{name},{pids},{cpu},{mem},{mem_p},{net_s},{net_r},{disk_r},{disk_w},{disk},{swap},{threads}"
 
 
 def make_lists(csv_file):
@@ -194,11 +182,14 @@ def main():
     temp_stats = "temp_opera_docker_stats.csv"
 
     # Remove lines that may have been recorded before Docker stated.
-    remove_unwanted_lines(stats_file, temp_stats)
+    stats_columns = "SECONDS,{{.Name}},CPU,{{.CPUPerc}},MEM,{{.MemUsage}},MEM_PERC,{{.MemPerc}},NET,{{.NetIO}},BLOCK,{{.BlockIO}},PIDS,{{.PIDs}},disk_used,swap_used,total_threads"
+    expected_column_count = len(stats_columns.split(','))
+    print(f"expected cols {expected_column_count}")
+    remove_unwanted_lines(stats_file, temp_stats, expected_column_count)
 
     current_time = datetime.datetime.today().strftime('%Y%m%d_%H%M%S')
 
-    # For now make two formatted files
+    # For now make formatted file
     docker_report_file = f"{output_dir}/docker_metrics_{container_info}_{container_name}_{current_time}.csv"
 
     # read files into lists
@@ -206,9 +197,9 @@ def main():
 
     if stats_list:
         # Write out the docker stats file
-        docker_columns = "Seconds, Name, PIDs, CPU, Memory, MemoryP, NetSend, NetRecv, DiskRead, DiskWrite, Disk, Swap, Threads, LastLogLine"
+        output_columns = "Seconds, Name, PIDs, CPU, Memory, MemoryP, NetSend, NetRecv, DiskRead, DiskWrite, Disk, Swap, Threads, LastLogLine"
         with open(docker_report_file, 'w') as out_file:
-            out_file.write(f"{docker_columns}\n")
+            out_file.write(f"{output_columns}\n")
             for stats_row in stats_list:
                 row = format_out_row_docker(stats_row)
                 out_file.write(f"{row}\n")
@@ -216,7 +207,7 @@ def main():
         print("ERROR: No docker statistics were collected.")
 
     # Remove temporary files
-    os.remove(temp_stats)
+    # os.remove(temp_stats)
 
 if __name__ == "__main__":
     main()

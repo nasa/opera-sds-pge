@@ -150,7 +150,7 @@ metrics_collection_start()
     ds="docker stats --no-stream --format ${docker_stats_columns} ${container_name}";
 
     # Output the column titles
-    echo "SECONDS,${docker_stats_columns},disk_used,swap_used,total_threads,last_line" > "$metrics_stats"
+    echo "SECONDS,${docker_stats_columns},disk_used,swap_used,total_threads" > "$metrics_stats"
 
     # test for operating system
     if [[ $OSTYPE == "darwin"* ]]; then
