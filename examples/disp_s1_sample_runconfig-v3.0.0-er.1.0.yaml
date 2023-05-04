@@ -1,0 +1,756 @@
+# Sample RunConfig for use with the DISP-S1 PGE
+# This RunConfig should require minimal changes in order to be used with the
+# OPERA PCM.
+
+RunConfig:
+    # Name for the RunConfig, may be any string
+    Name: OPERA-DISP-S1-PGE-SAMPLE-CONFIG
+
+    Groups:
+        # PGE-specific RunConfig section
+        # This section is only used by the PGE, however, paths to inputs/outputs
+        # should align with the similar sections of the SAS RunConfig
+        PGE:
+            PGENameGroup:
+                PGEName: DISP_S1_PGE
+
+            InputFilesGroup:
+                InputFilePaths:
+                    - disp_s1_pge_test/input_dir
+
+            DynamicAncillaryFilesGroup:
+                AncillaryFileMap:
+                    dem_file: disp_s1_pge_test/input_dir/dem_4326.tiff
+
+            ProductPathGroup:
+                OutputProductPath: disp_s1_pge_test/output_dir
+                ScratchPath: disp_s1_pge_test/scratch_dir
+
+            PrimaryExecutable:
+                ProductIdentifier: DISP_S1
+                ProgramPath: /bin/echo
+                ProgramOptions:
+                    - 'hello world > disp_s1_pge_test/output_dir/disp_s1_test.txt;'
+                    - '/bin/echo DISP-S1 invoked with RunConfig'
+                ErrorCodeBase: 500000
+                SchemaPath: pge/disp_s1/schema/disp_s1_sas_schema.yaml
+                IsoTemplatePath:
+
+            QAExecutable:
+                Enabled: False
+                ProgramPath:
+                ProgramOptions: []
+
+            DebugLevelGroup:
+                DebugSwitch: False
+                ExecuteViaShell: False
+
+
+        # SAS-specific RunConfig section
+        # Prior to SAS execution by the PGE, the section below starting at "runconfig"
+        # is isolated into its own YAML file for use with the SAS
+        SAS:
+          runconfig:
+            name: disp_s1_workflow_default
+
+            groups:
+              pge_name_group:
+                pge_name: DISP_S1_PGE
+
+              input_file_group:
+                # REQUIRED: List of paths to CSLC files.
+                #   Type: array.
+                cslc_file_list:
+                  - input_slcs/compressed_slc_t087_185678_iw2_20180101_20180210.h5
+                  - input_slcs/t087_185678_iw2_20180222_VV.h5
+                  - input_slcs/t087_185678_iw2_20180306_VV.h5
+                  - input_slcs/t087_185678_iw2_20180318_VV.h5
+                  - input_slcs/t087_185678_iw2_20180330_VV.h5
+                  - input_slcs/t087_185678_iw2_20180411_VV.h5
+                  - input_slcs/t087_185678_iw2_20180423_VV.h5
+                  - input_slcs/t087_185678_iw2_20180505_VV.h5
+                  - input_slcs/t087_185678_iw2_20180511_VV.h5
+                  - input_slcs/t087_185678_iw2_20180517_VV.h5
+                  - input_slcs/t087_185678_iw2_20180523_VV.h5
+                  - input_slcs/t087_185678_iw2_20180529_VV.h5
+                  - input_slcs/t087_185678_iw2_20180604_VV.h5
+                  - input_slcs/t087_185678_iw2_20180610_VV.h5
+                  - input_slcs/t087_185678_iw2_20180616_VV.h5
+                  - input_slcs/t087_185678_iw2_20180622_VV.h5
+                  - input_slcs/t087_185678_iw2_20180628_VV.h5
+                  - input_slcs/t087_185678_iw2_20180704_VV.h5
+                  - input_slcs/t087_185678_iw2_20180710_VV.h5
+                  - input_slcs/t087_185678_iw2_20180716_VV.h5
+                  - input_slcs/compressed_slc_t087_185678_iw3_20180101_20180210.h5
+                  - input_slcs/t087_185678_iw3_20180222_VV.h5
+                  - input_slcs/t087_185678_iw3_20180306_VV.h5
+                  - input_slcs/t087_185678_iw3_20180318_VV.h5
+                  - input_slcs/t087_185678_iw3_20180330_VV.h5
+                  - input_slcs/t087_185678_iw3_20180411_VV.h5
+                  - input_slcs/t087_185678_iw3_20180423_VV.h5
+                  - input_slcs/t087_185678_iw3_20180505_VV.h5
+                  - input_slcs/t087_185678_iw3_20180511_VV.h5
+                  - input_slcs/t087_185678_iw3_20180517_VV.h5
+                  - input_slcs/t087_185678_iw3_20180523_VV.h5
+                  - input_slcs/t087_185678_iw3_20180529_VV.h5
+                  - input_slcs/t087_185678_iw3_20180604_VV.h5
+                  - input_slcs/t087_185678_iw3_20180610_VV.h5
+                  - input_slcs/t087_185678_iw3_20180616_VV.h5
+                  - input_slcs/t087_185678_iw3_20180622_VV.h5
+                  - input_slcs/t087_185678_iw3_20180628_VV.h5
+                  - input_slcs/t087_185678_iw3_20180704_VV.h5
+                  - input_slcs/t087_185678_iw3_20180710_VV.h5
+                  - input_slcs/t087_185678_iw3_20180716_VV.h5
+                  - input_slcs/compressed_slc_t087_185679_iw1_20180101_20180210.h5
+                  - input_slcs/t087_185679_iw1_20180222_VV.h5
+                  - input_slcs/t087_185679_iw1_20180306_VV.h5
+                  - input_slcs/t087_185679_iw1_20180318_VV.h5
+                  - input_slcs/t087_185679_iw1_20180330_VV.h5
+                  - input_slcs/t087_185679_iw1_20180411_VV.h5
+                  - input_slcs/t087_185679_iw1_20180423_VV.h5
+                  - input_slcs/t087_185679_iw1_20180505_VV.h5
+                  - input_slcs/t087_185679_iw1_20180511_VV.h5
+                  - input_slcs/t087_185679_iw1_20180517_VV.h5
+                  - input_slcs/t087_185679_iw1_20180523_VV.h5
+                  - input_slcs/t087_185679_iw1_20180529_VV.h5
+                  - input_slcs/t087_185679_iw1_20180604_VV.h5
+                  - input_slcs/t087_185679_iw1_20180610_VV.h5
+                  - input_slcs/t087_185679_iw1_20180616_VV.h5
+                  - input_slcs/t087_185679_iw1_20180622_VV.h5
+                  - input_slcs/t087_185679_iw1_20180628_VV.h5
+                  - input_slcs/t087_185679_iw1_20180704_VV.h5
+                  - input_slcs/t087_185679_iw1_20180710_VV.h5
+                  - input_slcs/t087_185679_iw1_20180716_VV.h5
+                  - input_slcs/compressed_slc_t087_185679_iw2_20180101_20180210.h5
+                  - input_slcs/t087_185679_iw2_20180222_VV.h5
+                  - input_slcs/t087_185679_iw2_20180306_VV.h5
+                  - input_slcs/t087_185679_iw2_20180318_VV.h5
+                  - input_slcs/t087_185679_iw2_20180330_VV.h5
+                  - input_slcs/t087_185679_iw2_20180411_VV.h5
+                  - input_slcs/t087_185679_iw2_20180423_VV.h5
+                  - input_slcs/t087_185679_iw2_20180505_VV.h5
+                  - input_slcs/t087_185679_iw2_20180511_VV.h5
+                  - input_slcs/t087_185679_iw2_20180517_VV.h5
+                  - input_slcs/t087_185679_iw2_20180523_VV.h5
+                  - input_slcs/t087_185679_iw2_20180529_VV.h5
+                  - input_slcs/t087_185679_iw2_20180604_VV.h5
+                  - input_slcs/t087_185679_iw2_20180610_VV.h5
+                  - input_slcs/t087_185679_iw2_20180616_VV.h5
+                  - input_slcs/t087_185679_iw2_20180622_VV.h5
+                  - input_slcs/t087_185679_iw2_20180628_VV.h5
+                  - input_slcs/t087_185679_iw2_20180704_VV.h5
+                  - input_slcs/t087_185679_iw2_20180710_VV.h5
+                  - input_slcs/t087_185679_iw2_20180716_VV.h5
+                  - input_slcs/compressed_slc_t087_185679_iw3_20180101_20180210.h5
+                  - input_slcs/t087_185679_iw3_20180222_VV.h5
+                  - input_slcs/t087_185679_iw3_20180306_VV.h5
+                  - input_slcs/t087_185679_iw3_20180318_VV.h5
+                  - input_slcs/t087_185679_iw3_20180330_VV.h5
+                  - input_slcs/t087_185679_iw3_20180411_VV.h5
+                  - input_slcs/t087_185679_iw3_20180423_VV.h5
+                  - input_slcs/t087_185679_iw3_20180505_VV.h5
+                  - input_slcs/t087_185679_iw3_20180511_VV.h5
+                  - input_slcs/t087_185679_iw3_20180517_VV.h5
+                  - input_slcs/t087_185679_iw3_20180523_VV.h5
+                  - input_slcs/t087_185679_iw3_20180529_VV.h5
+                  - input_slcs/t087_185679_iw3_20180604_VV.h5
+                  - input_slcs/t087_185679_iw3_20180610_VV.h5
+                  - input_slcs/t087_185679_iw3_20180616_VV.h5
+                  - input_slcs/t087_185679_iw3_20180622_VV.h5
+                  - input_slcs/t087_185679_iw3_20180628_VV.h5
+                  - input_slcs/t087_185679_iw3_20180704_VV.h5
+                  - input_slcs/t087_185679_iw3_20180710_VV.h5
+                  - input_slcs/t087_185679_iw3_20180716_VV.h5
+                  - input_slcs/compressed_slc_t087_185680_iw1_20180101_20180210.h5
+                  - input_slcs/t087_185680_iw1_20180222_VV.h5
+                  - input_slcs/t087_185680_iw1_20180306_VV.h5
+                  - input_slcs/t087_185680_iw1_20180318_VV.h5
+                  - input_slcs/t087_185680_iw1_20180330_VV.h5
+                  - input_slcs/t087_185680_iw1_20180411_VV.h5
+                  - input_slcs/t087_185680_iw1_20180423_VV.h5
+                  - input_slcs/t087_185680_iw1_20180505_VV.h5
+                  - input_slcs/t087_185680_iw1_20180511_VV.h5
+                  - input_slcs/t087_185680_iw1_20180517_VV.h5
+                  - input_slcs/t087_185680_iw1_20180523_VV.h5
+                  - input_slcs/t087_185680_iw1_20180529_VV.h5
+                  - input_slcs/t087_185680_iw1_20180604_VV.h5
+                  - input_slcs/t087_185680_iw1_20180610_VV.h5
+                  - input_slcs/t087_185680_iw1_20180616_VV.h5
+                  - input_slcs/t087_185680_iw1_20180622_VV.h5
+                  - input_slcs/t087_185680_iw1_20180628_VV.h5
+                  - input_slcs/t087_185680_iw1_20180704_VV.h5
+                  - input_slcs/t087_185680_iw1_20180710_VV.h5
+                  - input_slcs/t087_185680_iw1_20180716_VV.h5
+                  - input_slcs/compressed_slc_t087_185680_iw2_20180101_20180210.h5
+                  - input_slcs/t087_185680_iw2_20180222_VV.h5
+                  - input_slcs/t087_185680_iw2_20180306_VV.h5
+                  - input_slcs/t087_185680_iw2_20180318_VV.h5
+                  - input_slcs/t087_185680_iw2_20180330_VV.h5
+                  - input_slcs/t087_185680_iw2_20180411_VV.h5
+                  - input_slcs/t087_185680_iw2_20180423_VV.h5
+                  - input_slcs/t087_185680_iw2_20180505_VV.h5
+                  - input_slcs/t087_185680_iw2_20180511_VV.h5
+                  - input_slcs/t087_185680_iw2_20180517_VV.h5
+                  - input_slcs/t087_185680_iw2_20180523_VV.h5
+                  - input_slcs/t087_185680_iw2_20180529_VV.h5
+                  - input_slcs/t087_185680_iw2_20180604_VV.h5
+                  - input_slcs/t087_185680_iw2_20180610_VV.h5
+                  - input_slcs/t087_185680_iw2_20180616_VV.h5
+                  - input_slcs/t087_185680_iw2_20180622_VV.h5
+                  - input_slcs/t087_185680_iw2_20180628_VV.h5
+                  - input_slcs/t087_185680_iw2_20180704_VV.h5
+                  - input_slcs/t087_185680_iw2_20180710_VV.h5
+                  - input_slcs/t087_185680_iw2_20180716_VV.h5
+                  - input_slcs/compressed_slc_t087_185680_iw3_20180101_20180210.h5
+                  - input_slcs/t087_185680_iw3_20180222_VV.h5
+                  - input_slcs/t087_185680_iw3_20180306_VV.h5
+                  - input_slcs/t087_185680_iw3_20180318_VV.h5
+                  - input_slcs/t087_185680_iw3_20180330_VV.h5
+                  - input_slcs/t087_185680_iw3_20180411_VV.h5
+                  - input_slcs/t087_185680_iw3_20180423_VV.h5
+                  - input_slcs/t087_185680_iw3_20180505_VV.h5
+                  - input_slcs/t087_185680_iw3_20180511_VV.h5
+                  - input_slcs/t087_185680_iw3_20180517_VV.h5
+                  - input_slcs/t087_185680_iw3_20180523_VV.h5
+                  - input_slcs/t087_185680_iw3_20180529_VV.h5
+                  - input_slcs/t087_185680_iw3_20180604_VV.h5
+                  - input_slcs/t087_185680_iw3_20180610_VV.h5
+                  - input_slcs/t087_185680_iw3_20180616_VV.h5
+                  - input_slcs/t087_185680_iw3_20180622_VV.h5
+                  - input_slcs/t087_185680_iw3_20180628_VV.h5
+                  - input_slcs/t087_185680_iw3_20180704_VV.h5
+                  - input_slcs/t087_185680_iw3_20180710_VV.h5
+                  - input_slcs/t087_185680_iw3_20180716_VV.h5
+                  - input_slcs/compressed_slc_t087_185681_iw1_20180101_20180210.h5
+                  - input_slcs/t087_185681_iw1_20180222_VV.h5
+                  - input_slcs/t087_185681_iw1_20180306_VV.h5
+                  - input_slcs/t087_185681_iw1_20180318_VV.h5
+                  - input_slcs/t087_185681_iw1_20180330_VV.h5
+                  - input_slcs/t087_185681_iw1_20180411_VV.h5
+                  - input_slcs/t087_185681_iw1_20180423_VV.h5
+                  - input_slcs/t087_185681_iw1_20180505_VV.h5
+                  - input_slcs/t087_185681_iw1_20180511_VV.h5
+                  - input_slcs/t087_185681_iw1_20180517_VV.h5
+                  - input_slcs/t087_185681_iw1_20180523_VV.h5
+                  - input_slcs/t087_185681_iw1_20180529_VV.h5
+                  - input_slcs/t087_185681_iw1_20180604_VV.h5
+                  - input_slcs/t087_185681_iw1_20180610_VV.h5
+                  - input_slcs/t087_185681_iw1_20180616_VV.h5
+                  - input_slcs/t087_185681_iw1_20180622_VV.h5
+                  - input_slcs/t087_185681_iw1_20180628_VV.h5
+                  - input_slcs/t087_185681_iw1_20180704_VV.h5
+                  - input_slcs/t087_185681_iw1_20180710_VV.h5
+                  - input_slcs/t087_185681_iw1_20180716_VV.h5
+                  - input_slcs/compressed_slc_t087_185681_iw2_20180101_20180210.h5
+                  - input_slcs/t087_185681_iw2_20180222_VV.h5
+                  - input_slcs/t087_185681_iw2_20180306_VV.h5
+                  - input_slcs/t087_185681_iw2_20180318_VV.h5
+                  - input_slcs/t087_185681_iw2_20180330_VV.h5
+                  - input_slcs/t087_185681_iw2_20180411_VV.h5
+                  - input_slcs/t087_185681_iw2_20180423_VV.h5
+                  - input_slcs/t087_185681_iw2_20180505_VV.h5
+                  - input_slcs/t087_185681_iw2_20180511_VV.h5
+                  - input_slcs/t087_185681_iw2_20180517_VV.h5
+                  - input_slcs/t087_185681_iw2_20180523_VV.h5
+                  - input_slcs/t087_185681_iw2_20180529_VV.h5
+                  - input_slcs/t087_185681_iw2_20180604_VV.h5
+                  - input_slcs/t087_185681_iw2_20180610_VV.h5
+                  - input_slcs/t087_185681_iw2_20180616_VV.h5
+                  - input_slcs/t087_185681_iw2_20180622_VV.h5
+                  - input_slcs/t087_185681_iw2_20180628_VV.h5
+                  - input_slcs/t087_185681_iw2_20180704_VV.h5
+                  - input_slcs/t087_185681_iw2_20180710_VV.h5
+                  - input_slcs/t087_185681_iw2_20180716_VV.h5
+                  - input_slcs/compressed_slc_t087_185681_iw3_20180101_20180210.h5
+                  - input_slcs/t087_185681_iw3_20180222_VV.h5
+                  - input_slcs/t087_185681_iw3_20180306_VV.h5
+                  - input_slcs/t087_185681_iw3_20180318_VV.h5
+                  - input_slcs/t087_185681_iw3_20180330_VV.h5
+                  - input_slcs/t087_185681_iw3_20180411_VV.h5
+                  - input_slcs/t087_185681_iw3_20180423_VV.h5
+                  - input_slcs/t087_185681_iw3_20180505_VV.h5
+                  - input_slcs/t087_185681_iw3_20180511_VV.h5
+                  - input_slcs/t087_185681_iw3_20180517_VV.h5
+                  - input_slcs/t087_185681_iw3_20180523_VV.h5
+                  - input_slcs/t087_185681_iw3_20180529_VV.h5
+                  - input_slcs/t087_185681_iw3_20180604_VV.h5
+                  - input_slcs/t087_185681_iw3_20180610_VV.h5
+                  - input_slcs/t087_185681_iw3_20180616_VV.h5
+                  - input_slcs/t087_185681_iw3_20180622_VV.h5
+                  - input_slcs/t087_185681_iw3_20180628_VV.h5
+                  - input_slcs/t087_185681_iw3_20180704_VV.h5
+                  - input_slcs/t087_185681_iw3_20180710_VV.h5
+                  - input_slcs/t087_185681_iw3_20180716_VV.h5
+                  - input_slcs/compressed_slc_t087_185682_iw1_20180101_20180210.h5
+                  - input_slcs/t087_185682_iw1_20180222_VV.h5
+                  - input_slcs/t087_185682_iw1_20180306_VV.h5
+                  - input_slcs/t087_185682_iw1_20180318_VV.h5
+                  - input_slcs/t087_185682_iw1_20180330_VV.h5
+                  - input_slcs/t087_185682_iw1_20180411_VV.h5
+                  - input_slcs/t087_185682_iw1_20180423_VV.h5
+                  - input_slcs/t087_185682_iw1_20180505_VV.h5
+                  - input_slcs/t087_185682_iw1_20180511_VV.h5
+                  - input_slcs/t087_185682_iw1_20180517_VV.h5
+                  - input_slcs/t087_185682_iw1_20180523_VV.h5
+                  - input_slcs/t087_185682_iw1_20180529_VV.h5
+                  - input_slcs/t087_185682_iw1_20180604_VV.h5
+                  - input_slcs/t087_185682_iw1_20180610_VV.h5
+                  - input_slcs/t087_185682_iw1_20180616_VV.h5
+                  - input_slcs/t087_185682_iw1_20180622_VV.h5
+                  - input_slcs/t087_185682_iw1_20180628_VV.h5
+                  - input_slcs/t087_185682_iw1_20180704_VV.h5
+                  - input_slcs/t087_185682_iw1_20180710_VV.h5
+                  - input_slcs/t087_185682_iw1_20180716_VV.h5
+                  - input_slcs/compressed_slc_t087_185682_iw2_20180101_20180210.h5
+                  - input_slcs/t087_185682_iw2_20180222_VV.h5
+                  - input_slcs/t087_185682_iw2_20180306_VV.h5
+                  - input_slcs/t087_185682_iw2_20180318_VV.h5
+                  - input_slcs/t087_185682_iw2_20180330_VV.h5
+                  - input_slcs/t087_185682_iw2_20180411_VV.h5
+                  - input_slcs/t087_185682_iw2_20180423_VV.h5
+                  - input_slcs/t087_185682_iw2_20180505_VV.h5
+                  - input_slcs/t087_185682_iw2_20180511_VV.h5
+                  - input_slcs/t087_185682_iw2_20180517_VV.h5
+                  - input_slcs/t087_185682_iw2_20180523_VV.h5
+                  - input_slcs/t087_185682_iw2_20180529_VV.h5
+                  - input_slcs/t087_185682_iw2_20180604_VV.h5
+                  - input_slcs/t087_185682_iw2_20180610_VV.h5
+                  - input_slcs/t087_185682_iw2_20180616_VV.h5
+                  - input_slcs/t087_185682_iw2_20180622_VV.h5
+                  - input_slcs/t087_185682_iw2_20180628_VV.h5
+                  - input_slcs/t087_185682_iw2_20180704_VV.h5
+                  - input_slcs/t087_185682_iw2_20180710_VV.h5
+                  - input_slcs/t087_185682_iw2_20180716_VV.h5
+                  - input_slcs/compressed_slc_t087_185682_iw3_20180101_20180210.h5
+                  - input_slcs/t087_185682_iw3_20180222_VV.h5
+                  - input_slcs/t087_185682_iw3_20180306_VV.h5
+                  - input_slcs/t087_185682_iw3_20180318_VV.h5
+                  - input_slcs/t087_185682_iw3_20180330_VV.h5
+                  - input_slcs/t087_185682_iw3_20180411_VV.h5
+                  - input_slcs/t087_185682_iw3_20180423_VV.h5
+                  - input_slcs/t087_185682_iw3_20180505_VV.h5
+                  - input_slcs/t087_185682_iw3_20180511_VV.h5
+                  - input_slcs/t087_185682_iw3_20180517_VV.h5
+                  - input_slcs/t087_185682_iw3_20180523_VV.h5
+                  - input_slcs/t087_185682_iw3_20180529_VV.h5
+                  - input_slcs/t087_185682_iw3_20180604_VV.h5
+                  - input_slcs/t087_185682_iw3_20180610_VV.h5
+                  - input_slcs/t087_185682_iw3_20180616_VV.h5
+                  - input_slcs/t087_185682_iw3_20180622_VV.h5
+                  - input_slcs/t087_185682_iw3_20180628_VV.h5
+                  - input_slcs/t087_185682_iw3_20180704_VV.h5
+                  - input_slcs/t087_185682_iw3_20180710_VV.h5
+                  - input_slcs/t087_185682_iw3_20180716_VV.h5
+                  - input_slcs/compressed_slc_t087_185683_iw1_20180101_20180210.h5
+                  - input_slcs/t087_185683_iw1_20180222_VV.h5
+                  - input_slcs/t087_185683_iw1_20180306_VV.h5
+                  - input_slcs/t087_185683_iw1_20180318_VV.h5
+                  - input_slcs/t087_185683_iw1_20180330_VV.h5
+                  - input_slcs/t087_185683_iw1_20180411_VV.h5
+                  - input_slcs/t087_185683_iw1_20180423_VV.h5
+                  - input_slcs/t087_185683_iw1_20180505_VV.h5
+                  - input_slcs/t087_185683_iw1_20180511_VV.h5
+                  - input_slcs/t087_185683_iw1_20180517_VV.h5
+                  - input_slcs/t087_185683_iw1_20180523_VV.h5
+                  - input_slcs/t087_185683_iw1_20180529_VV.h5
+                  - input_slcs/t087_185683_iw1_20180604_VV.h5
+                  - input_slcs/t087_185683_iw1_20180610_VV.h5
+                  - input_slcs/t087_185683_iw1_20180616_VV.h5
+                  - input_slcs/t087_185683_iw1_20180622_VV.h5
+                  - input_slcs/t087_185683_iw1_20180628_VV.h5
+                  - input_slcs/t087_185683_iw1_20180704_VV.h5
+                  - input_slcs/t087_185683_iw1_20180710_VV.h5
+                  - input_slcs/t087_185683_iw1_20180716_VV.h5
+                  - input_slcs/compressed_slc_t087_185683_iw2_20180101_20180210.h5
+                  - input_slcs/t087_185683_iw2_20180222_VV.h5
+                  - input_slcs/t087_185683_iw2_20180306_VV.h5
+                  - input_slcs/t087_185683_iw2_20180318_VV.h5
+                  - input_slcs/t087_185683_iw2_20180330_VV.h5
+                  - input_slcs/t087_185683_iw2_20180411_VV.h5
+                  - input_slcs/t087_185683_iw2_20180423_VV.h5
+                  - input_slcs/t087_185683_iw2_20180505_VV.h5
+                  - input_slcs/t087_185683_iw2_20180511_VV.h5
+                  - input_slcs/t087_185683_iw2_20180517_VV.h5
+                  - input_slcs/t087_185683_iw2_20180523_VV.h5
+                  - input_slcs/t087_185683_iw2_20180529_VV.h5
+                  - input_slcs/t087_185683_iw2_20180604_VV.h5
+                  - input_slcs/t087_185683_iw2_20180610_VV.h5
+                  - input_slcs/t087_185683_iw2_20180616_VV.h5
+                  - input_slcs/t087_185683_iw2_20180622_VV.h5
+                  - input_slcs/t087_185683_iw2_20180628_VV.h5
+                  - input_slcs/t087_185683_iw2_20180704_VV.h5
+                  - input_slcs/t087_185683_iw2_20180710_VV.h5
+                  - input_slcs/t087_185683_iw2_20180716_VV.h5
+                  - input_slcs/compressed_slc_t087_185683_iw3_20180101_20180210.h5
+                  - input_slcs/t087_185683_iw3_20180222_VV.h5
+                  - input_slcs/t087_185683_iw3_20180306_VV.h5
+                  - input_slcs/t087_185683_iw3_20180318_VV.h5
+                  - input_slcs/t087_185683_iw3_20180330_VV.h5
+                  - input_slcs/t087_185683_iw3_20180411_VV.h5
+                  - input_slcs/t087_185683_iw3_20180423_VV.h5
+                  - input_slcs/t087_185683_iw3_20180505_VV.h5
+                  - input_slcs/t087_185683_iw3_20180511_VV.h5
+                  - input_slcs/t087_185683_iw3_20180517_VV.h5
+                  - input_slcs/t087_185683_iw3_20180523_VV.h5
+                  - input_slcs/t087_185683_iw3_20180529_VV.h5
+                  - input_slcs/t087_185683_iw3_20180604_VV.h5
+                  - input_slcs/t087_185683_iw3_20180610_VV.h5
+                  - input_slcs/t087_185683_iw3_20180616_VV.h5
+                  - input_slcs/t087_185683_iw3_20180622_VV.h5
+                  - input_slcs/t087_185683_iw3_20180628_VV.h5
+                  - input_slcs/t087_185683_iw3_20180704_VV.h5
+                  - input_slcs/t087_185683_iw3_20180710_VV.h5
+                  - input_slcs/t087_185683_iw3_20180716_VV.h5
+                  - input_slcs/compressed_slc_t087_185684_iw1_20180101_20180210.h5
+                  - input_slcs/t087_185684_iw1_20180222_VV.h5
+                  - input_slcs/t087_185684_iw1_20180306_VV.h5
+                  - input_slcs/t087_185684_iw1_20180318_VV.h5
+                  - input_slcs/t087_185684_iw1_20180330_VV.h5
+                  - input_slcs/t087_185684_iw1_20180411_VV.h5
+                  - input_slcs/t087_185684_iw1_20180423_VV.h5
+                  - input_slcs/t087_185684_iw1_20180505_VV.h5
+                  - input_slcs/t087_185684_iw1_20180511_VV.h5
+                  - input_slcs/t087_185684_iw1_20180517_VV.h5
+                  - input_slcs/t087_185684_iw1_20180523_VV.h5
+                  - input_slcs/t087_185684_iw1_20180529_VV.h5
+                  - input_slcs/t087_185684_iw1_20180604_VV.h5
+                  - input_slcs/t087_185684_iw1_20180610_VV.h5
+                  - input_slcs/t087_185684_iw1_20180616_VV.h5
+                  - input_slcs/t087_185684_iw1_20180622_VV.h5
+                  - input_slcs/t087_185684_iw1_20180628_VV.h5
+                  - input_slcs/t087_185684_iw1_20180704_VV.h5
+                  - input_slcs/t087_185684_iw1_20180710_VV.h5
+                  - input_slcs/t087_185684_iw1_20180716_VV.h5
+                  - input_slcs/compressed_slc_t087_185684_iw2_20180101_20180210.h5
+                  - input_slcs/t087_185684_iw2_20180222_VV.h5
+                  - input_slcs/t087_185684_iw2_20180306_VV.h5
+                  - input_slcs/t087_185684_iw2_20180318_VV.h5
+                  - input_slcs/t087_185684_iw2_20180330_VV.h5
+                  - input_slcs/t087_185684_iw2_20180411_VV.h5
+                  - input_slcs/t087_185684_iw2_20180423_VV.h5
+                  - input_slcs/t087_185684_iw2_20180505_VV.h5
+                  - input_slcs/t087_185684_iw2_20180511_VV.h5
+                  - input_slcs/t087_185684_iw2_20180517_VV.h5
+                  - input_slcs/t087_185684_iw2_20180523_VV.
+                  - input_slcs/t087_185684_iw2_20180529_VV.h5
+                  - input_slcs/t087_185684_iw2_20180604_VV.h5
+                  - input_slcs/t087_185684_iw2_20180610_VV.h5
+                  - input_slcs/t087_185684_iw2_20180616_VV.h5
+                  - input_slcs/t087_185684_iw2_20180622_VV.h5
+                  - input_slcs/t087_185684_iw2_20180628_VV.h5
+                  - input_slcs/t087_185684_iw2_20180704_VV.h5
+                  - input_slcs/t087_185684_iw2_20180710_VV.h5
+                  - input_slcs/t087_185684_iw2_20180716_VV.h5
+                  - input_slcs/compressed_slc_t087_185684_iw3_20180101_20180210.h5
+                  - input_slcs/t087_185684_iw3_20180222_VV.h5
+                  - input_slcs/t087_185684_iw3_20180306_VV.h5
+                  - input_slcs/t087_185684_iw3_20180318_VV.h5
+                  - input_slcs/t087_185684_iw3_20180330_VV.h5
+                  - input_slcs/t087_185684_iw3_20180411_VV.h5
+                  - input_slcs/t087_185684_iw3_20180423_VV.h5
+                  - input_slcs/t087_185684_iw3_20180505_VV.h5
+                  - input_slcs/t087_185684_iw3_20180511_VV.h5
+                  - input_slcs/t087_185684_iw3_20180517_VV.h5
+                  - input_slcs/t087_185684_iw3_20180523_VV.h5
+                  - input_slcs/t087_185684_iw3_20180529_VV.h5
+                  - input_slcs/t087_185684_iw3_20180604_VV.h5
+                  - input_slcs/t087_185684_iw3_20180610_VV.h5
+                  - input_slcs/t087_185684_iw3_20180616_VV.h5
+                  - input_slcs/t087_185684_iw3_20180622_VV.h5
+                  - input_slcs/t087_185684_iw3_20180628_VV.h5
+                  - input_slcs/t087_185684_iw3_20180704_VV.h5
+                  - input_slcs/t087_185684_iw3_20180710_VV.h5
+                  - input_slcs/t087_185684_iw3_20180716_VV.h5
+                  - input_slcs/compressed_slc_t087_185685_iw1_20180101_20180210.h5
+                  - input_slcs/t087_185685_iw1_20180222_VV.h5
+                  - input_slcs/t087_185685_iw1_20180306_VV.h5
+                  - input_slcs/t087_185685_iw1_20180318_VV.h5
+                  - input_slcs/t087_185685_iw1_20180330_VV.h5
+                  - input_slcs/t087_185685_iw1_20180411_VV.h5
+                  - input_slcs/t087_185685_iw1_20180423_VV.h5
+                  - input_slcs/t087_185685_iw1_20180505_VV.h5
+                  - input_slcs/t087_185685_iw1_20180511_VV.h5
+                  - input_slcs/t087_185685_iw1_20180517_VV.h5
+                  - input_slcs/t087_185685_iw1_20180523_VV.h5
+                  - input_slcs/t087_185685_iw1_20180529_VV.h5
+                  - input_slcs/t087_185685_iw1_20180604_VV.h5
+                  - input_slcs/t087_185685_iw1_20180610_VV.h5
+                  - input_slcs/t087_185685_iw1_20180616_VV.h5
+                  - input_slcs/t087_185685_iw1_20180622_VV.h5
+                  - input_slcs/t087_185685_iw1_20180628_VV.h5
+                  - input_slcs/t087_185685_iw1_20180704_VV.h5
+                  - input_slcs/t087_185685_iw1_20180710_VV.h5
+                  - input_slcs/t087_185685_iw1_20180716_VV.h5
+                  - input_slcs/compressed_slc_t087_185685_iw2_20180101_20180210.h5
+                  - input_slcs/t087_185685_iw2_20180222_VV.h5
+                  - input_slcs/t087_185685_iw2_20180306_VV.h5
+                  - input_slcs/t087_185685_iw2_20180318_VV.h5
+                  - input_slcs/t087_185685_iw2_20180330_VV.h5
+                  - input_slcs/t087_185685_iw2_20180411_VV.h5
+                  - input_slcs/t087_185685_iw2_20180423_VV.h5
+                  - input_slcs/t087_185685_iw2_20180505_VV.h5
+                  - input_slcs/t087_185685_iw2_20180511_VV.h5
+                  - input_slcs/t087_185685_iw2_20180517_VV.h5
+                  - input_slcs/t087_185685_iw2_20180523_VV.h5
+                  - input_slcs/t087_185685_iw2_20180529_VV.h5
+                  - input_slcs/t087_185685_iw2_20180604_VV.h5
+                  - input_slcs/t087_185685_iw2_20180610_VV.h5
+                  - input_slcs/t087_185685_iw2_20180616_VV.h5
+                  - input_slcs/t087_185685_iw2_20180622_VV.h5
+                  - input_slcs/t087_185685_iw2_20180628_VV.h5
+                  - input_slcs/t087_185685_iw2_20180704_VV.h5
+                  - input_slcs/t087_185685_iw2_20180710_VV.h5
+                  - input_slcs/t087_185685_iw2_20180716_VV.h5
+                  - input_slcs/compressed_slc_t087_185685_iw3_20180101_20180210.h5
+                  - input_slcs/t087_185685_iw3_20180222_VV.h5
+                  - input_slcs/t087_185685_iw3_20180306_VV.h5
+                  - input_slcs/t087_185685_iw3_20180318_VV.h5
+                  - input_slcs/t087_185685_iw3_20180330_VV.h5
+                  - input_slcs/t087_185685_iw3_20180411_VV.h5
+                  - input_slcs/t087_185685_iw3_20180423_VV.h5
+                  - input_slcs/t087_185685_iw3_20180505_VV.h5
+                  - input_slcs/t087_185685_iw3_20180511_VV.h5
+                  - input_slcs/t087_185685_iw3_20180517_VV.h5
+                  - input_slcs/t087_185685_iw3_20180523_VV.h5
+                  - input_slcs/t087_185685_iw3_20180529_VV.h5
+                  - input_slcs/t087_185685_iw3_20180604_VV.h5
+                  - input_slcs/t087_185685_iw3_20180610_VV.h5
+                  - input_slcs/t087_185685_iw3_20180616_VV.h5
+                  - input_slcs/t087_185685_iw3_20180622_VV.h5
+                  - input_slcs/t087_185685_iw3_20180628_VV.h5
+                  - input_slcs/t087_185685_iw3_20180704_VV.h5
+                  - input_slcs/t087_185685_iw3_20180710_VV.h5
+                  - input_slcs/t087_185685_iw3_20180716_VV.h5
+                  - input_slcs/compressed_slc_t087_185686_iw1_20180101_20180210.h5
+                  - input_slcs/t087_185686_iw1_20180222_VV.h5
+                  - input_slcs/t087_185686_iw1_20180306_VV.h5
+                  - input_slcs/t087_185686_iw1_20180318_VV.h5
+                  - input_slcs/t087_185686_iw1_20180330_VV.h5
+                  - input_slcs/t087_185686_iw1_20180411_VV.h5
+                  - input_slcs/t087_185686_iw1_20180423_VV.h5
+                  - input_slcs/t087_185686_iw1_20180505_VV.h5
+                  - input_slcs/t087_185686_iw1_20180511_VV.h5
+                  - input_slcs/t087_185686_iw1_20180517_VV.h5
+                  - input_slcs/t087_185686_iw1_20180523_VV.h5
+                  - input_slcs/t087_185686_iw1_20180529_VV.h5
+                  - input_slcs/t087_185686_iw1_20180604_VV.h5
+                  - input_slcs/t087_185686_iw1_20180610_VV.h5
+                  - input_slcs/t087_185686_iw1_20180616_VV.h5
+                  - input_slcs/t087_185686_iw1_20180622_VV.h5
+                  - input_slcs/t087_185686_iw1_20180628_VV.h5
+                  - input_slcs/t087_185686_iw1_20180704_VV.h5
+                  - input_slcs/t087_185686_iw1_20180710_VV.h5
+                  - input_slcs/t087_185686_iw1_20180716_VV.h5
+                  - input_slcs/compressed_slc_t087_185686_iw2_20180101_20180210.h5
+                  - input_slcs/t087_185686_iw2_20180222_VV.h5
+                  - input_slcs/t087_185686_iw2_20180306_VV.h5
+                  - input_slcs/t087_185686_iw2_20180318_VV.h5
+                  - input_slcs/t087_185686_iw2_20180330_VV.h5
+                  - input_slcs/t087_185686_iw2_20180411_VV.h5
+                  - input_slcs/t087_185686_iw2_20180423_VV.h5
+                  - input_slcs/t087_185686_iw2_20180505_VV.h5
+                  - input_slcs/t087_185686_iw2_20180511_VV.h5
+                  - input_slcs/t087_185686_iw2_20180517_VV.h5
+                  - input_slcs/t087_185686_iw2_20180523_VV.h5
+                  - input_slcs/t087_185686_iw2_20180529_VV.h5
+                  - input_slcs/t087_185686_iw2_20180604_VV.h5
+                  - input_slcs/t087_185686_iw2_20180610_VV.h5
+                  - input_slcs/t087_185686_iw2_20180616_VV.h5
+                  - input_slcs/t087_185686_iw2_20180622_VV.h5
+                  - input_slcs/t087_185686_iw2_20180628_VV.h5
+                  - input_slcs/t087_185686_iw2_20180704_VV.h5
+                  - input_slcs/t087_185686_iw2_20180710_VV.h5
+                  - input_slcs/t087_185686_iw2_20180716_VV.h5
+                  - input_slcs/compressed_slc_t087_185686_iw3_20180101_20180210.h5
+                  - input_slcs/t087_185686_iw3_20180222_VV.h5
+                  - input_slcs/t087_185686_iw3_20180306_VV.h5
+                  - input_slcs/t087_185686_iw3_20180318_VV.h5
+                  - input_slcs/t087_185686_iw3_20180330_VV.h5
+                  - input_slcs/t087_185686_iw3_20180411_VV.h5
+                  - input_slcs/t087_185686_iw3_20180423_VV.h5
+                  - input_slcs/t087_185686_iw3_20180505_VV.h5
+                  - input_slcs/t087_185686_iw3_20180511_VV.h5
+                  - input_slcs/t087_185686_iw3_20180517_VV.h5
+                  - input_slcs/t087_185686_iw3_20180523_VV.h5
+                  - input_slcs/t087_185686_iw3_20180529_VV.h5
+                  - input_slcs/t087_185686_iw3_20180604_VV.h5
+                  - input_slcs/t087_185686_iw3_20180610_VV.h5
+                  - input_slcs/t087_185686_iw3_20180616_VV.h5
+                  - input_slcs/t087_185686_iw3_20180622_VV.h5
+                  - input_slcs/t087_185686_iw3_20180628_VV.h5
+                  - input_slcs/t087_185686_iw3_20180704_VV.h5
+                  - input_slcs/t087_185686_iw3_20180710_VV.h5
+                  - input_slcs/t087_185686_iw3_20180716_VV.h5
+                  - input_slcs/compressed_slc_t087_185687_iw1_20180101_20180210.h5
+                  - input_slcs/t087_185687_iw1_20180222_VV.h5
+                  - input_slcs/t087_185687_iw1_20180306_VV.h5
+                  - input_slcs/t087_185687_iw1_20180318_VV.h5
+                  - input_slcs/t087_185687_iw1_20180330_VV.h5
+                  - input_slcs/t087_185687_iw1_20180411_VV.h5
+                  - input_slcs/t087_185687_iw1_20180423_VV.h5
+                  - input_slcs/t087_185687_iw1_20180505_VV.h5
+                  - input_slcs/t087_185687_iw1_20180511_VV.h5
+                  - input_slcs/t087_185687_iw1_20180517_VV.h5
+                  - input_slcs/t087_185687_iw1_20180523_VV.h5
+                  - input_slcs/t087_185687_iw1_20180529_VV.h5
+                  - input_slcs/t087_185687_iw1_20180604_VV.h5
+                  - input_slcs/t087_185687_iw1_20180610_VV.h5
+                  - input_slcs/t087_185687_iw1_20180616_VV.h5
+                  - input_slcs/t087_185687_iw1_20180622_VV.h5
+                  - input_slcs/t087_185687_iw1_20180628_VV.h5
+                  - input_slcs/t087_185687_iw1_20180704_VV.h5
+                  - input_slcs/t087_185687_iw1_20180710_VV.h5
+                  - input_slcs/t087_185687_iw1_20180716_VV.h5
+                # REQUIRED: Frame ID of the bursts contained in `cslc_file_list`.
+                #   Type: integer.
+                frame_id: 123
+              dynamic_ancillary_file_group:
+                # REQUIRED: Path to file containing SAS algorithm parameters.
+                #   Type: string.
+                algorithm_parameters_file: algorithm_parameters.yaml
+                # Paths to existing Amplitude Dispersion file (1 per burst) for PS update calculation.
+                #   Type: array.
+                amplitude_dispersion_files:
+                  - dynamic_ancillary/ps_files/t087_185678_iw2_amp_dispersion.tif
+                  - dynamic_ancillary/ps_files/t087_185678_iw3_amp_dispersion.tif
+                  - dynamic_ancillary/ps_files/t087_185679_iw1_amp_dispersion.tif
+                  - dynamic_ancillary/ps_files/t087_185679_iw2_amp_dispersion.tif
+                  - dynamic_ancillary/ps_files/t087_185679_iw3_amp_dispersion.tif
+                  - dynamic_ancillary/ps_files/t087_185680_iw1_amp_dispersion.tif
+                  - dynamic_ancillary/ps_files/t087_185680_iw2_amp_dispersion.tif
+                  - dynamic_ancillary/ps_files/t087_185680_iw3_amp_dispersion.tif
+                  - dynamic_ancillary/ps_files/t087_185681_iw1_amp_dispersion.tif
+                  - dynamic_ancillary/ps_files/t087_185681_iw2_amp_dispersion.tif
+                  - dynamic_ancillary/ps_files/t087_185681_iw3_amp_dispersion.tif
+                  - dynamic_ancillary/ps_files/t087_185682_iw1_amp_dispersion.tif
+                  - dynamic_ancillary/ps_files/t087_185682_iw2_amp_dispersion.tif
+                  - dynic_ancillary/ps_files/t087_185682_iw3_amp_dispersion.tif
+                  - dynamic_ancillary/ps_files/t087_185683_iw1_amp_dispersion.tif
+                  - dynamic_ancillary/ps_files/t087_185683_iw2_amp_dispersion.tif
+                  - dynamic_ancillary/ps_files/t087_185683_iw3_amp_dispersion.tif
+                  - dynamic_ancillary/ps_files/t087_185684_iw1_amp_dispersion.tif
+                  - dynamic_ancillary/ps_files/t087_185684_iw2_amp_dispersion.tif
+                  - dynamic_ancillary/ps_files/t087_185684_iw3_amp_dispersion.tif
+                  - dynamic_ancillary/ps_files/t087_185685_iw1_amp_dispersion.tif
+                  - dynamic_ancillary/ps_files/t087_185685_iw2_amp_dispersion.tif
+                  - dynamic_ancillary/ps_files/t087_185685_iw3_amp_dispersion.tif
+                  - dynamic_ancillary/ps_files/t087_185686_iw1_amp_dispersion.tif
+                  - dynamic_ancillary/ps_files/t087_185686_iw2_amp_dispersion.tif
+                  - dynamic_ancillary/ps_files/t087_185686_iw3_amp_dispersion.tif
+                  - dynamic_ancillary/ps_files/t087_185687_iw1_amp_dispersion.tif
+                # Paths to an existing Amplitude Mean files (1 per burst) for PS update calculation.
+                #   Type: array.
+                amplitude_mean_files:
+                  - dynamic_ancillary/ps_files/t087_185678_iw2_amp_mean.tif
+                  - dynamic_ancillary/ps_files/t087_185678_iw3_amp_mean.tif
+                  - dynamic_ancillary/ps_files/t087_185679_iw1_amp_mean.tif
+                  - dynamic_ancillary/ps_files/t087_185679_iw2_amp_mean.tif
+                  - dynamic_ancillary/ps_files/t087_185679_iw3_amp_mean.tif
+                  - dynamic_ancillary/ps_files/t087_185680_iw1_amp_mean.tif
+                  - dynamic_ancillary/ps_files/t087_185680_iw2_amp_mean.tif
+                  - dynamic_ancillary/ps_files/t087_185680_iw3_amp_mean.tif
+                  - dynamic_ancillary/ps_files/t087_185681_iw1_amp_mean.tif
+                  - dynamic_ancillary/ps_files/t087_185681_iw2_amp_mean.tif
+                  - dynamic_ancillary/ps_files/t087_185681_iw3_amp_mean.tif
+                  - dynamic_ancillary/ps_files/t087_185682_iw1_amp_mean.tif
+                  - dynamic_ancillary/ps_files/t087_185682_iw2_amp_mean.tif
+                  - dynamic_ancillary/ps_files/t087_185682_iw3_amp_mean.tif
+                  - dynamic_ancillary/ps_files/t087_185683_iw1_amp_mean.tif
+                  - dynamic_ancillary/ps_files/t087_185683_iw2_amp_mean.tif
+                  - dynamic_ancillary/ps_files/t087_185683_iw3_amp_mean.tif
+                  - dynamic_ancillary/ps_files/t087_185684_iw1_amp_mean.tif
+                  - dynamic_ancillary/ps_files/t087_185684_iw2_amp_mean.tif
+                  - dynamic_ancillary/ps_files/t087_185684_iw3_amp_mean.tif
+                  - dynamic_ancillary/ps_files/t087_185685_iw1_amp_mean.tif
+                  - dynamic_ancillary/ps_files/t087_185685_iw2_amp_mean.tif
+                  - dynamic_ancillary/ps_files/t087_185685_iw3_amp_mean.tif
+                  - dynamic_ancillary/ps_files/t087_185686_iw1_amp_mean.tif
+                  - dynamic_ancillary/ps_files/t087_185686_iw2_amp_mean.tif
+                  - dynamic_ancillary/ps_files/t087_185686_iw3_amp_mean.tif
+                  - dynamic_ancillary/ps_files/t087_185687_iw1_amp_mean.tif
+                # Paths to the incidence/azimuth-angle files (1 per burst).
+                #   Type: array.
+                geometry_files:
+                  - dynamic_ancillary/geometry_files/t087_185678_iw2_topo.h5
+                  - dynamic_ancillary/geometry_files/t087_185678_iw3_topo.h5
+                  - dynamic_ancillary/geometry_files/t087_185679_iw1_topo.h5
+                  - dynamic_ancillary/geometry_files/t087_185679_iw2_topo.h5
+                  - dynamic_ancillary/geometry_files/t087_185679_iw3_topo.h5
+                  - dynamic_ancillary/geometry_files/t087_185680_iw1_topo.h5
+                  - dynamic_ancillary/geometry_files/t087_185680_iw2_topo.h5
+                  - dynamic_ancillary/geometry_files/t087_185680_iw3_topo.h5
+                  - dynamic_ancillary/geometry_files/t087_185681_iw1_topo.h5
+                  - dynamic_ancillary/geometry_files/t087_185681_iw2_topo.h5
+                  - dynamic_ancillary/geometry_files/t087_185681_iw3_topo.h5
+                  - dynamic_ancillary/geometry_files/t087_185682_iw1_topo.h5
+                  - dynamic_ancillary/geometry_files/t087_185682_iw2_topo.h5
+                  - dynamic_ancillary/geometry_files/t087_185682_iw3_topo.h5
+                  - dynamic_ancillary/geometry_files/t087_185683_iw1_topo.h5
+                  - dynamic_ancillary/geometry_files/t087_185683_iw2_topo.h5
+                  - dynamic_ancillary/geometry_files/t087_185683_iw3_topo.h5
+                  - dynamic_ancillary/geometry_files/t087_185684_iw1_topo.h5
+                  - dynamic_ancillary/geometry_files/t087_185684_iw2_topo.h5
+                  - dynamic_ancillary/geometry_files/t087_185684_iw3_topo.h5
+                  - dynamic_ancillary/geometry_files/t087_185685_iw1_topo.h5
+                  - dynamic_ancillary/geometry_files/t087_185685_iw2_topo.h5
+                  - dynamic_ancillary/geometry_files/t087_185685_iw3_topo.h5
+                  - dynamic_ancillary/geometry_files/t087_185686_iw1_topo.h5
+                  - dynamic_ancillary/geometry_files/t087_185686_iw2_topo.h5
+                  - dynamic_ancillary/geometry_files/t087_185686_iw3_topo.h5
+                  - dynamic_ancillary/geometry_files/t087_185687_iw1_topo.h5
+                # Mask files (e.g water mask), where convention is 0 for no data/invalid, and 1 for
+                #   data.
+                #   Type: array.
+                mask_file: dynamic_ancillary/water_mask.tif
+                # Path to the DEM file covering full frame.
+                #   Type: string.
+                dem_file: dynamic_ancillary/dem.tif
+                # List of Paths to TEC files in IONEX format for ionosphere correction.
+                #   Type: string.
+                tec_files:
+                  - dynamic_ancillary/jplg0410.18i.Z
+                  - dynamic_ancillary/jplg1970.18i.Z
+                # List of Paths to troposphere weather model files.
+                #   Type: string.
+                weather_model_files:
+                  - dynamic_ancillary/GMAO_tropo_20180210T000000_ztd.nc
+                  - dynamic_ancillary/GMAO_tropo_20180716T000000_ztd.nc
+              primary_executable:
+                # Product type of the PGE.
+                #   Type: string.
+                product_type: DISP_S1_SINGLE
+              product_path_group:
+                # REQUIRED: Directory where PGE will place results.
+                #   Type: string.
+                product_path: output
+                # Path to the scratch directory.
+                #   Type: string.
+                scratch_path: scratch
+                # Path to the SAS output directory.
+                #   Type: string.
+                sas_output_path: output
+                # Version of the product.
+                #   Type: string.
+                product_version: '0.1'
+                # Whether the SAS should output and save the Compressed SLCs in addition to the standard
+                #   product output.
+                #   Type: boolean.
+                save_compressed_slc: true
+              worker_settings:
+                # Whether to use GPU for processing (if available).
+                #   Type: boolean.
+                gpu_enabled: true
+                # (For non-GPU) Number of cpu cores to use for processing. Uses
+                #   `multiprocessing.cpu_count()` if not set.
+                #   Type: integer.
+                n_workers: 32
+                # Number of threads to use per worker. This sets the OMP_NUM_THREADS environment variable.
+                #   Type: integer.
+                threads_per_worker: 2
+                # Size (in GB) of blocks of data to load at a time.
+                #   Type: number.
+                block_size_gb: 1.0
+              # Path to the output log file in addition to logging to stderr.
+              #   Type: string.
+              log_file: output/pge_logfile.log
+              
