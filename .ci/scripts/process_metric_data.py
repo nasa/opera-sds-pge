@@ -204,7 +204,7 @@ def main():
         print("ERROR: No docker statistics were collected.")
 
     # Remove temporary files
-    # os.remove(temp_stats)
+    os.remove(temp_stats)
 
 if __name__ == "__main__":
     main()
