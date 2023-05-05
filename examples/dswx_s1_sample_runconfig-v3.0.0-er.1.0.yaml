@@ -22,13 +22,13 @@ RunConfig:
                 # For each burst there will be .tif file/s and an associated .h5 metadata file.
 
                 InputFilePaths: [
-                  /home/conda/input_data/rtc_data/t047_100908_iw3,
-                  /home/conda/input_data/rtc_data/t047_100909_iw1,
-                  /home/conda/input_data/rtc_data/t047_100909_iw2,
-                  /home/conda/input_data/rtc_data/t047_100909_iw3,
-                  /home/conda/input_data/rtc_data/t047_100910_iw1,
-                  /home/conda/input_data/rtc_data/t047_100910_iw2,
-                  /home/conda/input_data/rtc_data/t047_100910_iw3
+                  /home/conda/input_dir/rtc_data/t047_100908_iw3,
+                  /home/conda/input_dir/rtc_data/t047_100909_iw1,
+                  /home/conda/input_dir/rtc_data/t047_100909_iw2,
+                  /home/conda/input_dir/rtc_data/t047_100909_iw3,
+                  /home/conda/input_dir/rtc_data/t047_100910_iw1,
+                  /home/conda/input_dir/rtc_data/t047_100910_iw2,
+                  /home/conda/input_dir/rtc_data/t047_100910_iw3
                 ]
 
             DynamicAncillaryFilesGroup:
@@ -38,16 +38,15 @@ RunConfig:
                     # Path to the Digital Elevation Model
                     # Must be either a single .tif, or a .vrt that points to one
                     # or more .tif files
-                    dem_file: /home/conda/input_dir/dem.tif
+                    dem_file: /home/conda/input_dir/ancillary_data/dem.tif
 
                     # Path to the Discrete Classification Map
                     # Must point to a single .tif file
-                    hand_file: /home/conda/input_dir/hand.tif
+                    hand_file: /home/conda/input_dir/ancillary_data/hand.tif
 
-                    reference_water_file: /home/conda/input_dir/reference_water.tif
+                    reference_water_file: /home/conda/input_dir/ancillary_data/reference_water.tif
 
-                    world_cover: /home/conda/input_dir/worldcover.tif
-
+                    world_cover: /home/conda/input_dir/ancillary_data/worldcover.tif
 
             ProductPathGroup:
                 # Path to where output products should be stored
@@ -84,7 +83,7 @@ RunConfig:
 
                 # The Error Code base value added to the offset values to make
                 # error codes unique per-PGE
-                ErrorCodeBase: 100000
+                ErrorCodeBase: 400000
 
                 # Path to the Yamale schema used to validate the SAS portion
                 # of the RunConfig
@@ -144,37 +143,37 @@ RunConfig:
                 #            hdf5 metadata and rtc geotiff (directory or files)
                 #            for open water
                 input_file_path: [
-                  /home/conda/input_data/rtc_data/t047_100908_iw3,
-                  /home/conda/input_data/rtc_data/t047_100909_iw1,
-                  /home/conda/input_data/rtc_data/t047_100909_iw2,
-                  /home/conda/input_data/rtc_data/t047_100909_iw3,
-                  /home/conda/input_data/rtc_data/t047_100910_iw1,
-                  /home/conda/input_data/rtc_data/t047_100910_iw2,
-                  /home/conda/input_data/rtc_data/t047_100910_iw3
+                  /home/conda/input_dir/rtc_data/t047_100908_iw3,
+                  /home/conda/input_dir/rtc_data/t047_100909_iw1,
+                  /home/conda/input_dir/rtc_data/t047_100909_iw2,
+                  /home/conda/input_dir/rtc_data/t047_100909_iw3,
+                  /home/conda/input_dir/rtc_data/t047_100910_iw1,
+                  /home/conda/input_dir/rtc_data/t047_100910_iw2,
+                  /home/conda/input_dir/rtc_data/t047_100910_iw3
                 ]
               dynamic_ancillary_file_group:
                 # Digital elevation model (Required)
-                dem_file: input_data/ancillary_data/dem.tif
+                dem_file: /home/conda/input_dir/ancillary_data/dem.tif
 
                 # Digital elevation model source description
                 dem_file_description: 'DEM'
 
                 # ESA WorldCover map file
                 # (Required for opera_dswx_s1)
-                world_file: input_data/ancillary_data/landcover.tif
+                world_file: /home/conda/input_dir/ancillary_data/worldcover.tif
 
                 # ESA WorldCover map description
                 worldcover_file_description: 'COPERNICUS WORLDCOVER 10m'
 
                 # Reference water body map (Required)
                 # e.g., Pekel's water occurrence or seasonality map
-                reference_water_file: input_data/ancillary_data/reference_water.tif
+                reference_water_file: /home/conda/input_dir/ancillary_data/reference_water.tif
 
                 # Reference water description
                 reference_water_file_description: 'PEKELs water'
 
                 # Height Above Nearest Drainage (Required)
-                hand_file: input_data/ancillary_data/hand.tif
+                hand_file: /home/conda/input_dir/ancillary_data/hand.tif
 
                 # HAND description
                 hand_file_description: 'ASF HAND'
@@ -186,17 +185,17 @@ RunConfig:
                 shoreline_shapefile_description:
 
                 # Separate runconfig file for algorithm parameters
-                algorithm_parameters: input_data/ancillary_data/algorithm_parameter_s1.yaml
+                algorithm_parameters: /home/conda/input_dir/ancillary_data/algorithm_parameter_s1.yaml
 
               primary_executable:
                 product_type: dswx_s1
 
               product_path_group:
                 # Directory where PGE will place results
-                product_path: product
+                product_path: /home/conda/output_dir
 
                 # Directory where SAS can write temporary data
-                scratch_path: scratch
+                scratch_path: /home/conda/output_dir/scratch_dir
 
                 # SAS writes the output product to the following file.
                 # the scheme:
@@ -205,7 +204,7 @@ RunConfig:
                 # The default value for `product_version` is the PROTEUS software version.
                 # `layer_number` and `layer_name` are automatically set by the DSWx-HLS SAS
                 # The PGE should update `product_id` and `product_version`
-                sas_output_path: output_dir
+                sas_output_path: /home/conda/output_dir
 
                 product_version: 0.1
 
