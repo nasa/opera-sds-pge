@@ -225,7 +225,7 @@ metrics_collection_end()
 			if [[ $plot_metrics_exit_code == 0 ]]
 			then
                 metrics_html_file="${results_dir}/docker_metrics_${pge}_${container}_${timestamp}.html"
-                echo "<html><img src=\"${metrics_plot_file}\"></html>" > ${metrics_html_file}
+                echo "<html><img src=\"$(basename metrics_plot_file)\"></html>" > ${metrics_html_file}
                 rm "$metrics_stats"
             else
                 echo "An error occurred in plot_metric_data.py"

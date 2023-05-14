@@ -132,7 +132,7 @@ def generate_plots_from_csv_file(metrics_csv_file, metrics_plot_file):
     plot_width = 12
     plot_height = 5
     fig, axs = plt.subplots(len(pl), figsize=(plot_width, plot_height*(len(pl))))
-    fig.suptitle(metrics_csv_file)
+    fig.suptitle(os.path.basename(metrics_csv_file))
     x = secs
 
     for i in range(len(pl)):
