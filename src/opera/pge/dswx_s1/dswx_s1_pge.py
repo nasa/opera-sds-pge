@@ -8,7 +8,7 @@ Module defining the implementation for the Dynamic Surface Water Extent (DSWx)
 from Sentinel-1 A/B (S1) PGE.
 """
 
-from os.path import isfile
+from os.path import abspath, exists, isfile, splitext
 
 import yamale
 
@@ -76,6 +76,51 @@ class DSWxS1PreProcessorMixin(PreProcessorMixin):
         # Validate the algorithm parameter Runconfig against its schema file
         yamale.validate(algorithm_parameters_schema, algorithm_parameters_config_data, strict=True)
 
+    def _validate_ancillary_inputs(self):
+        """
+        Evaluates the list of ancillary inputs from the RunConfig to ensure they
+        exist and have an expected file extension.
+
+        """
+
+        dynamic_ancillary_file_group_dict = \
+            self.runconfig.sas_config['runconfig']['groups']['dynamic_ancillary_file_group']
+
+        for key, value in dynamic_ancillary_file_group_dict.items():
+            if key in ('dem_file', ):
+                input_validation.check_input(
+                    value, self.logger, self.name, valid_extensions=('.tif', '.tiff', '.vrt')
+                )
+            elif key in ('reference_water_file', 'world_file', 'hand_file'):
+                input_validation.check_input(
+                    value, self.logger, self.name, valid_extensions=('.tif', '.tiff')
+                )
+            elif key in ('shoreline_shapefile',):
+                input_validation.check_input(
+                    value, self.logger, self.name, valid_extensions=('.shp',)
+                )
+
+                # Only the .shp file is configured in the runconfig, but we
+                # need to ensure the other required files are co-located with it
+                for extension in ('.dbf', '.prj', '.shx'):
+                    additional_shapefile = splitext(value)[0] + extension
+
+                    if not exists(abspath(additional_shapefile)):
+                        error_msg = f"Additional shapefile {additional_shapefile} could not be located"
+
+                        self.logger.critical(self.name, ErrorCode.INVALID_INPUT, error_msg)
+
+            elif key in ('dem_file_description', 'worldcover_file_description',
+                         'reference_water_file_description', 'hand_file_description',
+                         'shoreline_shapefile_description'):
+                # these fields are included in the SAS input paths, but are not
+                # actually file paths, so skip them
+                continue
+            elif key in ('algorithm_parameters',):
+                input_validation.check_input(
+                    value, self.logger, self.name, valid_extensions=('yaml', )
+                )
+
     def run_preprocessor(self, **kwargs):
         """
         Executes the pre-processing steps for DSWx-S1 PGE initialization.
@@ -93,6 +138,7 @@ class DSWxS1PreProcessorMixin(PreProcessorMixin):
 
         self._validate_algorithm_parameters_config()
         input_validation.validate_dswx_inputs(self.runconfig, self.logger, self.runconfig.pge_name)
+        self._validate_ancillary_inputs()
 
 
 class DSWxS1PostProcessorMixin(PostProcessorMixin):

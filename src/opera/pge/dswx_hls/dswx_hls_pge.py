@@ -33,6 +33,7 @@ from opera.util.metadata_utils import get_sensor_from_spacecraft_name
 from opera.util.render_jinja2 import render_jinja2
 from opera.util.time import get_time_for_filename
 
+
 class DSWxHLSPreProcessorMixin(PreProcessorMixin):
     """
     Mixin class responsible for handling all pre-processing steps for the
@@ -77,7 +78,7 @@ class DSWxHLSPreProcessorMixin(PreProcessorMixin):
     def _validate_ancillary_inputs(self):
         """
         Evaluates the list of ancillary inputs from the RunConfig to ensure they
-        are exist and have an expected file extension.
+        exist and have an expected file extension.
 
         For the shoreline shapefile, this method also checks to ensure a full
         set of expected shapefiles were provided alongside the .shp file configured

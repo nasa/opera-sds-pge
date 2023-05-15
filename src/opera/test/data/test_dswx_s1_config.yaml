@@ -13,10 +13,11 @@ RunConfig:
 
             DynamicAncillaryFilesGroup:
                 AncillaryFileMap:
-                    dem_file: dswx_s1_pge_test/input_dir/dem.tiff
-                    hand_file: dswx_s1_pge_test/input_data/ancillary_data/hand.tif
-                    reference_water_file: dswx_s1_pge_test/input_data/ancillary_data/reference_water.tif
-                    world_cover: dswx_s1_pge_test/input_data/ancillary_data/worldcover.tif
+                    dem_file: dswx_s1_pge_test/input_dir/dem.tif
+                    hand_file: dswx_s1_pge_test/input_dir/hand.tif
+                    reference_water_file: dswx_s1_pge_test/input_dir/reference_water.tif
+                    world_cover: dswx_s1_pge_test/input_dir/worldcover.tif
+                    shoreline_shapefile: dswx_s1_pge_test/input_dir/shoreline.shp
 
             ProductPathGroup:
                 OutputProductPath: dswx_s1_pge_test/output_dir
@@ -53,16 +54,22 @@ RunConfig:
                     input_file_group:
                         # Required. List of SAFE files (min=1)
                         input_file_path:
-                            - dswx_s1_pge_test/input_data
+                            - dswx_s1_pge_test/input_dir
 
                     dynamic_ancillary_file_group:
                         # Digital elevation model
-                        dem_file: dswx_s1_pge_test/input_data/dem_4326.tiff
+                        dem_file: dswx_s1_pge_test/input_dir/dem.tif
+                        # dem_file: dswx_s1_pge_test/input_dir/dem.tif
+                        dem_file_description: 'DEM'
+                        # ESA WorldCover map file (Required)
+                        world_file: dswx_s1_pge_test/input_dir/worldcover.tif
                         # Reference water body map (Required)
                         # https://global-surface-water.appspot.com/download
-                        reference_water_file: dswx_s1_pge_test/input_data/ancillary_data/reference_water.tif
+                        reference_water_file: dswx_s1_pge_test/input_dir/reference_water.tif
                         # Height Above Nearest Drainage (optional)
-                        hand_file: dswx_s1_pge_test/input_data/ancillary_data/hand.tif
+                        shoreline_shapefile: dswx_s1_pge_test/input_dir/shoreline.shp
+                        # Height Above Nearest Drainage (Required)
+                        hand_file: dswx_s1_pge_test/input_dir/hand.tif
                         # Separate runconfig file for algorithm parameters
                         algorithm_parameters: test/data/test_algorithm_parameters_s1.yaml
 
@@ -73,7 +80,7 @@ RunConfig:
                         # Directory where PGE will place results
                         product_path: dswx_s1_pge_test/output_dir
                         # Directory where SAS writes temporary data
-                        scratch_path: dswx_s1_pge_test/output_dir/scratch_dir
+                        scratch_path: dswx_s1_pge_test/scratch_dir
                         # Intermediate file name. SAS writes the output to this file.
                         # PGE may rename the product according to file naming convention
                         sas_output_path: dswx_s1_pge_test/output_dir
