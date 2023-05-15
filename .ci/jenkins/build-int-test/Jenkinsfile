@@ -75,7 +75,6 @@ pipeline {
                 }
                 archiveArtifacts artifacts: 'test_results/**/test_int_*_results.html'
                 archiveArtifacts artifacts: 'test_results/**/docker_metrics_*.png'
-                archiveArtifacts artifacts: 'test_results/**/docker_metrics_*.html'
                 archiveArtifacts artifacts: 'test_results/**/*.csv'
             }
         }
