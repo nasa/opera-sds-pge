@@ -222,8 +222,8 @@ metrics_collection_end()
             metrics_plot_file="${results_dir}/docker_metrics_${pge}_${container}_${timestamp}.png"
             python3 "$SCRIPT_DIR"/plot_metric_data.py "$processed_csv_file" "$metrics_plot_file"
             plot_metrics_exit_code=$?
-			if [[ $plot_metrics_exit_code == 0 ]]
-			then
+            if [[ $plot_metrics_exit_code == 0 ]]
+            then
                 rm "$metrics_stats"
             else
                 echo "An error occurred in plot_metric_data.py"
