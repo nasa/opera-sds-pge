@@ -34,6 +34,7 @@ RunConfig:
                     - --pge
                 ErrorCodeBase: 500000
                 SchemaPath: /home/mamba/opera/pge/disp_s1/schema/disp_s1_sas_schema.yaml
+                AlgorithmParametersSchemaPath: /home/mamba/opera/pge/disp_s1/schema/algor_param_s1_schema.yaml
                 IsoTemplatePath:
 
             QAExecutable:
