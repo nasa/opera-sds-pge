@@ -171,38 +171,43 @@ class DswxS1PgeTestCase(unittest.TestCase):
         with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
             yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
 
-        # Kickoff execution of DSWX-S1 PGE
-        pge.run()
+        try:
+            # Kickoff execution of DSWX-S1 PGE
+            pge.run()
 
-        # Check that the runconfig and logger were instantiated
-        self.assertIsInstance(pge.runconfig, RunConfig)
-        self.assertIsInstance(pge.logger, PgeLogger)
+            # Check that the runconfig and logger were instantiated
+            self.assertIsInstance(pge.runconfig, RunConfig)
+            self.assertIsInstance(pge.logger, PgeLogger)
 
-        # Check that directories were created according to RunConfig
-        self.assertTrue(isdir(pge.runconfig.output_product_path))
-        self.assertTrue(isdir(pge.runconfig.scratch_path))
+            # Check that directories were created according to RunConfig
+            self.assertTrue(isdir(pge.runconfig.output_product_path))
+            self.assertTrue(isdir(pge.runconfig.scratch_path))
 
-        # Check that an in-memory log was created
-        stream = pge.logger.get_stream_object()
-        self.assertIsInstance(stream, StringIO)
+            # Check that an in-memory log was created
+            stream = pge.logger.get_stream_object()
+            self.assertIsInstance(stream, StringIO)
 
-        # Check that a RunConfig for the SAS was isolated within the scratch directory
-        expected_sas_config_file = join(pge.runconfig.scratch_path, 'test_dswx_s1_config_sas.yaml')
-        self.assertTrue(exists(expected_sas_config_file))
+            # Check that a RunConfig for the SAS was isolated within the scratch directory
+            expected_sas_config_file = join(pge.runconfig.scratch_path, 'test_dswx_s1_config_sas.yaml')
+            self.assertTrue(exists(expected_sas_config_file))
 
-        # Check that the log file was created and moved into the output directory
-        expected_log_file = pge.logger.get_file_name()
-        self.assertTrue(exists(expected_log_file))
+            # Check that the log file was created and moved into the output directory
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(exists(expected_log_file))
 
-        # Lastly, check that the dummy output products were created
-        slc_files = glob.glob(join(pge.runconfig.output_product_path, "*.txt"))
-        self.assertEqual(len(slc_files), 1)
+            # Lastly, check that the dummy output products were created
+            slc_files = glob.glob(join(pge.runconfig.output_product_path, "*.txt"))
+            self.assertEqual(len(slc_files), 1)
 
-        # Open and read the log
-        with open(expected_log_file, 'r', encoding='utf-8') as infile:
-            log_contents = infile.read()
+            # Open and read the log
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
 
-        self.assertIn(f"DSWx-S1 invoked with RunConfig {expected_sas_config_file}", log_contents)
+            self.assertIn(f"DSWx-S1 invoked with RunConfig {expected_sas_config_file}", log_contents)
+
+        finally:
+            if exists(test_runconfig_path):
+                os.unlink(test_runconfig_path)
 
         self._set_algorithm_parameters_path(runconfig_path, self.restore_test_algorithm_param_path)
 
