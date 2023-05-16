@@ -403,8 +403,9 @@ def get_cslc_s1_product_metadata(file_name):
         'identification': get_hdf5_group_as_dict(file_name, f"{S1_SLC_HDF5_PREFIX}/identification"),
         'grids': get_hdf5_group_as_dict(file_name, f"{S1_SLC_HDF5_PREFIX}/CSLC/grids"),
         'corrections': get_hdf5_group_as_dict(file_name, f"{S1_SLC_HDF5_PREFIX}/CSLC/corrections"),
-        'calibration_information': get_hdf5_group_as_dict(file_name,
-                                                          f"{S1_SLC_HDF5_PREFIX}/CSLC/metadata/calibration_information"),
+        'calibration_information':
+            get_hdf5_group_as_dict(file_name,
+                                   f"{S1_SLC_HDF5_PREFIX}/CSLC/metadata/calibration_information"),
         'noise_information': get_hdf5_group_as_dict(file_name,
                                                     f"{S1_SLC_HDF5_PREFIX}/CSLC/metadata/noise_information"),
         'processing_information': get_hdf5_group_as_dict(file_name,
@@ -460,13 +461,16 @@ def create_test_cslc_metadata_product(file_path):
         zero_doppler_time_spacing_dset = corrections_grp.create_dataset("zero_doppler_time_spacing",
                                                                         data=0.027999999991152436, dtype='float64')
 
-        calibration_information_grp = outfile.create_group(f"{S1_SLC_HDF5_PREFIX}/CSLC/metadata/calibration_information")
-        cal_basename_dset = calibration_information_grp.create_dataset("basename",
-                                                                       data=np.string_('calibration-s1a-iw1-slc-vv-20220501t015035-20220501t015102-043011-0522a4-004.xml'))
+        calibration_information_grp = outfile.create_group(
+            f"{S1_SLC_HDF5_PREFIX}/CSLC/metadata/calibration_information")
+        cal_basename_dset = calibration_information_grp.create_dataset(
+            "basename",
+            data=np.string_('calibration-s1a-iw1-slc-vv-20220501t015035-20220501t015102-043011-0522a4-004.xml'))
 
         noise_information_grp = outfile.create_group(f"{S1_SLC_HDF5_PREFIX}/CSLC/metadata/noise_information")
-        noise_basename_dset = noise_information_grp.create_dataset("basename",
-                                                                   data=np.string_('noise-s1a-iw1-slc-vv-20220501t015035-20220501t015102-043011-0522a4-004.xml'))
+        noise_basename_dset = noise_information_grp.create_dataset(
+            "basename",
+            data=np.string_('noise-s1a-iw1-slc-vv-20220501t015035-20220501t015102-043011-0522a4-004.xml'))
 
         processing_information_grp = outfile.create_group(f"{S1_SLC_HDF5_PREFIX}/CSLC/metadata/processing_information")
         algorithms_grp = outfile.create_group(f"{S1_SLC_HDF5_PREFIX}/CSLC/metadata/processing_information/algorithms")
