@@ -20,7 +20,7 @@ Integration Testing DSWx-HLS PGE docker image...
 
 PGE_NAME="dswx_hls"
 PGE_IMAGE="opera_pge/${PGE_NAME}"
-SAMPLE_TIME=15
+SAMPLE_TIME=1
 
 # defaults, test data and runconfig files should be updated as-needed to use
 # the latest available as defaults for use with the Jenkins pipeline call
