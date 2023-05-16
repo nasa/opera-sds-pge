@@ -308,6 +308,20 @@ class RunConfig:
             return None
 
     @property
+    def algorithm_parameters_file_config_path(self) -> str:
+        """Returns the path to the algorithm_parameter_file run configuration file for DISP-S1"""
+        try:
+            algorithm_parameters_file_config_path = \
+                self._sas_config['runconfig']['groups']['dynamic_ancillary_file_group']['algorithm_parameters_file']
+            return (
+                algorithm_parameters_file_config_path
+                if isabs(algorithm_parameters_file_config_path)
+                else resource_filename('opera', algorithm_parameters_file_config_path)
+            )
+        except KeyError:
+            return None
+
+    @property
     def iso_template_path(self) -> str:
         """Returns the ISO Template Path for a Primary Executable"""
         iso_template_path = self._pge_config['PrimaryExecutable']['IsoTemplatePath']
