@@ -26,9 +26,9 @@ SAMPLE_TIME=15
 # Test data should be uploaded to  s3://operasds-dev-pge/${PGE_NAME}/
 [ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath "$(dirname "$(realpath "$0")")"/../..)
 [ -z "${PGE_TAG}" ] && PGE_TAG="${USER}-dev"
-[ -z "${INPUT_DATA}" ] && INPUT_DATA="delivery_cslc_s1_gamma_0.1_input_data.zip"
-[ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="delivery_cslc_s1_gamma_0.1_expected_output.zip"
-[ -z "${RUNCONFIG}" ] && RUNCONFIG="cslc_s1_sample_runconfig-v2.0.0-rc.1.0.yaml"
+[ -z "${INPUT_DATA}" ] && INPUT_DATA="delivery_cslc_s1_gamma_0.1_expected_input_data.zip"
+[ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="delivery_cslc_s1_gamma_0.2_expected_output.zip"
+[ -z "${RUNCONFIG}" ] && RUNCONFIG="opera_pge_cslc_s1_delivery_4.1_gamma_runconfig.yaml"
 [ -z "${TMP_ROOT}" ] && TMP_ROOT="$DEFAULT_TMP_ROOT"
 
 # Create the test output directory in the workspace
@@ -62,6 +62,7 @@ runconfig_dir="${TMP_DIR}/runconfig"
 
 # the testdata reference metadata contains this path so we use it here
 output_dir="${TMP_DIR}/output_cslc_s1"
+
 # make sure no output directory already exists
 if [ -d "$output_dir" ]; then
     echo "Output directory $output_dir already exists (and should not). Removing directory."
@@ -72,6 +73,7 @@ mkdir -p "$output_dir"
 
 # the testdata reference metadata contains this path so we use it here
 scratch_dir="${TMP_DIR}/scratch_cslc_s1"
+
 # make sure no scratch directory already exists
 if [ -d "$scratch_dir" ]; then
     echo "Scratch directory $scratch_dir already exists (and should not). Removing directory."
@@ -87,7 +89,11 @@ metrics_collection_start "$PGE_NAME" "$container_name" "$TEST_RESULTS_DIR" "$SAM
 
 echo "Running Docker image ${PGE_IMAGE}:${PGE_TAG}"
 
-docker run --rm -u $UID:"$(id -g)" -w /home/compass_user/output_dir --name $container_name \
+# Get the number of available cores so we can limit utilization by the SAS
+num_cores=$((`nproc --all`))
+
+docker run --rm -u $UID:"$(id -g)" --env OMP_NUM_THREADS=$((num_cores-1)) \
+           -w /home/compass_user/scratch --name $container_name \
            -v "${runconfig_dir}":/home/compass_user/runconfig:ro \
            -v "${input_dir}":/home/compass_user/input_dir:ro \
            -v "${output_dir}":/home/compass_user/output_dir \
@@ -105,47 +111,29 @@ if [ $docker_exit_status -ne 0 ]; then
 else
     echo "<tr><th>Compare Result</th><th><ul><li>Expected file</li><li>Output file</li></ul></th><th>validate_product.py output</th></tr>" >> "$RESULTS_FILE"
     declare -a burst_ids=(  "t064_135518_iw1"
-                            "t064_135518_iw2"
-                            "t064_135518_iw3"
                             "t064_135519_iw1"
-                            "t064_135519_iw2"
-                            "t064_135519_iw3"
                             "t064_135520_iw1"
-                            "t064_135520_iw2"
-                            "t064_135520_iw3"
                             "t064_135521_iw1"
-                            "t064_135521_iw2"
-                            "t064_135521_iw3"
                             "t064_135522_iw1"
-                            "t064_135522_iw2"
-                            "t064_135522_iw3"
                             "t064_135523_iw1"
-                            "t064_135523_iw2"
-                            "t064_135523_iw3"
                             "t064_135524_iw1"
-                            "t064_135524_iw2"
-                            "t064_135524_iw3"
                             "t064_135525_iw1"
-                            "t064_135525_iw2"
-                            "t064_135525_iw3"
                             "t064_135526_iw1"
-                            "t064_135526_iw2"
-                            "t064_135526_iw3"
                             "t064_135527_iw1")
 
     for burst_id in "${burst_ids[@]}"; do
-        compare_result="PENDING"
+        cslc_compare_result="PENDING"
         echo "-------------------------------------"
         echo "Comparing results for burst id ${burst_id}"
         burst_id_uppercase=${burst_id^^}
         burst_id_replace_underscores=${burst_id_uppercase//_/-}
-        burst_id_pattern="*_${burst_id_replace_underscores}_*.h5"
+        burst_id_pattern="*_${burst_id_replace_underscores}_*Z.h5"
         output_file=`ls $output_dir/$burst_id_pattern`
-        echo "Output file matching burst id is $output_file"
+        echo "Output CSLC file matching burst id is $output_file"
 
         ref_product="/exp/${burst_id}/20220501/${burst_id}_20220501.h5"
         sec_product="/out/$(basename ${output_file})"
-        # TODO: add additional call to validate static layers
+
         docker_out=$(docker run --rm -u compass_user:compass_user \
                                 -v "${TMP_DIR}":/working:ro \
                                 -v "${output_dir}":/out:ro \
@@ -154,24 +142,62 @@ else
                                 ${PGE_IMAGE}:"${PGE_TAG}" \
                                 /working/validate_product.py \
                                 --ref-product ${ref_product} \
-                                --sec-product ${sec_product} 2>&1) || docker_exit_status=$?
+                                --sec-product ${sec_product} 2>&1 \
+                                -p CSLC) || docker_exit_status=$?
 
         echo "$docker_out"
         if [[ "$docker_out" != *"All CSLC product checks have passed"* ]]; then
             echo "Failure: All CSLC product checks DID NOT PASS"
-            compare_result="FAIL"
+            cslc_compare_result="FAIL"
             overall_status=2
         elif [[ "$docker_out" != *"All CSLC metadata checks have passed"* ]]; then
             echo "Failure: All CSLC metadata checks DID NOT PASS"
-            compare_result="FAIL"
+            cslc_compare_result="FAIL"
             overall_status=2
         else
             echo "Product validation was successful"
-            compare_result="PASS"
+            cslc_compare_result="PASS"
         fi
 
         docker_out="${docker_out//$'\n'/<br>}"
-        echo "<tr><td>${compare_result}</td><td><ul><li>${ref_product}</li><li>${sec_product}</li></ul></td><td>${docker_out}</td></tr>" >> "$RESULTS_FILE"
+        echo "<tr><td>${cslc_compare_result}</td><td><ul><li>${ref_product}</li><li>${sec_product}</li></ul></td><td>${docker_out}</td></tr>" >> "$RESULTS_FILE"
+
+        static_layers_compare_result="PENDING"
+
+        burst_id_pattern="*_${burst_id_replace_underscores}_*_static_layers.h5"
+        output_file=`ls $output_dir/$burst_id_pattern`
+        echo "Output static layers file matching burst id is $output_file"
+
+        ref_product="/exp/${burst_id}/20220501/static_layers_${burst_id}.h5"
+        sec_product="/out/$(basename ${output_file})"
+
+        docker_out=$(docker run --rm -u compass_user:compass_user \
+                                -v "${TMP_DIR}":/working:ro \
+                                -v "${output_dir}":/out:ro \
+                                -v "${expected_dir}":/exp:ro \
+                                --entrypoint /home/compass_user/miniconda3/envs/COMPASS/bin/python3 \
+                                ${PGE_IMAGE}:"${PGE_TAG}" \
+                                /working/validate_product.py \
+                                --ref-product ${ref_product} \
+                                --sec-product ${sec_product} 2>&1 \
+                                -p static_layers) || docker_exit_status=$?
+
+        echo "$docker_out"
+        if [[ "$docker_out" != *"All CSLC product checks have passed"* ]]; then
+            echo "Failure: All CSLC product checks DID NOT PASS"
+            static_layers_compare_result="FAIL"
+            overall_status=2
+        elif [[ "$docker_out" != *"All CSLC metadata checks have passed"* ]]; then
+            echo "Failure: All CSLC metadata checks DID NOT PASS"
+            static_layers_compare_result="FAIL"
+            overall_status=2
+        else
+            echo "Product validation was successful"
+            static_layers_compare_result="PASS"
+        fi
+
+        docker_out="${docker_out//$'\n'/<br>}"
+        echo "<tr><td>${static_layers_compare_result}</td><td><ul><li>${ref_product}</li><li>${sec_product}</li></ul></td><td>${docker_out}</td></tr>" >> "$RESULTS_FILE"
     done
 fi
 echo " "
