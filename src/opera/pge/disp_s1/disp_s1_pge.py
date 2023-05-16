@@ -11,6 +11,7 @@ from Sentinel-1 A/B (S1-A/B) data.
 from opera.pge.base.base_pge import PgeExecutor
 from opera.pge.base.base_pge import PostProcessorMixin
 from opera.pge.base.base_pge import PreProcessorMixin
+from opera.util.input_validation import validate_algorithm_parameters_config
 
 
 class DispS1PreProcessorMixin(PreProcessorMixin):
@@ -41,6 +42,12 @@ class DispS1PreProcessorMixin(PreProcessorMixin):
 
         """
         super().run_preprocessor(**kwargs)
+
+        self.algorithm_parameters_runconfig = self.runconfig.algorithm_parameters_file_config_path
+        validate_algorithm_parameters_config(self.name,
+                                             self.runconfig.algorithm_parameters_schema_path,
+                                             self.runconfig.algorithm_parameters_file_config_path,
+                                             self.logger)
 
 
 class DispS1PostProcessorMixin(PostProcessorMixin):
