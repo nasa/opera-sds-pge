@@ -9,6 +9,7 @@ Unit tests for the pge/dswx_s1/dswx_s1_pge.py module.
 
 import glob
 import os
+import shutil
 import tempfile
 import unittest
 from io import StringIO
@@ -61,6 +62,11 @@ class DswxS1PgeTestCase(unittest.TestCase):
             dir=test_input_dir, prefix="test_h5_", suffix=".h5"
         )
 
+        # Copy the algorithm_parameters config file into the test input directory.
+        shutil.copy(join(self.data_dir, 'test_algorithm_parameters_s1.yaml'), test_input_dir)
+        self.test_algorithm_parameters_path = abspath(join(test_input_dir, 'test_algorithm_parameters_s1.yaml'))
+        self.restore_test_algorithm_param_path = 'dswx_s1_pge_test/input_dir/test_algorithm_parameters_s1.yaml'
+
         # Create dummy versions of the expected ancillary inputs
         for ancillary_file in ('dem.tif', 'worldcover.tif',
                                'reference_water.tif', 'shoreline.shp', 'shoreline.dbf', 'shoreline.prj',
@@ -76,6 +82,32 @@ class DswxS1PgeTestCase(unittest.TestCase):
         os.chdir(self.test_dir)
         self.input_file.close()
         self.working_dir.cleanup()
+
+    def _set_algorithm_parameters_path(self, runconfig, path):
+        """
+        Set the path in the main runconfig file to the algorithm parameters
+        runconfig file.  For each test this path is set to the algorithm
+        parameters runconfig in the test data directory.  At the end of each
+        test it is set back to the original value.
+
+        Parameters
+        ----------
+        runconfig:  str
+            runconfig file to modify
+        path:  str
+            path to the algorithm parameters runconfig file
+
+        """
+        runconfig_path = join(self.data_dir, runconfig)
+
+        with open(runconfig_path, 'r', encoding='utf-8') as infile:
+            runconfig_dict = yaml.safe_load(infile)
+
+        runconfig_dict['RunConfig']['Groups']['SAS']['runconfig']['groups']['dynamic_ancillary_file_group']\
+            ['algorithm_parameters'] = path  # noqa E211
+
+        with open(runconfig_path, 'w', encoding='utf-8') as outfile:
+            yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
 
     def _compare_algorithm_parameters_runconfig_to_expected(self, runconfig):
         """
@@ -116,6 +148,9 @@ class DswxS1PgeTestCase(unittest.TestCase):
         a message to be captured by PgeLogger.
         """
         runconfig_path = join(self.data_dir, 'test_dswx_s1_config.yaml')
+        test_runconfig_path = join(self.data_dir, 'invalid_dswx_s1_config.yaml')
+
+        self._set_algorithm_parameters_path(runconfig_path, self.test_algorithm_parameters_path)
 
         pge = DSWxS1Executor(pge_name="DswxS1PgeTest", runconfig_path=runconfig_path)
 
@@ -127,6 +162,14 @@ class DswxS1PgeTestCase(unittest.TestCase):
         # Check that other objects have not been instantiated yet
         self.assertIsNone(pge.runconfig)
         self.assertIsNone(pge.logger)
+
+        with open(runconfig_path, 'r', encoding='utf-8') as infile:
+            runconfig_dict = yaml.safe_load(infile)
+
+        runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']['AlgorithmParametersSchemaPath'] = None
+
+        with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+            yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
 
         # Kickoff execution of DSWX-S1 PGE
         pge.run()
@@ -161,9 +204,13 @@ class DswxS1PgeTestCase(unittest.TestCase):
 
         self.assertIn(f"DSWx-S1 invoked with RunConfig {expected_sas_config_file}", log_contents)
 
+        self._set_algorithm_parameters_path(runconfig_path, self.restore_test_algorithm_param_path)
+
     def test_dswx_s1_pge_validate_algorithm_parameters_config(self):
         """Test basic parsing and validation of an algorithm parameters RunConfig file"""
         runconfig_path = join(self.data_dir, 'test_dswx_s1_config.yaml')
+
+        self._set_algorithm_parameters_path(runconfig_path, self.test_algorithm_parameters_path)
 
         self.runconfig = RunConfig(runconfig_path)
 
@@ -180,6 +227,8 @@ class DswxS1PgeTestCase(unittest.TestCase):
         # Check the properties of the algorithm parameters RunConfig to ensure they match as expected
         self._compare_algorithm_parameters_runconfig_to_expected(runconfig_dict)
 
+        self._set_algorithm_parameters_path(runconfig_path, self.restore_test_algorithm_param_path)
+
     def test_dswx_s1_pge_bad_algorithm_parameters_schema_path(self):
         """
         Test for invalid path in the optional 'AlgorithmParametersSchemaPath'
@@ -188,6 +237,8 @@ class DswxS1PgeTestCase(unittest.TestCase):
         """
         runconfig_path = join(self.data_dir, 'test_dswx_s1_config.yaml')
         test_runconfig_path = join(self.data_dir, 'invalid_dswx_s1_config.yaml')
+
+        self._set_algorithm_parameters_path(runconfig_path, self.test_algorithm_parameters_path)
 
         with open(runconfig_path, 'r', encoding='utf-8') as infile:
             runconfig_dict = yaml.safe_load(infile)
@@ -236,10 +287,14 @@ class DswxS1PgeTestCase(unittest.TestCase):
             if exists(test_runconfig_path):
                 os.unlink(test_runconfig_path)
 
+        self._set_algorithm_parameters_path(runconfig_path, self.restore_test_algorithm_param_path)
+
     def test_dswx_s1_pge_bad_algorithm_parameters_path(self):
         """Test for invalid path to 'algorithm_parameters' in SAS runconfig file"""
         runconfig_path = join(self.data_dir, 'test_dswx_s1_config.yaml')
         test_runconfig_path = join(self.data_dir, 'invalid_dswx_s1_config.yaml')
+
+        self._set_algorithm_parameters_path(runconfig_path, self.test_algorithm_parameters_path)
 
         with open(runconfig_path, 'r', encoding='utf-8') as infile:
             runconfig_dict = yaml.safe_load(infile)
@@ -260,10 +315,14 @@ class DswxS1PgeTestCase(unittest.TestCase):
             if exists(test_runconfig_path):
                 os.unlink(test_runconfig_path)
 
+        self._set_algorithm_parameters_path(runconfig_path, self.restore_test_algorithm_param_path)
+
     def test_dswx_s1_pge_ancillary_input_validation(self):
         """Test validation checks made on the set of ancillary input files"""
         runconfig_path = join(self.data_dir, 'test_dswx_s1_config.yaml')
         test_runconfig_path = join(self.data_dir, 'invalid_dswx_s1_runconfig.yaml')
+
+        self._set_algorithm_parameters_path(runconfig_path, self.test_algorithm_parameters_path)
 
         with open(runconfig_path, 'r', encoding='utf-8') as stream:
             runconfig_dict = yaml.safe_load(stream)
@@ -347,10 +406,14 @@ class DswxS1PgeTestCase(unittest.TestCase):
             if os.path.exists(test_runconfig_path):
                 os.unlink(test_runconfig_path)
 
+        self._set_algorithm_parameters_path(runconfig_path, self.restore_test_algorithm_param_path)
+
     def test_dswx_s1_pge_input_validation(self):
         """Test the input validation checks made by DSWxS1PreProcessorMixin."""
         runconfig_path = join(self.data_dir, 'test_dswx_s1_config.yaml')
         test_runconfig_path = join(self.data_dir, 'invalid_dswx_s1_runconfig.yaml')
+
+        self._set_algorithm_parameters_path(runconfig_path, self.test_algorithm_parameters_path)
 
         with open(runconfig_path, 'r', encoding='utf-8') as stream:
             runconfig_dict = yaml.safe_load(stream)
@@ -447,6 +510,8 @@ class DswxS1PgeTestCase(unittest.TestCase):
         finally:
             if os.path.exists(test_runconfig_path):
                 os.unlink(test_runconfig_path)
+
+        self._set_algorithm_parameters_path(runconfig_path, self.restore_test_algorithm_param_path)
 
 
 if __name__ == "__main__":

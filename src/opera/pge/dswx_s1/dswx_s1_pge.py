@@ -82,7 +82,6 @@ class DSWxS1PreProcessorMixin(PreProcessorMixin):
         exist and have an expected file extension.
 
         """
-
         dynamic_ancillary_file_group_dict = \
             self.runconfig.sas_config['runconfig']['groups']['dynamic_ancillary_file_group']
 
@@ -118,7 +117,7 @@ class DSWxS1PreProcessorMixin(PreProcessorMixin):
                 continue
             elif key in ('algorithm_parameters',):
                 input_validation.check_input(
-                    value, self.logger, self.name, valid_extensions=('yaml', )
+                    value, self.logger, self.name, valid_extensions=('.yaml', )
                 )
 
     def run_preprocessor(self, **kwargs):
@@ -136,8 +135,8 @@ class DSWxS1PreProcessorMixin(PreProcessorMixin):
         """
         super().run_preprocessor(**kwargs)
 
-        self._validate_algorithm_parameters_config()
         input_validation.validate_dswx_inputs(self.runconfig, self.logger, self.runconfig.pge_name)
+        self._validate_algorithm_parameters_config()
         self._validate_ancillary_inputs()
 
 
