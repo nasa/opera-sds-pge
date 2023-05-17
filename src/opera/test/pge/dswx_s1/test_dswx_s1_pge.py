@@ -468,7 +468,7 @@ class DswxS1PgeTestCase(unittest.TestCase):
                 log_contents = infile.read()
 
             self.assertIn(f"Input directory {abspath('dswx_s1_pge_test/scratch_dir')} "
-                          f"does not contain any tif files", log_contents)
+                          f"does not contain any .tif files", log_contents)
 
             # Test that an input directory with no .h5 files is caught
             input_files_group['InputFilePaths'] = ['dswx_s1_pge_test/scratch_dir']
@@ -490,7 +490,7 @@ class DswxS1PgeTestCase(unittest.TestCase):
                 log_contents = infile.read()
 
             self.assertIn(f"Input directory {abspath('dswx_s1_pge_test/scratch_dir')} "
-                          f"does not contain any h5 files", log_contents)
+                          f"does not contain any .h5 files", log_contents)
 
             # Lastly, check that a file that exists but is not a tif or an h5 is caught
             input_files_group['InputFilePaths'] = [runconfig_path]
@@ -510,7 +510,7 @@ class DswxS1PgeTestCase(unittest.TestCase):
                 log_contents = infile.read()
 
             self.assertIn(f"Input file {abspath(runconfig_path)} does not have "
-                          f".tif or .h5 extension", log_contents)
+                          f"an expected extension", log_contents)
 
         finally:
             if os.path.exists(test_runconfig_path):

@@ -28,6 +28,7 @@ from opera.util.img_utils import get_geotiff_sensor_product_id
 from opera.util.img_utils import get_geotiff_spacecraft_name
 from opera.util.img_utils import get_hls_filename_fields
 from opera.util.img_utils import set_geotiff_metadata
+from opera.util.input_validation import validate_dswx_inputs
 from opera.util.metadata_utils import get_geographic_boundaries_from_mgrs_tile
 from opera.util.metadata_utils import get_sensor_from_spacecraft_name
 from opera.util.render_jinja2 import render_jinja2
@@ -47,33 +48,6 @@ class DSWxHLSPreProcessorMixin(PreProcessorMixin):
     """
 
     _pre_mixin_name = "DSWxHLSPreProcessorMixin"
-
-    def _validate_inputs(self):
-        """
-        Evaluates the list of inputs from the RunConfig to ensure they are valid.
-        For directories, this means checking for directory existence, and that
-        at least one .tif file resides within the directory. For files,
-        each file is checked for existence and that it has a .tif extension.
-
-        """
-        for input_file in self.runconfig.input_files:
-            input_file_path = abspath(input_file)
-
-            if not exists(input_file_path):
-                error_msg = f"Could not locate specified input file/directory {input_file_path}"
-
-                self.logger.critical(self.name, ErrorCode.INPUT_NOT_FOUND, error_msg)
-            elif isdir(input_file_path):
-                list_of_input_tifs = glob.glob(join(input_file_path, '*.tif*'))
-
-                if len(list_of_input_tifs) <= 0:
-                    error_msg = f"Input directory {input_file_path} does not contain any tif files"
-
-                    self.logger.critical(self.name, ErrorCode.INPUT_NOT_FOUND, error_msg)
-            elif not input_file_path.endswith(".tif"):
-                error_msg = f"Input file {input_file_path} does not have .tif extension"
-
-                self.logger.critical(self.name, ErrorCode.INVALID_INPUT, error_msg)
 
     def _validate_ancillary_inputs(self):
         """
@@ -182,8 +156,9 @@ class DSWxHLSPreProcessorMixin(PreProcessorMixin):
         """
         super().run_preprocessor(**kwargs)
 
-        input_validation.validate_dswx_inputs(self.runconfig, self.logger, self.runconfig.pge_name)
-        # self._validate_inputs()
+        validate_dswx_inputs(
+            self.runconfig, self.logger, self.runconfig.pge_name, valid_extensions=(".tif",)
+        )
         self._validate_ancillary_inputs()
         self._validate_expected_input_platforms()
 

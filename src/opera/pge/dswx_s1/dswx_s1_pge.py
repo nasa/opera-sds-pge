@@ -17,6 +17,7 @@ from opera.pge.base.base_pge import PgeExecutor
 from opera.pge.base.base_pge import PostProcessorMixin
 from opera.pge.base.base_pge import PreProcessorMixin
 from opera.util.error_codes import ErrorCode
+from opera.util.input_validation import validate_dswx_inputs
 
 
 class DSWxS1PreProcessorMixin(PreProcessorMixin):
@@ -125,7 +126,7 @@ class DSWxS1PreProcessorMixin(PreProcessorMixin):
         Executes the pre-processing steps for DSWx-S1 PGE initialization.
         The DswxS1PreProcessorMixin version of this class performs all actions
         of the base PreProcessorMixin class, and adds an input validation step for
-        the inputs defined within the RunConfig (TODO).
+        the inputs defined within the RunConfig.
 
         Parameters
         ----------
@@ -135,7 +136,9 @@ class DSWxS1PreProcessorMixin(PreProcessorMixin):
         """
         super().run_preprocessor(**kwargs)
 
-        input_validation.validate_dswx_inputs(self.runconfig, self.logger, self.runconfig.pge_name)
+        validate_dswx_inputs(
+            self.runconfig, self.logger, self.runconfig.pge_name, valid_extensions=(".tif", ".h5")
+        )
         self._validate_algorithm_parameters_config()
         self._validate_ancillary_inputs()
 
