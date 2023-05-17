@@ -564,16 +564,17 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
         output_product_metadata['burst_center'] = burst_center_str
 
         # Parse the burst polygon coordinates to conform with gml
-        # sample: "POLYGON ((399015 3859970, 398975 3860000, ..., 399015 3859970))"
+        # samples: "POLYGON ((399015 3859970, 398975 3860000, ..., 399015 3859970))"
+        #          "MULTIPOLYGON (((399015, 3859970, ...)), ... ((... 399015, 3859970)))
         burst_polygon_str = output_product_metadata['identification']['bounding_polygon']
-        burst_polygon_pattern = r"POLYGON\s*\(\((.+)\)\)"
+        burst_polygon_pattern = r"(?:MULTI)?POLYGON\s*\(\((.+)\)\)"
         result = re.match(burst_polygon_pattern, burst_polygon_str)
 
         if not result:
             msg = f'Failed to parse burst polygon from string "{burst_polygon_str}"'
             self.logger.critical(self.name, ErrorCode.ISO_METADATA_RENDER_FAILED, msg)
 
-        output_product_metadata['burst_polygon'] = "".join(result.groups()[0].split(','))
+        output_product_metadata['burst_polygon'] = f"({''.join(result.groups()[0].split(','))})"
 
         return output_product_metadata
 
