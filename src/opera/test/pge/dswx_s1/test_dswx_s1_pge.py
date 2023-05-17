@@ -9,6 +9,7 @@ Unit tests for the pge/dswx_s1/dswx_s1_pge.py module.
 
 import glob
 import os
+import shutil
 import tempfile
 import unittest
 from io import StringIO
@@ -29,7 +30,9 @@ class DswxS1PgeTestCase(unittest.TestCase):
     starting_dir = None
     working_dir = None
     test_dir = None
-    input_file = None
+    input_tif_file = None
+    input_h5_file = None
+    input_dir = "dswx_s1_pge_test/input_dir"
 
     @classmethod
     def setUpClass(cls) -> None:
@@ -52,15 +55,25 @@ class DswxS1PgeTestCase(unittest.TestCase):
         )
 
         # Create the input directories expected by the test Runconfig file
-        input_dir = join(self.working_dir.name, "dswx_s1_pge_test/input_dir")
-        os.makedirs(input_dir, exist_ok=True)
-
-        ancillary_data_dir = join(self.working_dir.name, "dswx_s1_pge_test/input_dir/ancillary_data")
-        os.makedirs(ancillary_data_dir, exist_ok=True)
+        test_input_dir = join(self.working_dir.name, "dswx_s1_pge_test/input_dir")
+        os.makedirs(test_input_dir, exist_ok=True)
 
         self.input_file = tempfile.NamedTemporaryFile(
-            dir=input_dir, prefix="test_input_", suffix=".tiff"
+            dir=test_input_dir, prefix="test_h5_", suffix=".h5"
         )
+
+        # Copy the algorithm_parameters config file into the test input directory.
+        shutil.copy(join(self.data_dir, 'test_algorithm_parameters_s1.yaml'), test_input_dir)
+        self.test_algorithm_parameters_path = abspath(join(test_input_dir, 'test_algorithm_parameters_s1.yaml'))
+        self.restore_test_algorithm_param_path = 'dswx_s1_pge_test/input_dir/test_algorithm_parameters_s1.yaml'
+
+        # Create dummy versions of the expected ancillary inputs
+        for ancillary_file in ('dem.tif', 'worldcover.tif',
+                               'reference_water.tif', 'shoreline.shp', 'shoreline.dbf', 'shoreline.prj',
+                               'shoreline.shx', 'hand.tif'):
+            os.system(
+                f"touch {join(test_input_dir, ancillary_file)}"
+            )
 
         os.chdir(self.working_dir.name)
 
@@ -69,6 +82,32 @@ class DswxS1PgeTestCase(unittest.TestCase):
         os.chdir(self.test_dir)
         self.input_file.close()
         self.working_dir.cleanup()
+
+    def _set_algorithm_parameters_path(self, runconfig, path):
+        """
+        Set the path in the main runconfig file to the algorithm parameters
+        runconfig file.  For each test this path is set to the algorithm
+        parameters runconfig in the test data directory.  At the end of each
+        test it is set back to the original value.
+
+        Parameters
+        ----------
+        runconfig:  str
+            runconfig file to modify
+        path:  str
+            path to the algorithm parameters runconfig file
+
+        """
+        runconfig_path = join(self.data_dir, runconfig)
+
+        with open(runconfig_path, 'r', encoding='utf-8') as infile:
+            runconfig_dict = yaml.safe_load(infile)
+
+        runconfig_dict['RunConfig']['Groups']['SAS']['runconfig']['groups']['dynamic_ancillary_file_group']\
+            ['algorithm_parameters'] = path  # noqa E211
+
+        with open(runconfig_path, 'w', encoding='utf-8') as outfile:
+            yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
 
     def _compare_algorithm_parameters_runconfig_to_expected(self, runconfig):
         """
@@ -109,6 +148,9 @@ class DswxS1PgeTestCase(unittest.TestCase):
         a message to be captured by PgeLogger.
         """
         runconfig_path = join(self.data_dir, 'test_dswx_s1_config.yaml')
+        test_runconfig_path = join(self.data_dir, 'invalid_dswx_s1_config.yaml')
+
+        self._set_algorithm_parameters_path(runconfig_path, self.test_algorithm_parameters_path)
 
         pge = DSWxS1Executor(pge_name="DswxS1PgeTest", runconfig_path=runconfig_path)
 
@@ -121,42 +163,59 @@ class DswxS1PgeTestCase(unittest.TestCase):
         self.assertIsNone(pge.runconfig)
         self.assertIsNone(pge.logger)
 
-        # Kickoff execution of DSWX-S1 PGE
-        pge.run()
+        with open(runconfig_path, 'r', encoding='utf-8') as infile:
+            runconfig_dict = yaml.safe_load(infile)
 
-        # Check that the runconfig and logger were instantiated
-        self.assertIsInstance(pge.runconfig, RunConfig)
-        self.assertIsInstance(pge.logger, PgeLogger)
+        runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']['AlgorithmParametersSchemaPath'] = None
 
-        # Check that directories were created according to RunConfig
-        self.assertTrue(isdir(pge.runconfig.output_product_path))
-        self.assertTrue(isdir(pge.runconfig.scratch_path))
+        with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+            yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
 
-        # Check that an in-memory log was created
-        stream = pge.logger.get_stream_object()
-        self.assertIsInstance(stream, StringIO)
+        try:
+            # Kickoff execution of DSWX-S1 PGE
+            pge.run()
 
-        # Check that a RunConfig for the SAS was isolated within the scratch directory
-        expected_sas_config_file = join(pge.runconfig.scratch_path, 'test_dswx_s1_config_sas.yaml')
-        self.assertTrue(exists(expected_sas_config_file))
+            # Check that the runconfig and logger were instantiated
+            self.assertIsInstance(pge.runconfig, RunConfig)
+            self.assertIsInstance(pge.logger, PgeLogger)
 
-        # Check that the log file was created and moved into the output directory
-        expected_log_file = pge.logger.get_file_name()
-        self.assertTrue(exists(expected_log_file))
+            # Check that directories were created according to RunConfig
+            self.assertTrue(isdir(pge.runconfig.output_product_path))
+            self.assertTrue(isdir(pge.runconfig.scratch_path))
 
-        # Lastly, check that the dummy output products were created
-        slc_files = glob.glob(join(pge.runconfig.output_product_path, "*.txt"))
-        self.assertEqual(len(slc_files), 1)
+            # Check that an in-memory log was created
+            stream = pge.logger.get_stream_object()
+            self.assertIsInstance(stream, StringIO)
 
-        # Open and read the log
-        with open(expected_log_file, 'r', encoding='utf-8') as infile:
-            log_contents = infile.read()
+            # Check that a RunConfig for the SAS was isolated within the scratch directory
+            expected_sas_config_file = join(pge.runconfig.scratch_path, 'test_dswx_s1_config_sas.yaml')
+            self.assertTrue(exists(expected_sas_config_file))
 
-        self.assertIn(f"DSWx-S1 invoked with RunConfig {expected_sas_config_file}", log_contents)
+            # Check that the log file was created and moved into the output directory
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(exists(expected_log_file))
+
+            # Lastly, check that the dummy output products were created
+            slc_files = glob.glob(join(pge.runconfig.output_product_path, "*.txt"))
+            self.assertEqual(len(slc_files), 1)
+
+            # Open and read the log
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn(f"DSWx-S1 invoked with RunConfig {expected_sas_config_file}", log_contents)
+
+        finally:
+            if exists(test_runconfig_path):
+                os.unlink(test_runconfig_path)
+
+        self._set_algorithm_parameters_path(runconfig_path, self.restore_test_algorithm_param_path)
 
     def test_dswx_s1_pge_validate_algorithm_parameters_config(self):
         """Test basic parsing and validation of an algorithm parameters RunConfig file"""
         runconfig_path = join(self.data_dir, 'test_dswx_s1_config.yaml')
+
+        self._set_algorithm_parameters_path(runconfig_path, self.test_algorithm_parameters_path)
 
         self.runconfig = RunConfig(runconfig_path)
 
@@ -173,6 +232,8 @@ class DswxS1PgeTestCase(unittest.TestCase):
         # Check the properties of the algorithm parameters RunConfig to ensure they match as expected
         self._compare_algorithm_parameters_runconfig_to_expected(runconfig_dict)
 
+        self._set_algorithm_parameters_path(runconfig_path, self.restore_test_algorithm_param_path)
+
     def test_dswx_s1_pge_bad_algorithm_parameters_schema_path(self):
         """
         Test for invalid path in the optional 'AlgorithmParametersSchemaPath'
@@ -181,6 +242,8 @@ class DswxS1PgeTestCase(unittest.TestCase):
         """
         runconfig_path = join(self.data_dir, 'test_dswx_s1_config.yaml')
         test_runconfig_path = join(self.data_dir, 'invalid_dswx_s1_config.yaml')
+
+        self._set_algorithm_parameters_path(runconfig_path, self.test_algorithm_parameters_path)
 
         with open(runconfig_path, 'r', encoding='utf-8') as infile:
             runconfig_dict = yaml.safe_load(infile)
@@ -229,10 +292,14 @@ class DswxS1PgeTestCase(unittest.TestCase):
             if exists(test_runconfig_path):
                 os.unlink(test_runconfig_path)
 
+        self._set_algorithm_parameters_path(runconfig_path, self.restore_test_algorithm_param_path)
+
     def test_dswx_s1_pge_bad_algorithm_parameters_path(self):
         """Test for invalid path to 'algorithm_parameters' in SAS runconfig file"""
         runconfig_path = join(self.data_dir, 'test_dswx_s1_config.yaml')
         test_runconfig_path = join(self.data_dir, 'invalid_dswx_s1_config.yaml')
+
+        self._set_algorithm_parameters_path(runconfig_path, self.test_algorithm_parameters_path)
 
         with open(runconfig_path, 'r', encoding='utf-8') as infile:
             runconfig_dict = yaml.safe_load(infile)
@@ -252,6 +319,204 @@ class DswxS1PgeTestCase(unittest.TestCase):
         finally:
             if exists(test_runconfig_path):
                 os.unlink(test_runconfig_path)
+
+        self._set_algorithm_parameters_path(runconfig_path, self.restore_test_algorithm_param_path)
+
+    def test_dswx_s1_pge_ancillary_input_validation(self):
+        """Test validation checks made on the set of ancillary input files"""
+        runconfig_path = join(self.data_dir, 'test_dswx_s1_config.yaml')
+        test_runconfig_path = join(self.data_dir, 'invalid_dswx_s1_runconfig.yaml')
+
+        self._set_algorithm_parameters_path(runconfig_path, self.test_algorithm_parameters_path)
+
+        with open(runconfig_path, 'r', encoding='utf-8') as stream:
+            runconfig_dict = yaml.safe_load(stream)
+
+        ancillary_file_group_dict = \
+            runconfig_dict['RunConfig']['Groups']['SAS']['runconfig']['groups']['dynamic_ancillary_file_group']
+
+        # Test an invalid (missing) ancillary file
+        ancillary_file_group_dict['dem_file'] = 'non_existent_dem.tif'
+
+        with open(test_runconfig_path, 'w', encoding='utf-8') as input_path:
+            yaml.safe_dump(runconfig_dict, input_path, sort_keys=False)
+
+        try:
+            pge = DSWxS1Executor(pge_name="DSWxS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            # Config validation occurs before the log is fully initialized, but the
+            # initial log file should still exist and contain details of the validation
+            # error
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            # Open the log file, and check that the validation error details were captured
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn("Could not locate specified input non_existent_dem.tif.", log_contents)
+
+            # Reset to valid dem path
+            ancillary_file_group_dict['dem_file'] = 'dswx_s1_pge_test/input_dir/dem.tif'
+
+            # Test with an unexpected file extension
+            os.system("touch dswx_s1_pge_test/input_dir/worldcover.vrt")
+            ancillary_file_group_dict['world_file'] = 'dswx_s1_pge_test/input_dir/worldcover.vrt'
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as input_path:
+                yaml.safe_dump(runconfig_dict, input_path, sort_keys=False)
+
+            pge = DSWxS1Executor(pge_name="DSWxS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            # Open the log file, and check that the validation error details were captured
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn("Input file dswx_s1_pge_test/input_dir/worldcover.vrt "
+                          "does not have an expected file extension.", log_contents)
+
+            # Reset to valid worldcover path
+            ancillary_file_group_dict['world_file'] = 'dswx_s1_pge_test/input_dir/worldcover.tif'
+
+            # Test with incomplete shoreline shapefile set
+            os.system("touch dswx_s1_pge_test/input_dir/missing_shoreline.shp")
+            ancillary_file_group_dict['shoreline_shapefile'] = 'dswx_s1_pge_test/input_dir/missing_shoreline.shp'
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as input_path:
+                yaml.safe_dump(runconfig_dict, input_path, sort_keys=False)
+
+            pge = DSWxS1Executor(pge_name="DSWxS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            # Open the log file, and check that the validation error details were captured
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn("Additional shapefile dswx_s1_pge_test/input_dir/missing_shoreline.dbf "
+                          "could not be located", log_contents)
+        finally:
+
+            if os.path.exists(test_runconfig_path):
+                os.unlink(test_runconfig_path)
+
+        self._set_algorithm_parameters_path(runconfig_path, self.restore_test_algorithm_param_path)
+
+    def test_dswx_s1_pge_input_validation(self):
+        """Test the input validation checks made by DSWxS1PreProcessorMixin."""
+        runconfig_path = join(self.data_dir, 'test_dswx_s1_config.yaml')
+        test_runconfig_path = join(self.data_dir, 'invalid_dswx_s1_runconfig.yaml')
+
+        self._set_algorithm_parameters_path(runconfig_path, self.test_algorithm_parameters_path)
+
+        with open(runconfig_path, 'r', encoding='utf-8') as stream:
+            runconfig_dict = yaml.safe_load(stream)
+
+        input_files_group = runconfig_dict['RunConfig']['Groups']['PGE']['InputFilesGroup']
+
+        # Test that a non-existent file path is detected by pre-processor
+        input_files_group['InputFilePaths'] = ['temp/non_existent_file.tif']
+
+        with open(test_runconfig_path, 'w', encoding='utf-8') as input_path:
+            yaml.safe_dump(runconfig_dict, input_path, sort_keys=False)
+
+        try:
+            pge = DSWxS1Executor(pge_name="DSWxS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            # Config validation occurs before the log is fully initialized, but the
+            # initial log file should still exist and contain details of the validation
+            # error
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            # Open the log file, and check that the validation error details were captured
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn(f"Could not locate specified input file/directory "
+                          f"{abspath('temp/non_existent_file.tif')}", log_contents)
+
+            # Test that an input directory with no .tif files is caught
+            input_files_group['InputFilePaths'] = ['dswx_s1_pge_test/scratch_dir']
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as out_file:
+                yaml.safe_dump(runconfig_dict, out_file, sort_keys=False)
+
+            pge = DSWxS1Executor(pge_name="DSWxS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn(f"Input directory {abspath('dswx_s1_pge_test/scratch_dir')} "
+                          f"does not contain any .tif files", log_contents)
+
+            # Test that an input directory with no .h5 files is caught
+            input_files_group['InputFilePaths'] = ['dswx_s1_pge_test/scratch_dir']
+
+            os.system(f"touch {abspath('dswx_s1_pge_test/scratch_dir/test.tif')}")
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as out_file:
+                yaml.safe_dump(runconfig_dict, out_file, sort_keys=False)
+
+            pge = DSWxS1Executor(pge_name="DSWxS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn(f"Input directory {abspath('dswx_s1_pge_test/scratch_dir')} "
+                          f"does not contain any .h5 files", log_contents)
+
+            # Lastly, check that a file that exists but is not a tif or an h5 is caught
+            input_files_group['InputFilePaths'] = [runconfig_path]
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as runconfig_fh:
+                yaml.safe_dump(runconfig_dict, runconfig_fh, sort_keys=False)
+
+            pge = DSWxS1Executor(pge_name="DSWxS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn(f"Input file {abspath(runconfig_path)} does not have "
+                          f"an expected extension", log_contents)
+
+        finally:
+            if os.path.exists(test_runconfig_path):
+                os.unlink(test_runconfig_path)
+
+        self._set_algorithm_parameters_path(runconfig_path, self.restore_test_algorithm_param_path)
 
 
 if __name__ == "__main__":

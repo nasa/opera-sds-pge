@@ -1,82 +1,60 @@
 RunConfig:
-    Name: OPERA-DSWX-S1-PGE-TEST-CONFIG
-
-    Groups:
-
-        PGE:
-            PGENameGroup:
-                PGEName: DSWX_S1_PGE
-
-            InputFilesGroup:
-                InputFilePaths:
-                    - dswx_s1_pge_test/input_dir
-
-            DynamicAncillaryFilesGroup:
-                AncillaryFileMap:
-                    dem_file: dswx_s1_pge_test/input_dir/dem.tiff
-                    hand_file: dswx_s1_pge_test/input_data/ancillary_data/hand.tif
-                    reference_water_file: dswx_s1_pge_test/input_data/ancillary_data/reference_water.tif
-                    world_cover: dswx_s1_pge_test/input_data/ancillary_data/worldcover.tif
-
-            ProductPathGroup:
-                OutputProductPath: dswx_s1_pge_test/output_dir
-                ScratchPath: dswx_s1_pge_test/scratch_dir
-
-            PrimaryExecutable:
-                ProductIdentifier: DSWX_S1
-                ProgramPath: /bin/echo
-                ProgramOptions:
-                    - 'hello world > dswx_s1_pge_test/output_dir/dswx_s1_test.txt;'
-                    - '/bin/echo DSWx-S1 invoked with RunConfig'
-                ErrorCodeBase: 400000
-                SchemaPath: pge/dswx_s1/schema/dswx_s1_sas_schema.yaml
-                AlgorithmParametersSchemaPath: pge/dswx_s1/schema/algorithm_parameters_s1_schema.yaml
-                IsoTemplatePath:
-
-            QAExecutable:
-                Enabled: False
-                ProgramPath:
-                ProgramOptions: []
-
-            DebugLevelGroup:
-                DebugSwitch: False
-                ExecuteViaShell: True  # Must be set to True for test to work
-
-        SAS:
-            runconfig:
-                name: dswx_s1_workflow_default
-
-                groups:
-                    pge_name_group:
-                        pge_name: DSWX_S1_PGE
-
-                    input_file_group:
-                        # Required. List of SAFE files (min=1)
-                        input_file_path:
-                            - dswx_s1_pge_test/input_data
-
-                    dynamic_ancillary_file_group:
-                        # Digital elevation model
-                        dem_file: dswx_s1_pge_test/input_data/dem_4326.tiff
-                        # Reference water body map (Required)
-                        # https://global-surface-water.appspot.com/download
-                        reference_water_file: dswx_s1_pge_test/input_data/ancillary_data/reference_water.tif
-                        # Height Above Nearest Drainage (optional)
-                        hand_file: dswx_s1_pge_test/input_data/ancillary_data/hand.tif
-                        # Separate runconfig file for algorithm parameters
-                        algorithm_parameters: test/data/test_algorithm_parameters_s1.yaml
-
-                    primary_executable:
-                        product_type: dswx_s1
-
-                    product_path_group:
-                        # Directory where PGE will place results
-                        product_path: dswx_s1_pge_test/output_dir
-                        # Directory where SAS writes temporary data
-                        scratch_path: dswx_s1_pge_test/output_dir/scratch_dir
-                        # Intermediate file name. SAS writes the output to this file.
-                        # PGE may rename the product according to file naming convention
-                        sas_output_path: dswx_s1_pge_test/output_dir
-
-                    log_file: dswx_s1_pge_test/output_dir/test_log.log
-
+  Name: OPERA-DSWX-S1-PGE-TEST-CONFIG
+  Groups:
+    PGE:
+      PGENameGroup:
+        PGEName: DSWX_S1_PGE
+      InputFilesGroup:
+        InputFilePaths:
+        - dswx_s1_pge_test/input_dir
+      DynamicAncillaryFilesGroup:
+        AncillaryFileMap:
+          dem_file: dswx_s1_pge_test/input_dir/dem.tif
+          hand_file: dswx_s1_pge_test/input_dir/hand.tif
+          reference_water_file: dswx_s1_pge_test/input_dir/reference_water.tif
+          world_cover: dswx_s1_pge_test/input_dir/worldcover.tif
+          shoreline_shapefile: dswx_s1_pge_test/input_dir/shoreline.shp
+      ProductPathGroup:
+        OutputProductPath: dswx_s1_pge_test/output_dir
+        ScratchPath: dswx_s1_pge_test/scratch_dir
+      PrimaryExecutable:
+        ProductIdentifier: DSWX_S1
+        ProgramPath: /bin/echo
+        ProgramOptions:
+        - hello world > dswx_s1_pge_test/output_dir/dswx_s1_test.txt;
+        - /bin/echo DSWx-S1 invoked with RunConfig
+        ErrorCodeBase: 400000
+        SchemaPath: pge/dswx_s1/schema/dswx_s1_sas_schema.yaml
+        AlgorithmParametersSchemaPath: pge/dswx_s1/schema/algorithm_parameters_s1_schema.yaml
+        IsoTemplatePath: null
+      QAExecutable:
+        Enabled: false
+        ProgramPath: null
+        ProgramOptions: []
+      DebugLevelGroup:
+        DebugSwitch: false
+        ExecuteViaShell: true
+    SAS:
+      runconfig:
+        name: dswx_s1_workflow_default
+        groups:
+          pge_name_group:
+            pge_name: DSWX_S1_PGE
+          input_file_group:
+            input_file_path:
+            - dswx_s1_pge_test/input_dir
+          dynamic_ancillary_file_group:
+            dem_file: dswx_s1_pge_test/input_dir/dem.tif
+            dem_file_description: DEM
+            world_file: dswx_s1_pge_test/input_dir/worldcover.tif
+            reference_water_file: dswx_s1_pge_test/input_dir/reference_water.tif
+            shoreline_shapefile: dswx_s1_pge_test/input_dir/shoreline.shp
+            hand_file: dswx_s1_pge_test/input_dir/hand.tif
+            algorithm_parameters: dswx_s1_pge_test/input_dir/test_algorithm_parameters_s1.yaml
+          primary_executable:
+            product_type: dswx_s1
+          product_path_group:
+            product_path: dswx_s1_pge_test/output_dir
+            scratch_path: dswx_s1_pge_test/scratch_dir
+            sas_output_path: dswx_s1_pge_test/output_dir
+          log_file: dswx_s1_pge_test/output_dir/test_log.log

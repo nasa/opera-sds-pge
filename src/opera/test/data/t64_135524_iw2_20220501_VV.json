@@ -149,7 +149,7 @@
             "burst_id": "t64_iw2_b204"
         },
         "dynamic_ancillary_file_group": {
-            "dem_file": "input_data/dem_4326.tiff"
+            "dem_file": "input_data/dem.tiff",
         },
         "product_path_group": {
             "product_path": "output_dir",

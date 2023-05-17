@@ -13,7 +13,7 @@ import re
 import tempfile
 import unittest
 from io import StringIO
-from os.path import abspath, join
+from os.path import abspath, exists, join
 from pathlib import Path
 from unittest.mock import patch
 
@@ -438,15 +438,20 @@ class BasePgeTestCase(unittest.TestCase):
 
         pge = PgeExecutor(pge_name="PgeQATest", runconfig_path=test_runconfig_path)
 
-        with self.assertRaises(RuntimeError):
-            pge.run()
+        try:
+            with self.assertRaises(RuntimeError):
+                pge.run()
 
-        expected_log_file = pge.qa_logger.get_file_name()
-        self.assertTrue(os.path.exists(expected_log_file))
+            expected_log_file = pge.qa_logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
 
-        with open(expected_log_file, 'r', encoding='utf-8') as infile:
-            log_contents = infile.read()
-        self.assertIn("Starting SAS QA executable", log_contents)
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+            self.assertIn("Starting SAS QA executable", log_contents)
+
+        finally:
+            if exists(test_runconfig_path):
+                os.unlink(test_runconfig_path)
 
 
 if __name__ == "__main__":

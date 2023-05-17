@@ -207,7 +207,7 @@ class DSWxHLSPgeTestCase(unittest.TestCase):
                 log_contents = infile.read()
 
             self.assertIn(f"Input directory {abspath('dswx_hls_pge_test/scratch_dir')} "
-                          f"does not contain any tif files", log_contents)
+                          f"does not contain any .tif files", log_contents)
 
             # Lastly, check that a file that exists but is not a tif is caught
             input_files_group['InputFilePaths'] = [runconfig_path]
@@ -227,7 +227,8 @@ class DSWxHLSPgeTestCase(unittest.TestCase):
                 log_contents = infile.read()
 
             self.assertIn(f"Input file {abspath(runconfig_path)} does not have "
-                          f".tif extension", log_contents)
+                          f"an expected extension", log_contents)
+
         finally:
             if os.path.exists(test_runconfig_path):
                 os.unlink(test_runconfig_path)
