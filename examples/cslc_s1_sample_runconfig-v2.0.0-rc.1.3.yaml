@@ -1,4 +1,4 @@
-# Sample RunConfig for use with the CSLC-S1 PGE v2.0.0-rc.1.0
+# Sample RunConfig for use with the CSLC-S1 PGE v2.0.0-rc.1.3
 # This RunConfig should require minimal changes in order to be used with the
 # OPERA PCM.
 
@@ -157,7 +157,10 @@ RunConfig:
                         sas_output_file: /home/compass_user/output_dir
 
                         # Product version specific to output products
-                        product_version: 1.0
+                        product_version: "1.0"
+
+                        # Product specification document version
+                        product_specification_version: "0.1.5"
 
                     primary_executable:
                         # This should match the value used for ProductIdentifier
