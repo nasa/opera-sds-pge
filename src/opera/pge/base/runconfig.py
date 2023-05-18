@@ -294,32 +294,25 @@ class RunConfig:
             )
 
     @property
-    def algorithm_parameters_config_path(self) -> str:
-        """Returns the path to the algorithm_parameter run configuration file for DSWX-S1"""
-        try:
-            algorithm_parameters_config_path = \
-                self._sas_config['runconfig']['groups']['dynamic_ancillary_file_group']['algorithm_parameters']
-            return (
-                algorithm_parameters_config_path
-                if isabs(algorithm_parameters_config_path)
-                else resource_filename('opera', algorithm_parameters_config_path)
-            )
-        except KeyError:
-            return None
-
-    @property
     def algorithm_parameters_file_config_path(self) -> str:
-        """Returns the path to the algorithm_parameter_file run configuration file for DISP-S1"""
+        """Returns the path to the algorithm parameters run configuration file"""
+        dynamic_ancillary_file_group = self._sas_config['runconfig']['groups']['dynamic_ancillary_file_group']
+
+        # ADT is inconsistent with how they define this location across different SAS,
+        # so check all known permutations
         try:
-            algorithm_parameters_file_config_path = \
-                self._sas_config['runconfig']['groups']['dynamic_ancillary_file_group']['algorithm_parameters_file']
-            return (
-                algorithm_parameters_file_config_path
-                if isabs(algorithm_parameters_file_config_path)
-                else resource_filename('opera', algorithm_parameters_file_config_path)
-            )
+            algorithm_parameters_file_config_path = dynamic_ancillary_file_group['algorithm_parameters_file']
         except KeyError:
-            return None
+            try:
+                algorithm_parameters_file_config_path = dynamic_ancillary_file_group['algorithm_parameters']
+            except KeyError:
+                return None
+
+        return (
+            algorithm_parameters_file_config_path
+            if isabs(algorithm_parameters_file_config_path)
+            else resource_filename('opera', algorithm_parameters_file_config_path)
+        )
 
     @property
     def iso_template_path(self) -> str:

@@ -96,10 +96,10 @@ class DSWxS1PreProcessorMixin(PreProcessorMixin):
         validate_dswx_inputs(
             self.runconfig, self.logger, self.runconfig.pge_name, valid_extensions=(".tif", ".h5")
         )
-        self.algorithm_parameters_runconfig = self.runconfig.algorithm_parameters_config_path
+        self.algorithm_parameters_runconfig = self.runconfig.algorithm_parameters_file_config_path
         validate_algorithm_parameters_config(self.name,
                                              self.runconfig.algorithm_parameters_schema_path,
-                                             self.runconfig.algorithm_parameters_config_path,
+                                             self.runconfig.algorithm_parameters_file_config_path,
                                              self.logger)
         self._validate_ancillary_inputs()
 
