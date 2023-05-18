@@ -219,7 +219,7 @@ class DswxS1PgeTestCase(unittest.TestCase):
 
         self.runconfig = RunConfig(runconfig_path)
 
-        algorithm_parameters_runconfig = self.runconfig.algorithm_parameters_config_path
+        algorithm_parameters_runconfig = self.runconfig.algorithm_parameters_file_config_path
 
         pge = DSWxS1Executor(pge_name="DswxS1PgeTest", runconfig_path=runconfig_path)
 

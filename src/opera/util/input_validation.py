@@ -8,9 +8,10 @@ input_validation.py
 Common code used by some PGEs for input validation.
 
 """
+from os.path import abspath, exists, isfile, isdir, join, splitext
 
 import glob
-from os.path import abspath, exists, isdir, join, splitext
+import yamale
 
 from opera.util.error_codes import ErrorCode
 
@@ -157,3 +158,46 @@ def validate_dswx_inputs(runconfig, logger, name, valid_extensions=None):
                 error_msg = f"{name} Input file {input_file_path} does not have an expected extension ({valid_extensions})."
 
                 logger.critical(name, ErrorCode.INVALID_INPUT, error_msg)
+
+def validate_algorithm_parameters_config(name, algorithm_parameters_schema_file_path,
+                                         algorithm_parameters_runconfig, logger):
+    """
+    The DSWx-S1 and DISP-S1 interface SAS uses two runconfig files; one for the main SAS,
+    and another for algorithm parameters.  This allows for independent modification
+    of algorithm parameters within its own runconfig file.
+
+    This method performs validation of the 'algorithm parameters' runconfig file
+    against its associated schema file. The SAS section of the main runconfig
+    defines the location within the container of the 'algorithm parameters' runconfig
+    file, under ['dynamic_ancillary_file_group']['algorithm_parameters'].
+
+    The schema file for the 'algorithm parameters' runconfig file is referenced under
+    ['PrimaryExecutable']['AlgorithmParametersSchemaPath'] in the PGE section of the runconfig file.
+    For compatibility with the other PGE 'AlgorithmParametersSchemaPath' is optional.
+
+    """
+    #  If it was decided not to provide a path to the schema file, validation is impossible.
+    if algorithm_parameters_schema_file_path is None:
+        error_msg = "No algorithm_parameters_schema_path provided in runconfig file."
+        logger.info(name, ErrorCode.NO_ALGO_PARAM_SCHEMA_PATH, error_msg)
+        return
+    elif isfile(algorithm_parameters_schema_file_path):
+        # Load the 'algorithm parameters' schema
+        algorithm_parameters_schema = yamale.make_schema(algorithm_parameters_schema_file_path)
+    else:
+        raise RuntimeError(
+            f'Schema error: Could not validate algorithm_parameters schema file.  '
+            f'File: ({algorithm_parameters_schema_file_path}) not found.'
+        )
+
+    if isfile(algorithm_parameters_runconfig):
+        # Load the 'algorithm parameters' runconfig file
+        algorithm_parameters_config_data = yamale.make_data(algorithm_parameters_runconfig)
+    else:
+        raise RuntimeError(
+            f'Can not validate algorithm_parameters config file.  '
+            f'File: {algorithm_parameters_runconfig} not found.'
+        )
+
+    # Validate the algorithm parameter Runconfig against its schema file
+    yamale.validate(algorithm_parameters_schema, algorithm_parameters_config_data, strict=True)

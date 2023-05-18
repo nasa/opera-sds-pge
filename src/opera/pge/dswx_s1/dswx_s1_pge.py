@@ -8,15 +8,15 @@ Module defining the implementation for the Dynamic Surface Water Extent (DSWx)
 from Sentinel-1 A/B (S1) PGE.
 """
 
-from os.path import abspath, exists, isfile, splitext
+from os.path import abspath, exists, splitext
 
-import yamale
 
 import opera.util.input_validation as input_validation
 from opera.pge.base.base_pge import PgeExecutor
 from opera.pge.base.base_pge import PostProcessorMixin
 from opera.pge.base.base_pge import PreProcessorMixin
 from opera.util.error_codes import ErrorCode
+from opera.util.input_validation import validate_algorithm_parameters_config
 from opera.util.input_validation import validate_dswx_inputs
 
 
@@ -33,49 +33,6 @@ class DSWxS1PreProcessorMixin(PreProcessorMixin):
     """
 
     _pre_mixin_name = "DSWxS1PreProcessorMixin"
-
-    def _validate_algorithm_parameters_config(self):
-        """
-        The DSWx-S1 interface SAS uses two runconfig files; one for the main SAS,
-        and another for algorithm parameters.  This allows for independent modification
-        of algorithm parameters within it's own runconfig file. This method performs validation
-        of the 'algorithm parameters' runconfig file against its associated schema file. The SAS
-        section of the main runconfig defines the location within the container of the 'algorithm
-        parameters' runconfig file, under ['dynamic_ancillary_file_group']['algorithm_parameters'].
-        The schema file for the 'algorithm parameters' runconfig file is referenced under
-        ['PrimaryExecutable']['AlgorithmParametersSchemaPath'] in the PGE section of the runconfig file.
-        For compatibility with the other PGE 'AlgorithmParametersSchemaPath' is optional.
-
-        """
-        # Get the path to the optional 'algorithm_parameters_s1.schema.yaml' file
-        algorithm_parameters_schema_file_path = self.runconfig.algorithm_parameters_schema_path
-        #  If it was decided not to provide a path to the schema file, validation is impossible.
-        if algorithm_parameters_schema_file_path is None:
-            error_msg = "No algorithm_parameters_schema_path provided in runconfig file."
-            self.logger.info(self.name, ErrorCode.NO_ALGO_PARAM_SCHEMA_PATH, error_msg)
-            return
-        elif isfile(algorithm_parameters_schema_file_path):
-            # Load the 'algorithm parameters' schema
-            algorithm_parameters_schema = yamale.make_schema(algorithm_parameters_schema_file_path)
-        else:
-            raise RuntimeError(
-                f'Schema error: Could not validate algorithm_parameters schema file.  '
-                f'File: ({algorithm_parameters_schema_file_path}) not found.'
-            )
-
-        # Get the 'algorithm parameters' runconfig file
-        self.algorithm_parameters_runconfig = self.runconfig.algorithm_parameters_config_path
-        if isfile(self.algorithm_parameters_runconfig):
-            # Load the 'algorithm parameters' runconfig file
-            algorithm_parameters_config_data = yamale.make_data(self.algorithm_parameters_runconfig)
-        else:
-            raise RuntimeError(
-                f'Can not validate algorithm_parameters config file.  '
-                f'File: {self.algorithm_parameters_runconfig} not found.'
-            )
-
-        # Validate the algorithm parameter Runconfig against its schema file
-        yamale.validate(algorithm_parameters_schema, algorithm_parameters_config_data, strict=True)
 
     def _validate_ancillary_inputs(self):
         """
@@ -139,7 +96,11 @@ class DSWxS1PreProcessorMixin(PreProcessorMixin):
         validate_dswx_inputs(
             self.runconfig, self.logger, self.runconfig.pge_name, valid_extensions=(".tif", ".h5")
         )
-        self._validate_algorithm_parameters_config()
+        self.algorithm_parameters_runconfig = self.runconfig.algorithm_parameters_file_config_path
+        validate_algorithm_parameters_config(self.name,
+                                             self.runconfig.algorithm_parameters_schema_path,
+                                             self.runconfig.algorithm_parameters_file_config_path,
+                                             self.logger)
         self._validate_ancillary_inputs()
 
 

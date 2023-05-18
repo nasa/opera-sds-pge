@@ -27,6 +27,7 @@ RunConfig:
                     - '/bin/echo DISP-S1 invoked with RunConfig'
                 ErrorCodeBase: 500000
                 SchemaPath: pge/disp_s1/schema/disp_s1_sas_schema.yaml
+                AlgorithmParametersSchemaPath: pge/disp_s1/schema/algor_param_disp_s1_schema.yaml
                 IsoTemplatePath:
 
             QAExecutable:
@@ -56,7 +57,7 @@ RunConfig:
 
                     dynamic_ancillary_file_group:
                         # Path to file containing SAS algorithm parameters.
-                        algorithm_parameters_file: algorithm_parameters.yaml
+                        algorithm_parameters_file: test/data/test_disp_s1_algorithm_parameters.yaml
 
                         # Paths to existing Amplitude Dispersion files (1 per burst) for PS update calculation. If
                         # none provided, computed using the input SLC stack.
