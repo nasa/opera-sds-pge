@@ -64,8 +64,13 @@ class DswxS1PgeTestCase(unittest.TestCase):
 
         # Copy the algorithm_parameters config file into the test input directory.
         shutil.copy(join(self.data_dir, 'test_algorithm_parameters_s1.yaml'), test_input_dir)
+        # these path variables are use to update the main runconfig file, then to reset it
         self.test_algorithm_parameters_path = abspath(join(test_input_dir, 'test_algorithm_parameters_s1.yaml'))
         self.restore_test_algorithm_param_path = 'dswx_s1_pge_test/input_dir/test_algorithm_parameters_s1.yaml'
+
+        self.input_file = tempfile.NamedTemporaryFile(
+            dir=test_input_dir, prefix="test_h5_", suffix=".h5"
+        )
 
         # Create dummy versions of the expected ancillary inputs
         for ancillary_file in ('dem.tif', 'worldcover.tif',
@@ -74,6 +79,15 @@ class DswxS1PgeTestCase(unittest.TestCase):
             os.system(
                 f"touch {join(test_input_dir, ancillary_file)}"
             )
+
+        # Create the output directories expected by the test Runconfig file
+        self.test_output_dir = join(self.working_dir.name, "dswx_s1_pge_test/output_dir")
+        os.makedirs(self.test_output_dir, exist_ok=True)
+        # Add some burst data to the output directory:
+        burst_data = ('OPERA_L3_DSWx-S1_b1_B01_WTR.tif', 'OPERA_L3_DSWx-S1_b1_B02_BWTR.tif',
+                      'OPERA_L3_DSWx-S1_b1_B03_CONF.tif', 'OPERA_L3_DSWx-S1_b2_B01_WTR.tif',
+                      'OPERA_L3_DSWx-S1_b2_B02_BWTR.tif', 'OPERA_L3_DSWx-S1_b2_B03_CONF.tif')
+        self.generate_burst_output(burst_data, clear=False)
 
         os.chdir(self.working_dir.name)
 
@@ -103,7 +117,7 @@ class DswxS1PgeTestCase(unittest.TestCase):
         with open(runconfig_path, 'r', encoding='utf-8') as infile:
             runconfig_dict = yaml.safe_load(infile)
 
-        runconfig_dict['RunConfig']['Groups']['SAS']['runconfig']['groups']['dynamic_ancillary_file_group']\
+        runconfig_dict['RunConfig']['Groups']['SAS']['runconfig']['groups']['dynamic_ancillary_file_group'] \
             ['algorithm_parameters'] = path  # noqa E211
 
         with open(runconfig_path, 'w', encoding='utf-8') as outfile:
@@ -140,6 +154,41 @@ class DswxS1PgeTestCase(unittest.TestCase):
         self.assertEqual(runconfig['processing']['inundated_vegetation']['initial_class_path'], None)
         self.assertEqual(runconfig['processing']['inundated_vegetation']['line_per_block'], 300)
         self.assertEqual(runconfig['processing']['debug_mode'], False)
+
+    def generate_burst_output(self, burst_data, empty_file=False, clear=True):
+        """
+        Add files to the output directory.
+
+        Parameters
+        ----------
+        burst_data: tuple of str
+            Files to add to the output directory.
+        empty_file: bool
+            if 'True' do not add text to the file (leave empty)
+            if 'False' (default) add 'Test data string' to the file
+        clear : bool
+            Clear the output directory before writing new files (default=True)
+
+        """
+        # example of burst data passed to method:
+        # burst_data = ('OPERA_L3_DSWx-S1_burst_1_B01_WTR.tif', 'OPERA_L3_DSWx-S1_burst_1_B02_BWTR.tif',
+        #               'OPERA_L3_DSWx-S1_burst_1_B03_CONF.tif', 'OPERA_L3_DSWx-S1_burst_2_B01_WTR.tif',
+        #               'OPERA_L3_DSWx-S1_burst_2_B02_BWTR.tif', 'OPERA_L3_DSWx-S1_burst_2_B03_CONF.tif')
+
+        # Clears old burst files (default 'True')
+        output_dir = join(self.test_dir, str(self.test_output_dir))
+        if clear:
+            path = output_dir
+            cmd = f"rm {path}/*.tif"
+            os.system(cmd)
+        # Add files to the output directory
+        for burst_output_file in burst_data:
+            if not empty_file:
+                # os.system(f"echo 'Test data string' >> {join(self.test_output_dir, burst_output_file)}")
+                os.system(f"echo 'Test data string' >> {join(output_dir, burst_output_file)}")
+            else:
+                # os.system(f"touch {join(self.test_output_dir, burst_output_file)}")
+                os.system(f"touch {join(output_dir, burst_output_file)}")
 
     def test_dswx_s1_pge_execution(self):
         """
@@ -226,9 +275,10 @@ class DswxS1PgeTestCase(unittest.TestCase):
         # Kickoff execution of DSWX-S1 PGE
         pge.run()
 
-        self.assertEqual(algorithm_parameters_runconfig, pge.algorithm_parameters_runconfig)
+        self.assertEqual(algorithm_parameters_runconfig, pge.runconfig.algorithm_parameters_file_config_path)
         # parse the run config file
-        runconfig_dict = self.runconfig._parse_algorithm_parameters_run_config_file(pge.algorithm_parameters_runconfig)
+        runconfig_dict = self.runconfig._parse_algorithm_parameters_run_config_file \
+            (pge.runconfig.algorithm_parameters_file_config_path)       # noqa 211
         # Check the properties of the algorithm parameters RunConfig to ensure they match as expected
         self._compare_algorithm_parameters_runconfig_to_expected(runconfig_dict)
 
@@ -249,7 +299,7 @@ class DswxS1PgeTestCase(unittest.TestCase):
             runconfig_dict = yaml.safe_load(infile)
 
         runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']['AlgorithmParametersSchemaPath'] = \
-                       'test/data/test_algorithm_parameters_non_existent.yaml'  # noqa E211
+            'test/data/test_algorithm_parameters_non_existent.yaml'  # noqa E211
 
         with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
             yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
@@ -264,7 +314,7 @@ class DswxS1PgeTestCase(unittest.TestCase):
             if exists(test_runconfig_path):
                 os.unlink(test_runconfig_path)
 
-        # Verify that None is returned if 'AlgorithmParametersSchemaPath' is None
+        # Verify that None is returned when 'AlgorithmParametersSchemaPath' is set to None
         with open(runconfig_path, 'r', encoding='utf-8') as infile:
             runconfig_dict = yaml.safe_load(infile)
 
@@ -304,8 +354,8 @@ class DswxS1PgeTestCase(unittest.TestCase):
         with open(runconfig_path, 'r', encoding='utf-8') as infile:
             runconfig_dict = yaml.safe_load(infile)
 
-        runconfig_dict['RunConfig']['Groups']['SAS']['runconfig']['groups']['dynamic_ancillary_file_group']\
-                      ['algorithm_parameters'] = 'test/data/test_algorithm_parameters_non_existent.yaml' # noqa E211
+        runconfig_dict['RunConfig']['Groups']['SAS']['runconfig']['groups']['dynamic_ancillary_file_group'] \
+            ['algorithm_parameters'] = 'test/data/test_algorithm_parameters_non_existent.yaml'  # noqa E211
 
         with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
             yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
@@ -511,6 +561,127 @@ class DswxS1PgeTestCase(unittest.TestCase):
 
             self.assertIn(f"Input file {abspath(runconfig_path)} does not have "
                           f"an expected extension", log_contents)
+
+        finally:
+            if os.path.exists(test_runconfig_path):
+                os.unlink(test_runconfig_path)
+
+        self._set_algorithm_parameters_path(runconfig_path, self.restore_test_algorithm_param_path)
+
+    def test_dswx_s1_pge_output_validation(self):
+        """Test the output validation checks made by DSWxS1PostProcessorMixin."""
+        runconfig_path = join(self.data_dir, 'test_dswx_s1_config.yaml')
+        test_runconfig_path = join(self.data_dir, 'invalid_dswx_s1_runconfig.yaml')
+
+        self._set_algorithm_parameters_path(runconfig_path, self.test_algorithm_parameters_path)
+
+        with open(runconfig_path, 'r', encoding='utf-8') as stream:
+            runconfig_dict = yaml.safe_load(stream)
+
+        primary_executable_group = runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']
+
+        # Set up an input directory empty of .tif files
+        burst_data = ()
+        self.generate_burst_output(burst_data, clear=True)
+
+        # Test with a SAS command that does not produce any output file,
+        # post-processor should detect that expected output is missing
+        primary_executable_group['ProgramPath'] = 'echo'
+        primary_executable_group['ProgramOptions'] = ['hello world']
+
+        with open(test_runconfig_path, 'w', encoding='utf-8') as config_fh:
+            yaml.safe_dump(runconfig_dict, config_fh, sort_keys=False)
+
+        try:
+            pge = DSWxS1Executor(pge_name="DSWxS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            # expected_output_file = 'dswx_s1_pge_test/output_dir/missing_dswx_s1.tif'
+            # self.assertFalse(os.path.exists(expected_output_file))
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn("No SAS output file(s) containing product ID 'OPERA_L3_DSWx-S1",
+                          log_contents)
+
+            # Test with a SAS command that produces the expected output files, but
+            # with empty files (size 0 bytes). Post-processor should detect this
+            # and flag an error
+            burst_data = ('OPERA_L3_DSWx-S1_b1_B01_WTR.tif',)
+            self.generate_burst_output(burst_data, empty_file=True, clear=False)
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+                yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+
+            pge = DSWxS1Executor(pge_name="DSWxS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_output_file = 'dswx_s1_pge_test/output_dir/OPERA_L3_DSWx-S1_b1_B01_WTR.tif'
+            self.assertTrue(os.path.exists(expected_output_file))
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn(f"SAS output file {abspath(expected_output_file)} was "
+                          f"created, but is empty", log_contents)
+
+            # Test a misnamed burst file.  Post-processor should detect this and flag an error'
+            burst_data = ('OPERA_L3_DSWx-S1_b1_B01_WTR.tif', 'OPERA_L3_DSWx-S1_b1_B02_BWTR.tif',
+                          'OPERA_L3_DSWx-S1_b1_B03_CONF.tif', 'OPERA_L3_DSWx-S1_b2_B01_WTR.tif',
+                          'OPERA_L3_DSWx-S1_b2_B02_BWTR.tif', 'OPERA_L3_DSWx-S1_b2_B03_CON.tif')
+            self.generate_burst_output(burst_data, clear=True)
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+                yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+
+            pge = DSWxS1Executor(pge_name="DSWxS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn("Invalid SAS output file, too many burst types:",
+                          log_contents)
+
+            # Test for missing or extra burst files
+            # Test a misnamed burst file.  Post-processor should detect this and flag an error'
+            burst_data = ('OPERA_L3_DSWx-S1_b1_B01_WTR.tif', 'OPERA_L3_DSWx-S1_b1_B02_BWTR.tif',
+                          'OPERA_L3_DSWx-S1_b1_B03_CONF.tif', 'OPERA_L3_DSWx-S1_b2_B01_WTR.tif',
+                          'OPERA_L3_DSWx-S1_b2_B02_BWTR.tif')
+            self.generate_burst_output(burst_data, clear=True)
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+                yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+
+            pge = DSWxS1Executor(pge_name="DSWxS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn("Missing or extra burst files: number of burst files per burst:",
+                          log_contents)
 
         finally:
             if os.path.exists(test_runconfig_path):

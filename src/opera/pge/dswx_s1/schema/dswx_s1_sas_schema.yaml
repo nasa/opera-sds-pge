@@ -64,5 +64,5 @@ runconfig:
             sas_output_path: str()
 
             product_version: num(required=False)
-
+            product_id: str()
         log_file: str(required=False)
