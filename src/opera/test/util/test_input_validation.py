@@ -33,7 +33,6 @@ class InputValidationTestCase(unittest.TestCase):
     starting_dir = None
     working_dir = None
     test_dir = None
-    logger = None
 
     @classmethod
     def setUpClass(cls) -> None:
@@ -75,6 +74,9 @@ class InputValidationTestCase(unittest.TestCase):
 
     def test_validate_disp_inputs(self):
         """
+        Test that the validate_disp_inputs function is able to detect non-existent files,
+        zero-size files, and invalid extensions in filenames. Also check that
+        valid files pass validation.
         """
 
         # Test non-existent file detection
@@ -192,7 +194,6 @@ class InputValidationTestCase(unittest.TestCase):
 
         logger = PgeLogger()
         runconfig = MockRunConfig(sas_config)
-        # with self.assertRaises(RuntimeError):
         validate_disp_inputs(runconfig, logger, "DISP-S1")
 
         logger.close_log_stream()
