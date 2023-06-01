@@ -55,6 +55,12 @@ def check_input(input_object, logger, name, valid_extensions=None, check_zero_si
             logger.critical(name, ErrorCode.INVALID_INPUT, error_msg)
 
 
+def check_input_list(list_of_input_objects, logger, name, valid_extensions=None, check_zero_size=False):
+    """Call check_input for a list of input objects."""
+    for input_object in list_of_input_objects:
+        check_input(input_object, logger, name, valid_extensions=valid_extensions, check_zero_size=check_zero_size)
+
+
 def validate_slc_s1_inputs(runconfig, logger, name):
     """
     This function is shared by the RTC-S1 and CSLC-S1 PGEs:
@@ -137,38 +143,39 @@ def validate_disp_inputs(runconfig, logger, name):
     name:  str
         pge name
     """
-    runconfig_groups = runconfig.sas_config['runconfig']['groups']
+    input_file_group = runconfig.sas_config['runconfig']['groups']['input_file_group']
+    dyn_anc_file_group = runconfig.sas_config['runconfig']['groups']['dynamic_ancillary_file_group']
 
-    cslc_file_list = runconfig_groups['input_file_group']['cslc_file_list']
-    for cslc_file in cslc_file_list:
-        check_input(cslc_file, logger, name, valid_extensions=('.h5',), check_zero_size=True)
+    check_input_list(input_file_group['cslc_file_list'], logger, name,
+                     valid_extensions=('.h5',), check_zero_size=True)
 
-    amplitude_dispersion_files = runconfig_groups['dynamic_ancillary_file_group']['amplitude_dispersion_files']
-    for amp_dis_file in amplitude_dispersion_files:
-        check_input(amp_dis_file, logger, name, valid_extensions=('.tif', '.tiff'), check_zero_size=True)
+    if 'amplitude_dispersion_files' in dyn_anc_file_group:
+        check_input_list(dyn_anc_file_group['amplitude_dispersion_files'], logger, name,
+                         valid_extensions=('.tif', '.tiff'), check_zero_size=True)
 
-    amplitude_mean_files = runconfig_groups['dynamic_ancillary_file_group']['amplitude_mean_files']
-    for amp_mean_file in amplitude_mean_files:
-        check_input(amp_mean_file, logger, name, valid_extensions=('.tif', '.tiff'), check_zero_size=True)
+    if 'amplitude_mean_files' in dyn_anc_file_group:
+        check_input_list(dyn_anc_file_group['amplitude_mean_files'], logger, name,
+                         valid_extensions=('.tif', '.tiff'), check_zero_size=True)
 
-    geometry_files = runconfig_groups['dynamic_ancillary_file_group']['geometry_files']
-    for geo_file in geometry_files:
-        check_input(geo_file, logger, name, valid_extensions=('.h5',), check_zero_size=True)
+    if 'geometry_files' in dyn_anc_file_group:
+        check_input_list(dyn_anc_file_group['geometry_files'], logger, name,
+                         valid_extensions=('.h5',), check_zero_size=True)
 
-    mask_files = runconfig_groups['dynamic_ancillary_file_group']['mask_file']
-    for mask_file in mask_files:
-        check_input(mask_file, logger, name, valid_extensions=('.tif', '.tiff'), check_zero_size=True)
+    if 'mask_file' in dyn_anc_file_group:
+        check_input_list(dyn_anc_file_group['mask_file'], logger, name,
+                         valid_extensions=('.tif', '.tiff'), check_zero_size=True)
 
-    dem_file = runconfig_groups['dynamic_ancillary_file_group']['dem_file']
-    check_input(dem_file, logger, name, valid_extensions=('.tif', '.tiff'), check_zero_size=True)
+    if 'dem_file' in dyn_anc_file_group:
+        check_input(dyn_anc_file_group['dem_file'], logger, name,
+                    valid_extensions=('.tif', '.tiff'), check_zero_size=True)
 
-    tec_files = runconfig_groups['dynamic_ancillary_file_group']['tec_files']
-    for tec_file in tec_files:
-        check_input(tec_file, logger, name, check_zero_size=True)
+    if 'tec_files' in dyn_anc_file_group:
+        check_input_list(dyn_anc_file_group['tec_files'], logger, name,
+                         check_zero_size=True)
 
-    weather_model_files = runconfig_groups['dynamic_ancillary_file_group']['weather_model_files']
-    for wea_mo_file in weather_model_files:
-        check_input(wea_mo_file, logger, name, valid_extensions=('.nc', '.h5',), check_zero_size=True)
+    if 'weather_model_files' in dyn_anc_file_group:
+        check_input_list(dyn_anc_file_group['weather_model_files'], logger, name,
+                         valid_extensions=('.nc', '.h5',), check_zero_size=True)
 
 
 def validate_dswx_inputs(runconfig, logger, name, valid_extensions=None):

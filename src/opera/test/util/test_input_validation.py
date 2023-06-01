@@ -88,6 +88,8 @@ class InputValidationTestCase(unittest.TestCase):
                         'cslc_file_list' : [
                             test_filename
                         ]
+                    },
+                    'dynamic_ancillary_file_group' : {
                     }
                 }
             }
