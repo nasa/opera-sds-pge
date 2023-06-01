@@ -45,7 +45,7 @@ def check_input(input_object, logger, name, valid_extensions=None, check_zero_si
         ext = splitext(input_object)[-1]
 
         if ext not in valid_extensions:
-            error_msg = f"Input file {input_object} does not have an expected file extension ({valid_extensions})."
+            error_msg = f"Input file {input_object} does not have an expected file extension."
             logger.critical(name, ErrorCode.INVALID_INPUT, error_msg)
 
     if check_zero_size is True:
