@@ -42,25 +42,35 @@ class MetadataUtilsTestCase(unittest.TestCase):
         """Reproduce ADT results from values provided with code"""
         lat_min, lat_max, lon_min, lon_max = get_geographic_boundaries_from_mgrs_tile('15SXR')
 
-        self.assertAlmostEqual(lat_min, 31.616027943130398)
-        self.assertAlmostEqual(lat_max, 32.6212369766609)
-        self.assertAlmostEqual(lon_min, -91.94552881416524)
-        self.assertAlmostEqual(lon_max, -90.76425651871281)
+        self.assertAlmostEqual(lat_min, 31.572733739486036)
+        self.assertAlmostEqual(lat_max, 32.577473659397235)
+        self.assertAlmostEqual(lon_min, -91.99766472766642)
+        self.assertAlmostEqual(lon_max, -90.81751155385777)
 
     @skipIf(not osr_is_available(), reason="osgeo.osr is not installed on the local instance")
     def test_get_geographic_boundaries_from_mgrs_tile_leading_T(self):
         """Test MGRS tile code conversion when code starts with T"""
         lat_min, lat_max, lon_min, lon_max = get_geographic_boundaries_from_mgrs_tile('T15SXR')
 
-        self.assertAlmostEqual(lat_min, 31.616027943130398)
-        self.assertAlmostEqual(lat_max, 32.6212369766609)
-        self.assertAlmostEqual(lon_min, -91.94552881416524)
-        self.assertAlmostEqual(lon_max, -90.76425651871281)
+        self.assertAlmostEqual(lat_min, 31.572733739486036)
+        self.assertAlmostEqual(lat_max, 32.577473659397235)
+        self.assertAlmostEqual(lon_min, -91.99766472766642)
+        self.assertAlmostEqual(lon_max, -90.81751155385777)
 
     @skipIf(not osr_is_available(), reason="osgeo.osr is not installed on the local instance")
     def test_get_geographic_boundaries_from_mgrs_tile_invalid_tile(self):
         """Test MGRS tile code conversion with an invalid code"""
         self.assertRaises(RuntimeError, get_geographic_boundaries_from_mgrs_tile, 'X15SXR')
+
+    @skipIf(not osr_is_available(), reason="osgeo.osr is not installed on the local instance")
+    def test_get_geographic_boundaries_from_mgrs_tile_nominal_antimeridian(self):
+        """Test MGRS tile code conversion with a tile that crosses the anti-meridian"""
+        lat_min, lat_max, lon_min, lon_max = get_geographic_boundaries_from_mgrs_tile('T60VXQ')
+
+        self.assertAlmostEqual(lat_min, 62.13198085489144)
+        self.assertAlmostEqual(lat_max, 63.16076767648831)
+        self.assertAlmostEqual(lon_min, 178.82637550795243)
+        self.assertAlmostEqual(lon_max, -179.06925552951074)
 
     def test_get_rtc_s1_product_metadata(self):
         """Test retrieval of product metadata from HDF5 files"""
