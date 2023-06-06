@@ -57,5 +57,4 @@ RunConfig:
             product_path: dswx_s1_pge_test/output_dir
             scratch_path: dswx_s1_pge_test/scratch_dir
             sas_output_path: dswx_s1_pge_test/output_dir
-            product_id: OPERA_L3_DSWx-S1
           log_file: dswx_s1_pge_test/output_dir/test_log.log

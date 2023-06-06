@@ -129,19 +129,18 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
         """
         burst_dict = {}
         num_bursts = []
-        # Get the product ID that the SAS should have used to tag all output images
-        # TODO - check that this should be in the config file
-        product_id = self.runconfig.sas_config['runconfig']['groups']['product_path_group']['product_id']
+        output_extension = '.tif'
 
+        # get all .tiff files
         output_products = list(
             filter(
-                lambda filename: product_id in filename,
+                lambda filename: output_extension in filename,
                 self.runconfig.get_output_product_filenames()
             )
         )
 
         if not output_products:
-            error_msg = (f"No SAS output file(s) containing product ID '{product_id}' "
+            error_msg = (f"No SAS output file(s) with '{output_extension}' extension "
                          f"found within '{self.runconfig.output_product_path}'")
 
             self.logger.critical(self.name, ErrorCode.OUTPUT_NOT_FOUND, error_msg)
@@ -155,7 +154,7 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
             #  Gather the burst output files into a dictionary
             #     key = burst type (e.g. B01_WTR.tif)
             #     value = list of filenames of this type (e.g. ['OPERA_L3_DSWx-S1_..._v0.1_B01_WTR.tif', ...]
-            if '.tif' in out_product:
+            if output_extension in out_product:
                 key = '_'.join(out_product.split('_')[-2:])
                 if key not in burst_dict:
                     burst_dict[key] = []
@@ -205,7 +204,7 @@ class DSWxS1Executor(DSWxS1PreProcessorMixin, DSWxS1PostProcessorMixin, PgeExecu
 
     NAME = "DSWx"
     """Short name for the DSWx-S1 PGE"""
-    # TODO check that we do not want to differentiate between S1 and HLS
+    # TODO do we not want to differentiate between S1 and HLS
 
     LEVEL = "L3"
     """Processing Level for DSWx-S1 Products"""

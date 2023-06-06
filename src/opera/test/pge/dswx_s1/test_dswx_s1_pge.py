@@ -598,8 +598,8 @@ class DswxS1PgeTestCase(unittest.TestCase):
             with self.assertRaises(RuntimeError):
                 pge.run()
 
-            # expected_output_file = 'dswx_s1_pge_test/output_dir/missing_dswx_s1.tif'
-            # self.assertFalse(os.path.exists(expected_output_file))
+            expected_output_file = 'dswx_s1_pge_test/output_dir/missing_dswx_s1.tif'
+            self.assertFalse(os.path.exists(expected_output_file))
 
             expected_log_file = pge.logger.get_file_name()
             self.assertTrue(os.path.exists(expected_log_file))
@@ -607,7 +607,7 @@ class DswxS1PgeTestCase(unittest.TestCase):
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
 
-            self.assertIn("No SAS output file(s) containing product ID 'OPERA_L3_DSWx-S1",
+            self.assertIn("No SAS output file(s) with '.tif' extension found",
                           log_contents)
 
             # Test with a SAS command that produces the expected output files, but

@@ -205,7 +205,7 @@ RunConfig:
                 # `layer_number` and `layer_name` are automatically set by the DSWx-HLS SAS
                 # The PGE should update `product_id` and `product_version`
                 sas_output_path: /home/conda/output_dir
-                product_id: OPERA_L3_DSWx-S1
+
                 product_version: 0.1
 
               log_file:
