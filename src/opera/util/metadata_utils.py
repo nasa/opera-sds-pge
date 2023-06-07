@@ -172,8 +172,9 @@ def get_geographic_boundaries_from_mgrs_tile(mgrs_tile_name):
     wgs84_coordinate_system.SetWellKnownGeogCS("WGS84")
 
     # create transformation of coordinates from UTM to geographic (lat/lon)
-    transformation = osr.CoordinateTransformation(utm_coordinate_system,
-                                                  wgs84_coordinate_system)
+    transformation = osr.CoordinateTransformation(
+        utm_coordinate_system, wgs84_coordinate_system
+    )
 
     # compute boundaries
     elevation = 0
@@ -185,17 +186,36 @@ def get_geographic_boundaries_from_mgrs_tile(mgrs_tile_name):
     for offset_x_multiplier in range(2):
         for offset_y_multiplier in range(2):
 
-            x = x_min + offset_x_multiplier * 109.8 * 1000
-            y = y_min + offset_y_multiplier * 109.8 * 1000
+            # We are using MGRS 100km x 100km tiles
+            # HLS tiles have 4.9 km of margin => width/length = 109.8 km
+            x = x_min - 4.9 * 1000 + offset_x_multiplier * 109.8 * 1000
+            y = y_min - 4.9 * 1000 + offset_y_multiplier * 109.8 * 1000
+
             lat, lon, z = transformation.TransformPoint(x, y, elevation)
+
+            # wrap longitude values within the range [-180, +180]
+            if lon < -180:
+                lon += 360
+            elif lon > 180:
+                lon -= 360
 
             if lat_min is None or lat_min > lat:
                 lat_min = lat
             if lat_max is None or lat_max < lat:
                 lat_max = lat
-            if lon_min is None or lon_min > lon:
+
+            # The computation of min and max longitude values may be affected
+            # by antimeridian crossing. Notice that: 179 degrees +
+            # 2 degrees = -179 degrees
+
+            # We also want to check if the point is at the west or east side of the tile.
+            # Points at the west, i.e, where offset_x_multiplier == 0 may update `lon_min`
+            if (offset_x_multiplier == 0) and (lon_min is None or lon_min > lon):
                 lon_min = lon
-            if lon_max is None or lon_max < lon:
+
+            # Points at the east, i.e, where offset_x_multiplier == 1
+            # may update `lon_max`
+            if (offset_x_multiplier == 1) and (lon_max is None or lon_max < lon):
                 lon_max = lon
 
     return lat_min, lat_max, lon_min, lon_max
