@@ -45,145 +45,147 @@ test_int_setup_test_data
 # Setup cleanup on exit
 trap test_int_trap_cleanup EXIT
 
+# TODO Pull in product compare script from S3.
+
+
 # overall_status values and their meaning
 # 0 - pass
 # 1 - failure to execute some part of this script
 # 2 - product validation failure
 overall_status=0
 
-# For each <data_set> directory, run the Docker image to produce a <data_set>/output_dir
-# directory and then compare the contents of the output and expected directories
-for data_set in l30_greenland s30_louisiana
-do
-    input_data_basename=$(basename -- "$INPUT_DATA")
-    input_data_dir="${TMP_DIR}/${input_data_basename%.*}/${data_set}/input_dir"
+# Run the Docker image to produce a <data_set>/output_dir directory, then compare
+# the contents of the output to the contents to the expected_output directory.
 
-    expected_data_basename=$(basename -- "$EXPECTED_DATA")
-    expected_data_dir="${TMP_DIR}/${expected_data_basename%.*}/${data_set}/expected_output_dir"
+input_data_basename=$(basename -- "$INPUT_DATA")
+input_data_dir="${TMP_DIR}/${input_data_basename%.*}/${data_set}/input_dir"
 
-    echo "Input data directory: ${input_data_dir}"
-    echo "Expected data directory: ${expected_data_dir}"
+expected_data_basename=$(basename -- "$EXPECTED_DATA")
+expected_data_dir="${TMP_DIR}/${expected_data_basename%.*}/${data_set}/expected_output_dir"
 
-    # the testdata reference metadata contains this path so we use it here
-    output_dir="${TMP_DIR}/dswx_s1_output/${data_set}/output_dir"
+echo "Input data directory: ${input_data_dir}"
+echo "Expected data directory: ${expected_data_dir}"
 
-    # make sure no output directory already exists
-    if [ -d "$output_dir" ]; then
-        echo "Output directory $output_dir already exists (and should not). Removing directory."
-        rm -rf "${output_dir}"
-    fi
+# the testdata reference metadata contains this path so we use it here
+output_dir="${TMP_DIR}/dswx_s1_output/${data_set}/output_dir"
 
-    echo "Creating output directory $output_dir."
-    mkdir -p "$output_dir"
+# make sure no output directory already exists
+if [ -d "$output_dir" ]; then
+    echo "Output directory $output_dir already exists (and should not). Removing directory."
+    rm -rf "${output_dir}"
+fi
 
-    # the testdata reference metadata contains this path so we use it here
-    scratch_dir="${TMP_DIR}/dswx_s1_scratch/${data_set}/scratch_dir"
+echo "Creating output directory $output_dir."
+mkdir -p "$output_dir"
 
-    # make sure no scratch directory already exists
-    if [ -d "$scratch_dir" ]; then
-        echo "Scratch directory $scratch_dir already exists (and should not). Removing directory.."
-        rm -rf "${scratch_dir}"
-    fi
-    echo "Creating scratch directory $scratch_dir."
-    mkdir -p --mode=777 "$scratch_dir"
+# the testdata reference metadata contains this path so we use it here
+scratch_dir="${TMP_DIR}/dswx_s1_scratch/${data_set}/scratch_dir"
 
-    # Assign a container name to avoid the auto-generated one created by Docker
-    container_name="${PGE_NAME}-${data_set}"
+# make sure no scratch directory already exists
+if [ -d "$scratch_dir" ]; then
+    echo "Scratch directory $scratch_dir already exists (and should not). Removing directory.."
+    rm -rf "${scratch_dir}"
+fi
+echo "Creating scratch directory $scratch_dir."
+mkdir -p --mode=777 "$scratch_dir"
 
-    # Start metrics collection
-    metrics_collection_start "$PGE_NAME" "$container_name" "$TEST_RESULTS_DIR" "$SAMPLE_TIME"
+# Assign a container name to avoid the auto-generated one created by Docker
+container_name="${PGE_NAME}-${data_set}"
 
-    echo "Running Docker image ${PGE_IMAGE}:${PGE_TAG} for ${input_data_dir}"
-    docker run --rm -u $UID:"$(id -g)" --name $container_name \
-                -v "${TMP_DIR}/runconfig":/home/conda/runconfig:ro \
-                -v "$input_data_dir":/home/conda/input_dir:ro \
-                -v "$output_dir":/home/conda/output_dir \
-                -v "$scratch_dir":/home/conda/scratch_dir \
-                ${PGE_IMAGE}:"${PGE_TAG}" --file /home/conda/runconfig/"$RUNCONFIG"
+# Start metrics collection
+metrics_collection_start "$PGE_NAME" "$container_name" "$TEST_RESULTS_DIR" "$SAMPLE_TIME"
 
-    docker_exit_status=$?
+echo "Running Docker image ${PGE_IMAGE}:${PGE_TAG} for ${input_data_dir}"
+docker run --rm -u $UID:"$(id -g)" --name $container_name \
+            -v "${TMP_DIR}/runconfig":/home/conda/runconfig:ro \
+            -v "$input_data_dir":/home/conda/input_dir:ro \
+            -v "$output_dir":/home/conda/output_dir \
+            -v "$scratch_dir":/home/conda/scratch_dir \
+            ${PGE_IMAGE}:"${PGE_TAG}" --file /home/conda/runconfig/"$RUNCONFIG"
 
-    # End metrics collection
-    metrics_collection_end "$PGE_NAME" "$container_name" "$docker_exit_status" "$TEST_RESULTS_DIR"
+docker_exit_status=$?
 
-    if [ $docker_exit_status -ne 0 ]; then
-        echo "docker exit indicates failure: ${docker_exit_status}"
-        overall_status=1
-    else
-        # Compare output files against expected files
-        for output_file in "$output_dir"/*
-        do
-            docker_out="N/A"
-            compare_result="N/A"
-            expected_file="N/A"
+# End metrics collection
+metrics_collection_end "$PGE_NAME" "$container_name" "$docker_exit_status" "$TEST_RESULTS_DIR"
 
-            echo "output_file $output_file"
-            output_file=$(basename -- "$output_file")
+if [ $docker_exit_status -ne 0 ]; then
+    echo "docker exit indicates failure: ${docker_exit_status}"
+    overall_status=1
+else
+    # Compare output files against expected files
+    for output_file in "$output_dir"/*
+    do
+        docker_out="N/A"
+        compare_result="N/A"
+        expected_file="N/A"
 
-            if [[ "${output_file##*/}" == *.log ]]
-            then
-                echo "Not comparing log file ${output_file}"
-                compare_result="SKIPPED"
+        echo "output_file $output_file"
+        output_file=$(basename -- "$output_file")
 
-            elif [[ "${output_file##*/}" == *.tif* ]]
-            then
-                for potential_product in B01_WTR B02_BWTR B03_CONF BROWSE
-                do
-                    if [[ "$output_file" == *"$potential_product"* ]]; then
-                        product=$potential_product
-                        break
-                    fi
-                done
+        if [[ "${output_file##*/}" == *.log ]]
+        then
+            echo "Not comparing log file ${output_file}"
+            compare_result="SKIPPED"
 
-                echo "product is $product"
+        elif [[ "${output_file##*/}" == *.tif* ]]
+        then
+            for potential_product in B01_WTR B02_BWTR B03_CONF BROWSE
+            do
+                if [[ "$output_file" == *"$potential_product"* ]]; then
+                    product=$potential_product
+                    break
+                fi
+            done
 
-                for potential_file in "$expected_data_dir"/*.tif*
-                do
-                    if [[ "$potential_file" == *"$product"* ]]; then
-                        echo "expected file is $potential_file"
-                        expected_file=$potential_file
-                        break
-                    fi
-                done
+            echo "product is $product"
 
-                if [ ! -f "$expected_file" ]; then
-                    echo "No expected file found for product $product in expected directory $expected_data_dir"
+            for potential_file in "$expected_data_dir"/*.tif*
+            do
+                if [[ "$potential_file" == *"$product"* ]]; then
+                    echo "expected file is $potential_file"
+                    expected_file=$potential_file
+                    break
+                fi
+            done
+
+            if [ ! -f "$expected_file" ]; then
+                echo "No expected file found for product $product in expected directory $expected_data_dir"
+                overall_status=1
+            else
+                # compare output and expected files
+                expected_file=$(basename -- "$expected_file")
+                docker_out=$(docker run --rm -u conda:conda \
+                                 -v "${output_dir}":/out:ro \
+                                 -v "${expected_data_dir}":/exp:ro \
+                                 -v "$SCRIPT_DIR":/scripts \
+                                 --entrypoint python3 ${PGE_IMAGE}:"${PGE_TAG}" \
+                                 /scripts/dswx_compare_opera_pge.py \
+                                 /out/"${output_file}" /exp/"${expected_file}" --metadata_exclude_list PRODUCT_VERSION)
+                echo "$docker_out"
+
+                if [[ "$docker_out" == *"[FAIL]"* ]]; then
+                    echo "File comparison failed. Output and expected files differ for ${output_file}"
+                    compare_result="FAIL"
+                    overall_status=2
+                elif [[ "$docker_out" == *"ERROR"* ]]; then
+                    echo "An error occurred during file comparison."
+                    compare_result="ERROR"
                     overall_status=1
                 else
-                    # compare output and expected files
-                    expected_file=$(basename -- "$expected_file")
-                    docker_out=$(docker run --rm -u conda:conda \
-                                     -v "${output_dir}":/out:ro \
-                                     -v "${expected_data_dir}":/exp:ro \
-                                     -v "$SCRIPT_DIR":/scripts \
-                                     --entrypoint python3 ${PGE_IMAGE}:"${PGE_TAG}" \
-                                     /scripts/dswx_compare_opera_pge.py \
-                                     /out/"${output_file}" /exp/"${expected_file}" --metadata_exclude_list PRODUCT_VERSION)
-                    echo "$docker_out"
-
-                    if [[ "$docker_out" == *"[FAIL]"* ]]; then
-                        echo "File comparison failed. Output and expected files differ for ${output_file}"
-                        compare_result="FAIL"
-                        overall_status=2
-                    elif [[ "$docker_out" == *"ERROR"* ]]; then
-                        echo "An error occurred during file comparison."
-                        compare_result="ERROR"
-                        overall_status=1
-                    else
-                        echo "File comparison passed for ${output_file}"
-                        compare_result="PASS"
-                    fi
+                    echo "File comparison passed for ${output_file}"
+                    compare_result="PASS"
                 fi
-            else
-                echo "Not comparing file ${output_file}"
-                compare_result="SKIPPED"
             fi
+        else
+            echo "Not comparing file ${output_file}"
+            compare_result="SKIPPED"
+        fi
 
-            docker_out="${docker_out//$'\n'/<br>}"
-            echo "<tr><td>${compare_result}</td><td><ul><li>Output: ${output_file}</li><li>Expected: ${expected_file}</li></ul></td><td>${docker_out}</td></tr>" >> "$RESULTS_FILE"
-        done
-    fi
-done
+        docker_out="${docker_out//$'\n'/<br>}"
+        echo "<tr><td>${compare_result}</td><td><ul><li>Output: ${output_file}</li><li>Expected: ${expected_file}</li></ul></td><td>${docker_out}</td></tr>" >> "$RESULTS_FILE"
+    done
+fi
+
 echo " "
 if [ $overall_status -ne 0 ]; then
     echo "Test FAILED."
