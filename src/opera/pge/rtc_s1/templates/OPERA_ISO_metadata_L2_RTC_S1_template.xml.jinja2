@@ -1539,6 +1539,13 @@
                         </gmd:LI_Source>
                     </gmd:source>
                     {%- endfor %}
+                    <gmd:source>
+                        <gmd:LI_Source>
+                            <gmd:description>
+                                <gco:CharacterString>Burst Database - {{ run_config.Groups.SAS.runconfig.groups.static_ancillary_file_group.burst_database_file }}{# ISO_OPERA_burstDatabaseFile #}</gco:CharacterString>
+                            </gmd:description>
+                        </gmd:LI_Source>
+                    </gmd:source>
                 </gmd:LI_Lineage>
             </gmd:lineage>
         </gmd:DQ_DataQuality>
