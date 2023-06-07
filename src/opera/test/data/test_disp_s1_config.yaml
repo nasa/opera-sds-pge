@@ -50,7 +50,7 @@ RunConfig:
                     input_file_group:
                         # List of paths to CSLC files.
                         cslc_file_list:
-                            - /home/mamba/opera/test/data/test_disp_input/compressed_slc_t087_185678_iw2_20180101_20180210.h5
+                            - disp_s1_pge_test/input_dir/compressed_slc_t087_185678_iw2_20180101_20180210.h5
 
                         # Frame ID of the bursts contained in `cslc_file_list`.
                         frame_id: 123
@@ -62,7 +62,7 @@ RunConfig:
                         # Paths to existing Amplitude Dispersion files (1 per burst) for PS update calculation. If
                         # none provided, computed using the input SLC stack.
                         amplitude_dispersion_files:
-                            - /home/mamba/opera/test/data/test_disp_input/t087_185678_iw2_amp_dispersion.tif
+                            - disp_s1_pge_test/input_dir/t087_185678_iw2_amp_dispersion.tif
 
                     primary_executable:
                         # Product type of the PGE.
