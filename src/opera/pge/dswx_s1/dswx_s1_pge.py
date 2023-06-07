@@ -121,14 +121,15 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
         """
         Evaluates the output file(s) generated from SAS execution to ensure:
             - That the file(s) contains some content (size is greater than 0).
-            - That the .tif output files (burst data) end with 'B01_WTR',
+            - That the .tif output files (band data) end with 'B01_WTR',
               'B02_BWTR', or 'B03_CONF'
             - That the there are the same number of each type of file, implying
               3 output bands per tile
 
         """
-        burst_dict = {}
-        num_bursts = []
+        EXPECTED_NUM_BANDS: int = 3
+        band_dict = {}
+        num_bands = []
         output_extension = '.tif'
 
         # get all .tiff files
@@ -151,26 +152,25 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
 
                 self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
 
-            #  Gather the burst output files into a dictionary
-            #     key = burst type (e.g. B01_WTR.tif)
+            #  Gather the output files into a dictionary
+            #     key = band type (e.g. B01_WTR.tif)
             #     value = list of filenames of this type (e.g. ['OPERA_L3_DSWx-S1_..._v0.1_B01_WTR.tif', ...]
-            if output_extension in out_product:
-                key = '_'.join(out_product.split('_')[-2:])
-                if key not in burst_dict:
-                    burst_dict[key] = []
-                burst_dict[key].append(out_product)
+            key = '_'.join(out_product.split('_')[-2:])
+            if key not in band_dict:
+                band_dict[key] = []
+            band_dict[key].append(out_product)
 
-        if len(burst_dict.keys()) != 3:
-            error_msg = f"Invalid SAS output file, too many burst types: {burst_dict.keys()}"
+        if len(band_dict.keys()) != EXPECTED_NUM_BANDS:
+            error_msg = f"Invalid SAS output file, too many band types: {band_dict.keys()}"
 
             self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
 
-        # Make a list of the numbers of bursts per burst type
-        for burst in burst_dict.keys():
-            num_bursts.append(len(burst_dict[burst]))
-        if not all(burst_type == num_bursts[0] for burst_type in num_bursts):
-            error_msg = f"Missing or extra burst files: number of burst files per " \
-                        f"burst: {num_bursts}"
+        # Make a list of the numbers of bands per band type
+        for band in band_dict.keys():
+            num_bands.append(len(band_dict[band]))
+        if not all(band_type == num_bands[0] for band_type in num_bands):
+            error_msg = f"Missing or extra band files: number of band files per " \
+                        f"band: {num_bands}"
 
             self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
 
@@ -204,7 +204,6 @@ class DSWxS1Executor(DSWxS1PreProcessorMixin, DSWxS1PostProcessorMixin, PgeExecu
 
     NAME = "DSWx"
     """Short name for the DSWx-S1 PGE"""
-    # TODO do we not want to differentiate between S1 and HLS
 
     LEVEL = "L3"
     """Processing Level for DSWx-S1 Products"""

@@ -83,11 +83,11 @@ class DswxS1PgeTestCase(unittest.TestCase):
         # Create the output directories expected by the test Runconfig file
         self.test_output_dir = join(self.working_dir.name, "dswx_s1_pge_test/output_dir")
         os.makedirs(self.test_output_dir, exist_ok=True)
-        # Add some burst data to the output directory:
-        burst_data = ('OPERA_L3_DSWx-S1_b1_B01_WTR.tif', 'OPERA_L3_DSWx-S1_b1_B02_BWTR.tif',
-                      'OPERA_L3_DSWx-S1_b1_B03_CONF.tif', 'OPERA_L3_DSWx-S1_b2_B01_WTR.tif',
-                      'OPERA_L3_DSWx-S1_b2_B02_BWTR.tif', 'OPERA_L3_DSWx-S1_b2_B03_CONF.tif')
-        self.generate_burst_output(burst_data, clear=False)
+        # Add some band data to the output directory:
+        band_data = ('OPERA_L3_DSWx-S1_b1_B01_WTR.tif', 'OPERA_L3_DSWx-S1_b1_B02_BWTR.tif',
+                     'OPERA_L3_DSWx-S1_b1_B03_CONF.tif', 'OPERA_L3_DSWx-S1_b2_B01_WTR.tif',
+                     'OPERA_L3_DSWx-S1_b2_B02_BWTR.tif', 'OPERA_L3_DSWx-S1_b2_B03_CONF.tif')
+        self.generate_band_data_output(band_data, clear=False)
 
         os.chdir(self.working_dir.name)
 
@@ -155,13 +155,13 @@ class DswxS1PgeTestCase(unittest.TestCase):
         self.assertEqual(runconfig['processing']['inundated_vegetation']['line_per_block'], 300)
         self.assertEqual(runconfig['processing']['debug_mode'], False)
 
-    def generate_burst_output(self, burst_data, empty_file=False, clear=True):
+    def generate_band_data_output(self, band_data, empty_file=False, clear=True):
         """
         Add files to the output directory.
 
         Parameters
         ----------
-        burst_data: tuple of str
+        band_data: tuple of str
             Files to add to the output directory.
         empty_file: bool
             if 'True' do not add text to the file (leave empty)
@@ -170,25 +170,23 @@ class DswxS1PgeTestCase(unittest.TestCase):
             Clear the output directory before writing new files (default=True)
 
         """
-        # example of burst data passed to method:
-        # burst_data = ('OPERA_L3_DSWx-S1_burst_1_B01_WTR.tif', 'OPERA_L3_DSWx-S1_burst_1_B02_BWTR.tif',
-        #               'OPERA_L3_DSWx-S1_burst_1_B03_CONF.tif', 'OPERA_L3_DSWx-S1_burst_2_B01_WTR.tif',
-        #               'OPERA_L3_DSWx-S1_burst_2_B02_BWTR.tif', 'OPERA_L3_DSWx-S1_burst_2_B03_CONF.tif')
+        # example of band data passed to method:
+        # band_data = ('OPERA_L3_DSWx-S1_band_1_B01_WTR.tif', 'OPERA_L3_DSWx-S1_band_1_B02_BWTR.tif',
+        #               'OPERA_L3_DSWx-S1_band_1_B03_CONF.tif', 'OPERA_L3_DSWx-S1_band_2_B01_WTR.tif',
+        #               'OPERA_L3_DSWx-S1_band_2_B02_BWTR.tif', 'OPERA_L3_DSWx-S1_band_2_B03_CONF.tif')
 
-        # Clears old burst files (default 'True')
+        # Clears old band files (default 'True')
         output_dir = join(self.test_dir, str(self.test_output_dir))
         if clear:
             path = output_dir
             cmd = f"rm {path}/*.tif"
             os.system(cmd)
         # Add files to the output directory
-        for burst_output_file in burst_data:
+        for band_output_file in band_data:
             if not empty_file:
-                # os.system(f"echo 'Test data string' >> {join(self.test_output_dir, burst_output_file)}")
-                os.system(f"echo 'Test data string' >> {join(output_dir, burst_output_file)}")
+                os.system(f"echo 'Test data string' >> {join(output_dir, band_output_file)}")
             else:
-                # os.system(f"touch {join(self.test_output_dir, burst_output_file)}")
-                os.system(f"touch {join(output_dir, burst_output_file)}")
+                os.system(f"touch {join(output_dir, band_output_file)}")
 
     def test_dswx_s1_pge_execution(self):
         """
@@ -581,8 +579,8 @@ class DswxS1PgeTestCase(unittest.TestCase):
         primary_executable_group = runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']
 
         # Set up an input directory empty of .tif files
-        burst_data = ()
-        self.generate_burst_output(burst_data, clear=True)
+        band_data = ()
+        self.generate_band_data_output(band_data, clear=True)
 
         # Test with a SAS command that does not produce any output file,
         # post-processor should detect that expected output is missing
@@ -613,8 +611,8 @@ class DswxS1PgeTestCase(unittest.TestCase):
             # Test with a SAS command that produces the expected output files, but
             # with empty files (size 0 bytes). Post-processor should detect this
             # and flag an error
-            burst_data = ('OPERA_L3_DSWx-S1_b1_B01_WTR.tif',)
-            self.generate_burst_output(burst_data, empty_file=True, clear=False)
+            band_data = ('OPERA_L3_DSWx-S1_b1_B01_WTR.tif',)
+            self.generate_band_data_output(band_data, empty_file=True, clear=False)
 
             with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
                 yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
@@ -636,11 +634,11 @@ class DswxS1PgeTestCase(unittest.TestCase):
             self.assertIn(f"SAS output file {abspath(expected_output_file)} was "
                           f"created, but is empty", log_contents)
 
-            # Test a misnamed burst file.  Post-processor should detect this and flag an error'
-            burst_data = ('OPERA_L3_DSWx-S1_b1_B01_WTR.tif', 'OPERA_L3_DSWx-S1_b1_B02_BWTR.tif',
-                          'OPERA_L3_DSWx-S1_b1_B03_CONF.tif', 'OPERA_L3_DSWx-S1_b2_B01_WTR.tif',
-                          'OPERA_L3_DSWx-S1_b2_B02_BWTR.tif', 'OPERA_L3_DSWx-S1_b2_B03_CON.tif')
-            self.generate_burst_output(burst_data, clear=True)
+            # Test a misnamed band file.  Post-processor should detect this and flag an error'
+            band_data = ('OPERA_L3_DSWx-S1_b1_B01_WTR.tif', 'OPERA_L3_DSWx-S1_b1_B02_BWTR.tif',
+                         'OPERA_L3_DSWx-S1_b1_B03_CONF.tif', 'OPERA_L3_DSWx-S1_b2_B01_WTR.tif',
+                         'OPERA_L3_DSWx-S1_b2_B02_BWTR.tif', 'OPERA_L3_DSWx-S1_b2_B03_CON.tif')
+            self.generate_band_data_output(band_data, clear=True)
 
             with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
                 yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
@@ -656,15 +654,15 @@ class DswxS1PgeTestCase(unittest.TestCase):
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
 
-            self.assertIn("Invalid SAS output file, too many burst types:",
+            self.assertIn("Invalid SAS output file, too many band types:",
                           log_contents)
 
-            # Test for missing or extra burst files
-            # Test a misnamed burst file.  Post-processor should detect this and flag an error'
-            burst_data = ('OPERA_L3_DSWx-S1_b1_B01_WTR.tif', 'OPERA_L3_DSWx-S1_b1_B02_BWTR.tif',
-                          'OPERA_L3_DSWx-S1_b1_B03_CONF.tif', 'OPERA_L3_DSWx-S1_b2_B01_WTR.tif',
-                          'OPERA_L3_DSWx-S1_b2_B02_BWTR.tif')
-            self.generate_burst_output(burst_data, clear=True)
+            # Test for missing or extra band files
+            # Test a misnamed band file.  Post-processor should detect this and flag an error'
+            band_data = ('OPERA_L3_DSWx-S1_b1_B01_WTR.tif', 'OPERA_L3_DSWx-S1_b1_B02_BWTR.tif',
+                         'OPERA_L3_DSWx-S1_b1_B03_CONF.tif', 'OPERA_L3_DSWx-S1_b2_B01_WTR.tif',
+                         'OPERA_L3_DSWx-S1_b2_B02_BWTR.tif')
+            self.generate_band_data_output(band_data, clear=True)
 
             with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
                 yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
@@ -680,7 +678,7 @@ class DswxS1PgeTestCase(unittest.TestCase):
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
 
-            self.assertIn("Missing or extra burst files: number of burst files per burst:",
+            self.assertIn("Missing or extra band files: number of band files per band:",
                           log_contents)
 
         finally:
