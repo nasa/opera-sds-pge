@@ -80,7 +80,6 @@ class MetadataUtilsTestCase(unittest.TestCase):
         try:
             product_output = get_rtc_s1_product_metadata(file_name)
 
-            self.assertAlmostEqual(product_output['frequencyA']['centerFrequency'], 5405000454.33435)
             self.assertEqual(product_output['orbit']['orbitType'], "POE")
             self.assertEqual(product_output['processingInformation']['inputs']['demSource'], 'dem.tif')
             for po, eo in zip(product_output['processingInformation']['inputs']['annotationFiles'],

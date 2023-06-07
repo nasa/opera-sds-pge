@@ -18,7 +18,7 @@ from mgrs.core import MGRSError
 
 import numpy as np
 
-S1_SLC_HDF5_PREFIX = "/science/SENTINEL1"
+S1_SLC_HDF5_PREFIX = ""
 """Prefix used to index metadata within SLC-based HDF5 products"""
 
 # pylint: disable=F841
@@ -308,10 +308,10 @@ def get_rtc_s1_product_metadata(file_name):
         ISO template.
     """
     product_output = {
-        'frequencyA': get_hdf5_group_as_dict(file_name, f"{S1_SLC_HDF5_PREFIX}/RTC/grids/frequencyA"),
+        'data': get_hdf5_group_as_dict(file_name, f"{S1_SLC_HDF5_PREFIX}/data"),
         'processingInformation': get_hdf5_group_as_dict(file_name,
-                                                        f"{S1_SLC_HDF5_PREFIX}/RTC/metadata/processingInformation"),
-        'orbit': get_hdf5_group_as_dict(file_name, f"{S1_SLC_HDF5_PREFIX}/RTC/metadata/orbit"),
+                                                        f"{S1_SLC_HDF5_PREFIX}/metadata/processingInformation"),
+        'orbit': get_hdf5_group_as_dict(file_name, f"{S1_SLC_HDF5_PREFIX}/metadata/orbit"),
         'identification': get_hdf5_group_as_dict(file_name, f"{S1_SLC_HDF5_PREFIX}/identification")
     }
 
@@ -332,29 +332,21 @@ def create_test_rtc_metadata_product(file_path):
     """
     # pylint: disable=F841
     with h5py.File(file_path, 'w') as outfile:
-        frequencyA_grp = outfile.create_group(f"{S1_SLC_HDF5_PREFIX}/RTC/grids/frequencyA")
-        centerFrequency_dset = frequencyA_grp.create_dataset("centerFrequency", data=5405000454.33435, dtype='float64')
-        centerFrequency_dset.attrs['description'] = np.string_("Center frequency of the processed image in Hz")
-        xCoordinateSpacing_dset = frequencyA_grp.create_dataset("xCoordinateSpacing", data=30.0, dtype='float64')
-        xCoordinates_dset = frequencyA_grp.create_dataset("xCoordinates", data=np.zeros((10,)), dtype='float64')
-        yCoordinateSpacing_dset = frequencyA_grp.create_dataset("yCoordinateSpacing", data=30.0, dtype='float64')
-        yCoordinates_dset = frequencyA_grp.create_dataset("yCoordinates", data=np.zeros((10,)), dtype='float64')
-        projection_dset = frequencyA_grp.create_dataset("projection", data=b'1234')
-        listOfPolarizations_dset = frequencyA_grp.create_dataset("listOfPolarizations", data=np.array([b'VV', b'VH']))
-        rangeBandwidth_dset = frequencyA_grp.create_dataset('rangeBandwidth', data=56500000.0, dtype='float64')
-        slantRangeSpacing_dset = frequencyA_grp.create_dataset('slantRangeSpacing', data=2.32956, dtype='float64')
-        zeroDopplerTimeSpacing_dset = frequencyA_grp.create_dataset('zeroDopplerTimeSpacing',
-                                                                    data=0.002055, dtype='float64')
-        radiometricTerrainCorrectionFlag_dset = frequencyA_grp.create_dataset('radiometricTerrainCorrectionFlag',
-                                                                              data=True, dtype='bool')
+        data_grp = outfile.create_group(f"{S1_SLC_HDF5_PREFIX}/data")
+        xCoordinateSpacing_dset = data_grp.create_dataset("xCoordinateSpacing", data=30.0, dtype='float64')
+        xCoordinates_dset = data_grp.create_dataset("xCoordinates", data=np.zeros((10,)), dtype='float64')
+        yCoordinateSpacing_dset = data_grp.create_dataset("yCoordinateSpacing", data=30.0, dtype='float64')
+        yCoordinates_dset = data_grp.create_dataset("yCoordinates", data=np.zeros((10,)), dtype='float64')
+        projection_dset = data_grp.create_dataset("projection", data=b'1234')
+        listOfPolarizations_dset = data_grp.create_dataset("listOfPolarizations", data=np.array([b'VV', b'VH']))
 
-        orbit_grp = outfile.create_group(f"{S1_SLC_HDF5_PREFIX}/RTC/metadata/orbit")
+        orbit_grp = outfile.create_group(f"{S1_SLC_HDF5_PREFIX}/metadata/orbit")
         orbitType_dset = orbit_grp.create_dataset("orbitType", data=b'POE')
         interpMethod_dest = orbit_grp.create_dataset("interpMethod", data=b'Hermite')
         referenceEpoch_dset = orbit_grp.create_dataset("referenceEpoch", data=b'2018-05-02T10:45:07.581333000')
 
         processingInformation_inputs_grp = outfile.create_group(f"{S1_SLC_HDF5_PREFIX}"
-                                                                f"/RTC/metadata/processingInformation/inputs")
+                                                                f"/metadata/processingInformation/inputs")
         demSource_dset = processingInformation_inputs_grp.create_dataset("demSource", data=b'dem.tif')
         annotationFiles = np.array([b'calibration-s1b-iw1-slc-vv-20180504t104508-20180504t104533-010770-013aee-004.xml',
                                     b'noise-s1b-iw1-slc-vv-20180504t104508-20180504t104533-010770-013aee-004.xml'])
@@ -366,36 +358,63 @@ def create_test_rtc_metadata_product(file_path):
         orbitFiles_dset = processingInformation_inputs_grp.create_dataset("orbitFiles", data=orbitFiles)
 
         processingInformation_algorithms_grp = outfile.create_group(
-            f"{S1_SLC_HDF5_PREFIX}/RTC/metadata/processingInformation/algorithms")
+            f"{S1_SLC_HDF5_PREFIX}/metadata/processingInformation/algorithms")
         demInterpolation_dset = processingInformation_algorithms_grp.create_dataset("demInterpolation",
                                                                                     data=b'biquintic')
         geocoding_dset = processingInformation_algorithms_grp.create_dataset("geocoding", data=b'area_projection')
+        geocodingAlgoRef_dset = processingInformation_algorithms_grp.create_dataset("geocodingAlgorithmReference",
+                                                                                    data=b'Geocoding Algorithm Reference')
+        isceVersion_dset = processingInformation_algorithms_grp.create_dataset("isce3Version", data=b'0.13.0')
+        noiseCorrectionAlgoRef_dset = processingInformation_algorithms_grp.create_dataset("noiseCorrectionAlgorithmReference",
+                                                                                          data=b'Noise Correction Algorithm Reference')
         radiometricTerrainCorrection_dset = processingInformation_algorithms_grp.create_dataset(
             "radiometricTerrainCorrection", data=b'area_projection')
-        isceVersion_dset = processingInformation_algorithms_grp.create_dataset("ISCEVersion", data=b'0.8.0-dev')
-        s1ReaderVersion_dset = processingInformation_algorithms_grp.create_dataset("S1ReaderVersion", data=b'1.2.3')
+        radiometricTerrainCorrectionAlgoRef_dset = processingInformation_algorithms_grp.create_dataset(
+            "radiometricTerrainCorrectionAlgorithmReference", data=b'Radiometric Terrain Correction Algorithm Reference')
+        s1ReaderVersion_dset = processingInformation_algorithms_grp.create_dataset("s1ReaderVersion", data=b'1.2.3')
+        softwareVersion_dset = processingInformation_algorithms_grp.create_dataset("softwareVersion", data=b'0.4')
+
+        processingInformation_parameters_grp = outfile.create_group(
+            f"{S1_SLC_HDF5_PREFIX}/metadata/processingInformation/parameters")
+        bistaticDelayCorrectionApplied_dset = processingInformation_parameters_grp.create_dataset(
+            "bistaticDelayCorrectionApplied", data=True, dtype='bool')
+        dryTroposphericGeolocationCorrectionApplied_dset = processingInformation_parameters_grp.create_dataset(
+            "dryTroposphericGeolocationCorrectionApplied", data=True, dtype='bool')
+        noiseCorrectionApplied_dset = processingInformation_parameters_grp.create_dataset(
+            "noiseCorrectionApplied", data=True, dtype='bool')
+        postProcessingFilteringApplied_dset = processingInformation_parameters_grp.create_dataset(
+            "postProcessingFilteringApplied", data=True, dtype='bool')
+        radiometricTerrainCorrectionApplied_dset = processingInformation_parameters_grp.create_dataset(
+            'radiometricTerrainCorrectionApplied', data=True, dtype='bool')
+        wetTroposphericGeolocationCorrectionApplied_dset = processingInformation_parameters_grp.create_dataset(
+            "wetTroposphericGeolocationCorrectionApplied", data=True, dtype='bool')
 
         identification_grp = outfile.create_group(f"{S1_SLC_HDF5_PREFIX}/identification")
         absoluteOrbitNumber_dset = identification_grp.create_dataset("absoluteOrbitNumber", data=10770, dtype='int64')
         acquisitionMode_dset = identification_grp.create_dataset("acquisitionMode",
                                                                  data=np.string_('Interferometric Wide (IW)'))
         beamID_dset = identification_grp.create_dataset("beamID", data=np.string_('iw1'))
+        boundingBox_dset = identification_grp.create_dataset("boundingBox", data=b'[ 200700. 9391650.  293730. 9440880.]')
         boundingPolygon_dset = identification_grp.create_dataset(
             "boundingPolygon", data=b'POLYGON ((399015 3859970, 398975 3860000, ..., 399015 3859970))')
         burstID_dset = identification_grp.create_dataset("burstID", data=b't069_147170_iw1')
         diagnosticModeFlag_dset = identification_grp.create_dataset("diagnosticModeFlag", data=False, dtype='bool')
+        institution_dset = identification_grp.create_dataset("institution", data=b'NASA JPL')
+        instrumentName_dset = identification_grp.create_dataset("instrumentName", data=b'Sentinel-1B CSAR')
         isGeocodedFlag = identification_grp.create_dataset("isGeocoded", data=True, dtype='bool')
-        isUrgentObservation_dset = identification_grp.create_dataset("isUrgentObservation",
-                                                                     data=np.array([False, True]), dtype='bool')
         lookDirection_dset = identification_grp.create_dataset("lookDirection", data=b'Right')
-        listOfFrequencies_dset = identification_grp.create_dataset("listOfFrequencies", data=np.array([b'A']))
         orbitPassDirection_dset = identification_grp.create_dataset("orbitPassDirection", data=b'Descending')
         platform_dset = identification_grp.create_dataset("platform", data=b'Sentinel-1B')
         processingDateTime_dset = identification_grp.create_dataset("processingDateTime",
                                                                     data=np.string_('2023-03-23T20:32:18.962836Z'))
         processingType_dset = identification_grp.create_dataset("processingType", data=b'UNDEFINED')
+        productID_dset = identification_grp.create_dataset("productID", data=b'OPERA_L2_RTC-S1_T069-147169-IW3_v0.4')
+        productLevel_dset = identification_grp.create_dataset("productLevel", data=b'L2')
+        productSpecificationVersion_dset = identification_grp.create_dataset("productSpecificationVersion", data=b'0.1')
         productType_dset = identification_grp.create_dataset("productType", data=b'SLC')
         productVersion_dset = identification_grp.create_dataset("productVersion", data=b'1.0')
+        project_dset = identification_grp.create_dataset("project", data=b'OPERA')
+        radarBand_dset = identification_grp.create_dataset("radarBand", data=b'C')
         trackNumber_dset = identification_grp.create_dataset("trackNumber", data=147170, dtype='int64')
         zeroDopplerEndTime_dset = identification_grp.create_dataset("zeroDopplerEndTime",
                                                                     data=b'2018-05-04T10:45:11.501279')

@@ -173,7 +173,7 @@ class RtcS1PgeTestCase(unittest.TestCase):
                           rf"\w{{4}}-\w{{6}}-\w{{3}}_" \
                           rf"\d{{8}}T\d{{6}}Z_\d{{8}}T\d{{6}}Z_" \
                           rf"{sensor}_" \
-                          rf"{int(rtc_metadata['frequencyA']['xCoordinateSpacing'])}_" \
+                          rf"{int(rtc_metadata['data']['xCoordinateSpacing'])}_" \
                           rf"v{pge.runconfig.product_version}.h5"
 
         result = re.match(file_name_regex, os.path.basename(output_file))

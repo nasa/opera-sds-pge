@@ -240,7 +240,7 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
         sensor = get_sensor_from_spacecraft_name(product_metadata['identification']['platform'])
 
         # Spacing is assumed to be identical in both X and Y direction
-        spacing = int(product_metadata['frequencyA']['xCoordinateSpacing'])
+        spacing = int(product_metadata['data']['xCoordinateSpacing'])
 
         product_version = str(self.runconfig.product_version)
 
@@ -434,7 +434,7 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
         sensor = get_sensor_from_spacecraft_name(product_metadata['identification']['platform'])
 
         # Spacing is assumed to be identical in both X and Y direction
-        spacing = int(product_metadata['frequencyA']['xCoordinateSpacing'])
+        spacing = int(product_metadata['data']['xCoordinateSpacing'])
 
         production_time = get_time_for_filename(self.production_datetime)
         product_version = str(self.runconfig.product_version)
@@ -554,10 +554,10 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
         output_product_metadata = get_rtc_s1_product_metadata(metadata_product)
 
         # Fill in some additional fields expected within the ISO
-        output_product_metadata['frequencyA']['frequencyAWidth'] = len(output_product_metadata['frequencyA']
-                                                                       ['xCoordinates'])
-        output_product_metadata['frequencyA']['frequencyALength'] = len(output_product_metadata['frequencyA']
-                                                                        ['yCoordinates'])
+        output_product_metadata['data']['width'] = len(output_product_metadata['data']
+                                                        ['xCoordinates'])
+        output_product_metadata['data']['length'] = len(output_product_metadata['data']
+                                                        ['yCoordinates'])
 
         return output_product_metadata
 
