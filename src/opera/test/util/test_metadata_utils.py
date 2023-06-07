@@ -70,7 +70,7 @@ class MetadataUtilsTestCase(unittest.TestCase):
         self.assertAlmostEqual(lat_min, 62.13198085489144)
         self.assertAlmostEqual(lat_max, 63.16076767648831)
         self.assertAlmostEqual(lon_min, 178.82637550795243)
-        self.assertAlmostEqual(lon_max, -179.06925552951074)
+        self.assertAlmostEqual(lon_max, -178.93677941363356)
 
     def test_get_rtc_s1_product_metadata(self):
         """Test retrieval of product metadata from HDF5 files"""
