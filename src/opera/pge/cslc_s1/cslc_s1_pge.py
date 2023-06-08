@@ -167,7 +167,7 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
 
         return self._cached_core_filename
 
-    def _cslc_filename(self, inter_filename):
+    def _cslc_filename(self, inter_filename, use_validity_start_time=False):
         """
         Returns the file name to use for burst-based CSLC products produced by this PGE.
 
@@ -187,11 +187,21 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
             The intermediate filename of the output GeoTIFF to generate a
             filename for. This parameter may be used to inspect the file in order
             to derive any necessary components of the returned filename.
+        use_validity_start_time : bool, optional
+            If True, use the DataValidityStartTime value from the RunConfig in
+            lieu of an acquisition time from the product metadata. Defaults to
+            False.
 
         Returns
         -------
         cslc_filename : str
             The file name to assign to CSLC product(s) created by this PGE.
+
+        Raises
+        ------
+        ValueError
+            If use_validity_start_time is True and no value was specified for
+            DataValidityStartTime within the RunConfig.
 
         """
         core_filename = self._core_filename(inter_filename)
@@ -224,9 +234,19 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
         sensor = burst_metadata['platform_id']
         mode = 'IW'  # fixed to Interferometric Wide (IW) for all S1-based CSLC products
         pol = burst_metadata['polarization']
-        acquisition_time = get_time_for_filename(
-            datetime.strptime(burst_metadata['sensing_start'], '%Y-%m-%d %H:%M:%S.%f')
-        )
+
+        if use_validity_start_time:
+            acquisition_time = self.runconfig.data_validity_start_time
+
+            if acquisition_time is None:
+                raise ValueError(
+                    'use_validity_start_time was requested, but no value was provided '
+                    'for DataValidityStartTime within the RunConfig'
+                )
+        else:
+            acquisition_time = get_time_for_filename(
+                datetime.strptime(burst_metadata['sensing_start'], '%Y-%m-%d %H:%M:%S.%f')
+            )
 
         product_version = str(self.runconfig.product_version)
 
@@ -298,9 +318,9 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
             The file name to assign to static layers product(s) created by this PGE.
 
         """
-        cslc_filename = self._cslc_filename(inter_filename)
+        cslc_filename = self._cslc_filename(inter_filename, use_validity_start_time=True)
 
-        static_layers_filename = f"{cslc_filename}_static_layers.h5"
+        static_layers_filename = f"{cslc_filename}_Static.h5"
 
         return static_layers_filename
 
