@@ -64,6 +64,7 @@ runconfig_dir="${TMP_DIR}/runconfig"
 
 # the testdata reference metadata contains this path so we use it here
 output_dir="${TMP_DIR}/output_rtc_s1"
+
 # make sure no output directory already exists
 if [ -d "$output_dir" ]; then
     echo "Output directory $output_dir already exists (and should not). Removing directory."
@@ -99,6 +100,10 @@ docker_exit_status=$?
 
 # End metrics collection
 metrics_collection_end "$PGE_NAME" "$container_name" "$docker_exit_status" "$TEST_RESULTS_DIR"
+
+# Copy the PGE/SAS log file(s) to the test results directory so it can be archived
+# by Jenkins with the other results
+cp "${output_dir}"/*.log "${TEST_RESULTS_DIR}"
 
 if [ $docker_exit_status -ne 0 ]; then
     echo "docker exit indicates failure: ${docker_exit_status}"

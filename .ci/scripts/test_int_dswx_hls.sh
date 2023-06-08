@@ -106,6 +106,10 @@ do
     # End metrics collection
     metrics_collection_end "$PGE_NAME" "$container_name" "$docker_exit_status" "$TEST_RESULTS_DIR"
 
+    # Copy the PGE/SAS log file(s) to the test results directory so it can be archived
+    # by Jenkins with the other results
+    cp "${output_dir}"/*.log "${TEST_RESULTS_DIR}"
+
     if [ $docker_exit_status -ne 0 ]; then
         echo "docker exit indicates failure: ${docker_exit_status}"
         overall_status=1
