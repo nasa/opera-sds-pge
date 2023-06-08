@@ -81,7 +81,7 @@ class DswxS1PgeTestCase(unittest.TestCase):
             )
 
         # Create the output directories expected by the test Runconfig file
-        self.test_output_dir = join(self.working_dir.name, "dswx_s1_pge_test/output_dir")
+        self.test_output_dir = abspath(join(self.working_dir.name, "dswx_s1_pge_test/output_dir"))
         os.makedirs(self.test_output_dir, exist_ok=True)
         # Add some band data to the output directory:
         band_data = ('OPERA_L3_DSWx-S1_b1_B01_WTR.tif', 'OPERA_L3_DSWx-S1_b1_B02_BWTR.tif',
@@ -172,21 +172,19 @@ class DswxS1PgeTestCase(unittest.TestCase):
         """
         # example of band data passed to method:
         # band_data = ('OPERA_L3_DSWx-S1_band_1_B01_WTR.tif', 'OPERA_L3_DSWx-S1_band_1_B02_BWTR.tif',
-        #               'OPERA_L3_DSWx-S1_band_1_B03_CONF.tif', 'OPERA_L3_DSWx-S1_band_2_B01_WTR.tif',
-        #               'OPERA_L3_DSWx-S1_band_2_B02_BWTR.tif', 'OPERA_L3_DSWx-S1_band_2_B03_CONF.tif')
+        #              'OPERA_L3_DSWx-S1_band_1_B03_CONF.tif', 'OPERA_L3_DSWx-S1_band_2_B01_WTR.tif',
+        #              'OPERA_L3_DSWx-S1_band_2_B02_BWTR.tif', 'OPERA_L3_DSWx-S1_band_2_B03_CONF.tif')
 
-        # Clears old band files (default 'True')
-        output_dir = join(self.test_dir, str(self.test_output_dir))
         if clear:
-            path = output_dir
+            path = self.test_output_dir
             cmd = f"rm {path}/*.tif"
             os.system(cmd)
         # Add files to the output directory
         for band_output_file in band_data:
             if not empty_file:
-                os.system(f"echo 'Test data string' >> {join(output_dir, band_output_file)}")
+                os.system(f"echo 'Test data string' >> {join(self.test_output_dir, band_output_file)}")
             else:
-                os.system(f"touch {join(output_dir, band_output_file)}")
+                os.system(f"touch {join(self.test_output_dir, band_output_file)}")
 
     def test_dswx_s1_pge_execution(self):
         """
