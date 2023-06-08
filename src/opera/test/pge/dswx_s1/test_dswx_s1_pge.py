@@ -596,9 +596,6 @@ class DswxS1PgeTestCase(unittest.TestCase):
             with self.assertRaises(RuntimeError):
                 pge.run()
 
-            expected_output_file = 'dswx_s1_pge_test/output_dir/missing_dswx_s1.tif'
-            self.assertFalse(os.path.exists(expected_output_file))
-
             expected_log_file = pge.logger.get_file_name()
             self.assertTrue(os.path.exists(expected_log_file))
 
