@@ -48,6 +48,7 @@ RunConfig:
                 ErrorCodeBase: 300000
                 SchemaPath: pge/rtc_s1/schema/rtc_s1_sas_schema.yaml
                 IsoTemplatePath: pge/rtc_s1/templates/OPERA_ISO_metadata_L2_RTC_S1_template.xml.jinja2
+                DataValidityStartTime: 20000101T000000
 
             QAExecutable:
                 Enabled: False

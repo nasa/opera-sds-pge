@@ -186,7 +186,7 @@ class RtcS1PgeTestCase(unittest.TestCase):
 
         output_files = glob.glob(join(pge.runconfig.output_product_path, f"{core_filename}*.tif"))
 
-        self.assertEqual(len(output_files), 8)
+        self.assertEqual(len(output_files), 6)
 
         output_files = list(map(os.path.basename, output_files))
 
@@ -196,8 +196,25 @@ class RtcS1PgeTestCase(unittest.TestCase):
         self.assertIn(f"{core_filename}_HV.tif", output_files)
         self.assertIn(f"{core_filename}_VV+VH.tif", output_files)
         self.assertIn(f"{core_filename}_HH+HV.tif", output_files)
-        self.assertIn(f"{core_filename}_nlooks.tif", output_files)
-        self.assertIn(f"{core_filename}_layover_shadow_mask.tif", output_files)
+
+        # Check that the static layer files had conventions applied
+        static_output_files = glob.glob(join(pge.runconfig.output_product_path, f"*static*.tif"))
+
+        self.assertEqual(len(static_output_files), 2)
+
+        static_output_files = list(map(os.path.basename, static_output_files))
+
+        core_static_filename = os.path.basename(static_output_files[0]).split('_static')[0]
+
+        self.assertIn(f"{core_static_filename}_static_nlooks.tif", static_output_files)
+        self.assertIn(f"{core_static_filename}_static_layover_shadow_mask.tif", static_output_files)
+
+        # Ensure the DataValidityStartTime was used in the filenames for the
+        # static layer products
+        expected_data_validity_start_time = pge.runconfig.data_validity_start_time
+
+        for static_output_file in static_output_files:
+            self.assertIn(expected_data_validity_start_time, static_output_file)
 
         # Finally, ensure file name was applied to the png browse image
         output_files = glob.glob(join(pge.runconfig.output_product_path, f"{core_filename}*.png"))
