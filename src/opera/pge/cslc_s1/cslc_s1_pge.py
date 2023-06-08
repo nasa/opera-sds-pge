@@ -219,7 +219,7 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
 
             self._burst_metadata_cache[burst_id] = cslc_metadata
 
-        burst_metadata = cslc_metadata['processing_information']['s1_burst_metadata']
+        burst_metadata = cslc_metadata['processing_information']['input_burst_metadata']
 
         sensor = burst_metadata['platform_id']
         mode = 'IW'  # fixed to Interferometric Wide (IW) for all S1-based CSLC products
@@ -416,7 +416,7 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
         # a representative
         cslc_metadata = list(self._burst_metadata_cache.values())[0]
 
-        burst_metadata = cslc_metadata['processing_information']['s1_burst_metadata']
+        burst_metadata = cslc_metadata['processing_information']['input_burst_metadata']
 
         sensor = burst_metadata['platform_id']
         mode = 'IW'  # fixed for all S1-based CSLC products
@@ -546,20 +546,22 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
         output_product_metadata = get_cslc_s1_product_metadata(metadata_product)
 
         # Fill in some additional fields expected within the ISO
-        output_product_metadata['grids']['width'] = len(output_product_metadata['grids']['x_coordinates'])
-        output_product_metadata['grids']['length'] = len(output_product_metadata['grids']['y_coordinates'])
+        output_product_metadata['data']['width'] = len(output_product_metadata['data']['x_coordinates'])
+        output_product_metadata['data']['length'] = len(output_product_metadata['data']['y_coordinates'])
 
         # Remove some of the larger arrays from the metadata, so we don't use
         # too much memory when caching the metadata for each burst
-        for key in ['VV', 'VH', 'HH', 'HV', 'x_coordinates', 'y_coordinates']:
-            array = output_product_metadata['grids'].pop(key, None)
+        for key in ['azimuth_carrier_phase', 'flattening_phase',
+                    'VV', 'VH', 'HH', 'HV',
+                    'x_coordinates', 'y_coordinates']:
+            array = output_product_metadata['data'].pop(key, None)
 
             if array is not None:
                 del array
 
         # Parse the burst center coordinate to conform with gml schema
         # sample: {ndarray: (2,)} [-118.30363047, 33.8399832]
-        burst_center = output_product_metadata['processing_information']['s1_burst_metadata']['center']
+        burst_center = output_product_metadata['processing_information']['input_burst_metadata']['center']
         burst_center_str = f"{burst_center[0]} {burst_center[1]}"
         output_product_metadata['burst_center'] = burst_center_str
 

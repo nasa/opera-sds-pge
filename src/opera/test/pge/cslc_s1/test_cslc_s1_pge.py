@@ -182,7 +182,7 @@ class CslcS1PgeTestCase(unittest.TestCase):
         metadata_file = metadata_files[0]
 
         cslc_metadata = get_cslc_s1_product_metadata(metadata_file)
-        burst_metadata = cslc_metadata['processing_information']['s1_burst_metadata']
+        burst_metadata = cslc_metadata['processing_information']['input_burst_metadata']
 
         # Compare the filename returned by the PGE for JSON metadata files
         # to a regex which should match each component of the final filename
