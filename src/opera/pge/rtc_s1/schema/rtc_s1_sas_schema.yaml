@@ -22,7 +22,7 @@ runconfig:
       dem_file: str(required=False)
 
       # Digital elevation model description
-      dem_description: str(required=False)
+      dem_file_description: str(required=False)
 
     static_ancillary_file_group:
 
@@ -73,7 +73,7 @@ runconfig:
       # Save browse image(s)
       save_browse: bool(required=False)
 
-      output_imagery_format: enum('HDF5', 'NETCDF', 'ENVI', 'GTiff', 'COG', required=False)
+      output_imagery_format: enum('HDF5', 'NETCDF', 'GTiff', 'COG', 'ENVI', required=False)
       output_imagery_compression: str(required=False)
       output_imagery_nbits: int(min=1, required=False)
 
@@ -131,6 +131,15 @@ processing_options:
   # Apply thermal noise correction
   apply_thermal_noise_correction: bool(required=False)
 
+  # Compute geolocation correction LUTs and apply it
+  apply_correction_luts: bool(required=False)
+
+  # slant range spacing of the correction LUT in meters
+  correction_lut_range_spacing_in_meters: num(required=False)
+
+  # Azimuth time spacing of the correction LUT in meters
+  correction_lut_azimuth_spacing_in_meters: num(required=False)
+
   # Apply RTC
   apply_rtc: bool(required=False)
 
@@ -145,6 +154,9 @@ processing_options:
 
   # Geocoding options
   geocoding: include('geocoding_options', required=False)
+
+  # Mosaicking options
+  mosaicking: include('mosaicking_options', required=False)
 
   # Browse image
   browse_image_group: include('browse_image_options', required=False)
@@ -177,7 +189,11 @@ geocoding_options:
   # OPTIONAL - Apply shadow masking
   apply_shadow_masking: bool(required=False)
 
-  # Algorithm type, area projection or interpolation: sinc, bilinear, bicubic, nearest, and biquintic
+  # Skip geocoding already processed, which is tested by the existence of the output files
+  skip_if_output_files_exist: bool(required=False)
+
+  # Geocoding algorithm type, area projection or interpolation:
+  # sinc, bilinear, bicubic, nearest, and biquintic
   algorithm_type: enum('area_projection', 'sinc', 'bilinear', 'bicubic', 'nearest', 'biquintic', required=False)
 
   # Memory mode
@@ -212,8 +228,11 @@ geocoding_options:
   # Save the interpolated DEM used to generate the RTC product
   save_dem: bool(required=False)
 
-  # Save layover shadow mask
+  # Save layover/shadow mask
   save_layover_shadow_mask: bool(required=False)
+
+  # Layover/shadow mask dilation size of shadow pixels
+  shadow_dilation_size: int(min=0, required=False)
 
   # OPTIONAL - Absolute radiometric correction
   abs_rad_cal: num(required=False)
@@ -227,7 +246,25 @@ geocoding_options:
   # Double SLC sampling in the range direction
   upsample_radargrid: bool(required=False)
 
-  # Product EPSG code. Same as DEM if not provided
+  # Bursts geographic grid
+  bursts_geogrid: include('output_grid_options', required=False)
+
+
+mosaicking_options:
+
+  # Mosaic mode
+  mosaic_mode: enum('average', 'first', 'bursts_center', required=False)
+
+  # Mosaic geographic grid
+  mosaic_geogrid: include('output_grid_options', required=False)
+
+
+output_grid_options:
+  # Product EPSG code. If not provided, `output_epsg` will
+  # be determined based on the scene center:
+  # - If center_lat >= 75.0: 3413
+  # - If center_lat <= -75.0: 3031
+  # - Otherwise: EPSG code associated with the closest UTM zone
   output_epsg: int(min=1024, max=32767, required=False)
 
   # Product posting along X (same units as output_epsg)

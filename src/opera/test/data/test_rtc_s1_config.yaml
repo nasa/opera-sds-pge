@@ -127,14 +127,15 @@ RunConfig:
                             clip_min:
                             upsample_radargrid: False
 
-                            output_epsg:
-                            x_posting: 30
-                            y_posting: 30
-                            x_snap: 30
-                            y_snap: 30
-                            top_left:
-                                x:
-                                y:
-                            bottom_right:
-                                x:
-                                y:
+                            bursts_geogrid:
+                                output_epsg:
+                                x_posting: 30
+                                y_posting: 30
+                                x_snap: 30
+                                y_snap: 30
+                                top_left:
+                                    x:
+                                    y:
+                                bottom_right:
+                                    x:
+                                    y:
