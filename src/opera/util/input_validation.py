@@ -8,15 +8,15 @@ input_validation.py
 Common code used by some PGEs for input validation.
 
 """
-from os.path import abspath, exists, isfile, isdir, join, splitext
-
 import glob
+from os.path import abspath, exists, getsize, isdir, isfile, join, splitext
+
 import yamale
 
 from opera.util.error_codes import ErrorCode
 
 
-def check_input(input_object, logger, name, valid_extensions=None):
+def check_input(input_object, logger, name, valid_extensions=None, check_zero_size=False):
     """
     Validation checks for individual files.
     The input object is checked for existence and that it ends with
@@ -33,6 +33,8 @@ def check_input(input_object, logger, name, valid_extensions=None):
     valid_extensions : iterable, optional
         Expected file extensions of the file being validated. If not provided,
         no extension checking will take place.
+    check_zero_size : boolean, optional
+        If true, raise an exception for zero-size input objects
 
     """
     if not exists(input_object):
@@ -46,10 +48,22 @@ def check_input(input_object, logger, name, valid_extensions=None):
             error_msg = f"Input file {input_object} does not have an expected file extension."
             logger.critical(name, ErrorCode.INVALID_INPUT, error_msg)
 
+    if check_zero_size is True:
+        file_size = getsize(input_object)
+        if not file_size > 0:
+            error_msg = f"Input file {input_object} size is {file_size}. Size must be greater than 0."
+            logger.critical(name, ErrorCode.INVALID_INPUT, error_msg)
+
+
+def check_input_list(list_of_input_objects, logger, name, valid_extensions=None, check_zero_size=False):
+    """Call check_input for a list of input objects."""
+    for input_object in list_of_input_objects:
+        check_input(input_object, logger, name, valid_extensions=valid_extensions, check_zero_size=check_zero_size)
+
 
 def validate_slc_s1_inputs(runconfig, logger, name):
     """
-    This function is shared by the RTC-S1 and CLSC-S1 PGEs:
+    This function is shared by the RTC-S1 and CSLC-S1 PGEs:
     Evaluates the list of inputs from the RunConfig to ensure they are valid.
     There are 2 required categories defined in the 'input_file_group':
 
@@ -111,6 +125,59 @@ def validate_slc_s1_inputs(runconfig, logger, name):
             logger.critical(name, ErrorCode.INVALID_INPUT, error_msg)
 
 
+def validate_disp_inputs(runconfig, logger, name):
+    """
+    Evaluates the list of inputs from the RunConfig to ensure they are valid.
+
+    The input products for DISP-S1 can be classified into two groups:
+        1) the main input products (the CSLC burst products) and
+        2) the ancillary input products (DEM, geometry, amplitude mean/distortion,
+           water mask, tec files, and weather model).
+
+    Parameters
+    ----------
+    runconfig: file
+        Runconfig file passed by the calling PGE
+    logger: PgeLogger
+        Logger passed by the calling PGE
+    name:  str
+        pge name
+    """
+    input_file_group = runconfig.sas_config['runconfig']['groups']['input_file_group']
+    dyn_anc_file_group = runconfig.sas_config['runconfig']['groups']['dynamic_ancillary_file_group']
+
+    check_input_list(input_file_group['cslc_file_list'], logger, name,
+                     valid_extensions=('.h5',), check_zero_size=True)
+
+    if 'amplitude_dispersion_files' in dyn_anc_file_group:
+        check_input_list(dyn_anc_file_group['amplitude_dispersion_files'], logger, name,
+                         valid_extensions=('.tif', '.tiff'), check_zero_size=True)
+
+    if 'amplitude_mean_files' in dyn_anc_file_group:
+        check_input_list(dyn_anc_file_group['amplitude_mean_files'], logger, name,
+                         valid_extensions=('.tif', '.tiff'), check_zero_size=True)
+
+    if 'geometry_files' in dyn_anc_file_group:
+        check_input_list(dyn_anc_file_group['geometry_files'], logger, name,
+                         valid_extensions=('.h5',), check_zero_size=True)
+
+    if 'mask_file' in dyn_anc_file_group:
+        check_input_list(dyn_anc_file_group['mask_file'], logger, name,
+                         valid_extensions=('.tif', '.tiff'), check_zero_size=True)
+
+    if 'dem_file' in dyn_anc_file_group:
+        check_input(dyn_anc_file_group['dem_file'], logger, name,
+                    valid_extensions=('.tif', '.tiff'), check_zero_size=True)
+
+    if 'tec_files' in dyn_anc_file_group:
+        check_input_list(dyn_anc_file_group['tec_files'], logger, name,
+                         check_zero_size=True)
+
+    if 'weather_model_files' in dyn_anc_file_group:
+        check_input_list(dyn_anc_file_group['weather_model_files'], logger, name,
+                         valid_extensions=('.nc', '.h5',), check_zero_size=True)
+
+
 def validate_dswx_inputs(runconfig, logger, name, valid_extensions=None):
     """
     This function is shared by the DSWX-HLS and DSWX-S1 PGEs:
@@ -134,7 +201,7 @@ def validate_dswx_inputs(runconfig, logger, name, valid_extensions=None):
     name:  str
         PGE name
     valid_extensions : list, optional
-        The list of expected extensions for input files to have. If not provide,
+        The list of expected extensions for input files to have. If not provided,
         no extension checking is performed
 
     """
@@ -155,9 +222,11 @@ def validate_dswx_inputs(runconfig, logger, name, valid_extensions=None):
                     logger.critical(name, ErrorCode.INPUT_NOT_FOUND, error_msg)
         else:
             if valid_extensions and splitext(input_file_path)[-1] not in valid_extensions:
-                error_msg = f"{name} Input file {input_file_path} does not have an expected extension ({valid_extensions})."
+                error_msg = (f"{name} Input file {input_file_path} does not have an expected "
+                             f"extension ({valid_extensions}).")
 
                 logger.critical(name, ErrorCode.INVALID_INPUT, error_msg)
+
 
 def validate_algorithm_parameters_config(name, algorithm_parameters_schema_file_path,
                                          algorithm_parameters_runconfig, logger):
