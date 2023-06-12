@@ -42,6 +42,8 @@ class DSWxS1PreProcessorMixin(PreProcessorMixin):
         dynamic_ancillary_file_group_dict = \
             self.runconfig.sas_config['runconfig']['groups']['dynamic_ancillary_file_group']
 
+        print(f"ANCILLARY_DICT: {dynamic_ancillary_file_group_dict}")
+
         for key, value in dynamic_ancillary_file_group_dict.items():
             if key in ('dem_file', ):
                 input_validation.check_input(
