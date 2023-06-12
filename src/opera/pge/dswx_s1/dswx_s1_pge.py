@@ -8,8 +8,7 @@ Module defining the implementation for the Dynamic Surface Water Extent (DSWx)
 from Sentinel-1 A/B (S1) PGE.
 """
 
-from os.path import abspath, exists, splitext
-
+from os.path import abspath, exists, getsize, splitext
 
 import opera.util.input_validation as input_validation
 from opera.pge.base.base_pge import PgeExecutor
@@ -96,7 +95,6 @@ class DSWxS1PreProcessorMixin(PreProcessorMixin):
         validate_dswx_inputs(
             self.runconfig, self.logger, self.runconfig.pge_name, valid_extensions=(".tif", ".h5")
         )
-        self.algorithm_parameters_runconfig = self.runconfig.algorithm_parameters_file_config_path
         validate_algorithm_parameters_config(self.name,
                                              self.runconfig.algorithm_parameters_schema_path,
                                              self.runconfig.algorithm_parameters_file_config_path,
@@ -112,12 +110,69 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
 
     In addition to the base functionality inherited from PostProcessorMixin, this
     mixin adds an output validation step to ensure that the output file(s) defined
-    by the RunConfig exist and are valid (TODO).
+    by the RunConfig exist and are valid.
 
     """
 
     _post_mixin_name = "DSWxS1PostProcessorMixin"
     _cached_core_filename = None
+
+    def _validate_output(self):
+        """
+        Evaluates the output file(s) generated from SAS execution to ensure:
+            - That the file(s) contains some content (size is greater than 0).
+            - That the .tif output files (band data) end with 'B01_WTR',
+              'B02_BWTR', or 'B03_CONF'
+            - That the there are the same number of each type of file, implying
+              3 output bands per tile
+
+        """
+        EXPECTED_NUM_BANDS: int = 3
+        band_dict = {}
+        num_bands = []
+        output_extension = '.tif'
+
+        # get all .tiff files
+        output_products = list(
+            filter(
+                lambda filename: output_extension in filename,
+                self.runconfig.get_output_product_filenames()
+            )
+        )
+
+        if not output_products:
+            error_msg = (f"No SAS output file(s) with '{output_extension}' extension "
+                         f"found within '{self.runconfig.output_product_path}'")
+
+            self.logger.critical(self.name, ErrorCode.OUTPUT_NOT_FOUND, error_msg)
+
+        for out_product in output_products:
+            if not getsize(out_product):
+                error_msg = f"SAS output file {out_product} was created, but is empty"
+
+                self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
+
+            #  Gather the output files into a dictionary
+            #     key = band type (e.g. B01_WTR.tif)
+            #     value = list of filenames of this type (e.g. ['OPERA_L3_DSWx-S1_..._v0.1_B01_WTR.tif', ...]
+            key = '_'.join(out_product.split('_')[-2:])
+            if key not in band_dict:
+                band_dict[key] = []
+            band_dict[key].append(out_product)
+
+        if len(band_dict.keys()) != EXPECTED_NUM_BANDS:
+            error_msg = f"Invalid SAS output file, too many band types: {band_dict.keys()}"
+
+            self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
+
+        # Make a list of the numbers of bands per band type
+        for band in band_dict.keys():
+            num_bands.append(len(band_dict[band]))
+        if not all(band_type == num_bands[0] for band_type in num_bands):
+            error_msg = f"Missing or extra band files: number of band files per " \
+                        f"band: {num_bands}"
+
+            self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
 
     def run_postprocessor(self, **kwargs):
         """
@@ -125,7 +180,7 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
         The DSWxS1PostProcessorMixin version of this method performs the same
         steps as the base PostProcessorMixin, but inserts a step to perform
         output product validation prior to staging and renaming of the output
-        files (TODO).
+        files.
 
         Parameters
         ----------
@@ -133,7 +188,9 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
             Any keyword arguments needed by the post-processor
 
         """
-        super().run_postprocessor(**kwargs)
+        self._run_sas_qa_executable()
+        self._validate_output()
+        self._stage_output_files()
 
 
 class DSWxS1Executor(DSWxS1PreProcessorMixin, DSWxS1PostProcessorMixin, PgeExecutor):
