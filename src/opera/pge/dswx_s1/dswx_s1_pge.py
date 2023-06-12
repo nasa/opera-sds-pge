@@ -46,14 +46,17 @@ class DSWxS1PreProcessorMixin(PreProcessorMixin):
 
         for key, value in dynamic_ancillary_file_group_dict.items():
             if key in ('dem_file', ):
+                print(f"dem_file: {value}")
                 input_validation.check_input(
                     value, self.logger, self.name, valid_extensions=('.tif', '.tiff', '.vrt')
                 )
             elif key in ('reference_water_file', 'world_file', 'hand_file'):
+                print(f"one of 3: {value}")
                 input_validation.check_input(
                     value, self.logger, self.name, valid_extensions=('.tif', '.tiff')
                 )
             elif key in ('shoreline_shapefile',):
+                print(f"ANCILLARY_DICT: {dynamic_ancillary_file_group_dict}")
                 input_validation.check_input(
                     value, self.logger, self.name, valid_extensions=('.shp',)
                 )
