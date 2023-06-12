@@ -50,7 +50,7 @@ RunConfig:
             reference_water_file: dswx_s1_pge_test/input_dir/reference_water.tif
             shoreline_shapefile: dswx_s1_pge_test/input_dir/shoreline.shp
             hand_file: dswx_s1_pge_test/input_dir/hand.tif
-            algorithm_parameters: /workspace/src/opera/test/pge/dswx_s1/test_dswx_s1_pge_b4a80ftm_temp/dswx_s1_pge_test/input_dir/test_algorithm_parameters_s1.yaml
+            algorithm_parameters: dswx_s1_pge_test/input_dir/test_algorithm_parameters_s1.yaml
           primary_executable:
             product_type: dswx_s1
           product_path_group:

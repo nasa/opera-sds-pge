@@ -37,9 +37,15 @@ def check_input(input_object, logger, name, valid_extensions=None, check_zero_si
         If true, raise an exception for zero-size input objects
 
     """
-    if not exists(input_object):
+    try:
+        exists(input_object)
+    except TypeError as err:
+        print(f'input_object: {input_object}')
         error_msg = f"Could not locate specified input {input_object}."
         logger.critical(name, ErrorCode.INPUT_NOT_FOUND, error_msg)
+    # if not exists(input_object):
+    #     error_msg = f"Could not locate specified input {input_object}."
+    #     logger.critical(name, ErrorCode.INPUT_NOT_FOUND, error_msg)
 
     if valid_extensions:
         ext = splitext(input_object)[-1]
