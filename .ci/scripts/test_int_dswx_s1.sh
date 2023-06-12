@@ -57,7 +57,7 @@ overall_status=0
 #  There is only 1 expected output directory DSWX-S1
 
 input_data_basename=$(basename -- "$INPUT_DATA")
-input_data_dir="${TMP_DIR}/${input_data_basename%.*}/input_dir"
+input_data_dir="${TMP_DIR}/${input_data_basename%.*}/input_data"
 
 expected_data_basename=$(basename -- "$EXPECTED_DATA")
 expected_data_dir="${TMP_DIR}/${expected_data_basename%.*}/expected_output_dir"
@@ -66,7 +66,7 @@ echo "Input data directory: ${input_data_dir}"
 echo "Expected data directory: ${expected_data_dir}"
 
 # the testdata reference metadata contains this path so we use it here
-output_dir="${TMP_DIR}/output_dir"
+output_dir="${TMP_DIR}/output_dswx_s1"
 
 # make sure no output directory already exists
 if [ -d "$output_dir" ]; then
