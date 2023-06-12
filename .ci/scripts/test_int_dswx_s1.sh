@@ -30,7 +30,7 @@ SAMPLE_TIME=1
 [ -z "${PGE_TAG}" ] && PGE_TAG="${USER}-dev"
 [ -z "${INPUT_DATA}" ] && INPUT_DATA="dswx_s1_interface_0.1_expected_input.zip"
 [ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="dswx_s1_interface_0.1_expected_output.zip"
-[ -z "${RUNCONFIG}" ] && RUNCONFIG="dswx_s1_runconfig-v3.0.0-er.1.0.yaml"
+[ -z "${RUNCONFIG}" ] && RUNCONFIG="dswx_s1_interface_0.1_runconfig.yaml"
 [ -z "${TMP_ROOT}" ] && TMP_ROOT="$DEFAULT_TMP_ROOT"
 
 # Create the test output directory in the work space
@@ -54,20 +54,19 @@ trap test_int_trap_cleanup EXIT
 # 2 - product validation failure
 overall_status=0
 
-# Run the Docker image to produce a <data_set>/output_dir directory, then compare
-# the contents of the output to the contents to the expected_output directory.
+#  There is only 1 expected output directory DSWX-S1
 
 input_data_basename=$(basename -- "$INPUT_DATA")
-input_data_dir="${TMP_DIR}/${input_data_basename%.*}/${data_set}/input_dir"
+input_data_dir="${TMP_DIR}/${input_data_basename%.*}/input_dir"
 
 expected_data_basename=$(basename -- "$EXPECTED_DATA")
-expected_data_dir="${TMP_DIR}/${expected_data_basename%.*}/${data_set}/expected_output_dir"
+expected_data_dir="${TMP_DIR}/${expected_data_basename%.*}/expected_output_dir"
 
 echo "Input data directory: ${input_data_dir}"
 echo "Expected data directory: ${expected_data_dir}"
 
 # the testdata reference metadata contains this path so we use it here
-output_dir="${TMP_DIR}/dswx_s1_output/${data_set}/output_dir"
+output_dir="${TMP_DIR}/output_dir"
 
 # make sure no output directory already exists
 if [ -d "$output_dir" ]; then
@@ -79,7 +78,7 @@ echo "Creating output directory $output_dir."
 mkdir -p "$output_dir"
 
 # the testdata reference metadata contains this path so we use it here
-scratch_dir="${TMP_DIR}/dswx_s1_scratch/${data_set}/scratch_dir"
+scratch_dir="${TMP_DIR}/dswx_s1_scratch/scratch_dir"
 
 # make sure no scratch directory already exists
 if [ -d "$scratch_dir" ]; then
@@ -90,7 +89,7 @@ echo "Creating scratch directory $scratch_dir."
 mkdir -p --mode=777 "$scratch_dir"
 
 # Assign a container name to avoid the auto-generated one created by Docker
-container_name="${PGE_NAME}-${data_set}"
+container_name="${PGE_NAME}"
 
 # Start metrics collection
 metrics_collection_start "$PGE_NAME" "$container_name" "$TEST_RESULTS_DIR" "$SAMPLE_TIME"
