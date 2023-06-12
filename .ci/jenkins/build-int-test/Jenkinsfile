@@ -35,6 +35,27 @@ pipeline {
                 }
             }
         }
+        stage('Install local conda env') {
+            steps {
+                script {
+                    echo "Creating conda env"
+                    sh label: 'Installing int test conda environment',
+                       script: '''#!/bin/bash
+                         /usr/local/anaconda3/bin/conda create -n int_test_env python=3.9 pip
+                         /usr/local/anaconda3/bin/conda init bash
+                    '''
+
+                    sh label: 'Installing dependencies to int test conda environment',
+                       script: '''#!/bin/bash
+                       . /var/lib/jenkins/.bashrc
+                       conda activate int_test_env
+                       pip install -r ./requirements.txt
+                       conda uninstall -q poppler
+                       conda install -c conda-forge gdal poppler h5py matplotlib pandas numpy
+                       '''
+                }
+            }
+        }
         stage('Integration Test OPERA PGE Docker image(s)') {
             steps {
                 script {
@@ -45,7 +66,11 @@ pipeline {
                         echo "Integration testing Docker image ${DOCKER_IMAGE_PREFIX}/${DOCKER_IMAGE_SUFFIX}:${DOCKER_TAG}"
 
                         def statusCode = sh label: "Running Integration Test for image ${DOCKER_IMAGE_PREFIX}/${DOCKER_IMAGE_SUFFIX}:${DOCKER_TAG}", returnStatus:true,
-                           script: ".ci/scripts/test_int_${DOCKER_IMAGE_SUFFIX}.sh --tag ${DOCKER_TAG}"
+                           script: """#!/bin/bash
+                           . /var/lib/jenkins/.bashrc
+                           conda activate int_test_env
+                           .ci/scripts/test_int_${DOCKER_IMAGE_SUFFIX}.sh --tag ${DOCKER_TAG}
+                           """
 
                         echo "Test returned code ${statusCode}"
 
@@ -84,6 +109,9 @@ pipeline {
         always {
             echo "Cleaning up Docker images from local host"
             sh ".ci/scripts/cleanup.sh ${DOCKER_TAG}"
+            echo "Removing int test conda environment"
+            sh "/usr/local/anaconda3/bin/conda env remove --name int_test_env"
+            sh "/usr/local/anaconda3/bin/conda init --reverse"
             deleteDir()
         }
         success {
