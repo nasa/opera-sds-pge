@@ -114,7 +114,7 @@ def validate_slc_s1_inputs(runconfig, logger, name):
             # TODO: this might be utilized as an ancillary with later deliveries,
             #       but no example available currently
             continue
-        elif key in ('burst_id', 'dem_description'):
+        elif key in ('burst_id', 'dem_description', 'dem_file_description'):
             # these fields are included in the SAS input paths, but are not
             # actually file paths, so skip them
             continue

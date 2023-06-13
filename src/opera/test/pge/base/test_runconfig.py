@@ -56,6 +56,7 @@ class RunconfigTestCase(unittest.TestCase):
         self.assertListEqual(runconfig.qa_program_options, ["--debug"])
         self.assertEqual(runconfig.debug_switch, False)
         self.assertListEqual(runconfig.get_ancillary_filenames(), ["input/input_dem.vrt"])
+        self.assertEqual(runconfig.data_validity_start_time, "20010101T000000")
 
     def test_full_pge_config_parse_and_validate(self):
         """
@@ -76,7 +77,7 @@ class RunconfigTestCase(unittest.TestCase):
         self._compare_runconfig_to_expected(runconfig)
 
         # Make sure something was parsed for SAS section, not concerned with
-        # the internals though as its just an example SAS schema being used for
+        # the internals though as it's just an example SAS schema being used for
         # this test
         self.assertIsInstance(runconfig.sas_config, dict)
 
@@ -149,6 +150,8 @@ class RunconfigTestCase(unittest.TestCase):
             self.assertIn("RunConfig.Groups.PGE.PrimaryExecutable.ProgramOptions: '--debug --restart' is not a list.",
                           str(err))
             self.assertIn("RunConfig.Groups.PGE.QAExecutable.ProgramOptions: '--debug' is not a list.", str(err))
+            self.assertIn("RunConfig.Groups.PGE.PrimaryExecutable.DataValidityStartTime: '2001-01-01 00:00:00' is "
+                          "not a YYYYMMDDTHHmmss datetime.", str(err))
 
 
 if __name__ == "__main__":

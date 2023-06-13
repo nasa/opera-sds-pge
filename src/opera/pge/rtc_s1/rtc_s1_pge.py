@@ -171,7 +171,7 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
 
         return self._cached_core_filename
 
-    def _rtc_filename(self, inter_filename):
+    def _rtc_filename(self, inter_filename, use_validity_start_time=False):
         """
         Returns the base file name to use for RTC products produced by this PGE.
 
@@ -187,11 +187,21 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
             The intermediate filename of the output product to generate
             a filename for. This parameter may be used to inspect the file
             in order to derive any necessary components of the returned filename.
+        use_validity_start_time : bool, optional
+            If True, use the DataValidityStartTime value from the RunConfig in
+            lieu of an acquisition time from the product metadata. Defaults to
+            False.
 
         Returns
         -------
         rtc_filename : str
             The file name to assign to RTC product(s) created by this PGE.
+
+        Raises
+        ------
+        ValueError
+            If use_validity_start_time is True and no value was specified for
+            DataValidityStartTime within the RunConfig.
 
         """
         core_filename = self._core_filename(inter_filename)
@@ -225,22 +235,31 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
 
         production_time = get_time_for_filename(self.production_datetime)
 
-        # Use doppler start time as the acq time and convert it to our format
-        # used for file naming
-        acquisition_time = product_metadata['identification']['zeroDopplerStartTime']
+        if use_validity_start_time:
+            acquisition_time = self.runconfig.data_validity_start_time
 
-        if not acquisition_time.endswith('Z'):
-            acquisition_time += 'Z'
+            if acquisition_time is None:
+                raise ValueError(
+                    'use_validity_start_time was requested, but no value was provided '
+                    'for DataValidityStartTime within the RunConfig'
+                )
+        else:
+            # Use doppler start time as the acq time and convert it to our format
+            # used for file naming
+            acquisition_time = product_metadata['identification']['zeroDopplerStartTime']
 
-        acquisition_time = get_time_for_filename(
-            datetime.strptime(acquisition_time, "%Y-%m-%dT%H:%M:%S.%fZ")
-        )
+            if not acquisition_time.endswith('Z'):
+                acquisition_time += 'Z'
+
+            acquisition_time = get_time_for_filename(
+                datetime.strptime(acquisition_time, "%Y-%m-%dT%H:%M:%S.%fZ")
+            )
 
         # Get the sensor (should be either S1A or S1B)
         sensor = get_sensor_from_spacecraft_name(product_metadata['identification']['platform'])
 
         # Spacing is assumed to be identical in both X and Y direction
-        spacing = int(product_metadata['frequencyA']['xCoordinateSpacing'])
+        spacing = int(product_metadata['data']['xCoordinateSpacing'])
 
         product_version = str(self.runconfig.product_version)
 
@@ -269,7 +288,7 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
 
         The filename for static layer RTC products consists of:
 
-            <RTC filename>_<Static layer name>.tif
+            <RTC filename>_static_<Static layer name>.tif
 
         Where <RTC filename> is returned by RtcS1PostProcessorMixin._rtc_filename(),
         and <Static layer name> is the identifier for the specific static layer
@@ -302,9 +321,9 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
 
         static_layer_name = filename.split(product_version)[-1]
 
-        rtc_filename = self._rtc_filename(inter_filename)
+        rtc_filename = self._rtc_filename(inter_filename, use_validity_start_time=True)
 
-        static_layer_filename = f"{rtc_filename}{static_layer_name}.tif"
+        static_layer_filename = f"{rtc_filename}_static{static_layer_name}.tif"
 
         return static_layer_filename
 
@@ -434,7 +453,7 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
         sensor = get_sensor_from_spacecraft_name(product_metadata['identification']['platform'])
 
         # Spacing is assumed to be identical in both X and Y direction
-        spacing = int(product_metadata['frequencyA']['xCoordinateSpacing'])
+        spacing = int(product_metadata['data']['xCoordinateSpacing'])
 
         production_time = get_time_for_filename(self.production_datetime)
         product_version = str(self.runconfig.product_version)
@@ -554,10 +573,10 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
         output_product_metadata = get_rtc_s1_product_metadata(metadata_product)
 
         # Fill in some additional fields expected within the ISO
-        output_product_metadata['frequencyA']['frequencyAWidth'] = len(output_product_metadata['frequencyA']
-                                                                       ['xCoordinates'])
-        output_product_metadata['frequencyA']['frequencyALength'] = len(output_product_metadata['frequencyA']
-                                                                        ['yCoordinates'])
+        output_product_metadata['data']['width'] = len(output_product_metadata['data']
+                                                        ['xCoordinates'])
+        output_product_metadata['data']['length'] = len(output_product_metadata['data']
+                                                        ['yCoordinates'])
 
         return output_product_metadata
 
@@ -772,7 +791,7 @@ class RtcS1Executor(RtcS1PreProcessorMixin, RtcS1PostProcessorMixin, PgeExecutor
             "*_HV.tif": self._rtc_geotiff_filename,
             "*_VV+VH.tif": self._rtc_geotiff_filename,
             "*_HH+HV.tif": self._rtc_geotiff_filename,
-            "*_rtc_anf.tif": self._static_layer_filename,
+            "*_rtc_anf*.tif": self._static_layer_filename,
             "*_nlooks.tif": self._static_layer_filename,
             "*_local_incidence_angle.tif": self._static_layer_filename,
             "*_layover_shadow_mask.tif": self._static_layer_filename,
