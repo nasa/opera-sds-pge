@@ -274,8 +274,10 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
         rtc_filename = "_".join([core_filename, rtc_file_components])
 
         # Cache the file name for this burst ID, so it can be used with the ISO
-        # metadata later
-        self._burst_filename_cache[burst_id] = rtc_filename
+        # metadata later. Note, since this is used with the ISO filename, we
+        # only want to cache the version that does not use DataValidityStartTime.
+        if not use_validity_start_time:
+            self._burst_filename_cache[burst_id] = rtc_filename
 
         return rtc_filename
 
