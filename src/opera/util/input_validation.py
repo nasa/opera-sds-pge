@@ -37,6 +37,11 @@ def check_input(input_object, logger, name, valid_extensions=None, check_zero_si
         If true, raise an exception for zero-size input objects
 
     """
+    # The input object path must be explicitly tested for 'None' before os.path.exists() executes.
+    if input_object is None:
+        error_msg = f"TypeError: {input_object} is NoneType."
+        logger.critical(name, ErrorCode.INPUT_NOT_FOUND, error_msg)
+
     if not exists(input_object):
         error_msg = f"Could not locate specified input {input_object}."
         logger.critical(name, ErrorCode.INPUT_NOT_FOUND, error_msg)
