@@ -1,4 +1,4 @@
-# Sample RunConfig for use with the DSWx-S1 PGE
+# Sample RunConfig for use with the DSWx-S1 PGE v3.0.0-er.2.0
 # This RunConfig should require minimal changes in order to be used with the
 # OPERA PCM.
 
@@ -61,7 +61,7 @@ RunConfig:
                 # Must correspond to the file system within the Docker container,
                 # and must have write permissions for the User/Group used with
                 # the "Docker run" command
-                ScratchPath: /home/conda/output_dir/scratch_dir
+                ScratchPath: /home/conda/scratch_dir
 
             PrimaryExecutable:
                 # Identifier for the PGE executable, should always be DSWX_HLS for
@@ -78,8 +78,6 @@ RunConfig:
                 # List of command-line options to use with ProgramPath
                 ProgramOptions:
                     - /home/conda/dswx-s1-0.1.0/src/dswx_sar/dswx_s1.py
-                # TODO - the comment below will be removed when the option becomes available
-                #    - --full-log-format
 
                 # The Error Code base value added to the offset values to make
                 # error codes unique per-PGE
@@ -195,7 +193,7 @@ RunConfig:
                 product_path: /home/conda/output_dir
 
                 # Directory where SAS can write temporary data
-                scratch_path: /home/conda/output_dir/scratch_dir
+                scratch_path: /home/conda/scratch_dir
 
                 # SAS writes the output product to the following file.
                 # the scheme:
