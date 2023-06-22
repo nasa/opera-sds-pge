@@ -261,8 +261,10 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
         )
 
         # Cache the file name for this burst ID, so it can be used with the
-        # ISO metadata later
-        self._burst_filename_cache[burst_id] = cslc_filename
+        # ISO metadata later. Note, since this is used with the ISO filename, we
+        # only want to cache the version that does not use DataValidityStartTime.
+        if not use_validity_start_time:
+            self._burst_filename_cache[burst_id] = cslc_filename
 
         return cslc_filename
 
@@ -300,7 +302,7 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
 
         The HDF5 filename for the CSLC-S1 PGE consists of:
 
-            <CSLC filename>_static_layers.h5
+            <CSLC filename>_Static.h5
 
         Where <CSLC filename> is returned by CslcS1PostProcessorMixin._cslc_filename()
 
