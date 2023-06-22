@@ -410,7 +410,7 @@ class DswxS1PgeTestCase(unittest.TestCase):
 
             # Test with an unexpected file extension
             os.system("touch dswx_s1_pge_test/input_dir/worldcover.vrt")
-            ancillary_file_group_dict['world_file'] = 'dswx_s1_pge_test/input_dir/worldcover.vrt'
+            ancillary_file_group_dict['worldcover_file'] = 'dswx_s1_pge_test/input_dir/worldcover.vrt'
 
             with open(test_runconfig_path, 'w', encoding='utf-8') as input_path:
                 yaml.safe_dump(runconfig_dict, input_path, sort_keys=False)
@@ -429,8 +429,8 @@ class DswxS1PgeTestCase(unittest.TestCase):
             self.assertIn("Input file dswx_s1_pge_test/input_dir/worldcover.vrt "
                           "does not have an expected file extension.", log_contents)
 
-            # Reset to valid worldcover path
-            ancillary_file_group_dict['world_file'] = 'dswx_s1_pge_test/input_dir/worldcover.tif'
+            # Reset to valid worldcover_file path
+            ancillary_file_group_dict['worldcover_file'] = 'dswx_s1_pge_test/input_dir/worldcover.tif'
 
             # Test with incomplete shoreline shapefile set
             os.system("touch dswx_s1_pge_test/input_dir/missing_shoreline.shp")
