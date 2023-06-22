@@ -324,6 +324,11 @@ class RunConfig:
             else resource_filename('opera', iso_template_path)
         )
 
+    @property
+    def data_validity_start_time(self) -> str:
+        """Returns the DataValidityStartTime value for the Primary Executable"""
+        return self._pge_config['PrimaryExecutable'].get('DataValidityStartTime', None)
+
     # QAExecutable
     @property
     def qa_enabled(self) -> bool:

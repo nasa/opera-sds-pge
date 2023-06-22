@@ -103,7 +103,7 @@ class UsageMetricsTestCase(unittest.TestCase):
                              str(metrics['os.max_rss_kb.largest_child_process'])).group())
             # Verify that the User process times are greater than the kernel process times
             # TODO: disabled for this release since it is not passing
-            #self.assertGreater(metrics['os.cpu.seconds.user'], metrics['os.cpu.seconds.sys'])
+            # self.assertGreater(metrics['os.cpu.seconds.user'], metrics['os.cpu.seconds.sys'])
             # Verify that the main process, takes more RAM than the child process
             # TODO: still need to determine why this is equalling out for the RTC-S1 PGE
             self.assertGreaterEqual(metrics['os.max_rss_kb.main_process'],

@@ -26,9 +26,9 @@ SAMPLE_TIME=15
 # Test data should be uploaded to  s3://operasds-dev-pge/${PGE_NAME}/
 [ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath "$(dirname "$(realpath "$0")")"/../..)
 [ -z "${PGE_TAG}" ] && PGE_TAG="${USER}-dev"
-[ -z "${INPUT_DATA}" ] && INPUT_DATA="delivery_cslc_s1_gamma_0.1_expected_input_data.zip"
-[ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="delivery_cslc_s1_gamma_0.2_expected_output.zip"
-[ -z "${RUNCONFIG}" ] && RUNCONFIG="opera_pge_cslc_s1_delivery_4.1_gamma_runconfig.yaml"
+[ -z "${INPUT_DATA}" ] && INPUT_DATA="delivery_cslc_s1_calval_0.3.1_expected_input_data.zip"
+[ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="delivery_cslc_s1_calval_0.3.1_expected_output.zip"
+[ -z "${RUNCONFIG}" ] && RUNCONFIG="opera_pge_cslc_s1_delivery_5.0_calval_runconfig.yaml"
 [ -z "${TMP_ROOT}" ] && TMP_ROOT="$DEFAULT_TMP_ROOT"
 
 # Create the test output directory in the workspace
@@ -105,6 +105,10 @@ docker_exit_status=$?
 # End metrics collection
 metrics_collection_end "$PGE_NAME" "$container_name" "$docker_exit_status" "$TEST_RESULTS_DIR"
 
+# Copy the PGE/SAS log file(s) to the test results directory so it can be archived
+# by Jenkins with the other results
+cp "${output_dir}"/*.log "${TEST_RESULTS_DIR}"
+
 if [ $docker_exit_status -ne 0 ]; then
     echo "docker exit indicates failure: ${docker_exit_status}"
     overall_status=1
@@ -164,7 +168,7 @@ else
 
         static_layers_compare_result="PENDING"
 
-        burst_id_pattern="*_${burst_id_replace_underscores}_*_static_layers.h5"
+        burst_id_pattern="*_${burst_id_replace_underscores}_*_Static.h5"
         output_file=`ls $output_dir/$burst_id_pattern`
         echo "Output static layers file matching burst id is $output_file"
 

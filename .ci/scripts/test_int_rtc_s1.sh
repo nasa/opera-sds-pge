@@ -27,9 +27,9 @@ SAMPLE_TIME=15
 # RUNCONFIG should be the name of the runconfig in s3://operasds-dev-pge/${PGE_NAME}/
 [ -z "${WORKSPACE}" ] && WORKSPACE="$(realpath "$(dirname "$(realpath "$0")")"/../..)"
 [ -z "${PGE_TAG}" ] && PGE_TAG="${USER}-dev"
-[ -z "${INPUT_DATA}" ] && INPUT_DATA="rtc_s1_delivery_3_gamma_0.3_expected_input.zip"
-[ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="rtc_s1_delivery_3_gamma_0.3_expected_output.zip"
-[ -z "${RUNCONFIG}" ] && RUNCONFIG="rtc_s1_sample_runconfig-v2.0.0-rc.1.0.yaml"
+[ -z "${INPUT_DATA}" ] && INPUT_DATA="rtc_s1_delivery_4_calval_0.4_expected_input.zip"
+[ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="rtc_s1_delivery_4_calval_0.4_expected_output.zip"
+[ -z "${RUNCONFIG}" ] && RUNCONFIG="opera_pge_rtc_s1_delivery_4.0_calval_runconfig.yaml"
 [ -z "${TMP_ROOT}" ] && TMP_ROOT="$DEFAULT_TMP_ROOT"
 
 # Create the test output directory in the work space
@@ -64,6 +64,7 @@ runconfig_dir="${TMP_DIR}/runconfig"
 
 # the testdata reference metadata contains this path so we use it here
 output_dir="${TMP_DIR}/output_rtc_s1"
+
 # make sure no output directory already exists
 if [ -d "$output_dir" ]; then
     echo "Output directory $output_dir already exists (and should not). Removing directory."
@@ -74,13 +75,15 @@ mkdir -p "$output_dir"
 
 # the testdata reference metadata contains this path so we use it here
 scratch_dir="${TMP_DIR}/scratch_rtc_s1"
+
 # make sure no scratch directory already exists
 if [ -d "$scratch_dir" ]; then
     echo "Scratch directory $scratch_dir already exists (and should not). Removing directory..."
     rm -rf "${scratch_dir}"
 fi
+
 echo "Creating scratch directory $scratch_dir."
-mkdir -p --mode=777 "scratch_dir"
+mkdir -p --mode=777 "$scratch_dir"
 
 container_name="${PGE_NAME}"
 
@@ -100,37 +103,23 @@ docker_exit_status=$?
 # End metrics collection
 metrics_collection_end "$PGE_NAME" "$container_name" "$docker_exit_status" "$TEST_RESULTS_DIR"
 
+# Copy the PGE/SAS log file(s) to the test results directory so it can be archived
+# by Jenkins with the other results
+cp "${output_dir}"/*.log "${TEST_RESULTS_DIR}"
+
 if [ $docker_exit_status -ne 0 ]; then
     echo "docker exit indicates failure: ${docker_exit_status}"
     overall_status=1
 else
     declare -a burst_ids=("t069_147169_iw3"
-                          "t069_147170_iw1"
-                          "t069_147170_iw2"
                           "t069_147170_iw3"
-                          "t069_147171_iw1"
-                          "t069_147171_iw2"
                           "t069_147171_iw3"
-                          "t069_147172_iw1"
-                          "t069_147172_iw2"
                           "t069_147172_iw3"
-                          "t069_147173_iw1"
-                          "t069_147173_iw2"
                           "t069_147173_iw3"
-                          "t069_147174_iw1"
-                          "t069_147174_iw2"
                           "t069_147174_iw3"
-                          "t069_147175_iw1"
-                          "t069_147175_iw2"
                           "t069_147175_iw3"
-                          "t069_147176_iw1"
-                          "t069_147176_iw2"
                           "t069_147176_iw3"
-                          "t069_147177_iw1"
-                          "t069_147177_iw2"
                           "t069_147177_iw3"
-                          "t069_147178_iw1"
-                          "t069_147178_iw2"
                           "t069_147178_iw3")
 
     echo "<tr><th>Compare Result</th><th><ul><li>Expected file</li><li>Output file</li></ul></th><th>rtc_compare.py output</th></tr>" >> "$RESULTS_FILE"
@@ -139,15 +128,13 @@ else
 
         burst_id_uppercase=${burst_id^^}
         burst_id_replace_underscores=${burst_id_uppercase//_/-}
-        burst_id_remove_T=${burst_id_replace_underscores//T/}
         burst_id_pattern="*_${burst_id_replace_underscores}_*.h5"
-        expected_burst_id_pattern="*_${burst_id_remove_T}_*.h5"
 
         # shellcheck disable=SC2086
         output_file=$(ls ${output_dir}/${burst_id_pattern})
 
         # shellcheck disable=SC2086
-        expected_file=$(ls ${expected_dir}/${burst_id}/${expected_burst_id_pattern})
+        expected_file=$(ls ${expected_dir}/${burst_id}/${burst_id_pattern})
 
         echo "output file: $output_file"
         echo "expected_file: $expected_file"

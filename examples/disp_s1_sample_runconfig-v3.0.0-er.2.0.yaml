@@ -1,4 +1,4 @@
-# Sample RunConfig for use with the DISP-S1 PGE
+# Sample RunConfig for use with the DISP-S1 PGE v3.0.0-er.2.0
 # This RunConfig should require minimal changes in order to be used with the
 # OPERA PCM.
 
@@ -16,7 +16,16 @@ RunConfig:
 
             InputFilesGroup:
                 InputFilePaths:
-                    - /home/mamba/input_dir
+                    - /home/mamba/input_dir/input_slcs/compressed_slc_t087_185683_iw2_20180101_20180210.h5
+                    - /home/mamba/input_dir/input_slcs/t087_185683_iw2_20180222_VV.h5
+                    - /home/mamba/input_dir/input_slcs/t087_185683_iw2_20180306_VV.h5
+                    - /home/mamba/input_dir/input_slcs/t087_185683_iw2_20180318_VV.h5
+                    - /home/mamba/input_dir/input_slcs/t087_185683_iw2_20180330_VV.h5
+                    - /home/mamba/input_dir/input_slcs/compressed_slc_t087_185684_iw2_20180101_20180210.h5
+                    - /home/mamba/input_dir/input_slcs/t087_185684_iw2_20180222_VV.h5
+                    - /home/mamba/input_dir/input_slcs/t087_185684_iw2_20180306_VV.h5
+                    - /home/mamba/input_dir/input_slcs/t087_185684_iw2_20180318_VV.h5
+                    - /home/mamba/input_dir/input_slcs/t087_185684_iw2_20180330_VV.h5
 
             DynamicAncillaryFilesGroup:
                 AncillaryFileMap:
@@ -61,16 +70,17 @@ RunConfig:
                 # REQUIRED: List of paths to CSLC files.
                 #   Type: array.
                 cslc_file_list:
-                    - input_slcs/compressed_slc_t087_185683_iw2_20180101_20180210.h5
-                    - input_slcs/t087_185683_iw2_20180222_VV.h5
-                    - input_slcs/t087_185683_iw2_20180306_VV.h5
-                    - input_slcs/t087_185683_iw2_20180318_VV.h5
-                    - input_slcs/t087_185683_iw2_20180330_VV.h5
-                    - input_slcs/compressed_slc_t087_185684_iw2_20180101_20180210.h5
-                    - input_slcs/t087_185684_iw2_20180222_VV.h5
-                    - input_slcs/t087_185684_iw2_20180306_VV.h5
-                    - input_slcs/t087_185684_iw2_20180318_VV.h5
-                    - input_slcs/t087_185684_iw2_20180330_VV.h5
+                  - /home/mamba/input_dir/input_slcs/compressed_slc_t087_185683_iw2_20180101_20180210.h5
+                  - /home/mamba/input_dir/input_slcs/t087_185683_iw2_20180222_VV.h5
+                  - /home/mamba/input_dir/input_slcs/t087_185683_iw2_20180306_VV.h5
+                  - /home/mamba/input_dir/input_slcs/t087_185683_iw2_20180318_VV.h5
+                  - /home/mamba/input_dir/input_slcs/t087_185683_iw2_20180330_VV.h5
+                  - /home/mamba/input_dir/input_slcs/compressed_slc_t087_185684_iw2_20180101_20180210.h5
+                  - /home/mamba/input_dir/input_slcs/t087_185684_iw2_20180222_VV.h5
+                  - /home/mamba/input_dir/input_slcs/t087_185684_iw2_20180306_VV.h5
+                  - /home/mamba/input_dir/input_slcs/t087_185684_iw2_20180318_VV.h5
+                  - /home/mamba/input_dir/input_slcs/t087_185684_iw2_20180330_VV.h5
+
                 # REQUIRED: Frame ID of the bursts contained in `cslc_file_list`.
                 #   Type: integer.
                 frame_id: 123
@@ -81,18 +91,18 @@ RunConfig:
                 # Paths to existing Amplitude Dispersion file (1 per burst) for PS update calculation.
                 #   Type: array.
                 amplitude_dispersion_files:
-                    - dynamic_ancillary/ps_files/t087_185683_iw2_amp_dispersion.tif
-                    - dynamic_ancillary/ps_files/t087_185684_iw2_amp_dispersion.tif
+                  - /home/mamba/input_dir/dynamic_ancillary/ps_files/t087_185683_iw2_amp_dispersion.tif
+                  - /home/mamba/input_dir/dynamic_ancillary/ps_files/t087_185684_iw2_amp_dispersion.tif
                 # Paths to an existing Amplitude Mean files (1 per burst) for PS update calculation.
                 #   Type: array.
                 amplitude_mean_files:
-                    - dynamic_ancillary/ps_files/t087_185683_iw2_amp_mean.tif
-                    - dynamic_ancillary/ps_files/t087_185684_iw2_amp_mean.tif
+                  - /home/mamba/input_dir/dynamic_ancillary/ps_files/t087_185683_iw2_amp_mean.tif
+                  - /home/mamba/input_dir/dynamic_ancillary/ps_files/t087_185684_iw2_amp_mean.tif
                 # Paths to the incidence/azimuth-angle files (1 per burst).
                 #   Type: array.
                 geometry_files:
-                    - dynamic_ancillary/geometry_files/t087_185683_iw2_topo.h5
-                    - dynamic_ancillary/geometry_files/t087_185684_iw2_topo.h5
+                  - /home/mamba/input_dir/dynamic_ancillary/geometry_files/t087_185683_iw2_topo.h5
+                  - /home/mamba/input_dir/dynamic_ancillary/geometry_files/t087_185684_iw2_topo.h5
                 # Mask files (e.g water mask), where convention is 0 for no data/invalid, and 1 for
                 #   data.
                 #   Type: array.

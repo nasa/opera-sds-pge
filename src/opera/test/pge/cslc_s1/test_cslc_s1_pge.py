@@ -182,7 +182,7 @@ class CslcS1PgeTestCase(unittest.TestCase):
         metadata_file = metadata_files[0]
 
         cslc_metadata = get_cslc_s1_product_metadata(metadata_file)
-        burst_metadata = cslc_metadata['processing_information']['s1_burst_metadata']
+        burst_metadata = cslc_metadata['processing_information']['input_burst_metadata']
 
         # Compare the filename returned by the PGE for JSON metadata files
         # to a regex which should match each component of the final filename
@@ -209,12 +209,18 @@ class CslcS1PgeTestCase(unittest.TestCase):
                           rf"{burst_metadata['platform_id']}_IW_" \
                           rf"{cslc_metadata['identification']['burst_id'].upper().replace('_', '-')}_" \
                           rf"{burst_metadata['polarization']}_" \
-                          rf"\d{{8}}T\d{{6}}Z_v{pge.runconfig.product_version}_\d{{8}}T\d{{6}}Z_static_layers.h5"
+                          rf"\d{{8}}T\d{{6}}Z_v{pge.runconfig.product_version}_\d{{8}}T\d{{6}}Z_Static.h5"
 
         result = re.match(file_name_regex, file_name)
 
         self.assertIsNotNone(result)
         self.assertEqual(result.group(), file_name)
+
+        # Ensure the DataValidityStartTime value was used in the naming convention
+        # for the static layers product
+        expected_data_validity_start_time = pge.runconfig.data_validity_start_time
+
+        self.assertIn(expected_data_validity_start_time, file_name)
 
         file_name = pge._browse_filename(
             inter_filename='cslc_pge_test/output_dir/t064_135518_iw1/20220501/t064_135518_iw1_20220501.png'

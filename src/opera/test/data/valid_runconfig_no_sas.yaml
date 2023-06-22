@@ -29,6 +29,7 @@ RunConfig:
         ErrorCodeBase: 100000
         SchemaPath: test/data/sample_sas_schema.yaml
         IsoTemplatePath: sample_iso_template.xml.jinja2
+        DataValidityStartTime: 20010101T000000
 
       QAExecutable:
         Enabled: True

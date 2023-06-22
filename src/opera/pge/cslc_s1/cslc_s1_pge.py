@@ -167,7 +167,7 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
 
         return self._cached_core_filename
 
-    def _cslc_filename(self, inter_filename):
+    def _cslc_filename(self, inter_filename, use_validity_start_time=False):
         """
         Returns the file name to use for burst-based CSLC products produced by this PGE.
 
@@ -187,11 +187,21 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
             The intermediate filename of the output GeoTIFF to generate a
             filename for. This parameter may be used to inspect the file in order
             to derive any necessary components of the returned filename.
+        use_validity_start_time : bool, optional
+            If True, use the DataValidityStartTime value from the RunConfig in
+            lieu of an acquisition time from the product metadata. Defaults to
+            False.
 
         Returns
         -------
         cslc_filename : str
             The file name to assign to CSLC product(s) created by this PGE.
+
+        Raises
+        ------
+        ValueError
+            If use_validity_start_time is True and no value was specified for
+            DataValidityStartTime within the RunConfig.
 
         """
         core_filename = self._core_filename(inter_filename)
@@ -219,14 +229,24 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
 
             self._burst_metadata_cache[burst_id] = cslc_metadata
 
-        burst_metadata = cslc_metadata['processing_information']['s1_burst_metadata']
+        burst_metadata = cslc_metadata['processing_information']['input_burst_metadata']
 
         sensor = burst_metadata['platform_id']
         mode = 'IW'  # fixed to Interferometric Wide (IW) for all S1-based CSLC products
         pol = burst_metadata['polarization']
-        acquisition_time = get_time_for_filename(
-            datetime.strptime(burst_metadata['sensing_start'], '%Y-%m-%d %H:%M:%S.%f')
-        )
+
+        if use_validity_start_time:
+            acquisition_time = self.runconfig.data_validity_start_time
+
+            if acquisition_time is None:
+                raise ValueError(
+                    'use_validity_start_time was requested, but no value was provided '
+                    'for DataValidityStartTime within the RunConfig'
+                )
+        else:
+            acquisition_time = get_time_for_filename(
+                datetime.strptime(burst_metadata['sensing_start'], '%Y-%m-%d %H:%M:%S.%f')
+            )
 
         product_version = str(self.runconfig.product_version)
 
@@ -241,8 +261,10 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
         )
 
         # Cache the file name for this burst ID, so it can be used with the
-        # ISO metadata later
-        self._burst_filename_cache[burst_id] = cslc_filename
+        # ISO metadata later. Note, since this is used with the ISO filename, we
+        # only want to cache the version that does not use DataValidityStartTime.
+        if not use_validity_start_time:
+            self._burst_filename_cache[burst_id] = cslc_filename
 
         return cslc_filename
 
@@ -280,7 +302,7 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
 
         The HDF5 filename for the CSLC-S1 PGE consists of:
 
-            <CSLC filename>_static_layers.h5
+            <CSLC filename>_Static.h5
 
         Where <CSLC filename> is returned by CslcS1PostProcessorMixin._cslc_filename()
 
@@ -298,9 +320,9 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
             The file name to assign to static layers product(s) created by this PGE.
 
         """
-        cslc_filename = self._cslc_filename(inter_filename)
+        cslc_filename = self._cslc_filename(inter_filename, use_validity_start_time=True)
 
-        static_layers_filename = f"{cslc_filename}_static_layers.h5"
+        static_layers_filename = f"{cslc_filename}_Static.h5"
 
         return static_layers_filename
 
@@ -416,7 +438,7 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
         # a representative
         cslc_metadata = list(self._burst_metadata_cache.values())[0]
 
-        burst_metadata = cslc_metadata['processing_information']['s1_burst_metadata']
+        burst_metadata = cslc_metadata['processing_information']['input_burst_metadata']
 
         sensor = burst_metadata['platform_id']
         mode = 'IW'  # fixed for all S1-based CSLC products
@@ -546,20 +568,22 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
         output_product_metadata = get_cslc_s1_product_metadata(metadata_product)
 
         # Fill in some additional fields expected within the ISO
-        output_product_metadata['grids']['width'] = len(output_product_metadata['grids']['x_coordinates'])
-        output_product_metadata['grids']['length'] = len(output_product_metadata['grids']['y_coordinates'])
+        output_product_metadata['data']['width'] = len(output_product_metadata['data']['x_coordinates'])
+        output_product_metadata['data']['length'] = len(output_product_metadata['data']['y_coordinates'])
 
         # Remove some of the larger arrays from the metadata, so we don't use
         # too much memory when caching the metadata for each burst
-        for key in ['VV', 'VH', 'HH', 'HV', 'x_coordinates', 'y_coordinates']:
-            array = output_product_metadata['grids'].pop(key, None)
+        for key in ['azimuth_carrier_phase', 'flattening_phase',
+                    'VV', 'VH', 'HH', 'HV',
+                    'x_coordinates', 'y_coordinates']:
+            array = output_product_metadata['data'].pop(key, None)
 
             if array is not None:
                 del array
 
         # Parse the burst center coordinate to conform with gml schema
         # sample: {ndarray: (2,)} [-118.30363047, 33.8399832]
-        burst_center = output_product_metadata['processing_information']['s1_burst_metadata']['center']
+        burst_center = output_product_metadata['processing_information']['input_burst_metadata']['center']
         burst_center_str = f"{burst_center[0]} {burst_center[1]}"
         output_product_metadata['burst_center'] = burst_center_str
 
@@ -771,10 +795,10 @@ class CslcS1Executor(CslcS1PreProcessorMixin, CslcS1PostProcessorMixin, PgeExecu
     LEVEL = "L2"
     """Processing Level for CSLC-S1 Products"""
 
-    PGE_VERSION = "2.0.0-rc.1.3"
+    PGE_VERSION = "2.0.0-rc.2.0"
     """Version of the PGE (overrides default from base_pge)"""
 
-    SAS_VERSION = "0.1.5"  # Gamma release https://github.com/opera-adt/COMPASS/releases/tag/v0.1.5
+    SAS_VERSION = "0.3.1"  # Gamma release https://github.com/opera-adt/COMPASS/releases/tag/v0.3.1
     """Version of the SAS wrapped by this PGE, should be updated as needed"""
 
     def __init__(self, pge_name, runconfig_path, **kwargs):

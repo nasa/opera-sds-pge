@@ -1,4 +1,4 @@
-# Sample RunConfig for use with the RTC-S1 PGE v2.0.0-rc.1.0
+# Sample RunConfig for use with the RTC-S1 PGE v2.0.0-rc.2.0
 # This RunConfig should require minimal changes in order to be used with the
 # OPERA PCM.
 
@@ -50,7 +50,7 @@ RunConfig:
                 # Must correspond to the file system within the Docker container,
                 # and must have write permissions for the User/Group used with
                 # the "Docker run" command
-                ScratchPath: /home/rtc_user/output_dir/scratch_dir
+                ScratchPath: /home/rtc_user/scratch_dir
 
             PrimaryExecutable:
                 # Identifier for the PGE executable, should always be RTC_S1 for
@@ -91,6 +91,12 @@ RunConfig:
                 # with the opera_pge installation directory within the container
                 # Consult the Docker image build scripts for more info
                 IsoTemplatePath: /home/rtc_user/opera/pge/rtc_s1/templates/OPERA_ISO_metadata_L2_RTC_S1_template.xml.jinja2
+
+                # Date time field which designated the point after which the
+                # RTC static layer product(s) should be considered valid.
+                # This field must be provided for RTC-S1 jobs when static layer
+                # generation is enabled (see below), and must be of the form YYYYMMDDTHHmmss
+                DataValidityStartTime: 20140101T000000
 
             QAExecutable:
                 # Set to True to enable execution of an additional "Quality Assurance"
@@ -152,7 +158,7 @@ RunConfig:
                         product_path: /home/rtc_user/output_dir
 
                         # This should match the path used for ScratchPath
-                        scratch_path: /home/rtc_user/output_dir/scratch_dir
+                        scratch_path: /home/rtc_user/scratch_dir
 
                         # This should match the path used for OutputProductPath
                         output_dir: /home/rtc_user/output_dir
@@ -160,7 +166,7 @@ RunConfig:
                         # These field determines the intermediate file name used
                         # by the SAS for its output products. These products will
                         # be renamed by the PGE to match the OPERA file name conventions.
-                        product_id: OPERA_L2_RTC-S1_T{burst_id}
+                        product_id: OPERA_L2_RTC-S1_{burst_id}
 
                         # RTC-S1 imagery
                         save_bursts: True
@@ -274,31 +280,31 @@ RunConfig:
                             # OPTIONAL - Processing upsampling factor applied to input geogrid
                             geogrid_upsampling: 1
 
-                            # Save the incidence angle
+                            # Save the incidence angle static layer
                             save_incidence_angle: True
 
-                            # Save the local-incidence angle
+                            # Save the local-incidence angle static layer
                             save_local_inc_angle: True
 
-                            # Save the projection angle
+                            # Save the projection angle static layer
                             save_projection_angle: False
 
-                            # Save the RTC ANF computed with the projection angle method
+                            # Save the RTC ANF static layer computed with the projection angle method
                             save_rtc_anf_psi: False
 
-                            # Save the range slope angle
+                            # Save the range slope angle static layer
                             save_range_slope: False
 
-                            # Save the number of looks used to compute GCOV
+                            # Save the number of looks static layer used to compute GCOV
                             save_nlooks: True
 
-                            # Save the RTC area factor used to compute GCOV
+                            # Save the RTC area factor static layer used to compute GCOV
                             save_rtc_anf: True
 
-                            # Save interpolated DEM used to compute GCOV
+                            # Save interpolated DEM static layer used to compute GCOV
                             save_dem: False
 
-                            # Save layover shadow mask
+                            # Save layover shadow mask static layer
                             save_layover_shadow_mask: True
 
                             # OPTIONAL - Absolute radiometric correction
@@ -313,12 +319,17 @@ RunConfig:
                             # Double SLC sampling in the range direction
                             upsample_radargrid: False
 
-                            top_left:
-                                x:
-                                y:
-                            bottom_right:
-                                x:
-                                y:
+                            bursts_geogrid:
+                                top_left:
+                                    x:
+                                    y:
+                                bottom_right:
+                                    x:
+                                    y:
+
+                        mosaicking:
+                            # Mosaic mode
+                            mosaic_mode: first
 
                         browse_image_group:
 
