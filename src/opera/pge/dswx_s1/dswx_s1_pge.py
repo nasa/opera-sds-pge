@@ -47,7 +47,7 @@ class DSWxS1PreProcessorMixin(PreProcessorMixin):
                 input_validation.check_input(
                     value, self.logger, self.name, valid_extensions=('.tif', '.tiff', '.vrt')
                 )
-            elif key in ('reference_water_file', 'world_file', 'hand_file'):
+            elif key in ('reference_water_file', 'worldcover_file', 'hand_file'):
                 input_validation.check_input(
                     value, self.logger, self.name, valid_extensions=('.tif', '.tiff')
                 )
