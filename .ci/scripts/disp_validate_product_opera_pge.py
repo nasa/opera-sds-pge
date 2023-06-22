@@ -21,25 +21,41 @@ else:
 DSET_DEFAULT = "unwrapped_phase"
 
 
+# Opera PGE modifications to log errors and continue validation.
 '''
 class ValidationError(Exception):
     """Raised when a product fails a validation check."""
 
     pass
-'''
 
-def ValidationError(msg):
-    print(msg)
 
-'''
 class ComparisonError(ValidationError):
     """Exception raised when two datasets do not match."""
 
     pass
 '''
+validation_match = True
+
+
+def validation_failed():
+    global validation_match
+    validation_match = False
+
+
+def ValidationError(msg):
+    logger.error(msg)
+    validation_failed()
+
 
 def ComparisonError(msg):
-    print(msg)
+    logger.error(msg)
+    validation_failed()
+
+
+def ValueError(msg):
+    logger.error(msg)
+    validation_failed()
+
 
 def compare_groups(
     golden_group: h5py.Group,
@@ -217,7 +233,7 @@ def _validate_conncomp_labels(
     if not (0.0 <= threshold <= 1.0):
         errmsg = f"threshold must be between 0 and 1, got {threshold}"
         #raise ValueError(errmsg)
-        ComparisonError(errmsg)
+        ValueError(errmsg)
 
     # Total size of each dataset.
     size = ref_dataset.size
@@ -316,12 +332,12 @@ def _validate_unwrapped_phase(
     if not (0.0 <= nan_threshold <= 1.0):
         errmsg = f"nan_threshold must be between 0 and 1, got {nan_threshold}"
         #raise ValueError(errmsg)
-        print(errmsg)
+        ValueError(errmsg)
 
     if atol < 0.0:
         errmsg = f"atol must be >= 0, got {atol}"
         #raise ValueError(errmsg)
-        print(errmsg)
+        ValueError(errmsg)
 
     # Get a mask of valid pixels (pixels that had nonzero connected component label) in
     # both the test & reference data.
@@ -517,7 +533,10 @@ def compare(golden: Filename, test: Filename, data_dset: str = DSET_DEFAULT) -> 
         io.format_nc_filename(test, data_dset),
     )
 
-    logger.info(f"Files {golden} and {test} match.")
+    if validation_match:
+        logger.info(f"Files {golden} and {test} match.")
+    else:
+        logger.error(f"Files {golden} and {test} do not match.")
     _check_compressed_slc_dirs(golden, test)
 
 
