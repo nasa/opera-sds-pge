@@ -152,22 +152,42 @@ else
 
             if [ ! -f "$expected_file" ]; then
                 echo "No expected file found for product $product in expected directory $expected_data_dir"
-                # overall_status=1
+                overall_status=1
+                else
+                    # compare output and expected files
+                    expected_file=$(basename -- "$expected_file")
+                    docker_out=$(docker run --rm -u conda:conda \
+                                     -v "${output_dir}":/out:ro \
+                                     -v "${expected_data_dir}":/exp:ro \
+                                     -v "$SCRIPT_DIR":/scripts \
+                                     --entrypoint python3 ${PGE_IMAGE}:"${PGE_TAG}" \
+                                     /scripts/dswx_compare_opera_pge.py \
+                                     /out/"${output_file}" /exp/"${expected_file}" --metadata_exclude_list PRODUCT_VERSION)
+                    echo "$docker_out"
+
+                    if [[ "$docker_out" == *"[FAIL]"* ]]; then
+                        echo "File comparison failed. Output and expected files differ for ${output_file}"
+                        compare_result="FAIL"
+                        overall_status=2
+                    elif [[ "$docker_out" == *"ERROR"* ]]; then
+                        echo "An error occurred during file comparison."
+                        compare_result="ERROR"
+                        overall_status=1
+                    else
+                        echo "File comparison passed for ${output_file}"
+                        compare_result="PASS"
+                    fi
+                fi
             else
-                # compare output and expected files
-                # TODO write a dswx_s1_compare_opera_pge.py script
-                echo "Add compare script here."
+                echo "Not comparing file ${output_file}"
+                compare_result="SKIPPED"
             fi
-        else
-            echo "Not comparing file ${output_file}"
-            compare_result="SKIPPED"
-        fi
 
-        docker_out="${docker_out//$'\n'/<br>}"
-        echo "<tr><td>${compare_result}</td><td><ul><li>Output: ${output_file}</li><li>Expected: ${expected_file}</li></ul></td><td>${docker_out}</td></tr>" >> "$RESULTS_FILE"
-    done
-fi
-
+            docker_out="${docker_out//$'\n'/<br>}"
+            echo "<tr><td>${compare_result}</td><td><ul><li>Output: ${output_file}</li><li>Expected: ${expected_file}</li></ul></td><td>${docker_out}</td></tr>" >> "$RESULTS_FILE"
+        done
+    fi
+done
 echo " "
 if [ $overall_status -ne 0 ]; then
     echo "Test FAILED."
