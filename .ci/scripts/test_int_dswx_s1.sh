@@ -155,8 +155,9 @@ else
                 overall_status=1
             else
                 # compare output and expected files
-                # TODO write a dswx_s1_compare_opera_pge.py script to run in docker
-                echo "Comparison program will run here."
+                # TODO write a dswx_s1_compare_opera_pge.py script
+                echo "Add compare script here."
+            fi
         else
             echo "Not comparing file ${output_file}"
             compare_result="SKIPPED"
