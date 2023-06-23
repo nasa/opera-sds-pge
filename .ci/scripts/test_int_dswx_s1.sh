@@ -131,7 +131,7 @@ else
 
         elif [[ "${output_file##*/}" == *.tif* ]]
         then
-            for potential_product in B01_WTR B02_BWTR B03_CONF BROWSE
+            for potential_product in B01_WTR B02_BWTR B03_CONF
             do
                 if [[ "$output_file" == *"$potential_product"* ]]; then
                     product=$potential_product
@@ -155,29 +155,8 @@ else
                 overall_status=1
             else
                 # compare output and expected files
-                expected_file=$(basename -- "$expected_file")
-                docker_out=$(docker run --rm -u conda:conda \
-                                 -v "${output_dir}":/out:ro \
-                                 -v "${expected_data_dir}":/exp:ro \
-                                 -v "$SCRIPT_DIR":/scripts \
-                                 --entrypoint python3 ${PGE_IMAGE}:"${PGE_TAG}" \
-                                 /scripts/dswx_compare_opera_pge.py \
-                                 /out/"${output_file}" /exp/"${expected_file}" --metadata_exclude_list PRODUCT_VERSION)
-                echo "$docker_out"
-
-                if [[ "$docker_out" == *"[FAIL]"* ]]; then
-                    echo "File comparison failed. Output and expected files differ for ${output_file}"
-                    compare_result="FAIL"
-                    overall_status=2
-                elif [[ "$docker_out" == *"ERROR"* ]]; then
-                    echo "An error occurred during file comparison."
-                    compare_result="ERROR"
-                    overall_status=1
-                else
-                    echo "File comparison passed for ${output_file}"
-                    compare_result="PASS"
-                fi
-            fi
+                # TODO write a dswx_s1_compare_opera_pge.py script to run in docker
+                echo "Comparison program will run here."
         else
             echo "Not comparing file ${output_file}"
             compare_result="SKIPPED"
