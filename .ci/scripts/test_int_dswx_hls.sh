@@ -131,7 +131,7 @@ do
 
             elif [[ "${output_file##*/}" == *.tif* ]]
             then
-                for potential_product in B01_WTR B02_BWTR B03_CONF
+                for potential_product in B01_WTR B02_BWTR B03_CONF B04_DIAG B05_WTR-1 B06_WTR-2 B07_LAND B08_SHAD B09_CLOUD B10_DEM BROWSE
                 do
                     if [[ "$output_file" == *"$potential_product"* ]]; then
                         product=$potential_product
@@ -155,16 +155,36 @@ do
                     overall_status=1
                 else
                     # compare output and expected files
-                    # TODO add docker call to run comparison script here
-                    echo "Comparison script will run here."
+                    expected_file=$(basename -- "$expected_file")
+                    docker_out=$(docker run --rm -u conda:conda \
+                                     -v "${output_dir}":/out:ro \
+                                     -v "${expected_data_dir}":/exp:ro \
+                                     -v "$SCRIPT_DIR":/scripts \
+                                     --entrypoint python3 ${PGE_IMAGE}:"${PGE_TAG}" \
+                                     /scripts/dswx_compare_opera_pge.py \
+                                     /out/"${output_file}" /exp/"${expected_file}" --metadata_exclude_list PRODUCT_VERSION)
+                    echo "$docker_out"
+
+                    if [[ "$docker_out" == *"[FAIL]"* ]]; then
+                        echo "File comparison failed. Output and expected files differ for ${output_file}"
+                        compare_result="FAIL"
+                        overall_status=2
+                    elif [[ "$docker_out" == *"ERROR"* ]]; then
+                        echo "An error occurred during file comparison."
+                        compare_result="ERROR"
+                        overall_status=1
+                    else
+                        echo "File comparison passed for ${output_file}"
+                        compare_result="PASS"
+                    fi
                 fi
             else
                 echo "Not comparing file ${output_file}"
                 compare_result="SKIPPED"
             fi
-#            TODO put these back in when the comparision script is added
-#            docker_out="${docker_out//$'\n'/<br>}"
-#            echo "<tr><td>${compare_result}</td><td><ul><li>Output: ${output_file}</li><li>Expected: ${expected_file}</li></ul></td><td>${docker_out}</td></tr>" >> "$RESULTS_FILE"
+
+            docker_out="${docker_out//$'\n'/<br>}"
+            echo "<tr><td>${compare_result}</td><td><ul><li>Output: ${output_file}</li><li>Expected: ${expected_file}</li></ul></td><td>${docker_out}</td></tr>" >> "$RESULTS_FILE"
         done
     fi
 done

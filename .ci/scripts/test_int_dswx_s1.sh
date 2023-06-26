@@ -45,9 +45,6 @@ test_int_setup_test_data
 # Setup cleanup on exit
 trap test_int_trap_cleanup EXIT
 
-# TODO Pull in product compare script from S3.
-
-
 # overall_status values and their meaning
 # 0 - pass
 # 1 - failure to execute some part of this script
@@ -156,19 +153,19 @@ else
                 else
                     # compare output and expected files
                     # TODO add docker call to run the comparison script
-                    echo "Comparison script will run here."
+                    echo "Comparison script will run here"
                 fi
             else
                 echo "Not comparing file ${output_file}"
                 compare_result="SKIPPED"
             fi
+
             # TODO uncomment these lines when comparison script is in place
-            echo "docker results will display here"
             # docker_out="${docker_out//$'\n'/<br>}"
-            #echo "<tr><td>${compare_result}</td><td><ul><li>Output: ${output_file}</li><li>Expected: ${expected_file}</li></ul></td><td>${docker_out}</td></tr>" >> "$RESULTS_FILE"
+            # echo "<tr><td>${compare_result}</td><td><ul><li>Output: ${output_file}</li><li>Expected: ${expected_file}</li></ul></td><td>${docker_out}</td></tr>" >> "$RESULTS_FILE"
         done
     fi
-done
+
 echo " "
 if [ $overall_status -ne 0 ]; then
     echo "Test FAILED."
