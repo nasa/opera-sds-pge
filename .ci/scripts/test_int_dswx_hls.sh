@@ -155,16 +155,16 @@ do
                     overall_status=1
                 else
                     # compare output and expected files
-                    # TODO add comparison script here
+                    # TODO add docker call to run comparison script here
                     echo "Comparison script will run here."
                 fi
             else
                 echo "Not comparing file ${output_file}"
                 compare_result="SKIPPED"
             fi
-
-            docker_out="${docker_out//$'\n'/<br>}"
-            echo "<tr><td>${compare_result}</td><td><ul><li>Output: ${output_file}</li><li>Expected: ${expected_file}</li></ul></td><td>${docker_out}</td></tr>" >> "$RESULTS_FILE"
+#            TODO put these back in when the comparision script is added
+#            docker_out="${docker_out//$'\n'/<br>}"
+#            echo "<tr><td>${compare_result}</td><td><ul><li>Output: ${output_file}</li><li>Expected: ${expected_file}</li></ul></td><td>${docker_out}</td></tr>" >> "$RESULTS_FILE"
         done
     fi
 done
