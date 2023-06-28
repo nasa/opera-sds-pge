@@ -158,7 +158,7 @@ RunConfig:
 
                 # ESA WorldCover map file
                 # (Required for opera_dswx_s1)
-                world_file: /home/conda/input_dir/ancillary_data/worldcover.tif
+                worldcover_file: /home/conda/input_dir/ancillary_data/worldcover.tif
 
                 # ESA WorldCover map description
                 worldcover_file_description: 'COPERNICUS WORLDCOVER 10m'
