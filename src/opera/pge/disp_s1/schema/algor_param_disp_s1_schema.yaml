@@ -1,59 +1,55 @@
-runconfig:
-    name: str()
-
-    processing:
-        ps_options:
-            # Amplitude dispersion threshold to consider a pixel a PS.
-            amp_dispersion_threshold: num()
-        phase_linking:
-            # Size of the ministack for sequential estimator.
-            ministack_size: int()
-            # Beta regularization parameter for correlation matrix inversion. 0 is no regularization.
-            beta: num()
-            half_window:
-                # Half window size (in pixels) for x direction.
-                x: int()
-                # Half window size (in pixels) for y direction.
-                y: int()
-        interferogram_network:
-            # For single-reference network: Index of the reference image in the network.
-            reference_idx: int()
-            # Max `n` to form the nearest-`n` interferograms by index.
-            max_bandwidth: any(int(), null())
-            # Maximum temporal baseline of interferograms.
-            max_temporal_baseline: any(int(), null())
-            # For manual-index network: List of (ref_idx, sec_idx) defining the interferograms to form.
-            indexes: list(list())
-            # Type of interferogram network to create from phase-linking results.
-            # Options: ['single-reference', 'manual-index', 'max-bandwidth', 'max-temporal-baseline'].
-            network_type: enum('single-reference', 'manual-index', 'max-bandwidth', 'max-temporal-baseline')
-        unwrap_options:
-            # Whether to run the unwrapping step after wrapped phase estimation.
-            run_unwrap: bool()
-            # Phase unwrapping method, passable to Tophu.
-            # Options: ['snaphu', 'icu'].
-            unwrap_method: enum('snaphu', 'icu')
-            # Number of tiles to split the unwrapping into (for Tophu).
-            tiles: list()
-            # Initialization method for SNAPHU.
-            init_method: str()
-        output_options:
-            # Output (x, y) resolution (in units of input data).
-            output_resolution: any(include('x_y_object'), null())
-            # Alternative to specifying output resolution: Specify the (x, y) strides (decimation
-            #   factor) to perform while processing input. For example, strides of [4, 2] would turn an
-            #   input resolution of [5, 10] into an output resolution of [20, 20].
-            strides: any(include('x_y_object'), null())
-            # Options for `create_dataset` with h5py.
-            hdf5_creation_options:
-                chunks: list()
-                compression: str()
-                compression_opts: int()
-                shuffle: bool()
-            # GDAL creation options for GeoTIFF files.
-            gtiff_creation_options: list()
-        # Name of the subdataset to use in the input NetCDF files.
-        subdataset: str()
+ps_options:
+    # Amplitude dispersion threshold to consider a pixel a PS.
+    amp_dispersion_threshold: num()
+phase_linking:
+    # Size of the ministack for sequential estimator.
+    ministack_size: int()
+    # Beta regularization parameter for correlation matrix inversion. 0 is no regularization.
+    beta: num()
+    half_window:
+        # Half window size (in pixels) for x direction.
+        x: int()
+        # Half window size (in pixels) for y direction.
+        y: int()
+interferogram_network:
+    # For single-reference network: Index of the reference image in the network.
+    reference_idx: int()
+    # Max `n` to form the nearest-`n` interferograms by index.
+    max_bandwidth: any(int(), null())
+    # Maximum temporal baseline of interferograms.
+    max_temporal_baseline: any(int(), null())
+    # For manual-index network: List of (ref_idx, sec_idx) defining the interferograms to form.
+    indexes: list(list())
+    # Type of interferogram network to create from phase-linking results.
+    # Options: ['single-reference', 'manual-index', 'max-bandwidth', 'max-temporal-baseline'].
+    network_type: enum('single-reference', 'manual-index', 'max-bandwidth', 'max-temporal-baseline')
+unwrap_options:
+    # Whether to run the unwrapping step after wrapped phase estimation.
+    run_unwrap: bool()
+    # Phase unwrapping method, passable to Tophu.
+    # Options: ['snaphu', 'icu'].
+    unwrap_method: enum('snaphu', 'icu')
+    # Number of tiles to split the unwrapping into (for Tophu).
+    tiles: list()
+    # Initialization method for SNAPHU.
+    init_method: str()
+output_options:
+    # Output (x, y) resolution (in units of input data).
+    output_resolution: any(include('x_y_object'), null())
+    # Alternative to specifying output resolution: Specify the (x, y) strides (decimation
+    #   factor) to perform while processing input. For example, strides of [4, 2] would turn an
+    #   input resolution of [5, 10] into an output resolution of [20, 20].
+    strides: any(include('x_y_object'), null())
+    # Options for `create_dataset` with h5py.
+    hdf5_creation_options:
+        chunks: list()
+        compression: str()
+        compression_opts: int()
+        shuffle: bool()
+    # GDAL creation options for GeoTIFF files.
+    gtiff_creation_options: list()
+# Name of the subdataset to use in the input NetCDF files.
+subdataset: str()
 ---
 x_y_object:
     x: int()

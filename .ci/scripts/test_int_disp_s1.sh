@@ -78,18 +78,19 @@ fi
 echo "Creating scratch directory $scratch_dir."
 mkdir -p --mode=777 "$scratch_dir"
 
-container_name="${PGE_NAME}"
+container_name="${PGE_NAME}-PID$$"
 
 # Start metrics collection
 metrics_collection_start "$PGE_NAME" "$container_name" "$TEST_RESULTS_DIR" "$SAMPLE_TIME"
 
 echo "Running Docker image ${PGE_IMAGE}:${PGE_TAG}"
 
-
-# TODO Run the PGE docker image to create the output file.
-#
-# Temporarily we just copy the expected product to the output directory and run the comparison.
-cp ${expected_dir}/20180101_20180330.unw.nc ${output_dir}
+docker run --rm -u $UID:"$(id -g)" --name $container_name \
+           -v ${runconfig_dir}:/home/mamba/runconfig \
+           -v ${input_dir}:/home/mamba/input_dir \
+           -v ${output_dir}:/home/mamba/output_dir \
+           -v ${scratch_dir}:/home/mamba/scratch_dir \
+           ${PGE_IMAGE}:"${PGE_TAG}" --file /home/mamba/runconfig/"$RUNCONFIG"
 
 docker_exit_status=$?
 
