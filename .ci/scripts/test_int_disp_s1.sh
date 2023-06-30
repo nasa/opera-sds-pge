@@ -111,25 +111,25 @@ else
     expected_file="20180101_20180330.unw.nc"
 
     docker_out=$(docker run --rm \
-						    -v "${output_dir}":/out:ro \
-						    -v "${expected_dir}":/exp:ro \
-						    -v "$SCRIPT_DIR":/scripts \
-						    --entrypoint /opt/conda/bin/python opera/disp-s1:0.1 \
-						    /scripts/disp_validate_product_opera_pge.py \
-						    /out/${output_file} /exp/${expected_file})
+                            -v "${output_dir}":/out:ro \
+                            -v "${expected_dir}":/exp:ro \
+                            -v "$SCRIPT_DIR":/scripts \
+                            --entrypoint /opt/conda/bin/python opera/disp-s1:0.1 \
+                            /scripts/disp_validate_product_opera_pge.py \
+                            /out/${output_file} /exp/${expected_file})
     echo "$docker_out"
 
-	if [[ "$docker_out" == *"ERROR"* ]]; then
-		echo "File comparison failed. Output and expected files differ for ${output_file}"
-		compare_result="FAIL"
-		overall_status=2
-	else
-		echo "File comparison passed for ${output_file}"
-		compare_result="PASS"
-	fi
+    if [[ "$docker_out" == *"ERROR"* ]]; then
+        echo "File comparison failed. Output and expected files differ for ${output_file}"
+        compare_result="FAIL"
+        overall_status=2
+    else
+        echo "File comparison passed for ${output_file}"
+        compare_result="PASS"
+    fi
 
-	docker_out="${docker_out//$'\n'/<br>}"
-	echo "<tr><td>${compare_result}</td><td><ul><li>Expected: ${expected_file}</li><li>Output: ${output_file}</li></ul></td><td>${docker_out}</td></tr>" >> "$RESULTS_FILE"
+    docker_out="${docker_out//$'\n'/<br>}"
+    echo "<tr><td>${compare_result}</td><td><ul><li>Expected: ${expected_file}</li><li>Output: ${output_file}</li></ul></td><td>${docker_out}</td></tr>" >> "$RESULTS_FILE"
 fi
 
 echo " "
