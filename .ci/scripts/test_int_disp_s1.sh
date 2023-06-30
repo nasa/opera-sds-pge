@@ -99,7 +99,6 @@ metrics_collection_end "$PGE_NAME" "$container_name" "$docker_exit_status" "$TES
 
 # Copy the PGE/SAS log file(s) to the test results directory so it can be archived
 # by Jenkins with the other results
-touch "${output_dir}"/fake_log_file_TODO_remove_this_after_SAS_integratino.log
 cp "${output_dir}"/*.log "${TEST_RESULTS_DIR}"
 
 if [ $docker_exit_status -ne 0 ]; then
