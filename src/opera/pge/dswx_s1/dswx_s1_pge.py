@@ -47,24 +47,26 @@ class DSWxS1PreProcessorMixin(PreProcessorMixin):
                 input_validation.check_input(
                     value, self.logger, self.name, valid_extensions=('.tif', '.tiff', '.vrt')
                 )
-            elif key in ('reference_water_file', 'world_file', 'hand_file'):
+            elif key in ('reference_water_file', 'worldcover_file', 'hand_file'):
                 input_validation.check_input(
                     value, self.logger, self.name, valid_extensions=('.tif', '.tiff')
                 )
             elif key in ('shoreline_shapefile',):
-                input_validation.check_input(
-                    value, self.logger, self.name, valid_extensions=('.shp',)
-                )
+                if value is not None:
+                    input_validation.check_input(
+                        value, self.logger, self.name, valid_extensions=('.shp',))
+                    # Only the .shp file is configured in the runconfig, but we
+                    # need to ensure the other required files are co-located with it
+                    for extension in ('.dbf', '.prj', '.shx'):
+                        additional_shapefile = splitext(value)[0] + extension
 
-                # Only the .shp file is configured in the runconfig, but we
-                # need to ensure the other required files are co-located with it
-                for extension in ('.dbf', '.prj', '.shx'):
-                    additional_shapefile = splitext(value)[0] + extension
+                        if not exists(abspath(additional_shapefile)):
+                            error_msg = f"Additional shapefile {additional_shapefile} could not be located"
 
-                    if not exists(abspath(additional_shapefile)):
-                        error_msg = f"Additional shapefile {additional_shapefile} could not be located"
-
-                        self.logger.critical(self.name, ErrorCode.INVALID_INPUT, error_msg)
+                            self.logger.critical(self.name, ErrorCode.INVALID_INPUT, error_msg)
+                else:
+                    msg = f"No shoreline_shapefile specified in runconfig file."
+                    self.logger.info(self.name, ErrorCode.INPUT_NOT_FOUND, msg)
 
             elif key in ('dem_file_description', 'worldcover_file_description',
                          'reference_water_file_description', 'hand_file_description',

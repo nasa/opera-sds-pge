@@ -11,7 +11,7 @@ pipeline {
     }
     parameters {
         // TODO: update default value as newer PGE's are added
-        string(name: 'DOCKER_IMAGE_SUFFIXES', defaultValue: 'dswx_hls,cslc_s1,rtc_s1,disp_s1',
+        string(name: 'DOCKER_IMAGE_SUFFIXES', defaultValue: 'dswx_hls,cslc_s1,rtc_s1,dswx_s1,disp_s1',
                description: 'Comma-delimited list of PGE names to run integration tests for')
         string(name: 'ART_DOCKER_REGISTRY', defaultValue: 'artifactory-fn.jpl.nasa.gov:16001',
                description: 'Address of Artifactory-FN Docker registry for uploading Docker images.')
