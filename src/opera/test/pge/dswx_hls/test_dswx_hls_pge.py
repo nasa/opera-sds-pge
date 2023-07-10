@@ -397,7 +397,7 @@ class DSWxHLSPgeTestCase(unittest.TestCase):
 
         for image_file in image_files:
             file_name = pge._geotiff_filename(image_file)
-            md = MockGdal.MockDWSxHLSGdalDataset().GetMetadata()
+            md = MockGdal.MockDSWxHLSGdalDataset().GetMetadata()
             file_name_regex = rf"{pge.PROJECT}_{pge.LEVEL}_" \
                               rf"{md['PRODUCT_TYPE']}_" \
                               rf"{md['HLS_DATASET'].split('.')[2]}_" \
@@ -410,14 +410,14 @@ class DSWxHLSPgeTestCase(unittest.TestCase):
     class CustomMockGdal(MockGdal):
         """
         Custom version of the MockGdal class used to test specific metadata cases
-        not handled by the canned metadata within the baseline MockDWSxHLSGdalDataset class
+        not handled by the canned metadata within the baseline MockDSWxHLSGdalDataset class
 
         """
 
         @staticmethod
         def Open(filename):
             """Custom Open method for testing"""
-            gdal_dataset = MockGdal.MockDWSxHLSGdalDataset()
+            gdal_dataset = MockGdal.MockDSWxHLSGdalDataset()
 
             # Update sensing time to test the specific case where a plus sign is
             # used to concatenate multiple start times
@@ -434,19 +434,19 @@ class DSWxHLSPgeTestCase(unittest.TestCase):
         @staticmethod
         def Open(filename):
             """Custom Open method for Landsat testing"""
-            gdal_dataset = MockGdal.MockDWSxHLSGdalDataset()
+            gdal_dataset = MockGdal.MockDSWxHLSGdalDataset()
 
             # LC07 is invalid
             gdal_dataset.dummy_metadata['LANDSAT_PRODUCT_ID'] = "LC07_L1TP_096013_20220803_20220804_02_T1"
             return gdal_dataset
 
     class CustomMockGdal_InvalidSentinel(MockGdal):
-        """Custom version of the MockGdal class used to test specific Sentinael cases"""
+        """Custom version of the MockGdal class used to test specific Sentinel cases"""
 
         @staticmethod
         def Open(filename):
             """Custom Open method for Sentinel testing"""
-            gdal_dataset = MockGdal.MockDWSxHLSGdalDataset()
+            gdal_dataset = MockGdal.MockDSWxHLSGdalDataset()
 
             # S2C is invalid
             gdal_dataset.dummy_metadata['PRODUCT_URI'] = "S2C_MSIL1C_20210907T163901_N0301_" \
@@ -516,7 +516,7 @@ class DSWxHLSPgeTestCase(unittest.TestCase):
             log_contents = infile.read()
 
         # Look for the expected exception message in the log to verify the correct exception was raised.
-        # There is a temporary file name in the path so we only look for the static part.
+        # There is a temporary file name in the path, so we only look for the static part.
         expected_msg = (f"_temp/{input_file} appears to contain Landsat-7 data, "
                         f"LANDSAT_PRODUCT_ID is LC07_L1TP_096013_20220803_20220804_02_T1.")
         self.assertIn(expected_msg, log_contents)
@@ -542,7 +542,7 @@ class DSWxHLSPgeTestCase(unittest.TestCase):
             log_contents = infile.read()
 
         # Look for the expected exception message in the log to verify the correct exception was raised.
-        # There is a temporary file name in the path so we only look for the static part.
+        # There is a temporary file name in the path, so we only look for the static part.
         expected_msg = (f"_temp/{input_file} appears to not be Sentinel 2 A/B data, "
                         f"metadata PRODUCT_URI is S2C_MSIL1C_20210907T163901_N0301_R126_T15SXR_20210907T202434.SAFE.")
         self.assertIn(expected_msg, log_contents)

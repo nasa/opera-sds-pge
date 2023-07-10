@@ -28,7 +28,7 @@ class MockGdal:  # pragma: no cover
     """
 
     # pylint: disable=all
-    class MockDWSxHLSGdalDataset:
+    class MockDSWxHLSGdalDataset:
         """Mock class for gdal.Dataset objects, as returned from an Open call."""
 
         def __init__(self):
@@ -81,7 +81,7 @@ class MockGdal:  # pragma: no cover
     class MockDSWxS1GdalDataset:
         """
         Mock class for gdal.Dataset objects, as returned from an Open call.
-        DSWx_-S1 metadata consists of 4 sections:
+        DSWx-S1 metadata consists of 4 sections:
             1) Product Identification and Processing Information
             2) Sentinel-1 A/B product metadata.
             3) input ancillary datasets
@@ -132,7 +132,7 @@ class MockGdal:  # pragma: no cover
             return deepcopy(self.dummy_metadata)
 
     @staticmethod
-    def Open(self, filename):
+    def Open(filename):
         """Mock implementation for gdal.Open. Returns an instance of the mock Dataset."""
         if not exists(filename):
             # Return None since that's what GDAL does. The utility functions need
@@ -327,7 +327,7 @@ def get_geotiff_spacecraft_name(filename):
 
 def get_hls_filename_fields(file_name):
     """
-    Parse the HLS filename into components, changing Julian datetime to isoformat
+    Parse the HLS filename into components, changing Julian datetime to iso-format
     (YYYYMMDDTHHMMSS).
 
     Parameters

@@ -576,7 +576,7 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
 
         # Fill in some additional fields expected within the ISO
         output_product_metadata['data']['width'] = len(output_product_metadata['data']
-                                                        ['xCoordinates'])
+                                                       ['xCoordinates'])
         output_product_metadata['data']['length'] = len(output_product_metadata['data']
                                                         ['yCoordinates'])
 
