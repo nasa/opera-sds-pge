@@ -24,7 +24,7 @@ from opera.util.error_codes import ErrorCode
 from opera.util.img_utils import get_geotiff_hls_dataset
 from opera.util.img_utils import get_geotiff_metadata
 from opera.util.img_utils import get_geotiff_processing_datetime
-from opera.util.img_utils import get_geotiff_sensor_product_id
+from opera.util.img_utils import get_geotiff_hls_sensor_product_id
 from opera.util.img_utils import get_geotiff_spacecraft_name
 from opera.util.img_utils import get_hls_filename_fields
 from opera.util.img_utils import set_geotiff_metadata
@@ -227,7 +227,7 @@ class DSWxHLSPostProcessorMixin(PostProcessorMixin):
         output_images = filter(lambda product: 'tif' in splitext(product)[-1], output_products)
 
         for output_image in output_images:
-            sensor_product_id = get_geotiff_sensor_product_id(output_image)
+            sensor_product_id = get_geotiff_hls_sensor_product_id(output_image)
 
             # Certain HLS products have been observed to have sensor product
             # ID's that identify them as originating from Landsat-9, but

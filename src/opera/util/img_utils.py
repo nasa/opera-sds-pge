@@ -28,7 +28,7 @@ class MockGdal:  # pragma: no cover
     """
 
     # pylint: disable=all
-    class MockGdalDataset:
+    class MockDWSxHLSGdalDataset:
         """Mock class for gdal.Dataset objects, as returned from an Open call."""
 
         def __init__(self):
@@ -77,15 +77,74 @@ class MockGdal:  # pragma: no cover
             """
             return deepcopy(self.dummy_metadata)
 
+    # pylint: disable=all
+    class MockDSWxS1GdalDataset:
+        """
+        Mock class for gdal.Dataset objects, as returned from an Open call.
+        DSWx_-S1 metadata consists of 4 sections:
+            1) Product Identification and Processing Information
+            2) Sentinel-1 A/B product metadata.
+            3) input ancillary datasets
+            4) S1 product metadata
+        """
+
+        def __init__(self):
+            self.dummy_metadata = {
+                'DSWX_PRODUCT_VERSION': '0.1',
+                'SOFTWARE_VERSION': '0.1',
+                'PROJECT': 'OPERA',
+                'PRODUCT_LEVEL': '3',
+                'PRODUCT_TYPE': 'DSWx-S1',
+                'PRODUCT_SOURCE': 'S1',
+                'PROCESSING_DATETIME': '2022-01-31T21:54:26',
+                'SPACECRAFT_NAME': 'Sentinel-1A/B',
+                'SENSOR': 'IW',
+                'SENSING_START': '2021-09-05T14:31:56.9300799Z',
+                'SENSING_END': '2021-09-05T14:32:20.8126470Z',
+                'SPATIAL_COVERAGE': '99',
+                'LAYOVER_SHADOW_COVERAGE': '20',
+                'RTC_PRODUCT_VERSION': '1,0',
+                'POLARIZATION': 'VV',
+                'BURST_ID': 't047_10092_iw1',
+                'ABSOLUTE_ORBIT_NUMBER': '5',
+                'ORBIT_PASS_DIRECTION': 'A',
+                'TRACK_NUMBER': '7',
+                'SHORELINE_SOURCE': 'shoreline.shp',
+                'DEM_SOURCE': 'dem.tif',
+                'REFERENCE_WATER_SOURCE': 'reference_water.tif',
+                'WORLDCOVER_SOURCE': 'worldcover.tif',
+                'HAND_SOURCE': 'hand.tif',
+                'WORKFLOW': 'DSWx-S1-open_water',
+                'THRESHOLDING': 'OTSU',
+                'MULTI_THRESHOLD': False,
+                'TILE_SELECTION': 'combined',
+                'FILTER': 'Enhanced Lee Filter',
+                'INUNDATED_VEGETATION': False,
+                'FUZZY_SEED': '0.1',
+                'FUZZY_TOLERANCE': '0.01',
+            }
+
+        def GetMetadata(self):
+            """
+            Returns a subset of dummy metadata expected by the PGE.
+            This function should be updated as needed for requisite metadata fields.
+            """
+            return deepcopy(self.dummy_metadata)
+
     @staticmethod
-    def Open(filename):
+    def Open(self, filename):
         """Mock implementation for gdal.Open. Returns an instance of the mock Dataset."""
         if not exists(filename):
             # Return None since that's what GDAL does. The utility functions need
             # to be aware of this and handle a None return accordingly.
             return None
 
-        return MockGdal.MockGdalDataset()
+        file_name = filename.split('/')[-1].lower()
+
+        if 'dswx_s1' in file_name:
+            return MockGdal.MockDSWxS1GdalDataset()
+        else:
+            return MockGdal.MockDSWxHLSGdalDataset()
 
 
 def mock_gdal_edit(args):
@@ -238,14 +297,21 @@ def get_geotiff_processing_datetime(filename):
     return processing_datetime
 
 
-def get_geotiff_product_version(filename):
+def get_geotiff_hls_product_version(filename):
     """Returns the PRODUCT_VERSION value from the provided file, if it exists. None otherwise."""
     metadata = get_geotiff_metadata(filename)
 
     return metadata.get('PRODUCT_VERSION')
 
 
-def get_geotiff_sensor_product_id(filename):
+def get_geotiff_s1_product_version(filename):
+    """Returns the PRODUCT_VERSION value from the provided file, if it exists. None otherwise."""
+    metadata = get_geotiff_metadata(filename)
+
+    return metadata.get('DSWX_PRODUCT_VERSION')
+
+
+def get_geotiff_hls_sensor_product_id(filename):
     """Returns the SENSOR_PRODUCT_ID value from the provided file, if it exists. None otherwise."""
     metadata = get_geotiff_metadata(filename)
 

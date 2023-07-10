@@ -397,7 +397,7 @@ class DSWxHLSPgeTestCase(unittest.TestCase):
 
         for image_file in image_files:
             file_name = pge._geotiff_filename(image_file)
-            md = MockGdal.MockGdalDataset().GetMetadata()
+            md = MockGdal.MockDWSxHLSGdalDataset().GetMetadata()
             file_name_regex = rf"{pge.PROJECT}_{pge.LEVEL}_" \
                               rf"{md['PRODUCT_TYPE']}_" \
                               rf"{md['HLS_DATASET'].split('.')[2]}_" \
@@ -410,14 +410,14 @@ class DSWxHLSPgeTestCase(unittest.TestCase):
     class CustomMockGdal(MockGdal):
         """
         Custom version of the MockGdal class used to test specific metadata cases
-        not handled by the canned metadata within the baseline MockGdalDataset class
+        not handled by the canned metadata within the baseline MockDWSxHLSGdalDataset class
 
         """
 
         @staticmethod
         def Open(filename):
             """Custom Open method for testing"""
-            gdal_dataset = MockGdal.MockGdalDataset()
+            gdal_dataset = MockGdal.MockDWSxHLSGdalDataset()
 
             # Update sensing time to test the specific case where a plus sign is
             # used to concatenate multiple start times
@@ -434,7 +434,7 @@ class DSWxHLSPgeTestCase(unittest.TestCase):
         @staticmethod
         def Open(filename):
             """Custom Open method for Landsat testing"""
-            gdal_dataset = MockGdal.MockGdalDataset()
+            gdal_dataset = MockGdal.MockDWSxHLSGdalDataset()
 
             # LC07 is invalid
             gdal_dataset.dummy_metadata['LANDSAT_PRODUCT_ID'] = "LC07_L1TP_096013_20220803_20220804_02_T1"
@@ -446,7 +446,7 @@ class DSWxHLSPgeTestCase(unittest.TestCase):
         @staticmethod
         def Open(filename):
             """Custom Open method for Sentinel testing"""
-            gdal_dataset = MockGdal.MockGdalDataset()
+            gdal_dataset = MockGdal.MockDWSxHLSGdalDataset()
 
             # S2C is invalid
             gdal_dataset.dummy_metadata['PRODUCT_URI'] = "S2C_MSIL1C_20210907T163901_N0301_" \
