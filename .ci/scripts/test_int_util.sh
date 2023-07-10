@@ -152,4 +152,17 @@ test_int_trap_cleanup()
     ${DOCKER_RUN} -v ${TMP_DIR}:${TMP_DIR} --entrypoint /usr/bin/find ${PGE_IMAGE}:${PGE_TAG} ${TMP_DIR} -type f -exec chmod 664 {} +
     cd ${TMP_ROOT}
     rm -rf ${TMP_DIR}
+
+    # End background metrics collection
+    local stats_pid_file="${TEST_RESULTS_DIR}/${PGE_NAME}_metrics_stats_bg_pid.txt"
+    if [ -e ${stats_pid_file} ]
+    then
+        process_to_kill=$(cat "${stats_pid_file}")
+        if ps -p $process_to_kill > /dev/null
+        then
+            kill $process_to_kill
+            wait $process_to_kill 2> /dev/null || true
+        fi
+        rm "${stats_pid_file}"
+    fi
 }
