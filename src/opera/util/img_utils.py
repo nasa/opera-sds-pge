@@ -141,7 +141,7 @@ class MockGdal:  # pragma: no cover
 
         file_name = filename.split('/')[-1].lower()
 
-        if 'dswx_s1' in file_name:
+        if 'dswx_s1' in file_name or 'dswx-s1' in file_name:
             return MockGdal.MockDSWxS1GdalDataset()
         else:
             return MockGdal.MockDSWxHLSGdalDataset()
