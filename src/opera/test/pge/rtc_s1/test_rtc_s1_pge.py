@@ -198,7 +198,7 @@ class RtcS1PgeTestCase(unittest.TestCase):
         self.assertIn(f"{core_filename}_HH+HV.tif", output_files)
 
         # Check that the static layer files had conventions applied
-        static_output_files = glob.glob(join(pge.runconfig.output_product_path, f"*static*.tif"))
+        static_output_files = glob.glob(join(pge.runconfig.output_product_path, "*static*.tif"))
 
         self.assertEqual(len(static_output_files), 2)
 

@@ -361,7 +361,7 @@ class RunConfig:
         return self._sas_config
 
     def asdict(self) -> dict:
-        """Returns the entire parsed RunConfig in its dictonary representation"""
+        """Returns the entire parsed RunConfig in its dictionary representation"""
         return self._run_config
 
     def get_input_filenames(self):

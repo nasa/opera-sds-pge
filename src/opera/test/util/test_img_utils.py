@@ -21,7 +21,7 @@ from pkg_resources import resource_filename
 from opera.util.img_utils import get_geotiff_hls_dataset
 from opera.util.img_utils import get_geotiff_metadata
 from opera.util.img_utils import get_geotiff_processing_datetime
-from opera.util.img_utils import get_geotiff_product_version
+from opera.util.img_utils import get_geotiff_hls_product_version
 from opera.util.img_utils import get_geotiff_spacecraft_name
 from opera.util.img_utils import get_hls_filename_fields
 
@@ -72,7 +72,7 @@ class ImgUtilsTestCase(unittest.TestCase):
         self.assertEqual(get_geotiff_hls_dataset(input_dswx_hls_file), 'HLS.S30.T15SXR.2021250T163901.v2.0')
         self.assertIsInstance(get_geotiff_processing_datetime(input_dswx_hls_file), datetime)
         self.assertEqual(get_geotiff_processing_datetime(input_dswx_hls_file), datetime(2022, 1, 31, 21, 54, 26))
-        self.assertEqual(get_geotiff_product_version(input_dswx_hls_file), '0.1')
+        self.assertEqual(get_geotiff_hls_product_version(input_dswx_hls_file), '0.1')
         self.assertEqual(get_geotiff_spacecraft_name(input_dswx_hls_file), 'SENTINEL-2A')
 
         # Now try with an L30 (Landsat-8) DSWx-HLS file
@@ -88,7 +88,7 @@ class ImgUtilsTestCase(unittest.TestCase):
         self.assertEqual(get_geotiff_hls_dataset(input_dswx_hls_file), 'HLS.L30.T22VEQ.2021248T143156.v2.0')
         self.assertIsInstance(get_geotiff_processing_datetime(input_dswx_hls_file), datetime)
         self.assertEqual(get_geotiff_processing_datetime(input_dswx_hls_file), datetime(2022, 1, 7, 19, 25, 31))
-        self.assertEqual(get_geotiff_product_version(input_dswx_hls_file), '0.1')
+        self.assertEqual(get_geotiff_hls_product_version(input_dswx_hls_file), '0.1')
         self.assertEqual(get_geotiff_spacecraft_name(input_dswx_hls_file), 'LANDSAT-8')
 
         # Try with a missing file

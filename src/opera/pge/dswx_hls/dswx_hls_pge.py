@@ -22,9 +22,9 @@ from opera.pge.base.base_pge import PostProcessorMixin
 from opera.pge.base.base_pge import PreProcessorMixin
 from opera.util.error_codes import ErrorCode
 from opera.util.img_utils import get_geotiff_hls_dataset
+from opera.util.img_utils import get_geotiff_hls_sensor_product_id
 from opera.util.img_utils import get_geotiff_metadata
 from opera.util.img_utils import get_geotiff_processing_datetime
-from opera.util.img_utils import get_geotiff_sensor_product_id
 from opera.util.img_utils import get_geotiff_spacecraft_name
 from opera.util.img_utils import get_hls_filename_fields
 from opera.util.img_utils import set_geotiff_metadata
@@ -124,7 +124,7 @@ class DSWxHLSPreProcessorMixin(PreProcessorMixin):
             if re.match(r"^HLS\.L30.*", os.path.basename(input_tif)):
                 input_tif_metadata = get_geotiff_metadata(input_tif)
                 if 'LANDSAT_PRODUCT_ID' in input_tif_metadata:
-                    # LANDSAT_PRODUCT_ID can be a list so we don't restrict search to first element
+                    # LANDSAT_PRODUCT_ID can be a list, so we don't restrict search to first element
                     if re.match(r"LC07.*", input_tif_metadata['LANDSAT_PRODUCT_ID']):
                         error_msg = (f"Input file {input_tif} appears to contain Landsat-7 data, "
                                      f"LANDSAT_PRODUCT_ID is {input_tif_metadata['LANDSAT_PRODUCT_ID']}.")
@@ -227,7 +227,7 @@ class DSWxHLSPostProcessorMixin(PostProcessorMixin):
         output_images = filter(lambda product: 'tif' in splitext(product)[-1], output_products)
 
         for output_image in output_images:
-            sensor_product_id = get_geotiff_sensor_product_id(output_image)
+            sensor_product_id = get_geotiff_hls_sensor_product_id(output_image)
 
             # Certain HLS products have been observed to have sensor product
             # ID's that identify them as originating from Landsat-9, but
