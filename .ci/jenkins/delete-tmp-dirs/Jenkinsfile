@@ -1,0 +1,13 @@
+#!/usr/bin/env groovy
+
+pipeline {
+    agent any
+    stages {
+        stage("clean_up")  {
+            steps {
+                echo "Cleaning up data/tmp directories"
+                rm -rf tmp.*
+            }
+        }
+    }
+]
