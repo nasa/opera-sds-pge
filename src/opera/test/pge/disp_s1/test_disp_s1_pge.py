@@ -9,6 +9,7 @@ Unit tests for the pge/disp_s1/disp_s1_pge.py module.
 
 import glob
 import os
+import shutil
 import tempfile
 import unittest
 import yaml
@@ -59,6 +60,9 @@ class DispS1PgeTestCase(unittest.TestCase):
         self.input_file = tempfile.NamedTemporaryFile(
             dir=input_dir, prefix="test_input_", suffix=".tiff"
         )
+
+        # Copy the algorithm_parameters config file into the test input directory.
+        shutil.copy(join(self.data_dir, 'test_disp_s1_algorithm_parameters.yaml'), input_dir)
 
         os.system(
             f"echo \"non-empty file\" > {join(input_dir, 'compressed_slc_t087_185678_iw2_20180101_20180210.h5')}"
