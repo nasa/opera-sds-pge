@@ -138,9 +138,16 @@ else
 
             echo "product is $product"
 
+            # Parse the tile code from the filename
+            IFS='_' read -ra ARR <<< "$output_file"
+            tile_code=${ARR[3]}
+
+            echo "tile code is $tile_code"
+
             for potential_file in "$expected_data_dir"/*.tif*
             do
-                if [[ "$potential_file" == *"$product"* ]]; then
+                # TODO: this needs to take tile code into account
+                if [[ "$potential_file" == *"$tile_code"*"$product"* ]]; then
                     echo "expected file is $potential_file"
                     expected_file=$potential_file
                     break
