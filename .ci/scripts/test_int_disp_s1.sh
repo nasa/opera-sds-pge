@@ -114,7 +114,7 @@ else
                             -v "${output_dir}":/out:ro \
                             -v "${expected_dir}":/exp:ro \
                             -v "$SCRIPT_DIR":/scripts \
-                            --entrypoint /opt/conda/bin/python opera/disp-s1:0.1 \
+                            --entrypoint /opt/conda/bin/python ${PGE_IMAGE}:"${PGE_TAG}" \
                             /scripts/disp_validate_product_opera_pge.py \
                             /out/${output_file} /exp/${expected_file})
     echo "$docker_out"
