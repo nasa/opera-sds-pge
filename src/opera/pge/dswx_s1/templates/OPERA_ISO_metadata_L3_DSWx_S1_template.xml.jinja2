@@ -138,7 +138,7 @@
                         <gmx:FileName>{{ custom_data.ISO_OPERA_ProducerGranuleId }}{# ISO_OPERA_ProducerGranuleId #}</gmx:FileName>
                     </gmd:title>
                     <gmd:alternateTitle>
-                        <gco:CharacterString>Dynamic Surface Water Extent from Harmonized Landsat-8 and Sentinel-2 A/B Product</gco:CharacterString>
+                        <gco:CharacterString>Dynamic Surface Water Extent from Sentinel-1 A/B Product</gco:CharacterString>
                     </gmd:alternateTitle>
                     <!-- The date/time that data provider created or updated the granule info on data provider's database.-->
                     <gmd:date>
@@ -215,7 +215,7 @@
                 </gmd:CI_Citation>
             </gmd:citation>
             <gmd:abstract>
-                <gco:CharacterString>The L3 Dynamic Surface Water Extent (DSWx) HLS product maps the surface water extent on a near-global geographical scale, i.e., all land mass excluding Antarctica. DSWx-HLS products are distributed over projected map coordinates aligned with the Military Grid Reference System (MGRS).</gco:CharacterString>
+                <gco:CharacterString>The L3 Dynamic Surface Water Extent (DSWx) from Sentinel-1 (S1) product maps the surface water extent on a near-global geographical scale, i.e., all land mass excluding Antarctica. DSWx-S1 products are distributed over projected map coordinates aligned with the Military Grid Reference System (MGRS).</gco:CharacterString>
             </gmd:abstract>
             <gmd:status>
                 <gmd:MD_ProgressCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/gmxCodelists.xml#MD_ProgressCode" codeListValue="completed">completed</gmd:MD_ProgressCode>
@@ -533,8 +533,8 @@
                         <gmd:EX_TemporalExtent id="boundingTemporalExtent">
                             <gmd:extent>
                                 <gml:TimePeriod gml:id="DSWx_Time_Range">
-                                    <gml:beginPosition>{{ product_output.sensingTimeBegin }}{# ISO_OPERA_SensingTimeBegin #}</gml:beginPosition>
-                                    <gml:endPosition>{{ product_output.sensingTimeEnd}}{# ISO_OPERA_SensingTimeEnd #}</gml:endPosition>
+                                    <gml:beginPosition>{{ product_output.SENSING_START }}{# ISO_OPERA_sensingTimeStart #}</gml:beginPosition>
+                                    <gml:endPosition>{{ product_output.SENSING_END}}{# ISO_OPERA_sensingTimeEnd #}</gml:endPosition>
                                 </gml:TimePeriod>
                             </gmd:extent>
                         </gmd:EX_TemporalExtent>
@@ -590,10 +590,10 @@
                                                 <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
                                             </eos:type>
                                             <eos:name>
-                                                <gco:CharacterString>HlsDataset</gco:CharacterString>
+                                                <gco:CharacterString>DSWxProductVersion</gco:CharacterString>
                                             </eos:name>
                                             <eos:description>
-                                                <gco:CharacterString>Name of the input HLS product used to generate the DSWx-HLS product</gco:CharacterString>
+                                                <gco:CharacterString>The DSWx-S1 product version</gco:CharacterString>
                                             </eos:description>
                                             <eos:dataType>
                                                 <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
@@ -601,343 +601,7 @@
                                         </eos:EOS_AdditionalAttributeDescription>
                                     </eos:reference>
                                     <eos:value>
-                                        <gco:CharacterString>{{ product_output.HLS_DATASET }}{# ISO_OPERA_hlsDataset #}</gco:CharacterString>
-                                    </eos:value>
-                                </eos:AdditionalAttribute>
-                                <eos:AdditionalAttribute>
-                                    <eos:reference>
-                                        <eos:EOS_AdditionalAttributeDescription>
-                                            <eos:type>
-                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="platformInformation">platformInformation</eos:EOS_AdditionalAttributeTypeCode>
-                                            </eos:type>
-                                            <eos:name>
-                                                <gco:CharacterString>Sensor</gco:CharacterString>
-                                            </eos:name>
-                                            <eos:description>
-                                                <gco:CharacterString>Name of the sensor instrument</gco:CharacterString>
-                                            </eos:description>
-                                            <eos:dataType>
-                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
-                                            </eos:dataType>
-                                        </eos:EOS_AdditionalAttributeDescription>
-                                    </eos:reference>
-                                    <eos:value>
-                                        <gco:CharacterString>{{ product_output.SENSOR }}{# ISO_OPERA_sensor #}</gco:CharacterString>
-                                    </eos:value>
-                                </eos:AdditionalAttribute>
-                                <eos:AdditionalAttribute>
-                                    <eos:reference>
-                                        <eos:EOS_AdditionalAttributeDescription>
-                                            <eos:type>
-                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="platformInformation">platformInformation</eos:EOS_AdditionalAttributeTypeCode>
-                                            </eos:type>
-                                            <eos:name>
-                                                <gco:CharacterString>SensorProductID</gco:CharacterString>
-                                            </eos:name>
-                                            <eos:description>
-                                                <gco:CharacterString>Landsat product IDs, copied from the HLS metadata field LANDSAT_PRODUCT_ID, for Landsat-derived HLS products, or Sentinel granule Uniform Resource Identifier (URI), copied from PRODUCT_URI for Sentinel-derived HLS products</gco:CharacterString>
-                                            </eos:description>
-                                            <eos:dataType>
-                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
-                                            </eos:dataType>
-                                        </eos:EOS_AdditionalAttributeDescription>
-                                    </eos:reference>
-                                    <eos:value>
-                                        <gco:CharacterString>{{ product_output.SENSOR_PRODUCT_ID }}{# ISO_OPERA_sensorProductID #}</gco:CharacterString>
-                                    </eos:value>
-                                </eos:AdditionalAttribute>
-                                <eos:AdditionalAttribute>
-                                    <eos:reference>
-                                        <eos:EOS_AdditionalAttributeDescription>
-                                            <eos:type>
-                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
-                                            </eos:type>
-                                            <eos:name>
-                                                <gco:CharacterString>AerosolClassRemappingEnabled</gco:CharacterString>
-                                            </eos:name>
-                                            <eos:description>
-                                                <gco:CharacterString>Indicates if the aerosol class remapping is enabled (TRUE) or disabled (FALSE)</gco:CharacterString>
-                                            </eos:description>
-                                            <eos:dataType>
-                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
-                                            </eos:dataType>
-                                        </eos:EOS_AdditionalAttributeDescription>
-                                    </eos:reference>
-                                    <eos:value>
-                                        <gco:CharacterString>{{ product_output.AEROSOL_CLASS_REMAPPING_ENABLED }}{# ISO_OPERA_aerosolClassRemappingEnabled #}</gco:CharacterString>
-                                    </eos:value>
-                                </eos:AdditionalAttribute>
-                                <eos:AdditionalAttribute>
-                                    <eos:reference>
-                                        <eos:EOS_AdditionalAttributeDescription>
-                                            <eos:type>
-                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
-                                            </eos:type>
-                                            <eos:name>
-                                                <gco:CharacterString>AerosolNotWaterToHighConfWaterFMaskValues</gco:CharacterString>
-                                            </eos:name>
-                                            <eos:description>
-                                                <gco:CharacterString>HLS Fmask values to convert not-water to high-confidence water in the presence of high aerosol</gco:CharacterString>
-                                            </eos:description>
-                                            <eos:dataType>
-                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
-                                            </eos:dataType>
-                                        </eos:EOS_AdditionalAttributeDescription>
-                                    </eos:reference>
-                                    <eos:value>
-                                        <gco:CharacterString>{{ product_output.AEROSOL_NOT_WATER_TO_HIGH_CONF_WATER_FMASK_VALUES }}{# ISO_OPERA_aerosolNotWaterToHighConfWaterFMaskValues #}</gco:CharacterString>
-                                    </eos:value>
-                                </eos:AdditionalAttribute>
-                                <eos:AdditionalAttribute>
-                                    <eos:reference>
-                                        <eos:EOS_AdditionalAttributeDescription>
-                                            <eos:type>
-                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
-                                            </eos:type>
-                                            <eos:name>
-                                                <gco:CharacterString>AerosolPartialSurfaceAggressiveToHighConfWaterFMaskValues</gco:CharacterString>
-                                            </eos:name>
-                                            <eos:description>
-                                                <gco:CharacterString>HLS Fmask values to convert partial surface water aggressive to high-confidence water in the presence of high aerosol</gco:CharacterString>
-                                            </eos:description>
-                                            <eos:dataType>
-                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
-                                            </eos:dataType>
-                                        </eos:EOS_AdditionalAttributeDescription>
-                                    </eos:reference>
-                                    <eos:value>
-                                        <gco:CharacterString>{{ product_output.AEROSOL_PARTIAL_SURFACE_AGGRESSIVE_TO_HIGH_CONF_WATER_FMASK_VALUES }}{# ISO_OPERA_aerosolPartialSurfaceAggressiveToHighConfWaterFMaskValues #}</gco:CharacterString>
-                                    </eos:value>
-                                </eos:AdditionalAttribute>
-                                <eos:AdditionalAttribute>
-                                    <eos:reference>
-                                        <eos:EOS_AdditionalAttributeDescription>
-                                            <eos:type>
-                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
-                                            </eos:type>
-                                            <eos:name>
-                                                <gco:CharacterString>AerosolPartialSurfaceWaterConservativeToHighConfWaterFMaskValues</gco:CharacterString>
-                                            </eos:name>
-                                            <eos:description>
-                                                <gco:CharacterString>HLS Fmask values to convert partial surface water conservative to high-confidence water in the presence of high aerosol</gco:CharacterString>
-                                            </eos:description>
-                                            <eos:dataType>
-                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
-                                            </eos:dataType>
-                                        </eos:EOS_AdditionalAttributeDescription>
-                                    </eos:reference>
-                                    <eos:value>
-                                        <gco:CharacterString>{{ product_output.AEROSOL_PARTIAL_SURFACE_WATER_CONSERVATIVE_TO_HIGH_CONF_WATER_FMASK_VALUES }}{# ISO_OPERA_aerosolPartialSurfaceWaterConservativeToHighConfWaterFMaskValues #}</gco:CharacterString>
-                                    </eos:value>
-                                </eos:AdditionalAttribute>
-                                <eos:AdditionalAttribute>
-                                    <eos:reference>
-                                        <eos:EOS_AdditionalAttributeDescription>
-                                            <eos:type>
-                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
-                                            </eos:type>
-                                            <eos:name>
-                                                <gco:CharacterString>AerosolWaterModerateConfToHighConfWaterFMaskValues</gco:CharacterString>
-                                            </eos:name>
-                                            <eos:description>
-                                                <gco:CharacterString>HLS Fmask values to convert moderate-confidence water to high-confidence water in the presence of high aerosol</gco:CharacterString>
-                                            </eos:description>
-                                            <eos:dataType>
-                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
-                                            </eos:dataType>
-                                        </eos:EOS_AdditionalAttributeDescription>
-                                    </eos:reference>
-                                    <eos:value>
-                                        <gco:CharacterString>{{ product_output.AEROSOL_PARTIAL_SURFACE_WATER_CONSERVATIVE_TO_HIGH_CONF_WATER_FMASK_VALUES }}{# ISO_OPERA_aerosolPartialSurfaceWaterConservativeToHighConfWaterFMaskValues #}</gco:CharacterString>
-                                    </eos:value>
-                                </eos:AdditionalAttribute>
-                                <eos:AdditionalAttribute>
-                                    <eos:reference>
-                                        <eos:EOS_AdditionalAttributeDescription>
-                                            <eos:type>
-                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
-                                            </eos:type>
-                                            <eos:name>
-                                                <gco:CharacterString>ForestMaskLandcoverClasses</gco:CharacterString>
-                                            </eos:name>
-                                            <eos:description>
-                                                <gco:CharacterString>Copernicus CGLS Land Cover 100m forest classes used in additional testing that may mask false water detections from the WTR-2 and WTR layers, due to vegetation-related dark reflectance.</gco:CharacterString>
-                                            </eos:description>
-                                            <eos:dataType>
-                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
-                                            </eos:dataType>
-                                        </eos:EOS_AdditionalAttributeDescription>
-                                    </eos:reference>
-                                    <eos:value>
-                                        <gco:CharacterString>{{ product_output.FOREST_MASK_LANDCOVER_CLASSES }}{# ISO_OPERA_forestMaskLandcoverClasses #}</gco:CharacterString>
-                                    </eos:value>
-                                </eos:AdditionalAttribute>
-                                <eos:AdditionalAttribute>
-                                    <eos:reference>
-                                        <eos:EOS_AdditionalAttributeDescription>
-                                            <eos:type>
-                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
-                                            </eos:type>
-                                            <eos:name>
-                                                <gco:CharacterString>MaskAdjacentToCloudMode</gco:CharacterString>
-                                            </eos:name>
-                                            <eos:description>
-                                                <gco:CharacterString>Define how areas adjacent to cloud/cloud-shadow are handled. Three options are available: “mask” - mask out these areas marking them as cloud shadow (default); “ignore” - ignore the adjacent to cloud/cloud shadow classification; and “cover” - cover these areas with a dilation algorithm.</gco:CharacterString>
-                                            </eos:description>
-                                            <eos:dataType>
-                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
-                                            </eos:dataType>
-                                        </eos:EOS_AdditionalAttributeDescription>
-                                    </eos:reference>
-                                    <eos:value>
-                                        <gco:CharacterString>{{ product_output.MASK_ADJACENT_TO_CLOUD_MODE }}{# ISO_OPERA_maskAdjacentToCloudMode #}</gco:CharacterString>
-                                    </eos:value>
-                                </eos:AdditionalAttribute>
-                                <eos:AdditionalAttribute>
-                                    <eos:reference>
-                                        <eos:EOS_AdditionalAttributeDescription>
-                                            <eos:type>
-                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
-                                            </eos:type>
-                                            <eos:name>
-                                                <gco:CharacterString>AreaOrPoint</gco:CharacterString>
-                                            </eos:name>
-                                            <eos:description>
-                                                <gco:CharacterString>Indicates that pixel values are assumed to represent an area rather than points</gco:CharacterString>
-                                            </eos:description>
-                                            <eos:dataType>
-                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
-                                            </eos:dataType>
-                                        </eos:EOS_AdditionalAttributeDescription>
-                                    </eos:reference>
-                                    <eos:value>
-                                        <gco:CharacterString>{{ product_output.AREA_OR_POINT }}{# ISO_OPERA_areaOrPoint #}</gco:CharacterString>
-                                    </eos:value>
-                                </eos:AdditionalAttribute>
-                                <eos:AdditionalAttribute>
-                                    <eos:reference>
-                                        <eos:EOS_AdditionalAttributeDescription>
-                                            <eos:type>
-                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
-                                            </eos:type>
-                                            <eos:name>
-                                                <gco:CharacterString>ProcessingDatetime</gco:CharacterString>
-                                            </eos:name>
-                                            <eos:description>
-                                                <gco:CharacterString>DSWx-HLS product processing date</gco:CharacterString>
-                                            </eos:description>
-                                            <eos:dataType>
-                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
-                                            </eos:dataType>
-                                        </eos:EOS_AdditionalAttributeDescription>
-                                    </eos:reference>
-                                    <eos:value>
-                                        <gco:CharacterString>{{ product_output.PROCESSING_DATETIME }}{# ISO_OPERA_processingDatetime #}</gco:CharacterString>
-                                    </eos:value>
-                                </eos:AdditionalAttribute>
-                                <eos:AdditionalAttribute>
-                                    <eos:reference>
-                                        <eos:EOS_AdditionalAttributeDescription>
-                                            <eos:type>
-                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
-                                            </eos:type>
-                                            <eos:name>
-                                                <gco:CharacterString>ProductID</gco:CharacterString>
-                                            </eos:name>
-                                            <eos:description>
-                                                <gco:CharacterString>The DSWx-HLS product identification</gco:CharacterString>
-                                            </eos:description>
-                                            <eos:dataType>
-                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
-                                            </eos:dataType>
-                                        </eos:EOS_AdditionalAttributeDescription>
-                                    </eos:reference>
-                                    <eos:value>
-                                        <gco:CharacterString>{{ product_output.PRODUCT_ID }}{# ISO_OPERA_productID #}</gco:CharacterString>
-                                    </eos:value>
-                                </eos:AdditionalAttribute>
-                                <eos:AdditionalAttribute>
-                                    <eos:reference>
-                                        <eos:EOS_AdditionalAttributeDescription>
-                                            <eos:type>
-                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
-                                            </eos:type>
-                                            <eos:name>
-                                                <gco:CharacterString>ProductLevel</gco:CharacterString>
-                                            </eos:name>
-                                            <eos:description>
-                                                <gco:CharacterString>The product level</gco:CharacterString>
-                                            </eos:description>
-                                            <eos:dataType>
-                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
-                                            </eos:dataType>
-                                        </eos:EOS_AdditionalAttributeDescription>
-                                    </eos:reference>
-                                    <eos:value>
-                                        <gco:CharacterString>{{ product_output.PRODUCT_LEVEL }}{# ISO_OPERA_productLevel #}</gco:CharacterString>
-                                    </eos:value>
-                                </eos:AdditionalAttribute>
-                                <eos:AdditionalAttribute>
-                                    <eos:reference>
-                                        <eos:EOS_AdditionalAttributeDescription>
-                                            <eos:type>
-                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
-                                            </eos:type>
-                                            <eos:name>
-                                                <gco:CharacterString>ProductSource</gco:CharacterString>
-                                            </eos:name>
-                                            <eos:description>
-                                                <gco:CharacterString>The DSWx-HLS product source for reflectance measurements</gco:CharacterString>
-                                            </eos:description>
-                                            <eos:dataType>
-                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
-                                            </eos:dataType>
-                                        </eos:EOS_AdditionalAttributeDescription>
-                                    </eos:reference>
-                                    <eos:value>
-                                        <gco:CharacterString>{{ product_output.PRODUCT_SOURCE }}{# ISO_OPERA_productSource #}</gco:CharacterString>
-                                    </eos:value>
-                                </eos:AdditionalAttribute>
-                                <eos:AdditionalAttribute>
-                                    <eos:reference>
-                                        <eos:EOS_AdditionalAttributeDescription>
-                                            <eos:type>
-                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
-                                            </eos:type>
-                                            <eos:name>
-                                                <gco:CharacterString>ProductType</gco:CharacterString>
-                                            </eos:name>
-                                            <eos:description>
-                                                <gco:CharacterString>The product type</gco:CharacterString>
-                                            </eos:description>
-                                            <eos:dataType>
-                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
-                                            </eos:dataType>
-                                        </eos:EOS_AdditionalAttributeDescription>
-                                    </eos:reference>
-                                    <eos:value>
-                                        <gco:CharacterString>{{ product_output.PRODUCT_TYPE }}{# ISO_OPERA_productType #}</gco:CharacterString>
-                                    </eos:value>
-                                </eos:AdditionalAttribute>
-                                <eos:AdditionalAttribute>
-                                    <eos:reference>
-                                        <eos:EOS_AdditionalAttributeDescription>
-                                            <eos:type>
-                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
-                                            </eos:type>
-                                            <eos:name>
-                                                <gco:CharacterString>ProductVersion</gco:CharacterString>
-                                            </eos:name>
-                                            <eos:description>
-                                                <gco:CharacterString>The DSWx-HLS product version (same as in the product filename). It increments with changes to the structure and/or metadata contained within the product.</gco:CharacterString>
-                                            </eos:description>
-                                            <eos:dataType>
-                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
-                                            </eos:dataType>
-                                        </eos:EOS_AdditionalAttributeDescription>
-                                    </eos:reference>
-                                    <eos:value>
-                                        <gco:CharacterString>{{ product_output.PRODUCT_VERSION }}{# ISO_OPERA_productVersion #}</gco:CharacterString>
+                                        <gco:CharacterString>{{ product_output.DSWX_PRODUCT_VERSION }}{# ISO_OPERA_dswxProductVersion #}</gco:CharacterString>
                                     </eos:value>
                                 </eos:AdditionalAttribute>
                                 <eos:AdditionalAttribute>
@@ -950,7 +614,7 @@
                                                 <gco:CharacterString>SoftwareVersion</gco:CharacterString>
                                             </eos:name>
                                             <eos:description>
-                                                <gco:CharacterString>The algorithm software version used to generate the DSWx-HLS product</gco:CharacterString>
+                                                <gco:CharacterString>The software version used to generate the DSWx-S1 product</gco:CharacterString>
                                             </eos:description>
                                             <eos:dataType>
                                                 <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
@@ -971,7 +635,7 @@
                                                 <gco:CharacterString>Project</gco:CharacterString>
                                             </eos:name>
                                             <eos:description>
-                                                <gco:CharacterString>The project name</gco:CharacterString>
+                                                <gco:CharacterString>Name of the project</gco:CharacterString>
                                             </eos:description>
                                             <eos:dataType>
                                                 <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
@@ -986,7 +650,91 @@
                                     <eos:reference>
                                         <eos:EOS_AdditionalAttributeDescription>
                                             <eos:type>
-                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="platformInformation">platformInformation</eos:EOS_AdditionalAttributeTypeCode>
+                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
+                                            </eos:type>
+                                            <eos:name>
+                                                <gco:CharacterString>ProductLevel</gco:CharacterString>
+                                            </eos:name>
+                                            <eos:description>
+                                                <gco:CharacterString>Product level</gco:CharacterString>
+                                            </eos:description>
+                                            <eos:dataType>
+                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="int">int</eos:EOS_AdditionalAttributeDataTypeCode>
+                                            </eos:dataType>
+                                        </eos:EOS_AdditionalAttributeDescription>
+                                    </eos:reference>
+                                    <eos:value>
+                                        <gco:CharacterString>{{ product_output.PRODUCT_LEVEL }}{# ISO_OPERA_productLevel #}</gco:CharacterString>
+                                    </eos:value>
+                                </eos:AdditionalAttribute>
+                                <eos:AdditionalAttribute>
+                                    <eos:reference>
+                                        <eos:EOS_AdditionalAttributeDescription>
+                                            <eos:type>
+                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
+                                            </eos:type>
+                                            <eos:name>
+                                                <gco:CharacterString>ProductType</gco:CharacterString>
+                                            </eos:name>
+                                            <eos:description>
+                                                <gco:CharacterString>Product type</gco:CharacterString>
+                                            </eos:description>
+                                            <eos:dataType>
+                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
+                                            </eos:dataType>
+                                        </eos:EOS_AdditionalAttributeDescription>
+                                    </eos:reference>
+                                    <eos:value>
+                                        <gco:CharacterString>{{ product_output.PRODUCT_TYPE }}{# ISO_OPERA_productType #}</gco:CharacterString>
+                                    </eos:value>
+                                </eos:AdditionalAttribute>
+                                <eos:AdditionalAttribute>
+                                    <eos:reference>
+                                        <eos:EOS_AdditionalAttributeDescription>
+                                            <eos:type>
+                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
+                                            </eos:type>
+                                            <eos:name>
+                                                <gco:CharacterString>ProductSource</gco:CharacterString>
+                                            </eos:name>
+                                            <eos:description>
+                                                <gco:CharacterString>Source data for the product</gco:CharacterString>
+                                            </eos:description>
+                                            <eos:dataType>
+                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
+                                            </eos:dataType>
+                                        </eos:EOS_AdditionalAttributeDescription>
+                                    </eos:reference>
+                                    <eos:value>
+                                        <gco:CharacterString>{{ product_output.PRODUCT_SOURCE }}{# ISO_OPERA_productSource #}</gco:CharacterString>
+                                    </eos:value>
+                                </eos:AdditionalAttribute>
+                                <eos:AdditionalAttribute>
+                                    <eos:reference>
+                                        <eos:EOS_AdditionalAttributeDescription>
+                                            <eos:type>
+                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
+                                            </eos:type>
+                                            <eos:name>
+                                                <gco:CharacterString>ProcessingDateTime</gco:CharacterString>
+                                            </eos:name>
+                                            <eos:description>
+                                                <gco:CharacterString>DSWx-S1 product processing date. Format: YYYY-MM-DDTHH:MM:SSZ.</gco:CharacterString>
+                                            </eos:description>
+                                            <eos:dataType>
+                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
+                                            </eos:dataType>
+                                        </eos:EOS_AdditionalAttributeDescription>
+                                    </eos:reference>
+                                    <eos:value>
+                                        <gco:CharacterString>{{ product_output.PROCESSING_DATETIME }}{# ISO_OPERA_processingDatetime #}</gco:CharacterString>
+                                    </eos:value>
+                                </eos:AdditionalAttribute>
+                                <eos:AdditionalAttribute>
+                                    <eos:reference>
+                                        <eos:EOS_AdditionalAttributeDescription>
+                                            <eos:type>
+                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
                                             </eos:type>
                                             <eos:name>
                                                 <gco:CharacterString>SpacecraftName</gco:CharacterString>
@@ -1010,165 +758,18 @@
                                                 <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
                                             </eos:type>
                                             <eos:name>
-                                                <gco:CharacterString>MaxSunLocalIncAngle</gco:CharacterString>
+                                                <gco:CharacterString>Sensor</gco:CharacterString>
                                             </eos:name>
                                             <eos:description>
-                                                <gco:CharacterString>Maximum sun local-incidence angle (only applicable for “sun_local_inc_angle” shadow masking algorithm)</gco:CharacterString>
+                                                <gco:CharacterString>Name of the sensor instrument</gco:CharacterString>
                                             </eos:description>
-                                            <eos:parameterUnitsOfMeasure>
-                                                <gco:CharacterString>Degrees</gco:CharacterString>
-                                            </eos:parameterUnitsOfMeasure>
                                             <eos:dataType>
-                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="int">int</eos:EOS_AdditionalAttributeDataTypeCode>
+                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
                                             </eos:dataType>
                                         </eos:EOS_AdditionalAttributeDescription>
                                     </eos:reference>
                                     <eos:value>
-                                        <gco:CharacterString>{{ product_output.MAX_SUN_LOCAL_INC_ANGLE }}{# ISO_OPERA_maxSunLocalIncAngle #}</gco:CharacterString>
-                                    </eos:value>
-                                </eos:AdditionalAttribute>
-                                <eos:AdditionalAttribute>
-                                    <eos:reference>
-                                        <eos:EOS_AdditionalAttributeDescription>
-                                            <eos:type>
-                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
-                                            </eos:type>
-                                            <eos:name>
-                                                <gco:CharacterString>MinSlopeAngle</gco:CharacterString>
-                                            </eos:name>
-                                            <eos:description>
-                                                <gco:CharacterString>Minimum slope angle (only applicable for “sun_local_inc_angle” shadow masking algorithm)</gco:CharacterString>
-                                            </eos:description>
-                                            <eos:parameterUnitsOfMeasure>
-                                                <gco:CharacterString>Degrees</gco:CharacterString>
-                                            </eos:parameterUnitsOfMeasure>
-                                            <eos:dataType>
-                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="int">int</eos:EOS_AdditionalAttributeDataTypeCode>
-                                            </eos:dataType>
-                                        </eos:EOS_AdditionalAttributeDescription>
-                                    </eos:reference>
-                                    <eos:value>
-                                        <gco:CharacterString>{{ product_output.MIN_SLOPE_ANGLE }}{# ISO_OPERA_minSlopeAngle #}</gco:CharacterString>
-                                    </eos:value>
-                                </eos:AdditionalAttribute>
-                                <eos:AdditionalAttribute>
-                                    <eos:reference>
-                                        <eos:EOS_AdditionalAttributeDescription>
-                                            <eos:type>
-                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="geographicIdentifier">geographicIdentifier</eos:EOS_AdditionalAttributeTypeCode>
-                                            </eos:type>
-                                            <eos:name>
-                                                <gco:CharacterString>MeanSunAzimuthAngle</gco:CharacterString>
-                                            </eos:name>
-                                            <eos:description>
-                                                <gco:CharacterString>The mean solar azimuth in the tile</gco:CharacterString>
-                                            </eos:description>
-                                            <eos:parameterUnitsOfMeasure>
-                                                <gco:CharacterString>Degrees</gco:CharacterString>
-                                            </eos:parameterUnitsOfMeasure>
-                                            <eos:dataType>
-                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="float">float</eos:EOS_AdditionalAttributeDataTypeCode>
-                                            </eos:dataType>
-                                        </eos:EOS_AdditionalAttributeDescription>
-                                    </eos:reference>
-                                    <eos:value>
-                                        <gco:CharacterString>{{ product_output.MEAN_SUN_AZIMUTH_ANGLE }}{# ISO_OPERA_meanSunAzimuthAngle #}</gco:CharacterString>
-                                    </eos:value>
-                                </eos:AdditionalAttribute>
-                                <eos:AdditionalAttribute>
-                                    <eos:reference>
-                                        <eos:EOS_AdditionalAttributeDescription>
-                                            <eos:type>
-                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="geographicIdentifier">geographicIdentifier</eos:EOS_AdditionalAttributeTypeCode>
-                                            </eos:type>
-                                            <eos:name>
-                                                <gco:CharacterString>MeanSunZenithAngle</gco:CharacterString>
-                                            </eos:name>
-                                            <eos:description>
-                                                <gco:CharacterString>The mean solar zenith in the tile</gco:CharacterString>
-                                            </eos:description>
-                                            <eos:parameterUnitsOfMeasure>
-                                                <gco:CharacterString>Degrees</gco:CharacterString>
-                                            </eos:parameterUnitsOfMeasure>
-                                            <eos:dataType>
-                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="float">float</eos:EOS_AdditionalAttributeDataTypeCode>
-                                            </eos:dataType>
-                                        </eos:EOS_AdditionalAttributeDescription>
-                                    </eos:reference>
-                                    <eos:value>
-                                        <gco:CharacterString>{{ product_output.MEAN_SUN_ZENITH_ANGLE }}{# ISO_OPERA_meanSunZenithAngle #}</gco:CharacterString>
-                                    </eos:value>
-                                </eos:AdditionalAttribute>
-                                <eos:AdditionalAttribute>
-                                    <eos:reference>
-                                        <eos:EOS_AdditionalAttributeDescription>
-                                            <eos:type>
-                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="geographicIdentifier">geographicIdentifier</eos:EOS_AdditionalAttributeTypeCode>
-                                            </eos:type>
-                                            <eos:name>
-                                                <gco:CharacterString>MeanViewAzimuthAngle</gco:CharacterString>
-                                            </eos:name>
-                                            <eos:description>
-                                                <gco:CharacterString>The mean view azimuth angle</gco:CharacterString>
-                                            </eos:description>
-                                            <eos:parameterUnitsOfMeasure>
-                                                <gco:CharacterString>Degrees</gco:CharacterString>
-                                            </eos:parameterUnitsOfMeasure>
-                                            <eos:dataType>
-                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="float">float</eos:EOS_AdditionalAttributeDataTypeCode>
-                                            </eos:dataType>
-                                        </eos:EOS_AdditionalAttributeDescription>
-                                    </eos:reference>
-                                    <eos:value>
-                                        <gco:CharacterString>{{ product_output.MEAN_VIEW_AZIMUTH_ANGLE }}{# ISO_OPERA_meanViewAzimuthAngle #}</gco:CharacterString>
-                                    </eos:value>
-                                </eos:AdditionalAttribute>
-                                <eos:AdditionalAttribute>
-                                    <eos:reference>
-                                        <eos:EOS_AdditionalAttributeDescription>
-                                            <eos:type>
-                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="geographicIdentifier">geographicIdentifier</eos:EOS_AdditionalAttributeTypeCode>
-                                            </eos:type>
-                                            <eos:name>
-                                                <gco:CharacterString>MeanViewZenithAngle</gco:CharacterString>
-                                            </eos:name>
-                                            <eos:description>
-                                                <gco:CharacterString>The mean view zenith angle</gco:CharacterString>
-                                            </eos:description>
-                                            <eos:parameterUnitsOfMeasure>
-                                                <gco:CharacterString>Degrees</gco:CharacterString>
-                                            </eos:parameterUnitsOfMeasure>
-                                            <eos:dataType>
-                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="float">float</eos:EOS_AdditionalAttributeDataTypeCode>
-                                            </eos:dataType>
-                                        </eos:EOS_AdditionalAttributeDescription>
-                                    </eos:reference>
-                                    <eos:value>
-                                        <gco:CharacterString>{{ product_output.MEAN_VIEW_ZENITH_ANGLE }}{# ISO_OPERA_meanViewZenithAngle #}</gco:CharacterString>
-                                    </eos:value>
-                                </eos:AdditionalAttribute>
-                                <eos:AdditionalAttribute>
-                                    <eos:reference>
-                                        <eos:EOS_AdditionalAttributeDescription>
-                                            <eos:type>
-                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="geographicIdentifier">geographicIdentifier</eos:EOS_AdditionalAttributeTypeCode>
-                                            </eos:type>
-                                            <eos:name>
-                                                <gco:CharacterString>NBAR_SolarZenith</gco:CharacterString>
-                                            </eos:name>
-                                            <eos:description>
-                                                <gco:CharacterString>The solar zenith angle used in Nadir Bidirectional Reflectance Distribution Function Adjusted Reflectance (NBAR) derivation</gco:CharacterString>
-                                            </eos:description>
-                                            <eos:parameterUnitsOfMeasure>
-                                                <gco:CharacterString>Degrees</gco:CharacterString>
-                                            </eos:parameterUnitsOfMeasure>
-                                            <eos:dataType>
-                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="float">float</eos:EOS_AdditionalAttributeDataTypeCode>
-                                            </eos:dataType>
-                                        </eos:EOS_AdditionalAttributeDescription>
-                                    </eos:reference>
-                                    <eos:value>
-                                        <gco:CharacterString>{{ product_output.NBAR_SOLAR_ZENITH }}{# ISO_OPERA_nbarSolarZenith #}</gco:CharacterString>
+                                        <gco:CharacterString>{{ product_output.SENSOR }}{# ISO_OPERA_sensor #}</gco:CharacterString>
                                     </eos:value>
                                 </eos:AdditionalAttribute>
                                 <eos:AdditionalAttribute>
@@ -1178,10 +779,10 @@
                                                 <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="platformInformation">platformInformation</eos:EOS_AdditionalAttributeTypeCode>
                                             </eos:type>
                                             <eos:name>
-                                                <gco:CharacterString>Accode</gco:CharacterString>
+                                                <gco:CharacterString>SensingStart</gco:CharacterString>
                                             </eos:name>
                                             <eos:description>
-                                                <gco:CharacterString>The version of Land Surface Reflectance Code (LaSRC) used by HLS for the Landsat-8 30m (L30) product or the Sentinel-2 30m (S30) product for atmospheric correction</gco:CharacterString>
+                                                <gco:CharacterString>Sensing start time. Earliest acquisition time of OPERA burst RTC set. Format: YYYY-MM-DDTHH:MM:SSZ</gco:CharacterString>
                                             </eos:description>
                                             <eos:dataType>
                                                 <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
@@ -1189,20 +790,20 @@
                                         </eos:EOS_AdditionalAttributeDescription>
                                     </eos:reference>
                                     <eos:value>
-                                        <gco:CharacterString>{{ product_output.ACCODE }}{# ISO_OPERA_accode #}</gco:CharacterString>
+                                        <gco:CharacterString>{{ product_output.SENSING_START }}{# ISO_OPERA_sensingTimeStart #}</gco:CharacterString>
                                     </eos:value>
                                 </eos:AdditionalAttribute>
                                 <eos:AdditionalAttribute>
                                     <eos:reference>
                                         <eos:EOS_AdditionalAttributeDescription>
                                             <eos:type>
-                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
+                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="platformInformation">platformInformation</eos:EOS_AdditionalAttributeTypeCode>
                                             </eos:type>
                                             <eos:name>
-                                                <gco:CharacterString>OceanMaskingEnabled</gco:CharacterString>
+                                                <gco:CharacterString>SensingEnd</gco:CharacterString>
                                             </eos:name>
                                             <eos:description>
-                                                <gco:CharacterString>Indicates if the ocean masking is enabled (TRUE) or disabled (FALSE)</gco:CharacterString>
+                                                <gco:CharacterString>Sensing end time. Latest acquisition time of OPERA burst RTC set. Format: YYYY-MM-DDTHH:MM:SSZ</gco:CharacterString>
                                             </eos:description>
                                             <eos:dataType>
                                                 <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
@@ -1210,65 +811,20 @@
                                         </eos:EOS_AdditionalAttributeDescription>
                                     </eos:reference>
                                     <eos:value>
-                                        <gco:CharacterString>{{ product_output.OCEAN_MASKING_ENABLED }}{# ISO_OPERA_oceanMaskingEnabled #}</gco:CharacterString>
+                                        <gco:CharacterString>{{ product_output.SENSING_END }}{# ISO_OPERA_sensingTimeEnd #}</gco:CharacterString>
                                     </eos:value>
                                 </eos:AdditionalAttribute>
                                 <eos:AdditionalAttribute>
                                     <eos:reference>
                                         <eos:EOS_AdditionalAttributeDescription>
                                             <eos:type>
-                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
-                                            </eos:type>
-                                            <eos:name>
-                                                <gco:CharacterString>OceanMaskingShorelineDistanceKM</gco:CharacterString>
-                                            </eos:name>
-                                            <eos:description>
-                                                <gco:CharacterString>Ocean masking distance from shoreline in km (only applicable if the ocean masking is enabled)</gco:CharacterString>
-                                            </eos:description>
-                                            <eos:parameterUnitsOfMeasure>
-                                                <gco:CharacterString>Kilometers</gco:CharacterString>
-                                            </eos:parameterUnitsOfMeasure>
-                                            <eos:dataType>
-                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
-                                            </eos:dataType>
-                                        </eos:EOS_AdditionalAttributeDescription>
-                                    </eos:reference>
-                                    <eos:value>
-                                        <gco:CharacterString>{{ product_output.OCEAN_MASKING_SHORELINE_DISTANCE_KM }}{# ISO_OPERA_oceanMaskingShorelineDistanceKM #}</gco:CharacterString>
-                                    </eos:value>
-                                </eos:AdditionalAttribute>
-                                <eos:AdditionalAttribute>
-                                    <eos:reference>
-                                        <eos:EOS_AdditionalAttributeDescription>
-                                            <eos:type>
-                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
-                                            </eos:type>
-                                            <eos:name>
-                                                <gco:CharacterString>ShadowMaskingAlgorithm</gco:CharacterString>
-                                            </eos:name>
-                                            <eos:description>
-                                                <gco:CharacterString>Shadow masking algorithm, either “sun_local_inc_angle” (default) or “otsu”</gco:CharacterString>
-                                            </eos:description>
-                                            <eos:dataType>
-                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
-                                            </eos:dataType>
-                                        </eos:EOS_AdditionalAttributeDescription>
-                                    </eos:reference>
-                                    <eos:value>
-                                        <gco:CharacterString>{{ product_output.SHADOW_MASKING_ALGORITHM }}{# ISO_OPERA_shadowMaskingAlgorithm #}</gco:CharacterString>
-                                    </eos:value>
-                                </eos:AdditionalAttribute>
-                                <eos:AdditionalAttribute>
-                                    <eos:reference>
-                                        <eos:EOS_AdditionalAttributeDescription>
-                                            <eos:type>
-                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="qualityInformation">qualityInformation</eos:EOS_AdditionalAttributeTypeCode>
+                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="platformInformation">platformInformation</eos:EOS_AdditionalAttributeTypeCode>
                                             </eos:type>
                                             <eos:name>
                                                 <gco:CharacterString>SpatialCoverage</gco:CharacterString>
                                             </eos:name>
                                             <eos:description>
-                                                <gco:CharacterString>The percentage of the tile area with observational data (as opposed to fill value and ocean masked)</gco:CharacterString>
+                                                <gco:CharacterString>The area percentage of the tile with data</gco:CharacterString>
                                             </eos:description>
                                             <eos:dataType>
                                                 <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="int">int</eos:EOS_AdditionalAttributeDataTypeCode>
@@ -1283,13 +839,13 @@
                                     <eos:reference>
                                         <eos:EOS_AdditionalAttributeDescription>
                                             <eos:type>
-                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="qualityInformation">qualityInformation</eos:EOS_AdditionalAttributeTypeCode>
+                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="platformInformation">platformInformation</eos:EOS_AdditionalAttributeTypeCode>
                                             </eos:type>
                                             <eos:name>
-                                                <gco:CharacterString>SpatialCoverageExcludingMaskedOcean</gco:CharacterString>
+                                                <gco:CharacterString>LayoverShadowCoverage</gco:CharacterString>
                                             </eos:name>
                                             <eos:description>
-                                                <gco:CharacterString>The percentage of the tile area with observational data (as opposed to fill value and ocean masked) excluding masked ocean</gco:CharacterString>
+                                                <gco:CharacterString>The percentage of layover and shadow in the DSWx-S1 product based on OPERA RTC-S1 product</gco:CharacterString>
                                             </eos:description>
                                             <eos:dataType>
                                                 <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="int">int</eos:EOS_AdditionalAttributeDataTypeCode>
@@ -1297,83 +853,20 @@
                                         </eos:EOS_AdditionalAttributeDescription>
                                     </eos:reference>
                                     <eos:value>
-                                        <gco:CharacterString>{{ product_output.SPATIAL_COVERAGE_EXCLUDING_MASKED_OCEAN }}{# ISO_OPERA_spatialCoverageExcludingMaskedOcean #}</gco:CharacterString>
+                                        <gco:CharacterString>{{ product_output.LAYOVER_SHADOW_COVERAGE }}{# ISO_OPERA_layoverShadowCoverage #}</gco:CharacterString>
                                     </eos:value>
                                 </eos:AdditionalAttribute>
                                 <eos:AdditionalAttribute>
                                     <eos:reference>
                                         <eos:EOS_AdditionalAttributeDescription>
                                             <eos:type>
-                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="qualityInformation">qualityInformation</eos:EOS_AdditionalAttributeTypeCode>
+                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
                                             </eos:type>
                                             <eos:name>
-                                                <gco:CharacterString>CloudCoverage</gco:CharacterString>
+                                                <gco:CharacterString>RTCProductVersion</gco:CharacterString>
                                             </eos:name>
                                             <eos:description>
-                                                <gco:CharacterString>The percentage of pixels with observational data (as opposed to fill value and ocean masked) that HLS QA mask marks as cloud, cloud shadow, or adjacent-to-cloud (per MASK_ADJACENT_TO_CLOUD setting)</gco:CharacterString>
-                                            </eos:description>
-                                            <eos:dataType>
-                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="int">int</eos:EOS_AdditionalAttributeDataTypeCode>
-                                            </eos:dataType>
-                                        </eos:EOS_AdditionalAttributeDescription>
-                                    </eos:reference>
-                                    <eos:value>
-                                        <gco:CharacterString>{{ product_output.CLOUD_COVERAGE }}{# ISO_OPERA_cloudCoverage #}</gco:CharacterString>
-                                    </eos:value>
-                                </eos:AdditionalAttribute>
-                                <eos:AdditionalAttribute>
-                                    <eos:reference>
-                                        <eos:EOS_AdditionalAttributeDescription>
-                                            <eos:type>
-                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="qualityInformation">qualityInformation</eos:EOS_AdditionalAttributeTypeCode>
-                                            </eos:type>
-                                            <eos:name>
-                                                <gco:CharacterString>InputHlsProductCloudCoverage</gco:CharacterString>
-                                            </eos:name>
-                                            <eos:description>
-                                                <gco:CharacterString>The percentage of cloud/cloud shadow over observational data (as opposed to fill value) in the input HLS product derived using the HLS Fmask layer</gco:CharacterString>
-                                            </eos:description>
-                                            <eos:dataType>
-                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="int">int</eos:EOS_AdditionalAttributeDataTypeCode>
-                                            </eos:dataType>
-                                        </eos:EOS_AdditionalAttributeDescription>
-                                    </eos:reference>
-                                    <eos:value>
-                                        <gco:CharacterString>{{ product_output.INPUT_HLS_PRODUCT_CLOUD_COVERAGE }}{# ISO_OPERA_inputHlsProductCloudCoverage #}</gco:CharacterString>
-                                    </eos:value>
-                                </eos:AdditionalAttribute>
-                                <eos:AdditionalAttribute>
-                                    <eos:reference>
-                                        <eos:EOS_AdditionalAttributeDescription>
-                                            <eos:type>
-                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="qualityInformation">qualityInformation</eos:EOS_AdditionalAttributeTypeCode>
-                                            </eos:type>
-                                            <eos:name>
-                                                <gco:CharacterString>InputHlsProductSpatialCoverage</gco:CharacterString>
-                                            </eos:name>
-                                            <eos:description>
-                                                <gco:CharacterString>The percentage of the tile area with observational data (as opposed to fill value) in the input HLS product</gco:CharacterString>
-                                            </eos:description>
-                                            <eos:dataType>
-                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="int">int</eos:EOS_AdditionalAttributeDataTypeCode>
-                                            </eos:dataType>
-                                        </eos:EOS_AdditionalAttributeDescription>
-                                    </eos:reference>
-                                    <eos:value>
-                                        <gco:CharacterString>{{ product_output.INPUT_HLS_PRODUCT_SPATIAL_COVERAGE }}{# ISO_OPERA_inputHlsProductSpatialCoverage #}</gco:CharacterString>
-                                    </eos:value>
-                                </eos:AdditionalAttribute>
-                                <eos:AdditionalAttribute>
-                                    <eos:reference>
-                                        <eos:EOS_AdditionalAttributeDescription>
-                                            <eos:type>
-                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="qualityInformation">qualityInformation</eos:EOS_AdditionalAttributeTypeCode>
-                                            </eos:type>
-                                            <eos:name>
-                                                <gco:CharacterString>DEMCoverage</gco:CharacterString>
-                                            </eos:name>
-                                            <eos:description>
-                                                <gco:CharacterString>Input DEM coverage over the DSWx-HLS product: “FULL” for full coverage, “FULL_WITH_ANTIMERIDIAN_CROSSING” for full coverage with antimeridian crossing, or “NOT_TESTED” if coverage checks are disabled</gco:CharacterString>
+                                                <gco:CharacterString>The version of the OPERA RTC algorithm used with the input RTC products</gco:CharacterString>
                                             </eos:description>
                                             <eos:dataType>
                                                 <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
@@ -1381,20 +874,20 @@
                                         </eos:EOS_AdditionalAttributeDescription>
                                     </eos:reference>
                                     <eos:value>
-                                        <gco:CharacterString>{{ product_output.DEM_COVERAGE }}{# ISO_OPERA_demCoverage #}</gco:CharacterString>
+                                        <gco:CharacterString>{{ product_output.RTC_PRODUCT_VERSION }}{# ISO_OPERA_rtcProductVersion #}</gco:CharacterString>
                                     </eos:value>
                                 </eos:AdditionalAttribute>
                                 <eos:AdditionalAttribute>
                                     <eos:reference>
                                         <eos:EOS_AdditionalAttributeDescription>
                                             <eos:type>
-                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="qualityInformation">qualityInformation</eos:EOS_AdditionalAttributeTypeCode>
+                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
                                             </eos:type>
                                             <eos:name>
-                                                <gco:CharacterString>LandcoverCoverage</gco:CharacterString>
+                                                <gco:CharacterString>Polarization</gco:CharacterString>
                                             </eos:name>
                                             <eos:description>
-                                                <gco:CharacterString>Input CGLS discrete classification map coverage over the DSWx-HLS product: “FULL” for full coverage, “FULL_WITH_ANTIMERIDIAN_CROSSING” for full coverage with antimeridian crossing, “PARTIAL” if DSWx-HLS product coverage exceeds CGLS map limits (i.e., beyond latitudes -60 or +80 degrees), or “NOT_TESTED” if coverage checks are disabled.</gco:CharacterString>
+                                                <gco:CharacterString>Polarizations of input RTC products</gco:CharacterString>
                                             </eos:description>
                                             <eos:dataType>
                                                 <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
@@ -1402,20 +895,20 @@
                                         </eos:EOS_AdditionalAttributeDescription>
                                     </eos:reference>
                                     <eos:value>
-                                        <gco:CharacterString>{{ product_output.LANDCOVER_COVERAGE }}{# ISO_OPERA_landcoverCoverage #}</gco:CharacterString>
+                                        <gco:CharacterString>{{ product_output.POLARIZATION }}{# ISO_OPERA_polarization #}</gco:CharacterString>
                                     </eos:value>
                                 </eos:AdditionalAttribute>
                                 <eos:AdditionalAttribute>
                                     <eos:reference>
                                         <eos:EOS_AdditionalAttributeDescription>
                                             <eos:type>
-                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="qualityInformation">qualityInformation</eos:EOS_AdditionalAttributeTypeCode>
+                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="platformInformation">platformInformation</eos:EOS_AdditionalAttributeTypeCode>
                                             </eos:type>
                                             <eos:name>
-                                                <gco:CharacterString>WorldcoverCoverage</gco:CharacterString>
+                                                <gco:CharacterString>BurstID</gco:CharacterString>
                                             </eos:name>
                                             <eos:description>
-                                                <gco:CharacterString>Input ESA WorldCover map coverage over the DSWx-HLS product: “FULL” for full coverage, “FULL_WITH_ANTIMERIDIAN_CROSSING” for full coverage with antimeridian crossing, “PARTIAL” if DSWx-HLS product exceeds the WorldCover map limits (i.e.,beyond  latitudes -60 or +84 degrees), or “NOT_TESTED” if coverage checks are disabled</gco:CharacterString>
+                                                <gco:CharacterString>List of the burst id. Format: TrackNumber_BurstID_SwathNumber</gco:CharacterString>
                                             </eos:description>
                                             <eos:dataType>
                                                 <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
@@ -1423,7 +916,217 @@
                                         </eos:EOS_AdditionalAttributeDescription>
                                     </eos:reference>
                                     <eos:value>
-                                        <gco:CharacterString>{{ product_output.WORLDCOVER_COVERAGE }}{# ISO_OPERA_landcoverCoverage #}</gco:CharacterString>
+                                        <gco:CharacterString>{{ product_output.BURST_ID }}{# ISO_OPERA_burstID #}</gco:CharacterString>
+                                    </eos:value>
+                                </eos:AdditionalAttribute>
+                                <eos:AdditionalAttribute>
+                                    <eos:reference>
+                                        <eos:EOS_AdditionalAttributeDescription>
+                                            <eos:type>
+                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="platformInformation">platformInformation</eos:EOS_AdditionalAttributeTypeCode>
+                                            </eos:type>
+                                            <eos:name>
+                                                <gco:CharacterString>AbsoluteOrbitNumber</gco:CharacterString>
+                                            </eos:name>
+                                            <eos:description>
+                                                <gco:CharacterString>Absolute orbit number copied from the OPERA RTC burst products</gco:CharacterString>
+                                            </eos:description>
+                                            <eos:dataType>
+                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="int">int</eos:EOS_AdditionalAttributeDataTypeCode>
+                                            </eos:dataType>
+                                        </eos:EOS_AdditionalAttributeDescription>
+                                    </eos:reference>
+                                    <eos:value>
+                                        <gco:CharacterString>{{ product_output.ABSOLUTE_ORBIT_NUMBER }}{# ISO_OPERA_absoluteOrbitNumber #}</gco:CharacterString>
+                                    </eos:value>
+                                </eos:AdditionalAttribute>
+                                <eos:AdditionalAttribute>
+                                    <eos:reference>
+                                        <eos:EOS_AdditionalAttributeDescription>
+                                            <eos:type>
+                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="platformInformation">platformInformation</eos:EOS_AdditionalAttributeTypeCode>
+                                            </eos:type>
+                                            <eos:name>
+                                                <gco:CharacterString>TrackNumber</gco:CharacterString>
+                                            </eos:name>
+                                            <eos:description>
+                                                <gco:CharacterString>Track number copied from the OPERA RTC burst products</gco:CharacterString>
+                                            </eos:description>
+                                            <eos:dataType>
+                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="int">int</eos:EOS_AdditionalAttributeDataTypeCode>
+                                            </eos:dataType>
+                                        </eos:EOS_AdditionalAttributeDescription>
+                                    </eos:reference>
+                                    <eos:value>
+                                        <gco:CharacterString>{{ product_output.TRACK_NUMBER }}{# ISO_OPERA_trackNumber #}</gco:CharacterString>
+                                    </eos:value>
+                                </eos:AdditionalAttribute>
+                                <eos:AdditionalAttribute>
+                                    <eos:reference>
+                                        <eos:EOS_AdditionalAttributeDescription>
+                                            <eos:type>
+                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingParameter">processingParameter</eos:EOS_AdditionalAttributeTypeCode>
+                                            </eos:type>
+                                            <eos:name>
+                                                <gco:CharacterString>Workflow</gco:CharacterString>
+                                            </eos:name>
+                                            <eos:description>
+                                                <gco:CharacterString>Indicates the workflow for DSWx-S1, either DSWx-S1-open_water or DSWx-S1-inundated_vegetation</gco:CharacterString>
+                                            </eos:description>
+                                            <eos:dataType>
+                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
+                                            </eos:dataType>
+                                        </eos:EOS_AdditionalAttributeDescription>
+                                    </eos:reference>
+                                    <eos:value>
+                                        <gco:CharacterString>{{ product_output.WORKFLOW }}{# ISO_OPERA_workflow #}</gco:CharacterString>
+                                    </eos:value>
+                                </eos:AdditionalAttribute>
+                                <eos:AdditionalAttribute>
+                                    <eos:reference>
+                                        <eos:EOS_AdditionalAttributeDescription>
+                                            <eos:type>
+                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingParameter">processingParameter</eos:EOS_AdditionalAttributeTypeCode>
+                                            </eos:type>
+                                            <eos:name>
+                                                <gco:CharacterString>Thresholding</gco:CharacterString>
+                                            </eos:name>
+                                            <eos:description>
+                                                <gco:CharacterString>Initial thresholding algorithm, either “Kittler-Illingworth” or “OTSU”</gco:CharacterString>
+                                            </eos:description>
+                                            <eos:dataType>
+                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
+                                            </eos:dataType>
+                                        </eos:EOS_AdditionalAttributeDescription>
+                                    </eos:reference>
+                                    <eos:value>
+                                        <gco:CharacterString>{{ product_output.THRESHOLDING }}{# ISO_OPERA_thresholding #}</gco:CharacterString>
+                                    </eos:value>
+                                </eos:AdditionalAttribute>
+                                <eos:AdditionalAttribute>
+                                    <eos:reference>
+                                        <eos:EOS_AdditionalAttributeDescription>
+                                            <eos:type>
+                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingParameter">processingParameter</eos:EOS_AdditionalAttributeTypeCode>
+                                            </eos:type>
+                                            <eos:name>
+                                                <gco:CharacterString>MultiThreshold</gco:CharacterString>
+                                            </eos:name>
+                                            <eos:description>
+                                                <gco:CharacterString>Boolean if trimodal distribution is assumed</gco:CharacterString>
+                                            </eos:description>
+                                            <eos:dataType>
+                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="boolean">boolean</eos:EOS_AdditionalAttributeDataTypeCode>
+                                            </eos:dataType>
+                                        </eos:EOS_AdditionalAttributeDescription>
+                                    </eos:reference>
+                                    <eos:value>
+                                        <gco:CharacterString>{{ product_output.MULTI_THRESHOLD }}{# ISO_OPERA_multiThreshold #}</gco:CharacterString>
+                                    </eos:value>
+                                </eos:AdditionalAttribute>
+                                <eos:AdditionalAttribute>
+                                    <eos:reference>
+                                        <eos:EOS_AdditionalAttributeDescription>
+                                            <eos:type>
+                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingParameter">processingParameter</eos:EOS_AdditionalAttributeTypeCode>
+                                            </eos:type>
+                                            <eos:name>
+                                                <gco:CharacterString>TileSelection</gco:CharacterString>
+                                            </eos:name>
+                                            <eos:description>
+                                                <gco:CharacterString>Tile selection method (e.g. Tweles, Chini, Bimodality or combined)</gco:CharacterString>
+                                            </eos:description>
+                                            <eos:dataType>
+                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
+                                            </eos:dataType>
+                                        </eos:EOS_AdditionalAttributeDescription>
+                                    </eos:reference>
+                                    <eos:value>
+                                        <gco:CharacterString>{{ product_output.TILE_SELECTION }}{# ISO_OPERA_tileSelection #}</gco:CharacterString>
+                                    </eos:value>
+                                </eos:AdditionalAttribute>
+                                <eos:AdditionalAttribute>
+                                    <eos:reference>
+                                        <eos:EOS_AdditionalAttributeDescription>
+                                            <eos:type>
+                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingParameter">processingParameter</eos:EOS_AdditionalAttributeTypeCode>
+                                            </eos:type>
+                                            <eos:name>
+                                                <gco:CharacterString>Filter</gco:CharacterString>
+                                            </eos:name>
+                                            <eos:description>
+                                                <gco:CharacterString>Filter name</gco:CharacterString>
+                                            </eos:description>
+                                            <eos:dataType>
+                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
+                                            </eos:dataType>
+                                        </eos:EOS_AdditionalAttributeDescription>
+                                    </eos:reference>
+                                    <eos:value>
+                                        <gco:CharacterString>{{ product_output.FILTER }}{# ISO_OPERA_filter #}</gco:CharacterString>
+                                    </eos:value>
+                                </eos:AdditionalAttribute>
+                                <eos:AdditionalAttribute>
+                                    <eos:reference>
+                                        <eos:EOS_AdditionalAttributeDescription>
+                                            <eos:type>
+                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingParameter">processingParameter</eos:EOS_AdditionalAttributeTypeCode>
+                                            </eos:type>
+                                            <eos:name>
+                                                <gco:CharacterString>InundatedVegetation</gco:CharacterString>
+                                            </eos:name>
+                                            <eos:description>
+                                                <gco:CharacterString>Boolean if inundated vegetation is involved</gco:CharacterString>
+                                            </eos:description>
+                                            <eos:dataType>
+                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="boolean">boolean</eos:EOS_AdditionalAttributeDataTypeCode>
+                                            </eos:dataType>
+                                        </eos:EOS_AdditionalAttributeDescription>
+                                    </eos:reference>
+                                    <eos:value>
+                                        <gco:CharacterString>{{ product_output.INUNDATED_VEGETATION }}{# ISO_OPERA_inundatedVegetation #}</gco:CharacterString>
+                                    </eos:value>
+                                </eos:AdditionalAttribute>
+                                <eos:AdditionalAttribute>
+                                    <eos:reference>
+                                        <eos:EOS_AdditionalAttributeDescription>
+                                            <eos:type>
+                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingParameter">processingParameter</eos:EOS_AdditionalAttributeTypeCode>
+                                            </eos:type>
+                                            <eos:name>
+                                                <gco:CharacterString>FuzzySeed</gco:CharacterString>
+                                            </eos:name>
+                                            <eos:description>
+                                                <gco:CharacterString>Seed value for fuzzy-logic classification</gco:CharacterString>
+                                            </eos:description>
+                                            <eos:dataType>
+                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="int">int</eos:EOS_AdditionalAttributeDataTypeCode>
+                                            </eos:dataType>
+                                        </eos:EOS_AdditionalAttributeDescription>
+                                    </eos:reference>
+                                    <eos:value>
+                                        <gco:CharacterString>{{ product_output.FUZZY_SEED }}{# ISO_OPERA_fuzzySeed #}</gco:CharacterString>
+                                    </eos:value>
+                                </eos:AdditionalAttribute>
+                                <eos:AdditionalAttribute>
+                                    <eos:reference>
+                                        <eos:EOS_AdditionalAttributeDescription>
+                                            <eos:type>
+                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingParameter">processingParameter</eos:EOS_AdditionalAttributeTypeCode>
+                                            </eos:type>
+                                            <eos:name>
+                                                <gco:CharacterString>FuzzyTolerance</gco:CharacterString>
+                                            </eos:name>
+                                            <eos:description>
+                                                <gco:CharacterString>Tolerance value for fuzzy-logic classification</gco:CharacterString>
+                                            </eos:description>
+                                            <eos:dataType>
+                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="float">float</eos:EOS_AdditionalAttributeDataTypeCode>
+                                            </eos:dataType>
+                                        </eos:EOS_AdditionalAttributeDescription>
+                                    </eos:reference>
+                                    <eos:value>
+                                        <gco:CharacterString>{{ product_output.FUZZY_TOLERANCE }}{# ISO_OPERA_fuzzyTolerance #}</gco:CharacterString>
                                     </eos:value>
                                 </eos:AdditionalAttribute>
                             </eos:AdditionalAttributes>
@@ -1473,7 +1176,7 @@
             <gmd:lineage>
                 <gmd:LI_Lineage>
                     <gmd:statement>
-                        <gco:CharacterString>OPERA L3 DSWx product generated by JPL using HLS input data and SAS version {{ catalog_metadata.SAS_Version }}{# ISO_OPERA_SASVersionId #}</gco:CharacterString>
+                        <gco:CharacterString>OPERA L3 DSWx product generated by JPL using Sentinel-1 A/B input data and SAS version {{ catalog_metadata.SAS_Version }}{# ISO_OPERA_SASVersionId #}</gco:CharacterString>
                     </gmd:statement>
                     <!-- This section contains the PGEVersionClass -->
                     <gmd:processStep>
@@ -1555,7 +1258,7 @@
                     <gmd:source>
                         <gmd:LI_Source>
                             <gmd:description>
-                                <gco:CharacterString>Landcover File - {{ product_output.LANDCOVER_SOURCE }}{# ISO_OPERA_landcoverSource #}</gco:CharacterString>
+                                <gco:CharacterString>Reference Water File - {{ product_output.REFERENCE_WATER_SOURCE }}{# ISO_OPERA_refWaterSource #}</gco:CharacterString>
                             </gmd:description>
                         </gmd:LI_Source>
                     </gmd:source>
@@ -1563,6 +1266,13 @@
                         <gmd:LI_Source>
                             <gmd:description>
                                 <gco:CharacterString>Shoreline Shape File - {{ product_output.SHORELINE_SOURCE }}{# ISO_OPERA_shorelineSource #}</gco:CharacterString>
+                            </gmd:description>
+                        </gmd:LI_Source>
+                    </gmd:source>
+                    <gmd:source>
+                        <gmd:LI_Source>
+                            <gmd:description>
+                                <gco:CharacterString>HAND File - {{ product_output.HAND_SOURCE }}{# ISO_OPERA_handSource #}</gco:CharacterString>
                             </gmd:description>
                         </gmd:LI_Source>
                     </gmd:source>
