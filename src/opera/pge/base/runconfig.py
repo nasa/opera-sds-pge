@@ -297,7 +297,16 @@ class RunConfig:
     @property
     def algorithm_parameters_file_config_path(self) -> str:
         """Returns the path to the algorithm parameters run configuration file"""
-        dynamic_ancillary_file_group = self._sas_config['dynamic_ancillary_file_group']
+
+        # ADT is inconsistent with how they define this location across different SAS,
+        # so check all known permutations
+        try:
+            dynamic_ancillary_file_group = self._sas_config['runconfig']['groups']['dynamic_ancillary_file_group']
+        except KeyError:
+            try:
+                dynamic_ancillary_file_group = self._sas_config['dynamic_ancillary_file_group']
+            except KeyError:
+                return None
 
         # ADT is inconsistent with how they define this location across different SAS,
         # so check all known permutations
