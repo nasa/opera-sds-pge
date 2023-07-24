@@ -311,7 +311,7 @@ class RunConfig:
         return (
             algorithm_parameters_file_config_path
             if isabs(algorithm_parameters_file_config_path)
-            else resource_filename('opera', algorithm_parameters_file_config_path)
+            else os.path.abspath(algorithm_parameters_file_config_path)
         )
 
     @property

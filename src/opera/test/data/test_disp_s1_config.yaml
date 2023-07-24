@@ -57,7 +57,7 @@ RunConfig:
 
                     dynamic_ancillary_file_group:
                         # Path to file containing SAS algorithm parameters.
-                        algorithm_parameters_file: test/data/test_disp_s1_algorithm_parameters.yaml
+                        algorithm_parameters_file: disp_s1_pge_test/input_dir/test_disp_s1_algorithm_parameters.yaml
 
                         # Paths to existing Amplitude Dispersion files (1 per burst) for PS update calculation. If
                         # none provided, computed using the input SLC stack.

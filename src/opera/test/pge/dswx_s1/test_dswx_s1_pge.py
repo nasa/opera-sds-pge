@@ -9,6 +9,7 @@ Unit tests for the pge/dswx_s1/dswx_s1_pge.py module.
 
 import glob
 import os
+import re
 import shutil
 import tempfile
 import unittest
@@ -22,6 +23,8 @@ import yaml
 from opera.pge import RunConfig
 from opera.pge.dswx_s1.dswx_s1_pge import DSWxS1Executor
 from opera.util import PgeLogger
+from opera.util.img_utils import MockGdal
+from opera.util.metadata_utils import get_sensor_from_spacecraft_name
 
 
 class DswxS1PgeTestCase(unittest.TestCase):
@@ -63,10 +66,7 @@ class DswxS1PgeTestCase(unittest.TestCase):
         )
 
         # Copy the algorithm_parameters config file into the test input directory.
-        shutil.copy(join(self.data_dir, 'test_algorithm_parameters_s1.yaml'), test_input_dir)
-        # these path variables are use to update the main runconfig file, then to reset it
-        self.test_algorithm_parameters_path = abspath(join(test_input_dir, 'test_algorithm_parameters_s1.yaml'))
-        self.restore_test_algorithm_param_path = 'dswx_s1_pge_test/input_dir/test_algorithm_parameters_s1.yaml'
+        shutil.copy(join(self.data_dir, 'test_dswx_s1_algorithm_parameters.yaml'), test_input_dir)
 
         self.input_file = tempfile.NamedTemporaryFile(
             dir=test_input_dir, prefix="test_h5_", suffix=".h5"
@@ -83,11 +83,6 @@ class DswxS1PgeTestCase(unittest.TestCase):
         # Create the output directories expected by the test Runconfig file
         self.test_output_dir = abspath(join(self.working_dir.name, "dswx_s1_pge_test/output_dir"))
         os.makedirs(self.test_output_dir, exist_ok=True)
-        # Add some band data to the output directory:
-        band_data = ('OPERA_L3_DSWx-S1_b1_B01_WTR.tif', 'OPERA_L3_DSWx-S1_b1_B02_BWTR.tif',
-                     'OPERA_L3_DSWx-S1_b1_B03_CONF.tif', 'OPERA_L3_DSWx-S1_b2_B01_WTR.tif',
-                     'OPERA_L3_DSWx-S1_b2_B02_BWTR.tif', 'OPERA_L3_DSWx-S1_b2_B03_CONF.tif')
-        self.generate_band_data_output(band_data, clear=False)
 
         os.chdir(self.working_dir.name)
 
@@ -97,31 +92,6 @@ class DswxS1PgeTestCase(unittest.TestCase):
         self.input_file.close()
         self.working_dir.cleanup()
 
-    def _set_algorithm_parameters_path(self, runconfig, path):
-        """
-        Set the path in the main runconfig file to the algorithm parameters
-        runconfig file.  For each test this path is set to the algorithm
-        parameters runconfig in the test data directory.  At the end of each
-        test it is set back to the original value.
-
-        Parameters
-        ----------
-        runconfig:  str
-            runconfig file to modify
-        path:  str
-            path to the algorithm parameters runconfig file
-
-        """
-        runconfig_path = join(self.data_dir, runconfig)
-
-        with open(runconfig_path, 'r', encoding='utf-8') as infile:
-            runconfig_dict = yaml.safe_load(infile)
-
-        runconfig_dict['RunConfig']['Groups']['SAS']['runconfig']['groups']['dynamic_ancillary_file_group'] \
-            ['algorithm_parameters'] = path  # noqa E211
-
-        with open(runconfig_path, 'w', encoding='utf-8') as outfile:
-            yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
 
     def _compare_algorithm_parameters_runconfig_to_expected(self, runconfig):
         """
@@ -179,6 +149,7 @@ class DswxS1PgeTestCase(unittest.TestCase):
             path = self.test_output_dir
             cmd = f"rm {path}/*.tif"
             os.system(cmd)
+
         # Add files to the output directory
         for band_output_file in band_data:
             if not empty_file:
@@ -193,14 +164,11 @@ class DswxS1PgeTestCase(unittest.TestCase):
         a message to be captured by PgeLogger.
         """
         runconfig_path = join(self.data_dir, 'test_dswx_s1_config.yaml')
-        test_runconfig_path = join(self.data_dir, 'invalid_dswx_s1_config.yaml')
-
-        self._set_algorithm_parameters_path(runconfig_path, self.test_algorithm_parameters_path)
 
         pge = DSWxS1Executor(pge_name="DswxS1PgeTest", runconfig_path=runconfig_path)
 
         # Check that basic attributes were initialized
-        self.assertEqual(pge.name, "DSWx")
+        self.assertEqual(pge.name, "DSWx-S1")
         self.assertEqual(pge.pge_name, "DswxS1PgeTest")
         self.assertEqual(pge.runconfig_path, runconfig_path)
 
@@ -208,59 +176,70 @@ class DswxS1PgeTestCase(unittest.TestCase):
         self.assertIsNone(pge.runconfig)
         self.assertIsNone(pge.logger)
 
-        with open(runconfig_path, 'r', encoding='utf-8') as infile:
-            runconfig_dict = yaml.safe_load(infile)
+        # Kickoff execution of DSWX-S1 PGE
+        pge.run()
 
-        runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']['AlgorithmParametersSchemaPath'] = None
+        # Check that the runconfig and logger were instantiated
+        self.assertIsInstance(pge.runconfig, RunConfig)
+        self.assertIsInstance(pge.logger, PgeLogger)
 
-        with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
-            yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+        # Check that directories were created according to RunConfig
+        self.assertTrue(isdir(pge.runconfig.output_product_path))
+        self.assertTrue(isdir(pge.runconfig.scratch_path))
 
-        try:
-            # Kickoff execution of DSWX-S1 PGE
-            pge.run()
+        # Check that an in-memory log was created
+        stream = pge.logger.get_stream_object()
+        self.assertIsInstance(stream, StringIO)
 
-            # Check that the runconfig and logger were instantiated
-            self.assertIsInstance(pge.runconfig, RunConfig)
-            self.assertIsInstance(pge.logger, PgeLogger)
+        # Check that a RunConfig for the SAS was isolated within the scratch directory
+        expected_sas_config_file = join(pge.runconfig.scratch_path, 'test_dswx_s1_config_sas.yaml')
+        self.assertTrue(exists(expected_sas_config_file))
 
-            # Check that directories were created according to RunConfig
-            self.assertTrue(isdir(pge.runconfig.output_product_path))
-            self.assertTrue(isdir(pge.runconfig.scratch_path))
+        # Check that the catalog metadata file was created in the output directory
+        expected_catalog_metadata_file = join(
+            pge.runconfig.output_product_path, pge._catalog_metadata_filename())
+        self.assertTrue(os.path.exists(expected_catalog_metadata_file))
 
-            # Check that an in-memory log was created
-            stream = pge.logger.get_stream_object()
-            self.assertIsInstance(stream, StringIO)
+        # Check that the log file was created and moved into the output directory
+        expected_log_file = pge.logger.get_file_name()
+        self.assertTrue(exists(expected_log_file))
 
-            # Check that a RunConfig for the SAS was isolated within the scratch directory
-            expected_sas_config_file = join(pge.runconfig.scratch_path, 'test_dswx_s1_config_sas.yaml')
-            self.assertTrue(exists(expected_sas_config_file))
+        # Lastly, check that the dummy output products were created
+        output_files = glob.glob(join(pge.runconfig.output_product_path, "*.tif"))
+        self.assertEqual(len(output_files), 3)
 
-            # Check that the log file was created and moved into the output directory
-            expected_log_file = pge.logger.get_file_name()
-            self.assertTrue(exists(expected_log_file))
+        # Open and read the log
+        with open(expected_log_file, 'r', encoding='utf-8') as infile:
+            log_contents = infile.read()
 
-            # Lastly, check that the dummy output products were created
-            slc_files = glob.glob(join(pge.runconfig.output_product_path, "*.txt"))
-            self.assertEqual(len(slc_files), 1)
+        self.assertIn(f"DSWx-S1 invoked with RunConfig {expected_sas_config_file}", log_contents)
 
-            # Open and read the log
-            with open(expected_log_file, 'r', encoding='utf-8') as infile:
-                log_contents = infile.read()
 
-            self.assertIn(f"DSWx-S1 invoked with RunConfig {expected_sas_config_file}", log_contents)
+    def test_filename_application(self):
+        """Test the filename convention applied to DSWx-S1 output products"""
+        runconfig_path = join(self.data_dir, 'test_dswx_s1_config.yaml')
 
-        finally:
-            if exists(test_runconfig_path):
-                os.unlink(test_runconfig_path)
+        pge = DSWxS1Executor(pge_name="DswxS1PgeTest", runconfig_path=runconfig_path)
 
-        self._set_algorithm_parameters_path(runconfig_path, self.restore_test_algorithm_param_path)
+        pge.run()
+
+        image_files = glob.glob(join(pge.runconfig.output_product_path, "*.tif"))
+
+        for image_file in image_files:
+            file_name = pge._geotiff_filename(image_file)
+            md = MockGdal.MockDSWxS1GdalDataset().GetMetadata()
+            file_name_regex = rf"{pge.PROJECT}_{pge.LEVEL}_" \
+                              rf"{md['PRODUCT_TYPE']}_" \
+                              rf"T\w{{5}}_" \
+                              rf"\d{{8}}T\d{{6}}Z_\d{{8}}T\d{{6}}Z_" \
+                              rf"{get_sensor_from_spacecraft_name(md['SPACECRAFT_NAME'])}_" \
+                              rf"30_v{pge.runconfig.product_version}_" \
+                              rf"B\d{{2}}_\w+.tif"
+            self.assertEqual(re.match(file_name_regex, file_name).group(), file_name)
 
     def test_dswx_s1_pge_validate_algorithm_parameters_config(self):
         """Test basic parsing and validation of an algorithm parameters RunConfig file"""
         runconfig_path = join(self.data_dir, 'test_dswx_s1_config.yaml')
-
-        self._set_algorithm_parameters_path(runconfig_path, self.test_algorithm_parameters_path)
 
         self.runconfig = RunConfig(runconfig_path)
 
@@ -278,8 +257,6 @@ class DswxS1PgeTestCase(unittest.TestCase):
         # Check the properties of the algorithm parameters RunConfig to ensure they match as expected
         self._compare_algorithm_parameters_runconfig_to_expected(runconfig_dict)
 
-        self._set_algorithm_parameters_path(runconfig_path, self.restore_test_algorithm_param_path)
-
     def test_dswx_s1_pge_bad_algorithm_parameters_schema_path(self):
         """
         Test for invalid path in the optional 'AlgorithmParametersSchemaPath'
@@ -288,8 +265,6 @@ class DswxS1PgeTestCase(unittest.TestCase):
         """
         runconfig_path = join(self.data_dir, 'test_dswx_s1_config.yaml')
         test_runconfig_path = join(self.data_dir, 'invalid_dswx_s1_config.yaml')
-
-        self._set_algorithm_parameters_path(runconfig_path, self.test_algorithm_parameters_path)
 
         with open(runconfig_path, 'r', encoding='utf-8') as infile:
             runconfig_dict = yaml.safe_load(infile)
@@ -338,14 +313,10 @@ class DswxS1PgeTestCase(unittest.TestCase):
             if exists(test_runconfig_path):
                 os.unlink(test_runconfig_path)
 
-        self._set_algorithm_parameters_path(runconfig_path, self.restore_test_algorithm_param_path)
-
     def test_dswx_s1_pge_bad_algorithm_parameters_path(self):
         """Test for invalid path to 'algorithm_parameters' in SAS runconfig file"""
         runconfig_path = join(self.data_dir, 'test_dswx_s1_config.yaml')
         test_runconfig_path = join(self.data_dir, 'invalid_dswx_s1_config.yaml')
-
-        self._set_algorithm_parameters_path(runconfig_path, self.test_algorithm_parameters_path)
 
         with open(runconfig_path, 'r', encoding='utf-8') as infile:
             runconfig_dict = yaml.safe_load(infile)
@@ -366,14 +337,10 @@ class DswxS1PgeTestCase(unittest.TestCase):
             if exists(test_runconfig_path):
                 os.unlink(test_runconfig_path)
 
-        self._set_algorithm_parameters_path(runconfig_path, self.restore_test_algorithm_param_path)
-
     def test_dswx_s1_pge_ancillary_input_validation(self):
         """Test validation checks made on the set of ancillary input files"""
         runconfig_path = join(self.data_dir, 'test_dswx_s1_config.yaml')
         test_runconfig_path = join(self.data_dir, 'invalid_dswx_s1_runconfig.yaml')
-
-        self._set_algorithm_parameters_path(runconfig_path, self.test_algorithm_parameters_path)
 
         with open(runconfig_path, 'r', encoding='utf-8') as stream:
             runconfig_dict = yaml.safe_load(stream)
@@ -457,14 +424,10 @@ class DswxS1PgeTestCase(unittest.TestCase):
             if os.path.exists(test_runconfig_path):
                 os.unlink(test_runconfig_path)
 
-        self._set_algorithm_parameters_path(runconfig_path, self.restore_test_algorithm_param_path)
-
     def test_dswx_s1_pge_input_validation(self):
         """Test the input validation checks made by DSWxS1PreProcessorMixin."""
         runconfig_path = join(self.data_dir, 'test_dswx_s1_config.yaml')
         test_runconfig_path = join(self.data_dir, 'invalid_dswx_s1_runconfig.yaml')
-
-        self._set_algorithm_parameters_path(runconfig_path, self.test_algorithm_parameters_path)
 
         with open(runconfig_path, 'r', encoding='utf-8') as stream:
             runconfig_dict = yaml.safe_load(stream)
@@ -562,14 +525,10 @@ class DswxS1PgeTestCase(unittest.TestCase):
             if os.path.exists(test_runconfig_path):
                 os.unlink(test_runconfig_path)
 
-        self._set_algorithm_parameters_path(runconfig_path, self.restore_test_algorithm_param_path)
-
     def test_dswx_s1_pge_output_validation(self):
         """Test the output validation checks made by DSWxS1PostProcessorMixin."""
         runconfig_path = join(self.data_dir, 'test_dswx_s1_config.yaml')
         test_runconfig_path = join(self.data_dir, 'invalid_dswx_s1_runconfig.yaml')
-
-        self._set_algorithm_parameters_path(runconfig_path, self.test_algorithm_parameters_path)
 
         with open(runconfig_path, 'r', encoding='utf-8') as stream:
             runconfig_dict = yaml.safe_load(stream)
@@ -679,8 +638,6 @@ class DswxS1PgeTestCase(unittest.TestCase):
         finally:
             if os.path.exists(test_runconfig_path):
                 os.unlink(test_runconfig_path)
-
-        self._set_algorithm_parameters_path(runconfig_path, self.restore_test_algorithm_param_path)
 
 
 if __name__ == "__main__":
