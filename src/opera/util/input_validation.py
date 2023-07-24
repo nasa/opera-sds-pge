@@ -148,8 +148,8 @@ def validate_disp_inputs(runconfig, logger, name):
     name:  str
         pge name
     """
-    input_file_group = runconfig.sas_config['runconfig']['groups']['input_file_group']
-    dyn_anc_file_group = runconfig.sas_config['runconfig']['groups']['dynamic_ancillary_file_group']
+    input_file_group = runconfig.sas_config['input_file_group']
+    dyn_anc_file_group = runconfig.sas_config['dynamic_ancillary_file_group']
 
     check_input_list(input_file_group['cslc_file_list'], logger, name,
                      valid_extensions=('.h5',), check_zero_size=True)
@@ -167,8 +167,8 @@ def validate_disp_inputs(runconfig, logger, name):
                          valid_extensions=('.h5',), check_zero_size=True)
 
     if 'mask_file' in dyn_anc_file_group:
-        check_input_list(dyn_anc_file_group['mask_file'], logger, name,
-                         valid_extensions=('.tif', '.tiff'), check_zero_size=True)
+        check_input(dyn_anc_file_group['mask_file'], logger, name,
+                    valid_extensions=('.tif', '.tiff'), check_zero_size=True)
 
     if 'dem_file' in dyn_anc_file_group:
         check_input(dyn_anc_file_group['dem_file'], logger, name,

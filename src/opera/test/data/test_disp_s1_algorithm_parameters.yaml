@@ -1,89 +1,85 @@
-runconfig:
-    name: disp_s1_workflow_algorithm
+ps_options:
+  # Amplitude dispersion threshold to consider a pixel a PS.
+  #   Type: number.
+  amp_dispersion_threshold: 0.25
+phase_linking:
+  # Size of the ministack for sequential estimator.
+  #   Type: integer.
+  ministack_size: 1000
+  # Beta regularization parameter for correlation matrix inversion. 0 is no regularization.
+  #   Type: number.
+  beta: 0.01
+  half_window:
+    # Half window size (in pixels) for x direction.
+    #   Type: integer.
+    x: 11
+    # Half window size (in pixels) for y direction.
+    #   Type: integer.
+    y: 5
+interferogram_network:
+  # For single-reference network: Index of the reference image in the network.
+  #   Type: integer.
+  reference_idx: 0
+  # Max `n` to form the nearest-`n` interferograms by index.
+  #   Type: integer.
+  max_bandwidth:
+  # Maximum temporal baseline of interferograms.
+  #   Type: integer.
+  max_temporal_baseline:
+  # For manual-index network: List of (ref_idx, sec_idx) defining the interferograms to form.
+  #   Type: array.
+  indexes:
+  - - 0
+    - -1
+  # Type of interferogram network to create from phase-linking results.
+  #   Type: string.
+  #   Options: ['single-reference', 'manual-index', 'max-bandwidth', 'max-temporal-baseline'].
+  network_type: single-reference
+unwrap_options:
+  # Whether to run the unwrapping step after wrapped phase estimation.
+  #   Type: boolean.
+  run_unwrap: true
+  # Phase unwrapping method, passable to Tophu.
+  #   Type: string.
+  #   Options: ['snaphu', 'icu'].
+  unwrap_method: icu
+  # Number of tiles to split the unwrapping into (for Tophu).
+  #   Type: array.
+  tiles:
+  - 1
+  - 1
+  # Initialization method for SNAPHU.
+  #   Type: string.
+  init_method: mcf
+output_options:
+  # Output (x, y) resolution (in units of input data).
+  #   Type: object.
+  output_resolution:
+  # Alternative to specifying output resolution: Specify the (x, y) strides (decimation
+  #   factor) to perform while processing input. For example, strides of [4, 2] would turn an
+  #   input resolution of [5, 10] into an output resolution of [20, 20].
+  #   Type: object.
+  strides:
+    x: 6
+    y: 3
+  # Options for `create_dataset` with h5py.
+  #   Type: object.
+  hdf5_creation_options:
+    chunks:
+    - 128
+    - 128
+    compression: gzip
+    compression_opts: 4
+    shuffle: true
+  # GDAL creation options for GeoTIFF files.
+  #   Type: array.
+  gtiff_creation_options:
+  - COMPRESS=DEFLATE
+  - ZLEVEL=4
+  - TILED=YES
+  - BLOCKXSIZE=128
+  - BLOCKYSIZE=128
+# Name of the subdataset to use in the input NetCDF files.
+#   Type: string.
+subdataset: science/SENTINEL1/CSLC/grids/VV
 
-    processing:
-        ps_options:
-          # Amplitude dispersion threshold to consider a pixel a PS.
-          #   Type: number.
-          amp_dispersion_threshold: 0.25
-        phase_linking:
-          # Size of the ministack for sequential estimator.
-          #   Type: integer.
-          ministack_size: 1000
-          # Beta regularization parameter for correlation matrix inversion. 0 is no regularization.
-          #   Type: number.
-          beta: 0.01
-          half_window:
-            # Half window size (in pixels) for x direction.
-            #   Type: integer.
-            x: 11
-            # Half window size (in pixels) for y direction.
-            #   Type: integer.
-            y: 5
-        interferogram_network:
-          # For single-reference network: Index of the reference image in the network.
-          #   Type: integer.
-          reference_idx: 0
-          # Max `n` to form the nearest-`n` interferograms by index.
-          #   Type: integer.
-          max_bandwidth:
-          # Maximum temporal baseline of interferograms.
-          #   Type: integer.
-          max_temporal_baseline:
-          # For manual-index network: List of (ref_idx, sec_idx) defining the interferograms to form.
-          #   Type: array.
-          indexes:
-          - - 0
-            - -1
-          # Type of interferogram network to create from phase-linking results.
-          #   Type: string.
-          #   Options: ['single-reference', 'manual-index', 'max-bandwidth', 'max-temporal-baseline'].
-          network_type: single-reference
-        unwrap_options:
-          # Whether to run the unwrapping step after wrapped phase estimation.
-          #   Type: boolean.
-          run_unwrap: true
-          # Phase unwrapping method, passable to Tophu.
-          #   Type: string.
-          #   Options: ['snaphu', 'icu'].
-          unwrap_method: icu
-          # Number of tiles to split the unwrapping into (for Tophu).
-          #   Type: array.
-          tiles:
-          - 1
-          - 1
-          # Initialization method for SNAPHU.
-          #   Type: string.
-          init_method: mcf
-        output_options:
-          # Output (x, y) resolution (in units of input data).
-          #   Type: object.
-          output_resolution:
-          # Alternative to specifying output resolution: Specify the (x, y) strides (decimation
-          #   factor) to perform while processing input. For example, strides of [4, 2] would turn an
-          #   input resolution of [5, 10] into an output resolution of [20, 20].
-          #   Type: object.
-          strides:
-            x: 6
-            y: 3
-          # Options for `create_dataset` with h5py.
-          #   Type: object.
-          hdf5_creation_options:
-            chunks:
-            - 128
-            - 128
-            compression: gzip
-            compression_opts: 4
-            shuffle: true
-          # GDAL creation options for GeoTIFF files.
-          #   Type: array.
-          gtiff_creation_options:
-          - COMPRESS=DEFLATE
-          - ZLEVEL=4
-          - TILED=YES
-          - BLOCKXSIZE=128
-          - BLOCKYSIZE=128
-        # Name of the subdataset to use in the input NetCDF files.
-        #   Type: string.
-        subdataset: science/SENTINEL1/CSLC/grids/VV
-        

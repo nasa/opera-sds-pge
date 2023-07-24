@@ -43,7 +43,7 @@ RunConfig:
                     - --pge
                 ErrorCodeBase: 500000
                 SchemaPath: /home/mamba/opera/pge/disp_s1/schema/disp_s1_sas_schema.yaml
-                AlgorithmParametersSchemaPath: /home/mamba/opera/pge/disp_s1/schema/algor_param_s1_schema.yaml
+                AlgorithmParametersSchemaPath: /home/mamba/opera/pge/disp_s1/schema/algor_param_disp_s1_schema.yaml
                 IsoTemplatePath:
 
             QAExecutable:
@@ -56,17 +56,10 @@ RunConfig:
                 ExecuteViaShell: False
 
         # SAS-specific RunConfig section
-        # Prior to SAS execution by the PGE, the section below starting at "runconfig"
+        # Prior to SAS execution by the PGE, the section below starting at "input_file_group"
         # is isolated into its own YAML file for use with the SAS
         SAS:
-          runconfig:
-            name: disp_s1_workflow_default
-
-            groups:
-              pge_name_group:
-                pge_name: DISP_S1_PGE
-
-              input_file_group:
+            input_file_group:
                 # REQUIRED: List of paths to CSLC files.
                 #   Type: array.
                 cslc_file_list:
@@ -84,7 +77,7 @@ RunConfig:
                 # REQUIRED: Frame ID of the bursts contained in `cslc_file_list`.
                 #   Type: integer.
                 frame_id: 123
-              dynamic_ancillary_file_group:
+            dynamic_ancillary_file_group:
                 # REQUIRED: Path to file containing SAS algorithm parameters.
                 #   Type: string.
                 algorithm_parameters_file: /home/mamba/input_dir/algorithm_parameters.yaml
@@ -120,11 +113,11 @@ RunConfig:
                 weather_model_files:
                   - /home/mamba/input_dir/dynamic_ancillary/GMAO_tropo_20180210T000000_ztd.nc
                   - /home/mamba/input_dir/dynamic_ancillary/GMAO_tropo_20180716T000000_ztd.nc
-              primary_executable:
+            primary_executable:
                 # Product type of the PGE.
                 #   Type: string.
                 product_type: DISP_S1_SINGLE
-              product_path_group:
+            product_path_group:
                 # REQUIRED: Directory where PGE will place results.
                 #   Type: string.
                 product_path: /home/mamba/output_dir
@@ -141,7 +134,7 @@ RunConfig:
                 #   product output.
                 #   Type: boolean.
                 save_compressed_slc: true
-              worker_settings:
+            worker_settings:
                 # Whether to use GPU for processing (if available).
                 #   Type: boolean.
                 gpu_enabled: true
@@ -155,7 +148,6 @@ RunConfig:
                 # Size (in GB) of blocks of data to load at a time.
                 #   Type: number.
                 block_size_gb: 1.0
-              # Path to the output log file in addition to logging to stderr.
-              #   Type: string.
-              log_file: /home/mamba/output_dir/sas_logfile.log
-
+            # Path to the output log file in addition to logging to stderr.
+            #   Type: string.
+            log_file: /home/mamba/output_dir/sas_logfile.log

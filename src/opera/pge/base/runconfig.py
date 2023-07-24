@@ -100,18 +100,19 @@ class RunConfig:
         Raises
         ------
         RuntimeError
-            If the parsed config does not define a top-level "runconfig" entry
+            If the parsed config does not define dictionary.
 
         """
         with open(yaml_filename, 'r', encoding='utf-8') as stream:
             dictionary = yaml.safe_load(stream)
 
-        try:
-            return dictionary['runconfig']
-        except KeyError as key_error:
-            raise RuntimeError(
-                f'Unable to parse {yaml_filename}, expected top-level runconfig entry'
-            ) from key_error
+        if dictionary:
+            if 'runconfig' in dictionary:
+                return dictionary['runconfig']
+            else:
+                return dictionary
+        else:
+            raise RuntimeError(f'Unable to parse {yaml_filename}')
 
     def validate(self, pge_schema_file=BASE_PGE_SCHEMA, strict_mode=True):
         """
@@ -296,7 +297,16 @@ class RunConfig:
     @property
     def algorithm_parameters_file_config_path(self) -> str:
         """Returns the path to the algorithm parameters run configuration file"""
-        dynamic_ancillary_file_group = self._sas_config['runconfig']['groups']['dynamic_ancillary_file_group']
+
+        # ADT is inconsistent with how they define this location across different SAS,
+        # so check all known permutations
+        try:
+            dynamic_ancillary_file_group = self._sas_config['runconfig']['groups']['dynamic_ancillary_file_group']
+        except KeyError:
+            try:
+                dynamic_ancillary_file_group = self._sas_config['dynamic_ancillary_file_group']
+            except KeyError:
+                return None
 
         # ADT is inconsistent with how they define this location across different SAS,
         # so check all known permutations

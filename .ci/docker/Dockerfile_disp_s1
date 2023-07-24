@@ -55,7 +55,7 @@ RUN set -ex \
     && chmod 775 ${PGE_DEST_DIR}
 
 # Set the Docker entrypoint and clear the default command
-ENTRYPOINT ["sh", "-c", "exec ${CONDA_ROOT}/bin/pge_docker_entrypoint.sh \"${@}\"", "--"]
+ENTRYPOINT ["sh", "-c", "source /usr/local/bin/_activate_current_env.sh;exec ${CONDA_ROOT}/bin/pge_docker_entrypoint.sh \"${@}\"", "--"]
 CMD []
 
 # Set the user/group back to the default

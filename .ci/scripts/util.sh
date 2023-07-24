@@ -217,7 +217,7 @@ metrics_collection_end()
         processed_csv_file="${results_dir}/docker_metrics_${pge}_${container}_${timestamp}.csv"
         python3 "$SCRIPT_DIR"/process_metric_data.py "$pge" "$container" "$metrics_stats" "$processed_csv_file"
         process_metrics_exit_code=$?
-        if [[ $process_metrics_exit_code == 0 ]]
+        if [[ $process_metrics_exit_code == 0 ]] && [ -f $processed_csv_file ]
         then
             metrics_plot_file="${results_dir}/docker_metrics_${pge}_${container}_${timestamp}.png"
             python3 "$SCRIPT_DIR"/plot_metric_data.py "$processed_csv_file" "$metrics_plot_file"

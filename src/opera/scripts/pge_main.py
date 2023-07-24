@@ -24,7 +24,7 @@ from opera.util.logger import PgeLogger, default_log_file_name
 
 PGE_NAME_MAP = {
     'CSLC_S1_PGE': ('opera.pge.cslc_s1.cslc_s1_pge', 'CslcS1Executor'),
-    'DISP_S1_PGE': ('opera.pge.disp_s1.cslc_s1_pge', 'DispS1Executor'),
+    'DISP_S1_PGE': ('opera.pge.disp_s1.disp_s1_pge', 'DispS1Executor'),
     'DSWX_HLS_PGE': ('opera.pge.dswx_hls.dswx_hls_pge', 'DSWxHLSExecutor'),
     'DSWX_S1_PGE': ('opera.pge.dswx_s1.dswx_s1_pge', 'DSWxS1Executor'),
     'RTC_S1_PGE': ('opera.pge.rtc_s1.rtc_s1_pge', 'RtcS1Executor'),

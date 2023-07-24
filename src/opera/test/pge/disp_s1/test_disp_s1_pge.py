@@ -85,31 +85,30 @@ class DispS1PgeTestCase(unittest.TestCase):
         Helper method to check the properties of a parsed algorithm parameters runconfig against the
         expected values as defined by the "valid" sample algorithm parameters runconfig files.
         """
-        self.assertEqual(runconfig['name'], 'disp_s1_workflow_algorithm')
-        self.assertEqual(runconfig['processing']['ps_options']['amp_dispersion_threshold'], 0.25)
-        self.assertEqual(runconfig['processing']['phase_linking']['ministack_size'], 1000)
-        self.assertEqual(runconfig['processing']['phase_linking']['beta'], 0.01)
-        self.assertEqual(runconfig['processing']['phase_linking']['half_window']['x'], 11)
-        self.assertEqual(runconfig['processing']['phase_linking']['half_window']['y'], 5)
-        self.assertEqual(runconfig['processing']['interferogram_network']['reference_idx'], 0)
-        self.assertEqual(runconfig['processing']['interferogram_network']['max_bandwidth'], None)
-        self.assertEqual(runconfig['processing']['interferogram_network']['max_temporal_baseline'], None)
-        self.assertEqual(runconfig['processing']['interferogram_network']['indexes'], [[0, -1]])
-        self.assertEqual(runconfig['processing']['interferogram_network']['network_type'], 'single-reference')
-        self.assertEqual(runconfig['processing']['unwrap_options']['run_unwrap'], True)
-        self.assertEqual(runconfig['processing']['unwrap_options']['unwrap_method'], 'icu')
-        self.assertEqual(runconfig['processing']['unwrap_options']['tiles'], [1, 1])
-        self.assertEqual(runconfig['processing']['unwrap_options']['init_method'], 'mcf')
-        self.assertEqual(runconfig['processing']['output_options']['output_resolution'], None)
-        self.assertEqual(runconfig['processing']['output_options']['strides']['x'], 6)
-        self.assertEqual(runconfig['processing']['output_options']['strides']['y'], 3)
-        self.assertEqual(runconfig['processing']['output_options']['hdf5_creation_options']['chunks'], [128, 128])
-        self.assertEqual(runconfig['processing']['output_options']['hdf5_creation_options']['compression'], 'gzip')
-        self.assertEqual(runconfig['processing']['output_options']['hdf5_creation_options']['compression_opts'], 4)
-        self.assertEqual(runconfig['processing']['output_options']['hdf5_creation_options']['shuffle'], True)
-        self.assertEqual(runconfig['processing']['output_options']['gtiff_creation_options'],
+        self.assertEqual(runconfig['ps_options']['amp_dispersion_threshold'], 0.25)
+        self.assertEqual(runconfig['phase_linking']['ministack_size'], 1000)
+        self.assertEqual(runconfig['phase_linking']['beta'], 0.01)
+        self.assertEqual(runconfig['phase_linking']['half_window']['x'], 11)
+        self.assertEqual(runconfig['phase_linking']['half_window']['y'], 5)
+        self.assertEqual(runconfig['interferogram_network']['reference_idx'], 0)
+        self.assertEqual(runconfig['interferogram_network']['max_bandwidth'], None)
+        self.assertEqual(runconfig['interferogram_network']['max_temporal_baseline'], None)
+        self.assertEqual(runconfig['interferogram_network']['indexes'], [[0, -1]])
+        self.assertEqual(runconfig['interferogram_network']['network_type'], 'single-reference')
+        self.assertEqual(runconfig['unwrap_options']['run_unwrap'], True)
+        self.assertEqual(runconfig['unwrap_options']['unwrap_method'], 'icu')
+        self.assertEqual(runconfig['unwrap_options']['tiles'], [1, 1])
+        self.assertEqual(runconfig['unwrap_options']['init_method'], 'mcf')
+        self.assertEqual(runconfig['output_options']['output_resolution'], None)
+        self.assertEqual(runconfig['output_options']['strides']['x'], 6)
+        self.assertEqual(runconfig['output_options']['strides']['y'], 3)
+        self.assertEqual(runconfig['output_options']['hdf5_creation_options']['chunks'], [128, 128])
+        self.assertEqual(runconfig['output_options']['hdf5_creation_options']['compression'], 'gzip')
+        self.assertEqual(runconfig['output_options']['hdf5_creation_options']['compression_opts'], 4)
+        self.assertEqual(runconfig['output_options']['hdf5_creation_options']['shuffle'], True)
+        self.assertEqual(runconfig['output_options']['gtiff_creation_options'],
                          ['COMPRESS=DEFLATE', 'ZLEVEL=4', 'TILED=YES', 'BLOCKXSIZE=128', 'BLOCKYSIZE=128'])
-        self.assertEqual(runconfig['processing']['subdataset'], 'science/SENTINEL1/CSLC/grids/VV')
+        self.assertEqual(runconfig['subdataset'], 'science/SENTINEL1/CSLC/grids/VV')
 
     def test_disp_s1_pge_execution(self):
         """
@@ -246,7 +245,7 @@ class DispS1PgeTestCase(unittest.TestCase):
         with open(runconfig_path, 'r', encoding='utf-8') as infile:
             runconfig_dict = yaml.safe_load(infile)
 
-        runconfig_dict['RunConfig']['Groups']['SAS']['runconfig']['groups']['dynamic_ancillary_file_group']\
+        runconfig_dict['RunConfig']['Groups']['SAS']['dynamic_ancillary_file_group']\
                       ['algorithm_parameters_file'] = 'test/data/test_algorithm_parameters_non_existent.yaml' # noqa E211
 
         with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
@@ -273,16 +272,12 @@ class DispS1PgeTestCase(unittest.TestCase):
         # Test non-existent file detection
         test_filename = 'non_existent_input_file'
         sas_config = {
-            'runconfig' : {
-                'groups' : {
-                    'input_file_group' : {
-                        'cslc_file_list' : [
-                            test_filename
-                        ]
-                    },
-                    'dynamic_ancillary_file_group' : {
-                    }
-                }
+            'input_file_group' : {
+                'cslc_file_list' : [
+                    test_filename
+                ]
+            },
+            'dynamic_ancillary_file_group' : {
             }
         }
         runconfig = MockRunConfig(sas_config)
@@ -303,7 +298,7 @@ class DispS1PgeTestCase(unittest.TestCase):
         test_filename = "test invalid extension.inv"
         with open(test_filename, 'w') as ief:
             ief.write("\n")
-        sas_config['runconfig']['groups']['input_file_group']['cslc_file_list'] = [test_filename]
+        sas_config['input_file_group']['cslc_file_list'] = [test_filename]
         runconfig = MockRunConfig(sas_config)
         with self.assertRaises(RuntimeError):
             validate_disp_inputs(runconfig, logger, "DISP-S1")
@@ -322,7 +317,7 @@ class DispS1PgeTestCase(unittest.TestCase):
         test_filename = "zero size file.h5"
         open(test_filename, 'w').close()
         self.assertTrue(exists(test_filename))
-        sas_config['runconfig']['groups']['input_file_group']['cslc_file_list'] = [test_filename]
+        sas_config['input_file_group']['cslc_file_list'] = [test_filename]
         runconfig = MockRunConfig(sas_config)
         with self.assertRaises(RuntimeError):
             validate_disp_inputs(runconfig, logger, "DISP-S1")
@@ -341,49 +336,48 @@ class DispS1PgeTestCase(unittest.TestCase):
         for f in cslc_file_list:
             with open(f, 'w') as wf:
                 wf.write('\n')
-        sas_config['runconfig']['groups']['input_file_group']['cslc_file_list'] = cslc_file_list
+        sas_config['input_file_group']['cslc_file_list'] = cslc_file_list
 
-        sas_config['runconfig']['groups']['dynamic_ancillary_file_group'] = {}
+        sas_config['dynamic_ancillary_file_group'] = {}
         amplitude_dispersion_files = ['t087_185678_iw2_amp_dispersion.tif', 't087_185687_iw1_amp_dispersion.tif']
         for f in amplitude_dispersion_files:
             with open(f, 'w') as wf:
                 wf.write('\n')
-        sas_config['runconfig']['groups']['dynamic_ancillary_file_group']['amplitude_dispersion_files'] = amplitude_dispersion_files
+        sas_config['dynamic_ancillary_file_group']['amplitude_dispersion_files'] = amplitude_dispersion_files
 
         amplitude_mean_files = ['t087_185678_iw2_amp_mean.tif', 't087_185687_iw1_amp_mean.tif']
         for f in amplitude_mean_files:
             with open(f, 'w') as wf:
                 wf.write('\n')
-        sas_config['runconfig']['groups']['dynamic_ancillary_file_group']['amplitude_mean_files'] = amplitude_mean_files
+        sas_config['dynamic_ancillary_file_group']['amplitude_mean_files'] = amplitude_mean_files
 
         geometry_files = ['t087_185678_iw2_topo.h5', 't087_185687_iw1_topo.h5']
         for f in geometry_files:
             with open(f, 'w') as wf:
                 wf.write('\n')
-        sas_config['runconfig']['groups']['dynamic_ancillary_file_group']['geometry_files'] = geometry_files
+        sas_config['dynamic_ancillary_file_group']['geometry_files'] = geometry_files
 
-        mask_files = ['water_mask.tif']
-        for f in mask_files:
-            with open(f, 'w') as wf:
-                wf.write('\n')
-        sas_config['runconfig']['groups']['dynamic_ancillary_file_group']['mask_file'] = mask_files
+        mask_file = 'water_mask.tif'
+        with open(mask_file, 'w') as wf:
+            wf.write('\n')
+        sas_config['dynamic_ancillary_file_group']['mask_file'] = mask_file
 
         dem_file = 'dem.tif'
         with open(dem_file, 'w') as wf:
             wf.write('\n')
-        sas_config['runconfig']['groups']['dynamic_ancillary_file_group']['dem_file'] = dem_file
+        sas_config['dynamic_ancillary_file_group']['dem_file'] = dem_file
 
         tec_files = ['jplg0410.18i.Z', 'jplg1970.18i.Z']
         for f in tec_files:
             with open(f, 'w') as wf:
                 wf.write('\n')
-        sas_config['runconfig']['groups']['dynamic_ancillary_file_group']['tec_files'] = tec_files
+        sas_config['dynamic_ancillary_file_group']['tec_files'] = tec_files
 
         weather_model_files = ['GMAO_tropo_20180210T000000_ztd.nc', 'GMAO_tropo_20180716T000000_ztd.nc']
         for f in weather_model_files:
             with open(f, 'w') as wf:
                 wf.write('\n')
-        sas_config['runconfig']['groups']['dynamic_ancillary_file_group']['weather_model_files'] = weather_model_files
+        sas_config['dynamic_ancillary_file_group']['weather_model_files'] = weather_model_files
 
         logger = PgeLogger()
         runconfig = MockRunConfig(sas_config)
@@ -403,8 +397,9 @@ class DispS1PgeTestCase(unittest.TestCase):
         self.assertIn('overall.log_messages.critical: 0', log)
 
         files_to_remove = (cslc_file_list + amplitude_dispersion_files +
-                          amplitude_mean_files + geometry_files + mask_files +
+                          amplitude_mean_files + geometry_files +
                           tec_files + weather_model_files)
+        files_to_remove.append(mask_file)
         files_to_remove.append(dem_file)
         for f in files_to_remove:
             os.remove(f)
