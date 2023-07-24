@@ -33,6 +33,7 @@ class DSWxS1PreProcessorMixin(PreProcessorMixin):
 
     _pre_mixin_name = "DSWxS1PreProcessorMixin"
 
+    # TODO - new ticket
     def _validate_ancillary_inputs(self):
         """
         Evaluates the list of ancillary inputs from the RunConfig to ensure they
@@ -175,6 +176,86 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
                         f"band: {num_bands}"
 
             self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
+
+    def _stage_output_files(self):
+        """
+        Ensures that all output products produced by both the SAS and this PGE
+        are staged to the output location defined by the RunConfig. This includes
+        reassignment of file names to meet the file-naming conventions required
+        by the PGE.
+
+        This version of the method performs the same steps as the base PGE
+        implementation, except that an ISO xml metadata file is rendered for
+        each tile product covered by the input region.
+
+        """
+        # Gather the list of output files produced by the SAS
+        output_products = self.runconfig.get_output_product_filenames()
+
+        # For each output file name, assign the final file name matching the
+        # expected conventions
+        for output_product in output_products:
+            self._assign_filename(output_product, self.runconfig.output_product_path)
+
+        # Write the catalog metadata to disk with the appropriate filename
+        catalog_metadata = self._create_catalog_metadata()
+
+        if not catalog_metadata.validate(catalog_metadata.get_schema_file_path()):
+            msg = f"Failed to create valid catalog metadata, reason(s):\n {catalog_metadata.get_error_msg()}"
+            self.logger.critical(self.name, ErrorCode.INVALID_CATALOG_METADATA, msg)
+
+        cat_meta_filename = self._catalog_metadata_filename()
+        cat_meta_filepath = join(self.runconfig.output_product_path, cat_meta_filename)
+
+        self.logger.info(self.name, ErrorCode.CREATING_CATALOG_METADATA,
+                         f"Writing Catalog Metadata to {cat_meta_filepath}")
+
+        try:
+            catalog_metadata.write(cat_meta_filepath)
+        except OSError as err:
+            msg = f"Failed to write catalog metadata file {cat_meta_filepath}, reason: {str(err)}"
+            self.logger.critical(self.name, ErrorCode.CATALOG_METADATA_CREATION_FAILED, msg)
+
+        # Generate the ISO metadata for use with product submission to DAAC(s)
+        # For DSWX-S1, each tile-based product gets its own ISO xml
+        # TODO cleanly and accurately make this 'tile' based rather than 'burst' based
+        for burst_id, burst_metadata in self._burst_metadata_cache.items():
+            iso_metadata = self._create_iso_metadata(burst_metadata)
+
+            iso_meta_filename = self._iso_metadata_filename(burst_id)
+            iso_meta_filepath = join(self.runconfig.output_product_path, iso_meta_filename)
+
+            if iso_metadata:
+                self.logger.info(self.name, ErrorCode.RENDERING_ISO_METADATA,
+                                 f"Writing ISO Metadata to {iso_meta_filepath}")
+                with open(iso_meta_filepath, 'w', encoding='utf-8') as outfile:
+                    outfile.write(iso_metadata)
+
+        # Write the QA application log to disk with the appropriate filename,
+        # if necessary
+        if self.runconfig.qa_enabled:
+            qa_log_filename = self._qa_log_filename()
+            qa_log_filepath = join(self.runconfig.output_product_path, qa_log_filename)
+            self.qa_logger.move(qa_log_filepath)
+
+            try:
+                self._finalize_log(self.qa_logger)
+            except OSError as err:
+                msg = f"Failed to write QA log file to {qa_log_filepath}, reason: {str(err)}"
+                self.logger.critical(self.name, ErrorCode.LOG_FILE_CREATION_FAILED, msg)
+
+        # Lastly, write the combined PGE/SAS log to disk with the appropriate filename
+        log_filename = self._log_filename()
+        log_filepath = join(self.runconfig.output_product_path, log_filename)
+        self.logger.move(log_filepath)
+
+        try:
+            self._finalize_log(self.logger)
+        except OSError as err:
+            msg = f"Failed to write log file to {log_filepath}, reason: {str(err)}"
+
+            # Log stream might be closed by this point so raise an Exception instead
+            raise RuntimeError(msg)
 
     def run_postprocessor(self, **kwargs):
         """
