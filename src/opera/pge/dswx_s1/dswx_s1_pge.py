@@ -183,7 +183,11 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
 
             self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
 
+<<<<<<< HEAD
 
+=======
+<<<<<<< HEAD
+>>>>>>> 3cfad49 (commit after rename)
     def _core_filename(self, inter_filename=None):
         """
         Returns the core file name component for products produced by the
@@ -555,8 +559,20 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
                 with open(iso_meta_filepath, 'w', encoding='utf-8') as outfile:
                     outfile.write(iso_metadata)
 
-        # TODO: Generate the ISO metadata for use with product submission to DAAC(s)
-        #       For DSWx-S1, each tile-based product gets its own ISO xml
+        # Generate the ISO metadata for use with product submission to DAAC(s)
+        # For DSWX-S1, each tile-based product gets its own ISO xml
+        # TODO cleanly and accurately make this 'tile' based rather than 'burst' based
+        for burst_id, burst_metadata in self._burst_metadata_cache.items():
+            iso_metadata = self._create_iso_metadata(burst_metadata)
+
+            iso_meta_filename = self._iso_metadata_filename(burst_id)
+            iso_meta_filepath = join(self.runconfig.output_product_path, iso_meta_filename)
+
+            if iso_metadata:
+                self.logger.info(self.name, ErrorCode.RENDERING_ISO_METADATA,
+                                 f"Writing ISO Metadata to {iso_meta_filepath}")
+                with open(iso_meta_filepath, 'w', encoding='utf-8') as outfile:
+                    outfile.write(iso_metadata)
 
         # Write the QA application log to disk with the appropriate filename,
         # if necessary
