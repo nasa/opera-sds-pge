@@ -297,7 +297,6 @@ class RunConfig:
     @property
     def algorithm_parameters_file_config_path(self) -> str:
         """Returns the path to the algorithm parameters run configuration file"""
-
         # ADT is inconsistent with how they define this location across different SAS,
         # so check all known permutations
         try:
