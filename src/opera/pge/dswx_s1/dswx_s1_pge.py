@@ -21,6 +21,7 @@ from opera.util.input_validation import validate_algorithm_parameters_config
 from opera.util.input_validation import validate_dswx_inputs
 from opera.util.metadata_utils import get_geographic_boundaries_from_mgrs_tile
 from opera.util.metadata_utils import get_sensor_from_spacecraft_name
+from opera.util.render_jinja2 import render_jinja2
 from opera.util.time import get_time_for_filename
 
 
@@ -38,7 +39,6 @@ class DSWxS1PreProcessorMixin(PreProcessorMixin):
 
     _pre_mixin_name = "DSWxS1PreProcessorMixin"
 
-    # TODO - new ticket
     def _validate_ancillary_inputs(self):
         """
         Evaluates the list of ancillary inputs from the RunConfig to ensure they
@@ -71,7 +71,7 @@ class DSWxS1PreProcessorMixin(PreProcessorMixin):
 
                             self.logger.critical(self.name, ErrorCode.INVALID_INPUT, error_msg)
                 else:
-                    msg = f"No shoreline_shapefile specified in runconfig file."
+                    msg = "No shoreline_shapefile specified in runconfig file."
                     self.logger.info(self.name, ErrorCode.INPUT_NOT_FOUND, msg)
 
             elif key in ('dem_file_description', 'worldcover_file_description',
@@ -125,6 +125,7 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
     _post_mixin_name = "DSWxS1PostProcessorMixin"
     _cached_core_filename = None
     _tile_metadata_cache = {}
+    _tile_file_name = ''
 
     def _validate_output(self):
         """
@@ -183,11 +184,6 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
 
             self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
 
-<<<<<<< HEAD
-
-=======
-<<<<<<< HEAD
->>>>>>> 3cfad49 (commit after rename)
     def _core_filename(self, inter_filename=None):
         """
         Returns the core file name component for products produced by the
@@ -239,7 +235,7 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
         Returns the file name to use for MGRS tile-based DSWx products produced
         by this PGE.
 
-        The filename for the DSWx-S1 burst products consists of:
+        The filename for the DSWx-S1 tile products consists of:
 
         <Core filename>_<TILE ID>_<ACQ TIMETAG>_<PROD TIMETAG>_<SENSOR>_<SPACING>_<PRODUCT VERSION>
 
@@ -333,13 +329,13 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
             The file name to assign to GeoTIFF product(s) created by this PGE.
 
         """
-        tile_filename = self._tile_filename(inter_filename)
+        self._tile_file_name = self._tile_filename(inter_filename)
 
         # Specific output product band index and name should be the last parts
         # of the filename before the extension, delimited by underscores
         band_idx, band_name = splitext(inter_filename)[0].split("_")[-2:]
 
-        return f"{tile_filename}_{band_idx}_{band_name}.tif"
+        return f"{self._tile_file_name}_{band_idx}_{band_name}.tif"
 
     def _ancillary_filename(self):
         """
@@ -405,11 +401,29 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
 
         Returns
         -------
-        catalog_metadata_filename : str
+        <catalog metadata filename> : str
             The file name to assign to the Catalog Metadata product created by this PGE.
 
         """
         return self._ancillary_filename() + ".catalog.json"
+
+    def _iso_metadata_filename(self):
+        """
+        Returns the file name to use for ISO Metadata produced by the DSWX-S1 PGE.
+
+        The ISO Metadata file name for the DSWX-S1 PGE consists of:
+
+            <DSWX-S1 filename>.iso.xml
+
+        Where <DSWX-S1 filename> is returned by DSWxS1PostProcessorMixin._tile_filename()
+
+        Returns
+        -------
+        <iso metadata filename> : str
+            The file name to assign to the ISO Metadata product created by this PGE.
+
+        """
+        return self._tile_file_name + ".iso.xml"
 
     def _log_filename(self):
         """
@@ -452,6 +466,7 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
     from unittest.mock import patch
     import opera.util.img_utils
     from opera.util.img_utils import MockGdal
+
     @patch.object(opera.util.img_utils, "gdal", MockGdal)
     def _collect_dswx_s1_product_metadata(self, geotiff_product):
         """
@@ -505,6 +520,81 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
 
         return output_product_metadata
 
+    def _create_custom_metadata(self):
+        """
+        Creates the "custom data" dictionary used with the ISO metadata rendering.
+
+        Custom data contains all metadata information needed for the ISO template
+        that is not found within any of the other metadata sources (such as the
+        RunConfig, output product(s), or catalog metadata).
+
+        Returns
+        -------
+        custom_metadata : dict
+            Dictionary containing the custom metadata as expected by the ISO
+            metadata Jinja2 template.
+
+        """
+        custom_metadata = {
+            'ISO_OPERA_FilePackageName': self._core_filename(),
+            'ISO_OPERA_ProducerGranuleId': self._core_filename(),
+            'MetadataProviderAction': "creation",
+            'GranuleFilename': self._core_filename(),
+            'ISO_OPERA_ProjectKeywords': ['OPERA', 'JPL', 'CSLC', 'Co-registered', 'Single', 'Look', 'Complex'],
+            'ISO_OPERA_PlatformKeywords': ['S1'],
+            'ISO_OPERA_InstrumentKeywords': ['Sentinel 1 A/B']
+        }
+
+        return custom_metadata
+
+    def _create_iso_metadata(self, tile_metadata):
+        """
+        Creates a rendered version of the ISO metadata template for DSWX-S1
+        output products using metadata from the following locations:
+
+            * RunConfig (in dictionary form)
+            * Output product (dictionary extracted from HDF5 product, per-tile)
+            * Catalog metadata
+            * "Custom" metadata (all metadata not found anywhere else)
+
+        Parameters
+        ----------
+        tile_metadata : dict
+            The product metadata corresponding to a specific tile product to
+            be included as the "product_output" metadata in the rendered ISO xml.
+
+        Returns
+        -------
+        rendered_template : str
+            The ISO metadata template for DSWX-S1 filled in with values from
+            the sourced metadata dictionaries.
+
+        """
+        runconfig_dict = self.runconfig.asdict()
+
+        product_output_dict = tile_metadata
+
+        catalog_metadata_dict = self._create_catalog_metadata().asdict()
+
+        custom_data_dict = self._create_custom_metadata()
+
+        iso_metadata = {
+            'run_config': runconfig_dict,
+            'product_output': product_output_dict,
+            'catalog_metadata': catalog_metadata_dict,
+            'custom_data': custom_data_dict
+        }
+
+        iso_template_path = abspath(self.runconfig.iso_template_path)
+
+        if not exists(iso_template_path):
+            msg = f"Could not load ISO template {iso_template_path}, file does not exist"
+            self.logger.critical(self.name, ErrorCode.ISO_METADATA_TEMPLATE_NOT_FOUND, msg)
+
+        rendered_template = render_jinja2(iso_template_path, iso_metadata, self.logger)
+
+        return rendered_template
+
     def _stage_output_files(self):
         """
         Ensures that all output products produced by both the SAS and this PGE
@@ -545,34 +635,18 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
             self.logger.critical(self.name, ErrorCode.CATALOG_METADATA_CREATION_FAILED, msg)
 
         # Generate the ISO metadata for use with product submission to DAAC(s)
-        # For DSWX-S1, each tile-based product gets its own ISO xml
-        # TODO cleanly and accurately make this 'tile' based rather than 'burst' based
-        for burst_id, burst_metadata in self._burst_metadata_cache.items():
-            iso_metadata = self._create_iso_metadata(burst_metadata)
+        # For DSWX-S1, each tile-set is assigned an ISO xml file
+        for tile_id, tile_metadata in self._tile_metadata_cache.items():
+            iso_metadata = self._create_iso_metadata(tile_metadata)
 
-            iso_meta_filename = self._iso_metadata_filename(burst_id)
-            iso_meta_filepath = join(self.runconfig.output_product_path, iso_meta_filename)
+        iso_meta_filename = self._iso_metadata_filename()
+        iso_meta_filepath = join(self.runconfig.output_product_path, iso_meta_filename)
 
-            if iso_metadata:
-                self.logger.info(self.name, ErrorCode.RENDERING_ISO_METADATA,
-                                 f"Writing ISO Metadata to {iso_meta_filepath}")
-                with open(iso_meta_filepath, 'w', encoding='utf-8') as outfile:
-                    outfile.write(iso_metadata)
-
-        # Generate the ISO metadata for use with product submission to DAAC(s)
-        # For DSWX-S1, each tile-based product gets its own ISO xml
-        # TODO cleanly and accurately make this 'tile' based rather than 'burst' based
-        for burst_id, burst_metadata in self._burst_metadata_cache.items():
-            iso_metadata = self._create_iso_metadata(burst_metadata)
-
-            iso_meta_filename = self._iso_metadata_filename(burst_id)
-            iso_meta_filepath = join(self.runconfig.output_product_path, iso_meta_filename)
-
-            if iso_metadata:
-                self.logger.info(self.name, ErrorCode.RENDERING_ISO_METADATA,
-                                 f"Writing ISO Metadata to {iso_meta_filepath}")
-                with open(iso_meta_filepath, 'w', encoding='utf-8') as outfile:
-                    outfile.write(iso_metadata)
+        if iso_metadata:
+            self.logger.info(self.name, ErrorCode.RENDERING_ISO_METADATA,
+                             f"Writing ISO Metadata to {iso_meta_filepath}")
+            with open(iso_meta_filepath, 'w', encoding='utf-8') as outfile:
+                outfile.write(iso_metadata)
 
         # Write the QA application log to disk with the appropriate filename,
         # if necessary
@@ -640,6 +714,8 @@ class DSWxS1Executor(DSWxS1PreProcessorMixin, DSWxS1PostProcessorMixin, PgeExecu
     def __init__(self, pge_name, runconfig_path, **kwargs):
         super().__init__(pge_name, runconfig_path, **kwargs)
 
+        # Used in base_pge.py to rename and keep track of files
+        # renamed by the PGE
         self.rename_by_pattern_map = {
             '*.tif*': self._geotiff_filename
         }

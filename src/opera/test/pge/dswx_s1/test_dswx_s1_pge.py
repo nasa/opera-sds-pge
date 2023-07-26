@@ -92,7 +92,6 @@ class DswxS1PgeTestCase(unittest.TestCase):
         self.input_file.close()
         self.working_dir.cleanup()
 
-
     def _compare_algorithm_parameters_runconfig_to_expected(self, runconfig):
         """
         Helper method to check the properties of a parsed algorithm parameters runconfig against the
@@ -200,6 +199,21 @@ class DswxS1PgeTestCase(unittest.TestCase):
             pge.runconfig.output_product_path, pge._catalog_metadata_filename())
         self.assertTrue(os.path.exists(expected_catalog_metadata_file))
 
+        with open(expected_catalog_metadata_file, 'r', encoding='utf-8') as infile:
+            cat_contents = infile.read()
+
+        self.assertNotIn('!Not found!', cat_contents)
+
+        # Check that the ISO metadata file was created and all placeholders were filled in
+        expected_iso_metadata_file = join(
+            pge.runconfig.output_product_path, pge._iso_metadata_filename())
+        self.assertTrue(os.path.exists(expected_iso_metadata_file))
+
+        with open(expected_iso_metadata_file, 'r', encoding='utf-8') as infile:
+            iso_contents = infile.read()
+
+        self.assertNotIn('!Not found!', iso_contents)
+
         # Check that the log file was created and moved into the output directory
         expected_log_file = pge.logger.get_file_name()
         self.assertTrue(exists(expected_log_file))
@@ -213,7 +227,6 @@ class DswxS1PgeTestCase(unittest.TestCase):
             log_contents = infile.read()
 
         self.assertIn(f"DSWx-S1 invoked with RunConfig {expected_sas_config_file}", log_contents)
-
 
     def test_filename_application(self):
         """Test the filename convention applied to DSWx-S1 output products"""
@@ -237,6 +250,43 @@ class DswxS1PgeTestCase(unittest.TestCase):
                               rf"B\d{{2}}_\w+.tif"
             self.assertEqual(re.match(file_name_regex, file_name).group(), file_name)
 
+    def test_iso_metadata_creation(self):
+        """
+        Mock ISO metadata is created when the PGE post processor runs.
+        Successful creation of metadata is verified in test_dswx_s1_pge_execution().
+        This test will verify that error conditions are caught.
+        """
+        runconfig_path = join(self.data_dir, 'test_dswx_s1_config.yaml')
+
+        # Test bad iso_template_path
+        test_runconfig_path = join(self.data_dir, 'invalid_dswx_s1_runconfig.yaml')
+
+        with open(runconfig_path, 'r', encoding='utf-8') as infile:
+            runconfig_dict = yaml.safe_load(infile)
+
+        primary_executable = runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']
+        primary_executable['IsoTemplatePath'] = "pge/dswx_s1/templates/OPERA_ISO_metadata_L3_DSWx_S1_template.xml"
+
+        with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+            yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+
+        try:
+            pge = DSWxS1Executor(pge_name="DswxS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn("Could not load ISO template", log_contents)
+        finally:
+            if os.path.exists(test_runconfig_path):
+                os.unlink(test_runconfig_path)
+
     def test_dswx_s1_pge_validate_algorithm_parameters_config(self):
         """Test basic parsing and validation of an algorithm parameters RunConfig file"""
         runconfig_path = join(self.data_dir, 'test_dswx_s1_config.yaml')
@@ -252,7 +302,7 @@ class DswxS1PgeTestCase(unittest.TestCase):
 
         self.assertEqual(algorithm_parameters_runconfig, pge.runconfig.algorithm_parameters_file_config_path)
         # parse the run config file
-        runconfig_dict = self.runconfig._parse_algorithm_parameters_run_config_file \
+        runconfig_dict = self.runconfig._parse_algorithm_parameters_run_config_file\
             (pge.runconfig.algorithm_parameters_file_config_path)       # noqa 211
         # Check the properties of the algorithm parameters RunConfig to ensure they match as expected
         self._compare_algorithm_parameters_runconfig_to_expected(runconfig_dict)
@@ -375,7 +425,7 @@ class DswxS1PgeTestCase(unittest.TestCase):
             # Reset to valid dem path
             ancillary_file_group_dict['dem_file'] = 'dswx_s1_pge_test/input_dir/dem.tif'
 
-            # Test with an unexpected file extension
+            # Test with an unexpected file extension (should be 'tif')
             os.system("touch dswx_s1_pge_test/input_dir/worldcover.vrt")
             ancillary_file_group_dict['worldcover_file'] = 'dswx_s1_pge_test/input_dir/worldcover.vrt'
 
@@ -588,7 +638,7 @@ class DswxS1PgeTestCase(unittest.TestCase):
             self.assertIn(f"SAS output file {abspath(expected_output_file)} was "
                           f"created, but is empty", log_contents)
 
-            # Test a misnamed band file.  Post-processor should detect this and flag an error'
+            # Test a misnamed band file.  Post-processor should detect this and flag an error
             band_data = ('OPERA_L3_DSWx-S1_b1_B01_WTR.tif', 'OPERA_L3_DSWx-S1_b1_B02_BWTR.tif',
                          'OPERA_L3_DSWx-S1_b1_B03_CONF.tif', 'OPERA_L3_DSWx-S1_b2_B01_WTR.tif',
                          'OPERA_L3_DSWx-S1_b2_B02_BWTR.tif', 'OPERA_L3_DSWx-S1_b2_B03_CON.tif')
@@ -612,7 +662,7 @@ class DswxS1PgeTestCase(unittest.TestCase):
                           log_contents)
 
             # Test for missing or extra band files
-            # Test a misnamed band file.  Post-processor should detect this and flag an error'
+            # Test a misnamed band file.  Post-processor should detect this and flag an error
             band_data = ('OPERA_L3_DSWx-S1_b1_B01_WTR.tif', 'OPERA_L3_DSWx-S1_b1_B02_BWTR.tif',
                          'OPERA_L3_DSWx-S1_b1_B03_CONF.tif', 'OPERA_L3_DSWx-S1_b2_B01_WTR.tif',
                          'OPERA_L3_DSWx-S1_b2_B02_BWTR.tif')
