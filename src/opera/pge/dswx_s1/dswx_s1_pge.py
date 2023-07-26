@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 """
+#!/usr/bin/env python3
 ==============
 dswx_s1_pge.py
 ==============
@@ -446,6 +447,7 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
     from unittest.mock import patch
     import opera.util.img_utils
     from opera.util.img_utils import MockGdal
+
     @patch.object(opera.util.img_utils, "gdal", MockGdal)
     def _collect_dswx_s1_product_metadata(self, geotiff_product):
         """
@@ -584,8 +586,7 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
         """
         self._run_sas_qa_executable()
         self._validate_output()
-        self._stage_output_files()
-
+        self._stage_output_file
 
 class DSWxS1Executor(DSWxS1PreProcessorMixin, DSWxS1PostProcessorMixin, PgeExecutor):
     """

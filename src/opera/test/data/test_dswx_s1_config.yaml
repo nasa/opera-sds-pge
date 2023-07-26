@@ -29,7 +29,7 @@ RunConfig:
         ErrorCodeBase: 400000
         SchemaPath: pge/dswx_s1/schema/dswx_s1_sas_schema.yaml
         AlgorithmParametersSchemaPath: pge/dswx_s1/schema/algorithm_parameters_s1_schema.yaml
-        IsoTemplatePath: null
+        IsoTemplatePath: /home/conda/opera/pge/dswx_s1/templates/OPERA_ISO_metadata_L3_DSWx_S1_template.xml.jinja2
       QAExecutable:
         Enabled: false
         ProgramPath: null
