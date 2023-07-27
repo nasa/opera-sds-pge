@@ -12,7 +12,7 @@ pipeline {
         stage("clean_up")  {
             steps {
                 echo "Cleaning up data/tmp directories"
-                sh 'rm -rf tmp.*'
+                sh 'rm -rf /data/tmp/tmp.*'
             }
         }
     }
