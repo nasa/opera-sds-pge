@@ -21,9 +21,13 @@ RunConfig:
 
             PrimaryExecutable:
                 ProductIdentifier: DISP_S1
-                ProgramPath: /bin/echo
+                ProgramPath: mkdir
                 ProgramOptions:
-                    - 'hello world > disp_s1_pge_test/output_dir/disp_s1_test.txt;'
+                    - '-p disp_s1_pge_test/output_dir/compressed_slcs;'
+                    - 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.unw.nc bs=1M count=1;'
+                    - 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.unw.png bs=1M count=1;'
+                    - 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/compressed_slcs/compressed_slc_t087_185683_iw2_20180222_20180330.h5 bs=1M count=1;'
+                    - 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/compressed_slcs/compressed_slc_t087_185684_iw2_20180222_20180330.h5 bs=1M count=1;'
                     - '/bin/echo DISP-S1 invoked with RunConfig'
                 ErrorCodeBase: 500000
                 SchemaPath: pge/disp_s1/schema/disp_s1_sas_schema.yaml
@@ -95,4 +99,3 @@ RunConfig:
 
             # Path to the output log file in addition to logging to stderr.
             log_file: output/pge_logfile.log
-
