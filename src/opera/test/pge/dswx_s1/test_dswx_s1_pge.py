@@ -1,613 +1,716 @@
-
-"""
 #!/usr/bin/env python3
-==============
-dswx_s1_pge.py
-==============
-Module defining the implementation for the Dynamic Surface Water Extent (DSWx)
-from Sentinel-1 A/B (S1) PGE.
+
+"""
+===================
+test_dswx_s1_pge.py
+===================
+Unit tests for the pge/dswx_s1/dswx_s1_pge.py module.
 """
 
-from datetime import datetime
-from os.path import abspath, basename, exists, getsize, join, splitext
+import glob
+import os
+import re
+import shutil
+import tempfile
+import unittest
+from io import StringIO
+from os.path import abspath, exists, isdir, join
 
-import opera.util.input_validation as input_validation
-from opera.pge.base.base_pge import PgeExecutor
-from opera.pge.base.base_pge import PostProcessorMixin
-from opera.pge.base.base_pge import PreProcessorMixin
-from opera.util.error_codes import ErrorCode
-from opera.util.img_utils import get_geotiff_metadata
-from opera.util.input_validation import validate_algorithm_parameters_config
-from opera.util.input_validation import validate_dswx_inputs
-from opera.util.metadata_utils import get_geographic_boundaries_from_mgrs_tile
+from pkg_resources import resource_filename
+
+import yaml
+
+from opera.pge import RunConfig
+from opera.pge.dswx_s1.dswx_s1_pge import DSWxS1Executor
+from opera.util import PgeLogger
+from opera.util.img_utils import MockGdal
 from opera.util.metadata_utils import get_sensor_from_spacecraft_name
-from opera.util.time import get_time_for_filename
 
 
-class DSWxS1PreProcessorMixin(PreProcessorMixin):
-    """
-    Mixin class responsible for handling all pre-processing steps for the DSWx-S1
-    PGE. The pre-processing phase is defined as all steps necessary prior
-    to SAS execution.
+class DswxS1PgeTestCase(unittest.TestCase):
+    """Base test class using unittest"""
 
-    In addition to the base functionality inherited from PreProcessorMixin, this
-    mixin adds an input validation step to ensure that input(s) defined by the
-    RunConfig exist and are valid.
+    starting_dir = None
+    working_dir = None
+    test_dir = None
+    input_tif_file = None
+    input_h5_file = None
+    input_dir = "dswx_s1_pge_test/input_dir"
 
-    """
+    @classmethod
+    def setUpClass(cls) -> None:
+        """Set up directories and files for testing"""
+        cls.starting_dir = abspath(os.curdir)
+        cls.test_dir = resource_filename(__name__, "")
+        cls.data_dir = join(cls.test_dir, os.pardir, os.pardir, "data")
 
-    _pre_mixin_name = "DSWxS1PreProcessorMixin"
+        os.chdir(cls.test_dir)
 
-    def _validate_ancillary_inputs(self):
-        """
-        Evaluates the list of ancillary inputs from the RunConfig to ensure they
-        exist and have an expected file extension.
+    @classmethod
+    def tearDownClass(cls) -> None:
+        """At completion re-establish starting directory"""
+        os.chdir(cls.starting_dir)
 
-        """
-        dynamic_ancillary_file_group_dict = \
-            self.runconfig.sas_config['runconfig']['groups']['dynamic_ancillary_file_group']
-
-        for key, value in dynamic_ancillary_file_group_dict.items():
-            if key in ('dem_file', ):
-                input_validation.check_input(
-                    value, self.logger, self.name, valid_extensions=('.tif', '.tiff', '.vrt')
-                )
-            elif key in ('reference_water_file', 'worldcover_file', 'hand_file'):
-                input_validation.check_input(
-                    value, self.logger, self.name, valid_extensions=('.tif', '.tiff')
-                )
-            elif key in ('shoreline_shapefile',):
-                if value is not None:
-                    input_validation.check_input(
-                        value, self.logger, self.name, valid_extensions=('.shp',))
-                    # Only the .shp file is configured in the runconfig, but we
-                    # need to ensure the other required files are co-located with it
-                    for extension in ('.dbf', '.prj', '.shx'):
-                        additional_shapefile = splitext(value)[0] + extension
-
-                        if not exists(abspath(additional_shapefile)):
-                            error_msg = f"Additional shapefile {additional_shapefile} could not be located"
-
-                            self.logger.critical(self.name, ErrorCode.INVALID_INPUT, error_msg)
-                else:
-                    msg = f"No shoreline_shapefile specified in runconfig file."
-                    self.logger.info(self.name, ErrorCode.INPUT_NOT_FOUND, msg)
-
-            elif key in ('dem_file_description', 'worldcover_file_description',
-                         'reference_water_file_description', 'hand_file_description',
-                         'shoreline_shapefile_description'):
-                # these fields are included in the SAS input paths, but are not
-                # actually file paths, so skip them
-                continue
-            elif key in ('algorithm_parameters',):
-                input_validation.check_input(
-                    value, self.logger, self.name, valid_extensions=('.yaml', )
-                )
-
-    def run_preprocessor(self, **kwargs):
-        """
-        Executes the pre-processing steps for DSWx-S1 PGE initialization.
-        The DswxS1PreProcessorMixin version of this class performs all actions
-        of the base PreProcessorMixin class, and adds an input validation step for
-        the inputs defined within the RunConfig.
-
-        Parameters
-        ----------
-        **kwargs: dict
-            Any keyword arguments needed by the pre-processor
-
-        """
-        super().run_preprocessor(**kwargs)
-
-        validate_dswx_inputs(
-            self.runconfig, self.logger, self.runconfig.pge_name, valid_extensions=(".tif", ".h5")
+    def setUp(self) -> None:
+        """Use the temporary directory as the working directory"""
+        self.working_dir = tempfile.TemporaryDirectory(
+            prefix="test_dswx_s1_pge_", suffix="_temp", dir=os.curdir
         )
-        validate_algorithm_parameters_config(self.name,
-                                             self.runconfig.algorithm_parameters_schema_path,
-                                             self.runconfig.algorithm_parameters_file_config_path,
-                                             self.logger)
-        self._validate_ancillary_inputs()
 
+        # Create the input directories expected by the test Runconfig file
+        test_input_dir = join(self.working_dir.name, "dswx_s1_pge_test/input_dir")
+        os.makedirs(test_input_dir, exist_ok=True)
 
-class DSWxS1PostProcessorMixin(PostProcessorMixin):
-    """
-    Mixin class responsible for handling all post-processing steps for the DSWx-S1
-    PGE. The post-processing phase is defined as all steps required after SAS
-    execution has completed, prior to handover of output products to PCM.
+        self.input_file = tempfile.NamedTemporaryFile(
+            dir=test_input_dir, prefix="test_h5_", suffix=".h5"
+        )
 
-    In addition to the base functionality inherited from PostProcessorMixin, this
-    mixin adds an output validation step to ensure that the output file(s) defined
-    by the RunConfig exist and are valid.
+        # Copy the algorithm_parameters config file into the test input directory.
+        shutil.copy(join(self.data_dir, 'test_dswx_s1_algorithm_parameters.yaml'), test_input_dir)
 
-    """
+        self.input_file = tempfile.NamedTemporaryFile(
+            dir=test_input_dir, prefix="test_h5_", suffix=".h5"
+        )
 
-    _post_mixin_name = "DSWxS1PostProcessorMixin"
-    _cached_core_filename = None
-    _tile_metadata_cache = {}
-
-    def _validate_output(self):
-        """
-        Evaluates the output file(s) generated from SAS execution to ensure:
-            - That the file(s) contains some content (size is greater than 0).
-            - That the .tif output files (band data) end with 'B01_WTR',
-              'B02_BWTR', or 'B03_CONF'
-            - That the there are the same number of each type of file, implying
-              3 output bands per tile
-
-        """
-        EXPECTED_NUM_BANDS: int = 3
-        band_dict = {}
-        num_bands = []
-        output_extension = '.tif'
-
-        # get all .tiff files
-        output_products = list(
-            filter(
-                lambda filename: output_extension in filename,
-                self.runconfig.get_output_product_filenames()
+        # Create dummy versions of the expected ancillary inputs
+        for ancillary_file in ('dem.tif', 'worldcover.tif',
+                               'reference_water.tif', 'shoreline.shp', 'shoreline.dbf', 'shoreline.prj',
+                               'shoreline.shx', 'hand.tif'):
+            os.system(
+                f"touch {join(test_input_dir, ancillary_file)}"
             )
-        )
 
-        if not output_products:
-            error_msg = (f"No SAS output file(s) with '{output_extension}' extension "
-                         f"found within '{self.runconfig.output_product_path}'")
+        # Create the output directories expected by the test Runconfig file
+        self.test_output_dir = abspath(join(self.working_dir.name, "dswx_s1_pge_test/output_dir"))
+        os.makedirs(self.test_output_dir, exist_ok=True)
 
-            self.logger.critical(self.name, ErrorCode.OUTPUT_NOT_FOUND, error_msg)
+        os.chdir(self.working_dir.name)
 
-        for out_product in output_products:
-            if not getsize(out_product):
-                error_msg = f"SAS output file {out_product} was created, but is empty"
+    def tearDown(self) -> None:
+        """Return to starting directory"""
+        os.chdir(self.test_dir)
+        self.input_file.close()
+        self.working_dir.cleanup()
 
-                self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
-
-            #  Gather the output files into a dictionary
-            #     key = band type (e.g. B01_WTR.tif)
-            #     value = list of filenames of this type (e.g. ['OPERA_L3_DSWx-S1_..._v0.1_B01_WTR.tif', ...]
-            key = '_'.join(out_product.split('_')[-2:])
-            if key not in band_dict:
-                band_dict[key] = []
-            band_dict[key].append(out_product)
-
-        if len(band_dict.keys()) != EXPECTED_NUM_BANDS:
-            error_msg = f"Invalid SAS output file, too many band types: {band_dict.keys()}"
-
-            self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
-
-        # Make a list of the numbers of bands per band type
-        for band in band_dict.keys():
-            num_bands.append(len(band_dict[band]))
-        if not all(band_type == num_bands[0] for band_type in num_bands):
-            error_msg = f"Missing or extra band files: number of band files per " \
-                        f"band: {num_bands}"
-
-            self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
-
-    def _core_filename(self, inter_filename=None):
+    def _compare_algorithm_parameters_runconfig_to_expected(self, runconfig):
         """
-        Returns the core file name component for products produced by the
-        DSWx-S1 PGE.
+        Helper method to check the properties of a parsed algorithm parameters runconfig against the
+        expected values as defined by the "valid" sample algorithm parameters runconfig files.
+        """
+        self.assertEqual(runconfig['name'], 'dswx_s1_workflow_algorithm')
+        self.assertEqual(runconfig['processing']['dswx_workflow'], 'opera_dswx_s1')
+        self.assertListEqual(runconfig['processing']['polarizations'], ['VV', 'VH'])
+        self.assertEqual(runconfig['processing']['reference_water']['max_value'], 100)
+        self.assertEqual(runconfig['processing']['reference_water']['no_data_value'], 255)
+        self.assertEqual(runconfig['processing']['mosaic']['mosaic_prefix'], 'mosaic')
+        self.assertEqual(runconfig['processing']['mosaic']['mosaic_cog_enable'], True)
+        self.assertEqual(runconfig['processing']['filter']['enabled'], True)
+        self.assertEqual(runconfig['processing']['filter']['window_size'], 5)
+        self.assertEqual(runconfig['processing']['initial_threshold']['maximum_tile_size']['x'], 400)
+        self.assertEqual(runconfig['processing']['initial_threshold']['maximum_tile_size']['y'], 400)
+        self.assertEqual(runconfig['processing']['initial_threshold']['minimum_tile_size']['x'], 40)
+        self.assertEqual(runconfig['processing']['initial_threshold']['minimum_tile_size']['y'], 40)
+        self.assertEqual(runconfig['processing']['initial_threshold']['selection_method'], 'combined')
+        self.assertEqual(runconfig['processing']['initial_threshold']['interpolation_method'], 'smoothed')
+        self.assertEqual(runconfig['processing']['initial_threshold']['threshold_method'], 'ki')
+        self.assertEqual(runconfig['processing']['initial_threshold']['multi_threshold'], True)
+        self.assertEqual(runconfig['processing']['region_growing']['seed'], 0.83)
+        self.assertEqual(runconfig['processing']['region_growing']['tolerance'], 0.51)
+        self.assertEqual(runconfig['processing']['region_growing']['line_per_block'], 400)
+        self.assertEqual(runconfig['processing']['inundated_vegetation']['enabled'], False)
+        self.assertEqual(runconfig['processing']['inundated_vegetation']['mode'], 'static_layer')
+        self.assertEqual(runconfig['processing']['inundated_vegetation']['temporal_avg_path'], None)
+        self.assertEqual(runconfig['processing']['inundated_vegetation']['initial_class_path'], None)
+        self.assertEqual(runconfig['processing']['inundated_vegetation']['line_per_block'], 300)
+        self.assertEqual(runconfig['processing']['debug_mode'], False)
 
-        The core file name component of the DSWx-S1 PGE consists of:
-
-        <PROJECT>_<LEVEL>_<PGE NAME>
-
-        Callers of this function are responsible for assignment of any other
-        product-specific fields, such as the file extension.
-
-        Notes
-        -----
-        On first call to this function, the returned core filename is cached
-        for subsequent calls. This allows the core filename to be easily reused
-        across product types without needing to provide inter_filename for each
-        subsequent call.
+    def generate_band_data_output(self, band_data, empty_file=False, clear=True):
+        """
+        Add files to the output directory.
 
         Parameters
         ----------
-        inter_filename : str, optional
-            The intermediate filename of the output product to generate the
-            core filename for. This parameter may be used to inspect the file
-            in order to derive any necessary components of the returned filename.
-            Once the core filename is cached upon first call to this function,
-            this parameter may be omitted.
-
-        Returns
-        -------
-        core_filename : str
-            The core file name component to assign to products created by this PGE.
+        band_data: tuple of str
+            Files to add to the output directory.
+        empty_file: bool
+            if 'True' do not add text to the file (leave empty)
+            if 'False' (default) add 'Test data string' to the file
+        clear : bool
+            Clear the output directory before writing new files (default=True)
 
         """
-        # Check if the core filename has already been generated and cached,
-        # and return it if so
-        if self._cached_core_filename is not None:
-            return self._cached_core_filename
+        # example of band data passed to method:
+        # band_data = ('OPERA_L3_DSWx-S1_band_1_B01_WTR.tif', 'OPERA_L3_DSWx-S1_band_1_B02_BWTR.tif',
+        #              'OPERA_L3_DSWx-S1_band_1_B03_CONF.tif', 'OPERA_L3_DSWx-S1_band_2_B01_WTR.tif',
+        #              'OPERA_L3_DSWx-S1_band_2_B02_BWTR.tif', 'OPERA_L3_DSWx-S1_band_2_B03_CONF.tif')
 
-        # Assign the core file name to the cached class attribute
-        self._cached_core_filename = (
-            f"{self.PROJECT}_{self.LEVEL}_{self.NAME}"
+        if clear:
+            path = self.test_output_dir
+            cmd = f"rm {path}/*.tif"
+            os.system(cmd)
+
+        # Add files to the output directory
+        for band_output_file in band_data:
+            if not empty_file:
+                os.system(f"echo 'Test data string' >> {join(self.test_output_dir, band_output_file)}")
+            else:
+                os.system(f"touch {join(self.test_output_dir, band_output_file)}")
+
+    def test_dswx_s1_pge_execution(self):
+        """
+        Test execution of the DswxS1Executor class and its associated mixins
+        using a test RunConfig that creates dummy expected output files and logs
+        a message to be captured by PgeLogger.
+        """
+        runconfig_path = join(self.data_dir, 'test_dswx_s1_config.yaml')
+
+        pge = DSWxS1Executor(pge_name="DswxS1PgeTest", runconfig_path=runconfig_path)
+
+        # Check that basic attributes were initialized
+        self.assertEqual(pge.name, "DSWx-S1")
+        self.assertEqual(pge.pge_name, "DswxS1PgeTest")
+        self.assertEqual(pge.runconfig_path, runconfig_path)
+
+        # Check that other objects have not been instantiated yet
+        self.assertIsNone(pge.runconfig)
+        self.assertIsNone(pge.logger)
+
+        # Kickoff execution of DSWX-S1 PGE
+        pge.run()
+
+        # Check that the runconfig and logger were instantiated
+        self.assertIsInstance(pge.runconfig, RunConfig)
+        self.assertIsInstance(pge.logger, PgeLogger)
+
+        # Check that directories were created according to RunConfig
+        self.assertTrue(isdir(pge.runconfig.output_product_path))
+        self.assertTrue(isdir(pge.runconfig.scratch_path))
+
+        # Check that an in-memory log was created
+        stream = pge.logger.get_stream_object()
+        self.assertIsInstance(stream, StringIO)
+
+        # Check that a RunConfig for the SAS was isolated within the scratch directory
+        expected_sas_config_file = join(pge.runconfig.scratch_path, 'test_dswx_s1_config_sas.yaml')
+        self.assertTrue(exists(expected_sas_config_file))
+
+        # Check that the catalog metadata file was created in the output directory
+        expected_catalog_metadata_file = join(
+            pge.runconfig.output_product_path, pge._catalog_metadata_filename())
+        self.assertTrue(os.path.exists(expected_catalog_metadata_file))
+
+        # Check that the ISO metadata file was created and all placeholders were filled in
+        expected_iso_metadata_file = join(
+            pge.runconfig.output_product_path, pge._iso_metadata_filename(tile_id='T18MVA'))
+        self.assertTrue(os.path.exists(expected_iso_metadata_file))
+
+        with open(expected_iso_metadata_file, 'r', encoding='utf-8') as infile:
+            iso_contents = infile.read()
+
+        self.assertNotIn('!Not found!', iso_contents)
+
+        # Check that the log file was created and moved into the output directory
+        expected_log_file = pge.logger.get_file_name()
+        self.assertTrue(exists(expected_log_file))
+
+        # Lastly, check that the dummy output products were created
+        output_files = glob.glob(join(pge.runconfig.output_product_path, "*.tif"))
+        self.assertEqual(len(output_files), 3)
+
+        # Open and read the log
+        with open(expected_log_file, 'r', encoding='utf-8') as infile:
+            log_contents = infile.read()
+
+        self.assertIn(f"DSWx-S1 invoked with RunConfig {expected_sas_config_file}", log_contents)
+
+    def test_filename_application(self):
+        """Test the filename convention applied to DSWx-S1 output products"""
+        runconfig_path = join(self.data_dir, 'test_dswx_s1_config.yaml')
+
+        pge = DSWxS1Executor(pge_name="DswxS1PgeTest", runconfig_path=runconfig_path)
+
+        pge.run()
+
+        image_files = glob.glob(join(pge.runconfig.output_product_path, "*.tif"))
+
+        for image_file in image_files:
+            file_name = pge._geotiff_filename(image_file)
+            md = MockGdal.MockDSWxS1GdalDataset().GetMetadata()
+            file_name_regex = rf"{pge.PROJECT}_{pge.LEVEL}_" \
+                              rf"{md['PRODUCT_TYPE']}_" \
+                              rf"T\w{{5}}_" \
+                              rf"\d{{8}}T\d{{6}}Z_\d{{8}}T\d{{6}}Z_" \
+                              rf"{get_sensor_from_spacecraft_name(md['SPACECRAFT_NAME'])}_" \
+                              rf"30_v{pge.runconfig.product_version}_" \
+                              rf"B\d{{2}}_\w+.tif"
+            self.assertEqual(re.match(file_name_regex, file_name).group(), file_name)
+
+    def test_iso_metadata_creation(self):
+        """
+        Mock ISO metadata is created when the PGE post processor runs.
+        Successful creation of metadata is verified in test_dswx_s1_pge_execution().
+        This test will verify that error conditions are caught.
+        """
+        runconfig_path = join(self.data_dir, 'test_dswx_s1_config.yaml')
+
+        pge = DSWxS1Executor(pge_name="DSWxS1PgeTest", runconfig_path=runconfig_path)
+
+        # Run only the pre-processor steps to ingest the runconfig and set
+        # up directories
+        pge.run_preprocessor()
+
+        # TODO this will work for current Mock implementation of DSWx-S1 metadata
+        #      will need to fix once metadata is populated by SAS
+        output_dir = join(os.curdir, 'dswx_s1_pge_test/input_dir')
+        dummy_tif_file = join(
+            output_dir, 'OPERA_L3_DSWx-S1_T18MVA_20200702T231843Z_20230317T190549Z_v0.1_B01_WTR.tif'
         )
 
-        return self._cached_core_filename
+        with open(dummy_tif_file, 'w') as outfile:
+            outfile.write('dummy dswx data')
 
-    def _tile_filename(self, inter_filename=None):
-        """
-        Returns the file name to use for MGRS tile-based DSWx products produced
-        by this PGE.
+        dswx_s1_metadata = pge._collect_dswx_s1_product_metadata(dummy_tif_file)
 
-        The filename for the DSWx-S1 burst products consists of:
+        # Initialize the core filename for the catalog metadata generation step
+        pge._core_filename()
 
-        <Core filename>_<TILE ID>_<ACQ TIMETAG>_<PROD TIMETAG>_<SENSOR>_<SPACING>_<PRODUCT VERSION>
+        # Render ISO metadata using the sample metadata
+        iso_metadata = pge._create_iso_metadata(dswx_s1_metadata)
 
-        Where <Core filename> is returned by DSWxS1PostProcessorMixin._core_filename()
+        # Rendered template should not have any missing placeholders
+        self.assertNotIn('!Not found!', iso_metadata)
 
-        Callers of this function are responsible for assignment of any other
-        product-specific fields, such as the file extension.
+        # Test bad iso_template_path
+        test_runconfig_path = join(self.data_dir, 'invalid_dswx_s1_runconfig.yaml')
 
-        Parameters
-        ----------
-        inter_filename : str, optional
-            The intermediate filename of the output product to generate the
-            core filename for. This parameter may be used to inspect the file
-            in order to derive any necessary components of the returned filename.
-            Once the core filename is cached upon first call to this function,
-            this parameter may be omitted.
+        with open(runconfig_path, 'r', encoding='utf-8') as infile:
+            runconfig_dict = yaml.safe_load(infile)
 
-        Returns
-        -------
-        tile_filename : str
-            The filename component to assign to tile-based products created by
-            this PGE.
+        primary_executable = runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']
+        primary_executable['IsoTemplatePath'] = "pge/dswx_s1/templates/OPERA_ISO_metadata_L3_DSWx_S1_template.xml"
 
-        """
-        core_filename = self._core_filename(inter_filename)
-
-        # The tile ID should be included within the intermediate filename,
-        # extract it and prepare it for use within the final filename
-        tile_id = basename(inter_filename).split('_')[3]
-
-        if tile_id in self._tile_metadata_cache:
-            dswx_metadata = self._tile_metadata_cache[tile_id]
-        else:
-            # Collect the metadata from the GeoTIFF output product
-            dswx_metadata = self._collect_dswx_s1_product_metadata(inter_filename)
-
-            self._tile_metadata_cache[tile_id] = dswx_metadata
-
-        spacecraft_name = dswx_metadata['SPACECRAFT_NAME']
-        sensor = get_sensor_from_spacecraft_name(spacecraft_name)
-        pixel_spacing = "30"  # fixed for tile-based products
-
-        acquisition_time = get_time_for_filename(
-            datetime.strptime(dswx_metadata['SENSING_START'], '%Y-%m-%dT%H:%M:%SZ')
-        )
-
-        if not acquisition_time.endswith('Z'):
-            acquisition_time = f'{acquisition_time}Z'
-
-        processing_time = get_time_for_filename(
-            datetime.strptime(dswx_metadata['PROCESSING_DATETIME'], '%Y-%m-%dT%H:%M:%SZ')
-        )
-
-        if not processing_time.endswith('Z'):
-            processing_time = f'{processing_time}Z'
-
-        product_version = str(self.runconfig.product_version)
-
-        if not product_version.startswith('v'):
-            product_version = f'v{product_version}'
-
-        tile_filename = (
-            f"{core_filename}_{tile_id}_{acquisition_time}_{processing_time}_"
-            f"{sensor}_{pixel_spacing}_{product_version}"
-        )
-
-        return tile_filename
-
-    def _geotiff_filename(self, inter_filename):
-        """
-        Returns the file name to use for GeoTIFF's produced by the DSWx-S1 PGE.
-
-        The GeoTIFF filename for the DSWx-S1 PGE consists of:
-
-            <Tile filename>_<Band Index>_<Band Name>.tif
-
-        Where <Tile filename> is returned by DSWxS1PostProcessorMixin._tile_filename()
-        and <Band Index> and <Band Name> are determined from the name of the
-        intermediate geotiff file to be renamed.
-
-        Parameters
-        ----------
-        inter_filename : str
-            The intermediate filename of the output GeoTIFF to generate
-            a filename for. This parameter may be used to inspect the file
-            in order to derive any necessary components of the returned filename.
-
-        Returns
-        -------
-        geotiff_filename : str
-            The file name to assign to GeoTIFF product(s) created by this PGE.
-
-        """
-        tile_filename = self._tile_filename(inter_filename)
-
-        # Specific output product band index and name should be the last parts
-        # of the filename before the extension, delimited by underscores
-        band_idx, band_name = splitext(inter_filename)[0].split("_")[-2:]
-
-        return f"{tile_filename}_{band_idx}_{band_name}.tif"
-
-    def _ancillary_filename(self):
-        """
-        Helper method to derive the core component of the file names for the
-        ancillary products associated to a PGE job (catalog metadata, log file,
-        etc...).
-
-        The core file name component for DSWx-S1 ancillary products consists of:
-
-        <PROJECT>_<LEVEL>_<PGE NAME>_<PROD TIMETAG>_<SENSOR>_<SPACING>_<PRODUCT VERSION>
-
-        Since these files are not specific to any particular tile processed for
-        a DSWx-S1 job, fields such as tile ID and acquisition time are omitted from
-        this file pattern.
-
-        Also note that this does not include a file extension, which should be
-        added to the return value of this method by any callers to distinguish
-        the different formats of ancillary outputs produced by this PGE.
-
-        Returns
-        -------
-        ancillary_filename : str
-            The file name component to assign to ancillary products created by this PGE.
-
-        """
-        # Metadata fields we need for ancillary file name should be equivalent
-        # across all tiles, so just take the first set of cached metadata as
-        # a representative
-        dswx_metadata = list(self._tile_metadata_cache.values())[0]
-
-        spacecraft_name = dswx_metadata['SPACECRAFT_NAME']
-        sensor = get_sensor_from_spacecraft_name(spacecraft_name)
-        pixel_spacing = "30"  # fixed for tile-based products
-
-        processing_time = get_time_for_filename(
-            datetime.strptime(dswx_metadata['PROCESSING_DATETIME'], '%Y-%m-%dT%H:%M:%SZ')
-        )
-
-        if not processing_time.endswith('Z'):
-            processing_time = f'{processing_time}Z'
-
-        product_version = str(self.runconfig.product_version)
-
-        if not product_version.startswith('v'):
-            product_version = f'v{product_version}'
-
-        ancillary_filename = (
-            f"{self.PROJECT}_{self.LEVEL}_{self.NAME}_{processing_time}_"
-            f"{sensor}_{pixel_spacing}_{product_version}"
-        )
-
-        return ancillary_filename
-
-    def _catalog_metadata_filename(self):
-        """
-        Returns the file name to use for Catalog Metadata produced by the DSWx-S1 PGE.
-
-        The Catalog Metadata file name for the DSWx-S1 PGE consists of:
-
-            <Ancillary filename>.catalog.json
-
-        Where <Ancillary filename> is returned by DSWxS1PostProcessorMixin._ancillary_filename()
-
-        Returns
-        -------
-        catalog_metadata_filename : str
-            The file name to assign to the Catalog Metadata product created by this PGE.
-
-        """
-        return self._ancillary_filename() + ".catalog.json"
-
-    def _log_filename(self):
-        """
-        Returns the file name to use for the PGE/SAS log file produced by the DSWx-S1 PGE.
-
-        The log file name for the DSWx-S1 PGE consists of:
-
-            <Ancillary filename>.log
-
-        Where <Ancillary filename> is returned by DSWxS1PostProcessorMixin._ancillary_filename()
-
-        Returns
-        -------
-        log_filename : str
-            The file name to assign to the PGE/SAS log created by this PGE.
-
-        """
-        return self._ancillary_filename() + ".log"
-
-    def _qa_log_filename(self):
-        """
-        Returns the file name to use for the Quality Assurance application log
-        file produced by the DSWx-S1 PGE.
-
-        The log file name for the DSWx-S1 PGE consists of:
-
-            <Ancillary filename>.qa.log
-
-        Where <Ancillary filename> is returned by DSWxS1PostProcessorMixin._ancillary_filename()
-
-        Returns
-        -------
-        log_filename : str
-            The file name to assign to the QA log created by this PGE.
-
-        """
-        return self._ancillary_filename() + ".qa.log"
-
-    # TODO: remove patch and imports once SAS starts to populate metadata in GeoTIFF
-    from unittest.mock import patch
-    import opera.util.img_utils
-    from opera.util.img_utils import MockGdal
-    @patch.object(opera.util.img_utils, "gdal", MockGdal)
-    def _collect_dswx_s1_product_metadata(self, geotiff_product):
-        """
-        Gathers the available metadata from an output DSWx-S1 product for
-        use in filling out the ISO metadata template for the DSWx-S1 PGE.
-
-        Parameters
-        ----------
-        geotiff_product : str
-            Path the GeoTIFF product to collect metadata from.
-
-        Returns
-        -------
-        output_product_metadata : dict
-            Dictionary containing DSWx-S1 output product metadata, formatted
-            for use with the ISO metadata Jinja2 template.
-
-        """
-        # Extract all metadata assigned by the SAS at product creation time
-        output_product_metadata = get_geotiff_metadata(geotiff_product)
-
-        # Get the Military Grid Reference System (MGRS) tile code and zone
-        # identifier from the intermediate file name
-        mgrs_tile_id = basename(geotiff_product).split('_')[3]
-
-        output_product_metadata['tileCode'] = mgrs_tile_id
-        output_product_metadata['zoneIdentifier'] = mgrs_tile_id[:2]
-
-        # Translate the MGRS tile ID to a lat/lon bounding box
-        (lat_min,
-         lat_max,
-         lon_min,
-         lon_max) = get_geographic_boundaries_from_mgrs_tile(mgrs_tile_id)
-
-        output_product_metadata['geospatial_lon_min'] = lon_min
-        output_product_metadata['geospatial_lon_max'] = lon_max
-        output_product_metadata['geospatial_lat_min'] = lat_min
-        output_product_metadata['geospatial_lat_max'] = lat_max
-
-        # Add some fields on the dimensions of the data. These values should
-        # be the same for all DSWx-S1 products, and were derived from the
-        # ADT product spec
-        output_product_metadata['xCoordinates'] = {
-            'size': 3660,  # pixels
-            'spacing': 30  # meters/pixel
-        }
-        output_product_metadata['yCoordinates'] = {
-            'size': 3660,  # pixels
-            'spacing': 30  # meters/pixel
-        }
-
-        return output_product_metadata
-
-    def _stage_output_files(self):
-        """
-        Ensures that all output products produced by both the SAS and this PGE
-        are staged to the output location defined by the RunConfig. This includes
-        reassignment of file names to meet the file-naming conventions required
-        by the PGE.
-
-        This version of the method performs the same steps as the base PGE
-        implementation, except that an ISO xml metadata file is rendered for
-        each burst product created from the input SLC, since each burst can
-        have specific metadata fields, such as the bounding polygon.
-
-        """
-        # Gather the list of output files produced by the SAS
-        output_products = self.runconfig.get_output_product_filenames()
-
-        # For each output file name, assign the final file name matching the
-        # expected conventions
-        for output_product in output_products:
-            self._assign_filename(output_product, self.runconfig.output_product_path)
-
-        # Write the catalog metadata to disk with the appropriate filename
-        catalog_metadata = self._create_catalog_metadata()
-
-        if not catalog_metadata.validate(catalog_metadata.get_schema_file_path()):
-            msg = f"Failed to create valid catalog metadata, reason(s):\n {catalog_metadata.get_error_msg()}"
-            self.logger.critical(self.name, ErrorCode.INVALID_CATALOG_METADATA, msg)
-
-        cat_meta_filename = self._catalog_metadata_filename()
-        cat_meta_filepath = join(self.runconfig.output_product_path, cat_meta_filename)
-
-        self.logger.info(self.name, ErrorCode.CREATING_CATALOG_METADATA,
-                         f"Writing Catalog Metadata to {cat_meta_filepath}")
+        with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+            yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
 
         try:
-            catalog_metadata.write(cat_meta_filepath)
-        except OSError as err:
-            msg = f"Failed to write catalog metadata file {cat_meta_filepath}, reason: {str(err)}"
-            self.logger.critical(self.name, ErrorCode.CATALOG_METADATA_CREATION_FAILED, msg)
+            pge = DSWxS1Executor(pge_name="DswxS1PgeTest", runconfig_path=test_runconfig_path)
 
-        # TODO: Generate the ISO metadata for use with product submission to DAAC(s)
-        #       For DSWx-S1, each tile-based product gets its own ISO xml
+            with self.assertRaises(RuntimeError):
+                pge.run()
 
-        # Write the QA application log to disk with the appropriate filename,
-        # if necessary
-        if self.runconfig.qa_enabled:
-            qa_log_filename = self._qa_log_filename()
-            qa_log_filepath = join(self.runconfig.output_product_path, qa_log_filename)
-            self.qa_logger.move(qa_log_filepath)
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
 
-            try:
-                self._finalize_log(self.qa_logger)
-            except OSError as err:
-                msg = f"Failed to write QA log file to {qa_log_filepath}, reason: {str(err)}"
-                self.logger.critical(self.name, ErrorCode.LOG_FILE_CREATION_FAILED, msg)
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
 
-        # Lastly, write the combined PGE/SAS log to disk with the appropriate filename
-        log_filename = self._log_filename()
-        log_filepath = join(self.runconfig.output_product_path, log_filename)
-        self.logger.move(log_filepath)
+            self.assertIn("Could not load ISO template", log_contents)
+        finally:
+            if os.path.exists(test_runconfig_path):
+                os.unlink(test_runconfig_path)
+
+    def test_dswx_s1_pge_validate_algorithm_parameters_config(self):
+        """Test basic parsing and validation of an algorithm parameters RunConfig file"""
+        runconfig_path = join(self.data_dir, 'test_dswx_s1_config.yaml')
+
+        self.runconfig = RunConfig(runconfig_path)
+
+        algorithm_parameters_runconfig = self.runconfig.algorithm_parameters_file_config_path
+
+        pge = DSWxS1Executor(pge_name="DswxS1PgeTest", runconfig_path=runconfig_path)
+
+        # Kickoff execution of DSWX-S1 PGE
+        pge.run()
+
+        self.assertEqual(algorithm_parameters_runconfig, pge.runconfig.algorithm_parameters_file_config_path)
+        # parse the run config file
+        runconfig_dict = self.runconfig._parse_algorithm_parameters_run_config_file\
+            (pge.runconfig.algorithm_parameters_file_config_path)       # noqa 211
+        # Check the properties of the algorithm parameters RunConfig to ensure they match as expected
+        self._compare_algorithm_parameters_runconfig_to_expected(runconfig_dict)
+
+    def test_dswx_s1_pge_bad_algorithm_parameters_schema_path(self):
+        """
+        Test for invalid path in the optional 'AlgorithmParametersSchemaPath'
+        section of in the PGE runconfig file.
+        section of the runconfig file.  Also test for no AlgorithmParametersSchemaPath
+        """
+        runconfig_path = join(self.data_dir, 'test_dswx_s1_config.yaml')
+        test_runconfig_path = join(self.data_dir, 'invalid_dswx_s1_config.yaml')
+
+        with open(runconfig_path, 'r', encoding='utf-8') as infile:
+            runconfig_dict = yaml.safe_load(infile)
+
+        runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']['AlgorithmParametersSchemaPath'] = \
+            'test/data/test_algorithm_parameters_non_existent.yaml'  # noqa E211
+
+        with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+            yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
 
         try:
-            self._finalize_log(self.logger)
-        except OSError as err:
-            msg = f"Failed to write log file to {log_filepath}, reason: {str(err)}"
+            pge = DSWxS1Executor(pge_name="DswxS1PgeTest", runconfig_path=test_runconfig_path)
 
-            # Log stream might be closed by this point so raise an Exception instead
-            raise RuntimeError(msg)
+            with self.assertRaises(RuntimeError):
+                pge.run()
 
-    def run_postprocessor(self, **kwargs):
-        """
-        Executes the post-processing steps for the DSWx-S1 PGE.
-        The DSWxS1PostProcessorMixin version of this method performs the same
-        steps as the base PostProcessorMixin, but inserts a step to perform
-        output product validation prior to staging and renaming of the output
-        files.
+        finally:
+            if exists(test_runconfig_path):
+                os.unlink(test_runconfig_path)
 
-        Parameters
-        ----------
-        **kwargs: dict
-            Any keyword arguments needed by the post-processor
+        # Verify that None is returned when 'AlgorithmParametersSchemaPath' is set to None
+        with open(runconfig_path, 'r', encoding='utf-8') as infile:
+            runconfig_dict = yaml.safe_load(infile)
 
-        """
-        self._run_sas_qa_executable()
-        self._validate_output()
-        self._stage_output_files()
+        runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']['AlgorithmParametersSchemaPath'] = None
+
+        with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+            yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+
+        try:
+            pge = DSWxS1Executor(pge_name="DswxS1PgeTest", runconfig_path=test_runconfig_path)
+
+            pge.run()
+
+            # Check that the log file was created and moved into the output directory
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(exists(expected_log_file))
+
+            # Open and read the log
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn("No algorithm_parameters_schema_path provided in runconfig file", log_contents)
+
+        finally:
+            if exists(test_runconfig_path):
+                os.unlink(test_runconfig_path)
+
+    def test_dswx_s1_pge_bad_algorithm_parameters_path(self):
+        """Test for invalid path to 'algorithm_parameters' in SAS runconfig file"""
+        runconfig_path = join(self.data_dir, 'test_dswx_s1_config.yaml')
+        test_runconfig_path = join(self.data_dir, 'invalid_dswx_s1_config.yaml')
+
+        with open(runconfig_path, 'r', encoding='utf-8') as infile:
+            runconfig_dict = yaml.safe_load(infile)
+
+        runconfig_dict['RunConfig']['Groups']['SAS']['runconfig']['groups']['dynamic_ancillary_file_group'] \
+            ['algorithm_parameters'] = 'test/data/test_algorithm_parameters_non_existent.yaml'  # noqa E211
+
+        with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+            yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+
+        try:
+            pge = DSWxS1Executor(pge_name="DswxS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+        finally:
+            if exists(test_runconfig_path):
+                os.unlink(test_runconfig_path)
+
+    def test_dswx_s1_pge_ancillary_input_validation(self):
+        """Test validation checks made on the set of ancillary input files"""
+        runconfig_path = join(self.data_dir, 'test_dswx_s1_config.yaml')
+        test_runconfig_path = join(self.data_dir, 'invalid_dswx_s1_runconfig.yaml')
+
+        with open(runconfig_path, 'r', encoding='utf-8') as stream:
+            runconfig_dict = yaml.safe_load(stream)
+
+        ancillary_file_group_dict = \
+            runconfig_dict['RunConfig']['Groups']['SAS']['runconfig']['groups']['dynamic_ancillary_file_group']
+
+        # Test an invalid (missing) ancillary file
+        ancillary_file_group_dict['dem_file'] = 'non_existent_dem.tif'
+
+        with open(test_runconfig_path, 'w', encoding='utf-8') as input_path:
+            yaml.safe_dump(runconfig_dict, input_path, sort_keys=False)
+
+        try:
+            pge = DSWxS1Executor(pge_name="DSWxS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            # Config validation occurs before the log is fully initialized, but the
+            # initial log file should still exist and contain details of the validation
+            # error
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            # Open the log file, and check that the validation error details were captured
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn("Could not locate specified input non_existent_dem.tif.", log_contents)
+
+            # Reset to valid dem path
+            ancillary_file_group_dict['dem_file'] = 'dswx_s1_pge_test/input_dir/dem.tif'
+
+            # Test with an unexpected file extension (should be 'tif')
+            os.system("touch dswx_s1_pge_test/input_dir/worldcover.vrt")
+            ancillary_file_group_dict['worldcover_file'] = 'dswx_s1_pge_test/input_dir/worldcover.vrt'
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as input_path:
+                yaml.safe_dump(runconfig_dict, input_path, sort_keys=False)
+
+            pge = DSWxS1Executor(pge_name="DSWxS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            # Open the log file, and check that the validation error details were captured
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn("Input file dswx_s1_pge_test/input_dir/worldcover.vrt "
+                          "does not have an expected file extension.", log_contents)
+
+            # Reset to valid worldcover_file path
+            ancillary_file_group_dict['worldcover_file'] = 'dswx_s1_pge_test/input_dir/worldcover.tif'
+
+            # Test with incomplete shoreline shapefile set
+            os.system("touch dswx_s1_pge_test/input_dir/missing_shoreline.shp")
+            ancillary_file_group_dict['shoreline_shapefile'] = 'dswx_s1_pge_test/input_dir/missing_shoreline.shp'
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as input_path:
+                yaml.safe_dump(runconfig_dict, input_path, sort_keys=False)
+
+            pge = DSWxS1Executor(pge_name="DSWxS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            # Open the log file, and check that the validation error details were captured
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn("Additional shapefile dswx_s1_pge_test/input_dir/missing_shoreline.dbf "
+                          "could not be located", log_contents)
+        finally:
+
+            if os.path.exists(test_runconfig_path):
+                os.unlink(test_runconfig_path)
+
+    def test_dswx_s1_pge_input_validation(self):
+        """Test the input validation checks made by DSWxS1PreProcessorMixin."""
+        runconfig_path = join(self.data_dir, 'test_dswx_s1_config.yaml')
+        test_runconfig_path = join(self.data_dir, 'invalid_dswx_s1_runconfig.yaml')
+
+        with open(runconfig_path, 'r', encoding='utf-8') as stream:
+            runconfig_dict = yaml.safe_load(stream)
+
+        input_files_group = runconfig_dict['RunConfig']['Groups']['PGE']['InputFilesGroup']
+
+        # Test that a non-existent file path is detected by pre-processor
+        input_files_group['InputFilePaths'] = ['temp/non_existent_file.tif']
+
+        with open(test_runconfig_path, 'w', encoding='utf-8') as input_path:
+            yaml.safe_dump(runconfig_dict, input_path, sort_keys=False)
+
+        try:
+            pge = DSWxS1Executor(pge_name="DSWxS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            # Config validation occurs before the log is fully initialized, but the
+            # initial log file should still exist and contain details of the validation
+            # error
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            # Open the log file, and check that the validation error details were captured
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn(f"Could not locate specified input file/directory "
+                          f"{abspath('temp/non_existent_file.tif')}", log_contents)
+
+            # Test that an input directory with no .tif files is caught
+            input_files_group['InputFilePaths'] = ['dswx_s1_pge_test/scratch_dir']
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as out_file:
+                yaml.safe_dump(runconfig_dict, out_file, sort_keys=False)
+
+            pge = DSWxS1Executor(pge_name="DSWxS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn(f"Input directory {abspath('dswx_s1_pge_test/scratch_dir')} "
+                          f"does not contain any .tif files", log_contents)
+
+            # Test that an input directory with no .h5 files is caught
+            input_files_group['InputFilePaths'] = ['dswx_s1_pge_test/scratch_dir']
+
+            os.system(f"touch {abspath('dswx_s1_pge_test/scratch_dir/test.tif')}")
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as out_file:
+                yaml.safe_dump(runconfig_dict, out_file, sort_keys=False)
+
+            pge = DSWxS1Executor(pge_name="DSWxS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn(f"Input directory {abspath('dswx_s1_pge_test/scratch_dir')} "
+                          f"does not contain any .h5 files", log_contents)
+
+            # Lastly, check that a file that exists but is not a tif or an h5 is caught
+            input_files_group['InputFilePaths'] = [runconfig_path]
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as runconfig_fh:
+                yaml.safe_dump(runconfig_dict, runconfig_fh, sort_keys=False)
+
+            pge = DSWxS1Executor(pge_name="DSWxS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn(f"Input file {abspath(runconfig_path)} does not have "
+                          f"an expected extension", log_contents)
+
+        finally:
+            if os.path.exists(test_runconfig_path):
+                os.unlink(test_runconfig_path)
+
+    def test_dswx_s1_pge_output_validation(self):
+        """Test the output validation checks made by DSWxS1PostProcessorMixin."""
+        runconfig_path = join(self.data_dir, 'test_dswx_s1_config.yaml')
+        test_runconfig_path = join(self.data_dir, 'invalid_dswx_s1_runconfig.yaml')
+
+        with open(runconfig_path, 'r', encoding='utf-8') as stream:
+            runconfig_dict = yaml.safe_load(stream)
+
+        primary_executable_group = runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']
+
+        # Set up an input directory empty of .tif files
+        band_data = ()
+        self.generate_band_data_output(band_data, clear=True)
+
+        # Test with a SAS command that does not produce any output file,
+        # post-processor should detect that expected output is missing
+        primary_executable_group['ProgramPath'] = 'echo'
+        primary_executable_group['ProgramOptions'] = ['hello world']
+
+        with open(test_runconfig_path, 'w', encoding='utf-8') as config_fh:
+            yaml.safe_dump(runconfig_dict, config_fh, sort_keys=False)
+
+        try:
+            pge = DSWxS1Executor(pge_name="DSWxS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn("No SAS output file(s) with '.tif' extension found",
+                          log_contents)
+
+            # Test with a SAS command that produces the expected output files, but
+            # with empty files (size 0 bytes). Post-processor should detect this
+            # and flag an error
+            band_data = ('OPERA_L3_DSWx-S1_b1_B01_WTR.tif',)
+            self.generate_band_data_output(band_data, empty_file=True, clear=False)
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+                yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+
+            pge = DSWxS1Executor(pge_name="DSWxS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_output_file = 'dswx_s1_pge_test/output_dir/OPERA_L3_DSWx-S1_b1_B01_WTR.tif'
+            self.assertTrue(os.path.exists(expected_output_file))
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn(f"SAS output file {abspath(expected_output_file)} was "
+                          f"created, but is empty", log_contents)
+
+            # Test a misnamed band file.  Post-processor should detect this and flag an error
+            band_data = ('OPERA_L3_DSWx-S1_b1_B01_WTR.tif', 'OPERA_L3_DSWx-S1_b1_B02_BWTR.tif',
+                         'OPERA_L3_DSWx-S1_b1_B03_CONF.tif', 'OPERA_L3_DSWx-S1_b2_B01_WTR.tif',
+                         'OPERA_L3_DSWx-S1_b2_B02_BWTR.tif', 'OPERA_L3_DSWx-S1_b2_B03_CON.tif')
+            self.generate_band_data_output(band_data, clear=True)
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+                yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+
+            pge = DSWxS1Executor(pge_name="DSWxS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn("Invalid SAS output file, too many band types:",
+                          log_contents)
+
+            # Test for missing or extra band files
+            # Test a misnamed band file.  Post-processor should detect this and flag an error
+            band_data = ('OPERA_L3_DSWx-S1_b1_B01_WTR.tif', 'OPERA_L3_DSWx-S1_b1_B02_BWTR.tif',
+                         'OPERA_L3_DSWx-S1_b1_B03_CONF.tif', 'OPERA_L3_DSWx-S1_b2_B01_WTR.tif',
+                         'OPERA_L3_DSWx-S1_b2_B02_BWTR.tif')
+            self.generate_band_data_output(band_data, clear=True)
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+                yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+
+            pge = DSWxS1Executor(pge_name="DSWxS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn("Missing or extra band files: number of band files per band:",
+                          log_contents)
+
+        finally:
+            if os.path.exists(test_runconfig_path):
+                os.unlink(test_runconfig_path)
 
 
-class DSWxS1Executor(DSWxS1PreProcessorMixin, DSWxS1PostProcessorMixin, PgeExecutor):
-    """
-    Main class for execution of the DSWx-S1 PGE, including the SAS layer.
-    This class essentially rolls up the DSWx-specific pre- and post-processor
-    functionality, while inheriting all other functionality for setup and execution
-    of the SAS from the base PgeExecutor class.
-
-    """
-
-    NAME = "DSWx-S1"
-    """Short name for the L3_DSWx_S1 PGE"""
-
-    LEVEL = "L3"
-    """Processing Level for DSWx-S1 Products"""
-
-    SAS_VERSION = "0.1"
-    """Version of the SAS wrapped by this PGE, should be updated as needed"""
-
-    def __init__(self, pge_name, runconfig_path, **kwargs):
-        super().__init__(pge_name, runconfig_path, **kwargs)
-
-        self.rename_by_pattern_map = {
-            '*.tif*': self._geotiff_filename
-        }
+if __name__ == "__main__":
+    unittest.main()
