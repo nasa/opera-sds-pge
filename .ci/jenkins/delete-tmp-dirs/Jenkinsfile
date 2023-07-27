@@ -1,0 +1,19 @@
+#!/usr/bin/env groovy
+/*
+Although this file is not used, it is added to the repository
+in order to document the pipeline needed to delete the
+numerous 'tmp<unique_id>' directories that accumulate and consume
+disc space in the add/tmp directory on the opera-pge-ci aws machine.
+Using a Jenkins pipeline was required due to security concerns.
+*/
+pipeline {
+    agent any
+    stages {
+        stage("clean_up")  {
+            steps {
+                echo "Cleaning up data/tmp directories"
+                sh 'rm -rf /data/tmp/tmp.*'
+            }
+        }
+    }
+}
