@@ -1,4 +1,4 @@
-# Sample RunConfig for use with the DSWx-S1 PGE v3.0.0-er.2.0
+# Sample RunConfig for use with the DSWx-S1 PGE v3.0.0-er.3.0
 # This RunConfig should require minimal changes in order to be used with the
 # OPERA PCM.
 
@@ -46,7 +46,7 @@ RunConfig:
 
                     reference_water_file: /home/conda/input_dir/ancillary_data/reference_water.tif
 
-                    world_cover: /home/conda/input_dir/ancillary_data/worldcover.tif
+                    worldcover_file: /home/conda/input_dir/ancillary_data/worldcover.tif
 
             ProductPathGroup:
                 # Path to where output products should be stored
