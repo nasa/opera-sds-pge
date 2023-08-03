@@ -236,7 +236,7 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
         ------
         ValueError
             If static_layer_product is True and no value was specified for
-            DataValidityStartTime within the RunConfig.
+            DataValidityStartDate within the RunConfig.
 
         """
         if static_layer_product:
@@ -274,12 +274,12 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
         production_time = get_time_for_filename(self.production_datetime)
 
         if static_layer_product:
-            acquisition_time = self.runconfig.data_validity_start_time
+            acquisition_time = self.runconfig.data_validity_start_date
 
             if acquisition_time is None:
                 raise ValueError(
                     'static_layer_product was requested, but no value was provided '
-                    'for DataValidityStartTime within the RunConfig'
+                    'for DataValidityStartDate within the RunConfig'
                 )
         else:
             # Use doppler start time as the acq time and convert it to our format

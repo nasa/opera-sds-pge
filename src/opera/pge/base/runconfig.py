@@ -334,9 +334,9 @@ class RunConfig:
         )
 
     @property
-    def data_validity_start_time(self) -> str:
-        """Returns the DataValidityStartTime value for the Primary Executable"""
-        return self._pge_config['PrimaryExecutable'].get('DataValidityStartTime', None)
+    def data_validity_start_date(self) -> str:
+        """Returns the DataValidityStartDate value for the Primary Executable"""
+        return self._pge_config['PrimaryExecutable'].get('DataValidityStartDate', None)
 
     # QAExecutable
     @property

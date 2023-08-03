@@ -94,11 +94,11 @@ RunConfig:
                 # Consult the Docker image build scripts for more info
                 IsoTemplatePath: /home/compass_user/opera/pge/cslc_s1/templates/OPERA_ISO_metadata_L2_CSLC_S1_template.xml.jinja2
 
-                # Date time field which designated the point after which the
+                # Date field which designates the point after which the
                 # CSLC static layer product(s) should be considered valid.
                 # This field must be provided for CSLC-S1 jobs when static layer
-                # generation is enabled (see below), and must be of the form YYYYMMDDTHHmmss
-                DataValidityStartTime: 20140101T000000
+                # generation is enabled (see below), and must be of the form YYYYMMDD
+                DataValidityStartDate: 20140101
 
             QAExecutable:
                 # Set to True to enable execution of an additional "Quality Assurance"

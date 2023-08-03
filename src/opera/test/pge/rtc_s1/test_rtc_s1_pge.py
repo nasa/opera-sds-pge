@@ -212,7 +212,7 @@ class RtcS1PgeTestCase(unittest.TestCase):
         self.assertIn(f"{core_static_filename}{expected_version}_mask.tif", static_output_files)
         self.assertIn(f"{core_static_filename}{expected_version}_BROWSE.png", static_output_files)
 
-        # Ensure the DataValidityStartTime was used in the filenames for the
+        # Ensure the DataValidityStartDate was used in the filenames for the
         # static layer products
         expected_data_validity_start_date = pge.runconfig.data_validity_start_date
 

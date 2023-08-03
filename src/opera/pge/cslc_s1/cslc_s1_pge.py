@@ -188,7 +188,7 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
             filename for. This parameter may be used to inspect the file in order
             to derive any necessary components of the returned filename.
         use_validity_start_time : bool, optional
-            If True, use the DataValidityStartTime value from the RunConfig in
+            If True, use the DataValidityStartDate value from the RunConfig in
             lieu of an acquisition time from the product metadata. Defaults to
             False.
 
@@ -201,7 +201,7 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
         ------
         ValueError
             If use_validity_start_time is True and no value was specified for
-            DataValidityStartTime within the RunConfig.
+            DataValidityStartDate within the RunConfig.
 
         """
         core_filename = self._core_filename(inter_filename)
@@ -236,12 +236,12 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
         pol = burst_metadata['polarization']
 
         if use_validity_start_time:
-            acquisition_time = self.runconfig.data_validity_start_time
+            acquisition_time = self.runconfig.data_validity_start_date
 
             if acquisition_time is None:
                 raise ValueError(
                     'use_validity_start_time was requested, but no value was provided '
-                    'for DataValidityStartTime within the RunConfig'
+                    'for DataValidityStartDate within the RunConfig'
                 )
         else:
             acquisition_time = get_time_for_filename(
@@ -262,7 +262,7 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
 
         # Cache the file name for this burst ID, so it can be used with the
         # ISO metadata later. Note, since this is used with the ISO filename, we
-        # only want to cache the version that does not use DataValidityStartTime.
+        # only want to cache the version that does not use DataValidityStartDate.
         if not use_validity_start_time:
             self._burst_filename_cache[burst_id] = cslc_filename
 
