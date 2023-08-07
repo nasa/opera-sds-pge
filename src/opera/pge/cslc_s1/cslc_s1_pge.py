@@ -167,15 +167,52 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
 
         return self._cached_core_filename
 
-    def _cslc_filename(self, inter_filename, use_validity_start_time=False):
+    def _core_static_filename(self, inter_filename=None):
+        """
+        Returns the core file name component for static layer products produced
+        by the CSLC-S1 PGE.
+
+        The core file name component of the CSLC-S1 PGE static layer products
+        consists of:
+
+        <Core filename>-STATIC
+
+        Where <Core filename> is returned by CslcS1PostProcessorMixin._core_filename()
+
+        Parameters
+        ----------
+        inter_filename : str, optional
+            The intermediate filename of the output product to generate the
+            core filename for. This parameter may be used to inspect the file
+            in order to derive any necessary components of the returned filename.
+            Once the core filename is cached upon first call to this function,
+            this parameter may be omitted.
+
+        Returns
+        -------
+        core_static_filename : str
+            The core file name component to assign to static layer products
+            created by this PGE.
+
+        """
+        core_filename = self._core_filename(inter_filename)
+
+        return f"{core_filename}-STATIC"
+
+    def _cslc_filename(self, inter_filename, static_layer_product=False):
         """
         Returns the file name to use for burst-based CSLC products produced by this PGE.
 
         The filename for the CSLC-S1 burst products consists of:
 
-            <Core filename>-<SENSOR>_<MODE>_<BURST ID>_<POL>_<ACQ TIMETAG>_<PRODUCT VER>_<PROD TIMETAG>
+            <Core filename>_<BURST ID>_<ACQUISITION TIMETAG>_<PRODUCTION TIMETAG>_<SENSOR>_<POL>_<PRODUCT_VERSION>
 
         Where <Core filename> is returned by CslcS1PostProcessorMixin._core_filename()
+        if static_layer_product is False, otherwise it is the value returned by
+        CslcS1PostProcessorMixin._core_static_filename()
+
+        If static_layer_product is True, <ACQUISITION_TIME> will correspond
+        to the configured data validity start time (as defined in the RunConfig).
 
         Also note that this does not include a file extension, which should be
         added to the return value of this method by any callers to distinguish
@@ -187,10 +224,9 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
             The intermediate filename of the output GeoTIFF to generate a
             filename for. This parameter may be used to inspect the file in order
             to derive any necessary components of the returned filename.
-        use_validity_start_time : bool, optional
-            If True, use the DataValidityStartDate value from the RunConfig in
-            lieu of an acquisition time from the product metadata. Defaults to
-            False.
+        static_layer_product : bool, optional
+            If True, use the file name conventions specific to static layer
+            products. Otherwise, use the baseline conventions. Defaults to False.
 
         Returns
         -------
@@ -200,11 +236,14 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
         Raises
         ------
         ValueError
-            If use_validity_start_time is True and no value was specified for
+            If static_layer_product is True and no value was specified for
             DataValidityStartDate within the RunConfig.
 
         """
-        core_filename = self._core_filename(inter_filename)
+        if static_layer_product:
+            core_filename = self._core_static_filename(inter_filename)
+        else:
+            core_filename = self._core_filename(inter_filename)
 
         # The burst ID should be included within the file path for each
         # output directory, extract it and prepare it for use within the
@@ -216,7 +255,7 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
             cslc_metadata = self._burst_metadata_cache[burst_id]
         else:
             # Collect the metadata from the HDF5 output product
-            cslc_h5_product_pattern = join(os.path.dirname(inter_filename), f"{burst_id_dir}*.h5")
+            cslc_h5_product_pattern = join(os.path.dirname(inter_filename), f"*{burst_id_dir}*.h5")
 
             # Find the main .h5 product path based on location of the current file
             # and burst ID
@@ -232,21 +271,30 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
         burst_metadata = cslc_metadata['processing_information']['input_burst_metadata']
 
         sensor = burst_metadata['platform_id']
-        mode = 'IW'  # fixed to Interferometric Wide (IW) for all S1-based CSLC products
-        pol = burst_metadata['polarization']
 
-        if use_validity_start_time:
+        # Polarization only included in file name for baseline products
+        pol = "" if static_layer_product else f"_{burst_metadata['polarization']}"
+
+        if static_layer_product:
             acquisition_time = self.runconfig.data_validity_start_date
 
             if acquisition_time is None:
                 raise ValueError(
-                    'use_validity_start_time was requested, but no value was provided '
+                    'static_layer_product was requested, but no value was provided '
                     'for DataValidityStartDate within the RunConfig'
                 )
         else:
+            acquisition_time = burst_metadata['sensing_start']
+
+            if acquisition_time.endswith('Z'):
+                acquisition_time = acquisition_time[:-1]
+
             acquisition_time = get_time_for_filename(
-                datetime.strptime(burst_metadata['sensing_start'], '%Y-%m-%d %H:%M:%S.%f')
+                datetime.strptime(acquisition_time, '%Y-%m-%d %H:%M:%S.%f')
             )
+
+            if not acquisition_time.endswith('Z'):
+                acquisition_time += 'Z'
 
         product_version = str(self.runconfig.product_version)
 
@@ -256,15 +304,13 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
         production_time = get_time_for_filename(self.production_datetime)
 
         cslc_filename = (
-            f"{core_filename}-{sensor}_{mode}_{burst_id}_{pol}_"
-            f"{acquisition_time}Z_{product_version}_{production_time}Z"
+            f"{core_filename}_{burst_id}_{acquisition_time}_{production_time}Z_"
+            f"{sensor}{pol}_{product_version}"
         )
 
         # Cache the file name for this burst ID, so it can be used with the
-        # ISO metadata later. Note, since this is used with the ISO filename, we
-        # only want to cache the version that does not use DataValidityStartDate.
-        if not use_validity_start_time:
-            self._burst_filename_cache[burst_id] = cslc_filename
+        # ISO metadata later.
+        self._burst_filename_cache[burst_id] = cslc_filename
 
         return cslc_filename
 
@@ -300,19 +346,19 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
         Returns the file name to use for the static layers product produced by
         the CSLC-S1 PGE.
 
-        The HDF5 filename for the CSLC-S1 PGE consists of:
+        The static layers filename for the CSLC-S1 PGE consists of:
 
-            <CSLC filename>_Static.h5
+            <CSLC static filename>.h5
 
-        Where <CSLC filename> is returned by CslcS1PostProcessorMixin._cslc_filename()
+        Where <CSLC static filename> is returned by CslcS1PostProcessorMixin._cslc_filename()
+        with static_layer_product set to True.
 
         Parameters
         ----------
         inter_filename : str
             The intermediate filename of the output HDF5 product containing all
             the output static layers. This parameter is used to derive the
-            core CSLC file name component, to which "_static_layers" will be
-            appended to denote the file type.
+            core CSLC file name component for static layer products.
 
         Returns
         -------
@@ -320,9 +366,9 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
             The file name to assign to static layers product(s) created by this PGE.
 
         """
-        cslc_filename = self._cslc_filename(inter_filename, use_validity_start_time=True)
+        cslc_filename = self._cslc_filename(inter_filename, static_layer_product=True)
 
-        static_layers_filename = f"{cslc_filename}_Static.h5"
+        static_layers_filename = f"{cslc_filename}.h5"
 
         return static_layers_filename
 
@@ -417,7 +463,7 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
 
         The core file name component for CSLC-S1 ancillary products consists of:
 
-        <PROJECT>_<LEVEL>_<PGE NAME>-<SENSOR>_<MODE>_<POL>_<PRODUCT VER>_<PROD TIMETAG>
+        <PROJECT>_<LEVEL>_<PGE NAME>_<PRODUCTION TIMETAG>_<SENSOR>_<POL>_<PRODUCT VER>
 
         Since these files are not specific to any particular burst processed for
         a CSLC job, fields such as burst ID and acquisition time are omitted from
@@ -441,7 +487,6 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
         burst_metadata = cslc_metadata['processing_information']['input_burst_metadata']
 
         sensor = burst_metadata['platform_id']
-        mode = 'IW'  # fixed for all S1-based CSLC products
         pol = burst_metadata['polarization']
 
         product_version = str(self.runconfig.product_version)
@@ -452,8 +497,8 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
         production_time = get_time_for_filename(self.production_datetime)
 
         ancillary_filename = (
-            f"{self.PROJECT}_{self.LEVEL}_{self.NAME}-{sensor}_{mode}_{pol}_"
-            f"{product_version}_{production_time}Z"
+            f"{self.PROJECT}_{self.LEVEL}_{self.NAME}_{production_time}Z_"
+            f"{sensor}_{pol}_{product_version}"
         )
 
         return ancillary_filename
@@ -574,6 +619,8 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
         # Remove some of the larger arrays from the metadata, so we don't use
         # too much memory when caching the metadata for each burst
         for key in ['azimuth_carrier_phase', 'flattening_phase',
+                    'layover_shadow_mask', 'local_incidence_angle',
+                    'los_east', 'los_north',
                     'VV', 'VH', 'HH', 'HV',
                     'x_coordinates', 'y_coordinates']:
             array = output_product_metadata['data'].pop(key, None)
@@ -789,7 +836,7 @@ class CslcS1Executor(CslcS1PreProcessorMixin, CslcS1PostProcessorMixin, PgeExecu
 
     """
 
-    NAME = "CSLC"
+    NAME = "CSLC-S1"
     """Short name for the CSLC-S1 PGE"""
 
     LEVEL = "L2"
@@ -798,7 +845,7 @@ class CslcS1Executor(CslcS1PreProcessorMixin, CslcS1PostProcessorMixin, PgeExecu
     PGE_VERSION = "2.0.0-rc.2.0"
     """Version of the PGE (overrides default from base_pge)"""
 
-    SAS_VERSION = "0.3.1"  # Gamma release https://github.com/opera-adt/COMPASS/releases/tag/v0.3.1
+    SAS_VERSION = "0.4.0"  # CalVal# release https://github.com/opera-adt/COMPASS/releases/tag/v0.4.0
     """Version of the SAS wrapped by this PGE, should be updated as needed"""
 
     def __init__(self, pge_name, runconfig_path, **kwargs):
