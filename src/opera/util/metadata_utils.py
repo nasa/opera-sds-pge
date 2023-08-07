@@ -479,11 +479,6 @@ def get_cslc_s1_product_metadata(file_name):
     cslc_metadata = {
         'identification': get_hdf5_group_as_dict(file_name, f"{S1_SLC_HDF5_PREFIX}/identification"),
         'data': get_hdf5_group_as_dict(file_name, f"{S1_SLC_HDF5_PREFIX}/data"),
-        'calibration_information':
-            get_hdf5_group_as_dict(file_name,
-                                   f"{S1_SLC_HDF5_PREFIX}/metadata/calibration_information"),
-        'noise_information': get_hdf5_group_as_dict(file_name,
-                                                    f"{S1_SLC_HDF5_PREFIX}/metadata/noise_information"),
         'processing_information': get_hdf5_group_as_dict(file_name,
                                                          f"{S1_SLC_HDF5_PREFIX}/metadata/processing_information"),
         'orbit': get_hdf5_group_as_dict(file_name, f"{S1_SLC_HDF5_PREFIX}/metadata/orbit")
@@ -540,17 +535,6 @@ def create_test_cslc_metadata_product(file_path):
         y_coordinates_dset = data_grp.create_dataset("y_coordinates", data=np.zeros((10,)), dtype='float64')
         y_spacing_dset = data_grp.create_dataset("y_spacing", data=-10.0, dtype='float64')
 
-        calibration_information_grp = outfile.create_group(
-            f"{S1_SLC_HDF5_PREFIX}/metadata/calibration_information")
-        cal_basename_dset = calibration_information_grp.create_dataset(
-            "basename",
-            data=np.string_('calibration-s1a-iw1-slc-vv-20220501t015035-20220501t015102-043011-0522a4-004.xml'))
-
-        noise_information_grp = outfile.create_group(f"{S1_SLC_HDF5_PREFIX}/metadata/noise_information")
-        noise_basename_dset = noise_information_grp.create_dataset(
-            "basename",
-            data=np.string_('noise-s1a-iw1-slc-vv-20220501t015035-20220501t015102-043011-0522a4-004.xml'))
-
         processing_information_grp = outfile.create_group(f"{S1_SLC_HDF5_PREFIX}/metadata/processing_information")
 
         algorithms_grp = outfile.create_group(f"{S1_SLC_HDF5_PREFIX}/metadata/processing_information/algorithms")
@@ -561,15 +545,15 @@ def create_test_cslc_metadata_product(file_path):
                                                                                   data=np.string_("sinc interpolation"))
         float_data_geocoding_interpolator_dset = algorithms_grp.create_dataset("float_data_geocoding_interpolator",
                                                                                data=np.string_("biquintic interpolation"))
-        s1Reader_version_dset = algorithms_grp.create_dataset("s1Reader_version", data=np.string_("0.1.5"))
+        s1_reader_version_dset = algorithms_grp.create_dataset("s1_reader_version", data=np.string_("0.2.0"))
 
         inputs_grp = outfile.create_group(f"{S1_SLC_HDF5_PREFIX}/metadata/processing_information/inputs")
-        calibration_file_dset = inputs_grp.create_dataset("calibration_file", data=np.string_(
+        calibration_files_dset = inputs_grp.create_dataset("calibration_files", data=np.string_(
             'calibration-s1a-iw1-slc-vv-20220501t015035-20220501t015102-043011-0522a4-004.xml'))
         dem_source_dset = inputs_grp.create_dataset("dem_source", data=np.string_('dem_4326.tiff'))
         l1_slc_files_dset = inputs_grp.create_dataset('l1_slc_files', data=np.string_(
             'S1A_IW_SLC__1SDV_20220501T015035_20220501T015102_043011_0522A4_42CC'))
-        noise_file_dset = inputs_grp.create_dataset("noise_file", data=np.string_(
+        noise_files_dset = inputs_grp.create_dataset("noise_files", data=np.string_(
             'noise-s1a-iw1-slc-vv-20220501t015035-20220501t015102-043011-0522a4-004.xml'))
         orbit_files_dset = inputs_grp.create_dataset("orbit_files", data=np.array(
             [b'S1A_OPER_AUX_POEORB_OPOD_20220521T081912_V20220430T225942_20220502T005942.EOF']))
@@ -591,6 +575,8 @@ def create_test_cslc_metadata_product(file_path):
         bistatic_delay_applied_dset = processing_parameters_grp.create_dataset("bistatic_delay_applied", data=True, dtype='bool')
         dry_troposphere_weather_model_applied_dset = processing_parameters_grp.create_dataset("dry_troposphere_weather_model_applied",
                                                                                               data=True, dtype='bool')
+        elevation_antenna_pattern_correction_applied_dset = processing_parameters_grp.create_dataset("elevation_antenna_pattern_correction_applied",
+                                                                                                     data=np.string_("ESA"))
         ellipsoidal_flattening_applied_dset = processing_parameters_grp.create_dataset("ellipsoidal_flattening_applied",
                                                                                        data=True, dtype='bool')
         geometry_doppler_applied_dset = processing_parameters_grp.create_dataset("geometry_doppler_applied", data=True,

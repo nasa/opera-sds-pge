@@ -1074,7 +1074,7 @@
                                         </eos:EOS_AdditionalAttributeDescription>
                                     </eos:reference>
                                     <eos:value>
-                                        <gco:CharacterString>{{ product_output.processing_information.algorithms.s1Reader_version }}{# ISO_OPERA_s1ReaderVersion #}</gco:CharacterString>
+                                        <gco:CharacterString>{{ product_output.processing_information.algorithms.s1_reader_version }}{# ISO_OPERA_s1ReaderVersion #}</gco:CharacterString>
                                     </eos:value>
                                 </eos:AdditionalAttribute>
                                 <eos:AdditionalAttribute>
@@ -1294,6 +1294,27 @@
                                                 <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
                                             </eos:type>
                                             <eos:name>
+                                                <gco:CharacterString>ElevationAntennaPatternCorrectionApplied</gco:CharacterString>
+                                            </eos:name>
+                                            <eos:description>
+                                                <gco:CharacterString>The type of elevation antenna pattern correction applied</gco:CharacterString>
+                                            </eos:description>
+                                            <eos:dataType>
+                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
+                                            </eos:dataType>
+                                        </eos:EOS_AdditionalAttributeDescription>
+                                    </eos:reference>
+                                    <eos:value>
+                                        <gco:CharacterString>{{ product_output.processing_information.parameters.elevation_antenna_pattern_correction_applied }}{# ISO_OPERA_dryTroposphereWeatherModelApplied #}</gco:CharacterString>
+                                    </eos:value>
+                                </eos:AdditionalAttribute>
+                                <eos:AdditionalAttribute>
+                                    <eos:reference>
+                                        <eos:EOS_AdditionalAttributeDescription>
+                                            <eos:type>
+                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
+                                            </eos:type>
+                                            <eos:name>
                                                 <gco:CharacterString>EllipsoidalFlatteningApplied</gco:CharacterString>
                                             </eos:name>
                                             <eos:description>
@@ -1441,7 +1462,7 @@
                                                 <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
                                             </eos:type>
                                             <eos:name>
-                                                <gco:CharacterString>CalibrationFile</gco:CharacterString>
+                                                <gco:CharacterString>CalibrationFiles</gco:CharacterString>
                                             </eos:name>
                                             <eos:description>
                                                 <gco:CharacterString>List of input calibration files used</gco:CharacterString>
@@ -1452,7 +1473,7 @@
                                         </eos:EOS_AdditionalAttributeDescription>
                                     </eos:reference>
                                     <eos:value>
-                                        <gco:CharacterString>{{ product_output.processing_information.inputs.calibration_file }}{# ISO_OPERA_calibrationFile #}</gco:CharacterString>
+                                        <gco:CharacterString>{{ product_output.processing_information.inputs.calibration_files|string }}{# ISO_OPERA_calibrationFiles #}</gco:CharacterString>
                                     </eos:value>
                                 </eos:AdditionalAttribute>
                                 <eos:AdditionalAttribute>
@@ -1515,7 +1536,7 @@
                                         </eos:EOS_AdditionalAttributeDescription>
                                     </eos:reference>
                                     <eos:value>
-                                        <gco:CharacterString>{{ product_output.processing_information.inputs.noise_file|string }}{# ISO_OPERA_noiseFile #}</gco:CharacterString>
+                                        <gco:CharacterString>{{ product_output.processing_information.inputs.noise_files|string }}{# ISO_OPERA_noiseFiles #}</gco:CharacterString>
                                     </eos:value>
                                 </eos:AdditionalAttribute>
                                 <eos:AdditionalAttribute>
