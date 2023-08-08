@@ -369,12 +369,14 @@ def create_test_rtc_metadata_product(file_path):
         annotationFiles_dset = processingInformation_inputs_grp.create_dataset("annotationFiles", data=annotationFiles)
         configFiles_dset = processingInformation_inputs_grp.create_dataset("configFiles", data=b'rtc_s1.yaml')
         l1SlcGranules = np.array([b'S1B_IW_SLC__1SDV_20180504T104507_20180504T104535_010770_013AEE_919F.zip'])
-        l1SlcGranules_dset = processingInformation_inputs_grp.create_dataset("l1SLCGranules", data=l1SlcGranules)
+        l1SlcGranules_dset = processingInformation_inputs_grp.create_dataset("l1SlcGranules", data=l1SlcGranules)
         orbitFiles = np.array([b'S1B_OPER_AUX_POEORB_OPOD_20180524T110543_V20180503T225942_20180505T005942.EOF'])
         orbitFiles_dset = processingInformation_inputs_grp.create_dataset("orbitFiles", data=orbitFiles)
 
         processingInformation_algorithms_grp = outfile.create_group(
             f"{S1_SLC_HDF5_PREFIX}/metadata/processingInformation/algorithms")
+        demEgmModel_dset = processingInformation_algorithms_grp.create_dataset("demEgmModel",
+                                                                               data=b'Earth Gravitational Model EGM08')
         demInterpolation_dset = processingInformation_algorithms_grp.create_dataset("demInterpolation",
                                                                                     data=b'biquintic')
         geocoding_dset = processingInformation_algorithms_grp.create_dataset("geocoding", data=b'area_projection')
@@ -396,10 +398,25 @@ def create_test_rtc_metadata_product(file_path):
             "bistaticDelayCorrectionApplied", data=True, dtype='bool')
         dryTroposphericGeolocationCorrectionApplied_dset = processingInformation_parameters_grp.create_dataset(
             "dryTroposphericGeolocationCorrectionApplied", data=True, dtype='bool')
+        filteringApplied_dset = processingInformation_parameters_grp.create_dataset(
+            "filteringApplied", data=False, dtype='bool')
+        geocoding_grp = processingInformation_parameters_grp.create_group("geocoding")
+        burstGeogridSnapX_dset = geocoding_grp.create_dataset("burstGeogridSnapX", data=30, dtype='int')
+        burstGeogridSnapY_dset = geocoding_grp.create_dataset("burstGeogridSnapY", data=30, dtype='int')
+        ceosAnalysisReadyDataPixelCoordinateConvention_dset = geocoding_grp.create_dataset(
+            "ceosAnalysisReadyDataPixelCoordinateConvention", data=b'ULC')
+        inputBackscatterNormalizationConvention_dset = processingInformation_parameters_grp.create_dataset(
+            "inputBackscatterNormalizationConvention", data=b'beta0')
         noiseCorrectionApplied_dset = processingInformation_parameters_grp.create_dataset(
             "noiseCorrectionApplied", data=True, dtype='bool')
-        postProcessingFilteringApplied_dset = processingInformation_parameters_grp.create_dataset(
-            "postProcessingFilteringApplied", data=True, dtype='bool')
+        outputBackscatterDecibelConversionEquation_dset = processingInformation_parameters_grp.create_dataset(
+            "outputBackscatterDecibelConversionEquation", data=b'backscatter_dB = 10*log10(backscatter_linear)')
+        outputBackscatterExpressionConvention_dset = processingInformation_parameters_grp.create_dataset(
+            "outputBackscatterExpressionConvention", data=b'linear backscatter intensity')
+        outputBackscatterNormalizationConvention_dset = processingInformation_parameters_grp.create_dataset(
+            "outputBackscatterNormalizationConvention", data=b'gamma0')
+        preprocessingMultilookingApplied_dset = processingInformation_parameters_grp.create_dataset(
+            "preprocessingMultilookingApplied", data=False, dtype='bool')
         radiometricTerrainCorrectionApplied_dset = processingInformation_parameters_grp.create_dataset(
             'radiometricTerrainCorrectionApplied', data=True, dtype='bool')
         wetTroposphericGeolocationCorrectionApplied_dset = processingInformation_parameters_grp.create_dataset(
@@ -414,6 +431,11 @@ def create_test_rtc_metadata_product(file_path):
         boundingPolygon_dset = identification_grp.create_dataset(
             "boundingPolygon", data=b'POLYGON ((399015 3859970, 398975 3860000, ..., 399015 3859970))')
         burstID_dset = identification_grp.create_dataset("burstID", data=b't069_147170_iw1')
+        ceosAnalysisReadyDataDocumentIdentifier_dset = identification_grp.create_dataset("ceosAnalysisReadyDataDocumentIdentifier",
+                                                                                         data=True, dtype='bool')
+        ceosAnalysisReadyDataProductType_dset = identification_grp.create_dataset("ceosAnalysisReadyDataProductType",
+                                                                                  data=b'Normalized Radar Backscatter')
+        dataAccess_dset = identification_grp.create_dataset("dataAccess", data=b'(NOT PROVIDED)')
         diagnosticModeFlag_dset = identification_grp.create_dataset("diagnosticModeFlag", data=False, dtype='bool')
         institution_dset = identification_grp.create_dataset("institution", data=b'NASA JPL')
         instrumentName_dset = identification_grp.create_dataset("instrumentName", data=b'Sentinel-1B CSAR')

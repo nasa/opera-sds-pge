@@ -124,7 +124,7 @@ def validate_slc_s1_inputs(runconfig, logger, name):
             # actually file paths, so skip them
             continue
         elif key == 'burst_database_file':
-            check_input(value, logger, name, valid_extensions=('.sqlite3',))
+            check_input(value, logger, name, valid_extensions=('.sqlite', '.sqlite3',))
         else:
             error_msg = f"Unexpected input: {key}: {value}"
             logger.critical(name, ErrorCode.INVALID_INPUT, error_msg)

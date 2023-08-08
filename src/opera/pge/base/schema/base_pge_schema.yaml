@@ -30,7 +30,7 @@ RunConfig:
         SchemaPath: str(required=True)
         AlgorithmParametersSchemaPath: str(required=False)
         IsoTemplatePath: str(required=False)
-        DataValidityStartTime: regex(r'\d{8}T\d{6}', name='YYYYMMDDTHHmmss datetime', required=False)
+        DataValidityStartDate: int(min=20000101, max=21991231, required=False)
 
       QAExecutable:
         Enabled: bool(required=True)

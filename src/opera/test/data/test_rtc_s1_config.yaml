@@ -26,29 +26,21 @@ RunConfig:
                 ProgramOptions:
                     - '-p rtc_s1_test/output_dir/t069_147170_iw1/;'
                     - 'python3 -c "from opera.util.metadata_utils import create_test_rtc_metadata_product; create_test_rtc_metadata_product(\"rtc_s1_test/output_dir/t069_147170_iw1/rtc_product_v1.0.h5\")";'
-                    - 'touch rtc_s1_test/output_dir/t069_147170_iw1/rtc_product_v1.0_VH.tif;'
-                    - 'touch rtc_s1_test/output_dir/t069_147170_iw1/rtc_product_v1.0_VV.tif;'
-                    - 'touch rtc_s1_test/output_dir/t069_147170_iw1/rtc_product_v1.0_HH.tif;'
-                    - 'touch rtc_s1_test/output_dir/t069_147170_iw1/rtc_product_v1.0_HV.tif;'
-                    - 'touch rtc_s1_test/output_dir/t069_147170_iw1/rtc_product_v1.0_VV+VH.tif;'
-                    - 'touch rtc_s1_test/output_dir/t069_147170_iw1/rtc_product_v1.0_HH+HV.tif;'
-                    - 'touch rtc_s1_test/output_dir/t069_147170_iw1/rtc_product_v1.0.png;'
-                    - 'touch rtc_s1_test/output_dir/t069_147170_iw1/rtc_product_v1.0_nlooks.tif;'
-                    - 'touch rtc_s1_test/output_dir/t069_147170_iw1/rtc_product_v1.0_layover_shadow_mask.tif;'
-                    - 'dd if=/dev/urandom of=rtc_s1_test/output_dir/t069_147170_iw1/rtc_product_v1.0_VH.tif bs=1M count=1;'
-                    - 'dd if=/dev/urandom of=rtc_s1_test/output_dir/t069_147170_iw1/rtc_product_v1.0_VV.tif bs=1M count=1;'
-                    - 'dd if=/dev/urandom of=rtc_s1_test/output_dir/t069_147170_iw1/rtc_product_v1.0_HH.tif bs=1M count=1;'
-                    - 'dd if=/dev/urandom of=rtc_s1_test/output_dir/t069_147170_iw1/rtc_product_v1.0_HV.tif bs=1M count=1;'
-                    - 'dd if=/dev/urandom of=rtc_s1_test/output_dir/t069_147170_iw1/rtc_product_v1.0_VV+VH.tif bs=1M count=1;'
-                    - 'dd if=/dev/urandom of=rtc_s1_test/output_dir/t069_147170_iw1/rtc_product_v1.0_HH+HV.tif bs=1M count=1;'
-                    - 'dd if=/dev/urandom of=rtc_s1_test/output_dir/t069_147170_iw1/rtc_product_v1.0.png bs=1M count=1;'
-                    - 'dd if=/dev/urandom of=rtc_s1_test/output_dir/t069_147170_iw1/rtc_product_v1.0_nlooks.tif bs=1M count=1;'
-                    - 'dd if=/dev/urandom of=rtc_s1_test/output_dir/t069_147170_iw1/rtc_product_v1.0_layover_shadow_mask.tif bs=1M count=1;'
+                    - 'dd if=/dev/urandom of=rtc_s1_test/output_dir/t069_147170_iw1/OPERA_L2_RTC-S1_20180504T104507Z_20230802T163957Z_S1B_30_v1.0_VH.tif bs=1M count=1;'
+                    - 'dd if=/dev/urandom of=rtc_s1_test/output_dir/t069_147170_iw1/OPERA_L2_RTC-S1_20180504T104507Z_20230802T163957Z_S1B_30_v1.0_VV.tif bs=1M count=1;'
+                    - 'dd if=/dev/urandom of=rtc_s1_test/output_dir/t069_147170_iw1/OPERA_L2_RTC-S1_20180504T104507Z_20230802T163957Z_S1B_30_v1.0_HH.tif bs=1M count=1;'
+                    - 'dd if=/dev/urandom of=rtc_s1_test/output_dir/t069_147170_iw1/OPERA_L2_RTC-S1_20180504T104507Z_20230802T163957Z_S1B_30_v1.0_HV.tif bs=1M count=1;'
+                    - 'dd if=/dev/urandom of=rtc_s1_test/output_dir/t069_147170_iw1/OPERA_L2_RTC-S1_20180504T104507Z_20230802T163957Z_S1B_30_v1.0_VV+VH.tif bs=1M count=1;'
+                    - 'dd if=/dev/urandom of=rtc_s1_test/output_dir/t069_147170_iw1/OPERA_L2_RTC-S1_20180504T104507Z_20230802T163957Z_S1B_30_v1.0_HH+HV.tif bs=1M count=1;'
+                    - 'dd if=/dev/urandom of=rtc_s1_test/output_dir/t069_147170_iw1/OPERA_L2_RTC-S1_20180504T104507Z_20230802T163957Z_S1B_30_v1.0.png bs=1M count=1;'
+                    - 'dd if=/dev/urandom of=rtc_s1_test/output_dir/t069_147170_iw1/OPERA_L2_RTC-S1-STATIC_20140403_20230802T201656Z_S1B_30_v1.0_number_of_looks.tif bs=1M count=1;'
+                    - 'dd if=/dev/urandom of=rtc_s1_test/output_dir/t069_147170_iw1/OPERA_L2_RTC-S1-STATIC_20140403_20230802T201656Z_S1B_30_v1.0_mask.tif bs=1M count=1;'
+                    - 'dd if=/dev/urandom of=rtc_s1_test/output_dir/t069_147170_iw1/OPERA_L2_RTC-S1-STATIC_20140403_20230802T201656Z_S1B_30_v1.0.png bs=1M count=1;'
                     - '/bin/echo RTC-S1 invoked with RunConfig'
                 ErrorCodeBase: 300000
                 SchemaPath: pge/rtc_s1/schema/rtc_s1_sas_schema.yaml
                 IsoTemplatePath: pge/rtc_s1/templates/OPERA_ISO_metadata_L2_RTC_S1_template.xml.jinja2
-                DataValidityStartTime: 20000101T000000
+                DataValidityStartDate: 20000101
 
             QAExecutable:
                 Enabled: False
@@ -99,40 +91,14 @@ RunConfig:
                     processing:
                         check_ancillary_inputs_coverage: True
                         polarization: dual-pol
-                        apply_absolute_radiometric_correction: True
-                        apply_thermal_noise_correction: True
-                        apply_rtc: True
 
                         rtc:
                             output_type: gamma0
-                            algorithm_type: area_projection
-                            input_terrain_radiometry: beta0
-                            rtc_min_value_db:
-                            dem_upsampling: 1
 
                         geocoding:
-                            algorithm_type: area_projection
                             memory_mode: auto
-                            geogrid_upsampling: 1
-                            save_incidence_angle: True
-                            save_local_inc_angle: True
-                            save_projection_angle: False
-                            save_rtc_anf_psi: False
-                            save_range_slope: False
-                            save_nlooks: True
-                            save_rtc_anf: True
-                            save_dem: False
-                            abs_rad_cal: 1
-                            clip_max:
-                            clip_min:
-                            upsample_radargrid: False
 
                             bursts_geogrid:
-                                output_epsg:
-                                x_posting: 30
-                                y_posting: 30
-                                x_snap: 30
-                                y_snap: 30
                                 top_left:
                                     x:
                                     y:
