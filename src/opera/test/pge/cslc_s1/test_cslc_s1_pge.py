@@ -115,7 +115,7 @@ class CslcS1PgeTestCase(unittest.TestCase):
         pge = CslcS1Executor(pge_name="CslcS1PgeTest", runconfig_path=runconfig_path)
 
         # Check that basic attributes were initialized
-        self.assertEqual(pge.name, "CSLC")
+        self.assertEqual(pge.name, "CSLC-S1")
         self.assertEqual(pge.pge_name, "CslcS1PgeTest")
         self.assertEqual(pge.runconfig_path, runconfig_path)
 
@@ -175,7 +175,7 @@ class CslcS1PgeTestCase(unittest.TestCase):
 
         # Grab the metadata generated from the PGE run, as it is used to generate
         # the final filename for output products
-        metadata_files = glob.glob(join(pge.runconfig.output_product_path, "*Z.h5"))
+        metadata_files = glob.glob(join(pge.runconfig.output_product_path, "OPERA_L2_CSLC-S1_T*.h5"))
 
         self.assertEqual(len(metadata_files), 1)
 
@@ -190,11 +190,13 @@ class CslcS1PgeTestCase(unittest.TestCase):
             inter_filename='cslc_pge_test/output_dir/t064_135518_iw1/20220501/t064_135518_iw1_20220501.h5'
         )
 
-        file_name_regex = rf"{pge.PROJECT}_{pge.LEVEL}_{pge.NAME}-" \
-                          rf"{burst_metadata['platform_id']}_IW_" \
+        file_name_regex = rf"{pge.PROJECT}_{pge.LEVEL}_{pge.NAME}_" \
                           rf"{cslc_metadata['identification']['burst_id'].upper().replace('_', '-')}_" \
+                          rf"\d{{8}}T\d{{6}}Z_\d{{8}}T\d{{6}}Z_" \
+                          rf"{burst_metadata['platform_id']}_" \
                           rf"{burst_metadata['polarization']}_" \
-                          rf"\d{{8}}T\d{{6}}Z_v{pge.runconfig.product_version}_\d{{8}}T\d{{6}}Z.h5"
+                          rf"v{pge.runconfig.product_version}.h5"
+
 
         result = re.match(file_name_regex, file_name)
 
@@ -205,11 +207,11 @@ class CslcS1PgeTestCase(unittest.TestCase):
             inter_filename='cslc_pge_test/output_dir/t064_135518_iw1/20220501/static_layers_t064_135518_iw1.h5'
         )
 
-        file_name_regex = rf"{pge.PROJECT}_{pge.LEVEL}_{pge.NAME}-" \
-                          rf"{burst_metadata['platform_id']}_IW_" \
+        file_name_regex = rf"{pge.PROJECT}_{pge.LEVEL}_{pge.NAME}-STATIC_" \
                           rf"{cslc_metadata['identification']['burst_id'].upper().replace('_', '-')}_" \
-                          rf"{burst_metadata['polarization']}_" \
-                          rf"\d{{8}}Z_v{pge.runconfig.product_version}_\d{{8}}T\d{{6}}Z_Static.h5"
+                          rf"\d{{8}}_\d{{8}}T\d{{6}}Z_" \
+                          rf"{burst_metadata['platform_id']}_" \
+                          rf"v{pge.runconfig.product_version}.h5"
 
         result = re.match(file_name_regex, file_name)
 
@@ -226,11 +228,12 @@ class CslcS1PgeTestCase(unittest.TestCase):
             inter_filename='cslc_pge_test/output_dir/t064_135518_iw1/20220501/t064_135518_iw1_20220501.png'
         )
 
-        file_name_regex = rf"{pge.PROJECT}_{pge.LEVEL}_{pge.NAME}-" \
-                          rf"{burst_metadata['platform_id']}_IW_" \
+        file_name_regex = rf"{pge.PROJECT}_{pge.LEVEL}_{pge.NAME}_" \
                           rf"{cslc_metadata['identification']['burst_id'].upper().replace('_', '-')}_" \
+                          rf"\d{{8}}T\d{{6}}Z_\d{{8}}T\d{{6}}Z_" \
+                          rf"{burst_metadata['platform_id']}_" \
                           rf"{burst_metadata['polarization']}_" \
-                          rf"\d{{8}}T\d{{6}}Z_v{pge.runconfig.product_version}_\d{{8}}T\d{{6}}Z_BROWSE.png"
+                          rf"v{pge.runconfig.product_version}_BROWSE.png"
 
         result = re.match(file_name_regex, file_name)
 

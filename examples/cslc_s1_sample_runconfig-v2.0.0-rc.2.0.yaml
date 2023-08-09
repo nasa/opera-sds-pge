@@ -150,7 +150,7 @@ RunConfig:
 
                     static_ancillary_file_group:
                         # burst database sqlite file
-                        burst_database_file: /home/compass_user/input_dir/opera_burst_database_deploy_2022_1212.sqlite3
+                        burst_database_file: /home/compass_user/input_dir/burst_db_20230713-bbox-only.sqlite
 
                     product_path_group:
                         # This should match the path used for OutputProductPath
@@ -169,7 +169,8 @@ RunConfig:
                         product_specification_version: "0.1.5"
 
                     primary_executable:
-                        # This should match the value used for ProductIdentifier
+                        # Must be one of CSLC_S1 or CSLC_S1_STATIC, this determines the type of
+                        # output product created
                         product_type: CSLC_S1
 
                     # SLC processing options
@@ -178,26 +179,9 @@ RunConfig:
                         polarization: co-pol
                         geocoding:
                             flatten: True
-                            lines_per_block: 1000
                             x_posting: 5
                             y_posting: 10
                         geo2rdr:
                             lines_per_block: 1000
                             threshold: 1.0e-8
                             numiter: 25
-                        rdr2geo:
-                            # This flag must be set to true to generate the static
-                            # layer product for each burst
-                            enabled: True
-                            threshold: 1.0e-8
-                            numiter: 25
-                            lines_per_block: 1000
-                            extraiter: 10
-                            compute_latitude: True
-                            compute_longitude: True
-                            compute_height: True
-                            compute_layover_shadow_mask: True
-                            compute_incidence_angle: True
-                            compute_local_incidence_angle: True
-                            compute_azimuth_angle: True
-                            geocode_metadata_layers: True
