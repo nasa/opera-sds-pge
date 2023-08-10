@@ -1,4 +1,4 @@
-# Sample RunConfig for use with the RTC-S1 PGE v2.0.0-rc.2.0
+# Sample RunConfig for use with the RTC-S1 PGE v2.0.0-rc.2.1
 # This RunConfig should require minimal changes in order to be used with the
 # OPERA PCM.
 
@@ -92,11 +92,11 @@ RunConfig:
                 # Consult the Docker image build scripts for more info
                 IsoTemplatePath: /home/rtc_user/opera/pge/rtc_s1/templates/OPERA_ISO_metadata_L2_RTC_S1_template.xml.jinja2
 
-                # Date time field which designated the point after which the
+                # Date field which designates the point after which the
                 # RTC static layer product(s) should be considered valid.
                 # This field must be provided for RTC-S1 jobs when static layer
-                # generation is enabled (see below), and must be of the form YYYYMMDDTHHmmss
-                DataValidityStartTime: 20140101T000000
+                # generation is enabled (see below), and must be of the form YYYYMMDD
+                DataValidityStartDate: 20140101
 
             QAExecutable:
                 # Set to True to enable execution of an additional "Quality Assurance"
@@ -145,11 +145,11 @@ RunConfig:
                     dynamic_ancillary_file_group:
                         # Digital elevation model
                         dem_file: /home/rtc_user/input_dir/dem.tif
-                        dem_description: Digital Elevation Model (DEM) for the NASA OPERA project (v1.0) based on the Copernicus DEM 30-m and Copernicus 90-m referenced to the WGS84 ellipsoid
+                        dem_file_description: Digital Elevation Model (DEM) for the NASA OPERA project (v1.0) based on the Copernicus DEM 30-m and Copernicus 90-m referenced to the WGS84 ellipsoid
 
                     static_ancillary_file_group:
                         # burst database sqlite file
-                        burst_database_file: /home/rtc_user/input_dir/opera_burst_database_deploy_2022_1212.sqlite3
+                        burst_database_file: /home/rtc_user/input_dir/burst_db_20230713-bbox-only.sqlite
 
                     product_group:
                         product_version: 1.0
@@ -167,6 +167,12 @@ RunConfig:
                         # by the SAS for its output products. These products will
                         # be renamed by the PGE to match the OPERA file name conventions.
                         product_id: OPERA_L2_RTC-S1_{burst_id}
+
+                        # Validity start date for RTC-S1-STATIC products in the format YYYYMMDD,
+                        # This field must be provided for RTC-S1 jobs when static layer
+                        # generation is enabled, and should match the value assigned to
+                        # DataValidityStartDate above.
+                        rtc_s1_static_validity_start_date: 20140101
 
                         # RTC-S1 imagery
                         save_bursts: True
@@ -192,7 +198,8 @@ RunConfig:
                         save_metadata: True
 
                     primary_executable:
-                        # This should match the value used for ProductIdentifier
+                        # Must be one of RTC_S1 or RTC_S1_STATIC, this determines the type of
+                        # output product created
                         product_type: RTC_S1
 
                     # SLC processing options
@@ -205,56 +212,8 @@ RunConfig:
                         # Polarization channels to process.
                         polarization: dual-pol
 
-                        # Options to run geo2rdr
-                        geo2rdr:
-                            threshold: 1.0e-7
-                            numiter: 50
-
-                        # Options to run rdr2geo
-                        rdr2geo:
-                            threshold: 1.0e-7
-                            numiter: 25
-
-                        # DEM interpolation method
-                        dem_interpolation_method: biquintic
-
-                        # Apply absolute radiometric correction
-                        apply_absolute_radiometric_correction: True
-
-                        # Apply thermal noise correction
-                        apply_thermal_noise_correction: True
-
-                        # OPTIONAL - Apply RTC
-                        apply_rtc: True
-
-                        # Apply bistatic delay correction
-                        apply_bistatic_delay_correction: True
-
-                        # Apply dry tropospheric delay correction
-                        apply_dry_tropospheric_delay_correction: True
-
-                        # OPTIONAL - to control behavior of RTC module
                         rtc:
-                            # OPTIONAL - Choices:
-                            # "gamma0" (default)
-                            # "sigma0"
                             output_type: gamma0
-
-                            # OPTIONAL - Choices:
-                            # "bilinear_distribution" (default)
-                            # "area_projection"
-                            algorithm_type: area_projection
-
-                            # OPTIONAL - Choices:
-                            # "beta0" (default)
-                            # "sigma0"
-                            input_terrain_radiometry: beta0
-
-                            # OPTIONAL - Minimum RTC area factor in dB
-                            rtc_min_value_db: -30
-
-                            # RTC DEM upsampling
-                            dem_upsampling: 2
 
                         # OPTIONAL - to provide the number of processes when processing the bursts in parallel
                         # "0" means that the number will be automatically decided based on
@@ -264,60 +223,8 @@ RunConfig:
 
                         # OPTIONAL - Mechanism to specify output posting and DEM
                         geocoding:
-                            # OPTIONAL - Apply RSLC metadata valid-samples sub-swath masking
-                            apply_valid_samples_sub_swath_masking: True
-
-                            # OPTIONAL - Apply shadow masking
-                            apply_shadow_masking: True
-
-                            # OPTIONAL - Algorithm type, area projection or
-                            # interpolation: sinc, bilinear, bicubic, nearest, and biquintic
-                            algorithm_type: area_projection
-
                             # OPTIONAL - Choices: "single_block", "geogrid", "geogrid_and_radargrid", and "auto" (default)
                             memory_mode: auto
-
-                            # OPTIONAL - Processing upsampling factor applied to input geogrid
-                            geogrid_upsampling: 1
-
-                            # Save the incidence angle static layer
-                            save_incidence_angle: True
-
-                            # Save the local-incidence angle static layer
-                            save_local_inc_angle: True
-
-                            # Save the projection angle static layer
-                            save_projection_angle: False
-
-                            # Save the RTC ANF static layer computed with the projection angle method
-                            save_rtc_anf_psi: False
-
-                            # Save the range slope angle static layer
-                            save_range_slope: False
-
-                            # Save the number of looks static layer used to compute GCOV
-                            save_nlooks: True
-
-                            # Save the RTC area factor static layer used to compute GCOV
-                            save_rtc_anf: True
-
-                            # Save interpolated DEM static layer used to compute GCOV
-                            save_dem: False
-
-                            # Save layover shadow mask static layer
-                            save_layover_shadow_mask: True
-
-                            # OPTIONAL - Absolute radiometric correction
-                            abs_rad_cal: 1
-
-                            # OPTIONAL - Clip values above threshold
-                            clip_max:
-
-                            # OPTIONAL - Clip values below threshold
-                            clip_min:
-
-                            # Double SLC sampling in the range direction
-                            upsample_radargrid: False
 
                             bursts_geogrid:
                                 top_left:
@@ -328,25 +235,5 @@ RunConfig:
                                     y:
 
                         mosaicking:
-                            # Mosaic mode
+                            # Mosaic mode - Choices: "average", "first", "bursts_center" (default)
                             mosaic_mode: first
-
-                        browse_image_group:
-
-                            # If neither height or width parameters are provided, the browse
-                            # image is generated with the same pixel spacing of the RTC-S1
-                            # imagery (burst or mosaic).
-
-                            # If the height parameter is provided but the width is not provided,
-                            # a new width is assigned in order to keep the aspect ratio
-                            # of the RTC-S1 geographic grid.
-
-                            # Conversely, if the width parameter is provided but the height is not,
-                            # a new height is assigned in order to keep the aspect ratio
-                            # of the RTC-S1 geographic grid.
-
-                            # Height in pixels for the PNG browse image of RTC-S1 bursts.
-                            browse_image_burst_height: 1024
-
-                            # Height in pixels for the PNG browse image of RTC-S1 mosaics.
-                            browse_image_mosaic_height: 1024

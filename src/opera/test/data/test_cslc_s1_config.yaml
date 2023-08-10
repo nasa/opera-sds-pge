@@ -28,16 +28,13 @@ RunConfig:
                 ProgramPath: mkdir
                 ProgramOptions:
                     - '-p cslc_pge_test/output_dir/t064_135518_iw1/20220501/;'
-                    - 'touch cslc_pge_test/output_dir/t064_135518_iw1/20220501/static_layers_t064_135518_iw1.h5;'
-                    - 'touch cslc_pge_test/output_dir/t064_135518_iw1/20220501/t064_135518_iw1_20220501.png;'
                     - 'dd if=/dev/urandom of=cslc_pge_test/output_dir/t064_135518_iw1/20220501/t064_135518_iw1_20220501.png bs=1M count=1;'
-                    - 'dd if=/dev/urandom of=cslc_pge_test/output_dir/t064_135518_iw1/20220501/static_layers_t064_135518_iw1.h5 bs=1M count=1;'
                     - 'python3 -c "from opera.util.metadata_utils import create_test_cslc_metadata_product; create_test_cslc_metadata_product(\"cslc_pge_test/output_dir/t064_135518_iw1/20220501/t064_135518_iw1_20220501.h5\")";'
                     - '/bin/echo CSLC-S1 invoked with RunConfig'
                 ErrorCodeBase: 200000
                 SchemaPath: pge/cslc_s1/schema/cslc_s1_sas_schema.yaml
                 IsoTemplatePath: pge/cslc_s1/templates/OPERA_ISO_metadata_L2_CSLC_S1_template.xml.jinja2
-                DataValidityStartTime: 20000101T000000
+                DataValidityStartDate: 20000101
 
             QAExecutable:
                 Enabled: False

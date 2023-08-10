@@ -25,7 +25,7 @@ RunConfig:
         ErrorCodeBase: 100000
         SchemaPath: test/data/sample_sas_schema.yaml
         IsoTemplatePath: sample_iso_template.xml.jinja2
-        DataValidityStartTime: 2001-01-01 00:00:00  # Invalid expected datetime format
+        DataValidityStartDate: 2001-01-01  # Invalid expected date format
 
       QAExecutable:
         Enabled: True

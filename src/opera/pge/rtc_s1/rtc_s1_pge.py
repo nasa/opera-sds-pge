@@ -171,7 +171,38 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
 
         return self._cached_core_filename
 
-    def _rtc_filename(self, inter_filename, use_validity_start_time=False):
+    def _core_static_filename(self, inter_filename=None):
+        """
+        Returns the core file name component for static layer products produced
+        by the RTC-S1 PGE.
+
+        The core file name component for RTC-S1 products consists of:
+
+        <Core filename>-STATIC
+
+        Where <Core filename> is returned by RtcS1PostProcessorMixin._core_filename().
+
+        Parameters
+        ----------
+        inter_filename : str, optional
+            The intermediate filename of the output product to generate the
+            core filename for. This parameter may be used to inspect the file
+            in order to derive any necessary components of the returned filename.
+            Once the core filename is cached upon first call to this function,
+            this parameter may be omitted.
+
+        Returns
+        -------
+        core_static_filename : str
+            The core file name component to assign to static layer products
+            created by this PGE.
+
+        """
+        core_filename = self._core_filename(inter_filename)
+
+        return f"{core_filename}-STATIC"
+
+    def _rtc_filename(self, inter_filename, static_layer_product=False):
         """
         Returns the base file name to use for RTC products produced by this PGE.
 
@@ -179,7 +210,12 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
 
             <Core filename>_<BURST ID>_<ACQUISITION TIME>_<PRODUCTION TIME>_<SENSOR>_<SPACING>_<PRODUCT VERSION>
 
-        Where <Core filename> is returned by RtcS1PostProcessorMixin._core_filename().
+        Where <Core filename> is returned by RtcS1PostProcessorMixin._core_filename()
+        if static_layer_product is False, otherwise it is the value returned by
+        RtcS1PostProcessorMixin._core_static_filename()
+
+        If static_layer_product is True, <ACQUISITION TIME> will correspond
+        to the configured data validity start time (as defined in the RunConfig).
 
         Parameters
         ----------
@@ -187,10 +223,9 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
             The intermediate filename of the output product to generate
             a filename for. This parameter may be used to inspect the file
             in order to derive any necessary components of the returned filename.
-        use_validity_start_time : bool, optional
-            If True, use the DataValidityStartTime value from the RunConfig in
-            lieu of an acquisition time from the product metadata. Defaults to
-            False.
+        static_layer_product : bool, optional
+            If True, use the file name conventions specific to static layer
+            products. Otherwise, use the baseline conventions. Defaults to False.
 
         Returns
         -------
@@ -200,11 +235,14 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
         Raises
         ------
         ValueError
-            If use_validity_start_time is True and no value was specified for
-            DataValidityStartTime within the RunConfig.
+            If static_layer_product is True and no value was specified for
+            DataValidityStartDate within the RunConfig.
 
         """
-        core_filename = self._core_filename(inter_filename)
+        if static_layer_product:
+            core_filename = self._core_static_filename(inter_filename)
+        else:
+            core_filename = self._core_filename(inter_filename)
 
         product_dir = os.path.dirname(inter_filename)
 
@@ -235,25 +273,28 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
 
         production_time = get_time_for_filename(self.production_datetime)
 
-        if use_validity_start_time:
-            acquisition_time = self.runconfig.data_validity_start_time
+        if static_layer_product:
+            acquisition_time = self.runconfig.data_validity_start_date
 
             if acquisition_time is None:
                 raise ValueError(
-                    'use_validity_start_time was requested, but no value was provided '
-                    'for DataValidityStartTime within the RunConfig'
+                    'static_layer_product was requested, but no value was provided '
+                    'for DataValidityStartDate within the RunConfig'
                 )
         else:
             # Use doppler start time as the acq time and convert it to our format
             # used for file naming
             acquisition_time = product_metadata['identification']['zeroDopplerStartTime']
 
-            if not acquisition_time.endswith('Z'):
-                acquisition_time += 'Z'
+            if acquisition_time.endswith('Z'):
+                acquisition_time = acquisition_time[:-1]
 
             acquisition_time = get_time_for_filename(
-                datetime.strptime(acquisition_time, "%Y-%m-%dT%H:%M:%S.%fZ")
+                datetime.strptime(acquisition_time, "%Y-%m-%dT%H:%M:%S.%f")
             )
+
+            if not acquisition_time.endswith('Z'):
+                acquisition_time += 'Z'
 
         # Get the sensor (should be either S1A or S1B)
         sensor = get_sensor_from_spacecraft_name(product_metadata['identification']['platform'])
@@ -267,17 +308,15 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
             product_version = f'v{product_version}'
 
         rtc_file_components = (
-            f"{burst_id}_{acquisition_time}Z_{production_time}Z_{sensor}_"
+            f"{burst_id}_{acquisition_time}_{production_time}Z_{sensor}_"
             f"{spacing}_{product_version}"
         )
 
-        rtc_filename = "_".join([core_filename, rtc_file_components])
+        rtc_filename = f"{core_filename}_{rtc_file_components}"
 
         # Cache the file name for this burst ID, so it can be used with the ISO
-        # metadata later. Note, since this is used with the ISO filename, we
-        # only want to cache the version that does not use DataValidityStartTime.
-        if not use_validity_start_time:
-            self._burst_filename_cache[burst_id] = rtc_filename
+        # metadata later.
+        self._burst_filename_cache[burst_id] = rtc_filename
 
         return rtc_filename
 
@@ -290,10 +329,11 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
 
         The filename for static layer RTC products consists of:
 
-            <RTC filename>_static_<Static layer name>.tif
+            <RTC static filename>_<Static layer name>.tif
 
-        Where <RTC filename> is returned by RtcS1PostProcessorMixin._rtc_filename(),
-        and <Static layer name> is the identifier for the specific static layer
+        Where <RTC static filename> is returned by RtcS1PostProcessorMixin._rtc_filename()
+        with static_layer_product set to True.
+        <Static layer name> is the identifier for the specific static layer
         as parsed from the intermediate filename.
 
         Parameters
@@ -323,9 +363,9 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
 
         static_layer_name = filename.split(product_version)[-1]
 
-        rtc_filename = self._rtc_filename(inter_filename, use_validity_start_time=True)
+        rtc_filename = self._rtc_filename(inter_filename, static_layer_product=True)
 
-        static_layer_filename = f"{rtc_filename}_static{static_layer_name}.tif"
+        static_layer_filename = f"{rtc_filename}{static_layer_name}.tif"
 
         return static_layer_filename
 
@@ -365,12 +405,39 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
 
         return f"{rtc_filename}_{polarization}.tif"
 
+    def _mask_filename(self, inter_filename):
+        """
+        Returns the file name to use for RTC mask products produced by this PGE.
+
+        The filename for GeoTIFF RTC products consists of:
+
+            <RTC filename>_mask.tif
+
+        Where <RTC filename> is returned by RtcS1PostProcessorMixin._rtc_filename().
+
+        Parameters
+        ----------
+        inter_filename : str
+            The intermediate filename of the output product to generate
+            a filename for. This parameter may be used to inspect the file
+            in order to derive any necessary components of the returned filename.
+
+        Returns
+        -------
+        mask_filename : str
+            The file name to assign to RTC GeoTIFF product(s) created by this PGE.
+
+        """
+        rtc_filename = self._rtc_filename(inter_filename)
+
+        return f"{rtc_filename}_mask.tif"
+
     def _browse_filename(self, inter_filename):
         """
         Returns the final file name of the PNG browse image product which may
         be optionally produced by this PGE.
 
-        The filename for RTC metadata products consists of:
+        The filename for RTC browse product consists of:
 
             <RTC filename>_BROWSE.png
 
@@ -390,6 +457,37 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
 
         """
         rtc_filename = self._rtc_filename(inter_filename)
+
+        browse_filename = f"{rtc_filename}_BROWSE.png"
+
+        return browse_filename
+
+    def _static_browse_filename(self, inter_filename):
+        """
+        Returns the final file name of the static layer PNG browse image product
+        which may be optionally produced by this PGE.
+
+        The filename for the RTC static layer browse product consists of:
+
+            <RTC static filename>_BROWSE.png
+
+        Where <RTC static filename> is returned by RtcS1PostProcessorMixin._rtc_filename()
+        with static_layer_product set ot True.
+
+        Parameters
+        ----------
+        inter_filename : str
+            The intermediate filename of the output product to generate
+            a filename for. This parameter may be used to inspect the file
+            in order to derive any necessary components of the returned filename.
+
+        Returns
+        -------
+        browse_filename : str
+            The file name to assign to browse product created by this PGE.
+
+        """
+        rtc_filename = self._rtc_filename(inter_filename, static_layer_product=True)
 
         browse_filename = f"{rtc_filename}_BROWSE.png"
 
@@ -423,6 +521,38 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
         ext = os.path.splitext(inter_filename)[-1]
 
         rtc_filename = self._rtc_filename(inter_filename)
+
+        return f"{rtc_filename}{ext}"
+
+    def _static_metadata_filename(self, inter_filename):
+        """
+        Returns the file name to use for RTC metadata products produced by this PGE.
+
+        The filename for RTC metadata products consists of:
+
+            <RTC static filename>.<ext>
+
+        Where <RTC static filename> is returned by RtcS1PostProcessorMixin._rtc_filename()
+        with static_layer_product set ot True, and <ext> is the file extension
+        carried over from inter_filename (usually .h5 or .nc).
+
+        Parameters
+        ----------
+        inter_filename : str
+            The intermediate filename of the output product to generate
+            a filename for. This parameter may be used to inspect the file
+            in order to derive any necessary components of the returned filename.
+
+        Returns
+        -------
+        static_metadata_filename : str
+            The file name to assign to static layer metadata product(s) created
+            by this PGE.
+
+        """
+        ext = os.path.splitext(inter_filename)[-1]
+
+        rtc_filename = self._rtc_filename(inter_filename, static_layer_product=True)
 
         return f"{rtc_filename}{ext}"
 
@@ -775,10 +905,10 @@ class RtcS1Executor(RtcS1PreProcessorMixin, RtcS1PostProcessorMixin, PgeExecutor
     LEVEL = "L2"
     """Processing Level for RTC-S1 Products"""
 
-    PGE_VERSION = "2.0.0-rc.2.0"
+    PGE_VERSION = "2.0.0-rc.2.1"
     """Version of the PGE (overrides default from base_pge)"""
 
-    SAS_VERSION = "0.4"  # Gamma release https://github.com/opera-adt/RTC/releases/tag/v0.4
+    SAS_VERSION = "0.4.1"  # CalVal release https://github.com/opera-adt/RTC/releases/tag/v0.4.1
     """Version of the SAS wrapped by this PGE, should be updated as needed"""
 
     SOURCE = "S1"
@@ -787,17 +917,21 @@ class RtcS1Executor(RtcS1PreProcessorMixin, RtcS1PostProcessorMixin, PgeExecutor
         super().__init__(pge_name, runconfig_path, **kwargs)
 
         self.rename_by_pattern_map = {
+            # Note: Order matters here
             "*_VV.tif": self._rtc_geotiff_filename,
             "*_VH.tif": self._rtc_geotiff_filename,
             "*_HH.tif": self._rtc_geotiff_filename,
             "*_HV.tif": self._rtc_geotiff_filename,
             "*_VV+VH.tif": self._rtc_geotiff_filename,
             "*_HH+HV.tif": self._rtc_geotiff_filename,
-            "*_rtc_anf*.tif": self._static_layer_filename,
-            "*_nlooks.tif": self._static_layer_filename,
-            "*_local_incidence_angle.tif": self._static_layer_filename,
-            "*_layover_shadow_mask.tif": self._static_layer_filename,
-            "*_incidence_angle.tif": self._static_layer_filename,
+            "*-STATIC_*_mask.tif": self._static_layer_filename,
+            "*-STATIC_*_rtc_anf*.tif": self._static_layer_filename,
+            "*-STATIC_*_number_of_looks.tif": self._static_layer_filename,
+            "*-STATIC_*_local_incidence_angle.tif": self._static_layer_filename,
+            "*-STATIC_*_incidence_angle.tif": self._static_layer_filename,
+            "*-STATIC_*.png": self._static_browse_filename,
+            "*-STATIC_*.h5": self._static_metadata_filename,
+            "*_mask.tif": self._mask_filename,
             "*.png": self._browse_filename,
             "*.h5": self._rtc_metadata_filename,
             "*.nc": self._rtc_metadata_filename

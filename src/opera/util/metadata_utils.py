@@ -369,12 +369,14 @@ def create_test_rtc_metadata_product(file_path):
         annotationFiles_dset = processingInformation_inputs_grp.create_dataset("annotationFiles", data=annotationFiles)
         configFiles_dset = processingInformation_inputs_grp.create_dataset("configFiles", data=b'rtc_s1.yaml')
         l1SlcGranules = np.array([b'S1B_IW_SLC__1SDV_20180504T104507_20180504T104535_010770_013AEE_919F.zip'])
-        l1SlcGranules_dset = processingInformation_inputs_grp.create_dataset("l1SLCGranules", data=l1SlcGranules)
+        l1SlcGranules_dset = processingInformation_inputs_grp.create_dataset("l1SlcGranules", data=l1SlcGranules)
         orbitFiles = np.array([b'S1B_OPER_AUX_POEORB_OPOD_20180524T110543_V20180503T225942_20180505T005942.EOF'])
         orbitFiles_dset = processingInformation_inputs_grp.create_dataset("orbitFiles", data=orbitFiles)
 
         processingInformation_algorithms_grp = outfile.create_group(
             f"{S1_SLC_HDF5_PREFIX}/metadata/processingInformation/algorithms")
+        demEgmModel_dset = processingInformation_algorithms_grp.create_dataset("demEgmModel",
+                                                                               data=b'Earth Gravitational Model EGM08')
         demInterpolation_dset = processingInformation_algorithms_grp.create_dataset("demInterpolation",
                                                                                     data=b'biquintic')
         geocoding_dset = processingInformation_algorithms_grp.create_dataset("geocoding", data=b'area_projection')
@@ -396,10 +398,25 @@ def create_test_rtc_metadata_product(file_path):
             "bistaticDelayCorrectionApplied", data=True, dtype='bool')
         dryTroposphericGeolocationCorrectionApplied_dset = processingInformation_parameters_grp.create_dataset(
             "dryTroposphericGeolocationCorrectionApplied", data=True, dtype='bool')
+        filteringApplied_dset = processingInformation_parameters_grp.create_dataset(
+            "filteringApplied", data=False, dtype='bool')
+        geocoding_grp = processingInformation_parameters_grp.create_group("geocoding")
+        burstGeogridSnapX_dset = geocoding_grp.create_dataset("burstGeogridSnapX", data=30, dtype='int')
+        burstGeogridSnapY_dset = geocoding_grp.create_dataset("burstGeogridSnapY", data=30, dtype='int')
+        ceosAnalysisReadyDataPixelCoordinateConvention_dset = geocoding_grp.create_dataset(
+            "ceosAnalysisReadyDataPixelCoordinateConvention", data=b'ULC')
+        inputBackscatterNormalizationConvention_dset = processingInformation_parameters_grp.create_dataset(
+            "inputBackscatterNormalizationConvention", data=b'beta0')
         noiseCorrectionApplied_dset = processingInformation_parameters_grp.create_dataset(
             "noiseCorrectionApplied", data=True, dtype='bool')
-        postProcessingFilteringApplied_dset = processingInformation_parameters_grp.create_dataset(
-            "postProcessingFilteringApplied", data=True, dtype='bool')
+        outputBackscatterDecibelConversionEquation_dset = processingInformation_parameters_grp.create_dataset(
+            "outputBackscatterDecibelConversionEquation", data=b'backscatter_dB = 10*log10(backscatter_linear)')
+        outputBackscatterExpressionConvention_dset = processingInformation_parameters_grp.create_dataset(
+            "outputBackscatterExpressionConvention", data=b'linear backscatter intensity')
+        outputBackscatterNormalizationConvention_dset = processingInformation_parameters_grp.create_dataset(
+            "outputBackscatterNormalizationConvention", data=b'gamma0')
+        preprocessingMultilookingApplied_dset = processingInformation_parameters_grp.create_dataset(
+            "preprocessingMultilookingApplied", data=False, dtype='bool')
         radiometricTerrainCorrectionApplied_dset = processingInformation_parameters_grp.create_dataset(
             'radiometricTerrainCorrectionApplied', data=True, dtype='bool')
         wetTroposphericGeolocationCorrectionApplied_dset = processingInformation_parameters_grp.create_dataset(
@@ -414,6 +431,11 @@ def create_test_rtc_metadata_product(file_path):
         boundingPolygon_dset = identification_grp.create_dataset(
             "boundingPolygon", data=b'POLYGON ((399015 3859970, 398975 3860000, ..., 399015 3859970))')
         burstID_dset = identification_grp.create_dataset("burstID", data=b't069_147170_iw1')
+        ceosAnalysisReadyDataDocumentIdentifier_dset = identification_grp.create_dataset("ceosAnalysisReadyDataDocumentIdentifier",
+                                                                                         data=True, dtype='bool')
+        ceosAnalysisReadyDataProductType_dset = identification_grp.create_dataset("ceosAnalysisReadyDataProductType",
+                                                                                  data=b'Normalized Radar Backscatter')
+        dataAccess_dset = identification_grp.create_dataset("dataAccess", data=b'(NOT PROVIDED)')
         diagnosticModeFlag_dset = identification_grp.create_dataset("diagnosticModeFlag", data=False, dtype='bool')
         institution_dset = identification_grp.create_dataset("institution", data=b'NASA JPL')
         instrumentName_dset = identification_grp.create_dataset("instrumentName", data=b'Sentinel-1B CSAR')
@@ -457,11 +479,6 @@ def get_cslc_s1_product_metadata(file_name):
     cslc_metadata = {
         'identification': get_hdf5_group_as_dict(file_name, f"{S1_SLC_HDF5_PREFIX}/identification"),
         'data': get_hdf5_group_as_dict(file_name, f"{S1_SLC_HDF5_PREFIX}/data"),
-        'calibration_information':
-            get_hdf5_group_as_dict(file_name,
-                                   f"{S1_SLC_HDF5_PREFIX}/metadata/calibration_information"),
-        'noise_information': get_hdf5_group_as_dict(file_name,
-                                                    f"{S1_SLC_HDF5_PREFIX}/metadata/noise_information"),
         'processing_information': get_hdf5_group_as_dict(file_name,
                                                          f"{S1_SLC_HDF5_PREFIX}/metadata/processing_information"),
         'orbit': get_hdf5_group_as_dict(file_name, f"{S1_SLC_HDF5_PREFIX}/metadata/orbit")
@@ -518,17 +535,6 @@ def create_test_cslc_metadata_product(file_path):
         y_coordinates_dset = data_grp.create_dataset("y_coordinates", data=np.zeros((10,)), dtype='float64')
         y_spacing_dset = data_grp.create_dataset("y_spacing", data=-10.0, dtype='float64')
 
-        calibration_information_grp = outfile.create_group(
-            f"{S1_SLC_HDF5_PREFIX}/metadata/calibration_information")
-        cal_basename_dset = calibration_information_grp.create_dataset(
-            "basename",
-            data=np.string_('calibration-s1a-iw1-slc-vv-20220501t015035-20220501t015102-043011-0522a4-004.xml'))
-
-        noise_information_grp = outfile.create_group(f"{S1_SLC_HDF5_PREFIX}/metadata/noise_information")
-        noise_basename_dset = noise_information_grp.create_dataset(
-            "basename",
-            data=np.string_('noise-s1a-iw1-slc-vv-20220501t015035-20220501t015102-043011-0522a4-004.xml'))
-
         processing_information_grp = outfile.create_group(f"{S1_SLC_HDF5_PREFIX}/metadata/processing_information")
 
         algorithms_grp = outfile.create_group(f"{S1_SLC_HDF5_PREFIX}/metadata/processing_information/algorithms")
@@ -539,15 +545,15 @@ def create_test_cslc_metadata_product(file_path):
                                                                                   data=np.string_("sinc interpolation"))
         float_data_geocoding_interpolator_dset = algorithms_grp.create_dataset("float_data_geocoding_interpolator",
                                                                                data=np.string_("biquintic interpolation"))
-        s1Reader_version_dset = algorithms_grp.create_dataset("s1Reader_version", data=np.string_("0.1.5"))
+        s1_reader_version_dset = algorithms_grp.create_dataset("s1_reader_version", data=np.string_("0.2.0"))
 
         inputs_grp = outfile.create_group(f"{S1_SLC_HDF5_PREFIX}/metadata/processing_information/inputs")
-        calibration_file_dset = inputs_grp.create_dataset("calibration_file", data=np.string_(
+        calibration_files_dset = inputs_grp.create_dataset("calibration_files", data=np.string_(
             'calibration-s1a-iw1-slc-vv-20220501t015035-20220501t015102-043011-0522a4-004.xml'))
         dem_source_dset = inputs_grp.create_dataset("dem_source", data=np.string_('dem_4326.tiff'))
         l1_slc_files_dset = inputs_grp.create_dataset('l1_slc_files', data=np.string_(
             'S1A_IW_SLC__1SDV_20220501T015035_20220501T015102_043011_0522A4_42CC'))
-        noise_file_dset = inputs_grp.create_dataset("noise_file", data=np.string_(
+        noise_files_dset = inputs_grp.create_dataset("noise_files", data=np.string_(
             'noise-s1a-iw1-slc-vv-20220501t015035-20220501t015102-043011-0522a4-004.xml'))
         orbit_files_dset = inputs_grp.create_dataset("orbit_files", data=np.array(
             [b'S1A_OPER_AUX_POEORB_OPOD_20220521T081912_V20220430T225942_20220502T005942.EOF']))
@@ -569,6 +575,8 @@ def create_test_cslc_metadata_product(file_path):
         bistatic_delay_applied_dset = processing_parameters_grp.create_dataset("bistatic_delay_applied", data=True, dtype='bool')
         dry_troposphere_weather_model_applied_dset = processing_parameters_grp.create_dataset("dry_troposphere_weather_model_applied",
                                                                                               data=True, dtype='bool')
+        elevation_antenna_pattern_correction_applied_dset = processing_parameters_grp.create_dataset("elevation_antenna_pattern_correction_applied",
+                                                                                                     data=np.string_("ESA"))
         ellipsoidal_flattening_applied_dset = processing_parameters_grp.create_dataset("ellipsoidal_flattening_applied",
                                                                                        data=True, dtype='bool')
         geometry_doppler_applied_dset = processing_parameters_grp.create_dataset("geometry_doppler_applied", data=True,

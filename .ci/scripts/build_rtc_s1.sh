@@ -24,7 +24,7 @@ BUILD_DATE_TIME=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
 # defaults, SAS image should be updated as necessary for new image releases from ADT
 [ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath $(dirname $(realpath $0))/../..)
 [ -z "${TAG}" ] && TAG="${USER}-dev"
-[ -z "${SAS_IMAGE}" ] && SAS_IMAGE="artifactory-fn.jpl.nasa.gov:16001/gov/nasa/jpl/opera/adt/opera/rtc:calval_0.4.0"
+[ -z "${SAS_IMAGE}" ] && SAS_IMAGE="artifactory-fn.jpl.nasa.gov:16001/gov/nasa/jpl/opera/adt/opera/rtc:calval_0.4.1"
 
 echo "WORKSPACE: $WORKSPACE"
 echo "IMAGE: $IMAGE"
@@ -71,7 +71,7 @@ else
 fi
 
 # Build the PGE docker image
-docker build ${PLATFORM}  --rm --force-rm -t ${IMAGE}:${TAG} \
+docker build ${PLATFORM}  --progress plain --rm --force-rm -t ${IMAGE}:${TAG} \
     --build-arg SAS_IMAGE=${SAS_IMAGE} \
     --build-arg BUILD_DATE_TIME=${BUILD_DATE_TIME} \
     --build-arg BUILD_VERSION=${TAG} \
