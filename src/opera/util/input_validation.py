@@ -10,6 +10,7 @@ Common code used by some PGEs for input validation.
 """
 import glob
 from os.path import abspath, exists, getsize, isdir, isfile, join, splitext
+import re
 
 import yamale
 
@@ -130,6 +131,133 @@ def validate_slc_s1_inputs(runconfig, logger, name):
             logger.critical(name, ErrorCode.INVALID_INPUT, error_msg)
 
 
+def get_burst_id_set(input_file_group, logger, name):
+    """
+    Compiles a set of burst_ids from a list of files defined in the runconfig file.
+    Each file in the list should have have a burst_id in the file name.
+
+    Parameters
+    ----------
+    input_file_group : list
+        List of files containing a burst_id
+    logger : PgeLogger
+        Logger passed by the calling PGE
+    name : str
+        PGE name
+
+    Returns
+    -------
+    burst_ids :set
+
+    Raises
+    ------
+    RuntimeError
+        If a burst_id is improperly formatted.
+
+    """
+    burst_ids = set()
+    for i in input_file_group:
+        reg_ex = r't\w{3}_\d{6}_iw[1|2|3]'
+        match = re.search(reg_ex, i)
+        if match:
+            burst_ids.add(re.findall(reg_ex, i)[0])
+        else:
+            msg = f'Input file present without properly formatted burst_id: {i}'
+            logger.critical(name, ErrorCode.INVALID_INPUT, msg)
+
+    return burst_ids
+
+
+def check_amp_mean_geometry_burst_ids(cslc_input_burst_ids, ancillary_file_list, logger, name):
+    """
+    Verify burst_ids from the ancillary input files:
+        'amplitude_dispersion_files',
+        'amplitude_mean_files',
+        'geometry_files
+    Verify that each file has a unique burst id in the file name, and that the burst idea is in the
+    set of of DISP_S1 cslc input burst ids.
+
+    Parameters
+    ----------
+    cslc_input_burst_ids : set
+        Set of the DISP_S1 input file burst_ids
+    ancillary_file_list : list
+        List from the runconfig file of the desired set of ancillary files to check
+    logger : PgeLogger
+        Logger passed by the calling PGE
+    name : str
+        PGE name
+
+    Raises
+    ------
+    RuntimeError
+        If there are ancillary files of the same type with the same burst_id.
+        If the set of ancillary file burst_ids do not match the set of cslc input file burst_ids.
+
+    """
+    ancillary_burst_ids = get_burst_id_set(ancillary_file_list, logger, name)
+    # Test that there is a unique burst_id for each burst
+    if len(ancillary_burst_ids) != len(ancillary_file_list):
+        msg = f'Burst ids in {ancillary_file_list} are not unique.'
+        logger.critical(name, ErrorCode.INVALID_INPUT, msg)
+    # Verify that the sets of burst_ids are equal
+    if ancillary_burst_ids != cslc_input_burst_ids:
+        msg = f'input_burst_ids: {cslc_input_burst_ids} do not match ancillary_burst_ids: ' \
+              f'{ancillary_burst_ids} for {ancillary_file_list}'
+        logger.critical(name, ErrorCode.INVALID_INPUT, msg)
+
+
+def get_cslc_input_burst_id_set(cslc_input_file_list, logger, name):
+    """
+    Compile the set of burst ids from the cslc input files
+    There may be uncompressed files only, or a mixture of uncompressed
+    and compressed files.  If mixed the uncompressed set of burst ids
+    must match the set of compressed burst ids.
+
+    Parameters
+    ----------
+    cslc_input_file_list : list
+        List of all cslc input files pulled from the runconfig file
+    logger : PgeLogger
+        Logger passed by the calling PGE
+    name : str
+        PGE name
+
+    Returns
+    -------
+    burst_id_set :set
+
+    Raises
+    ------
+    RuntimeError
+        If the compressed burst_ids set does not match the uncompressed burst_id set.
+
+    """
+    compressed_input_file_list = []
+    single_input_file_list = []
+
+    for i in cslc_input_file_list:
+        if 'compressed' in i:
+            compressed_input_file_list.append(i)
+        else:
+            single_input_file_list.append(i)
+
+    compressed_ids = get_burst_id_set(compressed_input_file_list, logger, name)
+    single_file_burst_id_set = get_burst_id_set(single_input_file_list, logger, name)
+
+    # Case 1:  uncompressed files only in cslc inputs
+    if len(compressed_ids) == 0:
+        return single_file_burst_id_set
+    # Case 2: uncompressed files and compressed files in cslc inputs with non-matching burst ids
+    elif single_file_burst_id_set != compressed_ids:
+        msg = f"single_file_burst_id_set: {single_file_burst_id_set} does not match compressed_file_burst_id_set: " \
+              f"'{compressed_ids}'"
+        logger.critical(name, ErrorCode.INVALID_INPUT, msg)
+    # Case 3: uncompressed file and compressed files with matching burst id sets
+    else:
+        return compressed_ids
+
+
 def validate_disp_inputs(runconfig, logger, name):
     """
     Evaluates the list of inputs from the RunConfig to ensure they are valid.
@@ -153,18 +281,33 @@ def validate_disp_inputs(runconfig, logger, name):
 
     check_input_list(input_file_group['cslc_file_list'], logger, name,
                      valid_extensions=('.h5',), check_zero_size=True)
+    cslc_burst_id_set = get_cslc_input_burst_id_set(runconfig.sas_config['input_file_group']['cslc_file_list'],
+                                                    logger,
+                                                    name)
 
     if 'amplitude_dispersion_files' in dyn_anc_file_group:
         check_input_list(dyn_anc_file_group['amplitude_dispersion_files'], logger, name,
                          valid_extensions=('.tif', '.tiff'), check_zero_size=True)
+        check_amp_mean_geometry_burst_ids(cslc_burst_id_set,
+                                          dyn_anc_file_group['amplitude_dispersion_files'],
+                                          logger,
+                                          name)
 
     if 'amplitude_mean_files' in dyn_anc_file_group:
         check_input_list(dyn_anc_file_group['amplitude_mean_files'], logger, name,
                          valid_extensions=('.tif', '.tiff'), check_zero_size=True)
+        check_amp_mean_geometry_burst_ids(cslc_burst_id_set,
+                                          dyn_anc_file_group['amplitude_mean_files'],
+                                          logger,
+                                          name)
 
     if 'geometry_files' in dyn_anc_file_group:
         check_input_list(dyn_anc_file_group['geometry_files'], logger, name,
                          valid_extensions=('.h5',), check_zero_size=True)
+        check_amp_mean_geometry_burst_ids(cslc_burst_id_set,
+                                          dyn_anc_file_group['geometry_files'],
+                                          logger,
+                                          name)
 
     if 'mask_file' in dyn_anc_file_group:
         check_input(dyn_anc_file_group['mask_file'], logger, name,
