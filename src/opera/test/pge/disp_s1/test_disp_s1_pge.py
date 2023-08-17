@@ -465,7 +465,6 @@ class DispS1PgeTestCase(unittest.TestCase):
             shutil.rmtree(pge.runconfig.output_product_path)
 
             # PNG file is missing
-            '''
             runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']['ProgramOptions'] = \
                 ['-p disp_s1_pge_test/output_dir/compressed_slcs;',
                  'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.unw.nc bs=1M count=1;',
@@ -482,10 +481,8 @@ class DispS1PgeTestCase(unittest.TestCase):
                 log_contents = infile.read()
             self.assertIn("SAS output file 20180101_20180330.unw.png does not exist", log_contents)
             shutil.rmtree(pge.runconfig.output_product_path)
-            '''
 
             # PNG is zero sized
-            '''
             runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']['ProgramOptions'] = \
                 ['-p disp_s1_pge_test/output_dir/compressed_slcs;',
                  'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.unw.nc bs=1M count=1;',
@@ -503,7 +500,6 @@ class DispS1PgeTestCase(unittest.TestCase):
                 log_contents = infile.read()
             self.assertIn("SAS output file 20180101_20180330.unw.png exists but is empty", log_contents)
             shutil.rmtree(pge.runconfig.output_product_path)
-            '''
 
             # compressed_slc directory does not exist
             runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']['ProgramOptions'] = \

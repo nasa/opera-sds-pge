@@ -111,13 +111,11 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
         if not exists(png_file):
             error_msg = f"SAS output file {basename(png_file)} does not exist"
 
-            print(f"TODO: {error_msg}")
-            # self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
+            self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
         elif not getsize(png_file):
             error_msg = f"SAS output file {basename(png_file)} exists but is empty"
 
-            print(f"TODO: {error_msg}")
-            # self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
+            self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
 
         save_compressed_slc = self.runconfig.sas_config['product_path_group']['save_compressed_slc']
         if save_compressed_slc:
