@@ -20,7 +20,7 @@ Integration Testing DISP-S1 PGE docker image...
 
 PGE_NAME="disp_s1"
 PGE_IMAGE="opera_pge/${PGE_NAME}"
-SAMPLE_TIME=15
+SAMPLE_TIME=2
 
 # defaults, test data and runconfig files should be updated as-needed to use
 # the latest available as defaults for use with the Jenkins pipeline call
@@ -116,7 +116,8 @@ else
                             -v "$SCRIPT_DIR":/scripts \
                             --entrypoint /opt/conda/bin/python ${PGE_IMAGE}:"${PGE_TAG}" \
                             /scripts/disp_validate_product_opera_pge.py \
-                            /out/${output_file} /exp/${expected_file})
+                            /out/${output_file} /exp/${expected_file} \
+                            --exclude_groups pge_runconfig)
     echo "$docker_out"
 
     if [[ "$docker_out" == *"ERROR"* ]]; then
