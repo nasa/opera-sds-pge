@@ -38,7 +38,7 @@ RunConfig:
                     tec_file: /home/compass_user/input_dir/jplg1210.22i
 
                     # Burst database, must be an .sqlite3 file
-                    burst_database_file: /home/compass_user/input_dir/opera_burst_database_deploy_2022_1212.sqlite3
+                    burst_database_file: /home/compass_user/input_dir/burst_db_20230713-bbox-only.sqlite
 
             ProductPathGroup:
                 # Path to where output products should be stored
