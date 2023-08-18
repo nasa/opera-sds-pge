@@ -225,7 +225,9 @@ def get_cslc_input_burst_id_set(cslc_input_file_list, logger, name):
 
     Returns
     -------
-    burst_id_set :set
+    burst id set : set
+        Will be either 'single_file_burst_id_set' or 'compressed_file_burst_id_set' depending upon
+        the list of burst ids passed to the function.
 
     Raises
     ------
@@ -242,20 +244,20 @@ def get_cslc_input_burst_id_set(cslc_input_file_list, logger, name):
         else:
             single_input_file_list.append(i)
 
-    compressed_ids = get_burst_id_set(compressed_input_file_list, logger, name)
+    compressed_file_burst_id_set = get_burst_id_set(compressed_input_file_list, logger, name)
     single_file_burst_id_set = get_burst_id_set(single_input_file_list, logger, name)
 
     # Case 1:  uncompressed files only in cslc inputs
-    if len(compressed_ids) == 0:
+    if len(compressed_file_burst_id_set) == 0:
         return single_file_burst_id_set
     # Case 2: uncompressed files and compressed files in cslc inputs with non-matching burst ids
-    elif single_file_burst_id_set != compressed_ids:
+    elif single_file_burst_id_set != compressed_file_burst_id_set:
         msg = f"single_file_burst_id_set: {single_file_burst_id_set} does not match compressed_file_burst_id_set: " \
-              f"'{compressed_ids}'"
+              f"'{compressed_file_burst_id_set}'"
         logger.critical(name, ErrorCode.INVALID_INPUT, msg)
     # Case 3: uncompressed file and compressed files with matching burst id sets
     else:
-        return compressed_ids
+        return compressed_file_burst_id_set
 
 
 def validate_disp_inputs(runconfig, logger, name):

@@ -406,7 +406,7 @@ class DispS1PgeTestCase(unittest.TestCase):
 
     def test_get_cslc_input_burst_id_set(self):
         """
-        Set of tests to sanity check the burst ideas associated with:
+        Set of tests to sanity check the burst ids associated with:
         cslc_input_files, amplitude_dispersion_files, amplitude_mean_files,
         and geometry_files.
         """
@@ -527,7 +527,7 @@ class DispS1PgeTestCase(unittest.TestCase):
             log = lfile.read()
         self.assertIn('input_burst_ids: ', log)
         self.assertIn('do not match ancillary_burst_ids: ', log)
-        # Test for an ancillary file the does not have a unique burst id
+        # Test for an ancillary file that does not have a unique burst id
         cslc_file_list = ['compressed_slc_t087_185683_iw2_220180101_20180210.h5',
                           'compressed_slc_t087_185684_iw2_220180101_20180210.h5',
                           't087_185683_iw2_20180222_VV.h5', 't087_185683_iw2_20180306_VV.h5',
