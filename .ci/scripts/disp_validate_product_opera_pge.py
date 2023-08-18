@@ -62,8 +62,9 @@ def compare_groups(
     test_group: h5py.Group,
     pixels_failed_threshold: float = 0.01,
     diff_threshold: float = 1e-5,
+    exclude_groups: list = []
 ) -> None:
-    """Compare all datasets in two HDF5 files.
+    """Compare all datasets in two HDF5 files that are not in the exclude_groups.
 
     Parameters
     ----------
@@ -75,11 +76,13 @@ def compare_groups(
         The threshold of the percentage of pixels that can fail the comparison.
     diff_threshold : float, optional
         The abs. difference threshold between pixels to consider failing.
+    exclude_groups: list, optional
+        List of group names, e.g. pge_runconfig, to exclude from comparison.
 
     Raises
     ------
     ComparisonError
-        If the two files do not match in all datasets.
+        If the two files do not match in all compared datasets.
     """
     # Check if group names match
     if set(golden_group.keys()) != set(test_group.keys()):
@@ -90,12 +93,17 @@ def compare_groups(
         )
 
     for key in golden_group.keys():
+        if exclude_groups and key in exclude_groups:
+            logger.info(f"group {key} has been excluded from comparison on the command line")
+            continue
+
         if isinstance(golden_group[key], h5py.Group):
             compare_groups(
                 golden_group[key],
                 test_group[key],
                 pixels_failed_threshold,
                 diff_threshold,
+                exclude_groups
             )
         else:
             test_dataset = test_group[key]
@@ -521,11 +529,11 @@ def _check_compressed_slc_dirs(golden: Filename, test: Filename) -> None:
         )
 
 
-def compare(golden: Filename, test: Filename, data_dset: str = DSET_DEFAULT) -> None:
+def compare(golden: Filename, test: Filename, data_dset: str = DSET_DEFAULT, exclude_groups: list = []) -> None:
     """Compare two HDF5 files for consistency."""
     logger.info("Comparing HDF5 contents...")
     with h5py.File(golden, "r") as hf_g, h5py.File(test, "r") as hf_t:
-        compare_groups(hf_g, hf_t)
+        compare_groups(hf_g, hf_t, exclude_groups=exclude_groups)
 
     logger.info("Checking geospatial metadata...")
     _check_raster_geometadata(
@@ -557,6 +565,11 @@ def get_parser(
     parser.add_argument("golden", help="The golden HDF5 file.")
     parser.add_argument("test", help="The test HDF5 file to be compared.")
     parser.add_argument("--data-dset", default=DSET_DEFAULT)
+    parser.add_argument('--exclude_groups',
+                        nargs='+',
+                        help=("List of group names to ignore for purposes "
+                              "of determining comparison success or failure."))
+
     parser.set_defaults(run_func=compare)
     return parser
 
@@ -564,4 +577,4 @@ def get_parser(
 if __name__ == "__main__":
     parser = get_parser()
     args = parser.parse_args()
-    compare(args.golden, args.test, args.data_dset)
+    compare(args.golden, args.test, args.data_dset, args.exclude_groups)
