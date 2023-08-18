@@ -64,7 +64,7 @@ def compare_groups(
     diff_threshold: float = 1e-5,
     exclude_groups: list = []
 ) -> None:
-    """Compare all datasets in two HDF5 files.
+    """Compare all datasets in two HDF5 files that are not in the exclude_groups.
 
     Parameters
     ----------
@@ -76,11 +76,13 @@ def compare_groups(
         The threshold of the percentage of pixels that can fail the comparison.
     diff_threshold : float, optional
         The abs. difference threshold between pixels to consider failing.
+    exclude_groups: list, optional
+        List of group names, e.g. pge_runconfig, to exclude from comparison.
 
     Raises
     ------
     ComparisonError
-        If the two files do not match in all datasets.
+        If the two files do not match in all compared datasets.
     """
     # Check if group names match
     if set(golden_group.keys()) != set(test_group.keys()):
