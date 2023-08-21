@@ -198,7 +198,7 @@ class DispS1PgeTestCase(unittest.TestCase):
             runconfig_dict = yaml.safe_load(infile)
 
         runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']['AlgorithmParametersSchemaPath'] = \
-                       'test/data/test_algorithm_parameters_non_existent.yaml'  # noqa E211
+            'test/data/test_algorithm_parameters_non_existent.yaml'  # noqa E211
 
         with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
             yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
@@ -249,8 +249,8 @@ class DispS1PgeTestCase(unittest.TestCase):
         with open(runconfig_path, 'r', encoding='utf-8') as infile:
             runconfig_dict = yaml.safe_load(infile)
 
-        runconfig_dict['RunConfig']['Groups']['SAS']['dynamic_ancillary_file_group']\
-                      ['algorithm_parameters_file'] = 'test/data/test_algorithm_parameters_non_existent.yaml' # noqa E211
+        runconfig_dict['RunConfig']['Groups']['SAS']['dynamic_ancillary_file_group'] \
+            ['algorithm_parameters_file'] = 'test/data/test_algorithm_parameters_non_existent.yaml'  # noqa E211
 
         with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
             yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
@@ -275,12 +275,12 @@ class DispS1PgeTestCase(unittest.TestCase):
         # Test non-existent file detection
         test_filename = 't087_123456_iw2_non_existent_input_file'
         sas_config = {
-            'input_file_group' : {
-                'cslc_file_list' : [
+            'input_file_group': {
+                'cslc_file_list': [
                     test_filename
                 ]
             },
-            'dynamic_ancillary_file_group' : {
+            'dynamic_ancillary_file_group': {
             }
         }
         runconfig = MockRunConfig(sas_config)
@@ -397,12 +397,13 @@ class DispS1PgeTestCase(unittest.TestCase):
         self.assertIn('overall.log_messages.critical: 0', log)
 
         files_to_remove = (cslc_file_list + amplitude_dispersion_files +
-                          amplitude_mean_files + geometry_files +
-                          tec_files + weather_model_files)
+                           amplitude_mean_files + geometry_files +
+                           tec_files + weather_model_files)
         files_to_remove.append(mask_file)
         files_to_remove.append(dem_file)
         for f in files_to_remove:
             os.remove(f)
+
 
     def test_get_cslc_input_burst_id_set(self):
         """
@@ -410,6 +411,25 @@ class DispS1PgeTestCase(unittest.TestCase):
         cslc_input_files, amplitude_dispersion_files, amplitude_mean_files,
         and geometry_files.
         """
+
+        def get_sample_input_files(file_type: str) -> list:
+            """Helper function for test_get_cslc_input_burst_id_set()"""
+            if file_type == 'compressed':
+                return ['compressed_slc_t087_185683_iw2_220180101_20180210.h5',
+                        'compressed_slc_t087_185684_iw2_20180101_20180210.h5']
+            elif file_type == 'uncompressed':
+                return ['t087_185683_iw2_20180222_VV.h5', 't087_185683_iw2_20180306_VV.h5',
+                        't087_185684_iw2_20180222_VV.h5', 't087_185684_iw2_20180306_VV.h5']
+            else:
+                return []
+
+        def add_text_to_file(file_list: list) -> list:
+            """Helper function to add a bit of text to each empty file in a list"""
+            for f in file_list:
+                with open(f, 'w') as wf:
+                    wf.write('Hello\n')
+            return file_list
+
         sas_config = {
             'input_file_group': {
                 'cslc_file_list': [
@@ -420,35 +440,24 @@ class DispS1PgeTestCase(unittest.TestCase):
             }
         }
         # Test uncompressed files only as input
-        cslc_file_list = ['t087_185683_iw2_20180222_VV.h5', 't087_185683_iw2_20180306_VV.h5',
-                          't087_185684_iw2_20180222_VV.h5', 't087_185684_iw2_20180306_VV.h5']
-        for f in cslc_file_list:
-            with open(f, 'w') as wf:
-                wf.write('\n')
+        cslc_file_list = add_text_to_file(get_sample_input_files('uncompressed'))
         sas_config['input_file_group']['cslc_file_list'] = cslc_file_list
         runconfig = MockRunConfig(sas_config)
         logger = PgeLogger()
         validate_disp_inputs(runconfig, logger, "DISP-S1")
         # Test uncompressed and compressed files as input
-        cslc_file_list = ['compressed_slc_t087_185683_iw2_220180101_20180210.h5',
-                          'compressed_slc_t087_185684_iw2_20180101_20180210.h5',
-                          't087_185683_iw2_20180222_VV.h5', 't087_185683_iw2_20180306_VV.h5',
-                          't087_185684_iw2_20180222_VV.h5', 't087_185684_iw2_20180306_VV.h5']
-        for f in cslc_file_list:
-            with open(f, 'w') as wf:
-                wf.write('\n')
+        cslc_file_list = add_text_to_file(get_sample_input_files('compressed')
+                                          + get_sample_input_files('uncompressed'))
         sas_config['input_file_group']['cslc_file_list'] = cslc_file_list
         runconfig = MockRunConfig(sas_config)
         logger = PgeLogger()
         validate_disp_inputs(runconfig, logger, "DISP-S1")
-        # Test uncompressed burst_id set does not match compressed burst_id set
-        cslc_file_list = ['compressed_slc_t087_185683_iw2_220180101_20180210.h5',
-                          'compressed_slc_t087_185684_iw2_220180101_20180210.h5',
-                          't087_185683_iw2_20180222_VV.h5', 't087_185683_iw2_20180306_VV.h5',
-                          't087_185684_iw2_20180222_VV.h5', 't087_185685_iw2_20180306_VV.h5']
-        for f in cslc_file_list:
-            with open(f, 'w') as wf:
-                wf.write('\n')
+        # Test uncompressed burst_id set does not match compressed burst_id set (burst_id, '185685' below)
+        cslc_file_list = add_text_to_file(get_sample_input_files('compressed') +
+                                          ['t087_185683_iw2_20180222_VV.h5',
+                                           't087_185683_iw2_20180306_VV.h5',
+                                           't087_185684_iw2_20180222_VV.h5',
+                                           't087_185685_iw2_20180306_VV.h5'])
         sas_config['input_file_group']['cslc_file_list'] = cslc_file_list
         runconfig = MockRunConfig(sas_config)
         logger = PgeLogger()
@@ -460,16 +469,13 @@ class DispS1PgeTestCase(unittest.TestCase):
         self.assertTrue(exists(log_file))
         with open(log_file, 'r', encoding='utf-8') as lfile:
             log = lfile.read()
-        self.assertIn('single_file_burst_id_set: ', log)
-        self.assertIn('does not match compressed_file_burst_id_set: ', log)
-        # Test an improperly formatted burst id
-        cslc_file_list = ['compressed_slc_t087_185683_iw_220180101_20180210.h5',
-                          'compressed_slc_t087_185684_iw2_220180101_20180210.h5',
-                          't087_185683_iw2_20180222_VV.h5', 't087_185683_iw2_20180306_VV.h5',
-                          't087_185684_iw2_20180222_VV.h5', 't087_185685_iw2_20180306_VV.h5']
-        for f in cslc_file_list:
-            with open(f, 'w') as wf:
-                wf.write('\n')
+        self.assertIn("Set of input CSLC 'compressed' burst IDs do not match the set of 'uncompressed' burst IDs: ",
+                      log)
+
+        # Test an improperly formatted burst id ('_t087_185684_iw_' below
+        cslc_file_list = add_text_to_file(['compressed_slc_t087_185683_iw2_220180101_20180210.h5',
+                                           'compressed_slc_t087_185684_iw_220180101_20180210.h5']
+                                          + get_sample_input_files('uncompressed'))
         sas_config['input_file_group']['cslc_file_list'] = cslc_file_list
         runconfig = MockRunConfig(sas_config)
         logger = PgeLogger()
@@ -483,37 +489,25 @@ class DispS1PgeTestCase(unittest.TestCase):
             log = lfile.read()
         self.assertIn('Input file present without properly formatted burst_id: ', log)
         # Test an ancillary file group (nominal)
-        cslc_file_list = ['compressed_slc_t087_185683_iw2_220180101_20180210.h5',
-                          'compressed_slc_t087_185684_iw2_220180101_20180210.h5',
-                          't087_185683_iw2_20180222_VV.h5', 't087_185683_iw2_20180306_VV.h5',
-                          't087_185684_iw2_20180222_VV.h5', 't087_185684_iw2_20180306_VV.h5']
-        for f in cslc_file_list:
-            with open(f, 'w') as wf:
-                wf.write('\n')
+        cslc_file_list = add_text_to_file(get_sample_input_files('compressed')
+                                          + get_sample_input_files('uncompressed'))
         sas_config['input_file_group']['cslc_file_list'] = cslc_file_list
         sas_config['dynamic_ancillary_file_group'] = {}
-        amplitude_dispersion_files = ['t087_185683_iw2_amp_dispersion.tif', 't087_185684_iw2_amp_dispersion.tif']
-        for f in amplitude_dispersion_files:
-            with open(f, 'w') as wf:
-                wf.write('\n')
+        # Acceptable burst ids
+        amplitude_dispersion_files = add_text_to_file(['t087_185683_iw2_amp_dispersion.tif',
+                                                       't087_185684_iw2_amp_dispersion.tif'])
         sas_config['dynamic_ancillary_file_group']['amplitude_dispersion_files'] = amplitude_dispersion_files
         runconfig = MockRunConfig(sas_config)
         logger = PgeLogger()
         validate_disp_inputs(runconfig, logger, "DISP-S1")
         # Test an ancillary file group with an acceptable busrt id that does not match a cslc burst id
-        cslc_file_list = ['compressed_slc_t087_185683_iw2_220180101_20180210.h5',
-                          'compressed_slc_t087_185684_iw2_220180101_20180210.h5',
-                          't087_185683_iw2_20180222_VV.h5', 't087_185683_iw2_20180306_VV.h5',
-                          't087_185684_iw2_20180222_VV.h5', 't087_185684_iw2_20180306_VV.h5']
-        for f in cslc_file_list:
-            with open(f, 'w') as wf:
-                wf.write('\n')
+        cslc_file_list = add_text_to_file(get_sample_input_files('compressed')
+                                          + get_sample_input_files('uncompressed'))
         sas_config['input_file_group']['cslc_file_list'] = cslc_file_list
         sas_config['dynamic_ancillary_file_group'] = {}
-        amplitude_dispersion_files = ['t087_185683_iw2_amp_dispersion.tif', 't087_185684_iw1_amp_dispersion.tif']
-        for f in amplitude_dispersion_files:
-            with open(f, 'w') as wf:
-                wf.write('\n')
+        # Burst id 't087_185684_iw1' does not match a cslc burst id and will cause an error
+        amplitude_dispersion_files = add_text_to_file(['t087_185683_iw2_amp_dispersion.tif',
+                                                       't087_185684_iw1_amp_dispersion.tif'])
         sas_config['dynamic_ancillary_file_group']['amplitude_dispersion_files'] = amplitude_dispersion_files
         runconfig = MockRunConfig(sas_config)
         logger = PgeLogger()
@@ -525,23 +519,16 @@ class DispS1PgeTestCase(unittest.TestCase):
         self.assertTrue(exists(log_file))
         with open(log_file, 'r', encoding='utf-8') as lfile:
             log = lfile.read()
-        self.assertIn('input_burst_ids: ', log)
-        self.assertIn('do not match ancillary_burst_ids: ', log)
+        self.assertIn('Set of input CSLC burst IDs do not match the set of ancillary burst IDs: ', log)
         # Test for an ancillary file that does not have a unique burst id
-        cslc_file_list = ['compressed_slc_t087_185683_iw2_220180101_20180210.h5',
-                          'compressed_slc_t087_185684_iw2_220180101_20180210.h5',
-                          't087_185683_iw2_20180222_VV.h5', 't087_185683_iw2_20180306_VV.h5',
-                          't087_185684_iw2_20180222_VV.h5', 't087_185684_iw2_20180306_VV.h5']
-        for f in cslc_file_list:
-            with open(f, 'w') as wf:
-                wf.write('\n')
+        cslc_file_list = add_text_to_file(get_sample_input_files('compressed')
+                                          + get_sample_input_files('uncompressed'))
         sas_config['input_file_group']['cslc_file_list'] = cslc_file_list
         sas_config['dynamic_ancillary_file_group'] = {}
-        amplitude_dispersion_files = ['t087_185683_iw2_amp_dispersion.tif', 't087_185683_iw2_amp_dispersion.tif',
-                                      't087_185684_iw1_amp_dispersion.tif']
-        for f in amplitude_dispersion_files:
-            with open(f, 'w') as wf:
-                wf.write('\n')
+        # Two files have the same burst id ('t087_185683_iw2'): this will cause an error
+        amplitude_dispersion_files = add_text_to_file(['t087_185683_iw2_amp_dispersion.tif',
+                                                       't087_185683_iw2_amp_dispersion.tif',
+                                                       't087_185684_iw1_amp_dispersion.tif'])
         sas_config['dynamic_ancillary_file_group']['amplitude_dispersion_files'] = amplitude_dispersion_files
         runconfig = MockRunConfig(sas_config)
         logger = PgeLogger()
@@ -553,8 +540,7 @@ class DispS1PgeTestCase(unittest.TestCase):
         self.assertTrue(exists(log_file))
         with open(log_file, 'r', encoding='utf-8') as lfile:
             log = lfile.read()
-        self.assertIn('Burst ids in ', log)
-        self.assertIn('are not unique.', log)
+        self.assertIn("Duplicate burst ID's in ancillary file list.", log)
 
     def test_disp_s1_pge_validate_product_output(self):
         """Test off-nominal output conditions"""
@@ -712,7 +698,9 @@ class DispS1PgeTestCase(unittest.TestCase):
             expected_log_file = pge.logger.get_file_name()
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
-            self.assertIn("SAS compressed_slcs file 'compressed_slc_t087_185684_iw2_20180222_20180330.h5' exists but is empty", log_contents)
+            self.assertIn(
+                "SAS compressed_slcs file 'compressed_slc_t087_185684_iw2_20180222_20180330.h5' exists but is empty",
+                log_contents)
             shutil.rmtree(pge.runconfig.output_product_path)
 
         finally:
