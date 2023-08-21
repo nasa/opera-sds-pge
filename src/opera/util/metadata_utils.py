@@ -660,3 +660,150 @@ def create_test_cslc_metadata_product(file_path):
         velocity_x_dset = orbit_grp.create_dataset("velocity_x", data=np.zeros(12,), dtype='float64')
         velocity_y_dset = orbit_grp.create_dataset("velocity_y", data=np.zeros(12, ), dtype='float64')
         velocity_z_dset = orbit_grp.create_dataset("velocity_z", data=np.zeros(12, ), dtype='float64')
+
+
+def get_disp_s1_product_metadata(file_name):
+    """
+    Returns a python dict containing the DISP S1 metadata
+    which will be used with the ISO metadata template.
+
+    Parameters
+    ----------
+    file_name : str
+        the DISP S1 metadata file.
+
+    Returns
+    -------
+    disp_metadata : dict
+        python dict containing the HDF5 file metadata which is used in the
+        ISO template.
+    """
+    disp_metadata = {
+        'identification': get_hdf5_group_as_dict(file_name, f"{S1_SLC_HDF5_PREFIX}/identification"),
+    }
+
+    return disp_metadata
+
+
+def create_test_disp_metadata_product(file_path):
+    """
+    Creates a dummy DISP-S1 h5 metadata file with expected groups and datasets.
+    This function is intended for use with unit tests, but is included in this
+    module, so it will be importable from within a built container.
+
+    Parameters
+    ----------
+    file_path : str
+        Full path to write the dummy CSLC H5 metadata file to.
+
+    """
+
+    pge_runconfig_contents = """input_file_group:
+    # REQUIRED: List of paths to CSLC files.
+    #   Type: array.
+    cslc_file_list:
+      - input_slcs/compressed_slc_t087_185683_iw2_20180101_20180210.h5
+      - input_slcs/t087_185683_iw2_20180222_VV.h5
+      - input_slcs/t087_185683_iw2_20180306_VV.h5
+      - input_slcs/t087_185683_iw2_20180318_VV.h5
+      - input_slcs/t087_185683_iw2_20180330_VV.h5
+      - input_slcs/compressed_slc_t087_185684_iw2_20180101_20180210.h5
+      - input_slcs/t087_185684_iw2_20180222_VV.h5
+      - input_slcs/t087_185684_iw2_20180306_VV.h5
+      - input_slcs/t087_185684_iw2_20180318_VV.h5
+      - input_slcs/t087_185684_iw2_20180330_VV.h5
+    # REQUIRED: Frame ID of the bursts contained in `cslc_file_list`.
+    #   Type: integer.
+    frame_id: 123
+dynamic_ancillary_file_group:
+    # REQUIRED: Path to file containing SAS algorithm parameters.
+    #   Type: string.
+    algorithm_parameters_file: algorithm_parameters.yaml
+    # Paths to existing Amplitude Dispersion file (1 per burst) for PS update calculation. If
+    #   none provided, computed using the input SLC stack.
+    #   Type: array.
+    amplitude_dispersion_files:
+      - dynamic_ancillary/ps_files/t087_185683_iw2_amp_dispersion.tif
+      - dynamic_ancillary/ps_files/t087_185684_iw2_amp_dispersion.tif
+    # Paths to an existing Amplitude Mean files (1 per burst) for PS update calculation. If none
+    #   provided, computed using the input SLC stack.
+    #   Type: array.
+    amplitude_mean_files:
+      - dynamic_ancillary/ps_files/t087_185683_iw2_amp_mean.tif
+      - dynamic_ancillary/ps_files/t087_185684_iw2_amp_mean.tif
+    # Paths to the incidence/azimuth-angle files (1 per burst). If none provided, corrections
+    #   using incidence/azimuth-angle are skipped.
+    #   Type: array.
+    geometry_files:
+      - dynamic_ancillary/geometry_files/t087_185683_iw2_topo.h5
+      - dynamic_ancillary/geometry_files/t087_185684_iw2_topo.h5
+    # Optional Byte mask file used to ignore low correlation/bad data (e.g water mask).
+    #   Convention is 0 for no data/invalid, and 1 for good data. Dtype must be uint8.
+    #   Type: string.
+    mask_file: dynamic_ancillary/water_mask.tif
+    # Path to the DEM file covering full frame. If none provided, corrections using DEM are
+    #   skipped.
+    #   Type: string.
+    dem_file: dynamic_ancillary/dem.tif
+    # List of Paths to TEC files (1 per date) in IONEX format for ionosphere correction. If none
+    #   provided, ionosphere corrections are skipped.
+    #   Type: array.
+    tec_files:
+      - dynamic_ancillary/jplg0410.18i.Z
+      - dynamic_ancillary/jplg1970.18i.Z
+    # List of Paths to troposphere weather model files (1 per date). If none provided,
+    #   troposphere corrections are skipped.
+    #   Type: array.
+    weather_model_files:
+      - dynamic_ancillary/GMAO_tropo_20180210T000000_ztd.nc
+      - dynamic_ancillary/GMAO_tropo_20180716T000000_ztd.nc
+primary_executable:
+    # Product type of the PGE.
+    #   Type: string.
+    product_type: DISP_S1_SINGLE
+product_path_group:
+    # REQUIRED: Directory where PGE will place results.
+    #   Type: string.
+    product_path: output
+    # Path to the scratch directory.
+    #   Type: string.
+    scratch_path: scratch
+    # Path to the SAS output directory.
+    #   Type: string.
+    sas_output_path: output
+    # Version of the product.
+    #   Type: string.
+    product_version: '0.1'
+    # Whether the SAS should output and save the Compressed SLCs in addition to the standard
+    #   product output.
+    #   Type: boolean.
+    save_compressed_slc: true
+worker_settings:
+    # Whether to use GPU for processing (if available).
+    #   Type: boolean.
+    gpu_enabled: true
+    # (For non-GPU) Number of cpu cores to use for Python multiprocessing. Uses
+    #   `multiprocessing.cpu_count()` if not set.
+    #   Type: integer.
+    n_workers: 32
+    # Number of threads to use per worker. This sets the OMP_NUM_THREADS environment variable in
+    #   each python process.
+    #   Type: integer.
+    threads_per_worker: 2
+    # Size (in GB) of blocks of data to load at a time.
+    #   Type: number.
+    block_size_gb: 1.0
+# Path to the output log file in addition to logging to stderr.
+#   Type: string.
+log_file: output/pge_logfile.log
+"""
+
+    with h5py.File(file_path, 'w') as outfile:
+        identification_grp = outfile.create_group(f"{S1_SLC_HDF5_PREFIX}/identification")
+        frame_id_dset = identification_grp.create_dataset("frame_id", data=123, dtype='int64')
+        pge_runconfig_dset = identification_grp.create_dataset("pge_runconfig",
+                                                               data=np.string_(pge_runconfig_contents))
+        product_version_dset = identification_grp.create_dataset("product_version",
+                                                                 data=np.string_("0.1"))
+        software_version_dset = identification_grp.create_dataset("software_version",
+                                                                  data=np.string_("0.1.2"))
