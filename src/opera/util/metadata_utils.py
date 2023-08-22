@@ -660,3 +660,63 @@ def create_test_cslc_metadata_product(file_path):
         velocity_x_dset = orbit_grp.create_dataset("velocity_x", data=np.zeros(12,), dtype='float64')
         velocity_y_dset = orbit_grp.create_dataset("velocity_y", data=np.zeros(12, ), dtype='float64')
         velocity_z_dset = orbit_grp.create_dataset("velocity_z", data=np.zeros(12, ), dtype='float64')
+
+
+def get_disp_s1_product_metadata(file_name):
+    """
+    Returns a python dict containing the DISP S1 metadata
+    which will be used with the ISO metadata template.
+
+    Parameters
+    ----------
+    file_name : str
+        the DISP S1 metadata file.
+
+    Returns
+    -------
+    disp_metadata : dict
+        python dict containing the HDF5 file metadata which is used in the
+        ISO template.
+    """
+    disp_metadata = {
+        'identification': get_hdf5_group_as_dict(file_name, f"{S1_SLC_HDF5_PREFIX}/identification"),
+    }
+
+    return disp_metadata
+
+
+def create_test_disp_metadata_product(file_path):
+    """
+    Creates a dummy DISP-S1 h5 metadata file with expected groups and datasets.
+    This function is intended for use with unit tests, but is included in this
+    module, so it will be importable from within a built container.
+
+    Parameters
+    ----------
+    file_path : str
+        Full path to write the dummy DISP H5 metadata file to.
+
+    """
+
+    pge_runconfig_contents = """
+input_file_group:
+    # REQUIRED: List of paths to CSLC files.
+    #   Type: array.
+    cslc_file_list:
+      - input_slcs/compressed_slc_t087_185683_iw2_20180101_20180210.h5
+      - input_slcs/t087_185683_iw2_20180222_VV.h5
+... removed runconfig contents for testing
+# Path to the output log file in addition to logging to stderr.
+#   Type: string.
+log_file: output/pge_logfile.log
+"""
+
+    with h5py.File(file_path, 'w') as outfile:
+        identification_grp = outfile.create_group(f"{S1_SLC_HDF5_PREFIX}/identification")
+        frame_id_dset = identification_grp.create_dataset("frame_id", data=123, dtype='int64')
+        pge_runconfig_dset = identification_grp.create_dataset("pge_runconfig",
+                                                               data=np.string_(pge_runconfig_contents))
+        product_version_dset = identification_grp.create_dataset("product_version",
+                                                                 data=np.string_("0.1"))
+        software_version_dset = identification_grp.create_dataset("software_version",
+                                                                  data=np.string_("0.1.2"))
