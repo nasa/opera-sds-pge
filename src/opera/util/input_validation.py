@@ -131,7 +131,7 @@ def validate_slc_s1_inputs(runconfig, logger, name):
             logger.critical(name, ErrorCode.INVALID_INPUT, error_msg)
 
 
-def check_disp_s1_ancillary_burst_ids(input_file_group, logger, name):
+def get_burst_id_set(input_file_group, logger, name):
     """
     Compiles a set of burst_ids from a list of files defined in the runconfig file.
     Each file in the list should have have a burst_id in the file name.
@@ -168,7 +168,7 @@ def check_disp_s1_ancillary_burst_ids(input_file_group, logger, name):
     return burst_ids
 
 
-def check_amp_mean_geometry_burst_ids(cslc_input_burst_ids, ancillary_file_list, logger, name):
+def check_disp_s1_ancillary_burst_ids(cslc_input_burst_ids, ancillary_file_list, logger, name):
     """
     Verify burst_ids from the ancillary input files:
         'amplitude_dispersion_files',
@@ -195,18 +195,21 @@ def check_amp_mean_geometry_burst_ids(cslc_input_burst_ids, ancillary_file_list,
         If the set of ancillary file burst_ids do not match the set of cslc input file burst_ids.
 
     """
-    ancillary_burst_ids = check_disp_s1_ancillary_burst_ids(ancillary_file_list, logger, name)
+    nl, tab, dtab = '\n', '\t', '\t\t'   # used to format log output in fstrings.
+    ancillary_burst_ids = get_burst_id_set(ancillary_file_list, logger, name)
     # Test none of the ancillary inputs have the same burst ID
     if len(ancillary_burst_ids) != len(ancillary_file_list):
         msg = f"Duplicate burst ID's in ancillary file list. " \
-              f"Lenth of file list {ancillary_file_list}, Length of file set {ancillary_burst_ids}"
+              f"Length of file list {ancillary_file_list}, Length of file set {ancillary_burst_ids}"
         # msg = f'Burst ids in {ancillary_file_list} are not unique.'
         logger.critical(name, ErrorCode.INVALID_INPUT, msg)
     # Verify that the sets of ancillary input burst ID's match the set of CSLC input burst ID's
     if ancillary_burst_ids != cslc_input_burst_ids:
-        msg = f"Set of input CSLC burst IDs do not match the set of ancillary burst IDs: " \
-              f"In cslc set, but not in ancillary set: {cslc_input_burst_ids.difference(ancillary_burst_ids)} " \
-              f"In ancillary set, but not in cslc set: {ancillary_burst_ids.difference(cslc_input_burst_ids)}"
+        msg = f"{nl}{tab}Set of input CSLC burst IDs do not match the set of ancillary burst IDs: {nl}" \
+              f"{dtab}In cslc set, but not in ancillary set: " \
+              f"{cslc_input_burst_ids.difference(ancillary_burst_ids)}{nl}" \
+              f"{dtab}In ancillary set, but not in cslc set: " \
+              f"{ancillary_burst_ids.difference(cslc_input_burst_ids)}"
         logger.critical(name, ErrorCode.INVALID_INPUT, msg)
 
 
@@ -238,23 +241,24 @@ def get_cslc_input_burst_id_set(cslc_input_file_list, logger, name):
         If the compressed burst_ids set does not match the uncompressed burst_id set.
 
     """
-
+    nl, tab, dtab = '\n', '\t', '\t\t'  # used to format log output in fstrings.
     # Filter and separate into 2 list: files with 'compressed' in the name, and files without 'compressed' in the name.
     compressed_input_file_list = list(filter((lambda filename: 'compressed' in filename), cslc_input_file_list))
     single_input_file_list = list(set(cslc_input_file_list) - set(compressed_input_file_list))
 
-    compressed_file_burst_id_set = check_disp_s1_ancillary_burst_ids(compressed_input_file_list, logger, name)
-    single_file_burst_id_set = check_disp_s1_ancillary_burst_ids(single_input_file_list, logger, name)
+    compressed_file_burst_id_set = get_burst_id_set(compressed_input_file_list, logger, name)
+    single_file_burst_id_set = get_burst_id_set(single_input_file_list, logger, name)
 
     # Case 1:  uncompressed files only in cslc inputs
     if len(compressed_file_burst_id_set) == 0:
         return single_file_burst_id_set
     # Case 2: uncompressed files and compressed files in cslc inputs with non-matching burst ids
     elif single_file_burst_id_set != compressed_file_burst_id_set:
-        msg = f"Set of input CSLC 'compressed' burst IDs do not match the set of 'uncompressed' burst IDs: " \
-              f"In 'compressed' set, but not in 'uncompressed' set: " \
-              f"{compressed_file_burst_id_set.difference(single_file_burst_id_set)} " \
-              f"In 'uncompressed' set, but not in 'compressed' set:" \
+        msg = f"{nl}{tab}Set of input CSLC 'compressed' burst IDs do not match" \
+              f" the set of 'uncompressed' burst IDs: {nl}" \
+              f"{dtab}In 'compressed' set, but not in 'uncompressed' set: " \
+              f"{compressed_file_burst_id_set.difference(single_file_burst_id_set)} {nl}" \
+              f"{dtab}In 'uncompressed' set, but not in 'compressed' set:" \
               f" {single_file_burst_id_set.difference(compressed_file_burst_id_set)}"
         logger.critical(name, ErrorCode.INVALID_INPUT, msg)
     # Case 3: uncompressed file and compressed files with matching burst id sets
@@ -292,7 +296,7 @@ def validate_disp_inputs(runconfig, logger, name):
     if 'amplitude_dispersion_files' in dyn_anc_file_group:
         check_input_list(dyn_anc_file_group['amplitude_dispersion_files'], logger, name,
                          valid_extensions=('.tif', '.tiff'), check_zero_size=True)
-        check_amp_mean_geometry_burst_ids(cslc_burst_id_set,
+        check_disp_s1_ancillary_burst_ids(cslc_burst_id_set,
                                           dyn_anc_file_group['amplitude_dispersion_files'],
                                           logger,
                                           name)
@@ -300,7 +304,7 @@ def validate_disp_inputs(runconfig, logger, name):
     if 'amplitude_mean_files' in dyn_anc_file_group:
         check_input_list(dyn_anc_file_group['amplitude_mean_files'], logger, name,
                          valid_extensions=('.tif', '.tiff'), check_zero_size=True)
-        check_amp_mean_geometry_burst_ids(cslc_burst_id_set,
+        check_disp_s1_ancillary_burst_ids(cslc_burst_id_set,
                                           dyn_anc_file_group['amplitude_mean_files'],
                                           logger,
                                           name)
@@ -308,7 +312,7 @@ def validate_disp_inputs(runconfig, logger, name):
     if 'geometry_files' in dyn_anc_file_group:
         check_input_list(dyn_anc_file_group['geometry_files'], logger, name,
                          valid_extensions=('.h5',), check_zero_size=True)
-        check_amp_mean_geometry_burst_ids(cslc_burst_id_set,
+        check_disp_s1_ancillary_burst_ids(cslc_burst_id_set,
                                           dyn_anc_file_group['geometry_files'],
                                           logger,
                                           name)

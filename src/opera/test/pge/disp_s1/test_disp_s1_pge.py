@@ -471,7 +471,6 @@ class DispS1PgeTestCase(unittest.TestCase):
             log = lfile.read()
         self.assertIn("Set of input CSLC 'compressed' burst IDs do not match the set of 'uncompressed' burst IDs: ",
                       log)
-
         # Test an improperly formatted burst id ('_t087_185684_iw_' below
         cslc_file_list = add_text_to_file(['compressed_slc_t087_185683_iw2_220180101_20180210.h5',
                                            'compressed_slc_t087_185684_iw_220180101_20180210.h5']
