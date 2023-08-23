@@ -48,6 +48,7 @@ RunConfig:
                 # List of paths to CSLC files.
                 cslc_file_list:
                     - disp_s1_pge_test/input_dir/compressed_slc_t087_185678_iw2_20180101_20180210.h5
+                    - disp_s1_pge_test/input_dir/t087_185678_iw2_20180101_20180210.h5
 
                 # Frame ID of the bursts contained in `cslc_file_list`.
                 frame_id: 123
