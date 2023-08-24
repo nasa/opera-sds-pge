@@ -481,6 +481,8 @@ def get_cslc_s1_product_metadata(file_name):
         python dict containing the HDF5 file metadata which is used in the
         ISO template.
     """
+    # Remove some of the larger arrays from the metadata, so we don't use
+    # too much memory when caching the metadata for each burst
     cslc_ignore_list = [
         'azimuth_carrier_phase', 'flattening_phase',
         'layover_shadow_mask', 'local_incidence_angle',
