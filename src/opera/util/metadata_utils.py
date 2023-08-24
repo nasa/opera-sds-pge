@@ -290,7 +290,7 @@ def convert_h5py_group_to_dict(group_object, ignore_keys=[]):
     for key, val in group_object.items():
 
         if ignore_keys and key in ignore_keys:
-            converted_dict[key] = f"key {key} is in ignore-keys list"
+            converted_dict[key] = f"key {key} is in ignore_keys list"
             continue
 
         if isinstance(val, h5py.Dataset):
