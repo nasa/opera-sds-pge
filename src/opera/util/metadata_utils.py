@@ -9,8 +9,6 @@ ISO metadata utilities for use with OPERA PGEs.
 
 """
 
-from functools import lru_cache
-
 import h5py
 
 import mgrs
