@@ -237,8 +237,7 @@ def get_geographic_boundaries_from_mgrs_tile(mgrs_tile_name):
     return lat_min, lat_max, lon_min, lon_max
 
 
-@lru_cache
-def get_hdf5_group_as_dict(file_name, group_path):
+def get_hdf5_group_as_dict(file_name, group_path, ignore_keys=[]):
     """
     Returns HDF5 group variable data as a python dict for a given file and group path.
     Group attributes are not included.
@@ -249,6 +248,8 @@ def get_hdf5_group_as_dict(file_name, group_path):
         file system path and filename for the HDF5 file to use.
     group_path : str
         group path within the HDF5 file.
+    ignore_keys : list, optional
+        list of keys within the group to not include in the returned dict.
 
     Returns
     -------
@@ -261,12 +262,12 @@ def get_hdf5_group_as_dict(file_name, group_path):
         if group_object is None:
             raise RuntimeError(f"An error occurred retrieving group '{group_path}' from file '{file_name}'.")
 
-        group_dict = convert_h5py_group_to_dict(group_object)
+        group_dict = convert_h5py_group_to_dict(group_object, ignore_keys)
 
     return group_dict
 
 
-def convert_h5py_group_to_dict(group_object):
+def convert_h5py_group_to_dict(group_object, ignore_keys=[]):
     """
     Returns HDF5 group variable data as a python dict for a given h5py group object.
     Recursively calls itself to process sub-groups.
@@ -278,6 +279,8 @@ def convert_h5py_group_to_dict(group_object):
     ----------
     group_object : h5py._hl.group.Group
         h5py Group object to be converted to a dict.
+    ignore_keys : list, optional
+        list of keys within the group to not include in the returned dict.
 
     Returns
     -------
@@ -287,6 +290,10 @@ def convert_h5py_group_to_dict(group_object):
     """
     converted_dict = {}
     for key, val in group_object.items():
+
+        if ignore_keys and key in ignore_keys:
+            converted_dict[key] = f"key {key} is in ignore-keys list"
+            continue
 
         if isinstance(val, h5py.Dataset):
             if type(val[()]) is np.ndarray:
@@ -476,9 +483,16 @@ def get_cslc_s1_product_metadata(file_name):
         python dict containing the HDF5 file metadata which is used in the
         ISO template.
     """
+    cslc_ignore_list = [
+        'azimuth_carrier_phase', 'flattening_phase',
+        'layover_shadow_mask', 'local_incidence_angle',
+        'los_east', 'los_north',
+        'VV', 'VH', 'HH', 'HV',
+        'x_coordinates', 'y_coordinates'
+    ]
     cslc_metadata = {
         'identification': get_hdf5_group_as_dict(file_name, f"{S1_SLC_HDF5_PREFIX}/identification"),
-        'data': get_hdf5_group_as_dict(file_name, f"{S1_SLC_HDF5_PREFIX}/data"),
+        'data': get_hdf5_group_as_dict(file_name, f"{S1_SLC_HDF5_PREFIX}/data", cslc_ignore_list),
         'processing_information': get_hdf5_group_as_dict(file_name,
                                                          f"{S1_SLC_HDF5_PREFIX}/metadata/processing_information"),
         'orbit': get_hdf5_group_as_dict(file_name, f"{S1_SLC_HDF5_PREFIX}/metadata/orbit")

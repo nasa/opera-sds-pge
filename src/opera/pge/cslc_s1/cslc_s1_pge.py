@@ -616,18 +616,6 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
         output_product_metadata['data']['width'] = len(output_product_metadata['data']['x_coordinates'])
         output_product_metadata['data']['length'] = len(output_product_metadata['data']['y_coordinates'])
 
-        # Remove some of the larger arrays from the metadata, so we don't use
-        # too much memory when caching the metadata for each burst
-        for key in ['azimuth_carrier_phase', 'flattening_phase',
-                    'layover_shadow_mask', 'local_incidence_angle',
-                    'los_east', 'los_north',
-                    'VV', 'VH', 'HH', 'HV',
-                    'x_coordinates', 'y_coordinates']:
-            array = output_product_metadata['data'].pop(key, None)
-
-            if array is not None:
-                del array
-
         # Parse the burst center coordinate to conform with gml schema
         # sample: {ndarray: (2,)} [-118.30363047, 33.8399832]
         burst_center = output_product_metadata['processing_information']['input_burst_metadata']['center']
