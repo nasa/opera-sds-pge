@@ -247,7 +247,7 @@ def get_hdf5_group_as_dict(file_name, group_path, ignore_keys=None):
     group_path : str
         group path within the HDF5 file.
     ignore_keys : iterable, optional
-        iterable keys within the group to not include in the returned dict.
+        keys within the group to not include in the returned dict.
 
     Returns
     -------
@@ -278,7 +278,7 @@ def convert_h5py_group_to_dict(group_object, ignore_keys=None):
     group_object : h5py._hl.group.Group
         h5py Group object to be converted to a dict.
     ignore_keys : iterable, optional
-        iterable keys within the group to not include in the returned dict.
+        keys within the group to not include in the returned dict.
 
     Returns
     -------
