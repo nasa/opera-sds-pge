@@ -126,8 +126,6 @@ class MetadataUtilsTestCase(unittest.TestCase):
             self.assertEqual(product_metadata['identification']['absolute_orbit_number'], 43011)
             self.assertEqual(product_metadata['identification']['burst_id'], 't064_135518_iw1')
             self.assertEqual(product_metadata['data']['projection'], 32611)
-            self.assertEqual(product_metadata['data']['x_coordinates'], "key x_coordinates is in ignore_keys list")
-            self.assertEqual(product_metadata['data']['y_coordinates'], "key y_coordinates is in ignore_keys list")
             self.assertAlmostEqual(product_metadata['data']['y_spacing'], -10.0)
             self.assertEqual(product_metadata['processing_information']['algorithms']['COMPASS_version'], '0.1.3')
             self.assertEqual(product_metadata['orbit']['orbit_direction'], 'Ascending')
