@@ -15,8 +15,10 @@ import unittest
 from unittest import skipIf
 
 from opera.util.metadata_utils import create_test_cslc_metadata_product
+from opera.util.metadata_utils import create_test_disp_metadata_product
 from opera.util.metadata_utils import create_test_rtc_metadata_product
 from opera.util.metadata_utils import get_cslc_s1_product_metadata
+from opera.util.metadata_utils import get_disp_s1_product_metadata
 from opera.util.metadata_utils import get_geographic_boundaries_from_mgrs_tile
 from opera.util.metadata_utils import get_rtc_s1_product_metadata
 
@@ -71,6 +73,27 @@ class MetadataUtilsTestCase(unittest.TestCase):
         self.assertAlmostEqual(lat_max, 63.16076767648831)
         self.assertAlmostEqual(lon_min, 178.82637550795243)
         self.assertAlmostEqual(lon_max, -178.93677941363356)
+
+
+    def test_get_disp_s1_product_metadata(self):
+        """Test retrieval of product metadata from HDF5 files"""
+        file_name = os.path.join(tempfile.gettempdir(), "test_disp_metadata_file.hdf5")
+        create_test_disp_metadata_product(file_name)
+
+        try:
+            product_output = get_disp_s1_product_metadata(file_name)
+
+            self.assertEqual(product_output['identification']['frame_id'], 123)
+            self.assertIn("input_file_group",
+                          product_output['identification']['pge_runconfig'])
+            self.assertIn("log_file",
+                          product_output['identification']['pge_runconfig'])
+            self.assertEqual(product_output['identification']['product_version'], "0.1")
+            self.assertEqual(product_output['identification']['software_version'], "0.1.2")
+
+        finally:
+            os.remove(file_name)
+
 
     def test_get_rtc_s1_product_metadata(self):
         """Test retrieval of product metadata from HDF5 files"""
