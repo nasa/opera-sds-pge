@@ -616,13 +616,8 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
         output_product_metadata['data']['width'] = len(output_product_metadata['data']['x_coordinates'])
         output_product_metadata['data']['length'] = len(output_product_metadata['data']['y_coordinates'])
 
-        # Remove some of the larger arrays from the metadata, so we don't use
-        # too much memory when caching the metadata for each burst
-        for key in ['azimuth_carrier_phase', 'flattening_phase',
-                    'layover_shadow_mask', 'local_incidence_angle',
-                    'los_east', 'los_north',
-                    'VV', 'VH', 'HH', 'HV',
-                    'x_coordinates', 'y_coordinates']:
+        # Remove larger datasets to save memory when caching metadata for each burst
+        for key in ['x_coordinates', 'y_coordinates']:
             array = output_product_metadata['data'].pop(key, None)
 
             if array is not None:
