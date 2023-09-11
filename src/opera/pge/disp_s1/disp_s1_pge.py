@@ -354,7 +354,7 @@ class DispS1Executor(DispS1PreProcessorMixin, DispS1PostProcessorMixin, PgeExecu
 
     """
 
-    NAME = "DISP"
+    NAME = "DISP-S1"
     """Short name for the DISP-S1 PGE"""
 
     LEVEL = "L3"
