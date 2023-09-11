@@ -136,7 +136,6 @@ class DispS1PgeTestCase(unittest.TestCase):
         # Kickoff execution of DISP-S1 PGE
         pge.run()
 
-
         # Check that the runconfig and logger were instantiated
         self.assertIsInstance(pge.runconfig, RunConfig)
         self.assertIsInstance(pge.logger, PgeLogger)
