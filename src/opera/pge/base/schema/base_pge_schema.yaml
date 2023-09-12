@@ -22,7 +22,7 @@ RunConfig:
 
       PrimaryExecutable:
         ProductIdentifier: str(required=False)
-        ProductVersion: num(required=False)
+        ProductVersion: any(str(), num(), required=False)
         CompositeReleaseID: str(required=False)
         ProgramPath: str(required=True)
         ProgramOptions: list(str(), min=0, required=False)

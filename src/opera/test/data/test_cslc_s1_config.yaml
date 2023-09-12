@@ -24,7 +24,7 @@ RunConfig:
 
             PrimaryExecutable:
                 ProductIdentifier: CSLC_S1
-                ProductVersion: 1.0
+                ProductVersion: "1.0"
                 ProgramPath: mkdir
                 ProgramOptions:
                     - '-p cslc_pge_test/output_dir/t064_135518_iw1/20220501/;'

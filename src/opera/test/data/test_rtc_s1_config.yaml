@@ -21,7 +21,7 @@ RunConfig:
 
             PrimaryExecutable:
                 ProductIdentifier: RTC_S1
-                ProductVersion: 1.0
+                ProductVersion: "1.0"
                 ProgramPath: mkdir
                 ProgramOptions:
                     - '-p rtc_s1_test/output_dir/t069_147170_iw1/;'

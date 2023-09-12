@@ -19,7 +19,7 @@ RunConfig:
         ScratchPath: dswx_s1_pge_test/scratch_dir
       PrimaryExecutable:
         ProductIdentifier: DSWX_S1
-        ProductVersion: 1.0
+        ProductVersion: "1.0"
         ProgramPath: /bin/echo
         ProgramOptions:
         - hello world > dswx_s1_pge_test/output_dir/OPERA_L3_DSWx-S1_T18MVA_20200702T231843Z_20230317T190549Z_v0.1_B01_WTR.tif;
