@@ -134,7 +134,9 @@ class LoggerTestCase(unittest.TestCase):
         self.assertEqual(line_fields[1].strip(), severity)
         self.assertEqual(line_fields[2].strip(), workflow)
         self.assertEqual(line_fields[3].strip(), module)
-        self.assertEqual(line_fields[4].strip(), 'ErrorCode.OVERALL_SUCCESS')
+        # Python 3.11 (used by some SAS containers) changes the semantics of
+        # string representation for an IntEnum, so cover both cases here
+        self.assertIn(line_fields[4].strip(), ('0', 'ErrorCode.OVERALL_SUCCESS'))
         self.assertEqual(line_fields[5].strip(), error_location)
         self.assertEqual(line_fields[6].strip(), f'"{description}"')
 
