@@ -6,7 +6,7 @@ Jinja2
 jsonschema
 mgrs
 PyYAML
-pylint==2.12.2
+pylint
 pytest
 pytest-cov
 yamale
