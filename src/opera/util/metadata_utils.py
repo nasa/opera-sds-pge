@@ -371,7 +371,6 @@ def create_test_rtc_metadata_product(file_path):
         annotationFiles = np.array([b'calibration-s1b-iw1-slc-vv-20180504t104508-20180504t104533-010770-013aee-004.xml',
                                     b'noise-s1b-iw1-slc-vv-20180504t104508-20180504t104533-010770-013aee-004.xml'])
         annotationFiles_dset = processingInformation_inputs_grp.create_dataset("annotationFiles", data=annotationFiles)
-        configFiles_dset = processingInformation_inputs_grp.create_dataset("configFiles", data=b'rtc_s1.yaml')
         l1SlcGranules = np.array([b'S1B_IW_SLC__1SDV_20180504T104507_20180504T104535_010770_013AEE_919F.zip'])
         l1SlcGranules_dset = processingInformation_inputs_grp.create_dataset("l1SlcGranules", data=l1SlcGranules)
         orbitFiles = np.array([b'S1B_OPER_AUX_POEORB_OPOD_20180524T110543_V20180503T225942_20180505T005942.EOF'])
@@ -400,15 +399,13 @@ def create_test_rtc_metadata_product(file_path):
             f"{S1_SLC_HDF5_PREFIX}/metadata/processingInformation/parameters")
         bistaticDelayCorrectionApplied_dset = processingInformation_parameters_grp.create_dataset(
             "bistaticDelayCorrectionApplied", data=True, dtype='bool')
-        dryTroposphericGeolocationCorrectionApplied_dset = processingInformation_parameters_grp.create_dataset(
-            "dryTroposphericGeolocationCorrectionApplied", data=True, dtype='bool')
+        staticTroposphericGeolocationCorrectionApplied_dset = processingInformation_parameters_grp.create_dataset(
+            "staticTroposphericGeolocationCorrectionApplied", data=True, dtype='bool')
         filteringApplied_dset = processingInformation_parameters_grp.create_dataset(
             "filteringApplied", data=False, dtype='bool')
         geocoding_grp = processingInformation_parameters_grp.create_group("geocoding")
         burstGeogridSnapX_dset = geocoding_grp.create_dataset("burstGeogridSnapX", data=30, dtype='int')
         burstGeogridSnapY_dset = geocoding_grp.create_dataset("burstGeogridSnapY", data=30, dtype='int')
-        ceosAnalysisReadyDataPixelCoordinateConvention_dset = geocoding_grp.create_dataset(
-            "ceosAnalysisReadyDataPixelCoordinateConvention", data=b'ULC')
         inputBackscatterNormalizationConvention_dset = processingInformation_parameters_grp.create_dataset(
             "inputBackscatterNormalizationConvention", data=b'beta0')
         noiseCorrectionApplied_dset = processingInformation_parameters_grp.create_dataset(
@@ -435,6 +432,7 @@ def create_test_rtc_metadata_product(file_path):
         boundingPolygon_dset = identification_grp.create_dataset(
             "boundingPolygon", data=b'POLYGON ((399015 3859970, 398975 3860000, ..., 399015 3859970))')
         burstID_dset = identification_grp.create_dataset("burstID", data=b't069_147170_iw1')
+        contactInformation_dset = identification_grp.create_dataset("contactInformation", data=b'operasds@jpl.nasa.gov')
         ceosAnalysisReadyDataDocumentIdentifier_dset = identification_grp.create_dataset("ceosAnalysisReadyDataDocumentIdentifier",
                                                                                          data=True, dtype='bool')
         ceosAnalysisReadyDataProductType_dset = identification_grp.create_dataset("ceosAnalysisReadyDataProductType",
@@ -450,13 +448,14 @@ def create_test_rtc_metadata_product(file_path):
         processingDateTime_dset = identification_grp.create_dataset("processingDateTime",
                                                                     data=np.string_('2023-03-23T20:32:18.962836Z'))
         processingType_dset = identification_grp.create_dataset("processingType", data=b'UNDEFINED')
-        productID_dset = identification_grp.create_dataset("productID", data=b'OPERA_L2_RTC-S1_T069-147169-IW3_v0.4')
         productLevel_dset = identification_grp.create_dataset("productLevel", data=b'L2')
         productSpecificationVersion_dset = identification_grp.create_dataset("productSpecificationVersion", data=b'0.1')
         productType_dset = identification_grp.create_dataset("productType", data=b'SLC')
         productVersion_dset = identification_grp.create_dataset("productVersion", data=b'1.0')
         project_dset = identification_grp.create_dataset("project", data=b'OPERA')
         radarBand_dset = identification_grp.create_dataset("radarBand", data=b'C')
+        staticLayersDataAccess_dset = identification_grp.create_dataset("staticLayersDataAccess", data=b'(NOT PROVIDED)')
+        subSwathID_dset = identification_grp.create_dataset("subSwathID", data=b'IW3')
         trackNumber_dset = identification_grp.create_dataset("trackNumber", data=147170, dtype='int64')
         zeroDopplerEndTime_dset = identification_grp.create_dataset("zeroDopplerEndTime",
                                                                     data=b'2018-05-04T10:45:11.501279')
