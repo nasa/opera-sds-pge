@@ -5,6 +5,7 @@ h5py
 Jinja2
 jsonschema
 mgrs
+numpy
 PyYAML
 pylint
 pytest

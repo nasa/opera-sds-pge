@@ -411,7 +411,6 @@ class DispS1PgeTestCase(unittest.TestCase):
         for f in files_to_remove:
             os.remove(f)
 
-
     def test_get_cslc_input_burst_id_set(self):
         """
         Set of tests to sanity check the burst ids associated with:
@@ -704,6 +703,47 @@ class DispS1PgeTestCase(unittest.TestCase):
                 "SAS compressed_slcs file 'compressed_slc_t087_185684_iw2_20180222_20180330.h5' exists but is empty",
                 log_contents)
             shutil.rmtree(pge.runconfig.output_product_path)
+
+        finally:
+            if exists(test_runconfig_path):
+                os.unlink(test_runconfig_path)
+
+    def test_disp_s1_product_metadata_collection(self):
+        """Test _collect_disp_s1_product_metadata() method"""
+        runconfig_path = join(self.data_dir, 'test_disp_s1_config.yaml')
+
+        pge = DispS1Executor(pge_name="DispS1PgeTest", runconfig_path=runconfig_path)
+        pge.run()
+
+        output_product_metadata = pge._collect_disp_s1_product_metadata()
+
+        self.assertIsInstance(output_product_metadata, dict)
+
+        # Test bad iso_template_path
+        test_runconfig_path = join(self.data_dir, 'invalid_disp_s1_runconfig.yaml')
+
+        with open(runconfig_path, 'r', encoding='utf-8') as infile:
+            runconfig_dict = yaml.safe_load(infile)
+
+        primary_executable = runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']
+        primary_executable['IsoTemplatePath'] = "pge/disp_s1/templates/OPERA_ISO_metadata_L3_DSWX_S1_template.xml"
+
+        with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+            yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+
+        try:
+            pge = DispS1Executor(pge_name="DispPgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn("Could not load ISO template", log_contents)
 
         finally:
             if exists(test_runconfig_path):

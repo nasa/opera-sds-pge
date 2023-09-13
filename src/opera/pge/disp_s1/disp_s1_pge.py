@@ -9,6 +9,7 @@ from Sentinel-1 A/B (S1-A/B) data.
 """
 
 import glob
+import os.path
 import re
 from collections import OrderedDict
 from os import listdir
@@ -21,6 +22,7 @@ from opera.util.error_codes import ErrorCode
 from opera.util.input_validation import validate_algorithm_parameters_config, validate_disp_inputs
 from opera.util.metadata_utils import get_disp_s1_product_metadata
 from opera.util.time import get_time_for_filename
+from opera.util.render_jinja2 import render_jinja2
 
 
 class DispS1PreProcessorMixin(PreProcessorMixin):
@@ -40,7 +42,7 @@ class DispS1PreProcessorMixin(PreProcessorMixin):
     def run_preprocessor(self, **kwargs):
         """
         Executes the pre-processing steps for DISP-S1 PGE initialization.
-        The DswxS1PreProcessorMixin version of this class performs all actions
+        The DispS1PreProcessorMixin version of this class performs all actions
         of the base PreProcessorMixin class, and adds an input validation step for
         the inputs defined within the RunConfig (TODO).
 
@@ -188,7 +190,7 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
             f"{self.PROJECT}_{self.LEVEL}_{self.NAME}"
         )
 
-        disp_metadata = self._collect_disp_s1_product_metadata(inter_filename)
+        disp_metadata = self._collect_disp_s1_product_metadata()
 
         # Mode: S1-A/B acquisition mode, should be fixed to "IW"
         mode = "IW"
@@ -298,15 +300,10 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
 
         return netcdf_filename
 
-    def _collect_disp_s1_product_metadata(self, netcdf_product):
+    def _collect_disp_s1_product_metadata(self):
         """
-        Gathers the available metadata from an output DISP-S1 product for
+        Gathers the available metadata from a sample output DISP-S1 product for
         use in filling out the ISO metadata template for the DISP-S1 PGE.
-
-        Parameters
-        ----------
-        netcdf_product : str
-            Path to the netcdf product to collect metadata from.
 
         Returns
         -------
@@ -315,8 +312,22 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
             for use with the ISO metadata Jinja2 template.
 
         """
+        # Find a single representative output DSWx-HLS product, they should all
+        # have identical sets of metadata
+        output_products = self.runconfig.get_output_product_filenames()
+        representative_product = None
+
+        for output_product in output_products:
+            if basename(output_product).endswith(".nc"):
+                representative_product = output_product
+                break
+        else:
+            msg = (f"Could not find sample output product to derive metadata from "
+                   f"within {self.runconfig.output_product_path}")
+            self.logger.critical(self.name, ErrorCode.ISO_METADATA_RENDER_FAILED, msg)
+
         # Extract all metadata assigned by the SAS at product creation time
-        output_product_metadata = get_disp_s1_product_metadata(netcdf_product)
+        output_product_metadata = get_disp_s1_product_metadata(representative_product)
 
         # "identification/reference_datetime" is missing from
         # the current delivery. We should assign a placeholder datetime in
@@ -330,13 +341,82 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
 
         return output_product_metadata
 
+    def _create_custom_metadata(self):
+        """
+        Creates the "custom data" dictionary used with the ISO metadata rendering.
+
+        Custom data contains all metadata information needed for the ISO template
+        that is not found within any of the other metadata sources (such as the
+        RunConfig, output product(s), or catalog metadata).
+
+        Returns
+        -------
+        custom_metadata : dict
+            Dictionary containing the custom metadata as expected by the ISO
+            metadata Jinja2 template.
+
+        """
+        custom_metadata = {
+            'ISO_OPERA_FilePackageName': self._core_filename(),
+            'ISO_OPERA_ProducerGranuleId': self._core_filename(),
+            'MetadataProviderAction': "creation",
+            'GranuleFilename': self._core_filename(),
+            'ISO_OPERA_ProjectKeywords': ['OPERA', 'JPL', 'DSWx', 'Dynamic', 'Surface', 'Water', 'Extent'],
+            'ISO_OPERA_PlatformKeywords': ['S1'],
+            'ISO_OPERA_InstrumentKeywords': ['Sentinel 1 A/B']
+        }
+
+        return custom_metadata
+
+    def _create_iso_metadata(self):
+        """
+        Creates a rendered version of the ISO metadata template for DISP-S1
+        output products using metadata sourced from the following locations:
+
+            * RunConfig (in dictionary form)
+            * Output products (extracted from a sample product)
+            * Catalog metadata
+            * "Custom" metadata (all metadata not found anywhere else)
+
+        Returns
+        -------
+        rendered_template : str
+            The ISO metadata template for DISP-S1 filled in with values from
+            the sourced metadata dictionaries.
+
+        """
+        runconfig_dict = self.runconfig.asdict()
+
+        product_output_dict = self._collect_disp_s1_product_metadata()
+
+        catalog_metadata_dict = self._create_catalog_metadata().asdict()
+
+        custom_data_dict = self._create_custom_metadata()
+
+        iso_metadata = {
+            'run_config': runconfig_dict,
+            'product_output': product_output_dict,
+            'catalog_metadata': catalog_metadata_dict,
+            'custom_data': custom_data_dict
+        }
+
+        iso_template_path = os.path.abspath(self.runconfig.iso_template_path)
+
+        if not os.path.exists(iso_template_path):
+            msg = f"Could not load ISO template {iso_template_path}, file does not exist"
+            self.logger.critical(self.name, ErrorCode.ISO_METADATA_TEMPLATE_NOT_FOUND, msg)
+
+        rendered_template = render_jinja2(iso_template_path, iso_metadata, self.logger)
+
+        return rendered_template
+
     def run_postprocessor(self, **kwargs):
         """
         Executes the post-processing steps for the DISP-S1 PGE.
         The DispS1PostProcessorMixin version of this method performs the same
         steps as the base PostProcessorMixin, but inserts a step to perform
         output product validation prior to staging and renaming of the output
-        files (TODO).
+        files.
 
         Parameters
         ----------
