@@ -75,6 +75,7 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
     _cached_core_filename = None
     _burst_metadata_cache = {}
     _burst_filename_cache = {}
+    #_static_layer_metadata_cache = {}
 
     def _validate_output(self):
         """
@@ -351,6 +352,15 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
             by this PGE.
 
         """
+        # Cache the static layer GeoTIFF metadata for use later with the ISO XML
+        #static_metadata = get_geotiff_metadata(inter_filename)
+
+        #burst_id = static_metadata['BURST_ID']
+        #burst_id = burst_id.upper().replace('_', '-')
+
+        #if burst_id not in self._static_layer_metadata_cache:
+        #    self._static_layer_metadata_cache[burst_id] = static_metadata
+
         filename, ext = os.path.splitext(basename(inter_filename))
 
         # The name of the static layer should always follow the product version
@@ -709,6 +719,20 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
                                                        ['xCoordinates'])
         output_product_metadata['data']['length'] = len(output_product_metadata['data']
                                                         ['yCoordinates'])
+
+        product_type = self.runconfig.sas_config['runconfig']['groups']['primary_executable']['product_type']
+
+        # If creating ISO metadata for a static layer product, we need to
+        # formulate the bounding box, rather than the bounding polygon
+        if product_type == "RTC_S1_STATIC":
+            bounding_box = output_product_metadata['identification']['boundingBox']
+
+            output_product_metadata['boundingBox'] = {
+                'xmin': bounding_box[0],
+                'ymin': bounding_box[1],
+                'xmax': bounding_box[2],
+                'ymax': bounding_box[3]
+            }
 
         return output_product_metadata
 
