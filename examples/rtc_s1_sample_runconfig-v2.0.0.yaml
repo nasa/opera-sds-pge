@@ -1,4 +1,4 @@
-# Sample RunConfig for use with the RTC-S1 PGE v2.0.0-rc.2.1
+# Sample RunConfig for use with the RTC-S1 PGE v2.0.0
 # This RunConfig should require minimal changes in order to be used with the
 # OPERA PCM.
 
@@ -35,7 +35,7 @@ RunConfig:
                     dem_file: /home/rtc_user/input_dir/dem.tif
 
                     # Burst database, must be an .sqlite3 file
-                    burst_database_file: /home/rtc_user/input_dir/burst_db_20230713-bbox-only.sqlite
+                    burst_database_file: /home/rtc_user/input_dir/burst_db_0.2.0_230831-bbox-only.sqlite
 
             ProductPathGroup:
                 # Path to where output products should be stored
@@ -58,7 +58,7 @@ RunConfig:
                 ProductIdentifier: RTC_S1
 
                 # Product version specific to output products
-                ProductVersion: 1.0
+                ProductVersion: "1.0"
 
                 # Path to the executable to run, path must be reachable from
                 # within the Docker container (i.e. findable with a "which" command)
@@ -96,7 +96,7 @@ RunConfig:
                 # RTC static layer product(s) should be considered valid.
                 # This field must be provided for RTC-S1 jobs when static layer
                 # generation is enabled (see below), and must be of the form YYYYMMDD
-                DataValidityStartDate: 20140101
+                DataValidityStartDate: 20140403
 
             QAExecutable:
                 # Set to True to enable execution of an additional "Quality Assurance"
@@ -140,19 +140,21 @@ RunConfig:
                             - /home/rtc_user/input_dir/S1B_OPER_AUX_POEORB_OPOD_20180524T110543_V20180503T225942_20180505T005942.EOF
                         # Burst IDs to process. Leave empty to process all bursts.
                         burst_id:
+                        # Location from where the source data can be retrieved (URL or DOI)
+                        source_data_access: "https://search.asf.alaska.edu/#/?dataset=SENTINEL-1&productTypes=SLC"
 
                     # This section should match the DynamicAncillaryFilesGroup of the PGE RunConfig
                     dynamic_ancillary_file_group:
                         # Digital elevation model
                         dem_file: /home/rtc_user/input_dir/dem.tif
-                        dem_file_description: Digital Elevation Model (DEM) for the NASA OPERA project (v1.0) based on the Copernicus DEM 30-m and Copernicus 90-m referenced to the WGS84 ellipsoid
+                        dem_file_description: "Digital Elevation Model (DEM) for the NASA OPERA project version 1.1 (v1.1) based on the Copernicus DEM 30-m and Copernicus 90-m referenced to the WGS84 ellipsoid"
 
                     static_ancillary_file_group:
                         # burst database sqlite file
-                        burst_database_file: /home/rtc_user/input_dir/burst_db_20230713-bbox-only.sqlite
+                        burst_database_file: /home/rtc_user/input_dir/burst_db_0.2.0_230831-bbox-only.sqlite
 
                     product_group:
-                        product_version: 1.0
+                        product_version: "1.0"
 
                         # This should match the path used for OutputProductPath
                         product_path: /home/rtc_user/output_dir
@@ -163,16 +165,14 @@ RunConfig:
                         # This should match the path used for OutputProductPath
                         output_dir: /home/rtc_user/output_dir
 
-                        # These field determines the intermediate file name used
-                        # by the SAS for its output products. These products will
-                        # be renamed by the PGE to match the OPERA file name conventions.
-                        product_id: OPERA_L2_RTC-S1_{burst_id}
-
                         # Validity start date for RTC-S1-STATIC products in the format YYYYMMDD,
                         # This field must be provided for RTC-S1 jobs when static layer
                         # generation is enabled, and should match the value assigned to
                         # DataValidityStartDate above.
-                        rtc_s1_static_validity_start_date: 20140101
+                        rtc_s1_static_validity_start_date: 20140403
+
+                        # Location from where the output product can be retrieved (URL or DOI)
+                        product_data_access: "https://search.asf.alaska.edu/#/?dataset=OPERA-S1&productTypes=RTC"
 
                         # RTC-S1 imagery
                         save_bursts: True
@@ -217,7 +217,8 @@ RunConfig:
 
                         # OPTIONAL - Mechanism to specify output posting and DEM
                         geocoding:
-                            # OPTIONAL - Choices: "single_block", "geogrid", "geogrid_and_radargrid", and "auto" (default)
+                            # OPTIONAL - Choices: "single_block", "geogrid", "geogrid_and_radargrid",
+                            # and "auto" (default)
                             memory_mode: auto
 
                             bursts_geogrid:
@@ -227,6 +228,13 @@ RunConfig:
                                 bottom_right:
                                     x:
                                     y:
+
+                            # Fields to populate the products' metadata required by
+                            # CEOS Analysis Ready Data specifications
+                            estimated_geometric_accuracy_bias_x: 0.0
+                            estimated_geometric_accuracy_bias_y: 0.0
+                            estimated_geometric_accuracy_stddev_x: 0.0
+                            estimated_geometric_accuracy_stddev_y: 0.0
 
                         mosaicking:
                             # Mosaic mode - Choices: "average", "first", "bursts_center" (default)
