@@ -78,6 +78,27 @@ class MockGdal:  # pragma: no cover
             return deepcopy(self.dummy_metadata)
 
     # pylint: disable=all
+    class MockRtcS1GdalDataset:
+        """
+        Mock class for gdal.Dataset objects, as returned from an Open call.
+        For use when mocking metadata from RTC-S1 static layer GeoTIFF products
+        """
+        def __init__(self):
+            self.dummy_metadata = {
+                'BOUNDING_BOX': '[200700.0, 9391650.0, 293730.0, 9440880.0]',
+                'BOUNDING_BOX_EPSG_CODE': '32718',
+                'BOUNDING_BOX_PIXEL_COORDINATE_CONVENTION': 'UPPER LEFT CORNER (ULC)',
+                'BURST_ID': "T069-147170-IW1",
+            }
+
+        def GetMetadata(self):
+            """
+            Returns a subset of dummy metadata expected by the PGE.
+            This function should be updated as needed for requisite metadata fields.
+            """
+            return deepcopy(self.dummy_metadata)
+
+    # pylint: disable=all
     class MockDSWxS1GdalDataset:
         """
         Mock class for gdal.Dataset objects, as returned from an Open call.
@@ -143,6 +164,8 @@ class MockGdal:  # pragma: no cover
 
         if 'dswx_s1' in file_name or 'dswx-s1' in file_name:
             return MockGdal.MockDSWxS1GdalDataset()
+        elif 'rtc_s1' in file_name or 'rtc-s1' in file_name:
+            return MockGdal.MockRtcS1GdalDataset()
         else:
             return MockGdal.MockDSWxHLSGdalDataset()
 
