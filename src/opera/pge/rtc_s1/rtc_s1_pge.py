@@ -929,7 +929,7 @@ class RtcS1Executor(RtcS1PreProcessorMixin, RtcS1PostProcessorMixin, PgeExecutor
     LEVEL = "L2"
     """Processing Level for RTC-S1 Products"""
 
-    PGE_VERSION = "2.0.0-rc.2.1"
+    PGE_VERSION = "2.0.0"
     """Version of the PGE (overrides default from base_pge)"""
 
     SAS_VERSION = "1.0.0"  # Final release https://github.com/opera-adt/RTC/releases/tag/v1.0.0
