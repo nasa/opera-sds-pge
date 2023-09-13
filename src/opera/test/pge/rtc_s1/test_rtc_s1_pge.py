@@ -186,7 +186,7 @@ class RtcS1PgeTestCase(unittest.TestCase):
 
         output_files = glob.glob(join(pge.runconfig.output_product_path, f"{core_filename}*.tif"))
 
-        self.assertEqual(len(output_files), 6)
+        self.assertEqual(len(output_files), 7)
 
         output_files = list(map(os.path.basename, output_files))
 
@@ -196,28 +196,7 @@ class RtcS1PgeTestCase(unittest.TestCase):
         self.assertIn(f"{core_filename}_HV.tif", output_files)
         self.assertIn(f"{core_filename}_VV+VH.tif", output_files)
         self.assertIn(f"{core_filename}_HH+HV.tif", output_files)
-
-        # Check that the static layer files had conventions applied
-        static_output_files = glob.glob(join(pge.runconfig.output_product_path, "*STATIC*.*"))
-
-        self.assertEqual(len(static_output_files), 3)
-
-        static_output_files = list(map(os.path.basename, static_output_files))
-
-        expected_version = 'v1.0'
-
-        core_static_filename = os.path.basename(static_output_files[0]).split(expected_version)[0]
-
-        self.assertIn(f"{core_static_filename}{expected_version}_number_of_looks.tif", static_output_files)
-        self.assertIn(f"{core_static_filename}{expected_version}_mask.tif", static_output_files)
-        self.assertIn(f"{core_static_filename}{expected_version}_BROWSE.png", static_output_files)
-
-        # Ensure the DataValidityStartDate was used in the filenames for the
-        # static layer products
-        expected_data_validity_start_date = pge.runconfig.data_validity_start_date
-
-        for static_output_file in static_output_files:
-            self.assertIn(str(expected_data_validity_start_date), static_output_file)
+        self.assertIn(f"{core_filename}_mask.tif", output_files)
 
         # Finally, ensure file name was applied to the png browse image
         output_files = glob.glob(join(pge.runconfig.output_product_path, f"{core_filename}*.png"))
@@ -228,12 +207,79 @@ class RtcS1PgeTestCase(unittest.TestCase):
 
         self.assertIn(f"{core_filename}_BROWSE.png", output_files)
 
+    def test_static_layer_filename_application(self):
+        """Test the filename convention applied to RTC static layer output products"""
+        runconfig_path = join(self.data_dir, 'test_rtc_s1_static_config.yaml')
+
+        pge = RtcS1Executor(pge_name="RtcPgeTest", runconfig_path=runconfig_path)
+
+        pge.run()
+
+        # Check that the static layer files had conventions applied
+        static_output_files = glob.glob(join(pge.runconfig.output_product_path, "*STATIC*.*"))
+
+        self.assertEqual(len(static_output_files), 7)
+
+        static_output_files = list(map(os.path.basename, static_output_files))
+
+        expected_version = 'v1.0'
+
+        core_static_filename = os.path.basename(static_output_files[0]).split(expected_version)[0]
+
+        self.assertIn(f"{core_static_filename}{expected_version}_incidence_angle.tif", static_output_files)
+        self.assertIn(f"{core_static_filename}{expected_version}_local_incidence_angle.tif", static_output_files)
+        self.assertIn(f"{core_static_filename}{expected_version}_number_of_looks.tif", static_output_files)
+        self.assertIn(f"{core_static_filename}{expected_version}_rtc_anf_gamma0_to_beta0.tif", static_output_files)
+        self.assertIn(f"{core_static_filename}{expected_version}_rtc_anf_gamma0_to_sigma0.tif", static_output_files)
+        self.assertIn(f"{core_static_filename}{expected_version}_mask.tif", static_output_files)
+        self.assertIn(f"{core_static_filename}{expected_version}_BROWSE.png", static_output_files)
+
+        # Ensure the DataValidityStartDate was used in the filenames for the
+        # static layer products
+        expected_data_validity_start_date = pge.runconfig.data_validity_start_date
+
+        for static_output_file in static_output_files:
+            self.assertIn(str(expected_data_validity_start_date), static_output_file)
+
     def test_iso_metadata_creation(self):
         """
         Test that the ISO metadata template is fully filled out when realistic
         RTC metadata is available
         """
         runconfig_path = join(self.data_dir, 'test_rtc_s1_config.yaml')
+
+        pge = RtcS1Executor(pge_name="RtcS1PgeTest", runconfig_path=runconfig_path)
+
+        # Run only the pre-processor steps to ingest the runconfig and set up
+        # directories
+        pge.run_preprocessor()
+
+        output_product_dir = join(os.curdir, "rtc_s1_test/output_dir/t069_147170_iw1")
+
+        os.makedirs(output_product_dir, exist_ok=True)
+
+        # Create a dummy RTC product
+        rtc_metadata_file_path = join(output_product_dir, "rtc_product_v1.0.h5")
+
+        create_test_rtc_metadata_product(rtc_metadata_file_path)
+
+        rtc_metadata = pge._collect_rtc_product_metadata(rtc_metadata_file_path)
+
+        # Initialize the core filename for the catalog metadata generation step
+        pge._core_filename(inter_filename=rtc_metadata_file_path)
+
+        # Render ISO metadata using the sample metadata
+        iso_metadata = pge._create_iso_metadata(rtc_metadata)
+
+        # Rendered template should not have any missing placeholders
+        self.assertNotIn('!Not found!', iso_metadata)
+
+    def test_static_layer_iso_metadata_creation(self):
+        """
+        Test that the ISO metadata template is fully filled out when realistic
+        RTC metadata is available and the workflow is set to RTC_S1_STATIC
+        """
+        runconfig_path = join(self.data_dir, 'test_rtc_s1_static_config.yaml')
 
         pge = RtcS1Executor(pge_name="RtcS1PgeTest", runconfig_path=runconfig_path)
 
@@ -421,8 +467,6 @@ class RtcS1PgeTestCase(unittest.TestCase):
             runconfig_dict = yaml.safe_load(infile)
 
         file_name = 'rtc_product_empty.nc'
-        # output_dir = join(self.working_dir.name, 'rtc_s1_test/output_dir/t069_147170_iw2')
-        # os.makedirs(output_dir, exist_ok=True)
 
         primary_executable_group = runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']
 
