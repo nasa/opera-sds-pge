@@ -312,7 +312,7 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
             for use with the ISO metadata Jinja2 template.
 
         """
-        # Find a single representative output DSWx-HLS product, they should all
+        # Find a single representative output DISP-S1 product, they should all
         # have identical sets of metadata
         output_products = self.runconfig.get_output_product_filenames()
         representative_product = None
@@ -361,7 +361,7 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
             'ISO_OPERA_ProducerGranuleId': self._core_filename(),
             'MetadataProviderAction': "creation",
             'GranuleFilename': self._core_filename(),
-            'ISO_OPERA_ProjectKeywords': ['OPERA', 'JPL', 'DSWx', 'Dynamic', 'Surface', 'Water', 'Extent'],
+            'ISO_OPERA_ProjectKeywords': ['OPERA', 'JPL', 'DISP', 'Displacement', 'Surface', 'Land', 'Global'],
             'ISO_OPERA_PlatformKeywords': ['S1'],
             'ISO_OPERA_InstrumentKeywords': ['Sentinel 1 A/B']
         }
