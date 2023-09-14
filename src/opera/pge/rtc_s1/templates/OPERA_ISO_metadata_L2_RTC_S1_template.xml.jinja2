@@ -495,10 +495,10 @@
                     {%- if run_config.Groups.SAS.runconfig.groups.primary_executable.product_type == 'RTC_S1_STATIC' %}
                     <gmd:geographicElement>
                         <gmd:EX_GeographicBoundingBox>
-                            <gmd:westBoundLongitude>{{ product_output.boundingBox.xmin }}</gmd:westBoundLongitude>
-                            <gmd:eastBoundLongitude>{{ product_output.boundingBox.xmax }}</gmd:eastBoundLongitude>
-                            <gmd:southBoundLatitude>{{ product_output.boundingBox.ymin }}</gmd:southBoundLatitude>
-                            <gmd:northBoundLatitude>{{ product_output.boundingBox.ymax }}</gmd:northBoundLatitude>
+                            <gmd:westBoundLongitude>{{ product_output.staticBoundingBox.lonMin }}</gmd:westBoundLongitude>
+                            <gmd:eastBoundLongitude>{{ product_output.staticBoundingBox.lonMax }}</gmd:eastBoundLongitude>
+                            <gmd:southBoundLatitude>{{ product_output.staticBoundingBox.latMin }}</gmd:southBoundLatitude>
+                            <gmd:northBoundLatitude>{{ product_output.staticBoundingBox.latMax }}</gmd:northBoundLatitude>
                         </gmd:EX_GeographicBoundingBox>
                     </gmd:geographicElement>
                     {%- else %}

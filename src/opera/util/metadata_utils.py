@@ -114,6 +114,54 @@ def get_sensor_from_spacecraft_name(spacecraft_name):
     except KeyError:
         raise RuntimeError(f"Unknown spacecraft name '{spacecraft_name}'")
 
+def translate_utm_bbox_to_lat_lon(bbox, epsg_code):
+    """
+    Translates a bounding box defined in UTM coordinates to Lat/Lon.
+
+    Parameters
+    ----------
+    bbox : iterable
+        The bounding box to transform. Expected order is xmin, ymin, xmax, ymax.
+    epsg_code : int
+        The EPSG code associated with the bounding box UTM coordinate convention.
+
+    Raises
+    ------
+    RuntimeError
+        If the coordinate transformation fails for any reason.
+
+    Returns
+    -------
+    lat_min : float
+        minimum latitude of bounding box
+    lat_max : float
+        maximum latitude of bounding box
+    lon_min : float
+        minimum longitude of bounding box
+    lon_max : float
+        maximum longitude of bounding box
+
+    """
+    # Set up the coordinate systems and point transformation objects
+    utm_coordinate_system = osr.SpatialReference()
+    result = utm_coordinate_system.ImportFromEPSG(epsg_code)
+
+    if result:
+        raise RuntimeError(f'Unrecognized EPSG code: {epsg_code}')
+
+    wgs84_coordinate_system = osr.SpatialReference()
+    wgs84_coordinate_system.SetWellKnownGeogCS("WGS84")
+
+    transformation = osr.CoordinateTransformation(utm_coordinate_system, wgs84_coordinate_system)
+
+    # Transform the min/max points from UTM to Lat/Lon
+    elevation = 0
+    xmin, ymin, xmax, ymax = bbox
+
+    lat_min, lon_min, _ = transformation.TransformPoint(xmin, ymin, elevation)
+    lat_max, lon_max, _ = transformation.TransformPoint(xmax, ymax, elevation)
+
+    return lat_min, lat_max, lon_min, lon_max
 
 def get_geographic_boundaries_from_mgrs_tile(mgrs_tile_name):
     """
@@ -357,7 +405,7 @@ def create_test_rtc_metadata_product(file_path):
         xCoordinates_dset = data_grp.create_dataset("xCoordinates", data=np.zeros((10,)), dtype='float64')
         yCoordinateSpacing_dset = data_grp.create_dataset("yCoordinateSpacing", data=30.0, dtype='float64')
         yCoordinates_dset = data_grp.create_dataset("yCoordinates", data=np.zeros((10,)), dtype='float64')
-        projection_dset = data_grp.create_dataset("projection", data=b'1234')
+        projection_dset = data_grp.create_dataset("projection", data=32718, dtype='int')
         listOfPolarizations_dset = data_grp.create_dataset("listOfPolarizations", data=np.array([b'VV', b'VH']))
 
         orbit_grp = outfile.create_group(f"{S1_SLC_HDF5_PREFIX}/metadata/orbit")
@@ -428,7 +476,7 @@ def create_test_rtc_metadata_product(file_path):
         acquisitionMode_dset = identification_grp.create_dataset("acquisitionMode",
                                                                  data=np.string_('Interferometric Wide (IW)'))
         beamID_dset = identification_grp.create_dataset("beamID", data=np.string_('iw1'))
-        boundingBox_dset = identification_grp.create_dataset("boundingBox", data=b'[ 200700. 9391650.  293730. 9440880.]')
+        boundingBox_dset = identification_grp.create_dataset("boundingBox", data=np.array([200700.0, 9391650.0,  293730.0, 9440880.0]))
         boundingPolygon_dset = identification_grp.create_dataset(
             "boundingPolygon", data=b'POLYGON ((399015 3859970, 398975 3860000, ..., 399015 3859970))')
         burstID_dset = identification_grp.create_dataset("burstID", data=b't069_147170_iw1')

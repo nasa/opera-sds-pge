@@ -26,6 +26,7 @@ from opera.util.error_codes import ErrorCode
 from opera.util.input_validation import validate_slc_s1_inputs
 from opera.util.metadata_utils import get_rtc_s1_product_metadata
 from opera.util.metadata_utils import get_sensor_from_spacecraft_name
+from opera.util.metadata_utils import translate_utm_bbox_to_lat_lon
 from opera.util.render_jinja2 import render_jinja2
 from opera.util.time import get_time_for_filename
 
@@ -721,12 +722,15 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
         # formulate the bounding box, rather than the bounding polygon
         if product_type == "RTC_S1_STATIC":
             bounding_box = output_product_metadata['identification']['boundingBox']
+            epsg_code = int(output_product_metadata['data']['projection'])
 
-            output_product_metadata['boundingBox'] = {
-                'xmin': bounding_box[0],
-                'ymin': bounding_box[1],
-                'xmax': bounding_box[2],
-                'ymax': bounding_box[3]
+            lat_min, lat_max, lon_min, lon_max = translate_utm_bbox_to_lat_lon(bounding_box, epsg_code)
+
+            output_product_metadata['staticBoundingBox'] = {
+                'lonMin': lon_min,
+                'latMin': lat_min,
+                'lonMax': lon_max,
+                'latMax': lat_max
             }
 
         # We also need to assign the URL for static layer data access for
