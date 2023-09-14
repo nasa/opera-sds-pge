@@ -150,6 +150,28 @@ class RtcS1PgeTestCase(unittest.TestCase):
 
         self.assertIn(f"RTC-S1 invoked with RunConfig {expected_sas_config_file}", log_contents)
 
+    def test_static_layer_data_access_url_injection(self):
+        """Test injection of static data access URL into the output HDF5 product(s)"""
+        runconfig_path = join(self.data_dir, 'test_rtc_s1_config.yaml')
+
+        pge = RtcS1Executor(pge_name="RtcPgeTest", runconfig_path=runconfig_path)
+
+        pge.run()
+
+        # Grab the metadata generated from the PGE run
+        output_files = glob.glob(join(pge.runconfig.output_product_path, "*.h5"))
+
+        self.assertEqual(len(output_files), 1)
+
+        output_file = output_files[0]
+
+        rtc_metadata = get_rtc_s1_product_metadata(output_file)
+
+        expected_url = 'https://search.asf.alaska.edu/#/?dataset=OPERA-S1&productTypes=RTC-STATIC&burstID=T069-147170-IW1&productVersion=1.0'
+
+        self.assertIn('staticLayersDataAccess', rtc_metadata['identification'])
+        self.assertEqual(rtc_metadata['identification']['staticLayersDataAccess'], expected_url)
+
     def test_filename_application(self):
         """Test the filename convention applied to RTC output products"""
         runconfig_path = join(self.data_dir, 'test_rtc_s1_config.yaml')
@@ -565,6 +587,8 @@ class RtcS1PgeTestCase(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             pge._iso_metadata_filename("bad_burst")
 
+    @patch.object(opera.util.img_utils, "gdal_edit", mock_gdal_edit)
+    @patch.object(opera.util.img_utils, "save_as_cog", mock_save_as_cog)
     def test_bad_iso_metadata_template(self):
         """Verify code when the QA application is enabled"""
         runconfig_path = join(self.data_dir, 'test_rtc_s1_config.yaml')
