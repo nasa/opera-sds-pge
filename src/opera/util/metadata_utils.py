@@ -218,18 +218,18 @@ def get_geographic_boundaries_from_mgrs_tile(mgrs_tile_name):
             # side of the tile.
             # Points at the west, i.e, where offset_x_multiplier == 0
             # may update `lon_min`
-            if (offset_x_multiplier == 0 and
-                    (lon_min is None or
-                     (abs(lon_min - lon) < 180 and lon_min > lon) or
-                     (lon > 100 and lon_min < -100))):
+            if (offset_x_multiplier == 0
+                    and (lon_min is None
+                         or (abs(lon_min - lon) < 180 and lon_min > lon)
+                         or (lon > 100 and lon_min < -100))):
                 lon_min = lon
 
             # Points at the east, i.e, where offset_x_multiplier == 1
             # may update `lon_max`
-            if (offset_x_multiplier == 1 and
-                    (lon_max is None or
-                     (abs(lon_max - lon) < 180 and lon_max < lon) or
-                     (lon < -100 and lon_max > 100))):
+            if (offset_x_multiplier == 1
+                    and (lon_max is None
+                         or (abs(lon_max - lon) < 180 and lon_max < lon)
+                         or (lon < -100 and lon_max > 100))):
                 lon_max = lon
 
     return lat_min, lat_max, lon_min, lon_max
@@ -384,15 +384,18 @@ def create_test_rtc_metadata_product(file_path):
         demInterpolation_dset = processingInformation_algorithms_grp.create_dataset("demInterpolation",
                                                                                     data=b'biquintic')
         geocoding_dset = processingInformation_algorithms_grp.create_dataset("geocoding", data=b'area_projection')
-        geocodingAlgoRef_dset = processingInformation_algorithms_grp.create_dataset("geocodingAlgorithmReference",
-                                                                                    data=b'Geocoding Algorithm Reference')
+        geocodingAlgoRef_dset = \
+            processingInformation_algorithms_grp.create_dataset("geocodingAlgorithmReference",
+                                                                data=b'Geocoding Algorithm Reference')
         isceVersion_dset = processingInformation_algorithms_grp.create_dataset("isce3Version", data=b'0.13.0')
-        noiseCorrectionAlgoRef_dset = processingInformation_algorithms_grp.create_dataset("noiseCorrectionAlgorithmReference",
-                                                                                          data=b'Noise Correction Algorithm Reference')
+        noiseCorrectionAlgoRef_dset = \
+            processingInformation_algorithms_grp.create_dataset("noiseCorrectionAlgorithmReference",
+                                                                data=b'Noise Correction Algorithm Reference')
         radiometricTerrainCorrection_dset = processingInformation_algorithms_grp.create_dataset(
             "radiometricTerrainCorrection", data=b'area_projection')
         radiometricTerrainCorrectionAlgoRef_dset = processingInformation_algorithms_grp.create_dataset(
-            "radiometricTerrainCorrectionAlgorithmReference", data=b'Radiometric Terrain Correction Algorithm Reference')
+            "radiometricTerrainCorrectionAlgorithmReference",
+            data=b'Radiometric Terrain Correction Algorithm Reference')
         s1ReaderVersion_dset = processingInformation_algorithms_grp.create_dataset("s1ReaderVersion", data=b'1.2.3')
         softwareVersion_dset = processingInformation_algorithms_grp.create_dataset("softwareVersion", data=b'0.4')
 
@@ -431,12 +434,13 @@ def create_test_rtc_metadata_product(file_path):
         acquisitionMode_dset = identification_grp.create_dataset("acquisitionMode",
                                                                  data=np.string_('Interferometric Wide (IW)'))
         beamID_dset = identification_grp.create_dataset("beamID", data=np.string_('iw1'))
-        boundingBox_dset = identification_grp.create_dataset("boundingBox", data=b'[ 200700. 9391650.  293730. 9440880.]')
+        boundingBox_dset = identification_grp.create_dataset("boundingBox",
+                                                             data=b'[ 200700. 9391650.  293730. 9440880.]')
         boundingPolygon_dset = identification_grp.create_dataset(
             "boundingPolygon", data=b'POLYGON ((399015 3859970, 398975 3860000, ..., 399015 3859970))')
         burstID_dset = identification_grp.create_dataset("burstID", data=b't069_147170_iw1')
-        ceosAnalysisReadyDataDocumentIdentifier_dset = identification_grp.create_dataset("ceosAnalysisReadyDataDocumentIdentifier",
-                                                                                         data=True, dtype='bool')
+        ceosAnalysisReadyDataDocumentIdentifier_dset = \
+            identification_grp.create_dataset("ceosAnalysisReadyDataDocumentIdentifier", data=True, dtype='bool')
         ceosAnalysisReadyDataProductType_dset = identification_grp.create_dataset("ceosAnalysisReadyDataProductType",
                                                                                   data=b'Normalized Radar Backscatter')
         dataAccess_dset = identification_grp.create_dataset("dataAccess", data=b'(NOT PROVIDED)')
@@ -554,9 +558,10 @@ def create_test_cslc_metadata_product(file_path):
         ISCE3_version_dset = algorithms_grp.create_dataset("ISCE3_version", data=np.string_("0.9.0"))
         dem_interpolation_dset = algorithms_grp.create_dataset("dem_interpolation", data=np.string_("biquintic"))
         complex_data_geocoding_interpolator_dset = algorithms_grp.create_dataset("complex_data_geocoding_interpolator",
-                                                                                  data=np.string_("sinc interpolation"))
-        float_data_geocoding_interpolator_dset = algorithms_grp.create_dataset("float_data_geocoding_interpolator",
-                                                                               data=np.string_("biquintic interpolation"))
+                                                                                 data=np.string_("sinc interpolation"))
+        float_data_geocoding_interpolator_dset = \
+            algorithms_grp.create_dataset("float_data_geocoding_interpolator",
+                                          data=np.string_("biquintic interpolation"))
         s1_reader_version_dset = algorithms_grp.create_dataset("s1_reader_version", data=np.string_("0.2.0"))
 
         inputs_grp = outfile.create_group(f"{S1_SLC_HDF5_PREFIX}/metadata/processing_information/inputs")
@@ -574,21 +579,27 @@ def create_test_cslc_metadata_product(file_path):
             f"{S1_SLC_HDF5_PREFIX}/metadata/processing_information/inputs/burst_location_parameters")
         burst_index_dset = burst_location_parameters_grp.create_dataset("burst_index", data=0, dtype='int64')
         first_valid_line_dset = burst_location_parameters_grp.create_dataset("first_valid_line", data=0, dtype='int64')
-        first_valid_sample_dset = burst_location_parameters_grp.create_dataset("first_valid_sample", data=63, dtype='int64')
+        first_valid_sample_dset = burst_location_parameters_grp.create_dataset("first_valid_sample", data=63,
+                                                                               dtype='int64')
         last_valid_line_dset = burst_location_parameters_grp.create_dataset("last_valid_line", data=1477, dtype='int64')
-        last_valid_sample_dset = burst_location_parameters_grp.create_dataset("last_valid_sample", data=20531, dtype='int64')
+        last_valid_sample_dset = burst_location_parameters_grp.create_dataset("last_valid_sample", data=20531,
+                                                                              dtype='int64')
         tiff_path_dset = burst_location_parameters_grp.create_dataset("tiff_path", data=np.string_(
             "s1a-iw1-slc-vv-20220501t015035-20220501t015102-043011-0522a4-004.tiff"))
 
-        processing_parameters_grp = outfile.create_group(f"{S1_SLC_HDF5_PREFIX}/metadata/processing_information/parameters")
-        azimuth_fm_rate_applied_dset = processing_parameters_grp.create_dataset("azimuth_fm_rate_applied", data=True, dtype='bool')
-        azimuth_solid_earth_tides_applied_dset = processing_parameters_grp.create_dataset("azimuth_solid_earth_tides_applied",
-                                                                                          data=True, dtype='bool')
-        bistatic_delay_applied_dset = processing_parameters_grp.create_dataset("bistatic_delay_applied", data=True, dtype='bool')
-        dry_troposphere_weather_model_applied_dset = processing_parameters_grp.create_dataset("dry_troposphere_weather_model_applied",
-                                                                                              data=True, dtype='bool')
-        elevation_antenna_pattern_correction_applied_dset = processing_parameters_grp.create_dataset("elevation_antenna_pattern_correction_applied",
-                                                                                                     data=np.string_("ESA"))
+        processing_parameters_grp = \
+            outfile.create_group(f"{S1_SLC_HDF5_PREFIX}/metadata/processing_information/parameters")
+        azimuth_fm_rate_applied_dset = \
+            processing_parameters_grp.create_dataset("azimuth_fm_rate_applied", data=True, dtype='bool')
+        azimuth_solid_earth_tides_applied_dset = \
+            processing_parameters_grp.create_dataset("azimuth_solid_earth_tides_applied", data=True, dtype='bool')
+        bistatic_delay_applied_dset = \
+            processing_parameters_grp.create_dataset("bistatic_delay_applied", data=True, dtype='bool')
+        dry_troposphere_weather_model_applied_dset = \
+            processing_parameters_grp.create_dataset("dry_troposphere_weather_model_applied", data=True, dtype='bool')
+        elevation_antenna_pattern_correction_applied_dset = \
+            processing_parameters_grp.create_dataset("elevation_antenna_pattern_correction_applied",
+                                                     data=np.string_("ESA"))
         ellipsoidal_flattening_applied_dset = processing_parameters_grp.create_dataset("ellipsoidal_flattening_applied",
                                                                                        data=True, dtype='bool')
         geometry_doppler_applied_dset = processing_parameters_grp.create_dataset("geometry_doppler_applied", data=True,
@@ -601,8 +612,8 @@ def create_test_cslc_metadata_product(file_path):
                                                                                    data=True, dtype='bool')
         topographic_flattening_applied_dset = processing_parameters_grp.create_dataset("topographic_flattening_applied",
                                                                                        data=True, dtype='bool')
-        wet_troposphere_weather_model_applied_dset = processing_parameters_grp.create_dataset("wet_troposphere_weather_model_applied",
-                                                                                              data=True, dtype='bool')
+        wet_troposphere_weather_model_applied_dset = \
+            processing_parameters_grp.create_dataset("wet_troposphere_weather_model_applied", data=True, dtype='bool')
 
         input_burst_metadata_grp = outfile.create_group(f"{S1_SLC_HDF5_PREFIX}"
                                                         f"/metadata/processing_information/input_burst_metadata")
@@ -631,33 +642,35 @@ def create_test_cslc_metadata_product(file_path):
         doppler_std_dset = doppler_grp.create_dataset("std", data=149896229.0, dtype='float64')
         ipf_version_dset = input_burst_metadata_grp.create_dataset("ipf_version", data=np.string_("3.51"))
         iw2_mid_range_dset = input_burst_metadata_grp.create_dataset("iw2_mid_range", data=876175.1695277416,
-                                                                  dtype='float64')
+                                                                     dtype='float64')
         platform_id_dset = input_burst_metadata_grp.create_dataset("platform_id", data=np.string_("S1A"))
         polarization_dset = input_burst_metadata_grp.create_dataset("polarization", data=np.string_("VV"))
         prf_raw_data_dset = input_burst_metadata_grp.create_dataset("prf_raw_data", data=1717.128973878037,
-                                                                 dtype='float64')
+                                                                    dtype='float64')
         radar_center_frequency_dset = input_burst_metadata_grp.create_dataset("radar_center_frequency",
-                                                                           data=5405000454.33435, dtype='float64')
-        range_bandwidth_dset = input_burst_metadata_grp.create_dataset("range_bandwidth", data=56500000.0, dtype='float64')
+                                                                              data=5405000454.33435, dtype='float64')
+        range_bandwidth_dset = input_burst_metadata_grp.create_dataset("range_bandwidth", data=56500000.0,
+                                                                       dtype='float64')
         range_chirp_rate_dset = input_burst_metadata_grp.create_dataset("range_chirp_rate", data=1078230321255.894,
-                                                                     dtype='float64')
-        range_pixel_spacing_dset = input_burst_metadata_grp.create_dataset("range_pixel_spacing", data=2.329562114715323,
                                                                         dtype='float64')
-        range_sampling_rate_dset = input_burst_metadata_grp.create_dataset("range_sampling_rate", data=64345238.12571428,
-                                                                        dtype='float64')
+        range_pixel_spacing_dset = input_burst_metadata_grp.create_dataset("range_pixel_spacing",
+                                                                           data=2.329562114715323, dtype='float64')
+        range_sampling_rate_dset = input_burst_metadata_grp.create_dataset("range_sampling_rate",
+                                                                           data=64345238.12571428, dtype='float64')
         range_window_coefficient_dset = input_burst_metadata_grp.create_dataset('range_window_coefficient', data=0.75,
-                                                                             dtype='float64')
-        range_window_type_dset = input_burst_metadata_grp.create_dataset("range_window_type", data=np.string_('Hamming'))
+                                                                                dtype='float64')
+        range_window_type_dset = input_burst_metadata_grp.create_dataset("range_window_type",
+                                                                         data=np.string_('Hamming'))
         rank_dset = input_burst_metadata_grp.create_dataset("rank", data=9, dtype='int64')
         sensing_start_dset = input_burst_metadata_grp.create_dataset("sensing_start",
-                                                                  data=np.string_('2022-05-01 01:50:35.031073'))
+                                                                     data=np.string_('2022-05-01 01:50:35.031073'))
         sensing_stop_dset = input_burst_metadata_grp.create_dataset("sensing_stop",
-                                                                 data=np.string_('2022-05-01 01:50:38.106185'))
+                                                                    data=np.string_('2022-05-01 01:50:38.106185'))
         shape_dset = input_burst_metadata_grp.create_dataset("shape", data=np.array([1497, 21576]), dtype='int64')
         slant_range_time_dset = input_burst_metadata_grp.create_dataset("slant_range_time",
-                                                                     data=0.00533757492066515, dtype='float64')
+                                                                        data=0.00533757492066515, dtype='float64')
         starting_range_dset = input_burst_metadata_grp.create_dataset("starting_range",
-                                                                   data=800082.3526126802, dtype='float64')
+                                                                      data=800082.3526126802, dtype='float64')
         wavelength_dset = input_burst_metadata_grp.create_dataset("wavelength", data=0.05546576, dtype='float64')
 
         orbit_grp = outfile.create_group(f"{S1_SLC_HDF5_PREFIX}/metadata/orbit")
@@ -709,7 +722,6 @@ def create_test_disp_metadata_product(file_path):
         Full path to write the dummy DISP H5 metadata file to.
 
     """
-
     pge_runconfig_contents = """
 input_file_group:
     # REQUIRED: List of paths to CSLC files.

@@ -393,7 +393,7 @@ class DswxS1PgeTestCase(unittest.TestCase):
         with open(runconfig_path, 'r', encoding='utf-8') as infile:
             runconfig_dict = yaml.safe_load(infile)
 
-        runconfig_dict['RunConfig']['Groups']['SAS']['runconfig']['groups']['dynamic_ancillary_file_group'] \
+        runconfig_dict['RunConfig']['Groups']['SAS']['runconfig']['groups']['dynamic_ancillary_file_group']\
             ['algorithm_parameters'] = 'test/data/test_algorithm_parameters_non_existent.yaml'  # noqa E211
 
         with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:

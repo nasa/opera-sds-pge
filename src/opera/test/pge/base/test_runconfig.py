@@ -22,6 +22,7 @@ from opera.pge import RunConfig
 class RunconfigTestCase(unittest.TestCase):
     """Base test class using unittest"""
 
+    data_dir = None
     test_dir = None
 
     @classmethod

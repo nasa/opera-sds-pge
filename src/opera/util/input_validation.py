@@ -9,8 +9,8 @@ Common code used by some PGEs for input validation.
 
 """
 import glob
-from os.path import abspath, exists, getsize, isdir, isfile, join, splitext
 import re
+from os.path import abspath, exists, getsize, isdir, isfile, join, splitext
 
 import yamale
 

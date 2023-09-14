@@ -21,7 +21,7 @@ from sys import platform
 def get_os_metrics():
     """
     Gets metrics related to machine resource usage, both by the current process
-    as well as all of its children processes.
+    as well as by all of its children processes.
 
     Returns
     -------

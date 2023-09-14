@@ -74,7 +74,6 @@ class MetadataUtilsTestCase(unittest.TestCase):
         self.assertAlmostEqual(lon_min, 178.82637550795243)
         self.assertAlmostEqual(lon_max, -178.93677941363356)
 
-
     def test_get_disp_s1_product_metadata(self):
         """Test retrieval of product metadata from HDF5 files"""
         file_name = os.path.join(tempfile.gettempdir(), "test_disp_metadata_file.hdf5")
@@ -93,7 +92,6 @@ class MetadataUtilsTestCase(unittest.TestCase):
 
         finally:
             os.remove(file_name)
-
 
     def test_get_rtc_s1_product_metadata(self):
         """Test retrieval of product metadata from HDF5 files"""

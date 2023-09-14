@@ -84,7 +84,7 @@ class CslcS1PgeTestCase(unittest.TestCase):
             f"touch {join(input_dir, 'db.sqlite3')}"
         )
 
-        # When the [QAExecutable] is enabled, a python script (specified in [QAExecutable][ProgramPath] is executed.
+        # When the [QAExecutable] is enabled, a python script (specified in [QAExecutable][ProgramPath]) is executed.
         # The empty files below simulate a script with proper permissions, and a script with improper permissions.
         os.system(
             f"touch {join(input_dir, 'test_qa_rwx.py')}"  # rwx - read, write, execute
@@ -196,7 +196,6 @@ class CslcS1PgeTestCase(unittest.TestCase):
                           rf"{burst_metadata['platform_id']}_" \
                           rf"{burst_metadata['polarization']}_" \
                           rf"v{pge.runconfig.product_version}.h5"
-
 
         result = re.match(file_name_regex, file_name)
 

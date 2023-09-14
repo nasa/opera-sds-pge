@@ -19,9 +19,9 @@ from unittest import skipIf
 from pkg_resources import resource_filename
 
 from opera.util.img_utils import get_geotiff_hls_dataset
+from opera.util.img_utils import get_geotiff_hls_product_version
 from opera.util.img_utils import get_geotiff_metadata
 from opera.util.img_utils import get_geotiff_processing_datetime
-from opera.util.img_utils import get_geotiff_hls_product_version
 from opera.util.img_utils import get_geotiff_spacecraft_name
 from opera.util.img_utils import get_hls_filename_fields
 
@@ -41,6 +41,9 @@ def gdal_is_available():
 
 class ImgUtilsTestCase(unittest.TestCase):
     """Unit test Image Utilities"""
+
+    test_dir = None
+    starting_dir = None
 
     @classmethod
     def setUpClass(cls) -> None:
