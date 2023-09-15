@@ -184,7 +184,7 @@ class CslcS1PgeTestCase(unittest.TestCase):
         cslc_metadata = get_cslc_s1_product_metadata(metadata_file)
         burst_metadata = cslc_metadata['processing_information']['input_burst_metadata']
 
-        # Compare the filename returned by the PGE for JSON metadata files
+        # Compare the filename returned by the PGE for HDF5 files
         # to a regex which should match each component of the final filename
         file_name = pge._h5_filename(
             inter_filename='cslc_pge_test/output_dir/t064_135518_iw1/20220501/t064_135518_iw1_20220501.h5'
@@ -203,6 +203,43 @@ class CslcS1PgeTestCase(unittest.TestCase):
         self.assertIsNotNone(result)
         self.assertEqual(result.group(), file_name)
 
+        file_name = pge._browse_filename(
+            inter_filename='cslc_pge_test/output_dir/t064_135518_iw1/20220501/t064_135518_iw1_20220501.png'
+        )
+
+        file_name_regex = rf"{pge.PROJECT}_{pge.LEVEL}_{pge.NAME}_" \
+                          rf"{cslc_metadata['identification']['burst_id'].upper().replace('_', '-')}_" \
+                          rf"\d{{8}}T\d{{6}}Z_\d{{8}}T\d{{6}}Z_" \
+                          rf"{burst_metadata['platform_id']}_" \
+                          rf"{burst_metadata['polarization']}_" \
+                          rf"v{pge.runconfig.product_version}_BROWSE.png"
+
+        result = re.match(file_name_regex, file_name)
+
+        self.assertIsNotNone(result)
+        self.assertEqual(result.group(), file_name)
+
+    def test_static_layer_filename_application(self):
+        """Test the filename convention applied to CSLC static layer products"""
+        runconfig_path = join(self.data_dir, 'test_cslc_s1_static_config.yaml')
+
+        pge = CslcS1Executor(pge_name="CslcPgeTest", runconfig_path=runconfig_path)
+
+        pge.run()
+
+        # Grab the metadata generated from the PGE run, as it is used to generate
+        # the final filename for output products
+        metadata_files = glob.glob(join(pge.runconfig.output_product_path, "OPERA_L2_CSLC-S1-STATIC_T*.h5"))
+
+        self.assertEqual(len(metadata_files), 1)
+
+        metadata_file = metadata_files[0]
+
+        cslc_metadata = get_cslc_s1_product_metadata(metadata_file)
+        burst_metadata = cslc_metadata['processing_information']['input_burst_metadata']
+
+        # Compare the filename returned by the PGE for HDF5 files
+        # to a regex which should match each component of the final filename
         file_name = pge._static_layers_filename(
             inter_filename='cslc_pge_test/output_dir/t064_135518_iw1/20220501/static_layers_t064_135518_iw1.h5'
         )
@@ -223,22 +260,6 @@ class CslcS1PgeTestCase(unittest.TestCase):
         expected_data_validity_start_date = pge.runconfig.data_validity_start_date
 
         self.assertIn(str(expected_data_validity_start_date), file_name)
-
-        file_name = pge._browse_filename(
-            inter_filename='cslc_pge_test/output_dir/t064_135518_iw1/20220501/t064_135518_iw1_20220501.png'
-        )
-
-        file_name_regex = rf"{pge.PROJECT}_{pge.LEVEL}_{pge.NAME}_" \
-                          rf"{cslc_metadata['identification']['burst_id'].upper().replace('_', '-')}_" \
-                          rf"\d{{8}}T\d{{6}}Z_\d{{8}}T\d{{6}}Z_" \
-                          rf"{burst_metadata['platform_id']}_" \
-                          rf"{burst_metadata['polarization']}_" \
-                          rf"v{pge.runconfig.product_version}_BROWSE.png"
-
-        result = re.match(file_name_regex, file_name)
-
-        self.assertIsNotNone(result)
-        self.assertEqual(result.group(), file_name)
 
     def test_iso_metadata_creation(self):
         """
@@ -301,6 +322,39 @@ class CslcS1PgeTestCase(unittest.TestCase):
         finally:
             if os.path.exists(test_runconfig_path):
                 os.unlink(test_runconfig_path)
+
+    def test_static_layer_iso_metadata_creation(self):
+        """
+        Test that the ISO metadata template is fully filled out when realistic
+        CSLC JSON metadata is available and the workflow is set to CSLC_S1_STATIC
+        """
+        runconfig_path = join(self.data_dir, 'test_cslc_s1_static_config.yaml')
+
+        pge = CslcS1Executor(pge_name="CslcPgeTest", runconfig_path=runconfig_path)
+
+        # Run only the pre-processor steps to ingest the runconfig and set
+        # up directories
+        pge.run_preprocessor()
+
+        # Create a sample metadata file within the output directory of the PGE
+        output_dir = join(os.curdir, "cslc_pge_test/output_dir")
+
+        cslc_metadata_path = join(output_dir, 'static_layers_t064_135518_iw1_20220501.h5')
+
+        create_test_cslc_metadata_product(cslc_metadata_path)
+
+        cslc_metadata = pge._collect_cslc_product_metadata(cslc_metadata_path)
+
+        # Initialize the core filename for the catalog metadata generation step
+        pge._core_filename(inter_filename=cslc_metadata_path)
+
+        # Render ISO metadata using the sample metadata
+        iso_metadata = pge._create_iso_metadata(cslc_metadata)
+
+        # Rendered template should not have any missing placeholders
+        self.assertNotIn('!Not found!', iso_metadata)
+
+        os.unlink(cslc_metadata_path)
 
     def test_cslc_s1_pge_input_validation(self):
         """Test the input validation checks."""

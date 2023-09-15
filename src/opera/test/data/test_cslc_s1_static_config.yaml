@@ -1,0 +1,77 @@
+RunConfig:
+    Name: OPERA-CSLC-S1-PGE-TEST-CONFIG
+
+    Groups:
+
+        PGE:
+            PGENameGroup:
+                PGEName: CSLC_S1_PGE
+
+            InputFilesGroup:
+                InputFilePaths:
+                    - cslc_pge_test/input_dir/S1A_IW_SLC__1SDV_20220501T015035_20220501T015102_043011_0522A4_42CC.zip
+                    - cslc_pge_test/input_dir/S1A_OPER_AUX_POEORB_OPOD_20220521T081912_V20220430T225942_20220502T005942.EOF
+
+            DynamicAncillaryFilesGroup:
+                AncillaryFileMap:
+                    dem_file: cslc_pge_test/input_dir/dem_4326.tiff
+                    tec_file: cslc_pge_test/input_dir/jplg1210.22i
+                    burst_database_file: cslc_pge_test/input_dir/opera_burst_database_deploy_2022_1212.sqlite3
+
+            ProductPathGroup:
+                OutputProductPath: cslc_pge_test/output_dir
+                ScratchPath: cslc_pge_test/output_dir/scratch_dir
+
+            PrimaryExecutable:
+                ProductIdentifier: CSLC_S1
+                ProductVersion: "1.0"
+                ProgramPath: mkdir
+                ProgramOptions:
+                    - '-p cslc_pge_test/output_dir/t064_135518_iw1/20220501/;'
+                    - 'python3 -c "from opera.util.metadata_utils import create_test_cslc_metadata_product; create_test_cslc_metadata_product(\"cslc_pge_test/output_dir/t064_135518_iw1/20220501/static_layers_t064_135518_iw1_20220501.h5\")";'
+                    - '/bin/echo CSLC-S1 invoked with RunConfig'
+                ErrorCodeBase: 200000
+                SchemaPath: pge/cslc_s1/schema/cslc_s1_sas_schema.yaml
+                IsoTemplatePath: pge/cslc_s1/templates/OPERA_ISO_metadata_L2_CSLC_S1_template.xml.jinja2
+                DataValidityStartDate: 20000101
+
+            QAExecutable:
+                Enabled: False
+                ProgramPath:
+                ProgramOptions: []
+
+            DebugLevelGroup:
+                DebugSwitch: False
+                ExecuteViaShell: True  # Must be set to True for test to work
+
+        SAS:
+            runconfig:
+                name: cslc_s1_workflow_default
+
+                groups:
+                    pge_name_group:
+                        pge_name: CSLC_S1_PGE
+
+                    input_file_group:
+                        safe_file_path:
+                            - cslc_pge_test/input_dir/S1A_IW_SLC__1SDV_20220501T015035_20220501T015102_043011_0522A4_42CC.zip
+                        orbit_file_path:
+                            - cslc_pge_test/input_dir/S1A_OPER_AUX_POEORB_OPOD_20220521T081912_V20220430T225942_20220502T005942.EOF
+                        burst_id:
+                            - t064_135518_iw1
+
+                    dynamic_ancillary_file_group:
+                        dem_file: cslc_pge_test/input_dir/dem_4326.tiff
+                        tec_file: cslc_pge_test/input_dir/jplg1210.22i
+
+                    static_ancillary_file_group:
+                        burst_database_file: cslc_pge_test/input_dir/db.sqlite3
+
+                    product_path_group:
+                        product_path: output_dir
+                        scratch_path: output_dir/scratch_dir
+                        sas_output_file: output_s1_cslc
+                        product_version: "1.0"
+
+                    primary_executable:
+                        product_type: CSLC_S1_STATIC
