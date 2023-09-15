@@ -642,6 +642,21 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
 
         output_product_metadata['burst_polygon'] = f"({''.join(result.groups()[0].split(','))})"
 
+        # Jinja2 cannot serialize int64 data types to JSON, so convert the shape array
+        # to a list of native Python ints
+        shape = output_product_metadata['processing_information']['input_burst_metadata']['shape']
+        shape = list(map(int, shape))
+        output_product_metadata['processing_information']['input_burst_metadata']['shape'] = shape
+
+        # Some metadata fields which can be a list of files can also be specified
+        # as a string if there is only a single file. Wrap these fields in a list
+        # so we can maintain a consistent approach to serializing them in the
+        # template
+        for key in ('calibration_files', 'l1_slc_files', 'noise_files', 'orbit_files'):
+            inputs = output_product_metadata['processing_information']['inputs'][key]
+            if isinstance(inputs, str):
+                output_product_metadata['processing_information']['inputs'][key] = [inputs]
+
         return output_product_metadata
 
     def _create_custom_metadata(self):

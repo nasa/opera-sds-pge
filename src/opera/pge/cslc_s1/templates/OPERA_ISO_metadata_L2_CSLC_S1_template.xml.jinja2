@@ -486,7 +486,7 @@
                 <gmd:MD_TopicCategoryCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/gmxCodelists.xml#MD_TopicCategoryCode" codeListValue="geoscientificInformation">geoscientificInformation</gmd:MD_TopicCategoryCode>
             </gmd:topicCategory>
             <gmd:environmentDescription>
-                <gco:CharacterString>Data product generated in Cloud-Optimized GeoTIFF format with ISO 19115 conformant metadata.</gco:CharacterString>
+                <gco:CharacterString>Data product generated in HDF5 format with ISO 19115 conformant metadata.</gco:CharacterString>
             </gmd:environmentDescription>
             <!-- This section documents the granules spatial and temporal extent as well as the grid mapping names and the projection names - NOT the TilingIdentificationSystem. -->
             <gmd:extent>
@@ -1014,6 +1014,7 @@
                                         <gco:CharacterString>{{ product_output.processing_information.algorithms.dem_interpolation }}{# ISO_OPERA_demInterpolation #}</gco:CharacterString>
                                     </eos:value>
                                 </eos:AdditionalAttribute>
+                                {%- if run_config.Groups.SAS.runconfig.groups.primary_executable.product_type == 'CSLC_S1' %}
                                 <eos:AdditionalAttribute>
                                     <eos:reference>
                                         <eos:EOS_AdditionalAttributeDescription>
@@ -1024,7 +1025,7 @@
                                                 <gco:CharacterString>ComplexDataGeocodingInterpolator</gco:CharacterString>
                                             </eos:name>
                                             <eos:description>
-                                                <gco:CharacterString>Complex Data Geocoding interpolation algorithm algorithm</gco:CharacterString>
+                                                <gco:CharacterString>Complex Data Geocoding interpolation algorithm</gco:CharacterString>
                                             </eos:description>
                                             <eos:dataType>
                                                 <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
@@ -1035,6 +1036,50 @@
                                         <gco:CharacterString>{{ product_output.processing_information.algorithms.complex_data_geocoding_interpolator }}{# ISO_OPERA_complexDataGeocodingInterpolator #}</gco:CharacterString>
                                     </eos:value>
                                 </eos:AdditionalAttribute>
+                                {%- else %}
+                                <eos:AdditionalAttribute>
+                                    <eos:reference>
+                                        <eos:EOS_AdditionalAttributeDescription>
+                                            <eos:type>
+                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
+                                            </eos:type>
+                                            <eos:name>
+                                                <gco:CharacterString>TopographyAlgorithm</gco:CharacterString>
+                                            </eos:name>
+                                            <eos:description>
+                                                <gco:CharacterString>Topography generation algorithm</gco:CharacterString>
+                                            </eos:description>
+                                            <eos:dataType>
+                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
+                                            </eos:dataType>
+                                        </eos:EOS_AdditionalAttributeDescription>
+                                    </eos:reference>
+                                    <eos:value>
+                                        <gco:CharacterString>{{ product_output.processing_information.algorithms.topography_algorithm }}{# ISO_OPERA_topographyAlgorithm #}</gco:CharacterString>
+                                    </eos:value>
+                                </eos:AdditionalAttribute>
+                                <eos:AdditionalAttribute>
+                                    <eos:reference>
+                                        <eos:EOS_AdditionalAttributeDescription>
+                                            <eos:type>
+                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
+                                            </eos:type>
+                                            <eos:name>
+                                                <gco:CharacterString>UintDataGeocodingInterpolator</gco:CharacterString>
+                                            </eos:name>
+                                            <eos:description>
+                                                <gco:CharacterString>Unsigned int geocoding interpolation method</gco:CharacterString>
+                                            </eos:description>
+                                            <eos:dataType>
+                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
+                                            </eos:dataType>
+                                        </eos:EOS_AdditionalAttributeDescription>
+                                    </eos:reference>
+                                    <eos:value>
+                                        <gco:CharacterString>{{ product_output.processing_information.algorithms.uint_data_geocoding_interpolator }}{# ISO_OPERA_uintDataGeocodingInterpolator #}</gco:CharacterString>
+                                    </eos:value>
+                                </eos:AdditionalAttribute>
+                                {%- endif %}
                                 <eos:AdditionalAttribute>
                                     <eos:reference>
                                         <eos:EOS_AdditionalAttributeDescription>
@@ -1203,6 +1248,7 @@
                                         <gco:CharacterString>{{ product_output.processing_information.inputs.burst_location_parameters.tiff_path }}{# ISO_OPERA_burstLocationLastValidSample #}</gco:CharacterString>
                                     </eos:value>
                                 </eos:AdditionalAttribute>
+                                {%- if run_config.Groups.SAS.runconfig.groups.primary_executable.product_type == 'CSLC_S1' %}
                                 <eos:AdditionalAttribute>
                                     <eos:reference>
                                         <eos:EOS_AdditionalAttributeDescription>
@@ -1455,6 +1501,7 @@
                                         <gco:CharacterString>{{ product_output.processing_information.parameters.wet_troposphere_weather_model_applied }}{# ISO_OPERA_wetTroposphereWeatherModelApplied #}</gco:CharacterString>
                                     </eos:value>
                                 </eos:AdditionalAttribute>
+                                {%- endif %}
                                 <eos:AdditionalAttribute>
                                     <eos:reference>
                                         <eos:EOS_AdditionalAttributeDescription>
@@ -1473,7 +1520,7 @@
                                         </eos:EOS_AdditionalAttributeDescription>
                                     </eos:reference>
                                     <eos:value>
-                                        <gco:CharacterString>{{ product_output.processing_information.inputs.calibration_files|string }}{# ISO_OPERA_calibrationFiles #}</gco:CharacterString>
+                                        <gco:CharacterString>{{ product_output.processing_information.inputs.calibration_files|list|tojson }}{# ISO_OPERA_calibrationFiles #}</gco:CharacterString>
                                     </eos:value>
                                 </eos:AdditionalAttribute>
                                 <eos:AdditionalAttribute>
@@ -1515,7 +1562,7 @@
                                         </eos:EOS_AdditionalAttributeDescription>
                                     </eos:reference>
                                     <eos:value>
-                                        <gco:CharacterString>{{ product_output.processing_information.inputs.l1_slc_files|string }}{# ISO_OPERA_l1SlcFiles #}</gco:CharacterString>
+                                        <gco:CharacterString>{{ product_output.processing_information.inputs.l1_slc_files|list|tojson }}{# ISO_OPERA_l1SlcFiles #}</gco:CharacterString>
                                     </eos:value>
                                 </eos:AdditionalAttribute>
                                 <eos:AdditionalAttribute>
@@ -1536,7 +1583,7 @@
                                         </eos:EOS_AdditionalAttributeDescription>
                                     </eos:reference>
                                     <eos:value>
-                                        <gco:CharacterString>{{ product_output.processing_information.inputs.noise_files|string }}{# ISO_OPERA_noiseFiles #}</gco:CharacterString>
+                                        <gco:CharacterString>{{ product_output.processing_information.inputs.noise_files|list|tojson }}{# ISO_OPERA_noiseFiles #}</gco:CharacterString>
                                     </eos:value>
                                 </eos:AdditionalAttribute>
                                 <eos:AdditionalAttribute>
@@ -1557,7 +1604,7 @@
                                         </eos:EOS_AdditionalAttributeDescription>
                                     </eos:reference>
                                     <eos:value>
-                                        <gco:CharacterString>{{ product_output.processing_information.inputs.orbit_files|string }}{# ISO_OPERA_orbitFiles #}</gco:CharacterString>
+                                        <gco:CharacterString>{{ product_output.processing_information.inputs.orbit_files|list|tojson }}{# ISO_OPERA_orbitFiles #}</gco:CharacterString>
                                     </eos:value>
                                 </eos:AdditionalAttribute>
                                 <eos:AdditionalAttribute>
@@ -1716,7 +1763,7 @@
                                         </eos:EOS_AdditionalAttributeDescription>
                                     </eos:reference>
                                     <eos:value>
-                                        <gco:CharacterString>{{ product_output.processing_information.input_burst_metadata.shape|string }}{# ISO_OPERA_shape #}</gco:CharacterString>
+                                        <gco:CharacterString>{{ product_output.processing_information.input_burst_metadata.shape|list|tojson }}{# ISO_OPERA_shape #}</gco:CharacterString>
                                     </eos:value>
                                 </eos:AdditionalAttribute>
                                 <eos:AdditionalAttribute>
@@ -1944,7 +1991,7 @@
                                         </eos:EOS_AdditionalAttributeDescription>
                                     </eos:reference>
                                     <eos:value>
-                                        <gco:CharacterString>{{ product_output.processing_information.input_burst_metadata.azimuth_fm_rate.coeffs|string }}{# ISO_OPERA_azimuthFmRateCoeffs #}</gco:CharacterString>
+                                        <gco:CharacterString>{{ product_output.processing_information.input_burst_metadata.azimuth_fm_rate.coeffs|list|tojson }}{# ISO_OPERA_azimuthFmRateCoeffs #}</gco:CharacterString>
                                     </eos:value>
                                 </eos:AdditionalAttribute>
                                 <eos:AdditionalAttribute>
@@ -2028,7 +2075,7 @@
                                         </eos:EOS_AdditionalAttributeDescription>
                                     </eos:reference>
                                     <eos:value>
-                                        <gco:CharacterString>{{ product_output.processing_information.input_burst_metadata.doppler.coeffs|string }}{# ISO_OPERA_dopplerCoeffs #}</gco:CharacterString>
+                                        <gco:CharacterString>{{ product_output.processing_information.input_burst_metadata.doppler.coeffs|list|tojson }}{# ISO_OPERA_dopplerCoeffs #}</gco:CharacterString>
                                     </eos:value>
                                 </eos:AdditionalAttribute>
                                 <eos:AdditionalAttribute>
@@ -2289,7 +2336,7 @@
                                         </eos:EOS_AdditionalAttributeDescription>
                                     </eos:reference>
                                     <eos:value>
-                                        <gco:CharacterString>{{ product_output.orbit.time|string }}{# ISO_OPERA_orbitTime #}</gco:CharacterString>
+                                        <gco:CharacterString>{{ product_output.orbit.time|list|tojson }}{# ISO_OPERA_orbitTime #}</gco:CharacterString>
                                     </eos:value>
                                 </eos:AdditionalAttribute>
                                 <eos:AdditionalAttribute>
@@ -2313,7 +2360,7 @@
                                         </eos:EOS_AdditionalAttributeDescription>
                                     </eos:reference>
                                     <eos:value>
-                                        <gco:CharacterString>{{ product_output.orbit.position_x|string }}{# ISO_OPERA_orbitPosX #}</gco:CharacterString>
+                                        <gco:CharacterString>{{ product_output.orbit.position_x|list|tojson }}{# ISO_OPERA_orbitPosX #}</gco:CharacterString>
                                     </eos:value>
                                 </eos:AdditionalAttribute>
                                 <eos:AdditionalAttribute>
@@ -2337,7 +2384,7 @@
                                         </eos:EOS_AdditionalAttributeDescription>
                                     </eos:reference>
                                     <eos:value>
-                                        <gco:CharacterString>{{ product_output.orbit.position_y|string }}{# ISO_OPERA_orbitPosY #}</gco:CharacterString>
+                                        <gco:CharacterString>{{ product_output.orbit.position_y|list|tojson }}{# ISO_OPERA_orbitPosY #}</gco:CharacterString>
                                     </eos:value>
                                 </eos:AdditionalAttribute>
                                 <eos:AdditionalAttribute>
@@ -2361,7 +2408,7 @@
                                         </eos:EOS_AdditionalAttributeDescription>
                                     </eos:reference>
                                     <eos:value>
-                                        <gco:CharacterString>{{ product_output.orbit.position_z|string }}{# ISO_OPERA_orbitPosZ #}</gco:CharacterString>
+                                        <gco:CharacterString>{{ product_output.orbit.position_z|list|tojson }}{# ISO_OPERA_orbitPosZ #}</gco:CharacterString>
                                     </eos:value>
                                 </eos:AdditionalAttribute>
                                 <eos:AdditionalAttribute>
@@ -2385,7 +2432,7 @@
                                         </eos:EOS_AdditionalAttributeDescription>
                                     </eos:reference>
                                     <eos:value>
-                                        <gco:CharacterString>{{ product_output.orbit.velocity_x|string }}{# ISO_OPERA_orbitVelX #}</gco:CharacterString>
+                                        <gco:CharacterString>{{ product_output.orbit.velocity_x|list|tojson }}{# ISO_OPERA_orbitVelX #}</gco:CharacterString>
                                     </eos:value>
                                 </eos:AdditionalAttribute>
                                 <eos:AdditionalAttribute>
@@ -2409,7 +2456,7 @@
                                         </eos:EOS_AdditionalAttributeDescription>
                                     </eos:reference>
                                     <eos:value>
-                                        <gco:CharacterString>{{ product_output.orbit.velocity_y|string }}{# ISO_OPERA_orbitVelY #}</gco:CharacterString>
+                                        <gco:CharacterString>{{ product_output.orbit.velocity_y|list|tojson }}{# ISO_OPERA_orbitVelY #}</gco:CharacterString>
                                     </eos:value>
                                 </eos:AdditionalAttribute>
                                 <eos:AdditionalAttribute>
@@ -2433,7 +2480,78 @@
                                         </eos:EOS_AdditionalAttributeDescription>
                                     </eos:reference>
                                     <eos:value>
-                                        <gco:CharacterString>{{ product_output.orbit.velocity_z|string }}{# ISO_OPERA_orbitVelZ #}</gco:CharacterString>
+                                        <gco:CharacterString>{{ product_output.orbit.velocity_z|list|tojson }}{# ISO_OPERA_orbitVelZ #}</gco:CharacterString>
+                                    </eos:value>
+                                </eos:AdditionalAttribute>
+                                <eos:AdditionalAttribute>
+                                    <eos:reference>
+                                        <eos:EOS_AdditionalAttributeDescription>
+                                            <eos:type>
+                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
+                                            </eos:type>
+                                            <eos:name>
+                                                <gco:CharacterString>QualityAssuranceOrbitInformation</gco:CharacterString>
+                                            </eos:name>
+                                            <eos:description>
+                                                <gco:CharacterString>The type of orbit ephemeris (i.e., restituted or precise) used for processing</gco:CharacterString>
+                                            </eos:description>
+                                            <eos:dataType>
+                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
+                                            </eos:dataType>
+                                        </eos:EOS_AdditionalAttributeDescription>
+                                    </eos:reference>
+                                    <eos:value>
+                                        <gco:CharacterString>{{ product_output.quality_assurance.orbit_information|tojson }}{# ISO_OPERA_QaOrbitInformation #}</gco:CharacterString>
+                                    </eos:value>
+                                </eos:AdditionalAttribute>
+                                <eos:AdditionalAttribute>
+                                    <eos:reference>
+                                        <eos:EOS_AdditionalAttributeDescription>
+                                            <eos:type>
+                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
+                                            </eos:type>
+                                            <eos:name>
+                                                <gco:CharacterString>QualityAssurancePixelClassification</gco:CharacterString>
+                                            </eos:name>
+                                            <eos:description>
+                                                {%- if run_config.Groups.SAS.runconfig.groups.primary_executable.product_type == 'CSLC_S1' %}
+                                                <gco:CharacterString>Contains information on the percentage of valid pixels with the complex backscatter layer and the percentage of valid pixels covering land</gco:CharacterString>
+                                                {%- else %}
+                                                <gco:CharacterString>Contains information on the percentage of pixels labeled as affected by layover, shadow, or both</gco:CharacterString>
+                                                {%- endif %}
+                                            </eos:description>
+                                            <eos:dataType>
+                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
+                                            </eos:dataType>
+                                        </eos:EOS_AdditionalAttributeDescription>
+                                    </eos:reference>
+                                    <eos:value>
+                                        <gco:CharacterString>{{ product_output.quality_assurance.pixel_classification|tojson }}{# ISO_OPERA_QaPixelClassification #}</gco:CharacterString>
+                                    </eos:value>
+                                </eos:AdditionalAttribute>
+                                <eos:AdditionalAttribute>
+                                    <eos:reference>
+                                        <eos:EOS_AdditionalAttributeDescription>
+                                            <eos:type>
+                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
+                                            </eos:type>
+                                            <eos:name>
+                                                <gco:CharacterString>QualityAssuranceStatistics</gco:CharacterString>
+                                            </eos:name>
+                                            <eos:description>
+                                                {%- if run_config.Groups.SAS.runconfig.groups.primary_executable.product_type == 'CSLC_S1' %}
+                                                <gco:CharacterString>Includes a series of metrics which statistically characterize the main data layers contained in the /data group and the timing corrections LUTs contained in processing_information/timing_corrections</gco:CharacterString>
+                                                {%- else %}
+                                                <gco:CharacterString>A set of metrics which statistically characterize the floating-point geometry layers contained within the CSLC-S1-Static Layer product</gco:CharacterString>
+                                                {%- endif %}
+                                            </eos:description>
+                                            <eos:dataType>
+                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
+                                            </eos:dataType>
+                                        </eos:EOS_AdditionalAttributeDescription>
+                                    </eos:reference>
+                                    <eos:value>
+                                        <gco:CharacterString>{{ product_output.quality_assurance.statistics|tojson }}{# ISO_OPERA_QaRfiInformation #}</gco:CharacterString>
                                     </eos:value>
                                 </eos:AdditionalAttribute>
                             </eos:AdditionalAttributes>
@@ -2451,7 +2569,7 @@
                     <gmd:distributionFormat>
                         <gmd:MD_Format>
                             <gmd:name>
-                                <gco:CharacterString>GeoTIFF</gco:CharacterString>
+                                <gco:CharacterString>HDF5</gco:CharacterString>
                             </gmd:name>
                         </gmd:MD_Format>
                     </gmd:distributionFormat>
