@@ -27,9 +27,9 @@ SAMPLE_TIME=15
 # RUNCONFIG should be the name of the runconfig in s3://operasds-dev-pge/${PGE_NAME}/
 [ -z "${WORKSPACE}" ] && WORKSPACE="$(realpath "$(dirname "$(realpath "$0")")"/../..)"
 [ -z "${PGE_TAG}" ] && PGE_TAG="${USER}-dev"
-[ -z "${INPUT_DATA}" ] && INPUT_DATA="rtc_s1_delivery_4.1_calval_0.4.1_expected_input.zip"
-[ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="rtc_s1_delivery_4.1_calval_0.4.1_expected_output.zip"
-[ -z "${RUNCONFIG}" ] && RUNCONFIG="opera_pge_rtc_s1_delivery_4.1_calval_runconfig.yaml"
+[ -z "${INPUT_DATA}" ] && INPUT_DATA="rtc_s1_delivery_5_final_1.0.0_expected_input.zip"
+[ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="rtc_s1_delivery_5_final_1.0.0_expected_output.zip"
+[ -z "${RUNCONFIG}" ] && RUNCONFIG="opera_pge_rtc_s1_delivery_5_final_runconfig.yaml"
 [ -z "${TMP_ROOT}" ] && TMP_ROOT="$DEFAULT_TMP_ROOT"
 
 # Create the test output directory in the work space
@@ -45,7 +45,7 @@ test_int_setup_test_data
 trap test_int_trap_cleanup EXIT
 
 # Download the RunConfig for the static layers workflow
-static_runconfig="opera_pge_rtc_s1_static_delivery_4.1_calval_runconfig.yaml"
+static_runconfig="opera_pge_rtc_s1_static_delivery_5_final_runconfig.yaml"
 local_static_runconfig="${TMP_DIR}/runconfig/${static_runconfig}"
 echo "Downloading s3://operasds-dev-pge/${PGE_NAME}/${static_runconfig} to ${local_static_runconfig}"
 aws s3 cp s3://operasds-dev-pge/${PGE_NAME}/${static_runconfig} ${local_static_runconfig} --no-progress
@@ -53,7 +53,7 @@ aws s3 cp s3://operasds-dev-pge/${PGE_NAME}/${static_runconfig} ${local_static_r
 # Pull in product compare script from S3.
 # Current source is https://raw.githubusercontent.com/opera-adt/RTC/main/app/rtc_compare.py
 local_compare_script=${TMP_DIR}/rtc_compare.py
-echo "Downloading s3://operasds-dev-pge/${PGE_NAME}/rtc_compare_calval_0.4.1.py to ${local_compare_script}"
+echo "Downloading s3://operasds-dev-pge/${PGE_NAME}/rtc_compare_final_1.0.0.py to ${local_compare_script}"
 aws s3 cp s3://operasds-dev-pge/${PGE_NAME}/rtc_compare_calval_0.4.1.py "$local_compare_script"
 
 # overall_status values and their meaning
