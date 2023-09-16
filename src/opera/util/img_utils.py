@@ -191,10 +191,15 @@ except (ImportError, ModuleNotFoundError):  # pragma: no cover
     gdal = MockGdal  # pragma: no cover
     gdal_edit = mock_gdal_edit  # pragma: no cover
 
+# Search for an available implementation of save_as_cog from the underlying
+# SAS library. Fallback to the mock implementation if we cannot find any.
 try:
     from proteus.core import save_as_cog
 except (ImportError, ModuleNotFoundError):  # pragma: no cover
-    save_as_cog = mock_save_as_cog  # pragma: no cover
+    try:
+        from rtc.core import save_as_cog
+    except (ImportError, ModuleNotFoundError):  # pragma: no cover
+        save_as_cog = mock_save_as_cog  # pragma: no cover
 
 
 def set_geotiff_metadata(filename, scratch_dir=os.curdir, **kwargs):
@@ -249,7 +254,7 @@ def set_geotiff_metadata(filename, scratch_dir=os.curdir, **kwargs):
         raise RuntimeError(f'Call to gdal_edit returned non-zero ({result})')
 
     # Modifying metadata breaks the Cloud-Optimized-Geotiff (COG) format,
-    # so use a function from PROTEUS to restore it
+    # so use a function from the SAS to restore it
     try:
         save_as_cog(filename, scratch_dir=scratch_dir)
     except Exception as err:

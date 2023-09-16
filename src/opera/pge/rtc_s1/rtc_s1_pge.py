@@ -11,7 +11,6 @@ from Sentinel-1 A/B (S1) PGE.
 """
 
 import os.path
-import re
 from datetime import datetime
 from os import walk
 from os.path import basename, getsize, join
@@ -23,7 +22,9 @@ from opera.pge.base.base_pge import PgeExecutor
 from opera.pge.base.base_pge import PostProcessorMixin
 from opera.pge.base.base_pge import PreProcessorMixin
 from opera.util.error_codes import ErrorCode
+from opera.util.img_utils import set_geotiff_metadata
 from opera.util.input_validation import validate_slc_s1_inputs
+from opera.util.metadata_utils import get_burst_id_from_file_name
 from opera.util.metadata_utils import get_rtc_s1_product_metadata
 from opera.util.metadata_utils import get_sensor_from_spacecraft_name
 from opera.util.metadata_utils import translate_utm_bbox_to_lat_lon
@@ -80,7 +81,6 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
     _cached_core_filename = None
     _burst_metadata_cache = {}
     _burst_filename_cache = {}
-    #_static_layer_metadata_cache = {}
 
     def _validate_output(self):
         """
@@ -918,7 +918,12 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
         Static Layer Data Access. This is only performed for the baseline
         RTC workflow.
         """
-        static_layers_data_access_path = "/identification/staticLayersDataAccess"
+        self.logger.info(
+            self.name, ErrorCode.UPDATING_PRODUCT_METADATA,
+            'Injecting static layer data access URL into product metadata'
+        )
+
+        static_layers_data_access_hdf5_path = "/identification/staticLayersDataAccess"
 
         product_type = self.runconfig.product_type
 
@@ -931,16 +936,7 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
             hdf5_products = list(filter(lambda filename: filename.endswith(".h5"), output_products))
 
             for hdf5_product in hdf5_products:
-                # Extract the burst ID from the file name
-                burst_id_regex = r'T\w{3}-\d{6}-IW[1|2|3]'
-
-                result = re.search(burst_id_regex, hdf5_product)
-
-                if result:
-                    burst_id = result.group(0)
-                else:
-                    msg = f'Could not parse Burst ID from HDF5 product {hdf5_product}'
-                    self.logger.critical(self.name, ErrorCode.UPDATING_PRODUCT_METADATA, msg)
+                burst_id = get_burst_id_from_file_name(hdf5_product)
 
                 # Get the static layer access URL we already assigned to the
                 # product metadata
@@ -949,10 +945,23 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
 
                 # Modify the HDF5 file with the instantiated URL for this burst product
                 with h5py.File(hdf5_product, 'r+') as hf:
-                    del hf[static_layers_data_access_path]
+                    del hf[static_layers_data_access_hdf5_path]
                     hf.create_dataset(
-                        static_layers_data_access_path, data=np.string_(url)
+                        static_layers_data_access_hdf5_path, data=np.string_(url)
                     )
+
+            tif_products = list(filter(lambda filename: filename.endswith(".tif"), output_products))
+
+            for tif_product in tif_products:
+                burst_id = get_burst_id_from_file_name(tif_product)
+
+                product_metadata = self._burst_metadata_cache[burst_id]
+                url = product_metadata['identification']['staticLayersDataAccess']
+
+                set_geotiff_metadata(
+                    tif_product, scratch_dir=self.runconfig.scratch_path,
+                    STATIC_LAYERS_DATA_ACCESS=url
+                )
 
     def run_postprocessor(self, **kwargs):
         """

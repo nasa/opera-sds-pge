@@ -9,6 +9,8 @@ ISO metadata utilities for use with OPERA PGEs.
 
 """
 
+import re
+
 import h5py
 
 import mgrs
@@ -79,6 +81,32 @@ try:
 except (ImportError, ModuleNotFoundError):  # pragma: no cover
     osr = MockOsr                           # pragma: no cover
 
+
+def get_burst_id_from_file_name(file_name):
+    """
+    Extracts and returns the burst ID from the provided file name.
+
+    Parameters
+    ----------
+    file_name : str
+        File name to extract the burst ID from.
+
+    Returns
+    -------
+    burst_id : str
+        The extracted burst ID.
+
+    """
+    burst_id_regex = r'[T|t]\w{3}[-|_]\d{6}[-|_][I|i][W|w][1|2|3]'
+
+    result = re.search(burst_id_regex, file_name)
+
+    if result:
+        burst_id = result.group(0)
+    else:
+        raise ValueError(f'Could not parse Burst ID from HDF5 product {file_name}')
+
+    return burst_id
 
 def get_sensor_from_spacecraft_name(spacecraft_name):
     """
