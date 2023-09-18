@@ -189,6 +189,8 @@ def mock_save_as_cog(filename, scratch_dir='.', logger=None,
 try:
     from osgeo import gdal
     from osgeo_utils.gdal_edit import main as gdal_edit
+
+    gdal.UseExceptions()
 except (ImportError, ModuleNotFoundError):  # pragma: no cover
     gdal = MockGdal  # pragma: no cover
     gdal_edit = mock_gdal_edit  # pragma: no cover

@@ -78,6 +78,8 @@ class MockOsr:  # pragma: no cover
 # resulting in the MockGdal class being substituted instead.
 try:
     from osgeo import osr
+
+    osr.UseExceptions()
 except (ImportError, ModuleNotFoundError):  # pragma: no cover
     osr = MockOsr                           # pragma: no cover
 
