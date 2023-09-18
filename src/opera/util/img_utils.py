@@ -8,6 +8,8 @@ img_utils.py
 Image file utilities for use with OPERA PGEs.
 
 """
+import contextlib
+import io
 import os
 from collections import namedtuple
 from copy import deepcopy
@@ -255,10 +257,16 @@ def set_geotiff_metadata(filename, scratch_dir=os.curdir, **kwargs):
 
     # Modifying metadata breaks the Cloud-Optimized-Geotiff (COG) format,
     # so use a function from the SAS to restore it
-    try:
-        save_as_cog(filename, scratch_dir=scratch_dir)
-    except Exception as err:
-        raise RuntimeError(f'Call to save_as_cog failed, reason: {str(err)}')
+    stdout = io.StringIO()
+    stderr = io.StringIO()
+
+    with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+        try:
+            save_as_cog(filename, scratch_dir=scratch_dir)
+        except Exception as err:
+            raise RuntimeError(
+                f'Call to save_as_cog failed, reason: {str(err)}, stderr: {stderr.getvalue()}'
+            )
 
     # Lastly, we need to clear the LRU for get_geotiff_metadata so any updates
     # made here can be pulled in on the next call
