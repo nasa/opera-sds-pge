@@ -642,6 +642,21 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
 
         output_product_metadata['burst_polygon'] = f"({''.join(result.groups()[0].split(','))})"
 
+        # Jinja2 cannot serialize int64 data types to JSON, so convert the shape array
+        # to a list of native Python ints
+        shape = output_product_metadata['processing_information']['input_burst_metadata']['shape']
+        shape = list(map(int, shape))
+        output_product_metadata['processing_information']['input_burst_metadata']['shape'] = shape
+
+        # Some metadata fields which can be a list of files can also be specified
+        # as a string if there is only a single file. Wrap these fields in a list
+        # so we can maintain a consistent approach to serializing them in the
+        # template
+        for key in ('calibration_files', 'l1_slc_files', 'noise_files', 'orbit_files'):
+            inputs = output_product_metadata['processing_information']['inputs'][key]
+            if isinstance(inputs, str):
+                output_product_metadata['processing_information']['inputs'][key] = [inputs]
+
         return output_product_metadata
 
     def _create_custom_metadata(self):
@@ -837,10 +852,10 @@ class CslcS1Executor(CslcS1PreProcessorMixin, CslcS1PostProcessorMixin, PgeExecu
     LEVEL = "L2"
     """Processing Level for CSLC-S1 Products"""
 
-    PGE_VERSION = "2.0.0-rc.2.1"
+    PGE_VERSION = "2.0.0"
     """Version of the PGE (overrides default from base_pge)"""
 
-    SAS_VERSION = "0.4.0"  # CalVal# release https://github.com/opera-adt/COMPASS/releases/tag/v0.4.0
+    SAS_VERSION = "0.5.1"  # Final release https://github.com/opera-adt/COMPASS/releases/tag/v0.5.1
     """Version of the SAS wrapped by this PGE, should be updated as needed"""
 
     def __init__(self, pge_name, runconfig_path, **kwargs):

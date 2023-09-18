@@ -1,4 +1,4 @@
-# Sample RunConfig for use with the CSLC-S1 PGE v2.0.0-rc.2.1
+# Sample RunConfig for use with the CSLC-S1 PGE v2.0.0
 # This RunConfig should require minimal changes in order to be used with the
 # OPERA PCM.
 
@@ -38,7 +38,7 @@ RunConfig:
                     tec_file: /home/compass_user/input_dir/jplg1210.22i
 
                     # Burst database, must be an .sqlite3 file
-                    burst_database_file: /home/compass_user/input_dir/burst_db_20230713-bbox-only.sqlite
+                    burst_database_file: /home/compass_user/input_dir/burst_db_0.2.0_230831-bbox-only.sqlite
 
             ProductPathGroup:
                 # Path to where output products should be stored
@@ -61,7 +61,7 @@ RunConfig:
                 ProductIdentifier: CSLC_S1
 
                 # Product version specific to output products
-                ProductVersion: 1.0
+                ProductVersion: "1.0"
 
                 # Path to the executable to run, path must be reachable from
                 # within the Docker container (i.e. findable with a "which" command)
@@ -98,7 +98,7 @@ RunConfig:
                 # CSLC static layer product(s) should be considered valid.
                 # This field must be provided for CSLC-S1 jobs when static layer
                 # generation is enabled (see below), and must be of the form YYYYMMDD
-                DataValidityStartDate: 20140101
+                DataValidityStartDate: 20140403
 
             QAExecutable:
                 # Set to True to enable execution of an additional "Quality Assurance"
@@ -146,11 +146,13 @@ RunConfig:
                     # This section should match the DynamicAncillaryFilesGroup of the PGE RunConfig
                     dynamic_ancillary_file_group:
                         dem_file: /home/compass_user/input_dir/dem_4326.tiff
+                        dem_description: "Digital Elevation Model (DEM) for the NASA OPERA project version 1.1 (v1.1) based on the Copernicus DEM 30-m and Copernicus 90-m referenced to the WGS84 ellipsoid"
+
                         tec_file: /home/compass_user/input_dir/jplg1210.22i
 
                     static_ancillary_file_group:
                         # burst database sqlite file
-                        burst_database_file: /home/compass_user/input_dir/burst_db_20230713-bbox-only.sqlite
+                        burst_database_file: /home/compass_user/input_dir/burst_db_0.2.0_230831-bbox-only.sqlite
 
                     product_path_group:
                         # This should match the path used for OutputProductPath
@@ -166,7 +168,7 @@ RunConfig:
                         product_version: "1.0"
 
                         # Product specification document version
-                        product_specification_version: "0.1.5"
+                        product_specification_version: "0.1.7"
 
                     primary_executable:
                         # Must be one of CSLC_S1 or CSLC_S1_STATIC, this determines the type of

@@ -493,7 +493,8 @@ def get_cslc_s1_product_metadata(file_name):
         'data': get_hdf5_group_as_dict(file_name, f"{S1_SLC_HDF5_PREFIX}/data", cslc_ignore_list),
         'processing_information': get_hdf5_group_as_dict(file_name,
                                                          f"{S1_SLC_HDF5_PREFIX}/metadata/processing_information"),
-        'orbit': get_hdf5_group_as_dict(file_name, f"{S1_SLC_HDF5_PREFIX}/metadata/orbit")
+        'orbit': get_hdf5_group_as_dict(file_name, f"{S1_SLC_HDF5_PREFIX}/metadata/orbit"),
+        'quality_assurance': get_hdf5_group_as_dict(file_name, f"{S1_SLC_HDF5_PREFIX}/quality_assurance")
     }
 
     return cslc_metadata
@@ -557,6 +558,9 @@ def create_test_cslc_metadata_product(file_path):
                                                                                   data=np.string_("sinc interpolation"))
         float_data_geocoding_interpolator_dset = algorithms_grp.create_dataset("float_data_geocoding_interpolator",
                                                                                data=np.string_("biquintic interpolation"))
+        topography_algorithm_dset = algorithms_grp.create_dataset("topography_algorithm", data=np.string_("isce3.geometry.topo"))
+        uint_data_geocoding_interpolator = algorithms_grp.create_dataset("uint_data_geocoding_interpolator",
+                                                                         data=np.string_("nearest neighbor interpolation"))
         s1_reader_version_dset = algorithms_grp.create_dataset("s1_reader_version", data=np.string_("0.2.0"))
 
         inputs_grp = outfile.create_group(f"{S1_SLC_HDF5_PREFIX}/metadata/processing_information/inputs")
@@ -673,6 +677,19 @@ def create_test_cslc_metadata_product(file_path):
         velocity_y_dset = orbit_grp.create_dataset("velocity_y", data=np.zeros(12, ), dtype='float64')
         velocity_z_dset = orbit_grp.create_dataset("velocity_z", data=np.zeros(12, ), dtype='float64')
 
+        quality_assurance_grp = outfile.create_group(f"{S1_SLC_HDF5_PREFIX}/quality_assurance")
+        orbit_information_grp = quality_assurance_grp.create_group('orbit_information')
+        qa_orbit_type_dset = orbit_information_grp.create_dataset('orbit_type', data=np.string_('precise_orbit_file'))
+        pixel_classification_grp = quality_assurance_grp.create_group('pixel_classification')
+        percent_land_pixels_dset = pixel_classification_grp.create_dataset('percent_land_pixels', data=59.38486551338992, dtype='float64')
+        percent_valid_pixels_dset = pixel_classification_grp.create_dataset('percent_valid_pixels', data=100.0, dtype='float64')
+        statistics_grp = quality_assurance_grp.create_group('statistics')
+        static_layers_grp = statistics_grp.create_group('static_layers')
+        local_incidence_angle_grp = static_layers_grp.create_group('local_incidence_angle')
+        max_dset = local_incidence_angle_grp.create_dataset('max', data=76.16073608398438, dtype='float64')
+        mean_dset = local_incidence_angle_grp.create_dataset('mean', data=36.48636245727539, dtype='float64')
+        min_dset = local_incidence_angle_grp.create_dataset('min', data=0.1674480438232422, dtype='float64')
+        std_dest = local_incidence_angle_grp.create_dataset('std', data=3.5223963260650635, dtype='float64')
 
 def get_disp_s1_product_metadata(file_name):
     """
