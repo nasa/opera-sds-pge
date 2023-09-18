@@ -10,6 +10,7 @@ from Sentinel-1 A/B (S1-A/B) data.
 
 import glob
 import re
+from collections import OrderedDict
 from os import listdir
 from os.path import abspath, basename, exists, getsize, join, splitext
 
@@ -149,7 +150,9 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
 
         The core file name component of the DISP-S1 PGE consists of:
 
-        <PROJECT>_<LEVEL>_<PGE NAME>
+        <PROJECT>_<LEVEL>_<PGE NAME>_<Mode>_<FrameID>_<Polarization>_\
+        <ReferenceDateTime>_<SecondaryDateTime>_<ProductVersion>_\
+        <ProductGenerationDateTime>
 
         Callers of this function are responsible for assignment of any other
         product-specific fields, such as the file extension.
@@ -173,51 +176,17 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
         Returns
         -------
         core_filename : str
-            The core file name component to assign to products created by this PGE.
-
+            The filename component to assign to frame-based products created by
+            this PGE.
         """
         # Check if the core filename has already been generated and cached,
         # and return it if so
         if self._cached_core_filename is not None:
             return self._cached_core_filename
 
-        # Assign the core file name to the cached class attribute
-        self._cached_core_filename = (
+        core_filename = (
             f"{self.PROJECT}_{self.LEVEL}_{self.NAME}"
         )
-
-        return self._cached_core_filename
-
-    def _frame_filename(self, inter_filename=None):
-        """
-        Returns the file name to use for frame-based DISP products produced
-        by this PGE.
-
-        The filename for the DISP-S1 frame products consists of:
-
-        <CoreFilename>_<Mode>_<FrameID>_<Polarization>_<ReferenceDateTime>_<SecondaryDateTime>_<ProductVersion>_<ProductGenerationDateTime>
-
-        Where <CoreFilename> is returned by DispS1PostProcessorMixin._core_filename()
-
-        Callers of this function are responsible for assignment of any other
-        product-specific fields, such as the file extension.
-
-        Parameters
-        ----------
-        inter_filename : str, optional
-            The intermediate filename of the output product to generate the
-            core filename for. This parameter may be used to inspect the file
-            in order to derive any necessary components of the returned filename.
-            Once the core filename is cached upon first call to this function,
-            this parameter may be omitted.
-
-        Returns
-        -------
-        frame_filename : str
-            The filename component to assign to frame-based products created by
-            this PGE.
-        """
-        core_filename = self._core_filename(inter_filename)
 
         disp_metadata = self._collect_disp_s1_product_metadata(inter_filename)
 
@@ -231,11 +200,14 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
         # Polarization:  polarization of the input bursts
         # derived from names of input CSLCs in the runconfig
         cslc_file_list = self.runconfig.sas_config['input_file_group']['cslc_file_list']
-        pattern = re.compile(r"t\w{3}_\d{6}_iw[1|2|3]_[0-9]{8}_(VV|VH).h5")
+
+        ps = r"t\w{3}_\d{6}_iw[1|2|3]_[0-9]{8}_(?P<polarization>VV|VH|HH|HV|VV\+VH|HH\+HV).h5"
+        pattern = re.compile(ps)
         for cslc_file in cslc_file_list:
             cslc_file_basename = basename(cslc_file)
-            if pattern.match(cslc_file_basename):
-                polarization = cslc_file_basename.split('_')[-1].split('.')[0]
+            result = pattern.match(cslc_file_basename)
+            if result:
+                polarization = result.groupdict()['polarization']
                 break
         else:
             raise RuntimeError(
@@ -246,17 +218,12 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
         # ReferenceDateTime: The acquisition sensing start date and time of
         # the input satellite imagery for the first burst in the frame of the
         # reference product in the format YYYYMMDDTHHMMSSZ
-        # TODO This should come from the product metadata under
-        # "identification/reference_datetime", however, it is missing from
-        # the current delivery. We should assign a placeholder datetime in
-        # the meantime
-        reference_date_time = "YYYYMMDDTHHMMSSZ"
+        reference_date_time = disp_metadata['identification']['reference_datetime']
 
         # SecondaryDateTime: The acquisition sensing start date and time of
         # the input satellite imagery for the first burst in the frame of this
         # secondary product in the format YYYYMMDDTHHMMSSZ
-        # TODO This should come from the product metadata
-        secondary_date_time = "YYYYMMDDTHHMMSSZ"
+        secondary_date_time =  disp_metadata['identification']['secondary_datetime']
 
         # ProductVersion: OPERA DISP-S1 product version number with four
         # characters, including the letter “v” and two digits indicating the
@@ -267,13 +234,43 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
         # was generated by OPERA with the format of YYYYMMDDTHHMMSSZ
         product_generation_date_time = f"{get_time_for_filename(self.production_datetime)}Z"
 
-        frame_filename = (
+        # Assign the core file name to the cached class attribute
+        self._cached_core_filename = (
             f"{core_filename}_{mode}_{frame_id}_{polarization}_"
             f"{reference_date_time}_{secondary_date_time}_{product_version}_"
             f"{product_generation_date_time}"
         )
 
-        return frame_filename
+        return self._cached_core_filename
+
+
+    def _browse_filename(self, inter_filename):
+        """
+        Returns the file name to use for the PNG browse image produced by
+        the DISP-S1 PGE.
+
+        The browse image filename for the DISP-S1 PGE consists of:
+
+            <Core filename>.png
+
+        Where <Core filename> is returned by DispS1PostProcessorMixin._core_filename()
+
+        Parameters
+        ----------
+        inter_filename : str
+            The intermediate filename of the output browse image to generate a
+            filename for. This parameter may be used to inspect the file in order
+            to derive any necessary components of the returned filename.
+
+        Returns
+        -------
+        browse_image_filename : str
+            The file name to assign to browse image created by this PGE.
+
+        """
+        browse_image_filename = self._core_filename(inter_filename)
+
+        return f"{browse_image_filename}.png"
 
     def _netcdf_filename(self, inter_filename):
         """
@@ -281,9 +278,9 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
 
         The netCDF filename for the DISP-S1 PGE consists of:
 
-            <FrameFilename>.nc
+            <Core filename>.nc
 
-        Where <FrameFilename> is returned by DispS1PostProcessorMixin._frame_filename().
+        Where <Core filename> is returned by DispS1PostProcessorMixin._core_filename().
 
         Parameters
         ----------
@@ -298,9 +295,9 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
             The file name to assign to netCDF product(s) created by this PGE.
 
         """
-        frame_filename = self._frame_filename(inter_filename)
+        core_filename = self._core_filename(inter_filename)
 
-        return f"{frame_filename}.nc"
+        return f"{core_filename}.nc"
 
     def _collect_disp_s1_product_metadata(self, netcdf_product):
         """
@@ -321,6 +318,16 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
         """
         # Extract all metadata assigned by the SAS at product creation time
         output_product_metadata = get_disp_s1_product_metadata(netcdf_product)
+
+        # "identification/reference_datetime" is missing from
+        # the current delivery. We should assign a placeholder datetime in
+        # the meantime
+        output_product_metadata['identification']['reference_datetime'] = "20230101T000000Z"
+
+        # "identification/secondary_datetime" is missing from
+        # the current delivery. We should assign a placeholder datetime in
+        # the meantime
+        output_product_metadata['identification']['secondary_datetime'] = "20230101T000000Z"
 
         return output_product_metadata
 
@@ -366,4 +373,10 @@ class DispS1Executor(DispS1PreProcessorMixin, DispS1PostProcessorMixin, PgeExecu
     def __init__(self, pge_name, runconfig_path, **kwargs):
         super().__init__(pge_name, runconfig_path, **kwargs)
 
-        self.rename_by_pattern_map = {}
+        self.rename_by_pattern_map = OrderedDict(
+            {
+                # Note: ordering matters here!
+                '*.nc': self._netcdf_filename,
+                '*.png': self._netcdf_filename
+            }
+        )

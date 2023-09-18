@@ -157,7 +157,7 @@ class DispS1PgeTestCase(unittest.TestCase):
         nc_files = glob.glob(join(output_dir, '*.nc'))
         nc_file = nc_files[0]
         nf = pge._netcdf_filename(nc_file)
-        self.assertRegex(nf, r'OPERA_L3_DISP-S1_IW_F00123_VV_YYYYMMDDTHHMMSSZ_YYYYMMDDTHHMMSSZ_v0\.1_[0-9]{8}T[0-9]{6}Z\.nc')
+        self.assertRegex(nf, r'OPERA_L3_DISP-S1_IW_F00123_VV_[0-9]{8}T[0-9]{6}Z_[0-9]{8}T[0-9]{6}Z_v0\.1_[0-9]{8}T[0-9]{6}Z\.nc')
 
         # Check that the log file was created and moved into the output directory
         expected_log_file = pge.logger.get_file_name()
