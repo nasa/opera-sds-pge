@@ -733,22 +733,27 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
                 'latMax': lat_max
             }
 
-        # We also need to assign the URL for static layer data access for
-        # products created in the baseline RTC workflow
-        if product_type == "RTC_S1":
-            url_template = (
-                "https://search.asf.alaska.edu/#/?dataset=OPERA-S1&"
-                "productTypes=RTC-STATIC&burstID={burst_id}&productVersion={product_ver}"
-            )
+        # We also need to create the URL for static layer data access
+        # This URL will be injected into metadata products after products
+        # have been renamed to meet naming conventions
+        url_template = (
+            "https://search.asf.alaska.edu/#/?dataset=OPERA-S1&"
+            "productTypes=RTC-STATIC&operaBurstID={burst_id}&end={sensor_date}"
+        )
 
-            product_version = self.runconfig.product_version
+        burst_id = output_product_metadata['identification']['burstID']
+        burst_id = burst_id.upper().replace('_', '-')
 
-            burst_id = output_product_metadata['identification']['burstID']
-            burst_id = burst_id.upper().replace('_', '-')
+        acquisition_time = output_product_metadata['identification']['zeroDopplerStartTime']
 
-            url = url_template.format(burst_id=burst_id, product_ver=product_version)
+        if acquisition_time.endswith('Z'):
+            acquisition_time = acquisition_time[:-1]
 
-            output_product_metadata['identification']['staticLayersDataAccess'] = url
+        sensor_date = datetime.strptime(acquisition_time, "%Y-%m-%dT%H:%M:%S.%f").strftime('%Y-%m-%d')
+
+        url = url_template.format(burst_id=burst_id, sensor_date=sensor_date)
+
+        output_product_metadata['identification']['staticLayersDataAccess'] = url
 
         return output_product_metadata
 
@@ -923,45 +928,53 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
             'Injecting static layer data access URL into product metadata'
         )
 
-        static_layers_data_access_hdf5_path = "/identification/staticLayersDataAccess"
-
         product_type = self.runconfig.product_type
 
-        # Only need to inject static data access URL for baseline RTC products
+        # For baseline RTC products, we are creating a linkage to where the
+        # corresponding static layer product can be obtained
         if product_type == "RTC_S1":
-            output_products = self.runconfig.get_output_product_filenames()
+            hdf5_path = "/identification/staticLayersDataAccess"
+            geotiff_key = "STATIC_LAYERS_DATA_ACCESS"
+        # For static layer RTC products, we are injecting a reference to where
+        # the current product can be obtained from (product data access)
+        else:
+            hdf5_path = "/identification/dataAccess"
+            geotiff_key = "PRODUCT_DATA_ACCESS"
 
-            # Iterate over all the HDF5 output products, by now they should all
-            # be staged within the top-level of the designated output directory
-            hdf5_products = list(filter(lambda filename: filename.endswith(".h5"), output_products))
+        output_products = self.runconfig.get_output_product_filenames()
 
-            for hdf5_product in hdf5_products:
-                burst_id = get_burst_id_from_file_name(hdf5_product)
+        # Iterate over all the HDF5 output products, by now they should all
+        # be staged within the top-level of the designated output directory
+        hdf5_products = list(filter(lambda filename: filename.endswith(".h5"), output_products))
 
-                # Get the static layer access URL we already assigned to the
-                # product metadata
-                product_metadata = self._burst_metadata_cache[burst_id]
-                url = product_metadata['identification']['staticLayersDataAccess']
+        for hdf5_product in hdf5_products:
+            burst_id = get_burst_id_from_file_name(hdf5_product)
 
-                # Modify the HDF5 file with the instantiated URL for this burst product
-                with h5py.File(hdf5_product, 'r+') as hf:
-                    del hf[static_layers_data_access_hdf5_path]
-                    hf.create_dataset(
-                        static_layers_data_access_hdf5_path, data=np.string_(url)
-                    )
+            # Get the static layer access URL we already assigned to the
+            # product metadata
+            product_metadata = self._burst_metadata_cache[burst_id]
+            url = product_metadata['identification']['staticLayersDataAccess']
 
-            tif_products = list(filter(lambda filename: filename.endswith(".tif"), output_products))
-
-            for tif_product in tif_products:
-                burst_id = get_burst_id_from_file_name(tif_product)
-
-                product_metadata = self._burst_metadata_cache[burst_id]
-                url = product_metadata['identification']['staticLayersDataAccess']
-
-                set_geotiff_metadata(
-                    tif_product, scratch_dir=self.runconfig.scratch_path,
-                    STATIC_LAYERS_DATA_ACCESS=url
+            # Modify the HDF5 file with the instantiated URL for this burst product
+            with h5py.File(hdf5_product, 'r+') as hf:
+                del hf[hdf5_path]
+                hf.create_dataset(
+                    hdf5_path, data=np.string_(url)
                 )
+
+        tif_products = list(filter(lambda filename: filename.endswith(".tif"), output_products))
+
+        for tif_product in tif_products:
+            burst_id = get_burst_id_from_file_name(tif_product)
+
+            product_metadata = self._burst_metadata_cache[burst_id]
+            url = product_metadata['identification']['staticLayersDataAccess']
+
+            kwargs = {geotiff_key: url}
+
+            set_geotiff_metadata(
+                tif_product, scratch_dir=self.runconfig.scratch_path, **kwargs
+            )
 
     def run_postprocessor(self, **kwargs):
         """

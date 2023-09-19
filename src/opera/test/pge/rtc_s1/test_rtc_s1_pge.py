@@ -159,7 +159,7 @@ class RtcS1PgeTestCase(unittest.TestCase):
     @patch.object(opera.util.img_utils, "save_as_cog", mock_save_as_cog)
     def test_static_layer_data_access_url_injection(self):
         """Test injection of static data access URL into the output HDF5 product(s)"""
-        expected_url = 'https://search.asf.alaska.edu/#/?dataset=OPERA-S1&productTypes=RTC-STATIC&burstID=T069-147170-IW1&productVersion=1.0'
+        expected_url = 'https://search.asf.alaska.edu/#/?dataset=OPERA-S1&productTypes=RTC-STATIC&operaBurstID=T069-147170-IW1&end=2018-05-04'
 
         runconfig_path = join(self.data_dir, 'test_rtc_s1_config.yaml')
 
@@ -250,6 +250,8 @@ class RtcS1PgeTestCase(unittest.TestCase):
 
         self.assertIn(f"{core_filename}_BROWSE.png", output_files)
 
+    @patch.object(opera.util.img_utils, "gdal_edit", mock_gdal_edit)
+    @patch.object(opera.util.img_utils, "save_as_cog", mock_save_as_cog)
     def test_static_layer_filename_application(self):
         """Test the filename convention applied to RTC static layer output products"""
         runconfig_path = join(self.data_dir, 'test_rtc_s1_static_config.yaml')
