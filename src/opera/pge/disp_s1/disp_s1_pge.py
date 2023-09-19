@@ -267,9 +267,9 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
             The file name to assign to browse image created by this PGE.
 
         """
-        browse_image_filename = self._core_filename(inter_filename)
+        browse_image_filename = f"{self._core_filename(inter_filename)}.png"
 
-        return f"{browse_image_filename}.png"
+        return browse_image_filename
 
     def _netcdf_filename(self, inter_filename):
         """
@@ -294,9 +294,9 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
             The file name to assign to netCDF product(s) created by this PGE.
 
         """
-        core_filename = self._core_filename(inter_filename)
+        netcdf_filename = f"{self._core_filename(inter_filename)}.nc"
 
-        return f"{core_filename}.nc"
+        return netcdf_filename
 
     def _collect_disp_s1_product_metadata(self, netcdf_product):
         """
