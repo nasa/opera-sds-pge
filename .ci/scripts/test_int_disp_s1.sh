@@ -107,7 +107,8 @@ if [ $docker_exit_status -ne 0 ]; then
 else
     echo "<tr><th>Compare Result</th><th><ul><li>Expected file</li><li>Output file</li></ul></th><th>disp_validate_product_opera_pge.py output</th></tr>" >> "$RESULTS_FILE"
 
-    output_file="20180101_20180330.unw.nc"
+    output_file=$(ls ${output_dir}/OPERA_L3_DISP-S1_IW_F00123_VV_20230101T000000Z_20230101T000000Z_v0.1_*T*Z.nc)
+    output_file=$(basename ${output_file})
     expected_file="20180101_20180330.unw.nc"
 
     docker_out=$(docker run --rm \
@@ -116,7 +117,7 @@ else
                             -v "$SCRIPT_DIR":/scripts \
                             --entrypoint /opt/conda/bin/python ${PGE_IMAGE}:"${PGE_TAG}" \
                             /scripts/disp_validate_product_opera_pge.py \
-                            /out/${output_file} /exp/${expected_file} \
+                            /exp/${expected_file} /out/${output_file} \
                             --exclude_groups pge_runconfig)
     echo "$docker_out"
 

@@ -223,7 +223,7 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
         # SecondaryDateTime: The acquisition sensing start date and time of
         # the input satellite imagery for the first burst in the frame of this
         # secondary product in the format YYYYMMDDTHHMMSSZ
-        secondary_date_time =  disp_metadata['identification']['secondary_datetime']
+        secondary_date_time = disp_metadata['identification']['secondary_datetime']
 
         # ProductVersion: OPERA DISP-S1 product version number with four
         # characters, including the letter “v” and two digits indicating the
@@ -242,7 +242,6 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
         )
 
         return self._cached_core_filename
-
 
     def _browse_filename(self, inter_filename):
         """
@@ -377,6 +376,6 @@ class DispS1Executor(DispS1PreProcessorMixin, DispS1PostProcessorMixin, PgeExecu
             {
                 # Note: ordering matters here!
                 '*.nc': self._netcdf_filename,
-                '*.png': self._netcdf_filename
+                '*.png': self._browse_filename
             }
         )
