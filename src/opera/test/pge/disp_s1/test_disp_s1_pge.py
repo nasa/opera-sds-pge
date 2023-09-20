@@ -69,7 +69,7 @@ class DispS1PgeTestCase(unittest.TestCase):
         )
 
         os.system(
-            f"echo \"non-empty file\" > {join(input_dir, 't087_185678_iw2_20180101_20180210.h5')}"
+            f"echo \"non-empty file\" > {join(input_dir, 't087_185678_iw2_20180222_VV.h5')}"
         )
 
         os.system(
@@ -125,7 +125,7 @@ class DispS1PgeTestCase(unittest.TestCase):
         pge = DispS1Executor(pge_name="DispS1PgeTest", runconfig_path=runconfig_path)
 
         # Check that basic attributes were initialized
-        self.assertEqual(pge.name, "DISP")
+        self.assertEqual(pge.name, "DISP-S1")
         self.assertEqual(pge.pge_name, "DispS1PgeTest")
         self.assertEqual(pge.runconfig_path, runconfig_path)
 
@@ -151,6 +151,13 @@ class DispS1PgeTestCase(unittest.TestCase):
         # Check that a RunConfig for the SAS was isolated within the scratch directory
         expected_sas_config_file = join(pge.runconfig.scratch_path, 'test_disp_s1_config_sas.yaml')
         self.assertTrue(os.path.exists(expected_sas_config_file))
+
+        # Check that the file naming is correct
+        output_dir = abspath(pge.runconfig.output_product_path)
+        nc_files = glob.glob(join(output_dir, '*.nc'))
+        nc_file = nc_files[0]
+        nf = pge._netcdf_filename(nc_file)
+        self.assertRegex(nf, r'OPERA_L3_DISP-S1_IW_F00123_VV_[0-9]{8}T[0-9]{6}Z_[0-9]{8}T[0-9]{6}Z_v0\.1_[0-9]{8}T[0-9]{6}Z\.nc')
 
         # Check that the log file was created and moved into the output directory
         expected_log_file = pge.logger.get_file_name()
