@@ -8,6 +8,8 @@ img_utils.py
 Image file utilities for use with OPERA PGEs.
 
 """
+import contextlib
+import io
 import os
 from collections import namedtuple
 from copy import deepcopy
@@ -68,6 +70,27 @@ class MockGdal:  # pragma: no cover
                 'SPATIAL_COVERAGE_EXCLUDING_MASKED_OCEAN': '99',
                 'WORLDCOVER_COVERAGE': 'FULL',
                 'WORLDCOVER_SOURCE': 'worldcover.tif',
+            }
+
+        def GetMetadata(self):
+            """
+            Returns a subset of dummy metadata expected by the PGE.
+            This function should be updated as needed for requisite metadata fields.
+            """
+            return deepcopy(self.dummy_metadata)
+
+    # pylint: disable=all
+    class MockRtcS1GdalDataset:
+        """
+        Mock class for gdal.Dataset objects, as returned from an Open call.
+        For use when mocking metadata from RTC-S1 static layer GeoTIFF products
+        """
+        def __init__(self):
+            self.dummy_metadata = {
+                'BOUNDING_BOX': '[200700.0, 9391650.0, 293730.0, 9440880.0]',
+                'BOUNDING_BOX_EPSG_CODE': '32718',
+                'BOUNDING_BOX_PIXEL_COORDINATE_CONVENTION': 'UPPER LEFT CORNER (ULC)',
+                'BURST_ID': "T069-147170-IW1",
             }
 
         def GetMetadata(self):
@@ -143,6 +166,8 @@ class MockGdal:  # pragma: no cover
 
         if 'dswx_s1' in file_name or 'dswx-s1' in file_name:
             return MockGdal.MockDSWxS1GdalDataset()
+        elif 'rtc_s1' in file_name or 'rtc-s1' in file_name:
+            return MockGdal.MockRtcS1GdalDataset()
         else:
             return MockGdal.MockDSWxHLSGdalDataset()
 
@@ -164,14 +189,21 @@ def mock_save_as_cog(filename, scratch_dir='.', logger=None,
 try:
     from osgeo import gdal
     from osgeo_utils.gdal_edit import main as gdal_edit
+
+    gdal.UseExceptions()
 except (ImportError, ModuleNotFoundError):  # pragma: no cover
     gdal = MockGdal  # pragma: no cover
     gdal_edit = mock_gdal_edit  # pragma: no cover
 
+# Search for an available implementation of save_as_cog from the underlying
+# SAS library. Fallback to the mock implementation if we cannot find any.
 try:
     from proteus.core import save_as_cog
 except (ImportError, ModuleNotFoundError):  # pragma: no cover
-    save_as_cog = mock_save_as_cog  # pragma: no cover
+    try:
+        from rtc.core import save_as_cog
+    except (ImportError, ModuleNotFoundError):  # pragma: no cover
+        save_as_cog = mock_save_as_cog  # pragma: no cover
 
 
 def set_geotiff_metadata(filename, scratch_dir=os.curdir, **kwargs):
@@ -226,11 +258,17 @@ def set_geotiff_metadata(filename, scratch_dir=os.curdir, **kwargs):
         raise RuntimeError(f'Call to gdal_edit returned non-zero ({result})')
 
     # Modifying metadata breaks the Cloud-Optimized-Geotiff (COG) format,
-    # so use a function from PROTEUS to restore it
-    try:
-        save_as_cog(filename, scratch_dir=scratch_dir)
-    except Exception as err:
-        raise RuntimeError(f'Call to save_as_cog failed, reason: {str(err)}')
+    # so use a function from the SAS to restore it
+    stdout = io.StringIO()
+    stderr = io.StringIO()
+
+    with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+        try:
+            save_as_cog(filename, scratch_dir=scratch_dir)
+        except Exception as err:
+            raise RuntimeError(
+                f'Call to save_as_cog failed, reason: {str(err)}, stderr: {stderr.getvalue()}'
+            )
 
     # Lastly, we need to clear the LRU for get_geotiff_metadata so any updates
     # made here can be pulled in on the next call

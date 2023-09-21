@@ -9,6 +9,8 @@ ISO metadata utilities for use with OPERA PGEs.
 
 """
 
+import re
+
 import h5py
 
 import mgrs
@@ -76,9 +78,37 @@ class MockOsr:  # pragma: no cover
 # resulting in the MockGdal class being substituted instead.
 try:
     from osgeo import osr
+
+    osr.UseExceptions()
 except (ImportError, ModuleNotFoundError):  # pragma: no cover
     osr = MockOsr                           # pragma: no cover
 
+
+def get_burst_id_from_file_name(file_name):
+    """
+    Extracts and returns the burst ID from the provided file name.
+
+    Parameters
+    ----------
+    file_name : str
+        File name to extract the burst ID from.
+
+    Returns
+    -------
+    burst_id : str
+        The extracted burst ID.
+
+    """
+    burst_id_regex = r'[T|t]\w{3}[-|_]\d{6}[-|_][I|i][W|w][1|2|3]'
+
+    result = re.search(burst_id_regex, file_name)
+
+    if result:
+        burst_id = result.group(0)
+    else:
+        raise ValueError(f'Could not parse Burst ID from HDF5 product {file_name}')
+
+    return burst_id
 
 def get_sensor_from_spacecraft_name(spacecraft_name):
     """
@@ -114,6 +144,54 @@ def get_sensor_from_spacecraft_name(spacecraft_name):
     except KeyError:
         raise RuntimeError(f"Unknown spacecraft name '{spacecraft_name}'")
 
+def translate_utm_bbox_to_lat_lon(bbox, epsg_code):
+    """
+    Translates a bounding box defined in UTM coordinates to Lat/Lon.
+
+    Parameters
+    ----------
+    bbox : iterable
+        The bounding box to transform. Expected order is xmin, ymin, xmax, ymax.
+    epsg_code : int
+        The EPSG code associated with the bounding box UTM coordinate convention.
+
+    Raises
+    ------
+    RuntimeError
+        If the coordinate transformation fails for any reason.
+
+    Returns
+    -------
+    lat_min : float
+        minimum latitude of bounding box
+    lat_max : float
+        maximum latitude of bounding box
+    lon_min : float
+        minimum longitude of bounding box
+    lon_max : float
+        maximum longitude of bounding box
+
+    """
+    # Set up the coordinate systems and point transformation objects
+    utm_coordinate_system = osr.SpatialReference()
+    result = utm_coordinate_system.ImportFromEPSG(epsg_code)
+
+    if result:
+        raise RuntimeError(f'Unrecognized EPSG code: {epsg_code}')
+
+    wgs84_coordinate_system = osr.SpatialReference()
+    wgs84_coordinate_system.SetWellKnownGeogCS("WGS84")
+
+    transformation = osr.CoordinateTransformation(utm_coordinate_system, wgs84_coordinate_system)
+
+    # Transform the min/max points from UTM to Lat/Lon
+    elevation = 0
+    xmin, ymin, xmax, ymax = bbox
+
+    lat_min, lon_min, _ = transformation.TransformPoint(xmin, ymin, elevation)
+    lat_max, lon_max, _ = transformation.TransformPoint(xmax, ymax, elevation)
+
+    return lat_min, lat_max, lon_min, lon_max
 
 def get_geographic_boundaries_from_mgrs_tile(mgrs_tile_name):
     """
@@ -357,7 +435,7 @@ def create_test_rtc_metadata_product(file_path):
         xCoordinates_dset = data_grp.create_dataset("xCoordinates", data=np.zeros((10,)), dtype='float64')
         yCoordinateSpacing_dset = data_grp.create_dataset("yCoordinateSpacing", data=30.0, dtype='float64')
         yCoordinates_dset = data_grp.create_dataset("yCoordinates", data=np.zeros((10,)), dtype='float64')
-        projection_dset = data_grp.create_dataset("projection", data=b'1234')
+        projection_dset = data_grp.create_dataset("projection", data=32718, dtype='int')
         listOfPolarizations_dset = data_grp.create_dataset("listOfPolarizations", data=np.array([b'VV', b'VH']))
 
         orbit_grp = outfile.create_group(f"{S1_SLC_HDF5_PREFIX}/metadata/orbit")
@@ -371,7 +449,6 @@ def create_test_rtc_metadata_product(file_path):
         annotationFiles = np.array([b'calibration-s1b-iw1-slc-vv-20180504t104508-20180504t104533-010770-013aee-004.xml',
                                     b'noise-s1b-iw1-slc-vv-20180504t104508-20180504t104533-010770-013aee-004.xml'])
         annotationFiles_dset = processingInformation_inputs_grp.create_dataset("annotationFiles", data=annotationFiles)
-        configFiles_dset = processingInformation_inputs_grp.create_dataset("configFiles", data=b'rtc_s1.yaml')
         l1SlcGranules = np.array([b'S1B_IW_SLC__1SDV_20180504T104507_20180504T104535_010770_013AEE_919F.zip'])
         l1SlcGranules_dset = processingInformation_inputs_grp.create_dataset("l1SlcGranules", data=l1SlcGranules)
         orbitFiles = np.array([b'S1B_OPER_AUX_POEORB_OPOD_20180524T110543_V20180503T225942_20180505T005942.EOF'])
@@ -400,15 +477,13 @@ def create_test_rtc_metadata_product(file_path):
             f"{S1_SLC_HDF5_PREFIX}/metadata/processingInformation/parameters")
         bistaticDelayCorrectionApplied_dset = processingInformation_parameters_grp.create_dataset(
             "bistaticDelayCorrectionApplied", data=True, dtype='bool')
-        dryTroposphericGeolocationCorrectionApplied_dset = processingInformation_parameters_grp.create_dataset(
-            "dryTroposphericGeolocationCorrectionApplied", data=True, dtype='bool')
+        staticTroposphericGeolocationCorrectionApplied_dset = processingInformation_parameters_grp.create_dataset(
+            "staticTroposphericGeolocationCorrectionApplied", data=True, dtype='bool')
         filteringApplied_dset = processingInformation_parameters_grp.create_dataset(
             "filteringApplied", data=False, dtype='bool')
         geocoding_grp = processingInformation_parameters_grp.create_group("geocoding")
         burstGeogridSnapX_dset = geocoding_grp.create_dataset("burstGeogridSnapX", data=30, dtype='int')
         burstGeogridSnapY_dset = geocoding_grp.create_dataset("burstGeogridSnapY", data=30, dtype='int')
-        ceosAnalysisReadyDataPixelCoordinateConvention_dset = geocoding_grp.create_dataset(
-            "ceosAnalysisReadyDataPixelCoordinateConvention", data=b'ULC')
         inputBackscatterNormalizationConvention_dset = processingInformation_parameters_grp.create_dataset(
             "inputBackscatterNormalizationConvention", data=b'beta0')
         noiseCorrectionApplied_dset = processingInformation_parameters_grp.create_dataset(
@@ -431,10 +506,11 @@ def create_test_rtc_metadata_product(file_path):
         acquisitionMode_dset = identification_grp.create_dataset("acquisitionMode",
                                                                  data=np.string_('Interferometric Wide (IW)'))
         beamID_dset = identification_grp.create_dataset("beamID", data=np.string_('iw1'))
-        boundingBox_dset = identification_grp.create_dataset("boundingBox", data=b'[ 200700. 9391650.  293730. 9440880.]')
+        boundingBox_dset = identification_grp.create_dataset("boundingBox", data=np.array([200700.0, 9391650.0,  293730.0, 9440880.0]))
         boundingPolygon_dset = identification_grp.create_dataset(
             "boundingPolygon", data=b'POLYGON ((399015 3859970, 398975 3860000, ..., 399015 3859970))')
         burstID_dset = identification_grp.create_dataset("burstID", data=b't069_147170_iw1')
+        contactInformation_dset = identification_grp.create_dataset("contactInformation", data=b'operasds@jpl.nasa.gov')
         ceosAnalysisReadyDataDocumentIdentifier_dset = identification_grp.create_dataset("ceosAnalysisReadyDataDocumentIdentifier",
                                                                                          data=True, dtype='bool')
         ceosAnalysisReadyDataProductType_dset = identification_grp.create_dataset("ceosAnalysisReadyDataProductType",
@@ -450,13 +526,14 @@ def create_test_rtc_metadata_product(file_path):
         processingDateTime_dset = identification_grp.create_dataset("processingDateTime",
                                                                     data=np.string_('2023-03-23T20:32:18.962836Z'))
         processingType_dset = identification_grp.create_dataset("processingType", data=b'UNDEFINED')
-        productID_dset = identification_grp.create_dataset("productID", data=b'OPERA_L2_RTC-S1_T069-147169-IW3_v0.4')
         productLevel_dset = identification_grp.create_dataset("productLevel", data=b'L2')
         productSpecificationVersion_dset = identification_grp.create_dataset("productSpecificationVersion", data=b'0.1')
         productType_dset = identification_grp.create_dataset("productType", data=b'SLC')
         productVersion_dset = identification_grp.create_dataset("productVersion", data=b'1.0')
         project_dset = identification_grp.create_dataset("project", data=b'OPERA')
         radarBand_dset = identification_grp.create_dataset("radarBand", data=b'C')
+        staticLayersDataAccess_dset = identification_grp.create_dataset("staticLayersDataAccess", data=b'(NOT PROVIDED)')
+        subSwathID_dset = identification_grp.create_dataset("subSwathID", data=b'IW3')
         trackNumber_dset = identification_grp.create_dataset("trackNumber", data=147170, dtype='int64')
         zeroDopplerEndTime_dset = identification_grp.create_dataset("zeroDopplerEndTime",
                                                                     data=b'2018-05-04T10:45:11.501279')

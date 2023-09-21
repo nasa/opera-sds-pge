@@ -365,6 +365,11 @@ class RunConfig:
         return bool(self._pge_config['DebugLevelGroup'].get('ExecuteViaShell', False))
 
     @property
+    def product_type(self) -> str:
+        """Returns the product type as defined in the SAS portion of the RunConfig"""
+        return self.sas_config['runconfig']['groups']['primary_executable']['product_type']
+
+    @property
     def sas_config(self) -> dict:
         """Returns the short-cut to the SAS-specific section of the parsed RunConfig"""
         return self._sas_config

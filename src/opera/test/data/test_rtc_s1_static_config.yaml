@@ -26,14 +26,13 @@ RunConfig:
                 ProgramOptions:
                     - '-p rtc_s1_test/output_dir/t069_147170_iw1/;'
                     - 'python3 -c "from opera.util.metadata_utils import create_test_rtc_metadata_product; create_test_rtc_metadata_product(\"rtc_s1_test/output_dir/t069_147170_iw1/rtc_product_v1.0.h5\")";'
-                    - 'dd if=/dev/urandom of=rtc_s1_test/output_dir/t069_147170_iw1/OPERA_L2_RTC-S1_T069-147170-IW1_20180504T104508Z_20230911T201937Z_S1B_30_v1.0_VH.tif bs=1M count=1;'
-                    - 'dd if=/dev/urandom of=rtc_s1_test/output_dir/t069_147170_iw1/OPERA_L2_RTC-S1_T069-147170-IW1_20180504T104508Z_20230911T201937Z_S1B_30_v1.0_VV.tif bs=1M count=1;'
-                    - 'dd if=/dev/urandom of=rtc_s1_test/output_dir/t069_147170_iw1/OPERA_L2_RTC-S1_T069-147170-IW1_20180504T104508Z_20230911T201937Z_S1B_30_v1.0_HH.tif bs=1M count=1;'
-                    - 'dd if=/dev/urandom of=rtc_s1_test/output_dir/t069_147170_iw1/OPERA_L2_RTC-S1_T069-147170-IW1_20180504T104508Z_20230911T201937Z_S1B_30_v1.0_HV.tif bs=1M count=1;'
-                    - 'dd if=/dev/urandom of=rtc_s1_test/output_dir/t069_147170_iw1/OPERA_L2_RTC-S1_T069-147170-IW1_20180504T104508Z_20230911T201937Z_S1B_30_v1.0_VV+VH.tif bs=1M count=1;'
-                    - 'dd if=/dev/urandom of=rtc_s1_test/output_dir/t069_147170_iw1/OPERA_L2_RTC-S1_T069-147170-IW1_20180504T104508Z_20230911T201937Z_S1B_30_v1.0_HH+HV.tif bs=1M count=1;'
-                    - 'dd if=/dev/urandom of=rtc_s1_test/output_dir/t069_147170_iw1/OPERA_L2_RTC-S1_T069-147170-IW1_20180504T104508Z_20230911T201937Z_S1B_30_v1.0.png bs=1M count=1;'
-                    - 'dd if=/dev/urandom of=rtc_s1_test/output_dir/t069_147170_iw1/OPERA_L2_RTC-S1_T069-147170-IW1_20180504T104508Z_20230911T201937Z_S1B_30_v1.0_mask.tif bs=1M count=1;'
+                    - 'dd if=/dev/urandom of=rtc_s1_test/output_dir/t069_147170_iw1/OPERA_L2_RTC-S1-STATIC_T069-147170-IW1_20140403_20230911T203246Z_S1B_30_v1.0_incidence_angle.tif bs=1M count=1;'
+                    - 'dd if=/dev/urandom of=rtc_s1_test/output_dir/t069_147170_iw1/OPERA_L2_RTC-S1-STATIC_T069-147170-IW1_20140403_20230911T203246Z_S1B_30_v1.0_local_incidence_angle.tif bs=1M count=1;'
+                    - 'dd if=/dev/urandom of=rtc_s1_test/output_dir/t069_147170_iw1/OPERA_L2_RTC-S1-STATIC_T069-147170-IW1_20140403_20230911T203246Z_S1B_30_v1.0_number_of_looks.tif bs=1M count=1;'
+                    - 'dd if=/dev/urandom of=rtc_s1_test/output_dir/t069_147170_iw1/OPERA_L2_RTC-S1-STATIC_T069-147170-IW1_20140403_20230911T203246Z_S1B_30_v1.0_rtc_anf_gamma0_to_beta0.tif bs=1M count=1;'
+                    - 'dd if=/dev/urandom of=rtc_s1_test/output_dir/t069_147170_iw1/OPERA_L2_RTC-S1-STATIC_T069-147170-IW1_20140403_20230911T203246Z_S1B_30_v1.0_rtc_anf_gamma0_to_sigma0.tif bs=1M count=1;'
+                    - 'dd if=/dev/urandom of=rtc_s1_test/output_dir/t069_147170_iw1/OPERA_L2_RTC-S1-STATIC_T069-147170-IW1_20140403_20230911T203246Z_S1B_30_v1.0_mask.tif bs=1M count=1;'
+                    - 'dd if=/dev/urandom of=rtc_s1_test/output_dir/t069_147170_iw1/OPERA_L2_RTC-S1-STATIC_T069-147170-IW1_20140403_20230911T203246Z_S1B_30_v1.0.png bs=1M count=1;'
                     - '/bin/echo RTC-S1 invoked with RunConfig'
                 ErrorCodeBase: 300000
                 SchemaPath: pge/rtc_s1/schema/rtc_s1_sas_schema.yaml
@@ -72,7 +71,7 @@ RunConfig:
                         burst_database_file: rtc_s1_test/input_dir/db.sqlite3
 
                     primary_executable:
-                        product_type: RTC_S1
+                        product_type: RTC_S1_STATIC
 
                     product_group:
                         processing_type: NOMINAL
