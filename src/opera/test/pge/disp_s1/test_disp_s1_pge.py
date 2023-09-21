@@ -726,7 +726,7 @@ class DispS1PgeTestCase(unittest.TestCase):
             runconfig_dict = yaml.safe_load(infile)
 
         primary_executable = runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']
-        primary_executable['IsoTemplatePath'] = "pge/disp_s1/templates/OPERA_ISO_metadata_L3_DSWX_S1_template.xml"
+        primary_executable['IsoTemplatePath'] = "pge/disp_s1/templates/OPERA_ISO_metadata_L3_DISP_S1_template.xml"
 
         with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
             yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
