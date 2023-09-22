@@ -855,7 +855,7 @@ class CslcS1Executor(CslcS1PreProcessorMixin, CslcS1PostProcessorMixin, PgeExecu
     PGE_VERSION = "2.0.0"
     """Version of the PGE (overrides default from base_pge)"""
 
-    SAS_VERSION = "0.5.1"  # Final release https://github.com/opera-adt/COMPASS/releases/tag/v0.5.1
+    SAS_VERSION = "0.5.2"  # Final release https://github.com/opera-adt/COMPASS/releases/tag/v0.5.2
     """Version of the SAS wrapped by this PGE, should be updated as needed"""
 
     def __init__(self, pge_name, runconfig_path, **kwargs):
