@@ -329,6 +329,7 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
         # Extract all metadata assigned by the SAS at product creation time
         output_product_metadata = get_disp_s1_product_metadata(representative_product)
 
+        # TODO: temporary fields, remove once available from product metadata
         # "identification/reference_datetime" is missing from
         # the current delivery. We should assign a placeholder datetime in
         # the meantime
@@ -338,6 +339,24 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
         # the current delivery. We should assign a placeholder datetime in
         # the meantime
         output_product_metadata['identification']['secondary_datetime'] = "20230101T000000Z"
+
+        output_product_metadata['geospatial_lon_min'] = 10.0
+        output_product_metadata['geospatial_lon_max'] = 20.0
+        output_product_metadata['geospatial_lat_min'] = 10.0
+        output_product_metadata['geospatial_lat_max'] = 30.0
+
+        output_product_metadata['polarization'] = 'VV'
+        # TODO: end temporary fields
+
+        # Add some fields on the dimensions of the data.
+        output_product_metadata['xCoordinates'] = {
+            'size': 3660,  # pixels
+            'spacing': 30  # meters/pixel
+        }
+        output_product_metadata['yCoordinates'] = {
+            'size': 3660,  # pixels
+            'spacing': 30  # meters/pixel
+        }
 
         return output_product_metadata
 

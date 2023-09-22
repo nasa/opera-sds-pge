@@ -153,11 +153,23 @@ class DispS1PgeTestCase(unittest.TestCase):
         self.assertTrue(os.path.exists(expected_sas_config_file))
 
         # Check that the file naming is correct
+        # TODO: move this test to its own function
         output_dir = abspath(pge.runconfig.output_product_path)
         nc_files = glob.glob(join(output_dir, '*.nc'))
         nc_file = nc_files[0]
         nf = pge._netcdf_filename(nc_file)
         self.assertRegex(nf, r'OPERA_L3_DISP-S1_IW_F00123_VV_[0-9]{8}T[0-9]{6}Z_[0-9]{8}T[0-9]{6}Z_v0\.1_[0-9]{8}T[0-9]{6}Z\.nc')
+
+        # Check that the ISO metadata file was created and all placeholders were
+        # filled in
+        expected_iso_metadata_file = join(
+            pge.runconfig.output_product_path, pge._iso_metadata_filename())
+        self.assertTrue(os.path.exists(expected_iso_metadata_file))
+
+        with open(expected_iso_metadata_file, 'r', encoding='utf-8') as infile:
+            iso_contents = infile.read()
+
+        self.assertNotIn('!Not found!', iso_contents)
 
         # Check that the log file was created and moved into the output directory
         expected_log_file = pge.logger.get_file_name()
@@ -718,6 +730,9 @@ class DispS1PgeTestCase(unittest.TestCase):
         output_product_metadata = pge._collect_disp_s1_product_metadata()
 
         self.assertIsInstance(output_product_metadata, dict)
+
+        # Remove dummy output products for next test
+        shutil.rmtree(abspath(join('disp_s1_pge_test', 'output_dir')))
 
         # Test bad iso_template_path
         test_runconfig_path = join(self.data_dir, 'invalid_disp_s1_runconfig.yaml')

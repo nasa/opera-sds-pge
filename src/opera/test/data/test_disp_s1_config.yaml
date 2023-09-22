@@ -21,6 +21,7 @@ RunConfig:
 
             PrimaryExecutable:
                 ProductIdentifier: DISP_S1
+                ProductVersion: "1.0"
                 ProgramPath: mkdir
                 ProgramOptions:
                     - '-p disp_s1_pge_test/output_dir/compressed_slcs;'
