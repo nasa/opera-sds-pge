@@ -3,19 +3,18 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera.pge.cslc_s1.cslc_s1_pge &mdash; opera-sds-pge 2.0.0-er.3.0 documentation</title>
+  <title>opera.pge.cslc_s1.cslc_s1_pge &mdash; opera-sds-pge 3.0.0-er.4.0 documentation</title>
       <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
-        <script src="../../../../_static/jquery.js"></script>
-        <script src="../../../../_static/underscore.js"></script>
-        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../../../../_static/doctools.js"></script>
-        <script src="../../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=141e5374"></script>
+        <script src="../../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
@@ -26,14 +25,18 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../../../index.html" class="icon icon-home"> opera-sds-pge
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            opera-sds-pge
           </a>
               <div class="version">
-                2.0.0-er.3.0
+                3.0.0-er.4.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -61,9 +64,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../../index.html">Module code</a> &raquo;</li>
-      <li>opera.pge.cslc_s1.cslc_s1_pge</li>
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">opera.pge.cslc_s1.cslc_s1_pge</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -84,23 +87,26 @@
 <span class="sd">from Sentinel-1 A/B (S1) PGE.</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
-
-<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">glob</span>
 <span class="kn">import</span> <span class="nn">os.path</span>
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
-<span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">exists</span><span class="p">,</span> <span class="n">getsize</span><span class="p">,</span> <span class="n">splitext</span>
+<span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">walk</span>
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">getsize</span><span class="p">,</span> <span class="n">join</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 
 <span class="kn">from</span> <span class="nn">opera.pge.base.base_pge</span> <span class="kn">import</span> <span class="n">PgeExecutor</span>
 <span class="kn">from</span> <span class="nn">opera.pge.base.base_pge</span> <span class="kn">import</span> <span class="n">PostProcessorMixin</span>
 <span class="kn">from</span> <span class="nn">opera.pge.base.base_pge</span> <span class="kn">import</span> <span class="n">PreProcessorMixin</span>
 <span class="kn">from</span> <span class="nn">opera.util.error_codes</span> <span class="kn">import</span> <span class="n">ErrorCode</span>
+<span class="kn">from</span> <span class="nn">opera.util.input_validation</span> <span class="kn">import</span> <span class="n">validate_slc_s1_inputs</span>
+<span class="kn">from</span> <span class="nn">opera.util.metadata_utils</span> <span class="kn">import</span> <span class="n">get_cslc_s1_product_metadata</span>
 <span class="kn">from</span> <span class="nn">opera.util.render_jinja2</span> <span class="kn">import</span> <span class="n">render_jinja2</span>
 <span class="kn">from</span> <span class="nn">opera.util.time</span> <span class="kn">import</span> <span class="n">get_time_for_filename</span>
 
 
 <div class="viewcode-block" id="CslcS1PreProcessorMixin"><a class="viewcode-back" href="../../../../opera.pge.cslc_s1.html#opera.pge.cslc_s1.cslc_s1_pge.CslcS1PreProcessorMixin">[docs]</a><span class="k">class</span> <span class="nc">CslcS1PreProcessorMixin</span><span class="p">(</span><span class="n">PreProcessorMixin</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Mixin class responsible for handling all pre-processing steps for the CSLC-S1</span>
 <span class="sd">    PGE. The pre-processing phase is defined as all steps necessary prior</span>
 <span class="sd">    to SAS execution.</span>
@@ -113,72 +119,8 @@
 
     <span class="n">_pre_mixin_name</span> <span class="o">=</span> <span class="s2">&quot;CslcS1PreProcessorMixin&quot;</span>
 
-    <span class="k">def</span> <span class="nf">_check_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_object</span><span class="p">,</span> <span class="n">valid_extensions</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Called by _validate_inputs() to check individual files.</span>
-<span class="sd">        The input object is checked for existence and that it ends with</span>
-<span class="sd">        a valid file extension.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        input_object : str</span>
-<span class="sd">            Relative path the object to be validated</span>
-<span class="sd">        valid_extensions : iterable</span>
-<span class="sd">            Expected file extensions of the file being validated.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">exists</span><span class="p">(</span><span class="n">input_object</span><span class="p">):</span>
-            <span class="n">error_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Could not locate specified input </span><span class="si">{</span><span class="n">input_object</span><span class="si">}</span><span class="s2">.&quot;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INPUT_NOT_FOUND</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">)</span>
-
-        <span class="n">ext</span> <span class="o">=</span> <span class="n">splitext</span><span class="p">(</span><span class="n">input_object</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-
-        <span class="k">if</span> <span class="n">ext</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">valid_extensions</span><span class="p">:</span>
-            <span class="n">error_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Input file </span><span class="si">{</span><span class="n">input_object</span><span class="si">}</span><span class="s2"> does not have an expected file extension.&quot;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INVALID_INPUT</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">_validate_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Evaluates the list of inputs from the RunConfig to ensure they are valid.</span>
-<span class="sd">        There are 2 required categories defined in the &#39;input_file_group&#39;:</span>
-
-<span class="sd">            - safe_file_path: list</span>
-<span class="sd">                List of SAFE files (min=1)</span>
-<span class="sd">            - orbit_file_path : list</span>
-<span class="sd">                List of orbit (EOF) files (min=1)</span>
-
-<span class="sd">        There is also an ancillary file contained in the input_dir</span>
-<span class="sd">            - dem_file : str</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># Retrieve the input_file_group from the run config file</span>
-        <span class="n">input_file_group_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">sas_config</span><span class="p">[</span><span class="s1">&#39;runconfig&#39;</span><span class="p">][</span><span class="s1">&#39;groups&#39;</span><span class="p">][</span><span class="s1">&#39;input_file_group&#39;</span><span class="p">]</span>
-
-        <span class="c1"># Retrieve the dynamic_ancillary_file_group from the run config file</span>
-        <span class="n">ancillary_file_group_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">sas_config</span><span class="p">[</span><span class="s1">&#39;runconfig&#39;</span><span class="p">][</span><span class="s1">&#39;groups&#39;</span><span class="p">][</span><span class="s1">&#39;dynamic_ancillary_file_group&#39;</span><span class="p">]</span>
-
-        <span class="c1"># Merge the 2 dictionaries</span>
-        <span class="n">input_file_group_dict</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">input_file_group_dict</span><span class="p">,</span> <span class="o">**</span><span class="n">ancillary_file_group_dict</span><span class="p">}</span>
-
-        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">input_file_group_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;safe_file_path&#39;</span><span class="p">:</span>
-                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)):</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_check_input</span><span class="p">(</span><span class="n">value</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">valid_extensions</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;.zip&#39;</span><span class="p">,))</span>
-            <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;orbit_file_path&#39;</span><span class="p">:</span>
-                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)):</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_check_input</span><span class="p">(</span><span class="n">value</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">valid_extensions</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;.EOF&#39;</span><span class="p">,))</span>
-            <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;dem_file&#39;</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_check_input</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">valid_extensions</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;.tif&#39;</span><span class="p">,</span> <span class="s1">&#39;.tiff&#39;</span><span class="p">,</span> <span class="s1">&#39;.vrt&#39;</span><span class="p">))</span>
-            <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;burst_id&#39;</span><span class="p">:</span>
-                <span class="c1"># burst_id is included in the SAS input paths, but is not</span>
-                <span class="c1"># actually a file, so skip it</span>
-                <span class="k">continue</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">error_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Unexpected input: </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INVALID_INPUT</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">)</span>
-
 <div class="viewcode-block" id="CslcS1PreProcessorMixin.run_preprocessor"><a class="viewcode-back" href="../../../../opera.pge.cslc_s1.html#opera.pge.cslc_s1.cslc_s1_pge.CslcS1PreProcessorMixin.run_preprocessor">[docs]</a>    <span class="k">def</span> <span class="nf">run_preprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Executes the pre-processing steps for CSLC-S1 PGE initialization.</span>
 
 <span class="sd">        The CslcS1PreProcessorMixin version of this class performs all actions</span>
@@ -193,11 +135,11 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">run_preprocessor</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_inputs</span><span class="p">()</span></div></div>
+        <span class="n">validate_slc_s1_inputs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="CslcS1PostProcessorMixin"><a class="viewcode-back" href="../../../../opera.pge.cslc_s1.html#opera.pge.cslc_s1.cslc_s1_pge.CslcS1PostProcessorMixin">[docs]</a><span class="k">class</span> <span class="nc">CslcS1PostProcessorMixin</span><span class="p">(</span><span class="n">PostProcessorMixin</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Mixin class responsible for handling all post-processing steps for the CSLC-S1</span>
 <span class="sd">    PGE. The post-processing phase is defined as all steps required after SAS</span>
 <span class="sd">    execution has completed, prior to handover of output products to PCM.</span>
@@ -210,44 +152,61 @@
 
     <span class="n">_post_mixin_name</span> <span class="o">=</span> <span class="s2">&quot;CslcS1PostProcessorMixin&quot;</span>
     <span class="n">_cached_core_filename</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">_burst_metadata_cache</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">_burst_filename_cache</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="k">def</span> <span class="nf">_validate_output</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Evaluates the output file(s) generated from SAS execution to ensure</span>
 <span class="sd">        existence, also validate that the file(s) contains some content</span>
 <span class="sd">        (size is greater than 0).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">output_product_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">output_product_path</span>
+        <span class="n">out_dir_walk_dict</span> <span class="o">=</span> <span class="p">{}</span>
 
-        <span class="c1"># Get the burst ID of the job</span>
-        <span class="n">burst_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">sas_config</span><span class="p">[</span><span class="s1">&#39;runconfig&#39;</span><span class="p">][</span><span class="s1">&#39;groups&#39;</span><span class="p">][</span><span class="s1">&#39;input_file_group&#39;</span><span class="p">][</span><span class="s1">&#39;burst_id&#39;</span><span class="p">]</span>
+        <span class="n">output_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">output_product_path</span><span class="p">)</span>
+        <span class="n">scratch_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">scratch_path</span><span class="p">)</span>
 
-        <span class="n">output_products</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
-            <span class="nb">filter</span><span class="p">(</span>
-                <span class="k">lambda</span> <span class="n">filename</span><span class="p">:</span> <span class="n">burst_id</span> <span class="ow">in</span> <span class="n">filename</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">get_output_product_filenames</span><span class="p">()</span>
-            <span class="p">)</span>
-        <span class="p">)</span>
+        <span class="c1"># from &#39;output_dir&#39; make a dictionary of {sub_dir_name: [file1, file2,...]}</span>
+        <span class="k">for</span> <span class="n">path</span><span class="p">,</span> <span class="n">dirs</span><span class="p">,</span> <span class="n">files</span> <span class="ow">in</span> <span class="n">walk</span><span class="p">(</span><span class="n">output_dir</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">dirs</span> <span class="ow">and</span> <span class="n">scratch_dir</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">path</span><span class="p">:</span>  <span class="c1"># Ignore files in &#39;output_dir&#39; and scratch directory</span>
+                <span class="n">dir_key</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">dir_key</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">):</span>
+                    <span class="n">dir_key</span> <span class="o">=</span> <span class="n">dir_key</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+                <span class="n">out_dir_walk_dict</span><span class="p">[</span><span class="n">dir_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">files</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">output_products</span><span class="p">:</span>
-            <span class="n">error_msg</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No SAS output file(s) containing burst ID </span><span class="si">{</span><span class="n">burst_id</span><span class="si">}</span><span class="s2"> &quot;</span>
-                         <span class="sa">f</span><span class="s2">&quot;found within </span><span class="si">{</span><span class="n">output_product_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">out_dir_walk_dict</span><span class="p">:</span>
+            <span class="n">error_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;No SAS output file(s) found within </span><span class="si">{</span><span class="n">output_dir</span><span class="si">}</span><span class="s2">&quot;</span>
+
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">OUTPUT_NOT_FOUND</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">)</span>
 
-        <span class="k">for</span> <span class="n">output_product</span> <span class="ow">in</span> <span class="n">output_products</span><span class="p">:</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">getsize</span><span class="p">(</span><span class="n">output_product</span><span class="p">):</span>
-                <span class="n">error_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SAS output file </span><span class="si">{</span><span class="n">output_product</span><span class="si">}</span><span class="s2"> was created, but is empty&quot;</span>
+        <span class="n">expected_ext</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;tiff&#39;</span><span class="p">,</span> <span class="s1">&#39;tif&#39;</span><span class="p">,</span> <span class="s1">&#39;h5&#39;</span><span class="p">,</span> <span class="s1">&#39;png&#39;</span><span class="p">]</span>
+
+        <span class="c1"># Verify: files in subdirectories, file length, and proper extension.</span>
+        <span class="k">for</span> <span class="n">dir_name_key</span><span class="p">,</span> <span class="n">file_names</span> <span class="ow">in</span> <span class="n">out_dir_walk_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">file_names</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">error_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Empty SAS output directory: </span><span class="si">{</span><span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="n">output_dir</span><span class="p">,</span><span class="w"> </span><span class="n">dir_name_key</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span>
 
                 <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INVALID_OUTPUT</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">)</span>
 
+            <span class="k">for</span> <span class="n">file_name</span> <span class="ow">in</span> <span class="n">file_names</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">getsize</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">dir_name_key</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)):</span>
+                    <span class="n">error_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SAS output file </span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2"> exists, but is empty&quot;</span>
+
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INVALID_OUTPUT</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">file_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">expected_ext</span><span class="p">:</span>
+                    <span class="n">error_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SAS output file </span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2"> extension error: expected one of </span><span class="si">{</span><span class="n">expected_ext</span><span class="si">}</span><span class="s2">&quot;</span>
+
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INVALID_OUTPUT</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">)</span>
+
     <span class="k">def</span> <span class="nf">_core_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inter_filename</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the core file name component for products produced by the</span>
 <span class="sd">        CSLC-S1 PGE.</span>
 
 <span class="sd">        The core file name component of the CSLC-S1 PGE consists of:</span>
 
-<span class="sd">        &lt;PROJECT&gt;_&lt;LEVEL&gt;_&lt;PGE NAME&gt;_&lt;SENSOR&gt;_&lt;MODE&gt;_&lt;BURST ID&gt;_&lt;POL&gt;_&lt;ACQ TIMETAG&gt;_&lt;PRODUCT VER&gt;_&lt;PROD TIMETAG&gt;</span>
+<span class="sd">        &lt;PROJECT&gt;_&lt;LEVEL&gt;_&lt;PGE NAME&gt;</span>
 
 <span class="sd">        Callers of this function are responsible for assignment of any other</span>
 <span class="sd">        product-specific fields, such as the file extension.</span>
@@ -279,50 +238,255 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cached_core_filename</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cached_core_filename</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">inter_filename</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No filename provided to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">._core_filename(), &quot;</span>
-                   <span class="sa">f</span><span class="s2">&quot;First call must provide a filename before result is cached.&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">FILE_MOVE_FAILED</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
-
-        <span class="c1"># CSLC-S1 SAS produces two output files: the image and a separate</span>
-        <span class="c1"># json metadata file, each with the same base filename.</span>
-        <span class="c1"># We use that here to always locate and read the json metadata file.</span>
-        <span class="n">metadata_filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">inter_filename</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;.json&#39;</span>
-
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">metadata_filename</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">infile</span><span class="p">:</span>
-            <span class="n">cslc_metadata</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">infile</span><span class="p">)</span>
-
-        <span class="n">sensor</span> <span class="o">=</span> <span class="n">cslc_metadata</span><span class="p">[</span><span class="s1">&#39;platform_id&#39;</span><span class="p">]</span>
-        <span class="n">mode</span> <span class="o">=</span> <span class="s1">&#39;IW&#39;</span>  <span class="c1"># fixed for all S1-based CSLC products</span>
-        <span class="n">burst_id</span> <span class="o">=</span> <span class="n">cslc_metadata</span><span class="p">[</span><span class="s1">&#39;burst_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">)</span>
-        <span class="n">pol</span> <span class="o">=</span> <span class="n">cslc_metadata</span><span class="p">[</span><span class="s1">&#39;polarization&#39;</span><span class="p">]</span>
-        <span class="n">acquisition_time</span> <span class="o">=</span> <span class="n">get_time_for_filename</span><span class="p">(</span>
-            <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">cslc_metadata</span><span class="p">[</span><span class="s1">&#39;sensing_start&#39;</span><span class="p">],</span> <span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1"> %H:%M:%S.</span><span class="si">%f</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="c1"># Assign the core file name to the cached class attribute</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cached_core_filename</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">PROJECT</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">LEVEL</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">NAME</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="p">)</span>
 
-        <span class="n">product_version</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">product_version</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cached_core_filename</span>
+
+    <span class="k">def</span> <span class="nf">_core_static_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inter_filename</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the core file name component for static layer products produced</span>
+<span class="sd">        by the CSLC-S1 PGE.</span>
+
+<span class="sd">        The core file name component of the CSLC-S1 PGE static layer products</span>
+<span class="sd">        consists of:</span>
+
+<span class="sd">        &lt;Core filename&gt;-STATIC</span>
+
+<span class="sd">        Where &lt;Core filename&gt; is returned by CslcS1PostProcessorMixin._core_filename()</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        inter_filename : str, optional</span>
+<span class="sd">            The intermediate filename of the output product to generate the</span>
+<span class="sd">            core filename for. This parameter may be used to inspect the file</span>
+<span class="sd">            in order to derive any necessary components of the returned filename.</span>
+<span class="sd">            Once the core filename is cached upon first call to this function,</span>
+<span class="sd">            this parameter may be omitted.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        core_static_filename : str</span>
+<span class="sd">            The core file name component to assign to static layer products</span>
+<span class="sd">            created by this PGE.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">core_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_core_filename</span><span class="p">(</span><span class="n">inter_filename</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">core_filename</span><span class="si">}</span><span class="s2">-STATIC&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_cslc_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inter_filename</span><span class="p">,</span> <span class="n">static_layer_product</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the file name to use for burst-based CSLC products produced by this PGE.</span>
+
+<span class="sd">        The filename for the CSLC-S1 burst products consists of:</span>
+
+<span class="sd">            &lt;Core filename&gt;_&lt;BURST ID&gt;_&lt;ACQUISITION TIMETAG&gt;_&lt;PRODUCTION TIMETAG&gt;_&lt;SENSOR&gt;_&lt;POL&gt;_&lt;PRODUCT_VERSION&gt;</span>
+
+<span class="sd">        Where &lt;Core filename&gt; is returned by CslcS1PostProcessorMixin._core_filename()</span>
+<span class="sd">        if static_layer_product is False, otherwise it is the value returned by</span>
+<span class="sd">        CslcS1PostProcessorMixin._core_static_filename()</span>
+
+<span class="sd">        If static_layer_product is True, &lt;ACQUISITION_TIME&gt; will correspond</span>
+<span class="sd">        to the configured data validity start time (as defined in the RunConfig).</span>
+
+<span class="sd">        Also note that this does not include a file extension, which should be</span>
+<span class="sd">        added to the return value of this method by any callers to distinguish</span>
+<span class="sd">        different file formats that are produced for each burst in an input SLC.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        inter_filename : str</span>
+<span class="sd">            The intermediate filename of the output GeoTIFF to generate a</span>
+<span class="sd">            filename for. This parameter may be used to inspect the file in order</span>
+<span class="sd">            to derive any necessary components of the returned filename.</span>
+<span class="sd">        static_layer_product : bool, optional</span>
+<span class="sd">            If True, use the file name conventions specific to static layer</span>
+<span class="sd">            products. Otherwise, use the baseline conventions. Defaults to False.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        cslc_filename : str</span>
+<span class="sd">            The file name to assign to CSLC product(s) created by this PGE.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If static_layer_product is True and no value was specified for</span>
+<span class="sd">            DataValidityStartDate within the RunConfig.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">static_layer_product</span><span class="p">:</span>
+            <span class="n">core_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_core_static_filename</span><span class="p">(</span><span class="n">inter_filename</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">core_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_core_filename</span><span class="p">(</span><span class="n">inter_filename</span><span class="p">)</span>
+
+        <span class="c1"># The burst ID should be included within the file path for each</span>
+        <span class="c1"># output directory, extract it and prepare it for use within the</span>
+        <span class="c1"># final filename</span>
+        <span class="n">burst_id_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">inter_filename</span><span class="p">))</span><span class="o">.</span><span class="n">parts</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">burst_id</span> <span class="o">=</span> <span class="n">burst_id_dir</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">burst_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_burst_metadata_cache</span><span class="p">:</span>
+            <span class="n">cslc_metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_burst_metadata_cache</span><span class="p">[</span><span class="n">burst_id</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Collect the metadata from the HDF5 output product</span>
+            <span class="n">cslc_h5_product_pattern</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">inter_filename</span><span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;*</span><span class="si">{</span><span class="n">burst_id_dir</span><span class="si">}</span><span class="s2">*.h5&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Find the main .h5 product path based on location of the current file</span>
+            <span class="c1"># and burst ID</span>
+            <span class="n">cslc_h5_product_paths</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">cslc_h5_product_pattern</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cslc_h5_product_paths</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Got unexpected number of CSLC .h5 paths: </span><span class="si">{</span><span class="n">cslc_h5_product_paths</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+            <span class="n">cslc_metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_collect_cslc_product_metadata</span><span class="p">(</span><span class="n">cslc_h5_product_paths</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_burst_metadata_cache</span><span class="p">[</span><span class="n">burst_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">cslc_metadata</span>
+
+        <span class="n">burst_metadata</span> <span class="o">=</span> <span class="n">cslc_metadata</span><span class="p">[</span><span class="s1">&#39;processing_information&#39;</span><span class="p">][</span><span class="s1">&#39;input_burst_metadata&#39;</span><span class="p">]</span>
+
+        <span class="n">sensor</span> <span class="o">=</span> <span class="n">burst_metadata</span><span class="p">[</span><span class="s1">&#39;platform_id&#39;</span><span class="p">]</span>
+
+        <span class="c1"># Polarization only included in file name for baseline products</span>
+        <span class="n">pol</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span> <span class="k">if</span> <span class="n">static_layer_product</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">burst_metadata</span><span class="p">[</span><span class="s1">&#39;polarization&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="k">if</span> <span class="n">static_layer_product</span><span class="p">:</span>
+            <span class="n">acquisition_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">data_validity_start_date</span>
+
+            <span class="k">if</span> <span class="n">acquisition_time</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s1">&#39;static_layer_product was requested, but no value was provided &#39;</span>
+                    <span class="s1">&#39;for DataValidityStartDate within the RunConfig&#39;</span>
+                <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">acquisition_time</span> <span class="o">=</span> <span class="n">burst_metadata</span><span class="p">[</span><span class="s1">&#39;sensing_start&#39;</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">acquisition_time</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;Z&#39;</span><span class="p">):</span>
+                <span class="n">acquisition_time</span> <span class="o">=</span> <span class="n">acquisition_time</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="n">acquisition_time</span> <span class="o">=</span> <span class="n">get_time_for_filename</span><span class="p">(</span>
+                <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">acquisition_time</span><span class="p">,</span> <span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1"> %H:%M:%S.</span><span class="si">%f</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">acquisition_time</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;Z&#39;</span><span class="p">):</span>
+                <span class="n">acquisition_time</span> <span class="o">+=</span> <span class="s1">&#39;Z&#39;</span>
+
+        <span class="n">product_version</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">product_version</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">product_version</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;v&#39;</span><span class="p">):</span>
             <span class="n">product_version</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;v</span><span class="si">{</span><span class="n">product_version</span><span class="si">}</span><span class="s1">&#39;</span>
 
         <span class="n">production_time</span> <span class="o">=</span> <span class="n">get_time_for_filename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">production_datetime</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_cached_core_filename</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">PROJECT</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">LEVEL</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">NAME</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">sensor</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">burst_id</span><span class="si">}</span><span class="s2">_&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">acquisition_time</span><span class="si">}</span><span class="s2">Z_</span><span class="si">{</span><span class="n">product_version</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">production_time</span><span class="si">}</span><span class="s2">Z&quot;</span>
+        <span class="n">cslc_filename</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">core_filename</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">burst_id</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">acquisition_time</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">production_time</span><span class="si">}</span><span class="s2">Z_&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sensor</span><span class="si">}{</span><span class="n">pol</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">product_version</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="p">)</span>
 
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cached_core_filename</span>
+        <span class="c1"># Cache the file name for this burst ID, so it can be used with the</span>
+        <span class="c1"># ISO metadata later.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_burst_filename_cache</span><span class="p">[</span><span class="n">burst_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">cslc_filename</span>
+
+        <span class="k">return</span> <span class="n">cslc_filename</span>
+
+    <span class="k">def</span> <span class="nf">_h5_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inter_filename</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the file name to use for HDF5 products produced by the CSLC-S1 PGE.</span>
+
+<span class="sd">        The HDF5 filename for the CSLC-S1 PGE consists of:</span>
+
+<span class="sd">            &lt;CSLC filename&gt;.h5</span>
+
+<span class="sd">        Where &lt;CSLC filename&gt; is returned by CslcS1PostProcessorMixin._cslc_filename()</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        inter_filename : str</span>
+<span class="sd">            The intermediate filename of the output HDF5 to generate a</span>
+<span class="sd">            filename for. This parameter may be used to inspect the file in order</span>
+<span class="sd">            to derive any necessary components of the returned filename.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        h5_filename : str</span>
+<span class="sd">            The file name to assign to HDF5 product(s) created by this PGE.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cslc_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cslc_filename</span><span class="p">(</span><span class="n">inter_filename</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">cslc_filename</span><span class="si">}</span><span class="s2">.h5&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_static_layers_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inter_filename</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the file name to use for the static layers product produced by</span>
+<span class="sd">        the CSLC-S1 PGE.</span>
+
+<span class="sd">        The static layers filename for the CSLC-S1 PGE consists of:</span>
+
+<span class="sd">            &lt;CSLC static filename&gt;.h5</span>
+
+<span class="sd">        Where &lt;CSLC static filename&gt; is returned by CslcS1PostProcessorMixin._cslc_filename()</span>
+<span class="sd">        with static_layer_product set to True.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        inter_filename : str</span>
+<span class="sd">            The intermediate filename of the output HDF5 product containing all</span>
+<span class="sd">            the output static layers. This parameter is used to derive the</span>
+<span class="sd">            core CSLC file name component for static layer products.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        static_layers_filename : str</span>
+<span class="sd">            The file name to assign to static layers product(s) created by this PGE.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cslc_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cslc_filename</span><span class="p">(</span><span class="n">inter_filename</span><span class="p">,</span> <span class="n">static_layer_product</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">static_layers_filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">cslc_filename</span><span class="si">}</span><span class="s2">.h5&quot;</span>
+
+        <span class="k">return</span> <span class="n">static_layers_filename</span>
+
+    <span class="k">def</span> <span class="nf">_browse_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inter_filename</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the file name to use for the PNG browse image produced by</span>
+<span class="sd">        the CSLC-S1 PGE.</span>
+
+<span class="sd">        The browse image filename for the CSLC-S1 PGE consists of:</span>
+
+<span class="sd">            &lt;CSLC filename&gt;_BROWSE.png</span>
+
+<span class="sd">        Where &lt;CSLC filename&gt; is returned by CslcS1PostProcessorMixin._cslc_filename()</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        inter_filename : str</span>
+<span class="sd">            The intermediate filename of the output browse image to generate a</span>
+<span class="sd">            filename for. This parameter may be used to inspect the file in order</span>
+<span class="sd">            to derive any necessary components of the returned filename.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        browse_image_filename : str</span>
+<span class="sd">            The file name to assign to browse image created by this PGE.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cslc_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cslc_filename</span><span class="p">(</span><span class="n">inter_filename</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">cslc_filename</span><span class="si">}</span><span class="s2">_BROWSE.png&quot;</span>
 
     <span class="k">def</span> <span class="nf">_geotiff_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inter_filename</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the file name to use for GeoTIFF&#39;s produced by the CSLC-S1 PGE.</span>
 
 <span class="sd">        The GeoTIFF filename for the CSLC-S1 PGE consists of:</span>
 
-<span class="sd">            &lt;Core filename&gt;.tiff</span>
+<span class="sd">            &lt;CSLC filename&gt;.tif</span>
 
-<span class="sd">        Where &lt;Core filename&gt; is returned by CslcS1PostProcessorMixin._core_filename()</span>
+<span class="sd">        Where &lt;CSLC filename&gt; is returned by CslcS1PostProcessorMixin._cslc_filename()</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -337,20 +501,20 @@
 <span class="sd">            The file name to assign to GeoTIFF product(s) created by this PGE.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">core_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_core_filename</span><span class="p">(</span><span class="n">inter_filename</span><span class="p">)</span>
+        <span class="n">cslc_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cslc_filename</span><span class="p">(</span><span class="n">inter_filename</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">core_filename</span><span class="si">}</span><span class="s2">.tiff&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">cslc_filename</span><span class="si">}</span><span class="s2">.tif&quot;</span>
 
     <span class="k">def</span> <span class="nf">_json_metadata_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inter_filename</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the file name to use for JSON metadata files produced by the</span>
 <span class="sd">        CSLC-S1 PGE.</span>
 
 <span class="sd">        The JSON metadata filename for the CSLC-S1 PGE consists of:</span>
 
-<span class="sd">            &lt;Core filename&gt;.json</span>
+<span class="sd">            &lt;CSLC filename&gt;.json</span>
 
-<span class="sd">        Where &lt;Core filename&gt; is returned by CslcS1PostProcessorMixin._core_filename()</span>
+<span class="sd">        Where &lt;CSLC filename&gt; is returned by CslcS1PostProcessorMixin._cslc_filename()</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -365,15 +529,157 @@
 <span class="sd">            The file name to assign to JSON metadata product(s) created by this PGE.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">core_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_core_filename</span><span class="p">(</span><span class="n">inter_filename</span><span class="p">)</span>
+        <span class="n">cslc_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cslc_filename</span><span class="p">(</span><span class="n">inter_filename</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">core_filename</span><span class="si">}</span><span class="s2">.json&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">cslc_filename</span><span class="si">}</span><span class="s2">.json&quot;</span>
 
-    <span class="k">def</span> <span class="nf">_collect_cslc_product_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Gathers the available metadata from the JSON metadata product created by</span>
-<span class="sd">        the CSLC-S1 SAS. This metadata is then formatted for use with filling in</span>
+    <span class="k">def</span> <span class="nf">_ancillary_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Helper method to derive the core component of the file names for the</span>
+<span class="sd">        ancillary products associated to a PGE job (catalog metadata, log file,</span>
+<span class="sd">        etc...).</span>
+
+<span class="sd">        The core file name component for CSLC-S1 ancillary products consists of:</span>
+
+<span class="sd">        &lt;PROJECT&gt;_&lt;LEVEL&gt;_&lt;PGE NAME&gt;_&lt;PRODUCTION TIMETAG&gt;_&lt;SENSOR&gt;_&lt;POL&gt;_&lt;PRODUCT VER&gt;</span>
+
+<span class="sd">        Since these files are not specific to any particular burst processed for</span>
+<span class="sd">        a CSLC job, fields such as burst ID and acquisition time are omitted from</span>
+<span class="sd">        this file pattern.</span>
+
+<span class="sd">        Also note that this does not include a file extension, which should be</span>
+<span class="sd">        added to the return value of this method by any callers to distinguish</span>
+<span class="sd">        the different formats of ancillary outputs produced by this PGE.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ancillary_filename : str</span>
+<span class="sd">            The file name component to assign to ancillary products created by this PGE.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Metadata fields we need for ancillary file name should be equivalent</span>
+        <span class="c1"># across all bursts, so just take the first set of cached metadata as</span>
+        <span class="c1"># a representative</span>
+        <span class="n">cslc_metadata</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_burst_metadata_cache</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">burst_metadata</span> <span class="o">=</span> <span class="n">cslc_metadata</span><span class="p">[</span><span class="s1">&#39;processing_information&#39;</span><span class="p">][</span><span class="s1">&#39;input_burst_metadata&#39;</span><span class="p">]</span>
+
+        <span class="n">sensor</span> <span class="o">=</span> <span class="n">burst_metadata</span><span class="p">[</span><span class="s1">&#39;platform_id&#39;</span><span class="p">]</span>
+        <span class="n">pol</span> <span class="o">=</span> <span class="n">burst_metadata</span><span class="p">[</span><span class="s1">&#39;polarization&#39;</span><span class="p">]</span>
+
+        <span class="n">product_version</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">product_version</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">product_version</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;v&#39;</span><span class="p">):</span>
+            <span class="n">product_version</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;v</span><span class="si">{</span><span class="n">product_version</span><span class="si">}</span><span class="s1">&#39;</span>
+
+        <span class="n">production_time</span> <span class="o">=</span> <span class="n">get_time_for_filename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">production_datetime</span><span class="p">)</span>
+
+        <span class="n">ancillary_filename</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">PROJECT</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">LEVEL</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">NAME</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">production_time</span><span class="si">}</span><span class="s2">Z_&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sensor</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">product_version</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">ancillary_filename</span>
+
+    <span class="k">def</span> <span class="nf">_catalog_metadata_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the file name to use for Catalog Metadata produced by the CSLC-S1 PGE.</span>
+
+<span class="sd">        The Catalog Metadata file name for the CSLC-S1 PGE consists of:</span>
+
+<span class="sd">            &lt;Ancillary filename&gt;.catalog.json</span>
+
+<span class="sd">        Where &lt;Ancillary filename&gt; is returned by CslcPostProcessorMixin._ancillary_filename()</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        catalog_metadata_filename : str</span>
+<span class="sd">            The file name to assign to the Catalog Metadata product created by this PGE.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ancillary_filename</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;.catalog.json&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_iso_metadata_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">burst_id</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the file name to use for ISO Metadata produced by the CSLC-S1 PGE.</span>
+
+<span class="sd">        The ISO Metadata file name for the CSLC-S1 PGE consists of:</span>
+
+<span class="sd">            &lt;CSLC filename&gt;.iso.xml</span>
+
+<span class="sd">        Where &lt;CSLC filename&gt; is returned by CslcS1PostProcessorMixin._cslc_filename()</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        burst_id : str</span>
+<span class="sd">            The burst identifier used to look up the corresponding cached</span>
+<span class="sd">            CSLC filename.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        iso_metadata_filename : str</span>
+<span class="sd">            The file name to assign to the ISO Metadata product created by this PGE.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        RuntimeError</span>
+<span class="sd">            If there is no file name cached for the provided burst ID.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">burst_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_burst_filename_cache</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No file name cached for burst ID </span><span class="si">{</span><span class="n">burst_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">iso_metadata_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_burst_filename_cache</span><span class="p">[</span><span class="n">burst_id</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">iso_metadata_filename</span> <span class="o">+</span> <span class="s2">&quot;.iso.xml&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_log_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the file name to use for the PGE/SAS log file produced by the CSLC-S1 PGE.</span>
+
+<span class="sd">        The log file name for the CSLC-S1 PGE consists of:</span>
+
+<span class="sd">            &lt;Ancillary filename&gt;.log</span>
+
+<span class="sd">        Where &lt;Ancillary filename&gt; is returned by CslcS1PostProcessorMixin._ancillary_filename()</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        log_filename : str</span>
+<span class="sd">            The file name to assign to the PGE/SAS log created by this PGE.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ancillary_filename</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;.log&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_qa_log_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the file name to use for the Quality Assurance application log</span>
+<span class="sd">        file produced by the CSLC-S1 PGE.</span>
+
+<span class="sd">        The log file name for the CSLC-S1 PGE consists of:</span>
+
+<span class="sd">            &lt;Ancillary filename&gt;.qa.log</span>
+
+<span class="sd">        Where &lt;Ancillary filename&gt; is returned by CslcS1PostProcessorMixin._ancillary_filename()</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        log_filename : str</span>
+<span class="sd">            The file name to assign to the QA log created by this PGE.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ancillary_filename</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;.qa.log&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_collect_cslc_product_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata_product</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gathers the available metadata from the HDF5 product created by the</span>
+<span class="sd">        CSLC-S1 SAS. This metadata is then formatted for use with filling in</span>
 <span class="sd">        the ISO metadata template for the CSLC-S1 PGE.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        metadata_product : str</span>
+<span class="sd">            Path the HDF5/NETCDF metadata product to collect metadata from.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -382,52 +688,57 @@
 <span class="sd">            use with the ISO metadata Jinja2 template.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># Gather the output products produced by the SAS to locate the JSON file</span>
-        <span class="c1"># containing the product metadata</span>
-        <span class="n">output_products</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">get_output_product_filenames</span><span class="p">()</span>
-        <span class="n">json_metadata_product</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">output_product_metadata</span> <span class="o">=</span> <span class="n">get_cslc_s1_product_metadata</span><span class="p">(</span><span class="n">metadata_product</span><span class="p">)</span>
 
-        <span class="k">for</span> <span class="n">output_product</span> <span class="ow">in</span> <span class="n">output_products</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">output_product</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.json&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">output_product</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.catalog.json&#39;</span><span class="p">):</span>
-                <span class="n">json_metadata_product</span> <span class="o">=</span> <span class="n">output_product</span>
-                <span class="k">break</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not find the JSON metadata output product within &quot;</span>
-                   <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">output_product_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">ISO_METADATA_RENDER_FAILED</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+        <span class="c1"># Fill in some additional fields expected within the ISO</span>
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">][</span><span class="s1">&#39;width&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">][</span><span class="s1">&#39;x_coordinates&#39;</span><span class="p">])</span>
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">][</span><span class="s1">&#39;length&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">][</span><span class="s1">&#39;y_coordinates&#39;</span><span class="p">])</span>
 
-        <span class="c1"># Read the output product metadata</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">json_metadata_product</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">infile</span><span class="p">:</span>
-            <span class="n">output_product_metadata</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">infile</span><span class="p">)</span>
+        <span class="c1"># Remove larger datasets to save memory when caching metadata for each burst</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;x_coordinates&#39;</span><span class="p">,</span> <span class="s1">&#39;y_coordinates&#39;</span><span class="p">]:</span>
+            <span class="n">array</span> <span class="o">=</span> <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">array</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">del</span> <span class="n">array</span>
 
         <span class="c1"># Parse the burst center coordinate to conform with gml schema</span>
-        <span class="c1"># sample: &quot;POINT (441737.4292702299 3877557.760490343)&quot;</span>
-        <span class="n">burst_center_str</span> <span class="o">=</span> <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;center&#39;</span><span class="p">]</span>
-        <span class="n">burst_center_pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;POINT\s*\(\s*(.+)\s*\)&quot;</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">burst_center_pattern</span><span class="p">,</span> <span class="n">burst_center_str</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">result</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Failed to parse burst center from string &quot;</span><span class="si">{</span><span class="n">burst_center_str</span><span class="si">}</span><span class="s1">&quot;&#39;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">ISO_METADATA_RENDER_FAILED</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
-
-        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;burst_center&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">groups</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="c1"># sample: {ndarray: (2,)} [-118.30363047, 33.8399832]</span>
+        <span class="n">burst_center</span> <span class="o">=</span> <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;processing_information&#39;</span><span class="p">][</span><span class="s1">&#39;input_burst_metadata&#39;</span><span class="p">][</span><span class="s1">&#39;center&#39;</span><span class="p">]</span>
+        <span class="n">burst_center_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">burst_center</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">burst_center</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;burst_center&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">burst_center_str</span>
 
         <span class="c1"># Parse the burst polygon coordinates to conform with gml</span>
-        <span class="c1"># sample: &quot;POLYGON ((399015 3859970, 398975 3860000, ..., 399015 3859970))&quot;</span>
-        <span class="n">burst_polygon_str</span> <span class="o">=</span> <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;border&#39;</span><span class="p">]</span>
-        <span class="n">burst_polygon_pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;POLYGON\s*\(\((.+)\)\)&quot;</span>
+        <span class="c1"># samples: &quot;POLYGON ((399015 3859970, 398975 3860000, ..., 399015 3859970))&quot;</span>
+        <span class="c1">#          &quot;MULTIPOLYGON (((399015, 3859970, ...)), ... ((... 399015, 3859970)))</span>
+        <span class="n">burst_polygon_str</span> <span class="o">=</span> <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;identification&#39;</span><span class="p">][</span><span class="s1">&#39;bounding_polygon&#39;</span><span class="p">]</span>
+        <span class="n">burst_polygon_pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;(?:MULTI)?POLYGON\s*\(\((.+)\)\)&quot;</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">burst_polygon_pattern</span><span class="p">,</span> <span class="n">burst_polygon_str</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">result</span><span class="p">:</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Failed to parse burst polygon from string &quot;</span><span class="si">{</span><span class="n">burst_polygon_str</span><span class="si">}</span><span class="s1">&quot;&#39;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">ISO_METADATA_RENDER_FAILED</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
 
-        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;burst_polygon&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">groups</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">))</span>
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;burst_polygon&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">groups</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">))</span><span class="si">}</span><span class="s2">)&quot;</span>
+
+        <span class="c1"># Jinja2 cannot serialize int64 data types to JSON, so convert the shape array</span>
+        <span class="c1"># to a list of native Python ints</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;processing_information&#39;</span><span class="p">][</span><span class="s1">&#39;input_burst_metadata&#39;</span><span class="p">][</span><span class="s1">&#39;shape&#39;</span><span class="p">]</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">shape</span><span class="p">))</span>
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;processing_information&#39;</span><span class="p">][</span><span class="s1">&#39;input_burst_metadata&#39;</span><span class="p">][</span><span class="s1">&#39;shape&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">shape</span>
+
+        <span class="c1"># Some metadata fields which can be a list of files can also be specified</span>
+        <span class="c1"># as a string if there is only a single file. Wrap these fields in a list</span>
+        <span class="c1"># so we can maintain a consistent approach to serializing them in the</span>
+        <span class="c1"># template</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;calibration_files&#39;</span><span class="p">,</span> <span class="s1">&#39;l1_slc_files&#39;</span><span class="p">,</span> <span class="s1">&#39;noise_files&#39;</span><span class="p">,</span> <span class="s1">&#39;orbit_files&#39;</span><span class="p">):</span>
+            <span class="n">inputs</span> <span class="o">=</span> <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;processing_information&#39;</span><span class="p">][</span><span class="s1">&#39;inputs&#39;</span><span class="p">][</span><span class="n">key</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;processing_information&#39;</span><span class="p">][</span><span class="s1">&#39;inputs&#39;</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">inputs</span><span class="p">]</span>
 
         <span class="k">return</span> <span class="n">output_product_metadata</span>
 
     <span class="k">def</span> <span class="nf">_create_custom_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates the &quot;custom data&quot; dictionary used with the ISO metadata rendering.</span>
 
 <span class="sd">        Custom data contains all metadata information needed for the ISO template</span>
@@ -453,15 +764,21 @@
 
         <span class="k">return</span> <span class="n">custom_metadata</span>
 
-    <span class="k">def</span> <span class="nf">_create_iso_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">_create_iso_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">burst_metadata</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates a rendered version of the ISO metadata template for CSLC-S1</span>
 <span class="sd">        output products using metadata from the following locations:</span>
 
 <span class="sd">            * RunConfig (in dictionary form)</span>
-<span class="sd">            * Output products (particularly the json metadata file)</span>
+<span class="sd">            * Output product (dictionary extracted from HDF5 product, per-burst)</span>
 <span class="sd">            * Catalog metadata</span>
 <span class="sd">            * &quot;Custom&quot; metadata (all metadata not found anywhere else)</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        burst_metadata : dict</span>
+<span class="sd">            The product metadata corresponding to a specific burst product to</span>
+<span class="sd">            be included as the &quot;product_output&quot; metadata in the rendered ISO xml.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -472,7 +789,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">runconfig_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">asdict</span><span class="p">()</span>
 
-        <span class="n">product_output_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_collect_cslc_product_metadata</span><span class="p">()</span>
+        <span class="n">product_output_dict</span> <span class="o">=</span> <span class="n">burst_metadata</span>
 
         <span class="n">catalog_metadata_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_catalog_metadata</span><span class="p">()</span><span class="o">.</span><span class="n">asdict</span><span class="p">()</span>
 
@@ -495,8 +812,88 @@
 
         <span class="k">return</span> <span class="n">rendered_template</span>
 
+    <span class="k">def</span> <span class="nf">_stage_output_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Ensures that all output products produced by both the SAS and this PGE</span>
+<span class="sd">        are staged to the output location defined by the RunConfig. This includes</span>
+<span class="sd">        reassignment of file names to meet the file-naming conventions required</span>
+<span class="sd">        by the PGE.</span>
+
+<span class="sd">        This version of the method performs the same steps as the base PGE</span>
+<span class="sd">        implementation, except that an ISO xml metadata file is rendered for</span>
+<span class="sd">        each burst product created from the input SLC, since each burst can</span>
+<span class="sd">        have specific metadata fields, such as the bounding polygon.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Gather the list of output files produced by the SAS</span>
+        <span class="n">output_products</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">get_output_product_filenames</span><span class="p">()</span>
+
+        <span class="c1"># For each output file name, assign the final file name matching the</span>
+        <span class="c1"># expected conventions</span>
+        <span class="k">for</span> <span class="n">output_product</span> <span class="ow">in</span> <span class="n">output_products</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_assign_filename</span><span class="p">(</span><span class="n">output_product</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">output_product_path</span><span class="p">)</span>
+
+        <span class="c1"># Write the catalog metadata to disk with the appropriate filename</span>
+        <span class="n">catalog_metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_catalog_metadata</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">catalog_metadata</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">catalog_metadata</span><span class="o">.</span><span class="n">get_schema_file_path</span><span class="p">()):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Failed to create valid catalog metadata, reason(s):</span><span class="se">\n</span><span class="s2"> </span><span class="si">{</span><span class="n">catalog_metadata</span><span class="o">.</span><span class="n">get_error_msg</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INVALID_CATALOG_METADATA</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+
+        <span class="n">cat_meta_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_catalog_metadata_filename</span><span class="p">()</span>
+        <span class="n">cat_meta_filepath</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">output_product_path</span><span class="p">,</span> <span class="n">cat_meta_filename</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">CREATING_CATALOG_METADATA</span><span class="p">,</span>
+                         <span class="sa">f</span><span class="s2">&quot;Writing Catalog Metadata to </span><span class="si">{</span><span class="n">cat_meta_filepath</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">catalog_metadata</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">cat_meta_filepath</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Failed to write catalog metadata file </span><span class="si">{</span><span class="n">cat_meta_filepath</span><span class="si">}</span><span class="s2">, reason: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">CATALOG_METADATA_CREATION_FAILED</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+
+        <span class="c1"># Generate the ISO metadata for use with product submission to DAAC(s)</span>
+        <span class="c1"># For CSLC-S1, each burst-based product gets its own ISO xml</span>
+        <span class="k">for</span> <span class="n">burst_id</span><span class="p">,</span> <span class="n">burst_metadata</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_burst_metadata_cache</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">iso_metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_iso_metadata</span><span class="p">(</span><span class="n">burst_metadata</span><span class="p">)</span>
+
+            <span class="n">iso_meta_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iso_metadata_filename</span><span class="p">(</span><span class="n">burst_id</span><span class="p">)</span>
+            <span class="n">iso_meta_filepath</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">output_product_path</span><span class="p">,</span> <span class="n">iso_meta_filename</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">iso_metadata</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">RENDERING_ISO_METADATA</span><span class="p">,</span>
+                                 <span class="sa">f</span><span class="s2">&quot;Writing ISO Metadata to </span><span class="si">{</span><span class="n">iso_meta_filepath</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">iso_meta_filepath</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
+                    <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">iso_metadata</span><span class="p">)</span>
+
+        <span class="c1"># Write the QA application log to disk with the appropriate filename,</span>
+        <span class="c1"># if necessary</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">qa_enabled</span><span class="p">:</span>
+            <span class="n">qa_log_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_qa_log_filename</span><span class="p">()</span>
+            <span class="n">qa_log_filepath</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">output_product_path</span><span class="p">,</span> <span class="n">qa_log_filename</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">qa_logger</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">qa_log_filepath</span><span class="p">)</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_finalize_log</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">qa_logger</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Failed to write QA log file to </span><span class="si">{</span><span class="n">qa_log_filepath</span><span class="si">}</span><span class="s2">, reason: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">LOG_FILE_CREATION_FAILED</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+
+        <span class="c1"># Lastly, write the combined PGE/SAS log to disk with the appropriate filename</span>
+        <span class="n">log_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log_filename</span><span class="p">()</span>
+        <span class="n">log_filepath</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">output_product_path</span><span class="p">,</span> <span class="n">log_filename</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">log_filepath</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_finalize_log</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Failed to write log file to </span><span class="si">{</span><span class="n">log_filepath</span><span class="si">}</span><span class="s2">, reason: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+
+            <span class="c1"># Log stream might be closed by this point so raise an Exception instead</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
 <div class="viewcode-block" id="CslcS1PostProcessorMixin.run_postprocessor"><a class="viewcode-back" href="../../../../opera.pge.cslc_s1.html#opera.pge.cslc_s1.cslc_s1_pge.CslcS1PostProcessorMixin.run_postprocessor">[docs]</a>    <span class="k">def</span> <span class="nf">run_postprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Executes the post-processing steps for the CSLC-S1 PGE.</span>
 
 <span class="sd">        The CslcS1PostProcessorMixin version of this method performs the same</span>
@@ -518,7 +915,7 @@
 
 
 <div class="viewcode-block" id="CslcS1Executor"><a class="viewcode-back" href="../../../../opera.pge.cslc_s1.html#opera.pge.cslc_s1.cslc_s1_pge.CslcS1Executor">[docs]</a><span class="k">class</span> <span class="nc">CslcS1Executor</span><span class="p">(</span><span class="n">CslcS1PreProcessorMixin</span><span class="p">,</span> <span class="n">CslcS1PostProcessorMixin</span><span class="p">,</span> <span class="n">PgeExecutor</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Main class for execution of the CSLC-S1 PGE, including the SAS layer.</span>
 
 <span class="sd">    This class essentially rolls up the CSLC-specific pre- and post-processor</span>
@@ -527,19 +924,25 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">NAME</span> <span class="o">=</span> <span class="s2">&quot;CSLC&quot;</span>
-    <span class="sd">&quot;&quot;&quot;Short name for the CSLC-S1 PGE&quot;&quot;&quot;</span>
+    <span class="n">NAME</span> <span class="o">=</span> <span class="s2">&quot;CSLC-S1&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Short name for the CSLC-S1 PGE&quot;&quot;&quot;</span>
 
     <span class="n">LEVEL</span> <span class="o">=</span> <span class="s2">&quot;L2&quot;</span>
-    <span class="sd">&quot;&quot;&quot;Processing Level for CSLC-S1 Products&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Processing Level for CSLC-S1 Products&quot;&quot;&quot;</span>
 
-    <span class="n">SAS_VERSION</span> <span class="o">=</span> <span class="s2">&quot;0.1.2&quot;</span>  <span class="c1"># https://github.com/opera-adt/COMPASS/releases/tag/v0.1.2</span>
-    <span class="sd">&quot;&quot;&quot;Version of the SAS wrapped by this PGE, should be updated as needed&quot;&quot;&quot;</span>
+    <span class="n">PGE_VERSION</span> <span class="o">=</span> <span class="s2">&quot;2.0.0&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Version of the PGE (overrides default from base_pge)&quot;&quot;&quot;</span>
+
+    <span class="n">SAS_VERSION</span> <span class="o">=</span> <span class="s2">&quot;0.5.2&quot;</span>  <span class="c1"># Final release https://github.com/opera-adt/COMPASS/releases/tag/v0.5.2</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Version of the SAS wrapped by this PGE, should be updated as needed&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pge_name</span><span class="p">,</span> <span class="n">runconfig_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">pge_name</span><span class="p">,</span> <span class="n">runconfig_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">rename_by_pattern_map</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;t*.h5&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_h5_filename</span><span class="p">,</span>
+            <span class="s1">&#39;static_layers*.h5&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_static_layers_filename</span><span class="p">,</span>
+            <span class="s1">&#39;*.png&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_browse_filename</span><span class="p">,</span>
             <span class="s1">&#39;*.slc&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geotiff_filename</span><span class="p">,</span>
             <span class="s1">&#39;*.tif*&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geotiff_filename</span><span class="p">,</span>
             <span class="s1">&#39;*.json&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_json_metadata_filename</span>
@@ -553,7 +956,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2021-2022 California Institute of Technology.</p>
+    <p>&#169; Copyright 2021-2023 California Institute of Technology.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
