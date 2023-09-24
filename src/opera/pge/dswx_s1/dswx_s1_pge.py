@@ -723,7 +723,7 @@ class DSWxS1Executor(DSWxS1PreProcessorMixin, DSWxS1PostProcessorMixin, PgeExecu
     LEVEL = "L3"
     """Processing Level for DSWx-S1 Products"""
 
-    SAS_VERSION = "0.1"
+    SAS_VERSION = "0.1"  # Interface release https://github.com/opera-adt/DSWX-SAR/releases/tag/v0.1
     """Version of the SAS wrapped by this PGE, should be updated as needed"""
 
     def __init__(self, pge_name, runconfig_path, **kwargs):
