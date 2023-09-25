@@ -465,7 +465,7 @@ class DispS1Executor(DispS1PreProcessorMixin, DispS1PostProcessorMixin, PgeExecu
     LEVEL = "L3"
     """Processing Level for DISP-S1 Products"""
 
-    SAS_VERSION = "0.1"
+    SAS_VERSION = "0.1.2" # Interface release
     """Version of the SAS wrapped by this PGE, should be updated as needed"""
 
     def __init__(self, pge_name, runconfig_path, **kwargs):
