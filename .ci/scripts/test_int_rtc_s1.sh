@@ -27,8 +27,8 @@ SAMPLE_TIME=15
 # RUNCONFIG should be the name of the runconfig in s3://operasds-dev-pge/${PGE_NAME}/
 [ -z "${WORKSPACE}" ] && WORKSPACE="$(realpath "$(dirname "$(realpath "$0")")"/../..)"
 [ -z "${PGE_TAG}" ] && PGE_TAG="${USER}-dev"
-[ -z "${INPUT_DATA}" ] && INPUT_DATA="rtc_s1_delivery_5_final_1.0.0_expected_input.zip"
-[ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="rtc_s1_delivery_5_final_1.0.0_expected_output.zip"
+[ -z "${INPUT_DATA}" ] && INPUT_DATA="rtc_s1_delivery_5.1_final_1.0.1_expected_input.zip"
+[ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="rtc_s1_delivery_5.1_final_1.0.1_expected_output.zip"
 [ -z "${RUNCONFIG}" ] && RUNCONFIG="opera_pge_rtc_s1_delivery_5_final_runconfig.yaml"
 [ -z "${TMP_ROOT}" ] && TMP_ROOT="$DEFAULT_TMP_ROOT"
 
