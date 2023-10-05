@@ -124,7 +124,7 @@ class TimeTestCase(unittest.TestCase):
         """
         Converts the provided datetime object to a time-tag string suitable for
         use with output filenames.
-        Verify the proper number of digits separated by 'T' in the string returned
+        Verify the proper number of digits separated by "T" in the string are returned
         """
         # Simple regex to test for YYYYMMDDTHHMMSS format ('Y'ear, 'M'onth, 'D'ay, 'T', 'H'our, 'M'inutes, 'S'econds)
         filename_regex = r'^\d{8}T\d{6}$'

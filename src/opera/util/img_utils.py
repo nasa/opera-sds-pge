@@ -85,6 +85,7 @@ class MockGdal:  # pragma: no cover
         Mock class for gdal.Dataset objects, as returned from an Open call.
         For use when mocking metadata from RTC-S1 static layer GeoTIFF products
         """
+
         def __init__(self):
             self.dummy_metadata = {
                 'BOUNDING_BOX': '[200700.0, 9391650.0, 293730.0, 9440880.0]',
@@ -187,7 +188,7 @@ def mock_save_as_cog(filename, scratch_dir='.', logger=None,
 # below should work. When running in a dev environment, the imports will fail,
 # resulting in the mock classes being substituted instead.
 try:
-    from osgeo import gdal
+    from osgeo import gdal  # pylint: disable=import-error
     from osgeo_utils.gdal_edit import main as gdal_edit
 
     gdal.UseExceptions()
@@ -198,10 +199,12 @@ except (ImportError, ModuleNotFoundError):  # pragma: no cover
 # Search for an available implementation of save_as_cog from the underlying
 # SAS library. Fallback to the mock implementation if we cannot find any.
 try:
-    from proteus.core import save_as_cog
+    # pylint: disable=import-error
+    from proteus.core import save_as_cog    # noinspection PyUnresolvedReferences,
 except (ImportError, ModuleNotFoundError):  # pragma: no cover
     try:
-        from rtc.core import save_as_cog
+        # pylint: disable=import-error
+        from rtc.core import save_as_cog     # noinspection PyUnresolvedReferences
     except (ImportError, ModuleNotFoundError):  # pragma: no cover
         save_as_cog = mock_save_as_cog  # pragma: no cover
 

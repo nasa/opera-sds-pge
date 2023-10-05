@@ -80,21 +80,20 @@ class MetadataUtilsTestCase(unittest.TestCase):
         """Test translation of a UTM bounding box to lat/lon"""
         # Derived from bounding box of static layer products for granule
         # S1B_IW_SLC__1SDV_20180504T104507_20180504T104535_010770_013AEE_919F
-        utm_bounding_box = [200700.0, 9391650.0,  293730.0, 9440880.0]
-        epsg_code = 32718 # UTM S Zone 18
+        utm_bounding_box = [200700.0, 9391650.0, 293730.0, 9440880.0]
+        epsg_code = 32718  # UTM S Zone 18
 
         lat_lon_bounding_box = translate_utm_bbox_to_lat_lon(utm_bounding_box, epsg_code)
-        expected_bounding_box = [-5.497645682689766, # lat_min
-                                 -5.055731551544852, # lat_max
-                                 -77.70109080363252, # lon_min
-                                 -76.86056393945721] # lon_max
+        expected_bounding_box = [-5.497645682689766,  # lat_min
+                                 -5.055731551544852,  # lat_max
+                                 -77.70109080363252,  # lon_min
+                                 -76.86056393945721]  # lon_max
 
         # Round off last couple digits since they can vary based on precision error
         lat_lon_bounding_box = list(map(lambda x: round(x, ndigits=12), lat_lon_bounding_box))
         expected_bounding_box = list(map(lambda x: round(x, ndigits=12), expected_bounding_box))
 
         self.assertListEqual(list(lat_lon_bounding_box), expected_bounding_box)
-
 
     def test_get_disp_s1_product_metadata(self):
         """Test retrieval of product metadata from HDF5 files"""
@@ -114,7 +113,6 @@ class MetadataUtilsTestCase(unittest.TestCase):
 
         finally:
             os.remove(file_name)
-
 
     def test_get_rtc_s1_product_metadata(self):
         """Test retrieval of product metadata from HDF5 files"""

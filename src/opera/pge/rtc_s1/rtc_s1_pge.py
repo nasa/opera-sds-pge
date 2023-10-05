@@ -16,6 +16,7 @@ from os import walk
 from os.path import basename, getsize, join
 
 import h5py
+
 import numpy as np
 
 from opera.pge.base.base_pge import PgeExecutor
@@ -996,6 +997,7 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
         self._run_sas_qa_executable()
         self._validate_output()
         self._stage_output_files()
+
 
 class RtcS1Executor(RtcS1PreProcessorMixin, RtcS1PostProcessorMixin, PgeExecutor):
     """

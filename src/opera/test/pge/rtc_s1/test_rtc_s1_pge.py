@@ -76,7 +76,7 @@ class RtcS1PgeTestCase(unittest.TestCase):
         # 'db.sqlite3' simulates the burst_id database file
         os.system(f"touch {join(input_dir, 'db.sqlite3')}")
 
-        # When the [QAExecutable] is enabled, a python script (specified in [QAExecutable][ProgramPath] is executed.
+        # When the [QAExecutable] is enabled, a python script (specified in [QAExecutable][ProgramPath]) is executed.
         # The empty files below simulate a script with proper permissions, and a script with improper permissions.
         os.system(f"touch {join(input_dir, 'test_qa_rwx.py')}")  # rwx - read, write, execute
 
@@ -159,7 +159,7 @@ class RtcS1PgeTestCase(unittest.TestCase):
     @patch.object(opera.util.img_utils, "save_as_cog", mock_save_as_cog)
     def test_static_layer_data_access_url_injection(self):
         """Test injection of static data access URL into the output HDF5 product(s)"""
-        expected_url = 'https://search.asf.alaska.edu/#/?dataset=OPERA-S1&productTypes=RTC-STATIC&operaBurstID=T069-147170-IW1&end=2018-05-04'
+        expected_url = 'https://search.asf.alaska.edu/#/?dataset=OPERA-S1&productTypes=RTC-STATIC&operaBurstID=T069-147170-IW1&end=2018-05-04'   # noqa E501
 
         runconfig_path = join(self.data_dir, 'test_rtc_s1_config.yaml')
 

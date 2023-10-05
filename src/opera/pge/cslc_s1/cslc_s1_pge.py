@@ -650,8 +650,8 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
 
         # Some metadata fields which can be a list of files can also be specified
         # as a string if there is only a single file. Wrap these fields in a list
-        # so we can maintain a consistent approach to serializing them in the
-        # template
+        # in order to maintain a consistent approach to serializing them in the
+        # template.
         for key in ('calibration_files', 'l1_slc_files', 'noise_files', 'orbit_files'):
             inputs = output_product_metadata['processing_information']['inputs'][key]
             if isinstance(inputs, str):

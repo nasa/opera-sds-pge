@@ -325,7 +325,7 @@ class DswxS1PgeTestCase(unittest.TestCase):
         self.assertEqual(algorithm_parameters_runconfig, pge.runconfig.algorithm_parameters_file_config_path)
         # parse the run config file
         runconfig_dict = self.runconfig._parse_algorithm_parameters_run_config_file\
-            (pge.runconfig.algorithm_parameters_file_config_path)       # noqa 211
+            (pge.runconfig.algorithm_parameters_file_config_path)       # noqa E211
         # Check the properties of the algorithm parameters RunConfig to ensure they match as expected
         self._compare_algorithm_parameters_runconfig_to_expected(runconfig_dict)
 
@@ -393,8 +393,8 @@ class DswxS1PgeTestCase(unittest.TestCase):
         with open(runconfig_path, 'r', encoding='utf-8') as infile:
             runconfig_dict = yaml.safe_load(infile)
 
-        runconfig_dict['RunConfig']['Groups']['SAS']['runconfig']['groups']['dynamic_ancillary_file_group'] \
-            ['algorithm_parameters'] = 'test/data/test_algorithm_parameters_non_existent.yaml'  # noqa E211
+        runconfig_dict['RunConfig']['Groups']['SAS']['runconfig']['groups']['dynamic_ancillary_file_group']\
+            ['algorithm_parameters'] = 'test/data/test_algorithm_parameters_non_existent.yaml'   # noqa E211
 
         with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
             yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
@@ -573,7 +573,7 @@ class DswxS1PgeTestCase(unittest.TestCase):
             self.assertIn(f"Input directory {abspath('dswx_s1_pge_test/scratch_dir')} "
                           f"does not contain any .h5 files", log_contents)
 
-            # Lastly, check that a file that exists but is not a tif or an h5 is caught
+            # Lastly, check that a file that exists but is not a tif or a h5 is caught
             input_files_group['InputFilePaths'] = [runconfig_path]
 
             with open(test_runconfig_path, 'w', encoding='utf-8') as runconfig_fh:

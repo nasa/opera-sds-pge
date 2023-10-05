@@ -145,7 +145,7 @@ class RenderJinja2TestCase(unittest.TestCase):
         # Verify that os.getcmd() is used to find the new template.
         render_jinja2('render_jinja_test_template_2.html', data)
 
-        # Remove the title fields and verify the '!Not Found! is returned
+        # Remove the title fields and verify the '!Not Found!' is returned
         new_data = self.get_data()
         self.remove_key(new_data, 'title')
 

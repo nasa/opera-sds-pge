@@ -21,8 +21,8 @@ from opera.pge.base.base_pge import PreProcessorMixin
 from opera.util.error_codes import ErrorCode
 from opera.util.input_validation import validate_algorithm_parameters_config, validate_disp_inputs
 from opera.util.metadata_utils import get_disp_s1_product_metadata
-from opera.util.time import get_time_for_filename
 from opera.util.render_jinja2 import render_jinja2
+from opera.util.time import get_time_for_filename
 
 
 class DispS1PreProcessorMixin(PreProcessorMixin):
@@ -465,7 +465,7 @@ class DispS1Executor(DispS1PreProcessorMixin, DispS1PostProcessorMixin, PgeExecu
     LEVEL = "L3"
     """Processing Level for DISP-S1 Products"""
 
-    SAS_VERSION = "0.1.2" # Interface release
+    SAS_VERSION = "0.1.2"  # Interface release
     """Version of the SAS wrapped by this PGE, should be updated as needed"""
 
     def __init__(self, pge_name, runconfig_path, **kwargs):

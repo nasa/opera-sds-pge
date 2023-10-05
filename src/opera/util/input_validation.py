@@ -9,8 +9,8 @@ Common code used by some PGEs for input validation.
 
 """
 import glob
-from os.path import abspath, exists, getsize, isdir, isfile, join, splitext
 import re
+from os.path import abspath, exists, getsize, isdir, isfile, join, splitext
 
 import yamale
 
@@ -135,7 +135,7 @@ def validate_slc_s1_inputs(runconfig, logger, name):
 def get_burst_id_set(input_file_group, logger, name):
     """
     Compiles a set of burst_ids from a list of files defined in the runconfig file.
-    Each file in the list should have have a burst_id in the file name.
+    Each file in the list should have a burst_id in the file name.
 
     Parameters
     ----------
@@ -174,14 +174,14 @@ def check_disp_s1_ancillary_burst_ids(cslc_input_burst_ids, ancillary_file_list,
     Verify burst_ids from the ancillary input files:
         'amplitude_dispersion_files',
         'amplitude_mean_files',
-        'geometry_files
+        'geometry_files'
     Verify that each file has a unique burst id in the file name, and that the burst idea is in the
-    set of of DISP_S1 cslc input burst ids.
+    set of DISP_S1 cslc input burst ids.
 
     Parameters
     ----------
     cslc_input_burst_ids : set
-        Set of the DISP_S1 input file burst_ids
+        DISP_S1 input file burst_ids
     ancillary_file_list : list
         List from the runconfig file of the desired set of ancillary files to check
     logger : PgeLogger
