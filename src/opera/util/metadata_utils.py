@@ -21,8 +21,6 @@ import numpy as np
 S1_SLC_HDF5_PREFIX = ""
 """Prefix used to index metadata within SLC-based HDF5 products"""
 
-# pylint: disable=unused-variable,invalid-name,too-many-locals,too-many-boolean-expressions
-
 
 class MockOsr:  # pragma: no cover
     """
@@ -425,6 +423,7 @@ def get_rtc_s1_product_metadata(file_name):
 
 
 def create_test_rtc_metadata_product(file_path):
+    # pylint: disable=unused-variable,invalid-name,too-many-locals,too-many-statements,too-many-boolean-expressions
     """
     Creates a dummy RTC HDF5 product with expected metadata fields.
     This function is intended for use with unit tests, but is included in this
@@ -436,7 +435,6 @@ def create_test_rtc_metadata_product(file_path):
         Full path to write the dummy RTC HDF5 product to.
 
     """
-    # pylint: disable=unused-variable
     with h5py.File(file_path, 'w') as outfile:
         data_grp = outfile.create_group(f"{S1_SLC_HDF5_PREFIX}/data")
         xCoordinateSpacing_dset = data_grp.create_dataset("xCoordinateSpacing", data=30.0, dtype='float64')
@@ -589,7 +587,7 @@ def get_cslc_s1_product_metadata(file_name):
 
 
 def create_test_cslc_metadata_product(file_path):
-    # pylint: disable=R0915
+    # pylint: disable=unused-variable,invalid-name,too-many-locals,too-many-statements,too-many-boolean-expressions
     """
     Creates a dummy CSLC h5 metadata file with expected groups and datasets.
     This function is intended for use with unit tests, but is included in this
