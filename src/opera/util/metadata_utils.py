@@ -23,6 +23,7 @@ S1_SLC_HDF5_PREFIX = ""
 
 
 class MockOsr:  # pragma: no cover
+    # pylint: disable=unused-variable,invalid-name,too-many-locals,too-many-statements,too-many-boolean-expressions
     """
     Mock class for the osgeo.osr module.
 
@@ -813,6 +814,7 @@ def get_disp_s1_product_metadata(file_name):
 
 
 def create_test_disp_metadata_product(file_path):
+    # pylint: disable=unused-variable,invalid-name,too-many-locals,too-many-statements,too-many-boolean-expressions
     """
     Creates a dummy DISP-S1 h5 metadata file with expected groups and datasets.
     This function is intended for use with unit tests, but is included in this
