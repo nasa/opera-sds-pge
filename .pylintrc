@@ -50,7 +50,13 @@ confidence=
 # --enable=similarities". If you want to run only the classes checker, but have
 # no Warning level messages displayed, use"--disable=all --enable=classes
 # --disable=W"
-disable=raise-missing-from,consider-using-assignment-expr,too-many-try-statements,docstring-first-line-empty,empty-comment,raw-checker-failed,bad-inline-option,file-ignored,suppressed-message,useless-suppression,deprecated-pragma,eq-without-hash,too-few-public-methods
+
+# R2004 is 'Consider using a named constant or an enum instead of a literal.'
+# R1260 is 'The McCabe rating is 11 (too-complex)'
+# R0923 is 'Too many arguments (8/7) (too-many-arguments)'
+disable=raise-missing-from,consider-using-assignment-expr,too-many-try-statements,docstring-first-line-empty,
+        empty-comment,raw-checker-failed,bad-inline-option,file-ignored,suppressed-message,useless-suppression,
+        deprecated-pragma,eq-without-hash,too-few-public-methods,R2004,R1260,R0913
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
@@ -208,10 +214,10 @@ notes=FIXME,XXX,TODO
 [BASIC]
 
 # Regular expression matching correct argument names
-argument-rgx=(([a-z][a-z0-9_]{2,30})|(_[a-z0-9_]*))$
+argument-rgx=(([a-z][a-z0-9_]{2,40})|(_[a-z0-9_]*))$
 
 # Regular expression matching correct attribute names
-attr-rgx=(([a-z][a-z0-9_]{2,30})|(_[a-z0-9_]*))$
+attr-rgx=(([a-z][a-z0-9_]{2,40})|(_[a-z0-9_]*))$
 
 # Bad variable names which should always be refused, separated by a comma
 bad-names=foo,bar,baz,toto,tutu,tata
@@ -260,7 +266,7 @@ no-docstring-rgx=^_
 property-classes=abc.abstractproperty
 
 # Regular expression matching correct variable names
-variable-rgx=(([a-z][a-z0-9_]{2,30})|(_[a-z0-9_]*))$
+variable-rgx=(([a-z][a-z0-9_]{2,60})|(_[a-z0-9_]*))$
 
 
 [LOGGING]
