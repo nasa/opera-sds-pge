@@ -78,7 +78,7 @@ class UsageMetricsTestCase(unittest.TestCase):
             ru_inblock - the number of times the filesystem had to perform input.  (int)
             ru_outblock - the number of times the filesystem had to perform output. (int)
             ru_maxrss - is the maximum resident set size used. For RUSAGE_CHILDREN, this is
-                        the 'high water mark', that indicates the PEAk RAM use of this process.
+                        the 'high-water mark', that indicates the PEAk RAM use of this process.
                         NOTE: on Mac OS X the value returned is in 'BYTES', on Linux and BSD machines
                               the results are in 'KILOBYTES'.
 

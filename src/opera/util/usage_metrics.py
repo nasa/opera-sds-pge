@@ -20,13 +20,13 @@ from sys import platform
 
 def get_os_metrics():
     """
-    Gets metrics related to machine resource usage, both by the current process
-    as well as all of its children processes.
+    Gets metrics related to machine resource usage, by the current process
+    and by all of its children processes.
 
     Returns
     -------
     metrics : dict
-        Dictionary containing metrics mapped to the following keys
+        Dictionary containing metrics mapped to the following keys:
             os.cpu.seconds.sys -
                 System CPU time, in seconds, consumed by the current process and
                 its children

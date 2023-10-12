@@ -14,6 +14,10 @@ ignore =
     D404
     # E722: do not use bare 'except'
     E722
+    # W503: line break before binary operator
+    W503
+    # W504: line break after binary operator
+    W504
 statistics = 1
 docstring-convention = numpy
 application-import-names = opera

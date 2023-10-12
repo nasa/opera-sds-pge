@@ -9,8 +9,8 @@ Common code used by some PGEs for input validation.
 
 """
 import glob
-from os.path import abspath, exists, getsize, isdir, isfile, join, splitext
 import re
+from os.path import abspath, exists, getsize, isdir, isfile, join, splitext
 
 import yamale
 
@@ -135,7 +135,7 @@ def validate_slc_s1_inputs(runconfig, logger, name):
 def get_burst_id_set(input_file_group, logger, name):
     """
     Compiles a set of burst_ids from a list of files defined in the runconfig file.
-    Each file in the list should have have a burst_id in the file name.
+    Each file in the list should have a burst_id in the file name.
 
     Parameters
     ----------
@@ -170,18 +170,19 @@ def get_burst_id_set(input_file_group, logger, name):
 
 
 def check_disp_s1_ancillary_burst_ids(cslc_input_burst_ids, ancillary_file_list, logger, name):
+    # pylint: disable=C0103
     """
     Verify burst_ids from the ancillary input files:
         'amplitude_dispersion_files',
         'amplitude_mean_files',
-        'geometry_files
+        'geometry_files'
     Verify that each file has a unique burst id in the file name, and that the burst idea is in the
-    set of of DISP_S1 cslc input burst ids.
+    set of DISP_S1 cslc input burst ids.
 
     Parameters
     ----------
     cslc_input_burst_ids : set
-        Set of the DISP_S1 input file burst_ids
+        DISP_S1 input file burst_ids
     ancillary_file_list : list
         List from the runconfig file of the desired set of ancillary files to check
     logger : PgeLogger
@@ -215,6 +216,7 @@ def check_disp_s1_ancillary_burst_ids(cslc_input_burst_ids, ancillary_file_list,
 
 
 def get_cslc_input_burst_id_set(cslc_input_file_list, logger, name):
+    # pylint: disable=C0103,R1710
     """
     Compile the set of burst ids from the cslc input files
     There may be uncompressed files only, or a mixture of uncompressed
@@ -254,7 +256,7 @@ def get_cslc_input_burst_id_set(cslc_input_file_list, logger, name):
     if len(compressed_file_burst_id_set) == 0:
         return single_file_burst_id_set
     # Case 2: uncompressed files and compressed files in cslc inputs with non-matching burst ids
-    elif single_file_burst_id_set != compressed_file_burst_id_set:
+    if single_file_burst_id_set != compressed_file_burst_id_set:
         msg = f"{nl}{tab}Set of input CSLC 'compressed' burst IDs do not match" \
               f" the set of 'uncompressed' burst IDs: {nl}" \
               f"{dtab}In 'compressed' set, but not in 'uncompressed' set: " \
@@ -377,12 +379,11 @@ def validate_dswx_inputs(runconfig, logger, name, valid_extensions=None):
                     error_msg = f"Input directory {input_file_path} does not contain any {extension} files"
 
                     logger.critical(name, ErrorCode.INPUT_NOT_FOUND, error_msg)
-        else:
-            if valid_extensions and splitext(input_file_path)[-1] not in valid_extensions:
-                error_msg = (f"{name} Input file {input_file_path} does not have an expected "
-                             f"extension ({valid_extensions}).")
+        elif valid_extensions and splitext(input_file_path)[-1] not in valid_extensions:
+            error_msg = (f"{name} Input file {input_file_path} does not have an expected "
+                         f"extension ({valid_extensions}).")
 
-                logger.critical(name, ErrorCode.INVALID_INPUT, error_msg)
+            logger.critical(name, ErrorCode.INVALID_INPUT, error_msg)
 
 
 def validate_algorithm_parameters_config(name, algorithm_parameters_schema_file_path,
@@ -407,7 +408,7 @@ def validate_algorithm_parameters_config(name, algorithm_parameters_schema_file_
         error_msg = "No algorithm_parameters_schema_path provided in runconfig file."
         logger.info(name, ErrorCode.NO_ALGO_PARAM_SCHEMA_PATH, error_msg)
         return
-    elif isfile(algorithm_parameters_schema_file_path):
+    if isfile(algorithm_parameters_schema_file_path):
         # Load the 'algorithm parameters' schema
         algorithm_parameters_schema = yamale.make_schema(algorithm_parameters_schema_file_path)
     else:

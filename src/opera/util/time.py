@@ -39,7 +39,7 @@ def get_iso_time(date_time):
     Parameters
     ----------
     date_time : datetime.datetime
-        Datetime object to convert to ISO format.
+        Convert to ISO format.
 
     Returns
     -------

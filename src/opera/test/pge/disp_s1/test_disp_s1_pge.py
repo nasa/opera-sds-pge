@@ -12,16 +12,17 @@ import os
 import shutil
 import tempfile
 import unittest
-import yaml
 from io import StringIO
-from os.path import abspath, join, exists
+from os.path import abspath, exists, join
 
 from pkg_resources import resource_filename
 
+import yaml
+
 from opera.pge import RunConfig
 from opera.pge.disp_s1.disp_s1_pge import DispS1Executor
-from opera.util.input_validation import validate_disp_inputs
 from opera.util import PgeLogger
+from opera.util.input_validation import validate_disp_inputs
 
 
 class DispS1PgeTestCase(unittest.TestCase):
@@ -158,7 +159,8 @@ class DispS1PgeTestCase(unittest.TestCase):
         nc_files = glob.glob(join(output_dir, '*.nc'))
         nc_file = nc_files[0]
         nf = pge._netcdf_filename(nc_file)
-        self.assertRegex(nf, r'OPERA_L3_DISP-S1_IW_F00123_VV_[0-9]{8}T[0-9]{6}Z_[0-9]{8}T[0-9]{6}Z_v0\.1_[0-9]{8}T[0-9]{6}Z\.nc')
+        self.assertRegex(
+            nf, r'OPERA_L3_DISP-S1_IW_F00123_VV_[0-9]{8}T[0-9]{6}Z_[0-9]{8}T[0-9]{6}Z_v0\.1_[0-9]{8}T[0-9]{6}Z\.nc')
 
         # Check that the ISO metadata file was created and all placeholders were
         # filled in
@@ -268,7 +270,7 @@ class DispS1PgeTestCase(unittest.TestCase):
         with open(runconfig_path, 'r', encoding='utf-8') as infile:
             runconfig_dict = yaml.safe_load(infile)
 
-        runconfig_dict['RunConfig']['Groups']['SAS']['dynamic_ancillary_file_group'] \
+        runconfig_dict['RunConfig']['Groups']['SAS']['dynamic_ancillary_file_group']\
             ['algorithm_parameters_file'] = 'test/data/test_algorithm_parameters_non_existent.yaml'  # noqa E211
 
         with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
@@ -290,7 +292,6 @@ class DispS1PgeTestCase(unittest.TestCase):
         zero-size files, and invalid extensions in filenames. Also check that
         valid files pass validation.
         """
-
         # Test non-existent file detection
         test_filename = 't087_123456_iw2_non_existent_input_file'
         sas_config = {
@@ -429,7 +430,6 @@ class DispS1PgeTestCase(unittest.TestCase):
         cslc_input_files, amplitude_dispersion_files, amplitude_mean_files,
         and geometry_files.
         """
-
         def get_sample_input_files(file_type: str) -> list:
             """Helper function for test_get_cslc_input_burst_id_set()"""
             if file_type == 'compressed':
@@ -699,7 +699,7 @@ class DispS1PgeTestCase(unittest.TestCase):
                 ['-p disp_s1_pge_test/output_dir/compressed_slcs;',
                  'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.unw.nc bs=1M count=1;',
                  'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.unw.png bs=1M count=1;',
-                 'touch disp_s1_pge_test/output_dir/compressed_slcs/compressed_slc_t087_185684_iw2_20180222_20180330.h5;',
+                 'touch disp_s1_pge_test/output_dir/compressed_slcs/compressed_slc_t087_185684_iw2_20180222_20180330.h5;',   # noqa E501
                  '/bin/echo DISP-S1 invoked with RunConfig']
             with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
                 yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
@@ -773,6 +773,7 @@ class MockRunConfig:
 
     @property
     def sas_config(self):
+        """Return a simple test runconfig dictionary"""
         return self._sas_config_dict
 
 

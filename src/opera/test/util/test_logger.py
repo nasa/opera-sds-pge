@@ -186,7 +186,7 @@ class LoggerTestCase(unittest.TestCase):
         self.assertEqual(str(self.logger.start_time),
                          re.match(self.monotonic_regex, str(self.logger.start_time)).group())
 
-        # Check that a in-memory log was created
+        # Check that an in-memory log was created
         stream = self.logger.get_stream_object()
         self.assertTrue(isinstance(stream, StringIO))
 
