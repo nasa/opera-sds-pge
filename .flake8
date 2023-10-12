@@ -16,7 +16,7 @@ ignore =
     E722
     # W503: line break before binary operator
     W503
-    # W504: line break before binary operator (we need them both)
+    # W504: line break after binary operator
     W504
 statistics = 1
 docstring-convention = numpy
