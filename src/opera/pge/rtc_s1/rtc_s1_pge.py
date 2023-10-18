@@ -215,14 +215,15 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
 
         The base filename for the RTC PGE consists of:
 
-            <Core filename>_<BURST ID>_<ACQUISITION TIME>_<PRODUCTION TIME>_<SENSOR>_<SPACING>_<PRODUCT VERSION>
+            <Core filename>_<BURST ID>_<ACQUISITION TIMETAG>[_<PRODUCTION TIMETAG>]_<SENSOR>_<SPACING>_<PRODUCT VERSION>
 
         Where <Core filename> is returned by RtcS1PostProcessorMixin._core_filename()
         if static_layer_product is False, otherwise it is the value returned by
         RtcS1PostProcessorMixin._core_static_filename()
 
-        If static_layer_product is True, <ACQUISITION TIME> will correspond
-        to the configured data validity start time (as defined in the RunConfig).
+        If static_layer_product is True, <ACQUISITION TIMETAG> will correspond
+        to the configured data validity start time (as defined in the RunConfig),
+        and <PRODUCTION TIMETAG> will be omitted altogether.
 
         Parameters
         ----------
@@ -278,8 +279,9 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
 
             self._burst_metadata_cache[burst_id] = product_metadata
 
-        production_time = get_time_for_filename(self.production_datetime)
-
+        # If generating a filename for a static layer product, we use the
+        # data validity start time configured in the RunConfig in lieu of
+        # the acquisition time
         if static_layer_product:
             acquisition_time = self.runconfig.data_validity_start_date
 
@@ -303,6 +305,13 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
             if not acquisition_time.endswith('Z'):
                 acquisition_time += 'Z'
 
+        # We omit production time from static layer products to make the file
+        # names more uniquely identifiable
+        if static_layer_product:
+            production_time = ""
+        else:
+            production_time = f"_{get_time_for_filename(self.production_datetime)}Z"
+
         # Get the sensor (should be either S1A or S1B)
         sensor = get_sensor_from_spacecraft_name(product_metadata['identification']['platform'])
 
@@ -315,7 +324,7 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
             product_version = f'v{product_version}'
 
         rtc_file_components = (
-            f"{burst_id}_{acquisition_time}_{production_time}Z_{sensor}_"
+            f"{burst_id}_{acquisition_time}{production_time}_{sensor}_"
             f"{spacing}_{product_version}"
         )
 

@@ -245,7 +245,7 @@ class CslcS1PgeTestCase(unittest.TestCase):
 
         file_name_regex = rf"{pge.PROJECT}_{pge.LEVEL}_{pge.NAME}-STATIC_" \
                           rf"{cslc_metadata['identification']['burst_id'].upper().replace('_', '-')}_" \
-                          rf"\d{{8}}_\d{{8}}T\d{{6}}Z_" \
+                          rf"\d{{8}}_" \
                           rf"{burst_metadata['platform_id']}_" \
                           rf"v{pge.runconfig.product_version}.h5"
 
