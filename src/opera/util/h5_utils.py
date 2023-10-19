@@ -23,12 +23,14 @@ S1_SLC_HDF5_PREFIX = ""
 # below should work. When running in a dev environment, the import will fail
 # resulting in the MockGdal class being substituted instead.
 
+# pylint: disable=import-error
 try:
     from osgeo import osr
 
     osr.UseExceptions()
 except (ImportError, ModuleNotFoundError):  # pragma: no cover
     osr = MockOsr                           # pragma: no cover
+# pylint: enable=import-error
 
 
 def get_hdf5_group_as_dict(file_name, group_path, ignore_keys=None):
@@ -51,8 +53,8 @@ def get_hdf5_group_as_dict(file_name, group_path, ignore_keys=None):
         python dict containing variable data from the group path location.
     """
     group_dict = {}
-    with h5py.File(file_name, 'r') as hf:
-        group_object = hf.get(group_path)
+    with h5py.File(file_name, 'r') as hf:    # pylint: disable=invalid-name
+        group_object = hf.get(group_path)    # pylint: disable=invalid-name
         if group_object is None:
             raise RuntimeError(f"An error occurred retrieving group '{group_path}' from file '{file_name}'.")
 

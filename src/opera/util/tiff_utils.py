@@ -20,7 +20,7 @@ from opera.util.mock_utils import MockGdal, mock_gdal_edit, mock_save_as_cog
 # below should work. When running in a dev environment, the imports will fail,
 # resulting in the mock classes being substituted instead.
 try:
-    from osgeo import gdal  # pylint: disable=import-error
+    from osgeo import gdal  # pylint: disable=import-error,invalid-name
     from osgeo_utils.gdal_edit import main as gdal_edit
 
     gdal.UseExceptions()
@@ -30,15 +30,15 @@ except (ImportError, ModuleNotFoundError):  # pragma: no cover
 
 # Search for an available implementation of save_as_cog from the underlying
 # SAS library. Fallback to the mock implementation if we cannot find any.
+# pylint: disable=import-error
 try:
-    # pylint: disable=import-error
-    from proteus.core import save_as_cog    # noinspection PyUnresolvedReferences,
-except (ImportError, ModuleNotFoundError):  # pragma: no cover
+    from proteus.core import save_as_cog        # noinspection PyUnresolvedReferences,
+except (ImportError, ModuleNotFoundError):      # pragma: no cover
     try:
-        # pylint: disable=import-error
-        from rtc.core import save_as_cog     # noinspection PyUnresolvedReferences
+        from rtc.core import save_as_cog        # noinspection PyUnresolvedReferences
     except (ImportError, ModuleNotFoundError):  # pragma: no cover
         save_as_cog = mock_save_as_cog  # pragma: no cover
+# pylint: enable=import-error
 
 
 def set_geotiff_metadata(filename, scratch_dir=os.curdir, **kwargs):

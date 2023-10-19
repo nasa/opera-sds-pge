@@ -15,17 +15,18 @@ from mgrs.core import MGRSError
 
 from opera.util.mock_utils import MockOsr
 
-
 # When running a PGE within a Docker image delivered from ADT, the gdal import
 # below should work. When running in a dev environment, the import will fail
 # resulting in the MockGdal class being substituted instead.
 
+# pylint: disable=invalid-name
 try:
     from osgeo import osr
 
     osr.UseExceptions()
 except (ImportError, ModuleNotFoundError):  # pragma: no cover
-    osr = MockOsr
+    osr = MockOsr                           # pragma: no cover
+# pylint: enable=invalid-name
 
 
 def translate_utm_bbox_to_lat_lon(bbox, epsg_code):
@@ -146,13 +147,12 @@ def get_geographic_boundaries_from_mgrs_tile(mgrs_tile_name):
 
     for offset_x_multiplier in range(2):
         for offset_y_multiplier in range(2):
-
             # We are using MGRS 100km x 100km tiles
             # HLS tiles have 4.9 km of margin => width/length = 109.8 km
-            x = x_min - 4.9 * 1000 + offset_x_multiplier * 109.8 * 1000
-            y = y_min - 4.9 * 1000 + offset_y_multiplier * 109.8 * 1000
+            x = x_min - 4.9 * 1000 + offset_x_multiplier * 109.8 * 1000   # pylint: disable=invalid-name
+            y = y_min - 4.9 * 1000 + offset_y_multiplier * 109.8 * 1000   # pylint: disable=invalid-name
 
-            lat, lon, z = transformation.TransformPoint(x, y, elevation)
+            lat, lon, z = transformation.TransformPoint(x, y, elevation)  # pylint: disable=invalid-name,unused-variable
 
             # wrap longitude values within the range [-180, +180]
             if lon < -180:
