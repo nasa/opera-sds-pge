@@ -20,13 +20,13 @@ from pkg_resources import resource_filename
 
 import yaml
 
-import opera.util.img_utils
+import opera.util.tiff_utils
 from opera.pge import RunConfig
 from opera.pge.dswx_hls.dswx_hls_pge import DSWxHLSExecutor
 from opera.util import PgeLogger
-from opera.util.img_utils import MockGdal
-from opera.util.metadata_utils import get_geographic_boundaries_from_mgrs_tile
-from opera.util.metadata_utils import get_sensor_from_spacecraft_name
+from opera.util.dataset_utils import get_sensor_from_spacecraft_name
+from opera.util.geo_utils import get_geographic_boundaries_from_mgrs_tile
+from opera.util.tiff_utils import MockGdal
 
 
 class DSWxHLSPgeTestCase(unittest.TestCase):
@@ -82,9 +82,9 @@ class DSWxHLSPgeTestCase(unittest.TestCase):
         os.chdir(self.test_dir)
         self.input_file.close()
         self.working_dir.cleanup()
-        opera.util.img_utils.get_geotiff_metadata.cache_clear()
+        opera.util.tiff_utils.get_geotiff_metadata.cache_clear()
 
-    @patch.object(opera.util.img_utils, "gdal", MockGdal)
+    @patch.object(opera.util.tiff_utils, "gdal", MockGdal)
     def test_dswx_hls_pge_execution(self):
         """
         Test execution of the DSWxHLSExecutor class and its associated mixins using
@@ -384,7 +384,7 @@ class DSWxHLSPgeTestCase(unittest.TestCase):
             if os.path.exists(test_runconfig_path):
                 os.unlink(test_runconfig_path)
 
-    @patch.object(opera.util.img_utils, "gdal", MockGdal)
+    @patch.object(opera.util.tiff_utils, "gdal", MockGdal)
     def test_geotiff_filename(self):
         """Test _geotiff_filename() method"""
         runconfig_path = join(self.data_dir, 'test_dswx_hls_config.yaml')
@@ -453,7 +453,7 @@ class DSWxHLSPgeTestCase(unittest.TestCase):
                                                          "R126_T15SXR_20210907T202434.SAFE"
             return gdal_dataset
 
-    @patch.object(opera.util.img_utils, "gdal", CustomMockGdal)
+    @patch.object(opera.util.tiff_utils, "gdal", CustomMockGdal)
     def test_dswx_hls_product_metadata_collection(self):
         """Test _collect_dswx_hls_product_metadata() method"""
         runconfig_path = join(self.data_dir, 'test_dswx_hls_config.yaml')
@@ -495,7 +495,7 @@ class DSWxHLSPgeTestCase(unittest.TestCase):
         self.assertEqual(output_product_metadata['yCoordinates']['size'], 3660)
         self.assertEqual(output_product_metadata['yCoordinates']['spacing'], 30)
 
-    @patch.object(opera.util.img_utils, "gdal", CustomMockGdal_InvalidLandsat)
+    @patch.object(opera.util.tiff_utils, "gdal", CustomMockGdal_InvalidLandsat)
     def test_dswx_hls_validate_expected_input_platforms_landsat(self):
         """Test exceptions raised for Landsat 7 input data"""
         # Create a filename that will trigger a metadata check
@@ -521,7 +521,7 @@ class DSWxHLSPgeTestCase(unittest.TestCase):
                         f"LANDSAT_PRODUCT_ID is LC07_L1TP_096013_20220803_20220804_02_T1.")
         self.assertIn(expected_msg, log_contents)
 
-    @patch.object(opera.util.img_utils, "gdal", CustomMockGdal_InvalidSentinel)
+    @patch.object(opera.util.tiff_utils, "gdal", CustomMockGdal_InvalidSentinel)
     def test_dswx_hls_validate_expected_input_platforms_sentinel(self):
         """Test exceptions raised for non-Sentinel S2A/B input data"""
         # Create a filename that will trigger a metadata check
@@ -547,7 +547,7 @@ class DSWxHLSPgeTestCase(unittest.TestCase):
                         f"metadata PRODUCT_URI is S2C_MSIL1C_20210907T163901_N0301_R126_T15SXR_20210907T202434.SAFE.")
         self.assertIn(expected_msg, log_contents)
 
-    @patch.object(opera.util.img_utils, "gdal", CustomMockGdal)
+    @patch.object(opera.util.tiff_utils, "gdal", CustomMockGdal)
     def test_dswx_hls_landsat_9_correction(self):
         """Test metadata correction on a DSWx-HLS product derived from Landsat-9"""
         runconfig_path = join(self.data_dir, 'test_dswx_hls_config.yaml')
@@ -574,8 +574,8 @@ class DSWxHLSPgeTestCase(unittest.TestCase):
             self.assertEqual(filename, test_file)
             self.assertEqual(scratch_dir, pge.runconfig.scratch_path)
 
-        with patch.object(opera.util.img_utils, "gdal_edit", _patched_gdal_edit):
-            with patch.object(opera.util.img_utils, "save_as_cog", _patched_save_as_cog):
+        with patch.object(opera.util.tiff_utils, "gdal_edit", _patched_gdal_edit):
+            with patch.object(opera.util.tiff_utils, "save_as_cog", _patched_save_as_cog):
                 pge._correct_landsat_9_products()
 
 

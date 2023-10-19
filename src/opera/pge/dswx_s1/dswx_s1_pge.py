@@ -15,13 +15,13 @@ import opera.util.input_validation as input_validation
 from opera.pge.base.base_pge import PgeExecutor
 from opera.pge.base.base_pge import PostProcessorMixin
 from opera.pge.base.base_pge import PreProcessorMixin
+from opera.util.dataset_utils import get_sensor_from_spacecraft_name
 from opera.util.error_codes import ErrorCode
-from opera.util.img_utils import get_geotiff_metadata
+from opera.util.geo_utils import get_geographic_boundaries_from_mgrs_tile
 from opera.util.input_validation import validate_algorithm_parameters_config
 from opera.util.input_validation import validate_dswx_inputs
-from opera.util.metadata_utils import get_geographic_boundaries_from_mgrs_tile
-from opera.util.metadata_utils import get_sensor_from_spacecraft_name
 from opera.util.render_jinja2 import render_jinja2
+from opera.util.tiff_utils import get_geotiff_metadata
 from opera.util.time import get_time_for_filename
 
 
@@ -479,10 +479,10 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
 
     # TODO: remove patch and imports once SAS starts to populate metadata in GeoTIFF
     from unittest.mock import patch
-    import opera.util.img_utils
-    from opera.util.img_utils import MockGdal
+    import opera.util.tiff_utils
+    from opera.util.tiff_utils import MockGdal
 
-    @patch.object(opera.util.img_utils, "gdal", MockGdal)
+    @patch.object(opera.util.tiff_utils, "gdal", MockGdal)
     def _collect_dswx_s1_product_metadata(self, geotiff_product):
         """
         Gathers the available metadata from an output DSWx-S1 product for

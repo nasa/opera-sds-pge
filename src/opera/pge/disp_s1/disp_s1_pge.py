@@ -19,8 +19,8 @@ from opera.pge.base.base_pge import PgeExecutor
 from opera.pge.base.base_pge import PostProcessorMixin
 from opera.pge.base.base_pge import PreProcessorMixin
 from opera.util.error_codes import ErrorCode
+from opera.util.h5_utils import get_disp_s1_product_metadata
 from opera.util.input_validation import validate_algorithm_parameters_config, validate_disp_inputs
-from opera.util.metadata_utils import get_disp_s1_product_metadata
 from opera.util.render_jinja2 import render_jinja2
 from opera.util.time import get_time_for_filename
 

@@ -24,8 +24,8 @@ import yaml
 from opera.pge import RunConfig
 from opera.pge.cslc_s1.cslc_s1_pge import CslcS1Executor
 from opera.util import PgeLogger
-from opera.util.metadata_utils import create_test_cslc_metadata_product
-from opera.util.metadata_utils import get_cslc_s1_product_metadata
+from opera.util.h5_utils import create_test_cslc_metadata_product
+from opera.util.h5_utils import get_cslc_s1_product_metadata
 
 
 class CslcS1PgeTestCase(unittest.TestCase):
