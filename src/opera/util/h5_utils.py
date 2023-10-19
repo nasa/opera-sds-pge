@@ -23,14 +23,14 @@ S1_SLC_HDF5_PREFIX = ""
 # below should work. When running in a dev environment, the import will fail
 # resulting in the MockGdal class being substituted instead.
 
-# pylint: disable=import-error
+# pylint: disable=import-error,invalid-name
 try:
     from osgeo import osr
 
     osr.UseExceptions()
 except (ImportError, ModuleNotFoundError):  # pragma: no cover
     osr = MockOsr                           # pragma: no cover
-# pylint: enable=import-error
+# pylint: enable=import-error,invalid-name
 
 
 def get_hdf5_group_as_dict(file_name, group_path, ignore_keys=None):
