@@ -51,7 +51,7 @@ pipeline {
                        conda activate int_test_env
                        pip install -r ./requirements.txt
                        conda uninstall -q poppler
-                       conda install -c conda-forge gdal poppler h5py matplotlib pandas numpy
+                       conda install -c conda-forge gdal poppler h5py matplotlib pandas numpy>=1.22.4
                        '''
                 }
             }

@@ -205,14 +205,15 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
 
         The filename for the CSLC-S1 burst products consists of:
 
-            <Core filename>_<BURST ID>_<ACQUISITION TIMETAG>_<PRODUCTION TIMETAG>_<SENSOR>_<POL>_<PRODUCT_VERSION>
+            <Core filename>_<BURST ID>_<ACQUISITION TIMETAG>[_<PRODUCTION TIMETAG>]_<SENSOR>_<POL>_<PRODUCT_VERSION>
 
         Where <Core filename> is returned by CslcS1PostProcessorMixin._core_filename()
         if static_layer_product is False, otherwise it is the value returned by
         CslcS1PostProcessorMixin._core_static_filename()
 
-        If static_layer_product is True, <ACQUISITION_TIME> will correspond
-        to the configured data validity start time (as defined in the RunConfig).
+        If static_layer_product is True, <ACQUISITION TIMETAG> will correspond
+        to the configured data validity start time (as defined in the RunConfig),
+        and <PRODUCTION TIMETAG> will be omitted altogether.
 
         Also note that this does not include a file extension, which should be
         added to the return value of this method by any callers to distinguish
@@ -270,11 +271,9 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
 
         burst_metadata = cslc_metadata['processing_information']['input_burst_metadata']
 
-        sensor = burst_metadata['platform_id']
-
-        # Polarization only included in file name for baseline products
-        pol = "" if static_layer_product else f"_{burst_metadata['polarization']}"
-
+        # If generating a filename for a static layer product, we use the
+        # data validity start time configured in the RunConfig in lieu of
+        # the acquisition time
         if static_layer_product:
             acquisition_time = self.runconfig.data_validity_start_date
 
@@ -296,15 +295,25 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
             if not acquisition_time.endswith('Z'):
                 acquisition_time += 'Z'
 
+        # We omit production time from static layer products to make the file
+        # names more uniquely identifiable
+        if static_layer_product:
+            production_time = ""
+        else:
+            production_time = f"_{get_time_for_filename(self.production_datetime)}Z"
+
+        sensor = burst_metadata['platform_id']
+
+        # Polarization only included in file name for baseline products
+        pol = "" if static_layer_product else f"_{burst_metadata['polarization']}"
+
         product_version = str(self.runconfig.product_version)
 
         if not product_version.startswith('v'):
             product_version = f'v{product_version}'
 
-        production_time = get_time_for_filename(self.production_datetime)
-
         cslc_filename = (
-            f"{core_filename}_{burst_id}_{acquisition_time}_{production_time}Z_"
+            f"{core_filename}_{burst_id}_{acquisition_time}{production_time}_"
             f"{sensor}{pol}_{product_version}"
         )
 
@@ -852,10 +861,10 @@ class CslcS1Executor(CslcS1PreProcessorMixin, CslcS1PostProcessorMixin, PgeExecu
     LEVEL = "L2"
     """Processing Level for CSLC-S1 Products"""
 
-    PGE_VERSION = "2.0.0"
+    PGE_VERSION = "2.1.0"
     """Version of the PGE (overrides default from base_pge)"""
 
-    SAS_VERSION = "0.5.2"  # Final release https://github.com/opera-adt/COMPASS/releases/tag/v0.5.2
+    SAS_VERSION = "0.5.4"  # Final release https://github.com/opera-adt/COMPASS/releases/tag/v0.5.4
     """Version of the SAS wrapped by this PGE, should be updated as needed"""
 
     def __init__(self, pge_name, runconfig_path, **kwargs):
