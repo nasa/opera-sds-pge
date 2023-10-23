@@ -15,10 +15,6 @@ from os.path import exists
 import mgrs
 
 
-S1_SLC_HDF5_PREFIX = ""
-"""Prefix used to index metadata within SLC-based HDF5 products"""
-
-
 class MockGdal:  # pragma: no cover
     """
     Mock class for the osgeo.gdal module.

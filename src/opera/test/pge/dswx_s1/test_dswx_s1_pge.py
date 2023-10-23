@@ -24,7 +24,7 @@ from opera.pge import RunConfig
 from opera.pge.dswx_s1.dswx_s1_pge import DSWxS1Executor
 from opera.util import PgeLogger
 from opera.util.dataset_utils import get_sensor_from_spacecraft_name
-from opera.util.tiff_utils import MockGdal
+from opera.util.mock_utils import MockGdal
 
 
 class DswxS1PgeTestCase(unittest.TestCase):

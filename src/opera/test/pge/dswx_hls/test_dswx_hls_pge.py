@@ -26,7 +26,7 @@ from opera.pge.dswx_hls.dswx_hls_pge import DSWxHLSExecutor
 from opera.util import PgeLogger
 from opera.util.dataset_utils import get_sensor_from_spacecraft_name
 from opera.util.geo_utils import get_geographic_boundaries_from_mgrs_tile
-from opera.util.tiff_utils import MockGdal
+from opera.util.mock_utils import MockGdal
 
 
 class DSWxHLSPgeTestCase(unittest.TestCase):

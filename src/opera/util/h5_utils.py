@@ -53,8 +53,8 @@ def get_hdf5_group_as_dict(file_name, group_path, ignore_keys=None):
         python dict containing variable data from the group path location.
     """
     group_dict = {}
-    with h5py.File(file_name, 'r') as hf:    # pylint: disable=invalid-name
-        group_object = hf.get(group_path)    # pylint: disable=invalid-name
+    with h5py.File(file_name, 'r') as h5file:
+        group_object = h5file.get(group_path)
         if group_object is None:
             raise RuntimeError(f"An error occurred retrieving group '{group_path}' from file '{file_name}'.")
 

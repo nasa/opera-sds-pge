@@ -29,8 +29,8 @@ from opera.util import PgeLogger
 from opera.util.dataset_utils import get_sensor_from_spacecraft_name
 from opera.util.h5_utils import create_test_rtc_metadata_product
 from opera.util.h5_utils import get_rtc_s1_product_metadata
-from opera.util.tiff_utils import mock_gdal_edit
-from opera.util.tiff_utils import mock_save_as_cog
+from opera.util.mock_utils import mock_gdal_edit
+from opera.util.mock_utils import mock_save_as_cog
 
 
 class RtcS1PgeTestCase(unittest.TestCase):
