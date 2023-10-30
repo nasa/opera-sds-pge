@@ -22,14 +22,14 @@ import numpy as np
 from opera.pge.base.base_pge import PgeExecutor
 from opera.pge.base.base_pge import PostProcessorMixin
 from opera.pge.base.base_pge import PreProcessorMixin
+from opera.util.dataset_utils import get_burst_id_from_file_name
+from opera.util.dataset_utils import get_sensor_from_spacecraft_name
 from opera.util.error_codes import ErrorCode
-from opera.util.img_utils import set_geotiff_metadata
+from opera.util.geo_utils import translate_utm_bbox_to_lat_lon
+from opera.util.h5_utils import get_rtc_s1_product_metadata
 from opera.util.input_validation import validate_slc_s1_inputs
-from opera.util.metadata_utils import get_burst_id_from_file_name
-from opera.util.metadata_utils import get_rtc_s1_product_metadata
-from opera.util.metadata_utils import get_sensor_from_spacecraft_name
-from opera.util.metadata_utils import translate_utm_bbox_to_lat_lon
 from opera.util.render_jinja2 import render_jinja2
+from opera.util.tiff_utils import set_geotiff_metadata
 from opera.util.time import get_time_for_filename
 
 

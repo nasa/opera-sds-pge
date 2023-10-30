@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 
 """
-=================
-test_img_utils.py
-=================
+==================
+test_tiff_utils.py
+==================
 
-Unit tests for the util/img_utils.py module.
+Unit tests for the util/tiff_utils.py module.
 
 """
 
@@ -13,17 +13,15 @@ import os
 import unittest
 from datetime import datetime
 from os.path import abspath, join
-from re import match
 from unittest import skipIf
 
 from pkg_resources import resource_filename
 
-from opera.util.img_utils import get_geotiff_hls_dataset
-from opera.util.img_utils import get_geotiff_hls_product_version
-from opera.util.img_utils import get_geotiff_metadata
-from opera.util.img_utils import get_geotiff_processing_datetime
-from opera.util.img_utils import get_geotiff_spacecraft_name
-from opera.util.img_utils import get_hls_filename_fields
+from opera.util.tiff_utils import get_geotiff_hls_dataset
+from opera.util.tiff_utils import get_geotiff_hls_product_version
+from opera.util.tiff_utils import get_geotiff_metadata
+from opera.util.tiff_utils import get_geotiff_processing_datetime
+from opera.util.tiff_utils import get_geotiff_spacecraft_name
 
 
 def gdal_is_available():
@@ -39,8 +37,8 @@ def gdal_is_available():
         return False
 
 
-class ImgUtilsTestCase(unittest.TestCase):
-    """Unit test Image Utilities"""
+class TiffUtilsTestCase(unittest.TestCase):
+    """Unit test Tiff Utilities"""
 
     test_dir = None
     starting_dir = None
@@ -97,31 +95,11 @@ class ImgUtilsTestCase(unittest.TestCase):
         # Try with a missing file
         with self.assertRaises(RuntimeError):
             get_geotiff_metadata('non-existent-file.tif')
+            get_geotiff_metadata(input_dswx_hls_file)
 
         # Try with an invalid file type
         with self.assertRaises(RuntimeError):
             get_geotiff_metadata(join(self.data_dir, "valid_runconfig_full.yaml"))
-
-    def test_get_hls_filename_fields(self):
-        """Test get_get_hls_filename_fields()"""
-        # Use an example HLS dataset name
-        file_name = 'HLS.S30.T53SMS.2020276T013701.v1.5'
-
-        # Call the function
-        hls_file_fields = get_hls_filename_fields(file_name)
-
-        # Verify a dictionary is returned
-        self.assertIsInstance(hls_file_fields, dict)
-
-        # Check the key names/values
-        self.assertIn('product', hls_file_fields)
-        self.assertIn('tile_id', hls_file_fields)
-        self.assertIn('collection_version', hls_file_fields)
-        self.assertEqual(hls_file_fields['short_name'], 'S30')
-        self.assertEqual(hls_file_fields['collection_version'], 'v1.5')
-
-        # Verify the conversion from Julian
-        self.assertNotEqual(match(r'\d{8}T\d{6}\b', hls_file_fields['acquisition_time']), None)
 
 
 if __name__ == "__main__":

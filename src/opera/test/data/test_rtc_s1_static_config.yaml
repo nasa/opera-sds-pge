@@ -25,7 +25,7 @@ RunConfig:
                 ProgramPath: mkdir
                 ProgramOptions:
                     - '-p rtc_s1_test/output_dir/t069_147170_iw1/;'
-                    - 'python3 -c "from opera.util.metadata_utils import create_test_rtc_metadata_product; create_test_rtc_metadata_product(\"rtc_s1_test/output_dir/t069_147170_iw1/rtc_product_v1.0.h5\")";'
+                    - 'python3 -c "from opera.util.h5_utils import create_test_rtc_metadata_product; create_test_rtc_metadata_product(\"rtc_s1_test/output_dir/t069_147170_iw1/rtc_product_v1.0.h5\")";'
                     - 'dd if=/dev/urandom of=rtc_s1_test/output_dir/t069_147170_iw1/OPERA_L2_RTC-S1-STATIC_T069-147170-IW1_20140403_20230911T203246Z_S1B_30_v1.0_incidence_angle.tif bs=1M count=1;'
                     - 'dd if=/dev/urandom of=rtc_s1_test/output_dir/t069_147170_iw1/OPERA_L2_RTC-S1-STATIC_T069-147170-IW1_20140403_20230911T203246Z_S1B_30_v1.0_local_incidence_angle.tif bs=1M count=1;'
                     - 'dd if=/dev/urandom of=rtc_s1_test/output_dir/t069_147170_iw1/OPERA_L2_RTC-S1-STATIC_T069-147170-IW1_20140403_20230911T203246Z_S1B_30_v1.0_number_of_looks.tif bs=1M count=1;'

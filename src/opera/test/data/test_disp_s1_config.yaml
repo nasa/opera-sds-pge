@@ -25,7 +25,7 @@ RunConfig:
                 ProgramPath: mkdir
                 ProgramOptions:
                     - '-p disp_s1_pge_test/output_dir/compressed_slcs;'
-                    - 'python3 -c "from opera.util.metadata_utils import create_test_disp_metadata_product; create_test_disp_metadata_product(\"disp_s1_pge_test/output_dir/20180101_20180330.unw.nc\")";'
+                    - 'python3 -c "from opera.util.h5_utils import create_test_disp_metadata_product; create_test_disp_metadata_product(\"disp_s1_pge_test/output_dir/20180101_20180330.unw.nc\")";'
                     - 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.unw.png bs=1M count=1;'
                     - 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/compressed_slcs/compressed_slc_t087_185683_iw2_20180222_20180330.h5 bs=1M count=1;'
                     - 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/compressed_slcs/compressed_slc_t087_185684_iw2_20180222_20180330.h5 bs=1M count=1;'

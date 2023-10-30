@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
 """
-=================
+==============
 test_logger.py
-=================
+==============
 
 Unit tests for the util/logger.py module.
 

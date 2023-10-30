@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
 """
-=================
+============
 test_time.py
-=================
+============
 
 Unit tests for the util/time.py module.
 """

@@ -20,18 +20,18 @@ import opera.util.input_validation as input_validation
 from opera.pge.base.base_pge import PgeExecutor
 from opera.pge.base.base_pge import PostProcessorMixin
 from opera.pge.base.base_pge import PreProcessorMixin
+from opera.util.dataset_utils import get_hls_filename_fields
+from opera.util.dataset_utils import get_sensor_from_spacecraft_name
 from opera.util.error_codes import ErrorCode
-from opera.util.img_utils import get_geotiff_hls_dataset
-from opera.util.img_utils import get_geotiff_hls_sensor_product_id
-from opera.util.img_utils import get_geotiff_metadata
-from opera.util.img_utils import get_geotiff_processing_datetime
-from opera.util.img_utils import get_geotiff_spacecraft_name
-from opera.util.img_utils import get_hls_filename_fields
-from opera.util.img_utils import set_geotiff_metadata
+from opera.util.geo_utils import get_geographic_boundaries_from_mgrs_tile
 from opera.util.input_validation import validate_dswx_inputs
-from opera.util.metadata_utils import get_geographic_boundaries_from_mgrs_tile
-from opera.util.metadata_utils import get_sensor_from_spacecraft_name
 from opera.util.render_jinja2 import render_jinja2
+from opera.util.tiff_utils import get_geotiff_hls_dataset
+from opera.util.tiff_utils import get_geotiff_hls_sensor_product_id
+from opera.util.tiff_utils import get_geotiff_metadata
+from opera.util.tiff_utils import get_geotiff_processing_datetime
+from opera.util.tiff_utils import get_geotiff_spacecraft_name
+from opera.util.tiff_utils import set_geotiff_metadata
 from opera.util.time import get_time_for_filename
 
 
