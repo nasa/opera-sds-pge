@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
 """
-=================
+==================
 test_tiff_utils.py
-=================
+==================
 
 Unit tests for the util/tiff_utils.py module.
 

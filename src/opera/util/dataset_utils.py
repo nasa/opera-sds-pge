@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 
 """
-=================
+================
 dataset_utils.py
-=================
+================
 
-Utilities used to to input datasets and generate and filenames.
+Utilities used to work with input datasets and filenames.
 
 """
 

@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
 """
-=================
+===============
 test_metfile.py
-=================
+===============
 
 Unit tests for the util/metfile.py module.
 """

@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
 """
-=================
+=====================
 test_render_jinja2.py
-=================
+=====================
 
 Unit tests for the util/render_jinja2.py module.
 """

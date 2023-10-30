@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 
 """
-=================
-metadata_utils.py
-=================
+===========
+h5_utils.py
+===========
 
-ISO metadata utilities for use with OPERA PGEs.
+Utilities used for working with HD5F files
 
 """
 # flake8: noqa F841

@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
 """
-=================
+=====================
 test_usage_metrics.py
-=================
+=====================
 
 Unit tests for the util/usage_metrics.py module.
 """

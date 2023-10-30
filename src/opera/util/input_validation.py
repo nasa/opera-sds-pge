@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
 """
-=================
+===================
 input_validation.py
-=================
+===================
 
 Common code used by some PGEs for input validation.
 

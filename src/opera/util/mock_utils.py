@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 
 """
-=================
+=============
 mock_utils.py
-=================
+=============
 
-Utilities used to simulate the Geospatial Data Abstraction Library (GDAL).
+Utilities used to simulate extensive libraries, such as the Geospatial Data
+Abstraction Library (GDAL), which may not be present in all environments
 
 """
 

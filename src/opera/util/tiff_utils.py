@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
 """
-============
+=============
 tiff_utils.py
-===========
+=============
 
 Utilities related to setting/getting metadata to/from geotiff files.
 

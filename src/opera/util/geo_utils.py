@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
 """
-=================
+============
 geo_utils.py
-=================
+============
 
 Utilities used for working with geographic coordinates
 
