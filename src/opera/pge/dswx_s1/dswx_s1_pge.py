@@ -288,6 +288,9 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
             # Collect the metadata from the GeoTIFF output product
             dswx_metadata = self._collect_dswx_s1_product_metadata(inter_filename)
 
+            # TODO: kludge since SAS hardcodes SPACECRAFT_NAME to "Sentinel-1A/B"
+            dswx_metadata['SPACECRAFT_NAME'] = "Sentinel-1A" if "S1A" in inter_filename else "Sentinel-1B"
+
             self._tile_metadata_cache[tile_id] = dswx_metadata
 
         spacecraft_name = dswx_metadata['SPACECRAFT_NAME']

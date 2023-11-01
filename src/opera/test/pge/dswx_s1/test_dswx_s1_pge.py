@@ -274,6 +274,8 @@ class DswxS1PgeTestCase(unittest.TestCase):
         for image_file in image_files:
             file_name = pge._geotiff_filename(image_file)
             md = MockGdal.MockDSWxS1GdalDataset().GetMetadata()
+            # TODO: kludge since SAS hardcodes SPACECRAFT_NAME to "Sentinel-1A/B"
+            md['SPACECRAFT_NAME'] = 'Sentinel-1B'
             file_name_regex = rf"{pge.PROJECT}_{pge.LEVEL}_" \
                               rf"{md['PRODUCT_TYPE']}_" \
                               rf"T\w{{5}}_" \
