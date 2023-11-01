@@ -477,12 +477,6 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
         """
         return self._ancillary_filename() + ".qa.log"
 
-    # TODO: remove patch and imports once SAS starts to populate metadata in GeoTIFF
-    from unittest.mock import patch
-    import opera.util.tiff_utils
-    from opera.util.tiff_utils import MockGdal
-
-    @patch.object(opera.util.tiff_utils, "gdal", MockGdal)
     def _collect_dswx_s1_product_metadata(self, geotiff_product):
         """
         Gathers the available metadata from an output DSWx-S1 product for
