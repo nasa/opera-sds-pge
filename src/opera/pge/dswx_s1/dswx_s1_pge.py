@@ -39,23 +39,19 @@ class DSWxS1PreProcessorMixin(PreProcessorMixin):
 
     _pre_mixin_name = "DSWxS1PreProcessorMixin"
 
-    def _validate_ancillary_inputs(self):
+    def _validate_dynamic_ancillary_inputs(self):
         """
-        Evaluates the list of ancillary inputs from the RunConfig to ensure they
-        exist and have an expected file extension.
+        Evaluates the list of dynamic ancillary inputs from the RunConfig to
+        ensure they exist and have an expected file extension.
 
         """
         dynamic_ancillary_file_group_dict = \
             self.runconfig.sas_config['runconfig']['groups']['dynamic_ancillary_file_group']
 
         for key, value in dynamic_ancillary_file_group_dict.items():
-            if key in ('dem_file', ):
+            if key in ('dem_file', 'reference_water_file', 'worldcover_file', 'hand_file'):
                 input_validation.check_input(
                     value, self.logger, self.name, valid_extensions=('.tif', '.tiff', '.vrt')
-                )
-            elif key in ('reference_water_file', 'worldcover_file', 'hand_file'):
-                input_validation.check_input(
-                    value, self.logger, self.name, valid_extensions=('.tif', '.tiff')
                 )
             elif key in ('shoreline_shapefile',):
                 if value is not None:
@@ -85,6 +81,25 @@ class DSWxS1PreProcessorMixin(PreProcessorMixin):
                     value, self.logger, self.name, valid_extensions=('.yaml', )
                 )
 
+    def _validate_static_ancillary_inputs(self):
+        """
+        Evaluates the list of static ancillary inputs from the RunConfig to
+        ensure they exist and have an expected file extension.
+
+        """
+        static_ancillary_file_group_dict = \
+            self.runconfig.sas_config['runconfig']['groups']['static_ancillary_file_group']
+
+        for key, value in static_ancillary_file_group_dict.items():
+            if key in ('mgrs_database_file', 'mgrs_collection_database_file'):
+                input_validation.check_input(
+                    value, self.logger, self.name, valid_extensions=('.sqlite', '.sqlite3')
+                )
+            elif key in ('static_ancillary_inputs_flag', ):
+                # these fields are included in the SAS input paths, but are not
+                # actually file paths, so skip them
+                continue
+
     def run_preprocessor(self, **kwargs):
         """
         Executes the pre-processing steps for DSWx-S1 PGE initialization.
@@ -107,7 +122,8 @@ class DSWxS1PreProcessorMixin(PreProcessorMixin):
                                              self.runconfig.algorithm_parameters_schema_path,
                                              self.runconfig.algorithm_parameters_file_config_path,
                                              self.logger)
-        self._validate_ancillary_inputs()
+        self._validate_dynamic_ancillary_inputs()
+        self._validate_static_ancillary_inputs()
 
 
 class DSWxS1PostProcessorMixin(PostProcessorMixin):
