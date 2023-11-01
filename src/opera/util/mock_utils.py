@@ -199,8 +199,8 @@ class MockOsr:  # pragma: no cover
         """Mock class for the osgeo.osr module"""
 
         def __init__(self):
-            self.zone = None
-            self.hemi = ''
+            self.zone = 1
+            self.hemi = 'N'
 
         def SetWellKnownGeogCS(self, name):
             """Mock implementation for osr.SetWellKnownGeogCS"""
@@ -210,6 +210,10 @@ class MockOsr:  # pragma: no cover
             """Mock implementation for osr.SetUTM"""
             self.zone = zone
             self.hemi = "N" if north else "S"
+
+        def ImportFromEPSG(self, epsgCode):
+            """Mock implementation for osr.ImportFromEPSG"""
+            return 0
 
     class MockCoordinateTransformation:
         """Mock class for the osgeo.osr.CoordinateTransformation class"""
@@ -223,9 +227,14 @@ class MockOsr:  # pragma: no cover
             # Use mgrs to convert UTM back to a tile ID, then covert to rough
             # lat/lon, this should be accurate enough for development testing
             mgrs_obj = mgrs.MGRS()
-            mgrs_tile = mgrs_obj.UTMToMGRS(self.src.zone, self.src.hemi, x, y)
-            lat, lon = mgrs_obj.toLatLon(mgrs_tile)
-            return lat, lon, z
+            try:
+                mgrs_tile = mgrs_obj.UTMToMGRS(self.src.zone, self.src.hemi, x, y)
+                lat, lon = mgrs_obj.toLatLon(mgrs_tile)
+                return lat, lon, z
+            except:
+                # Fallback to returning inputs if calls to MGRS library fail on
+                # fake inputs
+                return x, y, z
 
     @staticmethod
     def SpatialReference():
