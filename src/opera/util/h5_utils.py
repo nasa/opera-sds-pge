@@ -551,7 +551,10 @@ def get_disp_s1_product_metadata(file_name):
         ISO template.
     """
     disp_metadata = {
-        'identification': get_hdf5_group_as_dict(file_name, f"{S1_SLC_HDF5_PREFIX}/identification"),
+        'x': get_hdf5_group_as_dict(file_name, "/x"),
+        'y': get_hdf5_group_as_dict(file_name, "/y"),
+        'identification': get_hdf5_group_as_dict(file_name, "/identification"),
+        'metadata': get_hdf5_group_as_dict(file_name, "/metadata")
     }
 
     return disp_metadata
@@ -571,24 +574,35 @@ def create_test_disp_metadata_product(file_path):
 
     """
     pge_runconfig_contents = """
-input_file_group:
-    # REQUIRED: List of paths to CSLC files.
-    #   Type: array.
-    cslc_file_list:
-      - input_slcs/compressed_slc_t087_185683_iw2_20180101_20180210.h5
-      - input_slcs/t087_185683_iw2_20180222_VV.h5
-... removed runconfig contents for testing
-# Path to the output log file in addition to logging to stderr.
-#   Type: string.
-log_file: output/pge_logfile.log
-"""
+    input_file_group:
+        cslc_file_list:
+          - input_slcs/compressed_slc_t087_185683_iw2_20180101_20180210.h5
+          - input_slcs/t087_185683_iw2_20180222_VV.h5
+        frame_id: 11114
+    log_file: output/pge_logfile.log
+    """
 
     with h5py.File(file_path, 'w') as outfile:
-        identification_grp = outfile.create_group(f"{S1_SLC_HDF5_PREFIX}/identification")
+        x_dset = outfile.create_dataset("x", data=np.zeros(10,), dtype='float64')
+        y_dset = outfile.create_dataset("y", data=np.zeros(10,), dtype='float64')
+
+        identification_grp = outfile.create_group("/identification")
         frame_id_dset = identification_grp.create_dataset("frame_id", data=123, dtype='int64')
-        pge_runconfig_dset = identification_grp.create_dataset("pge_runconfig",
-                                                               data=np.string_(pge_runconfig_contents))
         product_version_dset = identification_grp.create_dataset("product_version",
-                                                                 data=np.string_("0.1"))
-        software_version_dset = identification_grp.create_dataset("software_version",
-                                                                  data=np.string_("0.1.2"))
+                                                                 data=np.string_("0.2"))
+        zero_doppler_start_time_dset = identification_grp.create_dataset("zero_doppler_start_time",
+                                                                         data=np.string_("2022-12-13 14:07:50.748411"))
+        zero_doppler_end_time_dset = identification_grp.create_dataset("zero_doppler_end_time",
+                                                                       data=np.string_("2022-12-13 14:07:56.584135"))
+        bounding_polygon_dset = identification_grp.create_dataset("bounding_polygon",
+                                                                  data=np.string_("POLYGON ((-119.26 39.15, -119.32 39.16, -119.22 39.32, -119.26 39.15))"))
+        radar_wavelength_dset = identification_grp.create_dataset("radar_wavelength",
+                                                                  data=0.05546576, dtype='float64')
+
+        metadata_grp = outfile.create_group("/metadata")
+        disp_s1_software_version_dset = metadata_grp.create_dataset("disp_s1_software_version",
+                                                                          data=np.string_("0.1.0"))
+        dolphin_software_version_dset = metadata_grp.create_dataset("dolphin_software_version",
+                                                                          data=np.string_("0.5.1"))
+        pge_runconfig_dset = metadata_grp.create_dataset("pge_runconfig",
+                                                         data=np.string_(pge_runconfig_contents))

@@ -13,6 +13,8 @@ import os
 import tempfile
 import unittest
 
+import numpy as np
+
 from opera.util.h5_utils import create_test_cslc_metadata_product
 from opera.util.h5_utils import create_test_disp_metadata_product
 from opera.util.h5_utils import create_test_rtc_metadata_product
@@ -45,13 +47,19 @@ class H5UtilsTestCase(unittest.TestCase):
         try:
             product_output = get_disp_s1_product_metadata(file_name)
 
+            np.testing.assert_array_equal(product_output['x'], np.zeros(10,))
+            np.testing.assert_array_equal(product_output['y'], np.zeros(10,))
             self.assertEqual(product_output['identification']['frame_id'], 123)
-            self.assertIn("input_file_group",
-                          product_output['identification']['pge_runconfig'])
-            self.assertIn("log_file",
-                          product_output['identification']['pge_runconfig'])
-            self.assertEqual(product_output['identification']['product_version'], "0.1")
-            self.assertEqual(product_output['identification']['software_version'], "0.1.2")
+            self.assertEqual(product_output['identification']['product_version'], "0.2")
+            self.assertEqual(product_output['identification']['zero_doppler_start_time'], "2022-12-13 14:07:50.748411")
+            self.assertEqual(product_output['identification']['zero_doppler_end_time'], "2022-12-13 14:07:56.584135")
+            self.assertEqual(product_output['identification']['bounding_polygon'],
+                             "POLYGON ((-119.26 39.15, -119.32 39.16, -119.22 39.32, -119.26 39.15))")
+            self.assertEqual(product_output['identification']['radar_wavelength'], 0.05546576)
+            self.assertEqual(product_output['metadata']['disp_s1_software_version'], "0.1.0")
+            self.assertEqual(product_output['metadata']['dolphin_software_version'], "0.5.1")
+            self.assertIn("input_file_group", product_output['metadata']['pge_runconfig'])
+            self.assertIn("log_file", product_output['metadata']['pge_runconfig'])
 
         finally:
             os.remove(file_name)
