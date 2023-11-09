@@ -24,6 +24,7 @@ from opera.pge.base.base_pge import PostProcessorMixin
 from opera.pge.base.base_pge import PreProcessorMixin
 from opera.util.dataset_utils import get_burst_id_from_file_name
 from opera.util.dataset_utils import get_sensor_from_spacecraft_name
+from opera.util.dataset_utils import parse_bounding_polygon_from_wkt
 from opera.util.error_codes import ErrorCode
 from opera.util.geo_utils import translate_utm_bbox_to_lat_lon
 from opera.util.h5_utils import get_rtc_s1_product_metadata
@@ -742,6 +743,16 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
                 'lonMax': lon_max,
                 'latMax': lat_max
             }
+        # Otherwise, convert the WKT format polygon to a gml:PosList
+        else:
+            # Parse the polygon coordinates to conform with gml
+            bounding_polygon_wtk_str = output_product_metadata['identification']['boundingPolygon']
+
+            try:
+                bounding_polygon_gml_str = parse_bounding_polygon_from_wkt(bounding_polygon_wtk_str)
+                output_product_metadata['boundingPolygon'] = bounding_polygon_gml_str
+            except ValueError as err:
+                self.logger.critical(self.name, ErrorCode.ISO_METADATA_RENDER_FAILED, str(err))
 
         # We also need to create the URL for static layer data access
         # This URL will be injected into metadata products after products

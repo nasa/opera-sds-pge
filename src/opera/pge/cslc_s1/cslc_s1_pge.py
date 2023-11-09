@@ -20,6 +20,7 @@ from pathlib import Path
 from opera.pge.base.base_pge import PgeExecutor
 from opera.pge.base.base_pge import PostProcessorMixin
 from opera.pge.base.base_pge import PreProcessorMixin
+from opera.util.dataset_utils import parse_bounding_polygon_from_wkt
 from opera.util.error_codes import ErrorCode
 from opera.util.h5_utils import get_cslc_s1_product_metadata
 from opera.util.input_validation import validate_slc_s1_inputs
@@ -639,17 +640,13 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
         output_product_metadata['burst_center'] = burst_center_str
 
         # Parse the burst polygon coordinates to conform with gml
-        # samples: "POLYGON ((399015 3859970, 398975 3860000, ..., 399015 3859970))"
-        #          "MULTIPOLYGON (((399015, 3859970, ...)), ... ((... 399015, 3859970)))
-        burst_polygon_str = output_product_metadata['identification']['bounding_polygon']
-        burst_polygon_pattern = r"(?:MULTI)?POLYGON\s*\(\((.+)\)\)"
-        result = re.match(burst_polygon_pattern, burst_polygon_str)
+        burst_polygon_wtk_str = output_product_metadata['identification']['bounding_polygon']
 
-        if not result:
-            msg = f'Failed to parse burst polygon from string "{burst_polygon_str}"'
-            self.logger.critical(self.name, ErrorCode.ISO_METADATA_RENDER_FAILED, msg)
-
-        output_product_metadata['burst_polygon'] = f"({''.join(result.groups()[0].split(','))})"
+        try:
+            burst_polygon_gml_str = parse_bounding_polygon_from_wkt(burst_polygon_wtk_str)
+            output_product_metadata['burst_polygon'] = burst_polygon_gml_str
+        except ValueError as err:
+            self.logger.critical(self.name, ErrorCode.ISO_METADATA_RENDER_FAILED, str(err))
 
         # Jinja2 cannot serialize int64 data types to JSON, so convert the shape array
         # to a list of native Python ints
