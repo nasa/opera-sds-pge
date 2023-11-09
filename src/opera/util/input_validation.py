@@ -17,7 +17,8 @@ import yamale
 from opera.util.error_codes import ErrorCode
 
 
-def check_input(input_object, logger, name, valid_extensions=None, check_zero_size=False):
+def check_input(input_object, logger, name, valid_extensions=None,
+                check_zero_size=False):
     """
     Validation checks for individual files.
     The input object is checked for existence and that it ends with
@@ -38,7 +39,8 @@ def check_input(input_object, logger, name, valid_extensions=None, check_zero_si
         If true, raise an exception for zero-size input objects
 
     """
-    # The input object path must be explicitly tested for 'None' before os.path.exists() executes.
+    # The input object path must be explicitly tested for 'None' before
+    # os.path.exists() executes.
     if input_object is None:
         error_msg = f"TypeError: {input_object} is NoneType."
         logger.critical(name, ErrorCode.INPUT_NOT_FOUND, error_msg)
@@ -51,20 +53,25 @@ def check_input(input_object, logger, name, valid_extensions=None, check_zero_si
         ext = splitext(input_object)[-1]
 
         if ext not in valid_extensions:
-            error_msg = f"Input file {input_object} does not have an expected file extension."
+            error_msg = (f"Input file {input_object} does not have an expected "
+                         f"file extension.")
             logger.critical(name, ErrorCode.INVALID_INPUT, error_msg)
 
     if check_zero_size is True:
         file_size = getsize(input_object)
         if not file_size > 0:
-            error_msg = f"Input file {input_object} size is {file_size}. Size must be greater than 0."
+            error_msg = (f"Input file {input_object} size is {file_size}. "
+                         "Size must be greater than 0.")
             logger.critical(name, ErrorCode.INVALID_INPUT, error_msg)
 
 
-def check_input_list(list_of_input_objects, logger, name, valid_extensions=None, check_zero_size=False):
+def check_input_list(list_of_input_objects, logger, name, valid_extensions=None,
+                     check_zero_size=False):
     """Call check_input for a list of input objects."""
     for input_object in list_of_input_objects:
-        check_input(input_object, logger, name, valid_extensions=valid_extensions, check_zero_size=check_zero_size)
+        check_input(input_object, logger, name,
+                    valid_extensions=valid_extensions,
+                    check_zero_size=check_zero_size)
 
 
 def validate_slc_s1_inputs(runconfig, logger, name):
@@ -117,8 +124,8 @@ def validate_slc_s1_inputs(runconfig, logger, name):
         elif key == 'tec_file':
             check_input(value, logger, name)
         elif key == 'weather_model_file':
-            # TODO: this might be utilized as an ancillary with later deliveries,
-            #       but no example available currently
+            # This key could show up since it is in the schema, but it should
+            # never be present in R2 production, so just ignore
             continue
         elif key in ('burst_id', 'dem_description', 'dem_file_description',
                      'source_data_access'):
@@ -176,8 +183,9 @@ def check_disp_s1_ancillary_burst_ids(cslc_input_burst_ids, ancillary_file_list,
         'amplitude_dispersion_files',
         'amplitude_mean_files',
         'geometry_files'
-    Verify that each file has a unique burst id in the file name, and that the burst idea is in the
-    set of DISP_S1 cslc input burst ids.
+
+    Verify that each file has a unique burst id in the file name, and that the
+    burst idea is in the set of DISP_S1 cslc input burst ids.
 
     Parameters
     ----------
@@ -194,24 +202,29 @@ def check_disp_s1_ancillary_burst_ids(cslc_input_burst_ids, ancillary_file_list,
     ------
     RuntimeError
         If there are ancillary files of the same type with the same burst_id.
-        If the set of ancillary file burst_ids do not match the set of cslc input file burst_ids.
+        If the set of ancillary file burst_ids do not match the set of cslc
+        input file burst_ids.
 
     """
     nl, tab, dtab = '\n', '\t', '\t\t'   # used to format log output in fstrings.
     ancillary_burst_ids = get_burst_id_set(ancillary_file_list, logger, name)
+
     # Test none of the ancillary inputs have the same burst ID
     if len(ancillary_burst_ids) != len(ancillary_file_list):
-        msg = f"Duplicate burst ID's in ancillary file list. " \
-              f"Length of file list {ancillary_file_list}, Length of file set {ancillary_burst_ids}"
-        # msg = f'Burst ids in {ancillary_file_list} are not unique.'
+        msg = (f"Duplicate burst ID's in ancillary file list. "
+               f"Length of file list {ancillary_file_list}, "
+               f"Length of file set {ancillary_burst_ids}")
         logger.critical(name, ErrorCode.INVALID_INPUT, msg)
-    # Verify that the sets of ancillary input burst ID's match the set of CSLC input burst ID's
+
+    # Verify that the sets of ancillary input burst ID's match the set of CSLC
+    # input burst ID's
     if ancillary_burst_ids != cslc_input_burst_ids:
-        msg = f"{nl}{tab}Set of input CSLC burst IDs do not match the set of ancillary burst IDs: {nl}" \
-              f"{dtab}In cslc set, but not in ancillary set: " \
-              f"{cslc_input_burst_ids.difference(ancillary_burst_ids)}{nl}" \
-              f"{dtab}In ancillary set, but not in cslc set: " \
-              f"{ancillary_burst_ids.difference(cslc_input_burst_ids)}"
+        msg = (f"{nl}{tab}Set of input CSLC burst IDs do not match the set of "
+               f"ancillary burst IDs: {nl}"
+               f"{dtab}In cslc set, but not in ancillary set: "
+               f"{cslc_input_burst_ids.difference(ancillary_burst_ids)}{nl}"
+               f"{dtab}In ancillary set, but not in cslc set: "
+               f"{ancillary_burst_ids.difference(cslc_input_burst_ids)}")
         logger.critical(name, ErrorCode.INVALID_INPUT, msg)
 
 
@@ -235,8 +248,8 @@ def get_cslc_input_burst_id_set(cslc_input_file_list, logger, name):
     Returns
     -------
     burst id set : set
-        Will be either 'single_file_burst_id_set' or 'compressed_file_burst_id_set' depending upon
-        the list of burst ids passed to the function.
+        Will be either 'single_file_burst_id_set' or 'compressed_file_burst_id_set'
+        depending upon the list of burst ids passed to the function.
 
     Raises
     ------
@@ -245,8 +258,10 @@ def get_cslc_input_burst_id_set(cslc_input_file_list, logger, name):
 
     """
     nl, tab, dtab = '\n', '\t', '\t\t'  # used to format log output in fstrings.
-    # Filter and separate into 2 list: files with 'compressed' in the name, and files without 'compressed' in the name.
-    compressed_input_file_list = list(filter((lambda filename: 'compressed' in filename), cslc_input_file_list))
+    # Filter and separate into 2 list: files with 'compressed' in the name, and
+    # files without 'compressed' in the name.
+    compressed_input_file_list = list(filter((lambda filename: 'compressed' in filename),
+                                             cslc_input_file_list))
     single_input_file_list = list(set(cslc_input_file_list) - set(compressed_input_file_list))
 
     compressed_file_burst_id_set = get_burst_id_set(compressed_input_file_list, logger, name)
@@ -255,14 +270,15 @@ def get_cslc_input_burst_id_set(cslc_input_file_list, logger, name):
     # Case 1:  uncompressed files only in cslc inputs
     if len(compressed_file_burst_id_set) == 0:
         return single_file_burst_id_set
+
     # Case 2: uncompressed files and compressed files in cslc inputs with non-matching burst ids
     if single_file_burst_id_set != compressed_file_burst_id_set:
-        msg = f"{nl}{tab}Set of input CSLC 'compressed' burst IDs do not match" \
-              f" the set of 'uncompressed' burst IDs: {nl}" \
-              f"{dtab}In 'compressed' set, but not in 'uncompressed' set: " \
-              f"{compressed_file_burst_id_set.difference(single_file_burst_id_set)} {nl}" \
-              f"{dtab}In 'uncompressed' set, but not in 'compressed' set:" \
-              f" {single_file_burst_id_set.difference(compressed_file_burst_id_set)}"
+        msg = (f"{nl}{tab}Set of input CSLC 'compressed' burst IDs do not match"
+               f" the set of 'uncompressed' burst IDs: {nl}"
+               f"{dtab}In 'compressed' set, but not in 'uncompressed' set: "
+               f"{compressed_file_burst_id_set.difference(single_file_burst_id_set)} {nl}"
+               f"{dtab}In 'uncompressed' set, but not in 'compressed' set:"
+               f" {single_file_burst_id_set.difference(compressed_file_burst_id_set)}")
         logger.critical(name, ErrorCode.INVALID_INPUT, msg)
     # Case 3: uncompressed file and compressed files with matching burst id sets
     else:
@@ -286,15 +302,19 @@ def validate_disp_inputs(runconfig, logger, name):
         Logger passed by the calling PGE
     name:  str
         pge name
+
     """
     input_file_group = runconfig.sas_config['input_file_group']
     dyn_anc_file_group = runconfig.sas_config['dynamic_ancillary_file_group']
+    static_anc_file_group = runconfig.sas_config['static_ancillary_file_group']
 
     check_input_list(input_file_group['cslc_file_list'], logger, name,
                      valid_extensions=('.h5',), check_zero_size=True)
-    cslc_burst_id_set = get_cslc_input_burst_id_set(runconfig.sas_config['input_file_group']['cslc_file_list'],
-                                                    logger,
-                                                    name)
+
+    cslc_burst_id_set = get_cslc_input_burst_id_set(
+        runconfig.sas_config['input_file_group']['cslc_file_list'],
+        logger, name
+    )
 
     if 'amplitude_dispersion_files' in dyn_anc_file_group:
         check_input_list(dyn_anc_file_group['amplitude_dispersion_files'], logger, name,
@@ -312,29 +332,33 @@ def validate_disp_inputs(runconfig, logger, name):
                                           logger,
                                           name)
 
-    if 'geometry_files' in dyn_anc_file_group:
-        check_input_list(dyn_anc_file_group['geometry_files'], logger, name,
+    if 'static_layer_files' in dyn_anc_file_group:
+        check_input_list(dyn_anc_file_group['static_layer_files'], logger, name,
                          valid_extensions=('.h5',), check_zero_size=True)
         check_disp_s1_ancillary_burst_ids(cslc_burst_id_set,
-                                          dyn_anc_file_group['geometry_files'],
+                                          dyn_anc_file_group['static_layer_files'],
                                           logger,
                                           name)
 
     if 'mask_file' in dyn_anc_file_group:
         check_input(dyn_anc_file_group['mask_file'], logger, name,
-                    valid_extensions=('.tif', '.tiff'), check_zero_size=True)
+                    valid_extensions=('.tif', '.tiff', '.vrt', '.flg'), check_zero_size=True)
 
     if 'dem_file' in dyn_anc_file_group:
         check_input(dyn_anc_file_group['dem_file'], logger, name,
-                    valid_extensions=('.tif', '.tiff'), check_zero_size=True)
+                    valid_extensions=('.tif', '.tiff', '.vrt'), check_zero_size=True)
 
-    if 'tec_files' in dyn_anc_file_group:
-        check_input_list(dyn_anc_file_group['tec_files'], logger, name,
+    if 'ionosphere_files' in dyn_anc_file_group:
+        check_input_list(dyn_anc_file_group['ionosphere_files'], logger, name,
                          check_zero_size=True)
 
-    if 'weather_model_files' in dyn_anc_file_group:
-        check_input_list(dyn_anc_file_group['weather_model_files'], logger, name,
-                         valid_extensions=('.nc', '.h5',), check_zero_size=True)
+    if 'troposphere_files' in dyn_anc_file_group:
+        check_input_list(dyn_anc_file_group['troposphere_files'], logger, name,
+                         valid_extensions=('.nc', '.h5', '.grb'), check_zero_size=True)
+
+    if 'frame_to_burst_json' in static_anc_file_group:
+        check_input(static_anc_file_group['frame_to_burst_json'], logger, name,
+                    valid_extensions=('.json',), check_zero_size=True)
 
 
 def validate_dswx_inputs(runconfig, logger, name, valid_extensions=None):
@@ -389,17 +413,19 @@ def validate_dswx_inputs(runconfig, logger, name, valid_extensions=None):
 def validate_algorithm_parameters_config(name, algorithm_parameters_schema_file_path,
                                          algorithm_parameters_runconfig, logger):
     """
-    The DSWx-S1 and DISP-S1 interface SAS uses two runconfig files; one for the main SAS,
-    and another for algorithm parameters.  This allows for independent modification
-    of algorithm parameters within its own runconfig file.
+    The DSWx-S1 and DISP-S1 interface SAS uses two runconfig files; one for the
+    main SAS, and another for algorithm parameters.  This allows for independent
+    modification of algorithm parameters within its own runconfig file.
 
     This method performs validation of the 'algorithm parameters' runconfig file
     against its associated schema file. The SAS section of the main runconfig
-    defines the location within the container of the 'algorithm parameters' runconfig
-    file, under ['dynamic_ancillary_file_group']['algorithm_parameters'].
+    defines the location within the container of the 'algorithm parameters'
+    runconfig file, under ['dynamic_ancillary_file_group']['algorithm_parameters'].
 
-    The schema file for the 'algorithm parameters' runconfig file is referenced under
-    ['PrimaryExecutable']['AlgorithmParametersSchemaPath'] in the PGE section of the runconfig file.
+    The schema file for the 'algorithm parameters' runconfig file is referenced
+    under ['PrimaryExecutable']['AlgorithmParametersSchemaPath'] in the PGE
+    section of the runconfig file.
+
     For compatibility with the other PGE 'AlgorithmParametersSchemaPath' is optional.
 
     """
@@ -408,6 +434,7 @@ def validate_algorithm_parameters_config(name, algorithm_parameters_schema_file_
         error_msg = "No algorithm_parameters_schema_path provided in runconfig file."
         logger.info(name, ErrorCode.NO_ALGO_PARAM_SCHEMA_PATH, error_msg)
         return
+
     if isfile(algorithm_parameters_schema_file_path):
         # Load the 'algorithm parameters' schema
         algorithm_parameters_schema = yamale.make_schema(algorithm_parameters_schema_file_path)
