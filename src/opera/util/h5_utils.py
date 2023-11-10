@@ -35,54 +35,65 @@ except (ImportError, ModuleNotFoundError):  # pragma: no cover
 
 def get_hdf5_group_as_dict(file_name, group_path, ignore_keys=None):
     """
-    Returns HDF5 group variable data as a python dict for a given file and group path.
+    Returns HDF5 group variable data as a python dict for a given file and group
+    path.
+
     Group attributes are not included.
 
     Parameters
     ----------
     file_name : str
-        file system path and filename for the HDF5 file to use.
+        File system path and filename for the HDF5 file to use.
     group_path : str
-        group path within the HDF5 file.
+        Group path within the HDF5 file.
     ignore_keys : iterable, optional
-        keys within the group to not include in the returned dict.
+        Keys within the group to not include in the returned dict.
 
     Returns
     -------
     group_dict : dict
-        python dict containing variable data from the group path location.
+        Python dict containing variable data from the group path location.
+
     """
-    group_dict = {}
     with h5py.File(file_name, 'r') as h5file:
         group_object = h5file.get(group_path)
+
         if group_object is None:
-            raise RuntimeError(f"An error occurred retrieving group '{group_path}' from file '{file_name}'.")
+            raise RuntimeError(f"An error occurred retrieving object '{group_path}' "
+                               f"from file '{file_name}'.")
+        elif isinstance(group_object, h5py.Dataset):
+            result = convert_h5py_dataset(group_object)
+        else:
+            result = convert_h5py_group_to_dict(group_object, ignore_keys)
 
-        group_dict = convert_h5py_group_to_dict(group_object, ignore_keys)
-
-    return group_dict
+    return result
 
 
 def convert_h5py_group_to_dict(group_object, ignore_keys=None):
     """
     Returns HDF5 group variable data as a python dict for a given h5py group object.
     Recursively calls itself to process subgroups.
+
     Group attributes are not included.
-    Byte sequences are converted to python strings which will probably cause issues
-    with non-text data.
+
+    Notes
+    -----
+    Byte sequences are converted to python strings which will probably cause
+    issues with non-text data.
 
     Parameters
     ----------
     group_object : h5py._hl.group.Group
         h5py Group object to be converted to a dict.
     ignore_keys : iterable, optional
-        keys within the group to not include in the returned dict.
+        Keys within the group to not include in the returned dict.
 
     Returns
     -------
     converted_dict : dict
-        python dict containing variable data from the group object.
+        Python dict containing variable data from the group object.
         data is copied from the h5py group object to a python dict.
+
     """
     converted_dict = {}
     for key, val in group_object.items():
@@ -91,22 +102,42 @@ def convert_h5py_group_to_dict(group_object, ignore_keys=None):
             continue
 
         if isinstance(val, h5py.Dataset):
-            if type(val[()]) is np.ndarray:       # pylint: disable=C0123
-                if isinstance(val[0], (bytes, np.bytes_)):
-                    # decode bytes to str
-                    converted_dict[key] = val.asstr()[()]
-                else:
-                    converted_dict[key] = val[()]
-            else:
-                if isinstance(val[()], (bytes, np.bytes_)):
-                    # decode bytes to str
-                    converted_dict[key] = val.asstr()[()]
-                else:
-                    converted_dict[key] = val[()]
+            converted_dict[key] = convert_h5py_dataset(val)
         elif isinstance(val, h5py.Group):
             converted_dict[key] = convert_h5py_group_to_dict(val)
 
     return converted_dict
+
+
+def convert_h5py_dataset(dataset_object):
+    """
+    Converts an instance of h5.Dataset to a native Python type.
+
+    Parameters
+    ----------
+    dataset_object : h5py.Dataset
+        The HDF5 Dataset object to convert.
+
+    Returns
+    -------
+    result : object
+        The result of the conversion to native Python type.
+
+    """
+    if type(dataset_object[()]) is np.ndarray:  # pylint: disable=C0123
+        if isinstance(dataset_object[0], (bytes, np.bytes_)):
+            # decode bytes to str
+            result = dataset_object.asstr()[()]
+        else:
+            result = dataset_object[()]
+    else:
+        if isinstance(dataset_object[()], (bytes, np.bytes_)):
+            # decode bytes to str
+            result = dataset_object.asstr()[()]
+        else:
+            result = dataset_object[()]
+
+    return result
 
 
 def get_rtc_s1_product_metadata(file_name):
