@@ -22,6 +22,9 @@ import yaml
 from opera.pge import RunConfig
 from opera.pge.disp_s1.disp_s1_pge import DispS1Executor
 from opera.util import PgeLogger
+from opera.util.h5_utils import create_test_cslc_metadata_product
+from opera.util.h5_utils import create_test_disp_metadata_product
+from opera.util.h5_utils import get_disp_s1_product_metadata
 from opera.util.input_validation import validate_disp_inputs
 
 
@@ -58,31 +61,31 @@ class DispS1PgeTestCase(unittest.TestCase):
         input_dir = join(self.working_dir.name, "disp_s1_pge_test/input_dir")
         os.makedirs(input_dir, exist_ok=True)
 
-        self.input_file = tempfile.NamedTemporaryFile(
-            dir=input_dir, prefix="test_input_", suffix=".tiff"
-        )
-
         # Copy the algorithm_parameters config file into the test input directory.
         shutil.copy(join(self.data_dir, 'test_disp_s1_algorithm_parameters.yaml'), input_dir)
 
-        os.system(
-            f"echo \"non-empty file\" > {join(input_dir, 'compressed_slc_t087_185678_iw2_20180101_20180210.h5')}"
-        )
+        # Create non-empty dummy input files expected by test runconfig
+        dummy_input_files = ['compressed_slc_t087_185678_iw2_20180101_20180210.h5',
+                             'dem.tif', 'water_mask.tif',
+                             't087_185678_iw2_amp_dispersion.tif',
+                             't087_185678_iw2_amp_mean.tif',
+                             't087_185678_iw2_topo.h5',
+                             'jplg0410.18i.Z',
+                             'GMAO_tropo_20180210T000000_ztd.nc',
+                             'opera-s1-disp-frame-to-burst.json']
+        for dummy_input_file in dummy_input_files:
+            os.system(
+                f"echo \"non-empty file\" > {join(input_dir, dummy_input_file)}"
+            )
 
-        os.system(
-            f"echo \"non-empty file\" > {join(input_dir, 't087_185678_iw2_20180222_VV.h5')}"
-        )
-
-        os.system(
-            f"echo \"non-empty file\" > {join(input_dir, 't087_185678_iw2_amp_dispersion.tif')}"
-        )
+        # Create a dummy input CSLC product with realistic metadata
+        create_test_cslc_metadata_product(join(input_dir, 't087_185678_iw2_20180222.h5'))
 
         os.chdir(self.working_dir.name)
 
     def tearDown(self) -> None:
         """Return to starting directory"""
         os.chdir(self.test_dir)
-        self.input_file.close()
         self.working_dir.cleanup()
 
     def _compare_algorithm_parameters_runconfig_to_expected(self, runconfig):
@@ -95,25 +98,33 @@ class DispS1PgeTestCase(unittest.TestCase):
         self.assertEqual(runconfig['phase_linking']['beta'], 0.01)
         self.assertEqual(runconfig['phase_linking']['half_window']['x'], 11)
         self.assertEqual(runconfig['phase_linking']['half_window']['y'], 5)
+        self.assertEqual(runconfig['phase_linking']['use_evd'], False)
+        self.assertEqual(runconfig['phase_linking']['beta'], 0.01)
+        self.assertEqual(runconfig['phase_linking']['shp_method'], 'glrt')
+        self.assertEqual(runconfig['phase_linking']['shp_alpha'], 0.005)
         self.assertEqual(runconfig['interferogram_network']['reference_idx'], 0)
         self.assertEqual(runconfig['interferogram_network']['max_bandwidth'], None)
         self.assertEqual(runconfig['interferogram_network']['max_temporal_baseline'], None)
         self.assertEqual(runconfig['interferogram_network']['indexes'], [[0, -1]])
         self.assertEqual(runconfig['interferogram_network']['network_type'], 'single-reference')
         self.assertEqual(runconfig['unwrap_options']['run_unwrap'], True)
-        self.assertEqual(runconfig['unwrap_options']['unwrap_method'], 'icu')
-        self.assertEqual(runconfig['unwrap_options']['tiles'], [1, 1])
+        self.assertEqual(runconfig['unwrap_options']['unwrap_method'], 'snaphu')
+        self.assertEqual(runconfig['unwrap_options']['ntiles'], [5, 5])
+        self.assertEqual(runconfig['unwrap_options']['downsample_factor'], [5, 5])
+        self.assertEqual(runconfig['unwrap_options']['n_parallel_jobs'], 2)
         self.assertEqual(runconfig['unwrap_options']['init_method'], 'mcf')
         self.assertEqual(runconfig['output_options']['output_resolution'], None)
         self.assertEqual(runconfig['output_options']['strides']['x'], 6)
         self.assertEqual(runconfig['output_options']['strides']['y'], 3)
+        self.assertEqual(runconfig['output_options']['bounds'], None)
+        self.assertEqual(runconfig['output_options']['bounds_epsg'], 4326)
         self.assertEqual(runconfig['output_options']['hdf5_creation_options']['chunks'], [128, 128])
         self.assertEqual(runconfig['output_options']['hdf5_creation_options']['compression'], 'gzip')
         self.assertEqual(runconfig['output_options']['hdf5_creation_options']['compression_opts'], 4)
         self.assertEqual(runconfig['output_options']['hdf5_creation_options']['shuffle'], True)
         self.assertEqual(runconfig['output_options']['gtiff_creation_options'],
                          ['COMPRESS=DEFLATE', 'ZLEVEL=4', 'TILED=YES', 'BLOCKXSIZE=128', 'BLOCKYSIZE=128'])
-        self.assertEqual(runconfig['subdataset'], 'science/SENTINEL1/CSLC/grids/VV')
+        self.assertEqual(runconfig['subdataset'], '//data/VV')
 
     def test_disp_s1_pge_execution(self):
         """
@@ -153,33 +164,31 @@ class DispS1PgeTestCase(unittest.TestCase):
         expected_sas_config_file = join(pge.runconfig.scratch_path, 'test_disp_s1_config_sas.yaml')
         self.assertTrue(os.path.exists(expected_sas_config_file))
 
-        # Check that the file naming is correct
-        # TODO: move this test to its own function
-        output_dir = abspath(pge.runconfig.output_product_path)
-        nc_files = glob.glob(join(output_dir, '*.nc'))
-        nc_file = nc_files[0]
-        nf = pge._netcdf_filename(nc_file)
-        self.assertRegex(
-            nf, r'OPERA_L3_DISP-S1_IW_F00123_VV_[0-9]{8}T[0-9]{6}Z_[0-9]{8}T[0-9]{6}Z_v0\.1_[0-9]{8}T[0-9]{6}Z\.nc')
+        # Check that the catalog metadata file was created in the output directory
+        expected_catalog_metadata_file = join(
+            pge.runconfig.output_product_path, pge._catalog_metadata_filename())
+        self.assertTrue(os.path.exists(expected_catalog_metadata_file))
+
+        expected_inter_filename = abspath("disp_s1_pge_test/output_dir/20180101_20180330.unw.nc")
 
         # Check that the ISO metadata file was created and all placeholders were
         # filled in
         expected_iso_metadata_file = join(
-            pge.runconfig.output_product_path, pge._iso_metadata_filename())
+            pge.runconfig.output_product_path, pge._iso_metadata_filename(expected_inter_filename))
         self.assertTrue(os.path.exists(expected_iso_metadata_file))
-
-        with open(expected_iso_metadata_file, 'r', encoding='utf-8') as infile:
-            iso_contents = infile.read()
-
-        self.assertNotIn('!Not found!', iso_contents)
 
         # Check that the log file was created and moved into the output directory
         expected_log_file = pge.logger.get_file_name()
         self.assertTrue(os.path.exists(expected_log_file))
 
-        # Lastly, check that the dummy output products were created
-        slc_files = glob.glob(join(pge.runconfig.output_product_path, "*.nc"))
-        self.assertEqual(len(slc_files), 1)
+        # Lastly, check that the dummy output product was created and renamed
+        expected_disp_product = join(
+            pge.runconfig.output_product_path,
+            pge._netcdf_filename(
+                inter_filename=expected_inter_filename
+            )
+        )
+        self.assertTrue(os.path.exists(expected_disp_product))
 
         # Open and read the log
         with open(expected_log_file, 'r', encoding='utf-8') as infile:
@@ -187,7 +196,63 @@ class DispS1PgeTestCase(unittest.TestCase):
 
         self.assertIn(f"DISP-S1 invoked with RunConfig {expected_sas_config_file}", log_contents)
 
-    def test_disp_s1_pge_validate_algorithm_parameters_config(self):
+    def test_filename_application(self):
+        """Test the filename convention applied to DISP output products"""
+        runconfig_path = join(self.data_dir, 'test_disp_s1_config.yaml')
+
+        pge = DispS1Executor(pge_name="DispS1PgeTest", runconfig_path=runconfig_path)
+
+        pge.run()
+
+        # Check that the file naming is correct
+        output_dir = abspath(pge.runconfig.output_product_path)
+        nc_files = glob.glob(join(output_dir, '*.nc'))
+        nc_file = nc_files[0]
+
+        expected_disp_filename = pge._netcdf_filename(
+            inter_filename=abspath("disp_s1_pge_test/output_dir/20180101_20180330.unw.nc")
+        )
+
+        self.assertEqual(os.path.basename(nc_file), expected_disp_filename)
+
+        disp_metadata = get_disp_s1_product_metadata(nc_file)
+
+        self.assertRegex(
+            expected_disp_filename,
+            rf'{pge.PROJECT}_{pge.LEVEL}_{pge.NAME}_'
+            rf'IW_F{disp_metadata["identification"]["frame_id"]:05d}_VV_'
+            rf'\d{{8}}T\d{{6}}Z_\d{{8}}T\d{{6}}Z_'
+            rf'v{disp_metadata["identification"]["product_version"]}_'
+            rf'\d{{8}}T\d{{6}}Z.nc'
+        )
+
+    def test_iso_metadata_creation(self):
+        """
+        Test that the ISO metadata template is fully filled out when realistic
+        DISP-S1 product metadata is available.
+        """
+        runconfig_path = join(self.data_dir, 'test_disp_s1_config.yaml')
+
+        pge = DispS1Executor(pge_name="DispS1PgeTest", runconfig_path=runconfig_path)
+
+        # Run only the pre-processor steps to ingest the runconfig and set
+        # up directories
+        pge.run_preprocessor()
+
+        # Create a sample metadata file within the output directory of the PGE
+        output_dir = join(os.curdir, "disp_s1_pge_test/output_dir")
+
+        disp_metadata_path = join(output_dir, '20180101_20180330.unw.nc')
+
+        create_test_disp_metadata_product(disp_metadata_path)
+
+        disp_metadata = pge._collect_disp_s1_product_metadata(disp_metadata_path)
+
+        iso_metadata = pge._create_iso_metadata(disp_metadata)
+
+        self.assertNotIn('!Not found!', iso_metadata)
+
+    def test_validate_algorithm_parameters_config(self):
         """Test basic parsing and validation of an algorithm parameters RunConfig file"""
         runconfig_path = join(self.data_dir, 'test_disp_s1_config.yaml')
 
@@ -195,22 +260,18 @@ class DispS1PgeTestCase(unittest.TestCase):
 
         algorithm_parameters_runconfig_file = self.runconfig.algorithm_parameters_file_config_path
 
-        pge = DispS1Executor(pge_name="DispS1PgeTest", runconfig_path=runconfig_path)
-
-        # Kickoff execution of DISP-S1 PGE
-        pge.run()
-
-        self.assertEqual(algorithm_parameters_runconfig_file, pge.algorithm_parameters_runconfig)
         # parse the run config file
-        runconfig_dict = self.runconfig._parse_algorithm_parameters_run_config_file(pge.algorithm_parameters_runconfig)
+        runconfig_dict = self.runconfig._parse_algorithm_parameters_run_config_file(algorithm_parameters_runconfig_file)
+
         # Check the properties of the algorithm parameters RunConfig to ensure they match as expected
         self._compare_algorithm_parameters_runconfig_to_expected(runconfig_dict)
 
-    def test_disp_s1_pge_bad_algorithm_parameters_schema_path(self):
+    def test_bad_algorithm_parameters_schema_path(self):
         """
         Test for invalid path in the optional 'AlgorithmParametersSchemaPath'
         section of in the PGE runconfig file.
-        section of the runconfig file.  Also test for no AlgorithmParametersSchemaPath
+
+        Also test for no AlgorithmParametersSchemaPath
         """
         runconfig_path = join(self.data_dir, 'test_disp_s1_config.yaml')
         test_runconfig_path = join(self.data_dir, 'invalid_disp_s1_config.yaml')
@@ -262,29 +323,6 @@ class DispS1PgeTestCase(unittest.TestCase):
             if exists(test_runconfig_path):
                 os.unlink(test_runconfig_path)
 
-    def test_disp_s1_pge_bad_algorithm_parameters_path(self):
-        """Test for invalid path to 'algorithm_parameters_file' in SAS runconfig file"""
-        runconfig_path = join(self.data_dir, 'test_disp_s1_config.yaml')
-        test_runconfig_path = join(self.data_dir, 'invalid_disp_s1_config.yaml')
-
-        with open(runconfig_path, 'r', encoding='utf-8') as infile:
-            runconfig_dict = yaml.safe_load(infile)
-
-        runconfig_dict['RunConfig']['Groups']['SAS']['dynamic_ancillary_file_group']\
-            ['algorithm_parameters_file'] = 'test/data/test_algorithm_parameters_non_existent.yaml'  # noqa E211
-
-        with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
-            yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
-
-        try:
-            pge = DispS1Executor(pge_name="DispS1PgeTest", runconfig_path=test_runconfig_path)
-
-            with self.assertRaises(RuntimeError):
-                pge.run()
-
-        finally:
-            if exists(test_runconfig_path):
-                os.unlink(test_runconfig_path)
 
     def test_disp_s1_pge_validate_inputs(self):
         """
@@ -301,6 +339,8 @@ class DispS1PgeTestCase(unittest.TestCase):
                 ]
             },
             'dynamic_ancillary_file_group': {
+            },
+            'static_ancillary_file_group': {
             }
         }
         runconfig = MockRunConfig(sas_config)
@@ -374,11 +414,11 @@ class DispS1PgeTestCase(unittest.TestCase):
                 wf.write('\n')
         sas_config['dynamic_ancillary_file_group']['amplitude_mean_files'] = amplitude_mean_files
 
-        geometry_files = ['t087_185678_iw2_topo.h5', 't087_185687_iw1_topo.h5']
-        for f in geometry_files:
+        static_layer_files = ['t087_185678_iw2_topo.h5', 't087_185687_iw1_topo.h5']
+        for f in static_layer_files:
             with open(f, 'w') as wf:
                 wf.write('\n')
-        sas_config['dynamic_ancillary_file_group']['geometry_files'] = geometry_files
+        sas_config['dynamic_ancillary_file_group']['static_layer_files'] = static_layer_files
 
         mask_file = 'water_mask.tif'
         with open(mask_file, 'w') as wf:
@@ -390,17 +430,22 @@ class DispS1PgeTestCase(unittest.TestCase):
             wf.write('\n')
         sas_config['dynamic_ancillary_file_group']['dem_file'] = dem_file
 
-        tec_files = ['jplg0410.18i.Z', 'jplg1970.18i.Z']
-        for f in tec_files:
+        ionosphere_files = ['jplg0410.18i.Z', 'jplg1970.18i.Z']
+        for f in ionosphere_files:
             with open(f, 'w') as wf:
                 wf.write('\n')
-        sas_config['dynamic_ancillary_file_group']['tec_files'] = tec_files
+        sas_config['dynamic_ancillary_file_group']['ionosphere_files'] = ionosphere_files
 
-        weather_model_files = ['GMAO_tropo_20180210T000000_ztd.nc', 'GMAO_tropo_20180716T000000_ztd.nc']
-        for f in weather_model_files:
+        troposphere_files = ['GMAO_tropo_20180210T000000_ztd.nc', 'GMAO_tropo_20180716T000000_ztd.nc']
+        for f in troposphere_files:
             with open(f, 'w') as wf:
                 wf.write('\n')
-        sas_config['dynamic_ancillary_file_group']['weather_model_files'] = weather_model_files
+        sas_config['dynamic_ancillary_file_group']['troposphere_files'] = troposphere_files
+
+        frame_to_burst_file = 'opera-s1-disp-frame-to-burst.json'
+        with open(frame_to_burst_file, 'w') as wf:
+            wf.write('\n')
+        sas_config['static_ancillary_file_group']['frame_to_burst_json'] = frame_to_burst_file
 
         logger = PgeLogger()
         runconfig = MockRunConfig(sas_config)
@@ -417,10 +462,11 @@ class DispS1PgeTestCase(unittest.TestCase):
         self.assertIn('overall.log_messages.critical: 0', log)
 
         files_to_remove = (cslc_file_list + amplitude_dispersion_files +
-                           amplitude_mean_files + geometry_files +
-                           tec_files + weather_model_files)
+                           amplitude_mean_files + static_layer_files +
+                           ionosphere_files + troposphere_files)
         files_to_remove.append(mask_file)
         files_to_remove.append(dem_file)
+        files_to_remove.append(frame_to_burst_file)
         for f in files_to_remove:
             os.remove(f)
 
@@ -455,6 +501,8 @@ class DispS1PgeTestCase(unittest.TestCase):
                 ]
             },
             'dynamic_ancillary_file_group': {
+            },
+            'static_ancillary_file_group': {
             }
         }
         # Test uncompressed files only as input
@@ -463,6 +511,7 @@ class DispS1PgeTestCase(unittest.TestCase):
         runconfig = MockRunConfig(sas_config)
         logger = PgeLogger()
         validate_disp_inputs(runconfig, logger, "DISP-S1")
+
         # Test uncompressed and compressed files as input
         cslc_file_list = add_text_to_file(get_sample_input_files('compressed')
                                           + get_sample_input_files('uncompressed'))
@@ -470,6 +519,7 @@ class DispS1PgeTestCase(unittest.TestCase):
         runconfig = MockRunConfig(sas_config)
         logger = PgeLogger()
         validate_disp_inputs(runconfig, logger, "DISP-S1")
+
         # Test uncompressed burst_id set does not match compressed burst_id set (burst_id, '185685' below)
         cslc_file_list = add_text_to_file(get_sample_input_files('compressed') +
                                           ['t087_185683_iw2_20180222_VV.h5',
@@ -479,16 +529,21 @@ class DispS1PgeTestCase(unittest.TestCase):
         sas_config['input_file_group']['cslc_file_list'] = cslc_file_list
         runconfig = MockRunConfig(sas_config)
         logger = PgeLogger()
+
         with self.assertRaises(RuntimeError):
             validate_disp_inputs(runconfig, logger, "DISP-S1")
+
         # Check to see that the RuntimeError is as expected
         logger.close_log_stream()
         log_file = logger.get_file_name()
         self.assertTrue(exists(log_file))
+
         with open(log_file, 'r', encoding='utf-8') as lfile:
             log = lfile.read()
+
         self.assertIn("Set of input CSLC 'compressed' burst IDs do not match the set of 'uncompressed' burst IDs: ",
                       log)
+
         # Test an improperly formatted burst id ('_t087_185684_iw_' below
         cslc_file_list = add_text_to_file(['compressed_slc_t087_185683_iw2_220180101_20180210.h5',
                                            'compressed_slc_t087_185684_iw_220180101_20180210.h5']
@@ -496,20 +551,26 @@ class DispS1PgeTestCase(unittest.TestCase):
         sas_config['input_file_group']['cslc_file_list'] = cslc_file_list
         runconfig = MockRunConfig(sas_config)
         logger = PgeLogger()
+
         with self.assertRaises(RuntimeError):
             validate_disp_inputs(runconfig, logger, "DISP-S1")
+
         # Check to see that the RuntimeError is as expected
         logger.close_log_stream()
         log_file = logger.get_file_name()
         self.assertTrue(exists(log_file))
+
         with open(log_file, 'r', encoding='utf-8') as lfile:
             log = lfile.read()
+
         self.assertIn('Input file present without properly formatted burst_id: ', log)
+
         # Test an ancillary file group (nominal)
         cslc_file_list = add_text_to_file(get_sample_input_files('compressed')
                                           + get_sample_input_files('uncompressed'))
         sas_config['input_file_group']['cslc_file_list'] = cslc_file_list
         sas_config['dynamic_ancillary_file_group'] = {}
+
         # Acceptable burst ids
         amplitude_dispersion_files = add_text_to_file(['t087_185683_iw2_amp_dispersion.tif',
                                                        't087_185684_iw2_amp_dispersion.tif'])
@@ -517,31 +578,39 @@ class DispS1PgeTestCase(unittest.TestCase):
         runconfig = MockRunConfig(sas_config)
         logger = PgeLogger()
         validate_disp_inputs(runconfig, logger, "DISP-S1")
+
         # Test an ancillary file group with an acceptable busrt id that does not match a cslc burst id
         cslc_file_list = add_text_to_file(get_sample_input_files('compressed')
                                           + get_sample_input_files('uncompressed'))
         sas_config['input_file_group']['cslc_file_list'] = cslc_file_list
         sas_config['dynamic_ancillary_file_group'] = {}
+
         # Burst id 't087_185684_iw1' does not match a cslc burst id and will cause an error
         amplitude_dispersion_files = add_text_to_file(['t087_185683_iw2_amp_dispersion.tif',
                                                        't087_185684_iw1_amp_dispersion.tif'])
         sas_config['dynamic_ancillary_file_group']['amplitude_dispersion_files'] = amplitude_dispersion_files
         runconfig = MockRunConfig(sas_config)
         logger = PgeLogger()
+
         with self.assertRaises(RuntimeError):
             validate_disp_inputs(runconfig, logger, "DISP-S1")
+
         # Check to see that the RuntimeError is as expected
         logger.close_log_stream()
         log_file = logger.get_file_name()
         self.assertTrue(exists(log_file))
+
         with open(log_file, 'r', encoding='utf-8') as lfile:
             log = lfile.read()
+
         self.assertIn('Set of input CSLC burst IDs do not match the set of ancillary burst IDs: ', log)
+
         # Test for an ancillary file that does not have a unique burst id
         cslc_file_list = add_text_to_file(get_sample_input_files('compressed')
                                           + get_sample_input_files('uncompressed'))
         sas_config['input_file_group']['cslc_file_list'] = cslc_file_list
         sas_config['dynamic_ancillary_file_group'] = {}
+
         # Two files have the same burst id ('t087_185683_iw2'): this will cause an error
         amplitude_dispersion_files = add_text_to_file(['t087_185683_iw2_amp_dispersion.tif',
                                                        't087_185683_iw2_amp_dispersion.tif',
@@ -549,8 +618,10 @@ class DispS1PgeTestCase(unittest.TestCase):
         sas_config['dynamic_ancillary_file_group']['amplitude_dispersion_files'] = amplitude_dispersion_files
         runconfig = MockRunConfig(sas_config)
         logger = PgeLogger()
+
         with self.assertRaises(RuntimeError):
             validate_disp_inputs(runconfig, logger, "DISP-S1")
+
         # Check to see that the RuntimeError is as expected
         logger.close_log_stream()
         log_file = logger.get_file_name()
@@ -571,17 +642,21 @@ class DispS1PgeTestCase(unittest.TestCase):
             # No .nc files
             runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']['ProgramOptions'] = \
                 ['-p disp_s1_pge_test/output_dir/compressed_slcs; echo ']
+
             with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
                 yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
 
             pge = DispS1Executor(pge_name="DispS1PgeTest", runconfig_path=test_runconfig_path)
+
             with self.assertRaises(RuntimeError):
                 pge.run()
 
             expected_log_file = pge.logger.get_file_name()
+
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
-            self.assertIn("The SAS did not create an output file with the expected '.nc' extension", log_contents)
+
+            self.assertIn("The SAS did not create any output file(s) with the expected '.nc' extension", log_contents)
             shutil.rmtree(pge.runconfig.output_product_path)
 
             # Too many .nc files
@@ -589,16 +664,20 @@ class DispS1PgeTestCase(unittest.TestCase):
                 ['-p disp_s1_pge_test/output_dir/compressed_slcs;',
                  'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.unw.nc bs=1M count=1;',
                  'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180331.unw.nc bs=1M count=1; echo ']
+
             with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
                 yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
 
             pge = DispS1Executor(pge_name="DispS1PgeTest", runconfig_path=test_runconfig_path)
+
             with self.assertRaises(RuntimeError):
                 pge.run()
 
             expected_log_file = pge.logger.get_file_name()
+
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
+
             self.assertIn("The SAS created too many files with the expected '.nc' extension:", log_contents)
             shutil.rmtree(pge.runconfig.output_product_path)
 
@@ -606,16 +685,20 @@ class DispS1PgeTestCase(unittest.TestCase):
             runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']['ProgramOptions'] = \
                 ['-p disp_s1_pge_test/output_dir/compressed_slcs;',
                  'touch disp_s1_pge_test/output_dir/20180101_20180330.unw.nc; echo ']
+
             with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
                 yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
 
             pge = DispS1Executor(pge_name="DispS1PgeTest", runconfig_path=test_runconfig_path)
+
             with self.assertRaises(RuntimeError):
                 pge.run()
 
             expected_log_file = pge.logger.get_file_name()
+
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
+
             self.assertIn("SAS output file 20180101_20180330.unw.nc exists, but is empty", log_contents)
             shutil.rmtree(pge.runconfig.output_product_path)
 
@@ -624,16 +707,20 @@ class DispS1PgeTestCase(unittest.TestCase):
                 ['-p disp_s1_pge_test/output_dir/compressed_slcs;',
                  'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.unw.nc bs=1M count=1;',
                  '/bin/echo DISP-S1 invoked with RunConfig']
+
             with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
                 yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
 
             pge = DispS1Executor(pge_name="DispS1PgeTest", runconfig_path=test_runconfig_path)
+
             with self.assertRaises(RuntimeError):
                 pge.run()
 
             expected_log_file = pge.logger.get_file_name()
+
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
+
             self.assertIn("SAS output file 20180101_20180330.unw.png does not exist", log_contents)
             shutil.rmtree(pge.runconfig.output_product_path)
 
@@ -643,17 +730,21 @@ class DispS1PgeTestCase(unittest.TestCase):
                  'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.unw.nc bs=1M count=1;',
                  'touch disp_s1_pge_test/output_dir/20180101_20180330.unw.png;',
                  '/bin/echo DISP-S1 invoked with RunConfig']
+
             with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
                 yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
 
             pge = DispS1Executor(pge_name="DispS1PgeTest", runconfig_path=test_runconfig_path)
+
             with self.assertRaises(RuntimeError):
                 pge.run()
 
             expected_log_file = pge.logger.get_file_name()
+
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
-            self.assertIn("SAS output file 20180101_20180330.unw.png exists but is empty", log_contents)
+
+            self.assertIn("SAS output file 20180101_20180330.unw.png exists, but is empty", log_contents)
             shutil.rmtree(pge.runconfig.output_product_path)
 
             # compressed_slc directory does not exist
@@ -662,16 +753,20 @@ class DispS1PgeTestCase(unittest.TestCase):
                  'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.unw.nc bs=1M count=1;',
                  'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.unw.png bs=1M count=1;',
                  '/bin/echo DISP-S1 invoked with RunConfig']
+
             with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
                 yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
 
             pge = DispS1Executor(pge_name="DispS1PgeTest", runconfig_path=test_runconfig_path)
+
             with self.assertRaises(RuntimeError):
                 pge.run()
 
             expected_log_file = pge.logger.get_file_name()
+
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
+
             self.assertIn("SAS output directory 'compressed_slcs' does not exist", log_contents)
             shutil.rmtree(pge.runconfig.output_product_path)
 
@@ -681,17 +776,21 @@ class DispS1PgeTestCase(unittest.TestCase):
                  'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.unw.nc bs=1M count=1;',
                  'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.unw.png bs=1M count=1;',
                  '/bin/echo DISP-S1 invoked with RunConfig']
+
             with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
                 yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
 
             pge = DispS1Executor(pge_name="DispS1PgeTest", runconfig_path=test_runconfig_path)
+
             with self.assertRaises(RuntimeError):
                 pge.run()
 
             expected_log_file = pge.logger.get_file_name()
+
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
-            self.assertIn("SAS output directory 'compressed_slcs' exists but is empty", log_contents)
+
+            self.assertIn("SAS output directory 'compressed_slcs' exists, but is empty", log_contents)
             shutil.rmtree(pge.runconfig.output_product_path)
 
             # File in compressed_slc directory is zero sized
@@ -701,69 +800,28 @@ class DispS1PgeTestCase(unittest.TestCase):
                  'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.unw.png bs=1M count=1;',
                  'touch disp_s1_pge_test/output_dir/compressed_slcs/compressed_slc_t087_185684_iw2_20180222_20180330.h5;',   # noqa E501
                  '/bin/echo DISP-S1 invoked with RunConfig']
+
             with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
                 yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
 
             pge = DispS1Executor(pge_name="DispS1PgeTest", runconfig_path=test_runconfig_path)
+
             with self.assertRaises(RuntimeError):
                 pge.run()
 
             expected_log_file = pge.logger.get_file_name()
+
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
+
             self.assertIn(
-                "SAS compressed_slcs file 'compressed_slc_t087_185684_iw2_20180222_20180330.h5' exists but is empty",
+                "Compressed CSLC file 'compressed_slc_t087_185684_iw2_20180222_20180330.h5' exists, but is empty",
                 log_contents)
             shutil.rmtree(pge.runconfig.output_product_path)
 
         finally:
             if exists(test_runconfig_path):
                 os.unlink(test_runconfig_path)
-
-    def test_disp_s1_product_metadata_collection(self):
-        """Test _collect_disp_s1_product_metadata() method"""
-        runconfig_path = join(self.data_dir, 'test_disp_s1_config.yaml')
-
-        pge = DispS1Executor(pge_name="DispS1PgeTest", runconfig_path=runconfig_path)
-        pge.run()
-
-        output_product_metadata = pge._collect_disp_s1_product_metadata()
-
-        self.assertIsInstance(output_product_metadata, dict)
-
-        # Remove dummy output products for next test
-        shutil.rmtree(abspath(join('disp_s1_pge_test', 'output_dir')))
-
-        # Test bad iso_template_path
-        test_runconfig_path = join(self.data_dir, 'invalid_disp_s1_runconfig.yaml')
-
-        with open(runconfig_path, 'r', encoding='utf-8') as infile:
-            runconfig_dict = yaml.safe_load(infile)
-
-        primary_executable = runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']
-        primary_executable['IsoTemplatePath'] = "pge/disp_s1/templates/OPERA_ISO_metadata_L3_DISP_S1_template.xml"
-
-        with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
-            yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
-
-        try:
-            pge = DispS1Executor(pge_name="DispPgeTest", runconfig_path=test_runconfig_path)
-
-            with self.assertRaises(RuntimeError):
-                pge.run()
-
-            expected_log_file = pge.logger.get_file_name()
-            self.assertTrue(os.path.exists(expected_log_file))
-
-            with open(expected_log_file, 'r', encoding='utf-8') as infile:
-                log_contents = infile.read()
-
-            self.assertIn("Could not load ISO template", log_contents)
-
-        finally:
-            if exists(test_runconfig_path):
-                os.unlink(test_runconfig_path)
-
 
 class MockRunConfig:
     """Mock runconfig for testing"""
