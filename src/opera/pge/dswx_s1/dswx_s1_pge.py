@@ -39,23 +39,19 @@ class DSWxS1PreProcessorMixin(PreProcessorMixin):
 
     _pre_mixin_name = "DSWxS1PreProcessorMixin"
 
-    def _validate_ancillary_inputs(self):
+    def _validate_dynamic_ancillary_inputs(self):
         """
-        Evaluates the list of ancillary inputs from the RunConfig to ensure they
-        exist and have an expected file extension.
+        Evaluates the list of dynamic ancillary inputs from the RunConfig to
+        ensure they exist and have an expected file extension.
 
         """
         dynamic_ancillary_file_group_dict = \
             self.runconfig.sas_config['runconfig']['groups']['dynamic_ancillary_file_group']
 
         for key, value in dynamic_ancillary_file_group_dict.items():
-            if key in ('dem_file', ):
+            if key in ('dem_file', 'reference_water_file', 'worldcover_file', 'hand_file'):
                 input_validation.check_input(
                     value, self.logger, self.name, valid_extensions=('.tif', '.tiff', '.vrt')
-                )
-            elif key in ('reference_water_file', 'worldcover_file', 'hand_file'):
-                input_validation.check_input(
-                    value, self.logger, self.name, valid_extensions=('.tif', '.tiff')
                 )
             elif key in ('shoreline_shapefile',):
                 if value is not None:
@@ -85,6 +81,25 @@ class DSWxS1PreProcessorMixin(PreProcessorMixin):
                     value, self.logger, self.name, valid_extensions=('.yaml', )
                 )
 
+    def _validate_static_ancillary_inputs(self):
+        """
+        Evaluates the list of static ancillary inputs from the RunConfig to
+        ensure they exist and have an expected file extension.
+
+        """
+        static_ancillary_file_group_dict = \
+            self.runconfig.sas_config['runconfig']['groups']['static_ancillary_file_group']
+
+        for key, value in static_ancillary_file_group_dict.items():
+            if key in ('mgrs_database_file', 'mgrs_collection_database_file'):
+                input_validation.check_input(
+                    value, self.logger, self.name, valid_extensions=('.sqlite', '.sqlite3')
+                )
+            elif key in ('static_ancillary_inputs_flag', ):
+                # these fields are included in the SAS input paths, but are not
+                # actually file paths, so skip them
+                continue
+
     def run_preprocessor(self, **kwargs):
         """
         Executes the pre-processing steps for DSWx-S1 PGE initialization.
@@ -107,7 +122,8 @@ class DSWxS1PreProcessorMixin(PreProcessorMixin):
                                              self.runconfig.algorithm_parameters_schema_path,
                                              self.runconfig.algorithm_parameters_file_config_path,
                                              self.logger)
-        self._validate_ancillary_inputs()
+        self._validate_dynamic_ancillary_inputs()
+        self._validate_static_ancillary_inputs()
 
 
 class DSWxS1PostProcessorMixin(PostProcessorMixin):
@@ -271,6 +287,9 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
         else:
             # Collect the metadata from the GeoTIFF output product
             dswx_metadata = self._collect_dswx_s1_product_metadata(inter_filename)
+
+            # TODO: kludge since SAS hardcodes SPACECRAFT_NAME to "Sentinel-1A/B"
+            dswx_metadata['SPACECRAFT_NAME'] = "Sentinel-1A" if "S1A" in inter_filename else "Sentinel-1B"
 
             self._tile_metadata_cache[tile_id] = dswx_metadata
 
@@ -477,12 +496,6 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
         """
         return self._ancillary_filename() + ".qa.log"
 
-    # TODO: remove patch and imports once SAS starts to populate metadata in GeoTIFF
-    from unittest.mock import patch
-    import opera.util.tiff_utils
-    from opera.util.tiff_utils import MockGdal
-
-    @patch.object(opera.util.tiff_utils, "gdal", MockGdal)
     def _collect_dswx_s1_product_metadata(self, geotiff_product):
         """
         Gathers the available metadata from an output DSWx-S1 product for
@@ -723,7 +736,7 @@ class DSWxS1Executor(DSWxS1PreProcessorMixin, DSWxS1PostProcessorMixin, PgeExecu
     LEVEL = "L3"
     """Processing Level for DSWx-S1 Products"""
 
-    SAS_VERSION = "0.1"  # Interface release https://github.com/opera-adt/DSWX-SAR/releases/tag/v0.1
+    SAS_VERSION = "0.2.1"  # Beta release https://github.com/opera-adt/DSWX-SAR/releases/tag/v0.2.1
     """Version of the SAS wrapped by this PGE, should be updated as needed"""
 
     def __init__(self, pge_name, runconfig_path, **kwargs):

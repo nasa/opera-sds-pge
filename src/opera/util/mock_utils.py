@@ -112,38 +112,40 @@ class MockGdal:  # pragma: no cover
 
         def __init__(self):
             self.dummy_metadata = {
+                'ABSOLUTE_ORBIT_NUMBER': '22298',
+                'AREA_OR_POINT': 'Area',
+                'BURST_ID': 't047_100909_iw1, t047_100910_iw1, t047_100911_iw1',
                 'DSWX_PRODUCT_VERSION': '0.1',
-                'SOFTWARE_VERSION': '0.1',
-                'PROJECT': 'OPERA',
+                'INPUT_DEM_SOURCE': 'dem.tif',
+                'INPUT_HAND_SOURCE': 'hand.tif',
+                'INPUT_REFERENCE_WATER_SOURCE': 'reference_water.tif',
+                'INPUT_SHORELINE_SOURCE': 'NOT_PROVIDED_OR_NOT_USED',
+                'INPUT_WORLDCOVER_SOURCE': 'worldcover.tif',
+                'INSTITUTION': 'NASA JPL',
+                'LAYOVER_SHADOW_COVERAGE': '0.0',
+                'ORBIT_PASS_DIRECTION': 'ascending',
+                'POLARIZATION': "['VV', 'VH']",
+                'PROCESSING_DATETIME': '2023-10-05T23:35:43Z',
+                'PROCESSING_INFORMATION_FILTER': 'Enhanced Lee filter',
+                'PROCESSING_INFORMATION_FUZZY_SEED': '0.81',
+                'PROCESSING_INFORMATION_FUZZY_TOLERANCE': '0.51',
+                'PROCESSING_INFORMATION_INUNDATED_VEGETATION': 'True',
+                'PROCESSING_INFORMATION_MULTI_THRESHOLD': 'True',
+                'PROCESSING_INFORMATION_POLARIZATION': "['VV', 'VH']",
+                'PROCESSING_INFORMATION_THRESHOLDING': 'Kittler-Illingworth',
+                'PROCESSING_INFORMATION_TILE_SELECTION': 'combined',
                 'PRODUCT_LEVEL': '3',
+                'PRODUCT_SOURCE': 'OPERA_RTC_S1',
                 'PRODUCT_TYPE': 'DSWx-S1',
-                'PRODUCT_SOURCE': 'S1',
-                'PROCESSING_DATETIME': '2022-01-31T21:54:26Z',
-                'SPACECRAFT_NAME': 'Sentinel-1A',
+                'PROJECT': 'OPERA',
+                'RTC_PRODUCT_VERSION': '0.2',
+                'SENSING_END': '2020-07-02T23:18:49Z',
+                'SENSING_START': '2020-07-02T23:18:44Z',
                 'SENSOR': 'IW',
-                'SENSING_START': '2021-09-05T14:31:56Z',
-                'SENSING_END': '2021-09-05T14:32:20Z',
-                'SPATIAL_COVERAGE': '99',
-                'LAYOVER_SHADOW_COVERAGE': '20',
-                'RTC_PRODUCT_VERSION': '1,0',
-                'POLARIZATION': 'VV',
-                'BURST_ID': 't047_10092_iw1',
-                'ABSOLUTE_ORBIT_NUMBER': '5',
-                'ORBIT_PASS_DIRECTION': 'A',
-                'TRACK_NUMBER': '7',
-                'SHORELINE_SOURCE': 'shoreline.shp',
-                'DEM_SOURCE': 'dem.tif',
-                'REFERENCE_WATER_SOURCE': 'reference_water.tif',
-                'WORLDCOVER_SOURCE': 'worldcover.tif',
-                'HAND_SOURCE': 'hand.tif',
-                'WORKFLOW': 'DSWx-S1-open_water',
-                'THRESHOLDING': 'OTSU',
-                'MULTI_THRESHOLD': False,
-                'TILE_SELECTION': 'combined',
-                'FILTER': 'Enhanced Lee Filter',
-                'INUNDATED_VEGETATION': False,
-                'FUZZY_SEED': '0.1',
-                'FUZZY_TOLERANCE': '0.01',
+                'SOFTWARE_VERSION': '0.2.1',
+                'SPACECRAFT_NAME': 'Sentinel-1A/B',
+                'SPATIAL_COVERAGE': '11.9356',
+                'TRACK_NUMBER': '47'
             }
 
         def GetMetadata(self):
@@ -197,8 +199,8 @@ class MockOsr:  # pragma: no cover
         """Mock class for the osgeo.osr module"""
 
         def __init__(self):
-            self.zone = None
-            self.hemi = ''
+            self.zone = 1
+            self.hemi = 'N'
 
         def SetWellKnownGeogCS(self, name):
             """Mock implementation for osr.SetWellKnownGeogCS"""
@@ -208,6 +210,10 @@ class MockOsr:  # pragma: no cover
             """Mock implementation for osr.SetUTM"""
             self.zone = zone
             self.hemi = "N" if north else "S"
+
+        def ImportFromEPSG(self, epsgCode):
+            """Mock implementation for osr.ImportFromEPSG"""
+            return 0
 
     class MockCoordinateTransformation:
         """Mock class for the osgeo.osr.CoordinateTransformation class"""
@@ -221,9 +227,14 @@ class MockOsr:  # pragma: no cover
             # Use mgrs to convert UTM back to a tile ID, then covert to rough
             # lat/lon, this should be accurate enough for development testing
             mgrs_obj = mgrs.MGRS()
-            mgrs_tile = mgrs_obj.UTMToMGRS(self.src.zone, self.src.hemi, x, y)
-            lat, lon = mgrs_obj.toLatLon(mgrs_tile)
-            return lat, lon, z
+            try:
+                mgrs_tile = mgrs_obj.UTMToMGRS(self.src.zone, self.src.hemi, x, y)
+                lat, lon = mgrs_obj.toLatLon(mgrs_tile)
+                return lat, lon, z
+            except:
+                # Fallback to returning inputs if calls to MGRS library fail on
+                # fake inputs
+                return x, y, z
 
     @staticmethod
     def SpatialReference():

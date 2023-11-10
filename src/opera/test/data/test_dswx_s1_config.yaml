@@ -54,6 +54,10 @@ RunConfig:
             shoreline_shapefile: dswx_s1_pge_test/input_dir/shoreline.shp
             hand_file: dswx_s1_pge_test/input_dir/hand.tif
             algorithm_parameters: dswx_s1_pge_test/input_dir/test_dswx_s1_algorithm_parameters.yaml
+          static_ancillary_file_group:
+            static_ancillary_inputs_flag: True
+            mgrs_database_file: dswx_s1_pge_test/input_dir/MGRS_tile.sqlite
+            mgrs_collection_database_file: dswx_s1_pge_test/input_dir/MGRS_tile_collection.sqlite
           primary_executable:
             product_type: dswx_s1
           product_path_group:

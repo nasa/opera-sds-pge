@@ -15,11 +15,13 @@ import tempfile
 import unittest
 from io import StringIO
 from os.path import abspath, exists, isdir, join
+from unittest.mock import patch
 
 from pkg_resources import resource_filename
 
 import yaml
 
+import opera.util.tiff_utils
 from opera.pge import RunConfig
 from opera.pge.dswx_s1.dswx_s1_pge import DSWxS1Executor
 from opera.util import PgeLogger
@@ -74,8 +76,10 @@ class DswxS1PgeTestCase(unittest.TestCase):
 
         # Create dummy versions of the expected ancillary inputs
         for ancillary_file in ('dem.tif', 'worldcover.tif',
-                               'reference_water.tif', 'shoreline.shp', 'shoreline.dbf', 'shoreline.prj',
-                               'shoreline.shx', 'hand.tif'):
+                               'reference_water.tif', 'shoreline.shp',
+                               'shoreline.dbf', 'shoreline.prj',
+                               'shoreline.shx', 'hand.tif',
+                               'MGRS_tile.sqlite', 'MGRS_tile_collection.sqlite'):
             os.system(
                 f"touch {join(test_input_dir, ancillary_file)}"
             )
@@ -94,14 +98,19 @@ class DswxS1PgeTestCase(unittest.TestCase):
 
     def _compare_algorithm_parameters_runconfig_to_expected(self, runconfig):
         """
-        Helper method to check the properties of a parsed algorithm parameters runconfig against the
-        expected values as defined by the "valid" sample algorithm parameters runconfig files.
+        Helper method to check the properties of a parsed algorithm parameters
+        runconfig against the expected values as defined by the "valid" sample
+        algorithm parameters runconfig files.
         """
         self.assertEqual(runconfig['name'], 'dswx_s1_workflow_algorithm')
         self.assertEqual(runconfig['processing']['dswx_workflow'], 'opera_dswx_s1')
         self.assertListEqual(runconfig['processing']['polarizations'], ['VV', 'VH'])
         self.assertEqual(runconfig['processing']['reference_water']['max_value'], 100)
         self.assertEqual(runconfig['processing']['reference_water']['no_data_value'], 255)
+        self.assertEqual(runconfig['processing']['reference_water']['permanent_water_value'], 0.9)
+        self.assertEqual(runconfig['processing']['reference_water']['drought_erosion_pixel'], 10)
+        self.assertEqual(runconfig['processing']['reference_water']['flood_dilation_pixel'], 16)
+        self.assertEqual(runconfig['processing']['hand']['mask_value'], 200)
         self.assertEqual(runconfig['processing']['mosaic']['mosaic_prefix'], 'mosaic')
         self.assertEqual(runconfig['processing']['mosaic']['mosaic_cog_enable'], True)
         self.assertEqual(runconfig['processing']['filter']['enabled'], True)
@@ -111,16 +120,43 @@ class DswxS1PgeTestCase(unittest.TestCase):
         self.assertEqual(runconfig['processing']['initial_threshold']['minimum_tile_size']['x'], 40)
         self.assertEqual(runconfig['processing']['initial_threshold']['minimum_tile_size']['y'], 40)
         self.assertEqual(runconfig['processing']['initial_threshold']['selection_method'], 'combined')
-        self.assertEqual(runconfig['processing']['initial_threshold']['interpolation_method'], 'smoothed')
+        self.assertListEqual(runconfig['processing']['initial_threshold']['tile_selection_twele'], [0.09, 0.8, 0.97])
+        self.assertEqual(runconfig['processing']['initial_threshold']['tile_selection_bimodality'], 0.7)
+        self.assertEqual(runconfig['processing']['initial_threshold']['extending_method'], 'gdal_grid')
         self.assertEqual(runconfig['processing']['initial_threshold']['threshold_method'], 'ki')
         self.assertEqual(runconfig['processing']['initial_threshold']['multi_threshold'], True)
-        self.assertEqual(runconfig['processing']['region_growing']['seed'], 0.83)
-        self.assertEqual(runconfig['processing']['region_growing']['tolerance'], 0.51)
+        self.assertEqual(runconfig['processing']['initial_threshold']['number_cpu'], 2)
+        self.assertEqual(runconfig['processing']['initial_threshold']['number_iterations'], 1)
+        self.assertEqual(runconfig['processing']['initial_threshold']['tile_average'], False)
+        self.assertEqual(runconfig['processing']['fuzzy_value']['hand']['member_min'], 0)
+        self.assertEqual(runconfig['processing']['fuzzy_value']['hand']['member_max'], 15)
+        self.assertEqual(runconfig['processing']['fuzzy_value']['slope']['member_min'], 0.5)
+        self.assertEqual(runconfig['processing']['fuzzy_value']['slope']['member_max'], 15)
+        self.assertEqual(runconfig['processing']['fuzzy_value']['reference_water']['member_min'], 0.8)
+        self.assertEqual(runconfig['processing']['fuzzy_value']['reference_water']['member_max'], 0.95)
+        self.assertEqual(runconfig['processing']['fuzzy_value']['area']['member_min'], 0)
+        self.assertEqual(runconfig['processing']['fuzzy_value']['area']['member_max'], 40)
+        self.assertEqual(runconfig['processing']['fuzzy_value']['dark_area']['cross_land'], -18)
+        self.assertEqual(runconfig['processing']['fuzzy_value']['dark_area']['cross_water'], -24)
+        self.assertEqual(runconfig['processing']['fuzzy_value']['high_frequent_water']['water_min_value'], 0.1)
+        self.assertEqual(runconfig['processing']['fuzzy_value']['high_frequent_water']['water_max_value'], 0.9)
+        self.assertEqual(runconfig['processing']['region_growing']['initial_threshold'], 0.81)
+        self.assertEqual(runconfig['processing']['region_growing']['relaxed_threshold'], 0.51)
         self.assertEqual(runconfig['processing']['region_growing']['line_per_block'], 400)
-        self.assertEqual(runconfig['processing']['inundated_vegetation']['enabled'], False)
-        self.assertEqual(runconfig['processing']['inundated_vegetation']['mode'], 'static_layer')
-        self.assertEqual(runconfig['processing']['inundated_vegetation']['temporal_avg_path'], None)
-        self.assertEqual(runconfig['processing']['inundated_vegetation']['initial_class_path'], None)
+        self.assertEqual(runconfig['processing']['masking_ancillary']['co_pol_threshold'], -14.6)
+        self.assertEqual(runconfig['processing']['masking_ancillary']['cross_pol_threshold'], -22.8)
+        self.assertEqual(runconfig['processing']['masking_ancillary']['water_threshold'], None)
+        self.assertEqual(runconfig['processing']['refine_with_bimodality']['number_cpu'], 1)
+        self.assertEqual(runconfig['processing']['refine_with_bimodality']['minimum_pixel'], 4)
+        self.assertEqual(runconfig['processing']['refine_with_bimodality']['thresholds']['ashman'], 1.5)
+        self.assertEqual(runconfig['processing']['refine_with_bimodality']['thresholds']['Bhattacharyya_coefficient'], 0.97)
+        self.assertEqual(runconfig['processing']['refine_with_bimodality']['thresholds']['bm_coefficient'], 0.7)
+        self.assertEqual(runconfig['processing']['refine_with_bimodality']['thresholds']['surface_ratio'], 0.1)
+        self.assertEqual(runconfig['processing']['inundated_vegetation']['enabled'], True)
+        self.assertEqual(runconfig['processing']['inundated_vegetation']['dual_pol_ratio_max'], 12)
+        self.assertEqual(runconfig['processing']['inundated_vegetation']['dual_pol_ratio_min'], 7)
+        self.assertEqual(runconfig['processing']['inundated_vegetation']['dual_pol_ratio_threshold'], 8)
+        self.assertEqual(runconfig['processing']['inundated_vegetation']['cross_pol_min'], -26)
         self.assertEqual(runconfig['processing']['inundated_vegetation']['line_per_block'], 300)
         self.assertEqual(runconfig['processing']['debug_mode'], False)
 
@@ -156,6 +192,7 @@ class DswxS1PgeTestCase(unittest.TestCase):
             else:
                 os.system(f"touch {join(self.test_output_dir, band_output_file)}")
 
+    @patch.object(opera.util.tiff_utils, "gdal", MockGdal)
     def test_dswx_s1_pge_execution(self):
         """
         Test execution of the DswxS1Executor class and its associated mixins
@@ -223,6 +260,7 @@ class DswxS1PgeTestCase(unittest.TestCase):
 
         self.assertIn(f"DSWx-S1 invoked with RunConfig {expected_sas_config_file}", log_contents)
 
+    @patch.object(opera.util.tiff_utils, "gdal", MockGdal)
     def test_filename_application(self):
         """Test the filename convention applied to DSWx-S1 output products"""
         runconfig_path = join(self.data_dir, 'test_dswx_s1_config.yaml')
@@ -236,6 +274,8 @@ class DswxS1PgeTestCase(unittest.TestCase):
         for image_file in image_files:
             file_name = pge._geotiff_filename(image_file)
             md = MockGdal.MockDSWxS1GdalDataset().GetMetadata()
+            # TODO: kludge since SAS hardcodes SPACECRAFT_NAME to "Sentinel-1A/B"
+            md['SPACECRAFT_NAME'] = 'Sentinel-1B'
             file_name_regex = rf"{pge.PROJECT}_{pge.LEVEL}_" \
                               rf"{md['PRODUCT_TYPE']}_" \
                               rf"T\w{{5}}_" \
@@ -245,6 +285,7 @@ class DswxS1PgeTestCase(unittest.TestCase):
                               rf"B\d{{2}}_\w+.tif"
             self.assertEqual(re.match(file_name_regex, file_name).group(), file_name)
 
+    @patch.object(opera.util.tiff_utils, "gdal", MockGdal)
     def test_iso_metadata_creation(self):
         """
         Mock ISO metadata is created when the PGE post processor runs.
@@ -259,8 +300,6 @@ class DswxS1PgeTestCase(unittest.TestCase):
         # up directories
         pge.run_preprocessor()
 
-        # TODO this will work for current Mock implementation of DSWx-S1 metadata
-        #      will need to fix once metadata is populated by SAS
         output_dir = join(os.curdir, 'dswx_s1_pge_test/input_dir')
         dummy_tif_file = join(
             output_dir, 'OPERA_L3_DSWx-S1_T18MVA_20200702T231843Z_20230317T190549Z_v0.1_B01_WTR.tif'
@@ -329,6 +368,7 @@ class DswxS1PgeTestCase(unittest.TestCase):
         # Check the properties of the algorithm parameters RunConfig to ensure they match as expected
         self._compare_algorithm_parameters_runconfig_to_expected(runconfig_dict)
 
+    @patch.object(opera.util.tiff_utils, "gdal", MockGdal)
     def test_dswx_s1_pge_bad_algorithm_parameters_schema_path(self):
         """
         Test for invalid path in the optional 'AlgorithmParametersSchemaPath'
@@ -447,9 +487,9 @@ class DswxS1PgeTestCase(unittest.TestCase):
             # Reset to valid dem path
             ancillary_file_group_dict['dem_file'] = 'dswx_s1_pge_test/input_dir/dem.tif'
 
-            # Test with an unexpected file extension (should be 'tif')
-            os.system("touch dswx_s1_pge_test/input_dir/worldcover.vrt")
-            ancillary_file_group_dict['worldcover_file'] = 'dswx_s1_pge_test/input_dir/worldcover.vrt'
+            # Test with an unexpected file extension (should be 'tif', 'tiff', or 'vrt)
+            os.system("touch dswx_s1_pge_test/input_dir/worldcover.png")
+            ancillary_file_group_dict['worldcover_file'] = 'dswx_s1_pge_test/input_dir/worldcover.png'
 
             with open(test_runconfig_path, 'w', encoding='utf-8') as input_path:
                 yaml.safe_dump(runconfig_dict, input_path, sort_keys=False)
@@ -465,7 +505,7 @@ class DswxS1PgeTestCase(unittest.TestCase):
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
 
-            self.assertIn("Input file dswx_s1_pge_test/input_dir/worldcover.vrt "
+            self.assertIn("Input file dswx_s1_pge_test/input_dir/worldcover.png "
                           "does not have an expected file extension.", log_contents)
 
             # Reset to valid worldcover_file path

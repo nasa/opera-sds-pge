@@ -28,9 +28,9 @@ SAMPLE_TIME=1
 # RUNCONFIG should be the name of the runconfig in s3://operasds-dev-pge/dswx_s1/
 [ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath "$(dirname "$(realpath "$0")")"/../..)
 [ -z "${PGE_TAG}" ] && PGE_TAG="${USER}-dev"
-[ -z "${INPUT_DATA}" ] && INPUT_DATA="dswx_s1_interface_0.1_expected_input.zip"
-[ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="dswx_s1_interface_0.1_expected_output.zip"
-[ -z "${RUNCONFIG}" ] && RUNCONFIG="dswx_s1_interface_0.1_runconfig.yaml"
+[ -z "${INPUT_DATA}" ] && INPUT_DATA="dswx_s1_beta_0.2.1_expected_input.zip"
+[ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="dswx_s1_beta_0.2.1_expected_output.zip"
+[ -z "${RUNCONFIG}" ] && RUNCONFIG="dswx_s1_beta_0.2.1_runconfig.yaml"
 [ -z "${TMP_ROOT}" ] && TMP_ROOT="$DEFAULT_TMP_ROOT"
 
 # Create the test output directory in the work space
@@ -54,7 +54,7 @@ overall_status=0
 #  There is only 1 expected output directory DSWX-S1
 
 input_data_basename=$(basename -- "$INPUT_DATA")
-input_data_dir="${TMP_DIR}/${input_data_basename%.*}/input_data"
+input_data_dir="${TMP_DIR}/${input_data_basename%.*}/input_dir"
 
 expected_data_basename=$(basename -- "$EXPECTED_DATA")
 expected_data_dir="${TMP_DIR}/${expected_data_basename%.*}/expected_output"
@@ -93,11 +93,11 @@ metrics_collection_start "$PGE_NAME" "$container_name" "$TEST_RESULTS_DIR" "$SAM
 
 echo "Running Docker image ${PGE_IMAGE}:${PGE_TAG} for ${input_data_dir}"
 docker run --rm -u $UID:"$(id -g)" --name $container_name \
-            -v "${TMP_DIR}/runconfig":/home/conda/runconfig:ro \
-            -v "$input_data_dir":/home/conda/input_dir:ro \
-            -v "$output_dir":/home/conda/output_dir \
-            -v "$scratch_dir":/home/conda/scratch_dir \
-            ${PGE_IMAGE}:"${PGE_TAG}" --file /home/conda/runconfig/"$RUNCONFIG"
+            -v "${TMP_DIR}/runconfig":/home/dswx_user/runconfig:ro \
+            -v "$input_data_dir":/home/dswx_user/input_dir:ro \
+            -v "$output_dir":/home/dswx_user/output_dir \
+            -v "$scratch_dir":/home/dswx_user/scratch_dir \
+            ${PGE_IMAGE}:"${PGE_TAG}" --file /home/dswx_user/runconfig/"$RUNCONFIG"
 
 docker_exit_status=$?
 
