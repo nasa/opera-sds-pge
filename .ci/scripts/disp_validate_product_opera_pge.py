@@ -5,11 +5,10 @@ from typing import TYPE_CHECKING, Any, Optional
 
 import h5py
 import numpy as np
-from numpy.typing import ArrayLike
-
 from dolphin import io
 from dolphin._log import get_log
 from dolphin._types import Filename
+from numpy.typing import ArrayLike
 
 logger = get_log()
 
@@ -562,8 +561,10 @@ def get_parser(
     else:
         parser = argparse.ArgumentParser(**metadata)  # type: ignore
 
-    parser.add_argument("golden", help="The golden HDF5 file.")
-    parser.add_argument("test", help="The test HDF5 file to be compared.")
+    parser.add_argument("--golden", help="The golden HDF5 file.", required=True)
+    parser.add_argument(
+        "--test", help="The test HDF5 file to be compared.", required=True
+    )
     parser.add_argument("--data-dset", default=DSET_DEFAULT)
     parser.add_argument('--exclude_groups',
                         nargs='+',
