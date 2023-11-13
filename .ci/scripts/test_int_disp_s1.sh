@@ -28,9 +28,9 @@ SAMPLE_TIME=2
 # RUNCONFIG should be the name of the runconfig in s3://operasds-dev-pge/disp_s1/
 [ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath "$(dirname "$(realpath "$0")")"/../..)
 [ -z "${PGE_TAG}" ] && PGE_TAG="${USER}-dev"
-[ -z "${INPUT_DATA}" ] && INPUT_DATA="disp_s1_r2.1_interface_expected_input.zip"
-[ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="disp_s1_r2.1_interface_expected_output.zip"
-[ -z "${RUNCONFIG}" ] && RUNCONFIG="opera_pge_disp_s1_r2.1_interface_runconfig.yaml"
+[ -z "${INPUT_DATA}" ] && INPUT_DATA="disp_s1_r3_beta_expected_input.zip"
+[ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="disp_s1_r3_beta_expected_output.zip"
+[ -z "${RUNCONFIG}" ] && RUNCONFIG="opera_pge_disp_s1_r3_beta_runconfig.yaml"
 [ -z "${TMP_ROOT}" ] && TMP_ROOT="$DEFAULT_TMP_ROOT"
 
 # Create the test output directory in the work space
@@ -107,9 +107,9 @@ if [ $docker_exit_status -ne 0 ]; then
 else
     echo "<tr><th>Compare Result</th><th><ul><li>Expected file</li><li>Output file</li></ul></th><th>disp_validate_product_opera_pge.py output</th></tr>" >> "$RESULTS_FILE"
 
-    output_file=$(ls ${output_dir}/OPERA_L3_DISP-S1_IW_F00123_VV_20230101T000000Z_20230101T000000Z_v0.1_*T*Z.nc)
+    output_file=$(ls ${output_dir}/OPERA_L3_DISP-S1_IW_F11114_VV_*T*Z_*T*Z_v0.2_*T*Z.nc)
     output_file=$(basename ${output_file})
-    expected_file="20180101_20180330.unw.nc"
+    expected_file="20221119_20221213.unw.nc"
 
     docker_out=$(docker run --rm \
                             -v "${output_dir}":/out:ro \
@@ -117,7 +117,7 @@ else
                             -v "$SCRIPT_DIR":/scripts \
                             --entrypoint /opt/conda/bin/python ${PGE_IMAGE}:"${PGE_TAG}" \
                             /scripts/disp_validate_product_opera_pge.py \
-                            /exp/${expected_file} /out/${output_file} \
+                            --golden /exp/${expected_file} --test /out/${output_file} \
                             --exclude_groups pge_runconfig)
     echo "$docker_out"
 
