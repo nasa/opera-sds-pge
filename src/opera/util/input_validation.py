@@ -332,11 +332,11 @@ def validate_disp_inputs(runconfig, logger, name):
                                           logger,
                                           name)
 
-    if 'static_layer_files' in dyn_anc_file_group:
-        check_input_list(dyn_anc_file_group['static_layer_files'], logger, name,
+    if 'static_layers_files' in dyn_anc_file_group:
+        check_input_list(dyn_anc_file_group['static_layers_files'], logger, name,
                          valid_extensions=('.h5',), check_zero_size=True)
         check_disp_s1_ancillary_burst_ids(cslc_burst_id_set,
-                                          dyn_anc_file_group['static_layer_files'],
+                                          dyn_anc_file_group['static_layers_files'],
                                           logger,
                                           name)
 

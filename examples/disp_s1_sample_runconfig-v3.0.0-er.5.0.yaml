@@ -59,7 +59,7 @@ RunConfig:
 
           # Paths to the incidence/azimuth-angle CSLC static layer files (1 per burst)
           # All files should be in HDF5 (.h5) format
-          static_layer_files:
+          static_layers_files:
             - /home/mamba/input_dir/static_layers_t042_088905_iw1.h5
             - /home/mamba/input_dir/static_layers_t042_088906_iw1.h5
 
@@ -226,7 +226,7 @@ RunConfig:
           - /home/mamba/input_dir/t042_088906_iw1_amp_mean.tif
         # Paths to the incidence/azimuth-angle files (1 per burst).
         #   Type: list.
-        static_layer_files:
+        static_layers_files:
           - /home/mamba/input_dir/static_layers_t042_088905_iw1.h5
           - /home/mamba/input_dir/static_layers_t042_088906_iw1.h5
         # Mask files (e.g water mask), where convention is 0 for no data/invalid, and 1 for

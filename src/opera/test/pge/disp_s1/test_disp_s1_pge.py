@@ -418,7 +418,7 @@ class DispS1PgeTestCase(unittest.TestCase):
         for f in static_layer_files:
             with open(f, 'w') as wf:
                 wf.write('\n')
-        sas_config['dynamic_ancillary_file_group']['static_layer_files'] = static_layer_files
+        sas_config['dynamic_ancillary_file_group']['static_layers_files'] = static_layer_files
 
         mask_file = 'water_mask.tif'
         with open(mask_file, 'w') as wf:

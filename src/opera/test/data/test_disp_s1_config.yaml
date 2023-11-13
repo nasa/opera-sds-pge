@@ -19,7 +19,7 @@ RunConfig:
                         - disp_s1_pge_test/input_dir/t087_185678_iw2_amp_dispersion.tif
                     amplitude_mean_files:
                         - disp_s1_pge_test/input_dir/t087_185678_iw2_amp_mean.tif
-                    static_layer_files:
+                    static_layers_files:
                         - disp_s1_pge_test/input_dir/t087_185678_iw2_topo.h5
                     ionosphere_files:
                         - disp_s1_pge_test/input_dir/jplg0410.18i.Z
@@ -71,7 +71,7 @@ RunConfig:
                     - disp_s1_pge_test/input_dir/t087_185678_iw2_amp_dispersion.tif
                 amplitude_mean_files:
                     - disp_s1_pge_test/input_dir/t087_185678_iw2_amp_mean.tif
-                static_layer_files:
+                static_layers_files:
                     - disp_s1_pge_test/input_dir/t087_185678_iw2_topo.h5
                 ionosphere_files:
                     - disp_s1_pge_test/input_dir/jplg0410.18i.Z

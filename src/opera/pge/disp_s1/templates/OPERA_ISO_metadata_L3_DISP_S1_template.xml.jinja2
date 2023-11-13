@@ -994,11 +994,11 @@
                         </gmd:LI_Source>
                     </gmd:source>
                     {%- endfor %}
-                    {%- for static_layer_file in run_config.Groups.PGE.DynamicAncillaryFilesGroup.AncillaryFileMap.static_layer_files %}
+                    {%- for static_layers_file in run_config.Groups.PGE.DynamicAncillaryFilesGroup.AncillaryFileMap.static_layers_files %}
                     <gmd:source>
                         <gmd:LI_Source>
                             <gmd:description>
-                                <gco:CharacterString>CSLC Static Layer File - {{ static_layer_file }}{# ISO_OPERA_staticLayerFile #}</gco:CharacterString>
+                                <gco:CharacterString>CSLC Static Layer File - {{ static_layers_file }}{# ISO_OPERA_staticLayerFile #}</gco:CharacterString>
                             </gmd:description>
                         </gmd:LI_Source>
                     </gmd:source>
