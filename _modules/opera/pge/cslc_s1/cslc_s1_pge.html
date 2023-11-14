@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera.pge.cslc_s1.cslc_s1_pge &mdash; opera-sds-pge 3.0.0-er.4.0 documentation</title>
+  <title>opera.pge.cslc_s1.cslc_s1_pge &mdash; opera-sds-pge 3.0.0-er.5.0 documentation</title>
       <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -12,7 +12,7 @@
   
         <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=141e5374"></script>
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=65cb192d"></script>
         <script src="../../../../_static/doctools.js?v=888ff710"></script>
         <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../../../_static/js/theme.js"></script>
@@ -32,7 +32,7 @@
             opera-sds-pge
           </a>
               <div class="version">
-                3.0.0-er.4.0
+                3.0.0-er.5.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
@@ -98,9 +98,10 @@
 <span class="kn">from</span> <span class="nn">opera.pge.base.base_pge</span> <span class="kn">import</span> <span class="n">PgeExecutor</span>
 <span class="kn">from</span> <span class="nn">opera.pge.base.base_pge</span> <span class="kn">import</span> <span class="n">PostProcessorMixin</span>
 <span class="kn">from</span> <span class="nn">opera.pge.base.base_pge</span> <span class="kn">import</span> <span class="n">PreProcessorMixin</span>
+<span class="kn">from</span> <span class="nn">opera.util.dataset_utils</span> <span class="kn">import</span> <span class="n">parse_bounding_polygon_from_wkt</span>
 <span class="kn">from</span> <span class="nn">opera.util.error_codes</span> <span class="kn">import</span> <span class="n">ErrorCode</span>
+<span class="kn">from</span> <span class="nn">opera.util.h5_utils</span> <span class="kn">import</span> <span class="n">get_cslc_s1_product_metadata</span>
 <span class="kn">from</span> <span class="nn">opera.util.input_validation</span> <span class="kn">import</span> <span class="n">validate_slc_s1_inputs</span>
-<span class="kn">from</span> <span class="nn">opera.util.metadata_utils</span> <span class="kn">import</span> <span class="n">get_cslc_s1_product_metadata</span>
 <span class="kn">from</span> <span class="nn">opera.util.render_jinja2</span> <span class="kn">import</span> <span class="n">render_jinja2</span>
 <span class="kn">from</span> <span class="nn">opera.util.time</span> <span class="kn">import</span> <span class="n">get_time_for_filename</span>
 
@@ -283,14 +284,15 @@
 
 <span class="sd">        The filename for the CSLC-S1 burst products consists of:</span>
 
-<span class="sd">            &lt;Core filename&gt;_&lt;BURST ID&gt;_&lt;ACQUISITION TIMETAG&gt;_&lt;PRODUCTION TIMETAG&gt;_&lt;SENSOR&gt;_&lt;POL&gt;_&lt;PRODUCT_VERSION&gt;</span>
+<span class="sd">            &lt;Core filename&gt;_&lt;BURST ID&gt;_&lt;ACQUISITION TIMETAG&gt;[_&lt;PRODUCTION TIMETAG&gt;]_&lt;SENSOR&gt;_&lt;POL&gt;_&lt;PRODUCT_VERSION&gt;</span>
 
 <span class="sd">        Where &lt;Core filename&gt; is returned by CslcS1PostProcessorMixin._core_filename()</span>
 <span class="sd">        if static_layer_product is False, otherwise it is the value returned by</span>
 <span class="sd">        CslcS1PostProcessorMixin._core_static_filename()</span>
 
-<span class="sd">        If static_layer_product is True, &lt;ACQUISITION_TIME&gt; will correspond</span>
-<span class="sd">        to the configured data validity start time (as defined in the RunConfig).</span>
+<span class="sd">        If static_layer_product is True, &lt;ACQUISITION TIMETAG&gt; will correspond</span>
+<span class="sd">        to the configured data validity start time (as defined in the RunConfig),</span>
+<span class="sd">        and &lt;PRODUCTION TIMETAG&gt; will be omitted altogether.</span>
 
 <span class="sd">        Also note that this does not include a file extension, which should be</span>
 <span class="sd">        added to the return value of this method by any callers to distinguish</span>
@@ -348,11 +350,9 @@
 
         <span class="n">burst_metadata</span> <span class="o">=</span> <span class="n">cslc_metadata</span><span class="p">[</span><span class="s1">&#39;processing_information&#39;</span><span class="p">][</span><span class="s1">&#39;input_burst_metadata&#39;</span><span class="p">]</span>
 
-        <span class="n">sensor</span> <span class="o">=</span> <span class="n">burst_metadata</span><span class="p">[</span><span class="s1">&#39;platform_id&#39;</span><span class="p">]</span>
-
-        <span class="c1"># Polarization only included in file name for baseline products</span>
-        <span class="n">pol</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span> <span class="k">if</span> <span class="n">static_layer_product</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">burst_metadata</span><span class="p">[</span><span class="s1">&#39;polarization&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
-
+        <span class="c1"># If generating a filename for a static layer product, we use the</span>
+        <span class="c1"># data validity start time configured in the RunConfig in lieu of</span>
+        <span class="c1"># the acquisition time</span>
         <span class="k">if</span> <span class="n">static_layer_product</span><span class="p">:</span>
             <span class="n">acquisition_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">data_validity_start_date</span>
 
@@ -374,15 +374,25 @@
             <span class="k">if</span> <span class="ow">not</span> <span class="n">acquisition_time</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;Z&#39;</span><span class="p">):</span>
                 <span class="n">acquisition_time</span> <span class="o">+=</span> <span class="s1">&#39;Z&#39;</span>
 
+        <span class="c1"># We omit production time from static layer products to make the file</span>
+        <span class="c1"># names more uniquely identifiable</span>
+        <span class="k">if</span> <span class="n">static_layer_product</span><span class="p">:</span>
+            <span class="n">production_time</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">production_time</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">get_time_for_filename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">production_datetime</span><span class="p">)</span><span class="si">}</span><span class="s2">Z&quot;</span>
+
+        <span class="n">sensor</span> <span class="o">=</span> <span class="n">burst_metadata</span><span class="p">[</span><span class="s1">&#39;platform_id&#39;</span><span class="p">]</span>
+
+        <span class="c1"># Polarization only included in file name for baseline products</span>
+        <span class="n">pol</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span> <span class="k">if</span> <span class="n">static_layer_product</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">burst_metadata</span><span class="p">[</span><span class="s1">&#39;polarization&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+
         <span class="n">product_version</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">product_version</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">product_version</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;v&#39;</span><span class="p">):</span>
             <span class="n">product_version</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;v</span><span class="si">{</span><span class="n">product_version</span><span class="si">}</span><span class="s1">&#39;</span>
 
-        <span class="n">production_time</span> <span class="o">=</span> <span class="n">get_time_for_filename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">production_datetime</span><span class="p">)</span>
-
         <span class="n">cslc_filename</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">core_filename</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">burst_id</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">acquisition_time</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">production_time</span><span class="si">}</span><span class="s2">Z_&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">core_filename</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">burst_id</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">acquisition_time</span><span class="si">}{</span><span class="n">production_time</span><span class="si">}</span><span class="s2">_&quot;</span>
             <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sensor</span><span class="si">}{</span><span class="n">pol</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">product_version</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="p">)</span>
 
@@ -708,17 +718,13 @@
         <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;burst_center&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">burst_center_str</span>
 
         <span class="c1"># Parse the burst polygon coordinates to conform with gml</span>
-        <span class="c1"># samples: &quot;POLYGON ((399015 3859970, 398975 3860000, ..., 399015 3859970))&quot;</span>
-        <span class="c1">#          &quot;MULTIPOLYGON (((399015, 3859970, ...)), ... ((... 399015, 3859970)))</span>
-        <span class="n">burst_polygon_str</span> <span class="o">=</span> <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;identification&#39;</span><span class="p">][</span><span class="s1">&#39;bounding_polygon&#39;</span><span class="p">]</span>
-        <span class="n">burst_polygon_pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;(?:MULTI)?POLYGON\s*\(\((.+)\)\)&quot;</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">burst_polygon_pattern</span><span class="p">,</span> <span class="n">burst_polygon_str</span><span class="p">)</span>
+        <span class="n">burst_polygon_wtk_str</span> <span class="o">=</span> <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;identification&#39;</span><span class="p">][</span><span class="s1">&#39;bounding_polygon&#39;</span><span class="p">]</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">result</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Failed to parse burst polygon from string &quot;</span><span class="si">{</span><span class="n">burst_polygon_str</span><span class="si">}</span><span class="s1">&quot;&#39;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">ISO_METADATA_RENDER_FAILED</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
-
-        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;burst_polygon&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">groups</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">))</span><span class="si">}</span><span class="s2">)&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">burst_polygon_gml_str</span> <span class="o">=</span> <span class="n">parse_bounding_polygon_from_wkt</span><span class="p">(</span><span class="n">burst_polygon_wtk_str</span><span class="p">)</span>
+            <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;burst_polygon&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">burst_polygon_gml_str</span>
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">ISO_METADATA_RENDER_FAILED</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">))</span>
 
         <span class="c1"># Jinja2 cannot serialize int64 data types to JSON, so convert the shape array</span>
         <span class="c1"># to a list of native Python ints</span>
@@ -728,8 +734,8 @@
 
         <span class="c1"># Some metadata fields which can be a list of files can also be specified</span>
         <span class="c1"># as a string if there is only a single file. Wrap these fields in a list</span>
-        <span class="c1"># so we can maintain a consistent approach to serializing them in the</span>
-        <span class="c1"># template</span>
+        <span class="c1"># in order to maintain a consistent approach to serializing them in the</span>
+        <span class="c1"># template.</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;calibration_files&#39;</span><span class="p">,</span> <span class="s1">&#39;l1_slc_files&#39;</span><span class="p">,</span> <span class="s1">&#39;noise_files&#39;</span><span class="p">,</span> <span class="s1">&#39;orbit_files&#39;</span><span class="p">):</span>
             <span class="n">inputs</span> <span class="o">=</span> <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;processing_information&#39;</span><span class="p">][</span><span class="s1">&#39;inputs&#39;</span><span class="p">][</span><span class="n">key</span><span class="p">]</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
@@ -930,10 +936,10 @@
     <span class="n">LEVEL</span> <span class="o">=</span> <span class="s2">&quot;L2&quot;</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Processing Level for CSLC-S1 Products&quot;&quot;&quot;</span>
 
-    <span class="n">PGE_VERSION</span> <span class="o">=</span> <span class="s2">&quot;2.0.0&quot;</span>
+    <span class="n">PGE_VERSION</span> <span class="o">=</span> <span class="s2">&quot;2.1.0&quot;</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Version of the PGE (overrides default from base_pge)&quot;&quot;&quot;</span>
 
-    <span class="n">SAS_VERSION</span> <span class="o">=</span> <span class="s2">&quot;0.5.2&quot;</span>  <span class="c1"># Final release https://github.com/opera-adt/COMPASS/releases/tag/v0.5.2</span>
+    <span class="n">SAS_VERSION</span> <span class="o">=</span> <span class="s2">&quot;0.5.4&quot;</span>  <span class="c1"># Final release https://github.com/opera-adt/COMPASS/releases/tag/v0.5.4</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Version of the SAS wrapped by this PGE, should be updated as needed&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pge_name</span><span class="p">,</span> <span class="n">runconfig_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>

@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera.util package &mdash; opera-sds-pge 3.0.0-er.4.0 documentation</title>
+  <title>opera.util package &mdash; opera-sds-pge 3.0.0-er.5.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -13,7 +13,7 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=141e5374"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=65cb192d"></script>
         <script src="_static/doctools.js?v=888ff710"></script>
         <script src="_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="_static/js/theme.js"></script>
@@ -35,7 +35,7 @@
             opera-sds-pge
           </a>
               <div class="version">
-                3.0.0-er.4.0
+                3.0.0-er.5.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -1009,7 +1009,7 @@ Zulu (GMT) time.</p>
 <dd><p>Converts the provided datetime object to an ISO-format time-tag.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>date_time</strong> (<em>datetime.datetime</em>) – Datetime object to convert to ISO format.</p>
+<dd class="field-odd"><p><strong>date_time</strong> (<em>datetime.datetime</em>) – Convert to ISO format.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>time_in_iso</strong> – Provided time in ISO format: YYYY-MM-DDTHH:MM:SS.mmmmmmZ</p>
@@ -1051,13 +1051,13 @@ Adapted By: Scott Collins</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="opera.util.usage_metrics.get_os_metrics">
 <span class="sig-prename descclassname"><span class="pre">opera.util.usage_metrics.</span></span><span class="sig-name descname"><span class="pre">get_os_metrics</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/opera/util/usage_metrics.html#get_os_metrics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opera.util.usage_metrics.get_os_metrics" title="Permalink to this definition"></a></dt>
-<dd><p>Gets metrics related to machine resource usage, both by the current process
-as well as all of its children processes.</p>
+<dd><p>Gets metrics related to machine resource usage, by the current process
+and by all of its children processes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><p><strong>metrics</strong> –</p>
 <dl class="simple">
-<dt>Dictionary containing metrics mapped to the following keys</dt><dd><dl class="simple">
+<dt>Dictionary containing metrics mapped to the following keys:</dt><dd><dl class="simple">
 <dt>os.cpu.seconds.sys -</dt><dd><p>System CPU time, in seconds, consumed by the current process and
 its children</p>
 </dd>
