@@ -14,7 +14,7 @@ RunConfig:
         InputFilePaths: list(str(), min=1, required=True)
 
       DynamicAncillaryFilesGroup:
-        AncillaryFileMap: map(str(), key=str(), min=0)
+        AncillaryFileMap: map(key=str(), min=0)
 
       ProductPathGroup:
         OutputProductPath: str(required=True)

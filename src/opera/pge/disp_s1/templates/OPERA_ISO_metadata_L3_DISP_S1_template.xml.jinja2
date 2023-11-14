@@ -82,11 +82,9 @@
                         <gmd:MD_DimensionNameTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/gmxCodelists.xml#MD_DimensionNameTypeCode" codeListValue="row">row</gmd:MD_DimensionNameTypeCode>
                     </gmd:dimensionName>
                     <gmd:dimensionSize>
-                        <!-- TODO: this will need to be added by the PGE -->
                         <gco:Integer>{{ product_output.xCoordinates.size }}{# ISO_OPERA_rangeCount #}</gco:Integer>
                     </gmd:dimensionSize>
                     <gmd:resolution>
-                        <!-- TODO: this will need to be added by the PGE -->
                         <gco:Length uom="meter">{{ product_output.xCoordinates.spacing }}{# ISO_OPERA_rangePixelSize #}</gco:Length>
                     </gmd:resolution>
                 </gmd:MD_Dimension>
@@ -97,11 +95,9 @@
                         <gmd:MD_DimensionNameTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/gmxCodelists.xml#MD_DimensionNameTypeCode" codeListValue="column">column</gmd:MD_DimensionNameTypeCode>
                     </gmd:dimensionName>
                     <gmd:dimensionSize>
-                        <!-- TODO: this will need to be added by the PGE -->
                         <gco:Integer>{{ product_output.yCoordinates.size }}{# ISO_OPERA_azimuthCount #}</gco:Integer>
                     </gmd:dimensionSize>
                     <gmd:resolution>
-                        <!-- TODO: this will need to be added by the PGE -->
                         <gco:Length uom="meter">{{ product_output.yCoordinates.spacing }}{# ISO_OPERA_azimuthPixelSize #}</gco:Length>
                     </gmd:resolution>
                 </gmd:MD_Dimension>
@@ -495,21 +491,18 @@
                 <gmd:EX_Extent id="boundingExtent">
                     <!--Bounding Rectangle-->
                     <gmd:geographicElement>
-                        <gmd:EX_GeographicBoundingBox>
-                            <!-- TODO: unsure where to source these, will need to be manually added by the PGE for the time being -->
-                            <gmd:westBoundLongitude>
-                                <gco:Decimal>{{ product_output.geospatial_lon_min }}{# doc ID ISO_OPERA_westBoundLongitude #}</gco:Decimal>
-                            </gmd:westBoundLongitude>
-                            <gmd:eastBoundLongitude>
-                                <gco:Decimal>{{ product_output.geospatial_lon_max }}{# doc ID ISO_OPERA_eastBoundLongitude #}</gco:Decimal>
-                            </gmd:eastBoundLongitude>
-                            <gmd:southBoundLatitude>
-                                <gco:Decimal>{{ product_output.geospatial_lat_min }}{# doc ID ISO_OPERA_southBoundLatitude #}</gco:Decimal>
-                            </gmd:southBoundLatitude>
-                            <gmd:northBoundLatitude>
-                                <gco:Decimal>{{ product_output.geospatial_lat_max }}{# doc ID ISO_OPERA_northBoundLatitude #}</gco:Decimal>
-                            </gmd:northBoundLatitude>
-                        </gmd:EX_GeographicBoundingBox>
+                        <gmd:EX_BoundingPolygon>
+                            <gmd:polygon>
+                                <gml:Polygon gml:id="DISP_Frame_Polygon">
+                                    <gml:exterior>
+                                        <gml:LinearRing>
+                                            <gml:description>Bounding polygon of the displacement image</gml:description>
+                                            <gml:posList>{{ product_output.bounding_polygon }}{# ISO_OPERA_boundingPolygon #}</gml:posList>
+                                        </gml:LinearRing>
+                                    </gml:exterior>
+                                </gml:Polygon>
+                            </gmd:polygon>
+                        </gmd:EX_BoundingPolygon>
                     </gmd:geographicElement>
                     <!-- This is the granules temporal extent -->
                     <gmd:temporalElement>
@@ -517,8 +510,8 @@
                         <gmd:EX_TemporalExtent id="boundingTemporalExtent">
                             <gmd:extent>
                                 <gml:TimePeriod gml:id="DISP_Time_Range">
-                                    <gml:beginPosition>{{ product_output.identification.reference_datetime }}{# ISO_OPERA_sensingTimeStart #}</gml:beginPosition>
-                                    <gml:endPosition>{{ product_output.identification.secondary_datetime }}{# ISO_OPERA_sensingTimeEnd #}</gml:endPosition>
+                                    <gml:beginPosition>{{ product_output.identification.reference_datetime }}{# ISO_OPERA_refDateTime #}</gml:beginPosition>
+                                    <gml:endPosition>{{ product_output.identification.secondary_datetime }}{# ISO_OPERA_secDateTime #}</gml:endPosition>
                                 </gml:TimePeriod>
                             </gmd:extent>
                         </gmd:EX_TemporalExtent>
@@ -542,48 +535,6 @@
                     <gmd:otherProperty>
                         <gco:Record>
                             <eos:AdditionalAttributes>
-                                <eos:AdditionalAttribute>
-                                    <eos:reference>
-                                        <eos:EOS_AdditionalAttributeDescription>
-                                            <eos:type>
-                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
-                                            </eos:type>
-                                            <eos:name>
-                                                <gco:CharacterString>ProductVersion</gco:CharacterString>
-                                            </eos:name>
-                                            <eos:description>
-                                                <gco:CharacterString>The DISP-S1 product version</gco:CharacterString>
-                                            </eos:description>
-                                            <eos:dataType>
-                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
-                                            </eos:dataType>
-                                        </eos:EOS_AdditionalAttributeDescription>
-                                    </eos:reference>
-                                    <eos:value>
-                                        <gco:CharacterString>{{ product_output.identification.product_version }}{# ISO_OPERA_dispProductVersion #}</gco:CharacterString>
-                                    </eos:value>
-                                </eos:AdditionalAttribute>
-                                <eos:AdditionalAttribute>
-                                    <eos:reference>
-                                        <eos:EOS_AdditionalAttributeDescription>
-                                            <eos:type>
-                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
-                                            </eos:type>
-                                            <eos:name>
-                                                <gco:CharacterString>SoftwareVersion</gco:CharacterString>
-                                            </eos:name>
-                                            <eos:description>
-                                                <gco:CharacterString>The software version used to generate the DISP-S1 product</gco:CharacterString>
-                                            </eos:description>
-                                            <eos:dataType>
-                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
-                                            </eos:dataType>
-                                        </eos:EOS_AdditionalAttributeDescription>
-                                    </eos:reference>
-                                    <eos:value>
-                                        <gco:CharacterString>{{ product_output.identification.software_version }}{# ISO_OPERA_softwareVersion #}</gco:CharacterString>
-                                    </eos:value>
-                                </eos:AdditionalAttribute>
                                 <eos:AdditionalAttribute>
                                     <eos:reference>
                                         <eos:EOS_AdditionalAttributeDescription>
@@ -644,7 +595,7 @@
                                         </eos:EOS_AdditionalAttributeDescription>
                                     </eos:reference>
                                     <eos:value>
-                                        <gco:CharacterString>DISP</gco:CharacterString>
+                                        <gco:CharacterString>DISP-S1</gco:CharacterString>
                                     </eos:value>
                                 </eos:AdditionalAttribute>
                                 <eos:AdditionalAttribute>
@@ -693,48 +644,6 @@
                                     <eos:reference>
                                         <eos:EOS_AdditionalAttributeDescription>
                                             <eos:type>
-                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="platformInformation">platformInformation</eos:EOS_AdditionalAttributeTypeCode>
-                                            </eos:type>
-                                            <eos:name>
-                                                <gco:CharacterString>ReferenceDatetime</gco:CharacterString>
-                                            </eos:name>
-                                            <eos:description>
-                                                <gco:CharacterString>UTC datetime of the acquisition sensing start of the reference epoch to which the unwrapped phase is referenced, in the format YYYYMMDDTHHMMSSZ.</gco:CharacterString>
-                                            </eos:description>
-                                            <eos:dataType>
-                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
-                                            </eos:dataType>
-                                        </eos:EOS_AdditionalAttributeDescription>
-                                    </eos:reference>
-                                    <eos:value>
-                                        <gco:CharacterString>{{ product_output.identification.reference_datetime }}{# ISO_OPERA_referenceDateTime #}</gco:CharacterString>
-                                    </eos:value>
-                                </eos:AdditionalAttribute>
-                                <eos:AdditionalAttribute>
-                                    <eos:reference>
-                                        <eos:EOS_AdditionalAttributeDescription>
-                                            <eos:type>
-                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="platformInformation">platformInformation</eos:EOS_AdditionalAttributeTypeCode>
-                                            </eos:type>
-                                            <eos:name>
-                                                <gco:CharacterString>SecondaryDatetime</gco:CharacterString>
-                                            </eos:name>
-                                            <eos:description>
-                                                <gco:CharacterString>UTC datetime of the acquisition sensing start of current acquisition used to create the unwrapped phase, in the format YYYYMMDDTHHMMSSZ</gco:CharacterString>
-                                            </eos:description>
-                                            <eos:dataType>
-                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
-                                            </eos:dataType>
-                                        </eos:EOS_AdditionalAttributeDescription>
-                                    </eos:reference>
-                                    <eos:value>
-                                        <gco:CharacterString>{{ product_output.identification.secondary_datetime }}{# ISO_OPERA_secondaryDateTime #}</gco:CharacterString>
-                                    </eos:value>
-                                </eos:AdditionalAttribute>
-                                <eos:AdditionalAttribute>
-                                    <eos:reference>
-                                        <eos:EOS_AdditionalAttributeDescription>
-                                            <eos:type>
                                                 <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
                                             </eos:type>
                                             <eos:name>
@@ -759,10 +668,10 @@
                                                 <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
                                             </eos:type>
                                             <eos:name>
-                                                <gco:CharacterString>Polarization</gco:CharacterString>
+                                                <gco:CharacterString>ProductVersion</gco:CharacterString>
                                             </eos:name>
                                             <eos:description>
-                                                <gco:CharacterString>Polarization of input CSLC products</gco:CharacterString>
+                                                <gco:CharacterString>The DISP-S1 product version</gco:CharacterString>
                                             </eos:description>
                                             <eos:dataType>
                                                 <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
@@ -770,8 +679,175 @@
                                         </eos:EOS_AdditionalAttributeDescription>
                                     </eos:reference>
                                     <eos:value>
-                                        <!-- TODO: this will need to be added by the PGE for the time being -->
-                                        <gco:CharacterString>{{ product_output.polarization }}{# ISO_OPERA_polarization #}</gco:CharacterString>
+                                        <gco:CharacterString>{{ product_output.identification.product_version }}{# ISO_OPERA_dispProductVersion #}</gco:CharacterString>
+                                    </eos:value>
+                                </eos:AdditionalAttribute>
+                                <eos:AdditionalAttribute>
+                                    <eos:reference>
+                                        <eos:EOS_AdditionalAttributeDescription>
+                                            <eos:type>
+                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
+                                            </eos:type>
+                                            <eos:name>
+                                                <gco:CharacterString>ZeroDopplerStartTime</gco:CharacterString>
+                                            </eos:name>
+                                            <eos:description>
+                                                <gco:CharacterString>Zero doppler start time of the first burst contained in the frame</gco:CharacterString>
+                                            </eos:description>
+                                            <eos:dataType>
+                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
+                                            </eos:dataType>
+                                        </eos:EOS_AdditionalAttributeDescription>
+                                    </eos:reference>
+                                    <eos:value>
+                                        <gco:CharacterString>{{ product_output.identification.zero_doppler_start_time }}{# ISO_OPERA_zeroDopplerStartTime #}</gco:CharacterString>
+                                    </eos:value>
+                                </eos:AdditionalAttribute>
+                                <eos:AdditionalAttribute>
+                                    <eos:reference>
+                                        <eos:EOS_AdditionalAttributeDescription>
+                                            <eos:type>
+                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
+                                            </eos:type>
+                                            <eos:name>
+                                                <gco:CharacterString>ZeroDopplerEndTime</gco:CharacterString>
+                                            </eos:name>
+                                            <eos:description>
+                                                <gco:CharacterString>Zero doppler end time of the last burst contained in the frame</gco:CharacterString>
+                                            </eos:description>
+                                            <eos:dataType>
+                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
+                                            </eos:dataType>
+                                        </eos:EOS_AdditionalAttributeDescription>
+                                    </eos:reference>
+                                    <eos:value>
+                                        <gco:CharacterString>{{ product_output.identification.zero_doppler_end_time }}{# ISO_OPERA_zeroDopplerEndTime #}</gco:CharacterString>
+                                    </eos:value>
+                                </eos:AdditionalAttribute>
+                                <eos:AdditionalAttribute>
+                                    <eos:reference>
+                                        <eos:EOS_AdditionalAttributeDescription>
+                                            <eos:type>
+                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
+                                            </eos:type>
+                                            <eos:name>
+                                                <gco:CharacterString>BoundingPolygon</gco:CharacterString>
+                                            </eos:name>
+                                            <eos:description>
+                                                <gco:CharacterString>WKT representation of bounding polygon of the image</gco:CharacterString>
+                                            </eos:description>
+                                            <eos:dataType>
+                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
+                                            </eos:dataType>
+                                        </eos:EOS_AdditionalAttributeDescription>
+                                    </eos:reference>
+                                    <eos:value>
+                                        <gco:CharacterString>{{ product_output.identification.bounding_polygon }}{# ISO_OPERA_boundingPolygon #}</gco:CharacterString>
+                                    </eos:value>
+                                </eos:AdditionalAttribute>
+                                <eos:AdditionalAttribute>
+                                    <eos:reference>
+                                        <eos:EOS_AdditionalAttributeDescription>
+                                            <eos:type>
+                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
+                                            </eos:type>
+                                            <eos:name>
+                                                <gco:CharacterString>RadarWavelength</gco:CharacterString>
+                                            </eos:name>
+                                            <eos:description>
+                                                <gco:CharacterString>Wavelength of the transmitted signal</gco:CharacterString>
+                                            </eos:description>
+                                            <eos:dataType>
+                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="float">float</eos:EOS_AdditionalAttributeDataTypeCode>
+                                            </eos:dataType>
+                                        </eos:EOS_AdditionalAttributeDescription>
+                                    </eos:reference>
+                                    <eos:value>
+                                        <gco:CharacterString>{{ product_output.identification.radar_wavelength }}{# ISO_OPERA_radarWavelength #}</gco:CharacterString>
+                                    </eos:value>
+                                </eos:AdditionalAttribute>
+                                <eos:AdditionalAttribute>
+                                    <eos:reference>
+                                        <eos:EOS_AdditionalAttributeDescription>
+                                            <eos:type>
+                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
+                                            </eos:type>
+                                            <eos:name>
+                                                <gco:CharacterString>ReferenceDatetime</gco:CharacterString>
+                                            </eos:name>
+                                            <eos:description>
+                                                <gco:CharacterString>UTC datetime of the acquisition sensing start of the reference epoch to which the unwrapped phase is referenced, in the format YYYY-MM-DD HH:MM:SS.ffffff</gco:CharacterString>
+                                            </eos:description>
+                                            <eos:dataType>
+                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
+                                            </eos:dataType>
+                                        </eos:EOS_AdditionalAttributeDescription>
+                                    </eos:reference>
+                                    <eos:value>
+                                        <gco:CharacterString>{{ product_output.identification.reference_datetime }}{# ISO_OPERA_referenceDateTime #}</gco:CharacterString>
+                                    </eos:value>
+                                </eos:AdditionalAttribute>
+                                <eos:AdditionalAttribute>
+                                    <eos:reference>
+                                        <eos:EOS_AdditionalAttributeDescription>
+                                            <eos:type>
+                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
+                                            </eos:type>
+                                            <eos:name>
+                                                <gco:CharacterString>SecondaryDatetime</gco:CharacterString>
+                                            </eos:name>
+                                            <eos:description>
+                                                <gco:CharacterString>UTC datetime of the acquisition sensing start of current acquisition used to create the unwrapped phase, in the format YYYY-MM-DD HH:MM:SS.ffffff</gco:CharacterString>
+                                            </eos:description>
+                                            <eos:dataType>
+                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
+                                            </eos:dataType>
+                                        </eos:EOS_AdditionalAttributeDescription>
+                                    </eos:reference>
+                                    <eos:value>
+                                        <gco:CharacterString>{{ product_output.identification.secondary_datetime }}{# ISO_OPERA_secondaryDateTime #}</gco:CharacterString>
+                                    </eos:value>
+                                </eos:AdditionalAttribute>
+                                <eos:AdditionalAttribute>
+                                    <eos:reference>
+                                        <eos:EOS_AdditionalAttributeDescription>
+                                            <eos:type>
+                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
+                                            </eos:type>
+                                            <eos:name>
+                                                <gco:CharacterString>DispS1SoftwareVersion</gco:CharacterString>
+                                            </eos:name>
+                                            <eos:description>
+                                                <gco:CharacterString>Version of the disp-s1 software used to generate the product</gco:CharacterString>
+                                            </eos:description>
+                                            <eos:dataType>
+                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
+                                            </eos:dataType>
+                                        </eos:EOS_AdditionalAttributeDescription>
+                                    </eos:reference>
+                                    <eos:value>
+                                        <gco:CharacterString>{{ product_output.metadata.disp_s1_software_version }}{# ISO_OPERA_dispS1SoftwareVersion #}</gco:CharacterString>
+                                    </eos:value>
+                                </eos:AdditionalAttribute>
+                                <eos:AdditionalAttribute>
+                                    <eos:reference>
+                                        <eos:EOS_AdditionalAttributeDescription>
+                                            <eos:type>
+                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
+                                            </eos:type>
+                                            <eos:name>
+                                                <gco:CharacterString>DolphinSoftwareVersion</gco:CharacterString>
+                                            </eos:name>
+                                            <eos:description>
+                                                <gco:CharacterString>Version of the Dolphin software used to generate the product</gco:CharacterString>
+                                            </eos:description>
+                                            <eos:dataType>
+                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
+                                            </eos:dataType>
+                                        </eos:EOS_AdditionalAttributeDescription>
+                                    </eos:reference>
+                                    <eos:value>
+                                        <gco:CharacterString>{{ product_output.metadata.dolphin_software_version }}{# ISO_OPERA_dolphinSoftwareVersion #}</gco:CharacterString>
                                     </eos:value>
                                 </eos:AdditionalAttribute>
                             </eos:AdditionalAttributes>
@@ -884,6 +960,65 @@
                                 </gmd:CI_Citation>
                             </gmd:sourceCitation>
                         </gmi:LE_Source>
+                    </gmd:source>
+                    {%- endfor %}
+                    <gmd:source>
+                        <gmd:LI_Source>
+                            <gmd:description>
+                                <gco:CharacterString>Reference DEM - {{ run_config.Groups.PGE.DynamicAncillaryFilesGroup.AncillaryFileMap.dem_file }}{# ISO_OPERA_digitalElevationModelFile #}</gco:CharacterString>
+                            </gmd:description>
+                        </gmd:LI_Source>
+                    </gmd:source>
+                    <gmd:source>
+                        <gmd:LI_Source>
+                            <gmd:description>
+                                <gco:CharacterString>Reference Water File - {{ run_config.Groups.PGE.DynamicAncillaryFilesGroup.AncillaryFileMap.mask_file }}{# ISO_OPERA_waterMaskFile #}</gco:CharacterString>
+                            </gmd:description>
+                        </gmd:LI_Source>
+                    </gmd:source>
+                    {%- for amplitude_dispersion_file in run_config.Groups.PGE.DynamicAncillaryFilesGroup.AncillaryFileMap.amplitude_dispersion_files %}
+                    <gmd:source>
+                        <gmd:LI_Source>
+                            <gmd:description>
+                                <gco:CharacterString>Amplitude Dispersion File - {{ amplitude_dispersion_file }}{# ISO_OPERA_amplitudeDispersionFile #}</gco:CharacterString>
+                            </gmd:description>
+                        </gmd:LI_Source>
+                    </gmd:source>
+                    {%- endfor %}
+                    {%- for amplitude_mean_file in run_config.Groups.PGE.DynamicAncillaryFilesGroup.AncillaryFileMap.amplitude_mean_files %}
+                    <gmd:source>
+                        <gmd:LI_Source>
+                            <gmd:description>
+                                <gco:CharacterString>Amplitude Mean File - {{ amplitude_mean_file }}{# ISO_OPERA_amplitudeMeanFile #}</gco:CharacterString>
+                            </gmd:description>
+                        </gmd:LI_Source>
+                    </gmd:source>
+                    {%- endfor %}
+                    {%- for static_layers_file in run_config.Groups.PGE.DynamicAncillaryFilesGroup.AncillaryFileMap.static_layers_files %}
+                    <gmd:source>
+                        <gmd:LI_Source>
+                            <gmd:description>
+                                <gco:CharacterString>CSLC Static Layer File - {{ static_layers_file }}{# ISO_OPERA_staticLayerFile #}</gco:CharacterString>
+                            </gmd:description>
+                        </gmd:LI_Source>
+                    </gmd:source>
+                    {%- endfor %}
+                    {%- for ionosphere_file in run_config.Groups.PGE.DynamicAncillaryFilesGroup.AncillaryFileMap.ionosphere_files %}
+                    <gmd:source>
+                        <gmd:LI_Source>
+                            <gmd:description>
+                                <gco:CharacterString>Ionosphere Correction - {{ ionosphere_file }}{# ISO_OPERA_ionosphereFile #}</gco:CharacterString>
+                            </gmd:description>
+                        </gmd:LI_Source>
+                    </gmd:source>
+                    {%- endfor %}
+                    {%- for troposphere_file in run_config.Groups.PGE.DynamicAncillaryFilesGroup.AncillaryFileMap.troposphere_files %}
+                    <gmd:source>
+                        <gmd:LI_Source>
+                            <gmd:description>
+                                <gco:CharacterString>Troposphere Model - {{ troposphere_file }}{# ISO_OPERA_troposphereFile #}</gco:CharacterString>
+                            </gmd:description>
+                        </gmd:LI_Source>
                     </gmd:source>
                     {%- endfor %}
                 </gmd:LI_Lineage>

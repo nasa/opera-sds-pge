@@ -437,7 +437,13 @@ class RunConfig:
             the DynamicAncillaryFilesGroup section.
 
         """
-        result = list(self.ancillary_file_map.values())
+        result = list()
+
+        for ancillary_mapping in self.ancillary_file_map.values():
+            if isinstance(ancillary_mapping, list):
+                result.extend(ancillary_mapping)
+            else:
+                result.append(ancillary_mapping)
 
         return result
 

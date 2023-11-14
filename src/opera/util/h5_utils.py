@@ -35,54 +35,65 @@ except (ImportError, ModuleNotFoundError):  # pragma: no cover
 
 def get_hdf5_group_as_dict(file_name, group_path, ignore_keys=None):
     """
-    Returns HDF5 group variable data as a python dict for a given file and group path.
+    Returns HDF5 group variable data as a python dict for a given file and group
+    path.
+
     Group attributes are not included.
 
     Parameters
     ----------
     file_name : str
-        file system path and filename for the HDF5 file to use.
+        File system path and filename for the HDF5 file to use.
     group_path : str
-        group path within the HDF5 file.
+        Group path within the HDF5 file.
     ignore_keys : iterable, optional
-        keys within the group to not include in the returned dict.
+        Keys within the group to not include in the returned dict.
 
     Returns
     -------
     group_dict : dict
-        python dict containing variable data from the group path location.
+        Python dict containing variable data from the group path location.
+
     """
-    group_dict = {}
     with h5py.File(file_name, 'r') as h5file:
         group_object = h5file.get(group_path)
+
         if group_object is None:
-            raise RuntimeError(f"An error occurred retrieving group '{group_path}' from file '{file_name}'.")
+            raise RuntimeError(f"An error occurred retrieving object '{group_path}' "
+                               f"from file '{file_name}'.")
+        elif isinstance(group_object, h5py.Dataset):
+            result = convert_h5py_dataset(group_object)
+        else:
+            result = convert_h5py_group_to_dict(group_object, ignore_keys)
 
-        group_dict = convert_h5py_group_to_dict(group_object, ignore_keys)
-
-    return group_dict
+    return result
 
 
 def convert_h5py_group_to_dict(group_object, ignore_keys=None):
     """
     Returns HDF5 group variable data as a python dict for a given h5py group object.
     Recursively calls itself to process subgroups.
+
     Group attributes are not included.
-    Byte sequences are converted to python strings which will probably cause issues
-    with non-text data.
+
+    Notes
+    -----
+    Byte sequences are converted to python strings which will probably cause
+    issues with non-text data.
 
     Parameters
     ----------
     group_object : h5py._hl.group.Group
         h5py Group object to be converted to a dict.
     ignore_keys : iterable, optional
-        keys within the group to not include in the returned dict.
+        Keys within the group to not include in the returned dict.
 
     Returns
     -------
     converted_dict : dict
-        python dict containing variable data from the group object.
+        Python dict containing variable data from the group object.
         data is copied from the h5py group object to a python dict.
+
     """
     converted_dict = {}
     for key, val in group_object.items():
@@ -91,22 +102,42 @@ def convert_h5py_group_to_dict(group_object, ignore_keys=None):
             continue
 
         if isinstance(val, h5py.Dataset):
-            if type(val[()]) is np.ndarray:       # pylint: disable=C0123
-                if isinstance(val[0], (bytes, np.bytes_)):
-                    # decode bytes to str
-                    converted_dict[key] = val.asstr()[()]
-                else:
-                    converted_dict[key] = val[()]
-            else:
-                if isinstance(val[()], (bytes, np.bytes_)):
-                    # decode bytes to str
-                    converted_dict[key] = val.asstr()[()]
-                else:
-                    converted_dict[key] = val[()]
+            converted_dict[key] = convert_h5py_dataset(val)
         elif isinstance(val, h5py.Group):
             converted_dict[key] = convert_h5py_group_to_dict(val)
 
     return converted_dict
+
+
+def convert_h5py_dataset(dataset_object):
+    """
+    Converts an instance of h5.Dataset to a native Python type.
+
+    Parameters
+    ----------
+    dataset_object : h5py.Dataset
+        The HDF5 Dataset object to convert.
+
+    Returns
+    -------
+    result : object
+        The result of the conversion to native Python type.
+
+    """
+    if type(dataset_object[()]) is np.ndarray:  # pylint: disable=C0123
+        if isinstance(dataset_object[0], (bytes, np.bytes_)):
+            # decode bytes to str
+            result = dataset_object.asstr()[()]
+        else:
+            result = dataset_object[()]
+    else:
+        if isinstance(dataset_object[()], (bytes, np.bytes_)):
+            # decode bytes to str
+            result = dataset_object.asstr()[()]
+        else:
+            result = dataset_object[()]
+
+    return result
 
 
 def get_rtc_s1_product_metadata(file_name):
@@ -520,7 +551,10 @@ def get_disp_s1_product_metadata(file_name):
         ISO template.
     """
     disp_metadata = {
-        'identification': get_hdf5_group_as_dict(file_name, f"{S1_SLC_HDF5_PREFIX}/identification"),
+        'x': get_hdf5_group_as_dict(file_name, "/x"),
+        'y': get_hdf5_group_as_dict(file_name, "/y"),
+        'identification': get_hdf5_group_as_dict(file_name, "/identification"),
+        'metadata': get_hdf5_group_as_dict(file_name, "/metadata")
     }
 
     return disp_metadata
@@ -540,24 +574,35 @@ def create_test_disp_metadata_product(file_path):
 
     """
     pge_runconfig_contents = """
-input_file_group:
-    # REQUIRED: List of paths to CSLC files.
-    #   Type: array.
-    cslc_file_list:
-      - input_slcs/compressed_slc_t087_185683_iw2_20180101_20180210.h5
-      - input_slcs/t087_185683_iw2_20180222_VV.h5
-... removed runconfig contents for testing
-# Path to the output log file in addition to logging to stderr.
-#   Type: string.
-log_file: output/pge_logfile.log
-"""
+    input_file_group:
+        cslc_file_list:
+          - input_slcs/compressed_slc_t087_185683_iw2_20180101_20180210.h5
+          - input_slcs/t087_185683_iw2_20180222_VV.h5
+        frame_id: 11114
+    log_file: output/pge_logfile.log
+    """
 
     with h5py.File(file_path, 'w') as outfile:
-        identification_grp = outfile.create_group(f"{S1_SLC_HDF5_PREFIX}/identification")
+        x_dset = outfile.create_dataset("x", data=np.zeros(10,), dtype='float64')
+        y_dset = outfile.create_dataset("y", data=np.zeros(10,), dtype='float64')
+
+        identification_grp = outfile.create_group("/identification")
         frame_id_dset = identification_grp.create_dataset("frame_id", data=123, dtype='int64')
-        pge_runconfig_dset = identification_grp.create_dataset("pge_runconfig",
-                                                               data=np.string_(pge_runconfig_contents))
         product_version_dset = identification_grp.create_dataset("product_version",
-                                                                 data=np.string_("0.1"))
-        software_version_dset = identification_grp.create_dataset("software_version",
-                                                                  data=np.string_("0.1.2"))
+                                                                 data=np.string_("0.2"))
+        zero_doppler_start_time_dset = identification_grp.create_dataset("zero_doppler_start_time",
+                                                                         data=np.string_("2022-12-13 14:07:50.748411"))
+        zero_doppler_end_time_dset = identification_grp.create_dataset("zero_doppler_end_time",
+                                                                       data=np.string_("2022-12-13 14:07:56.584135"))
+        bounding_polygon_dset = identification_grp.create_dataset("bounding_polygon",
+                                                                  data=np.string_("POLYGON ((-119.26 39.15, -119.32 39.16, -119.22 39.32, -119.26 39.15))"))
+        radar_wavelength_dset = identification_grp.create_dataset("radar_wavelength",
+                                                                  data=0.05546576, dtype='float64')
+
+        metadata_grp = outfile.create_group("/metadata")
+        disp_s1_software_version_dset = metadata_grp.create_dataset("disp_s1_software_version",
+                                                                          data=np.string_("0.1.0"))
+        dolphin_software_version_dset = metadata_grp.create_dataset("dolphin_software_version",
+                                                                          data=np.string_("0.5.1"))
+        pge_runconfig_dset = metadata_grp.create_dataset("pge_runconfig",
+                                                         data=np.string_(pge_runconfig_contents))

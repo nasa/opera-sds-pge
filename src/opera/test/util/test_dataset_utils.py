@@ -17,6 +17,7 @@ from re import match
 from pkg_resources import resource_filename
 
 from opera.util.dataset_utils import get_hls_filename_fields
+from opera.util.dataset_utils import parse_bounding_polygon_from_wkt
 
 
 class DatasetUtilsTestCase(unittest.TestCase):
@@ -59,3 +60,24 @@ class DatasetUtilsTestCase(unittest.TestCase):
 
         # Verify the conversion from Julian
         self.assertNotEqual(match(r'\d{8}T\d{6}\b', hls_file_fields['acquisition_time']), None)
+
+    def test_parse_bounding_polygon_from_wkt(self):
+        """Test dataset_utils.parse_bounding_polygon_from_wkt()"""
+        sample_wkt_polygon = "POLYGON ((1 1, 2 2, 3 3, 4 4))"
+
+        parsed_gml_polygon = parse_bounding_polygon_from_wkt(sample_wkt_polygon)
+        expected_gml_polygon = "(1 1 2 2 3 3 4 4)"
+
+        self.assertEqual(parsed_gml_polygon, expected_gml_polygon)
+
+        sample_wkt_multipolygon = "MULTIPOLYGON    ((1 1, 2 2, 3 3, 4 4), (4 4, 3 3, 2 2, 1 1))"
+
+        parsed_gml_multipolygon = parse_bounding_polygon_from_wkt(sample_wkt_multipolygon)
+        expected_gml_multipolygon = "(1 1 2 2 3 3 4 4) (4 4 3 3 2 2 1 1)"
+
+        self.assertEqual(parsed_gml_multipolygon, expected_gml_multipolygon)
+
+        sample_invalid_polygon = "POLYGON(1,2,3,4,5,6,7,8)"
+
+        with self.assertRaises(ValueError):
+            parse_bounding_polygon_from_wkt(sample_invalid_polygon)

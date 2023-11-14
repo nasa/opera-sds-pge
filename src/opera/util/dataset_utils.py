@@ -104,3 +104,39 @@ def get_sensor_from_spacecraft_name(spacecraft_name):
         }[spacecraft_name.upper()]
     except KeyError:
         raise RuntimeError(f"Unknown spacecraft name '{spacecraft_name}'")
+
+
+def parse_bounding_polygon_from_wkt(bounding_polygon_wkt_str):
+    """
+    Parses the list of polygon coordinates from a WKT formatted string, and
+    reformats them for inclusion within an ISO xml file.
+
+    Parameters
+    ----------
+    bounding_polygon_wkt_str : str
+        Input polygon (or multi-polygon) in WKT format.
+
+    Returns
+    -------
+    bounding_polygon_gml_str : str
+        The reformatted polygon string, suitable for use within a gml:posList tag.
+
+    Raises
+    ------
+    ValueError
+        If the provided WKT polygon cannot be parsed as-expected.
+
+    """
+    # samples: "POLYGON ((399015 3859970, 398975 3860000, ..., 399015 3859970))"
+    #          "MULTIPOLYGON (((399015, 3859970, ...)), ... ((... 399015, 3859970)))
+    bounding_polygon_pattern = r"(?:MULTI)?POLYGON\s*\(\((.+)\)\)"
+    result = re.match(bounding_polygon_pattern, bounding_polygon_wkt_str)
+
+    if not result:
+        raise ValueError(
+            f'Failed to parse bounding polygon from string "{bounding_polygon_wkt_str}"'
+        )
+
+    bounding_polygon_gml_str = f"({''.join(result.groups()[0].split(','))})"
+
+    return bounding_polygon_gml_str

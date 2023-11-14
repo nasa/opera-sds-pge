@@ -1,0 +1,332 @@
+# Sample RunConfig for use with the DISP-S1 PGE v3.0.0-er.5.0
+# This RunConfig should require minimal changes in order to be used with the
+# OPERA PCM.
+
+RunConfig:
+  # Name for the RunConfig, may be any string
+  Name: OPERA-DISP-S1-PGE-SAMPLE-CONFIG
+
+  Groups:
+    # PGE-specific RunConfig section
+    # This section is only used by the PGE, however, paths to inputs/outputs
+    # should align with the similar sections of the SAS RunConfig
+    PGE:
+      PGENameGroup:
+        # Name of the PGE for use with this RunConfig, should always be
+        # DISP_S1_PGE when using with the DISP-S1 PGE
+        PGEName: DISP_S1_PGE
+
+      InputFilesGroup:
+        # List of input files
+        # Must be a list containing the path to the input CSLC-S1 products,
+        # as well as the paths to any compressed CSLC-S1 products.
+        # Paths must correspond to the file system within the Docker container
+        InputFilePaths:
+          - /home/mamba/input_dir/compressed_t042_088905_iw1_20221107_20230506.h5
+          - /home/mamba/input_dir/compressed_t042_088906_iw1_20221107_20230506.h5
+          - /home/mamba/input_dir/t042_088905_iw1_20221119.h5
+          - /home/mamba/input_dir/t042_088906_iw1_20221119.h5
+          - /home/mamba/input_dir/t042_088905_iw1_20221201.h5
+          - /home/mamba/input_dir/t042_088906_iw1_20221201.h5
+          - /home/mamba/input_dir/t042_088905_iw1_20221213.h5
+          - /home/mamba/input_dir/t042_088906_iw1_20221213.h5
+
+      DynamicAncillaryFilesGroup:
+        # Map of ancillary file types to paths to the file
+        # Paths must correspond to the file system within the Docker container
+        AncillaryFileMap:
+          # Path to the Digital Elevation Model
+          # Must be either a single .tif, or a .vrt that points to one
+          # or more .tif files
+          dem_file: /home/mamba/input_dir/dem.tif
+
+          # Path to the reference water mask file
+          # Must be either a single .tif, .flg, or a .vrt that points to one
+          # or more .tif files
+          mask_file: /home/mamba/input_dir/watermask.flg
+
+          # Paths to Amplitude Dispersion files (1 per burst) for PS update calculation
+          # All files should be in .tif format
+          amplitude_dispersion_files:
+            - /home/mamba/input_dir/t042_088905_iw1_amp_dispersion.tif
+            - /home/mamba/input_dir/t042_088906_iw1_amp_dispersion.tif
+
+          # Paths to Amplitude Mean files (1 per burst) for PS update calculation
+          # All files should be in .tif format
+          amplitude_mean_files:
+            - /home/mamba/input_dir/t042_088905_iw1_amp_mean.tif
+            - /home/mamba/input_dir/t042_088906_iw1_amp_mean.tif
+
+          # Paths to the incidence/azimuth-angle CSLC static layer files (1 per burst)
+          # All files should be in HDF5 (.h5) format
+          static_layers_files:
+            - /home/mamba/input_dir/static_layers_t042_088905_iw1.h5
+            - /home/mamba/input_dir/static_layers_t042_088906_iw1.h5
+
+          # Paths to TEC files in IONEX format for ionosphere correction.
+          # One file should be provided for each date covered by the set of input CSLCs
+          # Files may be provided compressed (ending in .Z) or uncompressed (ending in .##i)
+          ionosphere_files:
+            - /home/mamba/input_dir/jplg0060.23i.Z
+            - /home/mamba/input_dir/jplg0180.23i.Z
+            - /home/mamba/input_dir/jplg0300.23i.Z
+            - /home/mamba/input_dir/jplg0420.23i.Z
+            - /home/mamba/input_dir/jplg0540.23i.Z
+            - /home/mamba/input_dir/jplg0660.23i.Z
+            - /home/mamba/input_dir/jplg0780.23i.Z
+            - /home/mamba/input_dir/jplg0900.23i.Z
+            - /home/mamba/input_dir/jplg1020.23i.Z
+            - /home/mamba/input_dir/jplg1140.23i.Z
+            - /home/mamba/input_dir/jplg1260.23i.Z
+            - /home/mamba/input_dir/jplg1380.23i.Z
+            - /home/mamba/input_dir/jplg1500.23i.Z
+            - /home/mamba/input_dir/jplg1620.23i.Z
+            - /home/mamba/input_dir/jplg1860.23i.Z
+            - /home/mamba/input_dir/jplg1980.23i.Z
+            - /home/mamba/input_dir/jplg2100.23i.Z
+            - /home/mamba/input_dir/jplg3230.22i.Z
+            - /home/mamba/input_dir/jplg3350.22i.Z
+            - /home/mamba/input_dir/jplg3470.22i.Z
+
+          # Paths to troposphere weather model files.
+          # One file should be provided for each date covered by the set of input CSLCs
+          # All files should be in GRIB (.grb), NetCDF (.nc) or HDF5 (.h5) format
+          troposphere_files:
+            - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20221119_14.grb
+            - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20221201_14.grb
+            - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20221213_14.grb
+            - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230106_14.grb
+            - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230118_14.grb
+            - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230130_14.grb
+            - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230211_14.grb
+            - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230223_14.grb
+            - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230307_14.grb
+            - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230319_14.grb
+            - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230331_14.grb
+            - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230412_14.grb
+            - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230424_14.grb
+            - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230506_14.grb
+            - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230518_14.grb
+            - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230530_14.grb
+            - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230611_14.grb
+            - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230705_14.grb
+            - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230717_14.grb
+            - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230729_14.grb
+
+      ProductPathGroup:
+        # Path to where output products should be stored
+        # Must correspond to the file system within the Docker container,
+        # and must have write permissions for the User/Group used with
+        # the "Docker run" command
+        OutputProductPath: /home/mamba/output_dir
+
+        # Path to a scratch directory for the PGE and SAS to store
+        # intermediate files that will not be needed after PGE execution
+        # completes
+        # Must correspond to the file system within the Docker container,
+        # and must have write permissions for the User/Group used with
+        # the "Docker run" command
+        ScratchPath: /home/mamba/scratch_dir
+
+      PrimaryExecutable:
+        # Identifier for the PGE executable, should always be DISP_S1 for
+        # this PGE
+        ProductIdentifier: DISP_S1
+
+        # Product version specific to output products
+        ProductVersion: "0.2"
+
+        # Path to the executable to run, path must be reachable from
+        # within the Docker container (i.e. findable with a "which" command)
+        ProgramPath: disp-s1
+
+        # List of command-line options to use with ProgramPath
+        ProgramOptions: []
+
+        # The Error Code base value added to the offset values to make
+        # error codes unique per-PGE
+        ErrorCodeBase: 500000
+
+        # Path to the Yamale schema used to validate the SAS portion
+        # of the RunConfig
+        # Path should correspond to the file system within the Docker
+        # container, and typically should reference a schema file bundled
+        # with the opera_pge installation directory within the container
+        # Consult the Docker image build scripts for more info
+        SchemaPath: /home/mamba/opera/pge/disp_s1/schema/disp_s1_sas_schema.yaml
+
+        # Path to the Yamale schema used specifically to validate the
+        # algorithm parameters config, which is stored within a separate
+        # yaml file referenced within the SAS portion of this RunConfig
+        AlgorithmParametersSchemaPath: /home/mamba/opera/pge/disp_s1/schema/algorithm_parameters_disp_s1_schema.yaml
+
+        # Path to the Jinja2 template used to generate the ISO xml
+        # metadata file
+        # Path should correspond to the file system within the Docker
+        # container, and typically should reference a template file bundled
+        # with the opera_pge installation directory within the container
+        # Consult the Docker image build scripts for more info
+        IsoTemplatePath: /home/mamba/opera/pge/disp_s1/templates/OPERA_ISO_metadata_L3_DISP_S1_template.xml.jinja2
+
+      QAExecutable:
+        # Set to True to enable execution of an additional "Quality Assurance"
+        # application after SAS execution has completed
+        Enabled: False
+
+        # Path to the executable to run, path must be reachable from
+        # within the Docker container (i.e. findable with a "which" command)
+        ProgramPath:
+
+        # List of command-line options to use with ProgramPath
+        ProgramOptions: []
+
+      DebugLevelGroup:
+        # Set to True to enable Debug mode (TODO this is currently a no-op)
+        DebugSwitch: False
+
+        # Set to True to have the PGE invoke the SAS/QA executables via
+        # a shell, rather than a Python subprocess
+        # This allows shell-style syntax to be used in ProgramPath and
+        # ProgramOptions, which can be useful for testing
+        ExecuteViaShell: False
+
+    # SAS-specific RunConfig section
+    # Prior to SAS execution by the PGE, the section below starting at "input_file_group"
+    # is isolated into its own YAML file for use with the SAS
+    SAS:
+      input_file_group:
+        # REQUIRED: List of paths to CSLC files.
+        #   Type: list.
+        cslc_file_list:
+          - /home/mamba/input_dir/compressed_t042_088905_iw1_20221107_20230506.h5
+          - /home/mamba/input_dir/compressed_t042_088906_iw1_20221107_20230506.h5
+          - /home/mamba/input_dir/t042_088905_iw1_20221119.h5
+          - /home/mamba/input_dir/t042_088906_iw1_20221119.h5
+          - /home/mamba/input_dir/t042_088905_iw1_20221201.h5
+          - /home/mamba/input_dir/t042_088906_iw1_20221201.h5
+          - /home/mamba/input_dir/t042_088905_iw1_20221213.h5
+          - /home/mamba/input_dir/t042_088906_iw1_20221213.h5
+
+        # REQUIRED: Frame ID of the bursts contained in `cslc_file_list`.
+        #   Type: integer.
+        frame_id: 11114
+      dynamic_ancillary_file_group:
+        # REQUIRED: Path to file containing SAS algorithm parameters.
+        #   Type: string.
+        algorithm_parameters_file: /home/mamba/input_dir/algorithm_parameters_forward.yaml
+        # Paths to existing Amplitude Dispersion file (1 per burst) for PS update calculation.
+        #   Type: list.
+        amplitude_dispersion_files:
+          - /home/mamba/input_dir/t042_088905_iw1_amp_dispersion.tif
+          - /home/mamba/input_dir/t042_088906_iw1_amp_dispersion.tif
+        # Paths to an existing Amplitude Mean files (1 per burst) for PS update calculation.
+        #   Type: list.
+        amplitude_mean_files:
+          - /home/mamba/input_dir/t042_088905_iw1_amp_mean.tif
+          - /home/mamba/input_dir/t042_088906_iw1_amp_mean.tif
+        # Paths to the incidence/azimuth-angle files (1 per burst).
+        #   Type: list.
+        static_layers_files:
+          - /home/mamba/input_dir/static_layers_t042_088905_iw1.h5
+          - /home/mamba/input_dir/static_layers_t042_088906_iw1.h5
+        # Mask files (e.g water mask), where convention is 0 for no data/invalid, and 1 for
+        #   data.
+        #   Type: array.
+        mask_file: /home/mamba/input_dir/watermask.flg
+        # Path to the DEM file covering full frame.
+        #   Type: string.
+        dem_file: /home/mamba/input_dir/dem.tif
+        # List of Paths to TEC files in IONEX format for ionosphere correction.
+        #   Type: string.
+        ionosphere_files:
+          - /home/mamba/input_dir/jplg0060.23i.Z
+          - /home/mamba/input_dir/jplg0180.23i.Z
+          - /home/mamba/input_dir/jplg0300.23i.Z
+          - /home/mamba/input_dir/jplg0420.23i.Z
+          - /home/mamba/input_dir/jplg0540.23i.Z
+          - /home/mamba/input_dir/jplg0660.23i.Z
+          - /home/mamba/input_dir/jplg0780.23i.Z
+          - /home/mamba/input_dir/jplg0900.23i.Z
+          - /home/mamba/input_dir/jplg1020.23i.Z
+          - /home/mamba/input_dir/jplg1140.23i.Z
+          - /home/mamba/input_dir/jplg1260.23i.Z
+          - /home/mamba/input_dir/jplg1380.23i.Z
+          - /home/mamba/input_dir/jplg1500.23i.Z
+          - /home/mamba/input_dir/jplg1620.23i.Z
+          - /home/mamba/input_dir/jplg1860.23i.Z
+          - /home/mamba/input_dir/jplg1980.23i.Z
+          - /home/mamba/input_dir/jplg2100.23i.Z
+          - /home/mamba/input_dir/jplg3230.22i.Z
+          - /home/mamba/input_dir/jplg3350.22i.Z
+          - /home/mamba/input_dir/jplg3470.22i.Z
+        # List of Paths to troposphere weather model files.
+        #   Type: string.
+        troposphere_files:
+          - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20221119_14.grb
+          - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20221201_14.grb
+          - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20221213_14.grb
+          - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230106_14.grb
+          - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230118_14.grb
+          - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230130_14.grb
+          - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230211_14.grb
+          - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230223_14.grb
+          - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230307_14.grb
+          - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230319_14.grb
+          - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230331_14.grb
+          - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230412_14.grb
+          - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230424_14.grb
+          - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230506_14.grb
+          - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230518_14.grb
+          - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230530_14.grb
+          - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230611_14.grb
+          - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230705_14.grb
+          - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230717_14.grb
+          - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230729_14.grb
+      static_ancillary_file_group:
+        # JSON file containing the mapping from frame_id to frame/burst information.
+        #   Type: string | null.
+        frame_to_burst_json: /home/mamba/input_dir/opera-s1-disp-frame-to-burst.json
+      primary_executable:
+        # Product type of the PGE. Should be one of: DISP_S1_FORWARD or DISP_S1_HISTORICAL
+        #   Type: string.
+        product_type: DISP_S1_FORWARD
+      product_path_group:
+        # REQUIRED: Directory where PGE will place results.
+        #   Type: string.
+        product_path: /home/mamba/output_dir
+        # Path to the scratch directory.
+        #   Type: string.
+        scratch_path: /home/mamba/scratch_dir
+        # Path to the SAS output directory.
+        #   Type: string.
+        sas_output_path: /home/mamba/output_dir
+        # Version of the product.
+        #   Type: string.
+        product_version: "0.2"
+        # Whether the SAS should output and save the Compressed SLCs in addition to the standard
+        #   product output.
+        #   Type: boolean.
+        save_compressed_slc: true
+      worker_settings:
+        # Whether to use GPU for processing (if available).
+        #   Type: boolean.
+        gpu_enabled: true
+        # (For non-GPU) Number of cpu cores to use for processing. Uses
+        #   `multiprocessing.cpu_count()` if not set.
+        #   Type: integer.
+        n_workers: 32
+        # Number of threads to use per worker. This sets the OMP_NUM_THREADS environment variable.
+        #   Type: integer.
+        threads_per_worker: 2
+        # If processing separate spatial bursts, number of bursts to run in parallel for wrapped-
+        #   phase-estimation.
+        #   Type: integer.
+        n_parallel_bursts: 1
+        # Size (rows, columns) of blocks of data to load at a time.
+        #   Type: list.
+        block_shape:
+          - 512
+          - 512
+      # Path to the output log file in addition to logging to stderr.
+      #   Type: string.
+      log_file: /home/mamba/output_dir/sas_logfile.log
