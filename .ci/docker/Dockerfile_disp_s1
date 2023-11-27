@@ -52,7 +52,11 @@ RUN set -ex \
     && chmod +x ${CONDA_ROOT}/bin/*_entrypoint.sh \
     && source /usr/local/bin/_activate_current_env.sh \
     && ${MAMBA_EXE} install --yes --channel conda-forge --file ${PGE_DEST_DIR}/opera/requirements.txt \
-    && chmod 775 ${PGE_DEST_DIR}
+    && chmod 775 ${PGE_DEST_DIR} \
+    && curl -o /tmp/eccodes-2.28.1-1.x86_64.rpm https://artifactory.jpl.nasa.gov:443/artifactory/general/gov/nasa/jpl/opera/sds/pge/disp_s1/eccodes/eccodes-2.28.1-1.x86_64.rpm \
+    && sudo dnf install -y /tmp/eccodes-2.28.1-1.x86_64.rpm \
+    && rm -rf /tmp/eccodes-2.28.1-1.x86_64.rpm \
+    && ln -sf /opt/eccodes/bin/grib_to_netcdf /opt/conda/bin/
 
 # Set the Docker entrypoint and clear the default command
 ENTRYPOINT ["sh", "-c", "source /usr/local/bin/_activate_current_env.sh;exec ${CONDA_ROOT}/bin/pge_docker_entrypoint.sh \"${@}\"", "--"]
