@@ -1,28 +1,19 @@
-#   diff_dswx_files.py
-#
-#   For: OPERA project
-#
-#   11-03-2023 - Ray Bambery
-#       initial release
-#
-#   Description: Python program to perform Quality Assurance Test
-#       on a directory of NETcdf4 files - searches for files with
-#       a .tif file extension.
-#       This script calls a subprocess script,  dswx_comparison.py
-#       located in the dswx_s1_x.y.z directory shown as <DSWX-S1_DIR>
-#       in the wiki page 
-#       https://github.com/nasa/opera-sds-pge/wiki/DWSX_S1_Beta-Acceptance-Test-Instruuctions
-#       which ensures there are matching files in each input directory
-##
-#   Arguments:
-#       expected_output_dir output_dir dir
-#
-#   Outputs: A terminal stream of  results of the tests showing 
-#       PASS (in GREEN) or FAIL (in RED)
-#   
-#   Calls:  
-#       dswx_comparison.py
-#
+#!/usr/bin/env python3
+""" 
+==================
+diff_dswx_files.py
+==================
+
+   Description: Python program to perform Quality Assurance Test
+       on a directory of NETcdf4 files - searches for files with
+       a .tif file extension.
+       This script calls a subprocess script,  dswx_comparison.py
+       located in the dswx_s1_x.y.z directory shown as <DSWX-S1_DIR>
+       in the wiki page 
+       https://github.com/nasa/opera-sds-pge/wiki/DWSX_S1_Beta-Acceptance-Test-Instruuctions
+       which ensures there are matching files in each input directory.
+"""
+
 import os
 import sys
 import subprocess
@@ -32,72 +23,82 @@ import glob
 
 ##################################################################
 def _parse_args():
+"""
+   This function gets the two directory names that are arguments to the module.
+   If no arguments are given, it prints a help message and exits, 
+   if only one argument is given, it gives a warning message and aborts.
+
+    Returns
+    --------
+    result : <-1 if FAIL> 
+             <0 if HELP>
+             <list - string if PASS>
+                  returns a list of 2 directory names to the calling function.
+"""
+    
     parser = argparse.ArgumentParser(
-        description='2 directories for comparison of files'
+        description='Compares sets DSWx-S1 products with the dswx_comparison.py script'
     )
     parser.add_argument('input dirs',
         type=str,
         nargs=2,
-        help='Input dir1 Input_dir2')
+        help='Expected_dir Output_dir')
 
-    print ("len(sys.argv) = ",len(sys.argv))
+    print ("len(sys.argv) = ", len(sys.argv))
     if len(sys.argv) == 1:
         parser.print_help()
-#        print ("options are ",options)
         sys.exit(0)
     else:
         if len(sys.argv) == 2:
-            print ("Missing second input directory")
+            print ("Missing Output_dir")
             sys.exit(-1)
         else:
-            print ("sys.argv[1] = ",sys.argv[1])
-            print ("sys.argv[2] = ",sys.argv[2])
-#           options = parser.parse_args()
-#           print ("options are ", options)
+            print ("sys.argv[1] = ", sys.argv[1])
+            print ("sys.argv[2] = ", sys.argv[2])
 
     return sys.argv
 #################################################################
 def get_files(options):
+"""
+    This function determines the number of files in each directory and, if equal, compares them file by file.
 
+    Notes
+    ------
+    Calls external python script, dswx_comparison.py, to perform the file comparison.  
 
-#     print ("options1 = ",options[1])
-#     print ("options2 = ",options[2])
+    Parameters
+    ------------
+    arg1 : <list - string>
+       Directory names of expected_dir and output
+  
+   Returns
+    --------
+    result : <-1 if FAIL>
+         FAILS if number of files in 2 directories are 0, or unequal.
+"""
 
     expected_dir = options[1]
     output_dir = options[2]
 
     # list to store files
     exp = [os.path.basename(f) for f in sorted(glob.glob(os.path.join(expected_dir, '*.tif')))]
-#    print (exp)
     expected_file_count = len(exp)
-    print("expected_file_count = ",len(exp))
+    print("expected_file_count = ", len(exp))
 
-    ecnt = 0
+    expected_count = 0
     for x in exp:
-#        print ("expected = ",x)
-        exp[ecnt] = x
-#         print ("ecnt = ",ecnt," exp[ecnt] = ",expected_dir + exp[ecnt])
-        ecnt += 1
-
+        exp[expected_count] = x
+        expected_count += 1
 
     # list to store files
     out = [os.path.basename(f) for f in sorted(glob.glob(os.path.join(output_dir, '*.tif')))]
-#    print (out)
     output_file_count = len(out)
-    print("output_file_count = ",len(out))
+    print("output_file_count = ", len(out))
 
-
-#    for x in out:
-#        print ("out = ",x)
-
-    ocnt = 0
+    output_count = 0
     for x in out:
-#        print ("out = ",x)
-        out[ocnt] = x
-#        print ("ocnt = ",ocnt," out[ocnt] = ",output_dir + out[ocnt])
-        ocnt += 1
-        #print ("cnt = ",cnt," out[cnt] = ",out[cnt])
-
+        out[output_count] = x
+        output_count += 1
 
     if expected_file_count == 0:
         print ("[FAIL]  expected file_count == 0")
@@ -109,21 +110,22 @@ def get_files(options):
         sys.exit(-1)
 
     if output_file_count > expected_file_count:
-        print ("[FAIL]  output_file_count ",output_file_count," exceeds expected_file_count ",expected_file_count)
+        print ("[FAIL]  output_file_count ", output_file_count, " exceeds expected_file_count ",expected_file_count)
         sys.exit(-1)
     if expected_file_count > output_file_count:
-        print ("[FAIL]  expected_file_count ",expected_file_count," exceeds output_file_count ",output_file_count)
+        print ("[FAIL]  expected_file_count ", expected_file_count, " exceeds output_file_count ",output_file_count)
         sys.exit(-1)
 
-#$ could be ocnt
-    for i in range(0, ecnt):
-#        print (i)
-        print ("python3 dswx_comparison.py  {}  {}".format(expected_dir + '/' + exp[i],output_dir + '/' + out[i]))
-        os.system("python3 dswx_comparison.py  {}  {}".format(expected_dir + '/' + exp[i],output_dir + '/' + out[i]))
+# could also be output_count
+    for i in range(0, expected_count):
+        expected_path = os.path.join(expected_dir, exp[i])
+        output_path = os.path.join(output_dir, out[i])
+        cmd1 = "python3"
+        cmd2 = "dswx_comparison.py"
+        command = cmd1 + ' ' + cmd2  + ' ' + expected_path + ' ' + output_path
+        print (command)
+        os.system(command)
 
-
-
-#    print ("stop")
 #################################################################
 def main():
 
