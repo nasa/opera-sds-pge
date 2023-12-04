@@ -1,8 +1,6 @@
 #!/bin/bash
 # Script to execute integration tests on OPERA DSWx-S1 PGE Docker image
 #
-#  11-27-2023 - Ray Bambery
-# remove 3 lines suggested by SCot Collins (see #### below
 set -e
 umask 002
 
@@ -45,7 +43,7 @@ test_int_setup_data_tmp_directory
 test_int_setup_test_data
 
 # Setup cleanup on exit
-####trap test_int_trap_cleanup EXIT
+trap test_int_trap_cleanup EXIT
 
 # overall_status values and their meaning
 # 0 - pass
@@ -91,7 +89,7 @@ mkdir -p --mode=777 "$scratch_dir"
 container_name="${PGE_NAME}"
 
 # Start metrics collection
-####metrics_collection_start "$PGE_NAME" "$container_name" "$TEST_RESULTS_DIR" "$SAMPLE_TIME"
+metrics_collection_start "$PGE_NAME" "$container_name" "$TEST_RESULTS_DIR" "$SAMPLE_TIME"
 
 echo "Running Docker image ${PGE_IMAGE}:${PGE_TAG} for ${input_data_dir}"
 docker run --rm -u $UID:"$(id -g)" --name $container_name \
@@ -104,7 +102,8 @@ docker run --rm -u $UID:"$(id -g)" --name $container_name \
 docker_exit_status=$?
 
 # End metrics collection
-####metrics_collection_end "$PGE_NAME" "$container_name" "$docker_exit_status" "$TEST_RESULTS_DIR"
+metrics_collection_end "$PGE_NAME" "$container_name" "$docker_exit_status" "$TEST_RESULTS_DIR"
+
 # Copy the PGE/SAS log file(s) to the test results directory so it can be archived
 # by Jenkins with the other results
 cp "${output_dir}"/*.log "${TEST_RESULTS_DIR}"

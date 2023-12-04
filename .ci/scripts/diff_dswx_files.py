@@ -1,41 +1,36 @@
 #!/usr/bin/env python3
-""" 
+"""
 ==================
 diff_dswx_files.py
 ==================
 
-   Description: Python program to perform Quality Assurance Test
-       on a directory of NETcdf4 files - searches for files with
-       a .tif file extension.
-       This script calls a subprocess script,  dswx_comparison.py
-       located in the dswx_s1_x.y.z directory shown as <DSWX-S1_DIR>
-       in the wiki page 
-       https://github.com/nasa/opera-sds-pge/wiki/DWSX_S1_Beta-Acceptance-Test-Instruuctions
-       which ensures there are matching files in each input directory.
+Python program to perform Quality Assurance Test on a directory of NetCDF4 files.
+This script searches for files with a .tif file extension and calls a subprocess
+script, dswx_comparison.py, located in the dswx_s1_x.y.z directory shown as <DSWX-S1_DIR>
+in the wiki page  https://github.com/nasa/opera-sds-pge/wiki/DWSX_S1_Beta-Acceptance-Test-Instruuctions
+which ensures there are matching files in each input directory.
+
 """
 
-import os
-import sys
-import subprocess
 import argparse
 import glob
-#import netCDF4 as nc
+import os
+import sys
 
-##################################################################
 def _parse_args():
-"""
-   This function gets the two directory names that are arguments to the module.
-   If no arguments are given, it prints a help message and exits, 
-   if only one argument is given, it gives a warning message and aborts.
+    """
+    This function gets the two directory names that are arguments to the module.
+    If no arguments are given, it prints a help message and exits,
+    if only one argument is given, it gives a warning message and aborts.
 
     Returns
     --------
-    result : <-1 if FAIL> 
+    result : <-1 if FAIL>
              <0 if HELP>
              <list - string if PASS>
-                  returns a list of 2 directory names to the calling function.
-"""
-    
+        Returns a list of 2 directory names to the calling function.
+
+    """
     parser = argparse.ArgumentParser(
         description='Compares sets DSWx-S1 products with the dswx_comparison.py script'
     )
@@ -57,26 +52,27 @@ def _parse_args():
             print ("sys.argv[2] = ", sys.argv[2])
 
     return sys.argv
-#################################################################
+
 def get_files(options):
-"""
-    This function determines the number of files in each directory and, if equal, compares them file by file.
+    """
+    This function determines the number of files in each directory and, if equal,
+    compares them file by file.
 
     Notes
     ------
-    Calls external python script, dswx_comparison.py, to perform the file comparison.  
+    Calls external python script, dswx_comparison.py, to perform the file comparison.
 
     Parameters
     ------------
-    arg1 : <list - string>
+    options : <list - string>
        Directory names of expected_dir and output
-  
-   Returns
+
+    Returns
     --------
     result : <-1 if FAIL>
          FAILS if number of files in 2 directories are 0, or unequal.
-"""
 
+    """
     expected_dir = options[1]
     output_dir = options[2]
 
@@ -101,41 +97,35 @@ def get_files(options):
         output_count += 1
 
     if expected_file_count == 0:
-        print ("[FAIL]  expected file_count == 0")
-        print ("    Expected file count of 0 usually implies a typo in directory name")
+        print("[FAIL]  expected file_count == 0")
+        print("    Expected file count of 0 usually implies a typo in directory name")
         sys.exit(-1)
     if output_file_count == 0:
-        print ("[FAIL]  output file_count == 0")
-        print ("    Output file count of 0 usually implies a typo in directory name")
+        print("[FAIL]  output file_count == 0")
+        print("    Output file count of 0 usually implies a typo in directory name")
         sys.exit(-1)
 
     if output_file_count > expected_file_count:
-        print ("[FAIL]  output_file_count ", output_file_count, " exceeds expected_file_count ",expected_file_count)
+        print("[FAIL]  output_file_count ", output_file_count, " exceeds expected_file_count ", expected_file_count)
         sys.exit(-1)
     if expected_file_count > output_file_count:
-        print ("[FAIL]  expected_file_count ", expected_file_count, " exceeds output_file_count ",output_file_count)
+        print("[FAIL]  expected_file_count ", expected_file_count, " exceeds output_file_count ", output_file_count)
         sys.exit(-1)
 
-# could also be output_count
+    # could also be output_count
     for i in range(0, expected_count):
         expected_path = os.path.join(expected_dir, exp[i])
         output_path = os.path.join(output_dir, out[i])
         cmd1 = "python3"
         cmd2 = "dswx_comparison.py"
         command = cmd1 + ' ' + cmd2  + ' ' + expected_path + ' ' + output_path
-        print (command)
+        print(command)
         os.system(command)
 
-#################################################################
 def main():
-
     options = _parse_args()
 
     get_files(options)
 
-#################################################################
 if __name__ == '__main__':
-
     main()
-
-
