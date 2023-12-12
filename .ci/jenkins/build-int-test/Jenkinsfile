@@ -41,7 +41,7 @@ pipeline {
                     echo "Creating conda env"
                     sh label: 'Installing int test conda environment',
                        script: '''#!/bin/bash
-                         /usr/local/anaconda3/bin/conda create -n int_test_env python=3.9 pip
+                         /usr/local/anaconda3/bin/conda create -n int_test_env python=3.10 pip
                          /usr/local/anaconda3/bin/conda init bash
                     '''
 
@@ -49,9 +49,8 @@ pipeline {
                        script: '''#!/bin/bash
                        . /var/lib/jenkins/.bashrc
                        conda activate int_test_env
+                       conda install -c conda-forge gdal poppler h5py matplotlib
                        pip install -r ./requirements.txt
-                       conda uninstall -q poppler
-                       conda install -c conda-forge gdal poppler h5py matplotlib pandas numpy>=1.22.4
                        '''
                 }
             }
