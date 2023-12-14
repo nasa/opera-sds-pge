@@ -6,6 +6,7 @@ Jinja2
 jsonschema
 mgrs
 numpy
+pandas
 PyYAML
 pylint
 pytest
