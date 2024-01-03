@@ -149,7 +149,8 @@ class DswxS1PgeTestCase(unittest.TestCase):
         self.assertEqual(runconfig['processing']['refine_with_bimodality']['number_cpu'], 1)
         self.assertEqual(runconfig['processing']['refine_with_bimodality']['minimum_pixel'], 4)
         self.assertEqual(runconfig['processing']['refine_with_bimodality']['thresholds']['ashman'], 1.5)
-        self.assertEqual(runconfig['processing']['refine_with_bimodality']['thresholds']['Bhattacharyya_coefficient'], 0.97)
+        self.assertEqual(runconfig['processing']['refine_with_bimodality']['thresholds']
+                                  ['Bhattacharyya_coefficient'], 0.97)
         self.assertEqual(runconfig['processing']['refine_with_bimodality']['thresholds']['bm_coefficient'], 0.7)
         self.assertEqual(runconfig['processing']['refine_with_bimodality']['thresholds']['surface_ratio'], 0.1)
         self.assertEqual(runconfig['processing']['inundated_vegetation']['enabled'], True)
