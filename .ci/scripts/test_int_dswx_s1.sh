@@ -43,7 +43,7 @@ test_int_setup_data_tmp_directory
 test_int_setup_test_data
 
 # Setup cleanup on exit
-trap test_int_trap_cleanup EXIT
+#trap test_int_trap_cleanup EXIT
 
 # overall_status values and their meaning
 # 0 - pass
@@ -162,15 +162,17 @@ else
                     # compare output and expected files
                     # TODO add docker call to run the comparison script
                     echo "Comparison script will run here"
-                fi
+		    echo "python3 dswx_comparison.py ${expected_file} ${output_dir}/${output_file}"
+		    python3 dswx_comparison.py ${expected_file} ${output_dir}/${output_file}
+	    fi
             else
                 echo "Not comparing file ${output_file}"
                 compare_result="SKIPPED"
             fi
 
             # TODO uncomment these lines when comparison script is in place
-            # docker_out="${docker_out//$'\n'/<br>}"
-            # echo "<tr><td>${compare_result}</td><td><ul><li>Output: ${output_file}</li><li>Expected: ${expected_file}</li></ul></td><td>${docker_out}</td></tr>" >> "$RESULTS_FILE"
+            docker_out="${docker_out//$'\n'/<br>}"
+            echo "<tr><td>${compare_result}</td><td><ul><li>Output: ${output_file}</li><li>Expected: ${expected_file}</li></ul></td><td>${docker_out}</td></tr>" >> "$RESULTS_FILE"
         done
     fi
 
