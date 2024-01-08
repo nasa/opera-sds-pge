@@ -25,7 +25,8 @@ RunConfig:
                         - disp_s1_pge_test/input_dir/jplg0410.18i.Z
                     troposphere_files:
                         - disp_s1_pge_test/input_dir/GMAO_tropo_20180210T000000_ztd.nc
-                        - disp_s1_pge_test/input_dir/GMAO_tropo_20180211T000000_ztd.nc
+                        - disp_s1_pge_test/input_dir/ERA5_N30_N40_W120_W110_20221119_14.grb
+                        - disp_s1_pge_test/input_dir/ERA5_N30_N40_W120_W110_20221201_14.grb
 
             ProductPathGroup:
                 OutputProductPath: disp_s1_pge_test/output_dir

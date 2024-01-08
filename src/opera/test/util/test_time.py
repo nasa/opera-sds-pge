@@ -79,7 +79,7 @@ class TimeTestCase(unittest.TestCase):
         the above pattern
 
         """
-        for i in range(self.reps):
+        for index in range(self.reps):
             # Verify returned value
             time = get_current_iso_time()
             self.assertEqual(time, self.match_iso_time(time).group())
@@ -110,7 +110,7 @@ class TimeTestCase(unittest.TestCase):
         Verify that the result of datetime.datetime.now() is successfully changed to ISO time
 
         """
-        for i in range(self.reps):
+        for index in range(self.reps):
             dt = datetime.now()
             time_in_iso = get_iso_time(dt)
             # Verify that the datetime.now() result has been changed to ISO format
@@ -130,7 +130,7 @@ class TimeTestCase(unittest.TestCase):
         filename_regex = r'^\d{8}T\d{6}$'
 
         # Test multiple times
-        for i in range(self.reps):
+        for index in range(self.reps):
             dt = datetime.now()
             time_for_fname = get_time_for_filename(dt)
             self.assertEqual(time_for_fname, re.match(filename_regex, time_for_fname).group())
@@ -159,7 +159,7 @@ class TimeTestCase(unittest.TestCase):
         """
         nano_regex = r'^\d{10}Z$'
         # Test multiple times
-        for i in range(self.reps):
+        for index in range(self.reps):
             dt = datetime.now()
             nano_str = get_catalog_metadata_datetime_str(dt).split('.')[-1]
             self.assertEqual(nano_str, re.match(nano_regex, nano_str).group())

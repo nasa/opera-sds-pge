@@ -68,7 +68,7 @@ class DispS1PreProcessorMixin(PreProcessorMixin):
 
     def convert_troposphere_model_files(self):
         """
-        Convert grip (.grp) files to netCDF (.nc)
+        Convert grib (.grb) files to netCDF (.nc)
         Update the in-memory runconfig object such that the SAS/dynamic_ancillary_file_group/troposphere_files
         section now points to the converted .nc files in the scratch directory.
 
@@ -82,9 +82,9 @@ class DispS1PreProcessorMixin(PreProcessorMixin):
         netcdf_file_list = []
 
         for tropo_file in troposphere_model_files_list:
-            if tropo_file[-3:] == 'grb':
+            if splitext(tropo_file)[-1] == '.grb':
                 # change the extension to .nc
-                netcdf_file = join(scratch_dir, tropo_file.split('/')[-1][:-4] + '.nc')
+                netcdf_file = join(scratch_dir, splitext(basename(tropo_file))[0] + '.nc')
                 # This list of will the new paths to the converted files in the in-memory runconfig file.
                 netcdf_file_list.append(netcdf_file)
                 grib_file_name = tropo_file

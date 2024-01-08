@@ -114,11 +114,11 @@ def validate_slc_s1_inputs(runconfig, logger, name):
 
     for key, value in input_file_group_dict.items():
         if key == 'safe_file_path':
-            for i in range(len(value)):
-                check_input(value[i], logger, name, valid_extensions=('.zip',))
+            for index in range(len(value)):
+                check_input(value[index], logger, name, valid_extensions=('.zip',))
         elif key == 'orbit_file_path':
-            for i in range(len(value)):
-                check_input(value[i], logger, name, valid_extensions=('.EOF',))
+            for index in range(len(value)):
+                check_input(value[index], logger, name, valid_extensions=('.EOF',))
         elif key == 'dem_file':
             check_input(value, logger, name, valid_extensions=('.tif', '.tiff', '.vrt'))
         elif key == 'tec_file':
@@ -164,13 +164,13 @@ def get_burst_id_set(input_file_group, logger, name):
 
     """
     burst_ids = set()
-    for i in input_file_group:
+    for index in input_file_group:
         reg_ex = r't\w{3}_\d{6}_iw[1|2|3]'
-        match = re.search(reg_ex, i)
+        match = re.search(reg_ex, index)
         if match:
-            burst_ids.add(re.findall(reg_ex, i)[0])
+            burst_ids.add(re.findall(reg_ex, index)[0])
         else:
-            msg = f'Input file present without properly formatted burst_id: {i}'
+            msg = f'Input file present without properly formatted burst_id: {index}'
             logger.critical(name, ErrorCode.INVALID_INPUT, msg)
 
     return burst_ids

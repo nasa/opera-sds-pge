@@ -34,9 +34,11 @@ from opera.util.input_validation import validate_disp_inputs
 def mock_grib_to_netcdf(*popenargs, input=None, capture_output=False, timeout=None, check=False, **kwargs):
     """
     Mack grit_to_netcdf function.
-    The functions arguments are those of the subprocess.run() command.
-    The 'else' statement had to be added because the 'time_and_execute' function
-    in run_utils.py uses the actual subprocess.run() command.
+    We are mocking the implementation of subprocess.run(), the function
+    arguments are therefore those of the subprocess.run() command.
+    The 'else' statement is added because the 'time_and_execute' function
+    in run_utils.py uses the actual subprocess.run() command, so when it gets
+    here we do not want this mocked version to run.
 
     """
     if popenargs[0][0] == "grib_to_netcdf":
@@ -876,9 +878,9 @@ class DispS1PgeTestCase(unittest.TestCase):
             runconfig_dict['RunConfig']['Groups']['SAS']['dynamic_ancillary_file_group']['troposphere_files']
         # Strip the path and extension (.grb) in order to compare just the file names after
         # conversion and placement of the converted file into /scratch_dir/<fname>.nc
-        for i in starting_tropo_paths:
-            if i[-4:] == '.grb':
-                starting_grb_file_names.append(i.split('/')[-1][:-4])
+        for starting_path in starting_tropo_paths:
+            if starting_path[-4:] == '.grb':
+                starting_grb_file_names.append(starting_path.split('/')[-1][:-4])
         # Run only the preprocessor and the sas_executable, so the temporary directories are created and still alive.
         pge.run_preprocessor()
         pge.run_sas_executable()
@@ -889,9 +891,10 @@ class DispS1PgeTestCase(unittest.TestCase):
         ending_tropo_paths = data['dynamic_ancillary_file_group']['troposphere_files']
         # Verify the .grb files are in /scratch_dir
         # Strip the path and extension (changed to .nc in this case) to allow comparison of file name only.
-        for i in ending_tropo_paths:
-            self.assertIn('scratch_dir', i)
-            ending_grb_file_names.append(i.split('/')[-1][:-3])
+        for ending_path in ending_tropo_paths:
+            self.assertIn('scratch_dir', ending_path)
+            self.assertTrue(exists(ending_path))        # verify the files exist on disk
+            ending_grb_file_names.append(ending_path.split('/')[-1][:-3])
 
         self.assertEqual(starting_grb_file_names, ending_grb_file_names)
 

@@ -88,7 +88,7 @@ class UsageMetricsTestCase(unittest.TestCase):
         int_regex = r'^[0-9]*$'  # match positive integers
         # Get the results
 
-        for i in range(self.reps):
+        for index in range(self.reps):
             metrics = get_os_metrics()
             # Verify the format of the values and verify they are all positive
             self.assertEqual(str(metrics['os.cpu.seconds.sys']), re.match(cpu_regex,
