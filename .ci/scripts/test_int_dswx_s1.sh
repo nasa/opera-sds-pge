@@ -43,7 +43,7 @@ test_int_setup_data_tmp_directory
 test_int_setup_test_data
 
 # Setup cleanup on exit
-#trap test_int_trap_cleanup EXIT
+trap test_int_trap_cleanup EXIT
 
 # overall_status values and their meaning
 # 0 - pass
