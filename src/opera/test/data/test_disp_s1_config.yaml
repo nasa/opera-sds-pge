@@ -25,6 +25,8 @@ RunConfig:
                         - disp_s1_pge_test/input_dir/jplg0410.18i.Z
                     troposphere_files:
                         - disp_s1_pge_test/input_dir/GMAO_tropo_20180210T000000_ztd.nc
+                        - disp_s1_pge_test/input_dir/ERA5_N30_N40_W120_W110_20221119_14.grb
+                        - disp_s1_pge_test/input_dir/ERA5_N30_N40_W120_W110_20221201_14.grb
 
             ProductPathGroup:
                 OutputProductPath: disp_s1_pge_test/output_dir
@@ -77,6 +79,8 @@ RunConfig:
                     - disp_s1_pge_test/input_dir/jplg0410.18i.Z
                 troposphere_files:
                     - disp_s1_pge_test/input_dir/GMAO_tropo_20180210T000000_ztd.nc
+                    - disp_s1_pge_test/input_dir/ERA5_N30_N40_W120_W110_20221119_14.grb
+                    - disp_s1_pge_test/input_dir/ERA5_N30_N40_W120_W110_20221201_14.grb
 
             static_ancillary_file_group:
                 frame_to_burst_json: disp_s1_pge_test/input_dir/opera-s1-disp-frame-to-burst.json
@@ -86,7 +90,7 @@ RunConfig:
 
             product_path_group:
                 product_path: disp_s1_pge_test/output_dir
-                scratch_path: scratch
+                scratch_path: disp_s1_pge_test/scratch_dir
                 sas_output_path: disp_s1_pge_test/output_dir
                 product_version: "0.2"
                 save_compressed_slc: true

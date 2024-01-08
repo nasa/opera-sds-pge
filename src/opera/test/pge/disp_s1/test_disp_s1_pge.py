@@ -14,11 +14,14 @@ import tempfile
 import unittest
 from io import StringIO
 from os.path import abspath, exists, join
+from subprocess import CompletedProcess, Popen
+from unittest.mock import patch
 
 from pkg_resources import resource_filename
 
 import yaml
 
+import opera.pge.disp_s1.disp_s1_pge
 from opera.pge import RunConfig
 from opera.pge.disp_s1.disp_s1_pge import DispS1Executor
 from opera.util import PgeLogger
@@ -26,6 +29,32 @@ from opera.util.h5_utils import create_test_cslc_metadata_product
 from opera.util.h5_utils import create_test_disp_metadata_product
 from opera.util.h5_utils import get_disp_s1_product_metadata
 from opera.util.input_validation import validate_disp_inputs
+
+
+def mock_grib_to_netcdf(*popenargs, input=None, capture_output=False, timeout=None, check=False, **kwargs):
+    """
+    Mack grit_to_netcdf function.
+    We are mocking the implementation of subprocess.run(), the function
+    arguments are therefore those of the subprocess.run() command.
+    The 'else' statement is added because the 'time_and_execute' function
+    in run_utils.py uses the actual subprocess.run() command, so when it gets
+    here we do not want this mocked version to run.
+
+    """
+    if popenargs[0][0] == "grib_to_netcdf":
+        output_path = popenargs[0][4]
+        open(output_path, 'w').close()
+    else:
+        with Popen(*popenargs, **kwargs) as process:
+            try:
+                stdout, stderr = process.communicate(input, timeout=timeout)
+            except:  # Including KeyboardInterrupt, communicate handled that.
+                process.kill()
+                # We don't call process.wait() as .__exit__ does that for us.
+                raise
+
+            retcode = process.poll()
+            return CompletedProcess(process.args, retcode, stdout, stderr)
 
 
 class DispS1PgeTestCase(unittest.TestCase):
@@ -72,6 +101,8 @@ class DispS1PgeTestCase(unittest.TestCase):
                              't087_185678_iw2_topo.h5',
                              'jplg0410.18i.Z',
                              'GMAO_tropo_20180210T000000_ztd.nc',
+                             'ERA5_N30_N40_W120_W110_20221119_14.grb',
+                             'ERA5_N30_N40_W120_W110_20221201_14.grb',
                              'opera-s1-disp-frame-to-burst.json']
         for dummy_input_file in dummy_input_files:
             os.system(
@@ -126,6 +157,7 @@ class DispS1PgeTestCase(unittest.TestCase):
                          ['COMPRESS=DEFLATE', 'ZLEVEL=4', 'TILED=YES', 'BLOCKXSIZE=128', 'BLOCKYSIZE=128'])
         self.assertEqual(runconfig['subdataset'], '//data/VV')
 
+    @patch.object(opera.pge.disp_s1.disp_s1_pge.subprocess, "run", mock_grib_to_netcdf)
     def test_disp_s1_pge_execution(self):
         """
         Test execution of the DispS1Executor class and its associated mixins
@@ -196,6 +228,7 @@ class DispS1PgeTestCase(unittest.TestCase):
 
         self.assertIn(f"DISP-S1 invoked with RunConfig {expected_sas_config_file}", log_contents)
 
+    @patch.object(opera.pge.disp_s1.disp_s1_pge.subprocess, "run", mock_grib_to_netcdf)
     def test_filename_application(self):
         """Test the filename convention applied to DISP output products"""
         runconfig_path = join(self.data_dir, 'test_disp_s1_config.yaml')
@@ -226,6 +259,7 @@ class DispS1PgeTestCase(unittest.TestCase):
             rf'\d{{8}}T\d{{6}}Z.nc'
         )
 
+    @patch.object(opera.pge.disp_s1.disp_s1_pge.subprocess, "run", mock_grib_to_netcdf)
     def test_iso_metadata_creation(self):
         """
         Test that the ISO metadata template is fully filled out when realistic
@@ -266,6 +300,7 @@ class DispS1PgeTestCase(unittest.TestCase):
         # Check the properties of the algorithm parameters RunConfig to ensure they match as expected
         self._compare_algorithm_parameters_runconfig_to_expected(runconfig_dict)
 
+    @patch.object(opera.pge.disp_s1.disp_s1_pge.subprocess, "run", mock_grib_to_netcdf)
     def test_bad_algorithm_parameters_schema_path(self):
         """
         Test for invalid path in the optional 'AlgorithmParametersSchemaPath'
@@ -322,7 +357,6 @@ class DispS1PgeTestCase(unittest.TestCase):
         finally:
             if exists(test_runconfig_path):
                 os.unlink(test_runconfig_path)
-
 
     def test_disp_s1_pge_validate_inputs(self):
         """
@@ -436,7 +470,8 @@ class DispS1PgeTestCase(unittest.TestCase):
                 wf.write('\n')
         sas_config['dynamic_ancillary_file_group']['ionosphere_files'] = ionosphere_files
 
-        troposphere_files = ['GMAO_tropo_20180210T000000_ztd.nc', 'GMAO_tropo_20180716T000000_ztd.nc']
+        troposphere_files = ['GMAO_tropo_20180210T000000_ztd.nc', 'GMAO_tropo_20180716T000000_ztd.nc',
+                             'ERA5_N30_N40_W120_W110_20221119_14.grb', 'ERA5_N30_N40_W120_W110_20221201_14.grb']
         for f in troposphere_files:
             with open(f, 'w') as wf:
                 wf.write('\n')
@@ -630,6 +665,7 @@ class DispS1PgeTestCase(unittest.TestCase):
             log = lfile.read()
         self.assertIn("Duplicate burst ID's in ancillary file list.", log)
 
+    @patch.object(opera.pge.disp_s1.disp_s1_pge.subprocess, "run", mock_grib_to_netcdf)
     def test_disp_s1_pge_validate_product_output(self):
         """Test off-nominal output conditions"""
         runconfig_path = join(self.data_dir, 'test_disp_s1_config.yaml')
@@ -822,6 +858,46 @@ class DispS1PgeTestCase(unittest.TestCase):
         finally:
             if exists(test_runconfig_path):
                 os.unlink(test_runconfig_path)
+
+    @patch.object(opera.pge.disp_s1.disp_s1_pge.subprocess, "run", mock_grib_to_netcdf)
+    def test_scratch_sas_runconfig_for_grib_to_netcdf_files(self):
+        """
+        Test that the grib_to_netcdf files are in 'disp_s1_pge_test/scratch_dir'.
+        Verify the file names of the .grb files found in ['SAS']['dynamic_ancillary_file_group']['troposphere_files']
+        are the same as the converted files that are now .nc files and are residing in scratch_dir.
+        """
+        starting_grb_file_names = []
+        ending_grb_file_names = []
+        runconfig_path = join(self.data_dir, 'test_disp_s1_config.yaml')
+
+        pge = DispS1Executor(pge_name="DispS1PgeTest", runconfig_path=runconfig_path)
+        # Pull out the starting value of the troposphere_files
+        with open(runconfig_path, 'r', encoding='utf-8') as infile:
+            runconfig_dict = yaml.safe_load(infile)
+        starting_tropo_paths = \
+            runconfig_dict['RunConfig']['Groups']['SAS']['dynamic_ancillary_file_group']['troposphere_files']
+        # Strip the path and extension (.grb) in order to compare just the file names after
+        # conversion and placement of the converted file into /scratch_dir/<fname>.nc
+        for starting_path in starting_tropo_paths:
+            if starting_path[-4:] == '.grb':
+                starting_grb_file_names.append(starting_path.split('/')[-1][:-4])
+        # Run only the preprocessor and the sas_executable, so the temporary directories are created and still alive.
+        pge.run_preprocessor()
+        pge.run_sas_executable()
+        temp_sas_runconfig = 'disp_s1_pge_test/scratch_dir/' + pge.runconfig.filename.split('/')[-1][:-5] + '_sas.yaml'
+        # open the yaml file
+        with open(temp_sas_runconfig, 'r') as file:
+            data = yaml.safe_load(file)
+        ending_tropo_paths = data['dynamic_ancillary_file_group']['troposphere_files']
+        # Verify the .grb files are in /scratch_dir
+        # Strip the path and extension (changed to .nc in this case) to allow comparison of file name only.
+        for ending_path in ending_tropo_paths:
+            self.assertIn('scratch_dir', ending_path)
+            self.assertTrue(exists(ending_path))        # verify the files exist on disk
+            ending_grb_file_names.append(ending_path.split('/')[-1][:-3])
+
+        self.assertEqual(starting_grb_file_names, ending_grb_file_names)
+
 
 class MockRunConfig:
     """Mock runconfig for testing"""

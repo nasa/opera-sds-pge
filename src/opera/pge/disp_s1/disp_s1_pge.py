@@ -12,6 +12,7 @@ from Sentinel-1 A/B (S1-A/B) data.
 
 import glob
 import os.path
+import subprocess
 from collections import OrderedDict
 from os import listdir
 from os.path import abspath, basename, exists, getsize, join, splitext
@@ -63,6 +64,45 @@ class DispS1PreProcessorMixin(PreProcessorMixin):
                                              self.runconfig.algorithm_parameters_schema_path,
                                              self.runconfig.algorithm_parameters_file_config_path,
                                              self.logger)
+        self.convert_troposphere_model_files()
+
+    def convert_troposphere_model_files(self):
+        """
+        Convert grib (.grb) files to netCDF (.nc)
+        Update the in-memory runconfig object such that the SAS/dynamic_ancillary_file_group/troposphere_files
+        section now points to the converted .nc files in the scratch directory.
+
+        """
+        # Retrieve the troposphere weather model file group from the run config file
+        troposphere_model_files_list = self.runconfig.sas_config['dynamic_ancillary_file_group']['troposphere_files']
+
+        # Converted files will be stored in the scratch directory.
+        scratch_dir = self.runconfig.sas_config['product_path_group']['scratch_path']
+
+        netcdf_file_list = []
+
+        for tropo_file in troposphere_model_files_list:
+            if splitext(tropo_file)[-1] == '.grb':
+                # change the extension to .nc
+                netcdf_file = join(scratch_dir, splitext(basename(tropo_file))[0] + '.nc')
+                # This list of will the new paths to the converted files in the in-memory runconfig file.
+                netcdf_file_list.append(netcdf_file)
+                grib_file_name = tropo_file
+                subprocess.run(
+                    [
+                        "grib_to_netcdf",
+                        "-D",
+                        "NC_FLOAT",
+                        "-o",
+                        netcdf_file,
+                        grib_file_name[:-4],
+                    ],
+                    shell=False,
+                    check=False,
+                )
+
+        # Update the in-memory runconfig instance
+        self.runconfig.sas_config['dynamic_ancillary_file_group']['troposphere_files'] = netcdf_file_list
 
 
 class DispS1PostProcessorMixin(PostProcessorMixin):
