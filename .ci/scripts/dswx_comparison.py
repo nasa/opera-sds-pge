@@ -1,22 +1,19 @@
 #!/usr/bin/env python3
 #
-# from delivery 
-#
-# 11-07-2023 - Ray Bambery
-#       Added colorization to FAIL
-#
+
 import argparse
 import os
 import sys
 import numpy as np
 from osgeo import gdal
-from termcolor import colored
 
 COMPARE_DSWX_SAR_PRODUCTS_ERROR_TOLERANCE = 1e-6
 COMPARISON_EXCEPTION_LIST = ['PROCESSING_DATETIME',
-                             'DEM_SOURCE',
-                             'WORLDCOVER_SOURCE',
-                             'REFERENCE_WATER_SOURCE',
+                             'INPUT_DEM_SOURCE',
+                             'INPUT_WORLDCOVER_SOURCE',
+                             'INPUT_REFERENCE_WATER_SOURCE',
+                             'INPUT_HAND_SOURCE',
+                             'INPUT_SHORELINE_SOURCE',
                              'SOFTWARE_VERSION']
 
 def _get_parser():
@@ -34,12 +31,10 @@ def _get_parser():
 
 def _get_prefix_str(flag_same, flag_all_ok):
     flag_all_ok[0] = flag_all_ok[0] and flag_same
-#    return '[OK]   ' if flag_same else (sys.stdout.write("\033[1;31m"), '[FAIL] ',sys.stdout.write("\033[1;31m") )
     if flag_same:
         return '[OK]'
     else:
-#        return (sys.stdout.write('\033[1;31m'), print ('[FAIL]', end=''),sys.stdout.write('\033[0;0m'))
-        return (colored('[FAIL]','red',attrs=['bold']))
+        return '[FAIL]'
 
 def _print_first_value_diff(image_1, image_2, prefix):
     """
