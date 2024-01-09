@@ -115,21 +115,16 @@ else
     # Compare output files against expected files
     for output_file in "$output_dir"/*
     do
-        docker_out="N/A"
+        compare_output="N/A"
         compare_result="N/A"
         expected_file="N/A"
 
         echo "output_file $output_file"
         output_file=$(basename -- "$output_file")
 
-        if [[ "${output_file##*/}" == *.log ]]
+        if [[ "${output_file##*/}" == *.tif* ]]
         then
-            echo "Not comparing log file ${output_file}"
-            compare_result="SKIPPED"
-
-        elif [[ "${output_file##*/}" == *.tif* ]]
-        then
-            for potential_product in B01_WTR B02_BWTR B03_CONF
+            for potential_product in B01_BWTR B02_WTR B03_CONF
             do
                 if [[ "$output_file" == *"$potential_product"* ]]; then
                     product=$potential_product
@@ -147,7 +142,6 @@ else
 
             for potential_file in "$expected_data_dir"/*.tif*
             do
-                # TODO: this needs to take tile code into account
                 if [[ "$potential_file" == *"$tile_code"*"$product"* ]]; then
                     echo "expected file is $potential_file"
                     expected_file=$potential_file
@@ -158,19 +152,31 @@ else
             if [ ! -f "$expected_file" ]; then
                 echo "No expected file found for product $product in expected directory $expected_data_dir"
                 overall_status=1
-                else
-                    # compare output and expected files
-                    # TODO add docker call to run the comparison script
-                    echo "Comparison script will run here"
-                fi
+		compare_result="FAIL"
+		compare_output="FAILED"
             else
-                echo "Not comparing file ${output_file}"
-                compare_result="SKIPPED"
-            fi
+               # compare output and expected files
+	       echo "python3 dswx_comparison.py $(basename -- ${expected_file}) ${output_file}"
+	       compare_output=$(python3 $SCRIPT_DIR/dswx_comparison.py ${expected_file} ${output_dir}/${output_file})
+	       echo "$compare_output"
+	    fi
 
-            # TODO uncomment these lines when comparison script is in place
-            # docker_out="${docker_out//$'\n'/<br>}"
-            # echo "<tr><td>${compare_result}</td><td><ul><li>Output: ${output_file}</li><li>Expected: ${expected_file}</li></ul></td><td>${docker_out}</td></tr>" >> "$RESULTS_FILE"
+	    if [[ "$compare_output" != *"FAIL"* ]]; then
+                echo "Product validation was successful for $output_file"
+                compare_result="PASS"
+            else
+                echo "Failure: Some comparisons failed for $output_file"
+                compare_result="FAIL"
+                overall_status=2
+            fi
+	else
+            echo "Not comparing file ${output_file}"
+            compare_result="SKIPPED"
+        fi
+	# add html breaks to newlines
+        compare_output=${compare_output//$'\n'/<br>$'\n'}
+
+	echo "<tr><td>${compare_result}</td><td><ul><li>Output: ${output_file}</li><li>Expected: ${expected_file}</li></ul></td><td>${compare_output}</td></tr>" >> "$RESULTS_FILE"
         done
     fi
 
