@@ -4,7 +4,7 @@ set -e
 # Source the build script utility functions
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
-. "${SCRIPT_DIR}"/util.sh
+. "${SCRIPT_DIR}"/../util/util.sh
 
 # Parse args
 parse_build_args "$@"
@@ -22,7 +22,7 @@ IMAGE="opera_pge/${PGE_NAME}"
 BUILD_DATE_TIME=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
 
 # defaults, SAS image should be updated as necessary for new image releases from ADT
-[ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath $(dirname $(realpath $0))/../..)
+[ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath $(dirname $(realpath $0))/../../..)
 [ -z "${TAG}" ] && TAG="${USER}-dev"
 [ -z "${SAS_IMAGE}" ] && SAS_IMAGE="artifactory-fn.jpl.nasa.gov:16001/gov/nasa/jpl/opera/adt/opera/proteus:final_4.1"
 
@@ -32,7 +32,7 @@ echo "TAG: $TAG"
 echo "SAS_IMAGE: $SAS_IMAGE"
 
 # Check that the .ci scripts directory exists
-if [ ! -d "${WORKSPACE}/.ci" ]; then
+if [ ! -d "${WORKSPACE}" ]; then
   echo "Error: the .ci directory doesn't exist at ${WORKSPACE}/.ci"
   exit 1
 fi
