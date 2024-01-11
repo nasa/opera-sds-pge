@@ -1,0 +1,107 @@
+RunConfig:
+    Name: OPERA-DISP-NI-PGE-TEST-CONFIG
+
+    Groups:
+        PGE:
+            PGENameGroup:
+                PGEName: DISP_NI_PGE
+
+            InputFilesGroup:
+                InputFilePaths:
+                    - disp_ni_pge_test/input_dir/compressed_slc_t087_185678_iw2_20180101_20180210.h5
+                    - disp_ni_pge_test/input_dir/t087_185678_iw2_20180222.h5
+
+            DynamicAncillaryFilesGroup:
+                AncillaryFileMap:
+                    dem_file: disp_ni_pge_test/input_dir/dem.tif
+                    mask_file: disp_ni_pge_test/input_dir/water_mask.tif
+                    amplitude_dispersion_files:
+                        - disp_ni_pge_test/input_dir/t087_185678_iw2_amp_dispersion.tif
+                    amplitude_mean_files:
+                        - disp_ni_pge_test/input_dir/t087_185678_iw2_amp_mean.tif
+                    static_layers_files:
+                        - disp_ni_pge_test/input_dir/t087_185678_iw2_topo.h5
+                    ionosphere_files:
+                        - disp_ni_pge_test/input_dir/jplg0410.18i.Z
+                    troposphere_files:
+                        - disp_ni_pge_test/input_dir/GMAO_tropo_20180210T000000_ztd.nc
+                        - disp_ni_pge_test/input_dir/ERA5_N30_N40_W120_W110_20221119_14.grb
+                        - disp_ni_pge_test/input_dir/ERA5_N30_N40_W120_W110_20221201_14.grb
+
+            ProductPathGroup:
+                OutputProductPath: disp_ni_pge_test/output_dir
+                ScratchPath: disp_ni_pge_test/scratch_dir
+
+            PrimaryExecutable:
+                ProductIdentifier: DISP_NI
+                ProductVersion: "0.2"
+                ProgramPath: mkdir
+                ProgramOptions:
+                    - '-p disp_ni_pge_test/output_dir/compressed_slcs;'
+                    - 'python3 -c "from opera.util.h5_utils import create_test_disp_metadata_product; create_test_disp_metadata_product(\"disp_ni_pge_test/output_dir/20180101_20180330.unw.nc\")";'
+                    - 'dd if=/dev/urandom of=disp_ni_pge_test/output_dir/20180101_20180330.unw.png bs=1M count=1;'
+                    - 'dd if=/dev/urandom of=disp_ni_pge_test/output_dir/compressed_slcs/compressed_slc_t087_185683_iw2_20180222_20180330.h5 bs=1M count=1;'
+                    - 'dd if=/dev/urandom of=disp_ni_pge_test/output_dir/compressed_slcs/compressed_slc_t087_185684_iw2_20180222_20180330.h5 bs=1M count=1;'
+                    - '/bin/echo DISP-NI invoked with RunConfig'
+                ErrorCodeBase: 500000
+                SchemaPath: pge/disp_ni/schema/disp_ni_sas_schema.yaml
+                AlgorithmParametersSchemaPath: pge/disp_ni/schema/algorithm_parameters_disp_ni_schema.yaml
+                IsoTemplatePath: pge/disp_ni/templates/OPERA_ISO_metadata_L3_DISP_NI_template.xml.jinja2
+
+            QAExecutable:
+                Enabled: False
+                ProgramPath:
+                ProgramOptions: []
+
+            DebugLevelGroup:
+                DebugSwitch: False
+                ExecuteViaShell: True  # Must be set to True for test to work
+
+        SAS:
+            input_file_group:
+                cslc_file_list:
+                    - disp_ni_pge_test/input_dir/compressed_slc_t087_185678_iw2_20180101_20180210.h5
+                    - disp_ni_pge_test/input_dir/t087_185678_iw2_20180222.h5
+
+                frame_id: 123
+
+            dynamic_ancillary_file_group:
+                algorithm_parameters_file: disp_ni_pge_test/input_dir/test_disp_ni_algorithm_parameters.yaml
+                dem_file: disp_ni_pge_test/input_dir/dem.tif
+                mask_file: disp_ni_pge_test/input_dir/water_mask.tif
+                amplitude_dispersion_files:
+                    - disp_ni_pge_test/input_dir/t087_185678_iw2_amp_dispersion.tif
+                amplitude_mean_files:
+                    - disp_ni_pge_test/input_dir/t087_185678_iw2_amp_mean.tif
+                static_layers_files:
+                    - disp_ni_pge_test/input_dir/t087_185678_iw2_topo.h5
+                ionosphere_files:
+                    - disp_ni_pge_test/input_dir/jplg0410.18i.Z
+                troposphere_files:
+                    - disp_ni_pge_test/input_dir/GMAO_tropo_20180210T000000_ztd.nc
+                    - disp_ni_pge_test/input_dir/ERA5_N30_N40_W120_W110_20221119_14.grb
+                    - disp_ni_pge_test/input_dir/ERA5_N30_N40_W120_W110_20221201_14.grb
+
+            static_ancillary_file_group:
+                frame_to_burst_json: disp_ni_pge_test/input_dir/opera-ni-disp-frame-to-burst.json
+
+            primary_executable:
+                product_type: DISP_NI_FORWARD
+
+            product_path_group:
+                product_path: disp_ni_pge_test/output_dir
+                scratch_path: disp_ni_pge_test/scratch_dir
+                sas_output_path: disp_ni_pge_test/output_dir
+                product_version: "0.2"
+                save_compressed_slc: true
+
+            worker_settings:
+                gpu_enabled: true
+                n_workers: 32
+                threads_per_worker: 2
+                n_parallel_bursts: 1
+                block_shape:
+                    - 512
+                    - 512
+
+            log_file: disp_ni_pge_test/output_dir/pge_logfile.log
