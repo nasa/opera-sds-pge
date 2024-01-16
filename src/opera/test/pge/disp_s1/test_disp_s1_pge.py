@@ -41,7 +41,7 @@ def mock_grib_to_netcdf(*popenargs, input=None, capture_output=False, timeout=No
     here we do not want this mocked version to run.
 
     """
-    if popenargs[0][0] == "grib_to_netcdf":
+    if popenargs[0][0].endswith("grib_to_netcdf"):
         output_path = popenargs[0][4]
         open(output_path, 'w').close()
     else:

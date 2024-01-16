@@ -93,13 +93,14 @@ class DispS1PreProcessorMixin(PreProcessorMixin):
                 grib_file_name = tropo_file
                 subprocess.run(
                     [
-                        "grib_to_netcdf",
+                        "/opt/conda/envs/eccodes/bin/grib_to_netcdf",
                         "-D",
                         "NC_FLOAT",
                         "-o",
                         netcdf_file,
                         grib_file_name[:-4],
                     ],
+                    env={'ENV_NAME': 'eccodes', 'LD_LIBRARY_PATH': '/opt/conda/envs/eccodes/lib'},
                     shell=False,
                     check=False,
                 )
