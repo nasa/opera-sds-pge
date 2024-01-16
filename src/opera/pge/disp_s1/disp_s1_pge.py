@@ -734,6 +734,8 @@ class DispS1Executor(DispS1PreProcessorMixin, DispS1PostProcessorMixin, PgeExecu
     LEVEL = "L3"
     """Processing Level for DISP-S1 Products"""
 
+    PGE_VERSION = "3.0.0-er.5.1"
+
     SAS_VERSION = "0.1.0"  # Beta release https://github.com/opera-adt/disp-s1/releases/tag/v0.1.0
     """Version of the SAS wrapped by this PGE, should be updated as needed"""
 
