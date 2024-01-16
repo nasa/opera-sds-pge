@@ -85,8 +85,8 @@ class DispS1PreProcessorMixin(PreProcessorMixin):
             if splitext(tropo_file)[-1] == '.grb':
                 # change the extension to .nc
                 netcdf_file = join(scratch_dir, splitext(basename(tropo_file))[0] + '.nc')
+
                 # This list of will the new paths to the converted files in the in-memory runconfig file.
-                netcdf_file_list.append(netcdf_file)
                 grib_file_name = tropo_file
                 subprocess.run(
                     [
@@ -100,6 +100,11 @@ class DispS1PreProcessorMixin(PreProcessorMixin):
                     shell=False,
                     check=False,
                 )
+            else:
+                # no conversion necessary, carry NetCDF file along as-is
+                netcdf_file = tropo_file
+
+            netcdf_file_list.append(netcdf_file)
 
         # Update the in-memory runconfig instance
         self.runconfig.sas_config['dynamic_ancillary_file_group']['troposphere_files'] = netcdf_file_list

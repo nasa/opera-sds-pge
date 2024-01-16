@@ -863,38 +863,49 @@ class DispS1PgeTestCase(unittest.TestCase):
     def test_scratch_sas_runconfig_for_grib_to_netcdf_files(self):
         """
         Test that the grib_to_netcdf files are in 'disp_s1_pge_test/scratch_dir'.
-        Verify the file names of the .grb files found in ['SAS']['dynamic_ancillary_file_group']['troposphere_files']
-        are the same as the converted files that are now .nc files and are residing in scratch_dir.
+
+        Verify the file names of the .grb files found in
+        ['SAS']['dynamic_ancillary_file_group']['troposphere_files']
+        are the same as the converted files that are now .nc files and are
+        residing in scratch_dir.
         """
         starting_grb_file_names = []
         ending_grb_file_names = []
         runconfig_path = join(self.data_dir, 'test_disp_s1_config.yaml')
 
         pge = DispS1Executor(pge_name="DispS1PgeTest", runconfig_path=runconfig_path)
+
         # Pull out the starting value of the troposphere_files
         with open(runconfig_path, 'r', encoding='utf-8') as infile:
             runconfig_dict = yaml.safe_load(infile)
         starting_tropo_paths = \
             runconfig_dict['RunConfig']['Groups']['SAS']['dynamic_ancillary_file_group']['troposphere_files']
+
         # Strip the path and extension (.grb) in order to compare just the file names after
         # conversion and placement of the converted file into /scratch_dir/<fname>.nc
         for starting_path in starting_tropo_paths:
             if starting_path[-4:] == '.grb':
                 starting_grb_file_names.append(starting_path.split('/')[-1][:-4])
+
         # Run only the preprocessor and the sas_executable, so the temporary directories are created and still alive.
         pge.run_preprocessor()
         pge.run_sas_executable()
         temp_sas_runconfig = 'disp_s1_pge_test/scratch_dir/' + pge.runconfig.filename.split('/')[-1][:-5] + '_sas.yaml'
+
         # open the yaml file
         with open(temp_sas_runconfig, 'r') as file:
             data = yaml.safe_load(file)
+
         ending_tropo_paths = data['dynamic_ancillary_file_group']['troposphere_files']
-        # Verify the .grb files are in /scratch_dir
+
+        # Verify the converted .grb files are in /scratch_dir
         # Strip the path and extension (changed to .nc in this case) to allow comparison of file name only.
         for ending_path in ending_tropo_paths:
-            self.assertIn('scratch_dir', ending_path)
-            self.assertTrue(exists(ending_path))        # verify the files exist on disk
-            ending_grb_file_names.append(ending_path.split('/')[-1][:-3])
+            ending_file_name = os.path.splitext(os.path.basename(ending_path))[0]
+            if ending_file_name in starting_grb_file_names:
+                self.assertIn('scratch_dir', ending_path)
+                self.assertTrue(exists(ending_path))        # verify the files exist on disk
+                ending_grb_file_names.append(ending_file_name)
 
         self.assertEqual(starting_grb_file_names, ending_grb_file_names)
 
