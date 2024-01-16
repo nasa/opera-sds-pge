@@ -58,7 +58,10 @@ class DispS1PreProcessorMixin(PreProcessorMixin):
         """
         super().run_preprocessor(**kwargs)
 
-        validate_disp_inputs(self.runconfig, self.logger, self.name)
+        # If debug mode is enabled, skip the input validation, since we might
+        # be working with only a partial set of inputs/ancillaries
+        if not self.runconfig.debug_switch:
+            validate_disp_inputs(self.runconfig, self.logger, self.name)
 
         validate_algorithm_parameters_config(self.name,
                                              self.runconfig.algorithm_parameters_schema_path,
