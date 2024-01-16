@@ -139,7 +139,7 @@ def validate_slc_s1_inputs(runconfig, logger, name):
             logger.critical(name, ErrorCode.INVALID_INPUT, error_msg)
 
 
-def get_burst_id_set(input_file_group, logger, name):
+def get_burst_id_set(input_file_group : list, logger, name) -> set:
     """
     Compiles a set of burst_ids from a list of files defined in the runconfig file.
     Each file in the list should have a burst_id in the file name.
@@ -155,7 +155,8 @@ def get_burst_id_set(input_file_group, logger, name):
 
     Returns
     -------
-    burst_ids :set
+    burst_ids : set
+        The unique set of burst IDs parsed from the list of input file names.
 
     Raises
     ------
@@ -176,7 +177,8 @@ def get_burst_id_set(input_file_group, logger, name):
     return burst_ids
 
 
-def check_disp_s1_ancillary_burst_ids(cslc_input_burst_ids, ancillary_file_list, logger, name):
+def check_disp_s1_ancillary_burst_ids(cslc_input_burst_ids : set,
+                                      ancillary_file_list : list, logger, name):
     # pylint: disable=C0103
     """
     Verify burst_ids from the ancillary input files:
@@ -207,7 +209,7 @@ def check_disp_s1_ancillary_burst_ids(cslc_input_burst_ids, ancillary_file_list,
 
     """
     nl, tab, dtab = '\n', '\t', '\t\t'   # used to format log output in fstrings.
-    ancillary_burst_ids = get_burst_id_set(ancillary_file_list, logger, name)
+    ancillary_burst_ids : set = get_burst_id_set(ancillary_file_list, logger, name)
 
     # Test none of the ancillary inputs have the same burst ID
     if len(ancillary_burst_ids) != len(ancillary_file_list):
@@ -264,8 +266,8 @@ def get_cslc_input_burst_id_set(cslc_input_file_list, logger, name):
                                              cslc_input_file_list))
     single_input_file_list = list(set(cslc_input_file_list) - set(compressed_input_file_list))
 
-    compressed_file_burst_id_set = get_burst_id_set(compressed_input_file_list, logger, name)
-    single_file_burst_id_set = get_burst_id_set(single_input_file_list, logger, name)
+    compressed_file_burst_id_set : set = get_burst_id_set(compressed_input_file_list, logger, name)
+    single_file_burst_id_set : set = get_burst_id_set(single_input_file_list, logger, name)
 
     # Case 1:  uncompressed files only in cslc inputs
     if len(compressed_file_burst_id_set) == 0:
@@ -316,7 +318,8 @@ def validate_disp_inputs(runconfig, logger, name):
         logger, name
     )
 
-    if 'amplitude_dispersion_files' in dyn_anc_file_group:
+    if ('amplitude_dispersion_files' in dyn_anc_file_group and
+            len(dyn_anc_file_group['amplitude_dispersion_files']) > 0):
         check_input_list(dyn_anc_file_group['amplitude_dispersion_files'], logger, name,
                          valid_extensions=('.tif', '.tiff'), check_zero_size=True)
         check_disp_s1_ancillary_burst_ids(cslc_burst_id_set,
@@ -324,7 +327,8 @@ def validate_disp_inputs(runconfig, logger, name):
                                           logger,
                                           name)
 
-    if 'amplitude_mean_files' in dyn_anc_file_group:
+    if ('amplitude_mean_files' in dyn_anc_file_group and
+            len(dyn_anc_file_group['amplitude_mean_files']) > 0):
         check_input_list(dyn_anc_file_group['amplitude_mean_files'], logger, name,
                          valid_extensions=('.tif', '.tiff'), check_zero_size=True)
         check_disp_s1_ancillary_burst_ids(cslc_burst_id_set,
@@ -332,7 +336,8 @@ def validate_disp_inputs(runconfig, logger, name):
                                           logger,
                                           name)
 
-    if 'static_layers_files' in dyn_anc_file_group:
+    if ('static_layers_files' in dyn_anc_file_group and
+            len(dyn_anc_file_group['static_layers_files']) > 0):
         check_input_list(dyn_anc_file_group['static_layers_files'], logger, name,
                          valid_extensions=('.h5',), check_zero_size=True)
         check_disp_s1_ancillary_burst_ids(cslc_burst_id_set,
@@ -340,19 +345,21 @@ def validate_disp_inputs(runconfig, logger, name):
                                           logger,
                                           name)
 
-    if 'mask_file' in dyn_anc_file_group:
+    if 'mask_file' in dyn_anc_file_group and dyn_anc_file_group['mask_file']:
         check_input(dyn_anc_file_group['mask_file'], logger, name,
                     valid_extensions=('.tif', '.tiff', '.vrt', '.flg'), check_zero_size=True)
 
-    if 'dem_file' in dyn_anc_file_group:
+    if 'dem_file' in dyn_anc_file_group and dyn_anc_file_group['dem_file']:
         check_input(dyn_anc_file_group['dem_file'], logger, name,
                     valid_extensions=('.tif', '.tiff', '.vrt'), check_zero_size=True)
 
-    if 'ionosphere_files' in dyn_anc_file_group:
+    if ('ionosphere_files' in dyn_anc_file_group
+            and len(dyn_anc_file_group['ionosphere_files']) > 0):
         check_input_list(dyn_anc_file_group['ionosphere_files'], logger, name,
                          check_zero_size=True)
 
-    if 'troposphere_files' in dyn_anc_file_group:
+    if ('troposphere_files' in dyn_anc_file_group and
+            len(dyn_anc_file_group['troposphere_files']) > 0):
         check_input_list(dyn_anc_file_group['troposphere_files'], logger, name,
                          valid_extensions=('.nc', '.h5', '.grb'), check_zero_size=True)
 
