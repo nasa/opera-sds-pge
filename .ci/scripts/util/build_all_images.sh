@@ -28,11 +28,11 @@ fi
 
 # Build all of the Docker images
 BUILD_SCRIPTS_DIR=${WORKSPACE}/.ci/scripts
-${BUILD_SCRIPTS_DIR}/../dswx_hls/build_dswx_hls.sh --tag ${TAG} --workspace ${WORKSPACE}
-${BUILD_SCRIPTS_DIR}/../cslc_s1/build_cslc_s1.sh --tag ${TAG} --workspace ${WORKSPACE}
-${BUILD_SCRIPTS_DIR}/../rtc_s1/build_rtc_s1.sh --tag ${TAG} --workspace ${WORKSPACE}
-${BUILD_SCRIPTS_DIR}/../dswx_s1/build_dswx_s1.sh --tag ${TAG} --workspace ${WORKSPACE}
-${BUILD_SCRIPTS_DIR}/../disp_s1/build_disp_s1.sh --tag ${TAG} --workspace ${WORKSPACE}
+${BUILD_SCRIPTS_DIR}/dswx_hls/build_dswx_hls.sh --tag ${TAG} --workspace ${WORKSPACE}
+${BUILD_SCRIPTS_DIR}/cslc_s1/build_cslc_s1.sh --tag ${TAG} --workspace ${WORKSPACE}
+${BUILD_SCRIPTS_DIR}/rtc_s1/build_rtc_s1.sh --tag ${TAG} --workspace ${WORKSPACE}
+${BUILD_SCRIPTS_DIR}/dswx_s1/build_dswx_s1.sh --tag ${TAG} --workspace ${WORKSPACE}
+${BUILD_SCRIPTS_DIR}/disp_s1/build_disp_s1.sh --tag ${TAG} --workspace ${WORKSPACE}
 
 echo 'Build Complete'
 

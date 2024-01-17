@@ -4,7 +4,7 @@ set -e
 # Source the build script utility functions
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
-. "${SCRIPT_DIR}"/util.sh
+. "${SCRIPT_DIR}"/../util/util.sh
 
 # Parse args
 parse_build_args "$@"
@@ -12,19 +12,19 @@ parse_build_args "$@"
 echo '
 =====================================
 
-Building DSWx-S1 PGE docker image...
+Building CSLC-S1 PGE docker image...
 
 =====================================
 '
 
-PGE_NAME="dswx_s1"
+PGE_NAME="cslc_s1"
 IMAGE="opera_pge/${PGE_NAME}"
 BUILD_DATE_TIME=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
 
 # defaults, SAS image should be updated as necessary for new image releases from ADT
-[ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath $(dirname $(realpath $0))/../..)
+[ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath $(dirname $(realpath $0))/../../..)
 [ -z "${TAG}" ] && TAG="${USER}-dev"
-[ -z "${SAS_IMAGE}" ] && SAS_IMAGE="artifactory-fn.jpl.nasa.gov:16001/gov/nasa/jpl/opera/adt/opera/dswx-s1:gamma_0.3"
+[ -z "${SAS_IMAGE}" ] && SAS_IMAGE="artifactory-fn.jpl.nasa.gov:16001/gov/nasa/jpl/opera/adt/opera/cslc_s1:final_0.5.4"
 
 echo "WORKSPACE: $WORKSPACE"
 echo "IMAGE: $IMAGE"
@@ -83,8 +83,8 @@ docker build ${PLATFORM} --progress plain --rm --force-rm -t ${IMAGE}:${TAG} \
     --build-arg BUILD_DATE_TIME=${BUILD_DATE_TIME} \
     --build-arg BUILD_VERSION=${TAG} \
     --build-arg PGE_SOURCE_DIR=$(basename ${STAGING_DIR}) \
-    --file ${WORKSPACE}/.ci/docker/Dockerfile_dswx_s1 ${WORKSPACE}
+    --file ${WORKSPACE}/.ci/docker/Dockerfile_${PGE_NAME} ${WORKSPACE}
 
-echo "DSWx-S1 PGE Docker image build complete"
+echo "CSLC-S1 PGE Docker image build complete"
 
 exit 0

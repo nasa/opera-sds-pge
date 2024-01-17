@@ -1,12 +1,12 @@
 #!/bin/bash
-# Script to execute unit tests on the OPERA CSLC-S1 PGE Docker image
+# Script to execute unit tests on the OPERA RTC-S1 PGE Docker image
 
 set -e
 
 # Source the build script utility functions
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
-. "${SCRIPT_DIR}"/util.sh
+. "${SCRIPT_DIR}"/../util/util.sh
 
 # Parse args
 parse_build_args "$@"
@@ -14,19 +14,19 @@ parse_build_args "$@"
 echo '
 =====================================
 
-Testing CSLC-S1 PGE Docker image...
+Testing RTC-S1 PGE Docker image...
 
 =====================================
 '
 
-PGE_NAME="cslc_s1"
+PGE_NAME="rtc_s1"
 IMAGE="opera_pge/${PGE_NAME}"
 TEST_RESULTS_REL_DIR="test_results"
-CONTAINER_HOME="/home/compass_user"
-CONDA_ROOT="/home/compass_user/miniconda3"
+CONTAINER_HOME="/home/rtc_user"
+CONDA_ROOT="/home/rtc_user/miniconda3"
 
 # defaults
-[ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath $(dirname $(realpath $0))/../..)
+[ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath $(dirname $(realpath $0))/../../..)
 [ -z "${TAG}" ] && TAG="${USER}-dev"
 
 TEST_RESULTS_DIR="${WORKSPACE}/${TEST_RESULTS_REL_DIR}/${PGE_NAME}"
@@ -47,7 +47,7 @@ DOCKER_RUN="docker run --rm \
     --entrypoint conda \
     ${IMAGE}:${TAG}"
 
-ENTRYPOINT="run --no-capture-output -n COMPASS ${CONDA_ROOT}/bin/pge_tests_entrypoint.sh"
+ENTRYPOINT="run --no-capture-output -n RTC ${CONDA_ROOT}/bin/pge_tests_entrypoint.sh"
 
 # Configure a trap to set permissions on exit regardless of whether the testing succeeds
 function set_perms {
@@ -93,6 +93,6 @@ ${DOCKER_RUN} ${ENTRYPOINT} pytest \
     /workspace/src/opera/test/scripts \
     /workspace/src/opera/test/util > ${TEST_RESULTS_DIR}/pytest.log
 
-echo "CSLC-S1 PGE Docker image test complete"
+echo "RTC-S1 PGE Docker image test complete"
 
 exit 0

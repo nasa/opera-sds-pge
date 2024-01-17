@@ -27,7 +27,7 @@ pipeline {
                     docker.withRegistry ('https://' + params.ART_DOCKER_REGISTRY, params.ART_CREDENTIALS) {
                         echo "Building ${DOCKER_IMAGE_PREFIX} docker images with tag ${DOCKER_TAG}"
                         sh label: 'Build all OPERA Docker images',
-                           script: ".ci/scripts/build_all_images.sh $DOCKER_TAG"
+                           script: ".ci/scripts/util/build_all_images.sh $DOCKER_TAG"
                     }
                 }
             }
@@ -36,7 +36,7 @@ pipeline {
             steps {
                 echo "Testing ${DOCKER_IMAGE_PREFIX} docker images with tag ${DOCKER_TAG}"
                 sh label: 'Test all OPERA Docker images',
-                   script: ".ci/scripts/test_all_images.sh $DOCKER_TAG"
+                   script: ".ci/scripts/util/test_all_images.sh $DOCKER_TAG"
                 junit 'test_results/**/*.xml'
                 archiveArtifacts artifacts: 'test_results/**/*.log', fingerprint: true
                 script {
@@ -62,7 +62,7 @@ pipeline {
     post {
         always {
             echo "Cleaning up Docker images from local host"
-            sh ".ci/scripts/cleanup.sh ${DOCKER_TAG}"
+            sh ".ci/scripts/util/cleanup.sh ${DOCKER_TAG}"
             deleteDir()
         }
         success {
