@@ -10,8 +10,8 @@
 #
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
-. "$SCRIPT_DIR"/test_int_util.sh
-. "$SCRIPT_DIR"/util.sh
+. "$SCRIPT_DIR"/../util/test_int_util.sh
+. "$SCRIPT_DIR"/../util/util.sh
 
 # TODO: validate number of provided arguments matches expected,
 #       and print help usage (or set defaults) if wrong

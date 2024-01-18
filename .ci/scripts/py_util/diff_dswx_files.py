@@ -17,6 +17,7 @@ import glob
 import os
 import sys
 
+
 def _parse_args():
     """
     This function gets the two directory names that are arguments to the module.
@@ -52,6 +53,7 @@ def _parse_args():
             print ("sys.argv[2] = ", sys.argv[2])
 
     return sys.argv
+
 
 def get_files(options):
     """
@@ -122,10 +124,12 @@ def get_files(options):
         print(command)
         os.system(command)
 
+
 def main():
     options = _parse_args()
 
     get_files(options)
+
 
 if __name__ == '__main__':
     main()
