@@ -301,7 +301,7 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
         pixel_spacing = "30"  # fixed for tile-based products
 
         acquisition_time = get_time_for_filename(
-            datetime.strptime(dswx_metadata['SENSING_START'], '%Y-%m-%dT%H:%M:%SZ')
+            datetime.strptime(dswx_metadata['RTC_SENSING_START_TIME'], '%Y-%m-%dT%H:%M:%SZ')
         )
 
         if not acquisition_time.endswith('Z'):
