@@ -149,12 +149,12 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
         Evaluates the output file(s) generated from SAS execution to ensure:
             - That the file(s) contains some content (size is greater than 0).
             - That the .tif output files (band data) end with 'B01_WTR',
-              'B02_BWTR', or 'B03_CONF'
+              'B02_BWTR', 'B03_CONF' or 'B04_DIAG'
             - That the there are the same number of each type of file, implying
               3 output bands per tile
 
         """
-        EXPECTED_NUM_BANDS: int = 3
+        EXPECTED_NUM_BANDS: int = 4
         band_dict = {}
         num_bands = []
         output_extension = '.tif'
@@ -188,13 +188,15 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
             band_dict[key].append(out_product)
 
         if len(band_dict.keys()) != EXPECTED_NUM_BANDS:
-            error_msg = f"Invalid SAS output file, too many band types: {band_dict.keys()}"
+            error_msg = (f"Invalid SAS output file, wrong number of bands, "
+                         f"expected {EXPECTED_NUM_BANDS}, found {band_dict.keys()}")
 
             self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
 
         # Make a list of the numbers of bands per band type
         for band in band_dict.keys():
             num_bands.append(len(band_dict[band]))
+
         if not all(band_type == num_bands[0] for band_type in num_bands):
             error_msg = f"Missing or extra band files: number of band files per " \
                         f"band: {num_bands}"
