@@ -75,7 +75,7 @@ RunConfig:
         ProductIdentifier: DSWX_S1
 
         # Product version specific to output products
-        ProductVersion: "1.0"
+        ProductVersion: "0.1"
 
         # Path to the executable to run, path must be reachable from
         # within the Docker container (i.e. findable with a "which" command)
@@ -162,27 +162,27 @@ RunConfig:
             dem_file: /home/dswx_user/input_dir/ancillary_data/dem.tif
 
             # Digital elevation model source description
-            dem_file_description: 'DEM'
+            dem_file_description: 'Copernicus DEM GLO-30 2021 WGS84'
 
             # ESA WorldCover map file
             # (Required for opera_dswx_s1)
             worldcover_file: /home/dswx_user/input_dir/ancillary_data/worldcover.tif
 
             # ESA WorldCover map description
-            worldcover_file_description: 'COPERNICUS WORLDCOVER 10m'
+            worldcover_file_description: 'ESA WorldCover 10m 2020 v1.0'
 
             # Reference water body map (Required)
             # e.g., Pekel's water occurrence or seasonality map
             reference_water_file: /home/dswx_user/input_dir/ancillary_data/reference_water.tif
 
             # Reference water description
-            reference_water_file_description: 'PEKELs water'
+            reference_water_file_description: 'JRC Global Surface Water - collection from 1984 to 2021'
 
             # Height Above Nearest Drainage (Required)
             hand_file: /home/dswx_user/input_dir/ancillary_data/hand.tif
 
             # HAND description
-            hand_file_description: 'ASF HAND'
+            hand_file_description: 'ASF HAND GLO30'
 
             # Separate runconfig file for algorithm parameters
             algorithm_parameters: /home/dswx_user/input_dir/ancillary_data/algorithm_parameter_s1.yaml
@@ -214,4 +214,19 @@ RunConfig:
             # DSWx-S1 product format
             output_imagery_format: 'COG'
 
-          log_file:
+          browse_image_group:
+            # Save a full-res Cloud-Optimized GEOTIFF DSWx-S1 browse image and
+            # a modified-resolution PNG of the browse image for DSWx-S1
+            save_browse: True
+
+            # Setting `browse_image_height` and `browse_image_width` equal
+            # will maintain this original DSWx-S1 aspect ratio
+            # of 3660 pixels x 3660 pixels for the PNG browse image.
+            # If these fields are left empty, 1024 x 1024 will be used.
+            # Height in pixels for the PNG browse image
+            browse_image_height: 1024
+
+            # Width in pixels for the PNG browse image
+            browse_image_width: 1024
+
+          log_file: /home/dswx_user/output_dir/dswx-s1.log
