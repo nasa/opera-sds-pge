@@ -28,9 +28,9 @@ SAMPLE_TIME=1
 # RUNCONFIG should be the name of the runconfig in s3://operasds-dev-pge/dswx_s1/
 [ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath "$(dirname "$(realpath "$0")")"/../..)
 [ -z "${PGE_TAG}" ] && PGE_TAG="${USER}-dev"
-[ -z "${INPUT_DATA}" ] && INPUT_DATA="dswx_s1_beta_0.2.1_expected_input.zip"
-[ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="dswx_s1_beta_0.2.1_expected_output.zip"
-[ -z "${RUNCONFIG}" ] && RUNCONFIG="dswx_s1_beta_0.2.1_runconfig.yaml"
+[ -z "${INPUT_DATA}" ] && INPUT_DATA="dswx_s1_gamma_0.3_expected_input.zip"
+[ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="dswx_s1_gamma_0.3_expected_output.zip"
+[ -z "${RUNCONFIG}" ] && RUNCONFIG="dswx_s1_gamma_0.3_runconfig.yaml"
 [ -z "${TMP_ROOT}" ] && TMP_ROOT="$DEFAULT_TMP_ROOT"
 
 # Create the test output directory in the work space
@@ -93,6 +93,7 @@ metrics_collection_start "$PGE_NAME" "$container_name" "$TEST_RESULTS_DIR" "$SAM
 
 echo "Running Docker image ${PGE_IMAGE}:${PGE_TAG} for ${input_data_dir}"
 docker run --rm -u $UID:"$(id -g)" --name $container_name \
+            -w /home/dswx_user \
             -v "${TMP_DIR}/runconfig":/home/dswx_user/runconfig:ro \
             -v "$input_data_dir":/home/dswx_user/input_dir:ro \
             -v "$output_dir":/home/dswx_user/output_dir \
@@ -124,7 +125,7 @@ else
 
         if [[ "${output_file##*/}" == *.tif* ]]
         then
-            for potential_product in B01_BWTR B02_WTR B03_CONF
+            for potential_product in B01_WTR B02_BWTR B03_CONF B04_DIAG
             do
                 if [[ "$output_file" == *"$potential_product"* ]]; then
                     product=$potential_product
@@ -152,16 +153,16 @@ else
             if [ ! -f "$expected_file" ]; then
                 echo "No expected file found for product $product in expected directory $expected_data_dir"
                 overall_status=1
-		compare_result="FAIL"
-		compare_output="FAILED"
+                compare_result="FAIL"
+                compare_output="FAILED"
             else
                # compare output and expected files
-	       echo "python3 dswx_comparison.py $(basename -- ${expected_file}) ${output_file}"
-	       compare_output=$(python3 $SCRIPT_DIR/dswx_comparison.py ${expected_file} ${output_dir}/${output_file})
-	       echo "$compare_output"
-	    fi
+               echo "python3 dswx_comparison.py $(basename -- ${expected_file}) ${output_file}"
+               compare_output=$(python3 $SCRIPT_DIR/dswx_comparison.py ${expected_file} ${output_dir}/${output_file})
+               echo "$compare_output"
+            fi
 
-	    if [[ "$compare_output" != *"FAIL"* ]]; then
+            if [[ "$compare_output" != *"FAIL"* ]]; then
                 echo "Product validation was successful for $output_file"
                 compare_result="PASS"
             else
@@ -169,14 +170,15 @@ else
                 compare_result="FAIL"
                 overall_status=2
             fi
-	else
+        else
             echo "Not comparing file ${output_file}"
             compare_result="SKIPPED"
         fi
-	# add html breaks to newlines
+
+        # add html breaks to newlines
         compare_output=${compare_output//$'\n'/<br>$'\n'}
 
-	echo "<tr><td>${compare_result}</td><td><ul><li>Output: ${output_file}</li><li>Expected: ${expected_file}</li></ul></td><td>${compare_output}</td></tr>" >> "$RESULTS_FILE"
+        echo "<tr><td>${compare_result}</td><td><ul><li>Output: ${output_file}</li><li>Expected: ${expected_file}</li></ul></td><td>${compare_output}</td></tr>" >> "$RESULTS_FILE"
         done
     fi
 
