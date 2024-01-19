@@ -104,7 +104,7 @@ class DswxS1PgeTestCase(unittest.TestCase):
         """
         self.assertEqual(runconfig['name'], 'dswx_s1_workflow_algorithm')
         self.assertEqual(runconfig['processing']['dswx_workflow'], 'opera_dswx_s1')
-        self.assertListEqual(runconfig['processing']['polarizations'], ['VV', 'VH'])
+        self.assertListEqual(runconfig['processing']['polarizations'], ['dual-pol'])
         self.assertEqual(runconfig['processing']['reference_water']['max_value'], 100)
         self.assertEqual(runconfig['processing']['reference_water']['no_data_value'], 255)
         self.assertEqual(runconfig['processing']['reference_water']['permanent_water_value'], 0.9)
@@ -113,21 +113,25 @@ class DswxS1PgeTestCase(unittest.TestCase):
         self.assertEqual(runconfig['processing']['hand']['mask_value'], 200)
         self.assertEqual(runconfig['processing']['mosaic']['mosaic_prefix'], 'mosaic')
         self.assertEqual(runconfig['processing']['mosaic']['mosaic_cog_enable'], True)
+        self.assertEqual(runconfig['processing']['mosaic']['mosaic_mode'], 'first')
         self.assertEqual(runconfig['processing']['filter']['enabled'], True)
         self.assertEqual(runconfig['processing']['filter']['window_size'], 5)
+        self.assertEqual(runconfig['processing']['filter']['line_per_block'], 1000)
         self.assertEqual(runconfig['processing']['initial_threshold']['maximum_tile_size']['x'], 400)
         self.assertEqual(runconfig['processing']['initial_threshold']['maximum_tile_size']['y'], 400)
         self.assertEqual(runconfig['processing']['initial_threshold']['minimum_tile_size']['x'], 40)
         self.assertEqual(runconfig['processing']['initial_threshold']['minimum_tile_size']['y'], 40)
-        self.assertEqual(runconfig['processing']['initial_threshold']['selection_method'], 'combined')
+        self.assertEqual(runconfig['processing']['initial_threshold']['selection_method'], ['combined'])
         self.assertListEqual(runconfig['processing']['initial_threshold']['tile_selection_twele'], [0.09, 0.8, 0.97])
         self.assertEqual(runconfig['processing']['initial_threshold']['tile_selection_bimodality'], 0.7)
         self.assertEqual(runconfig['processing']['initial_threshold']['extending_method'], 'gdal_grid')
         self.assertEqual(runconfig['processing']['initial_threshold']['threshold_method'], 'ki')
         self.assertEqual(runconfig['processing']['initial_threshold']['multi_threshold'], True)
-        self.assertEqual(runconfig['processing']['initial_threshold']['number_cpu'], 2)
-        self.assertEqual(runconfig['processing']['initial_threshold']['number_iterations'], 1)
-        self.assertEqual(runconfig['processing']['initial_threshold']['tile_average'], False)
+        self.assertEqual(runconfig['processing']['initial_threshold']['adjust_threshold_nonoverlapped_distribution'], True)
+        self.assertEqual(runconfig['processing']['initial_threshold']['number_cpu'], -1)
+        self.assertEqual(runconfig['processing']['initial_threshold']['tile_average'], True)
+        self.assertEqual(runconfig['processing']['initial_threshold']['line_per_block'], 300)
+        self.assertEqual(runconfig['processing']['fuzzy_value']['line_per_block'], 200)
         self.assertEqual(runconfig['processing']['fuzzy_value']['hand']['member_min'], 0)
         self.assertEqual(runconfig['processing']['fuzzy_value']['hand']['member_max'], 15)
         self.assertEqual(runconfig['processing']['fuzzy_value']['slope']['member_min'], 0.5)
@@ -143,9 +147,19 @@ class DswxS1PgeTestCase(unittest.TestCase):
         self.assertEqual(runconfig['processing']['region_growing']['initial_threshold'], 0.81)
         self.assertEqual(runconfig['processing']['region_growing']['relaxed_threshold'], 0.51)
         self.assertEqual(runconfig['processing']['region_growing']['line_per_block'], 400)
+        self.assertEqual(runconfig['processing']['masking_ancillary']['land_cover_darkland_list'],
+                         ['Bare sparse vegetation', 'Urban', 'Moss and lichen'])
+        self.assertEqual(runconfig['processing']['masking_ancillary']['land_cover_darkland_extension_list'],
+                         ['Grassland', 'Shrubs'])
         self.assertEqual(runconfig['processing']['masking_ancillary']['co_pol_threshold'], -14.6)
         self.assertEqual(runconfig['processing']['masking_ancillary']['cross_pol_threshold'], -22.8)
-        self.assertEqual(runconfig['processing']['masking_ancillary']['water_threshold'], None)
+        self.assertEqual(runconfig['processing']['masking_ancillary']['water_threshold'], 0.05)
+        self.assertEqual(runconfig['processing']['masking_ancillary']['extended_darkland'], True)
+        self.assertEqual(runconfig['processing']['masking_ancillary']['hand_variation_mask'], True)
+        self.assertEqual(runconfig['processing']['masking_ancillary']['hand_variation_threshold'], 2.5)
+        self.assertEqual(runconfig['processing']['masking_ancillary']['line_per_block'], 400)
+        self.assertEqual(runconfig['processing']['masking_ancillary']['number_cpu'], 1)
+        self.assertEqual(runconfig['processing']['refine_with_bimodality']['lines_per_block'], 500)
         self.assertEqual(runconfig['processing']['refine_with_bimodality']['number_cpu'], 1)
         self.assertEqual(runconfig['processing']['refine_with_bimodality']['minimum_pixel'], 4)
         self.assertEqual(runconfig['processing']['refine_with_bimodality']['thresholds']['ashman'], 1.5)
@@ -159,6 +173,7 @@ class DswxS1PgeTestCase(unittest.TestCase):
         self.assertEqual(runconfig['processing']['inundated_vegetation']['dual_pol_ratio_threshold'], 8)
         self.assertEqual(runconfig['processing']['inundated_vegetation']['cross_pol_min'], -26)
         self.assertEqual(runconfig['processing']['inundated_vegetation']['line_per_block'], 300)
+        self.assertEqual(runconfig['processing']['inundated_vegetation']['target_land_cover'], ['Herbaceous wetland'])
         self.assertEqual(runconfig['processing']['debug_mode'], False)
 
     def generate_band_data_output(self, band_data, empty_file=False, clear=True):
@@ -183,8 +198,8 @@ class DswxS1PgeTestCase(unittest.TestCase):
 
         if clear:
             path = self.test_output_dir
-            cmd = f"rm {path}/*.tif"
-            os.system(cmd)
+            for file_path in glob.glob(f"{path}/*.tif"):
+                os.unlink(file_path)
 
         # Add files to the output directory
         for band_output_file in band_data:
@@ -252,8 +267,11 @@ class DswxS1PgeTestCase(unittest.TestCase):
         self.assertTrue(exists(expected_log_file))
 
         # Lastly, check that the dummy output products were created
-        output_files = glob.glob(join(pge.runconfig.output_product_path, "*.tif"))
-        self.assertEqual(len(output_files), 3)
+        output_tif_files = glob.glob(join(pge.runconfig.output_product_path, "*.tif"))
+        self.assertEqual(len(output_tif_files), 4)
+
+        output_browse_files = glob.glob(join(pge.runconfig.output_product_path, "*.png"))
+        self.assertEqual(len(output_browse_files), 1)
 
         # Open and read the log
         with open(expected_log_file, 'r', encoding='utf-8') as infile:
@@ -434,7 +452,7 @@ class DswxS1PgeTestCase(unittest.TestCase):
         with open(runconfig_path, 'r', encoding='utf-8') as infile:
             runconfig_dict = yaml.safe_load(infile)
 
-        runconfig_dict['RunConfig']['Groups']['SAS']['runconfig']['groups']['dynamic_ancillary_file_group']\
+        runconfig_dict['RunConfig']['Groups']['SAS']['runconfig']['groups']['dynamic_ancillary_file_group'] \
             ['algorithm_parameters'] = 'test/data/test_algorithm_parameters_non_existent.yaml'   # noqa E211
 
         with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
@@ -701,10 +719,9 @@ class DswxS1PgeTestCase(unittest.TestCase):
             self.assertIn(f"SAS output file {abspath(expected_output_file)} was "
                           f"created, but is empty", log_contents)
 
-            # Test a misnamed band file.  Post-processor should detect this and flag an error
+            # Test a missing band type.  Post-processor should detect this and flag an error
             band_data = ('OPERA_L3_DSWx-S1_b1_B01_WTR.tif', 'OPERA_L3_DSWx-S1_b1_B02_BWTR.tif',
-                         'OPERA_L3_DSWx-S1_b1_B03_CONF.tif', 'OPERA_L3_DSWx-S1_b2_B01_WTR.tif',
-                         'OPERA_L3_DSWx-S1_b2_B02_BWTR.tif', 'OPERA_L3_DSWx-S1_b2_B03_CON.tif')
+                         'OPERA_L3_DSWx-S1_b1_B03_CONF.tif')
             self.generate_band_data_output(band_data, clear=True)
 
             with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
@@ -721,14 +738,15 @@ class DswxS1PgeTestCase(unittest.TestCase):
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
 
-            self.assertIn("Invalid SAS output file, too many band types:",
+            self.assertIn("Invalid SAS output file, wrong number of bands,",
                           log_contents)
 
             # Test for missing or extra band files
             # Test a misnamed band file.  Post-processor should detect this and flag an error
             band_data = ('OPERA_L3_DSWx-S1_b1_B01_WTR.tif', 'OPERA_L3_DSWx-S1_b1_B02_BWTR.tif',
-                         'OPERA_L3_DSWx-S1_b1_B03_CONF.tif', 'OPERA_L3_DSWx-S1_b2_B01_WTR.tif',
-                         'OPERA_L3_DSWx-S1_b2_B02_BWTR.tif')
+                         'OPERA_L3_DSWx-S1_b1_B03_CONF.tif', 'OPERA_L3_DSWx-S1_b1_B04_DIAG.tif',
+                         'OPERA_L3_DSWx-S1_b2_B01_WTR.tif', 'OPERA_L3_DSWx-S1_b2_B02_BWTR.tif',
+                         'OPERA_L3_DSWx-S1_b2_B04_DIAG.tif')
             self.generate_band_data_output(band_data, clear=True)
 
             with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
