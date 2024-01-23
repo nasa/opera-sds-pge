@@ -351,6 +351,30 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
 
         return netcdf_filename
 
+    def _compressed_cslc_filename(self, inter_filename):
+        """
+        Returns the file name to use for compressed CSLC files produced by the
+        DISP-S1 PGE.
+
+        The current convention is to maintain the filename assigned by the DISP-S1
+        SAS, but this function is still required to ensure the compressed CSLC products
+        are moved to the output directory defined by the RunConfig.
+
+        Parameters
+        ----------
+        inter_filename : str
+            The intermediate filename of the compressed CSLC product to generate
+            a filename for. This parameter may be used to inspect the file
+            in order to derive any necessary components of the returned filename.
+
+        Returns
+        -------
+        compressed_cslc_filename : str
+            The file name to assign to compressed CSLC product(s) created by this PGE.
+
+        """
+        return os.path.basename(inter_filename)
+
     def _ancillary_filename(self):
         """
         Helper method to derive the core component of the file names for the
@@ -747,6 +771,7 @@ class DispS1Executor(DispS1PreProcessorMixin, DispS1PostProcessorMixin, PgeExecu
             {
                 # Note: ordering matters here!
                 '*.nc': self._netcdf_filename,
-                '*.png': self._browse_filename
+                '*.png': self._browse_filename,
+                'compressed*.h5': self._compressed_cslc_filename
             }
         )
