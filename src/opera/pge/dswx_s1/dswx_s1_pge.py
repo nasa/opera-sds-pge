@@ -8,8 +8,9 @@ Module defining the implementation for the Dynamic Surface Water Extent (DSWx)
 from Sentinel-1 A/B (S1) PGE.
 """
 
+import glob
 from datetime import datetime
-from os.path import abspath, basename, exists, getsize, join, splitext
+from os.path import abspath, basename, dirname, exists, getsize, join, splitext
 
 import opera.util.input_validation as input_validation
 from opera.pge.base.base_pge import PgeExecutor
@@ -148,12 +149,12 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
         Evaluates the output file(s) generated from SAS execution to ensure:
             - That the file(s) contains some content (size is greater than 0).
             - That the .tif output files (band data) end with 'B01_WTR',
-              'B02_BWTR', or 'B03_CONF'
+              'B02_BWTR', 'B03_CONF' or 'B04_DIAG'
             - That the there are the same number of each type of file, implying
               3 output bands per tile
 
         """
-        EXPECTED_NUM_BANDS: int = 3
+        EXPECTED_NUM_BANDS: int = 4
         band_dict = {}
         num_bands = []
         output_extension = '.tif'
@@ -187,13 +188,15 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
             band_dict[key].append(out_product)
 
         if len(band_dict.keys()) != EXPECTED_NUM_BANDS:
-            error_msg = f"Invalid SAS output file, too many band types: {band_dict.keys()}"
+            error_msg = (f"Invalid SAS output file, wrong number of bands, "
+                         f"expected {EXPECTED_NUM_BANDS}, found {band_dict.keys()}")
 
             self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
 
         # Make a list of the numbers of bands per band type
         for band in band_dict.keys():
             num_bands.append(len(band_dict[band]))
+
         if not all(band_type == num_bands[0] for band_type in num_bands):
             error_msg = f"Missing or extra band files: number of band files per " \
                         f"band: {num_bands}"
@@ -298,7 +301,7 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
         pixel_spacing = "30"  # fixed for tile-based products
 
         acquisition_time = get_time_for_filename(
-            datetime.strptime(dswx_metadata['SENSING_START'], '%Y-%m-%dT%H:%M:%SZ')
+            datetime.strptime(dswx_metadata['RTC_SENSING_START_TIME'], '%Y-%m-%dT%H:%M:%SZ')
         )
 
         if not acquisition_time.endswith('Z'):
@@ -359,6 +362,51 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
         band_idx, band_name = splitext(inter_filename)[0].split("_")[-2:]
 
         return f"{tile_filename}_{band_idx}_{band_name}.tif"
+
+    def _browse_filename(self, inter_filename):
+        """
+        Returns the file name to use for the PNG browse image produced by
+        the DSWx-S1 PGE.
+
+        The browse image filename for the DSWx-S1 PGE consists of:
+
+            <Tile filename>_BROWSE.png
+
+        Where <Tile filename> is returned by DSWxS1PostProcessorMixin._tile_filename().
+
+        Parameters
+        ----------
+        inter_filename : str
+            The intermediate filename of the output browse image from which to
+            generate a filename. This parameter may be used to inspect the
+            file in order to derive any necessary components of the returned filename.
+
+        Returns
+        -------
+        browse_image_filename : str
+            The file name to assign to browse image created by this PGE.
+
+        """
+        # Find one of the tif files corresponding to the provided browse image
+        # based on the tile ID
+        tile_id = basename(inter_filename).split('_')[3]
+
+        tif_pattern = f"*{tile_id}*.tif*"
+
+        tif_files = list(glob.glob(join(dirname(inter_filename), tif_pattern)))
+
+        if not len(tif_files):
+            error_msg = f"Could not find any .tif files corresponding to browse image {inter_filename}"
+            self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
+
+        # Now we derive the core (tile) filename using the tif file(s) we located,
+        # since we need to extract product metadata to form the correct filename.
+        # We can use the first tif file in the list, since they should all have
+        # the same metadata.
+        tile_filename = self._tile_filename(tif_files[0])
+
+        # Add the portion specific to browse images
+        return f"{tile_filename}_BROWSE.png"
 
     def _ancillary_filename(self):
         """
@@ -736,7 +784,7 @@ class DSWxS1Executor(DSWxS1PreProcessorMixin, DSWxS1PostProcessorMixin, PgeExecu
     LEVEL = "L3"
     """Processing Level for DSWx-S1 Products"""
 
-    SAS_VERSION = "0.2.1"  # Beta release https://github.com/opera-adt/DSWX-SAR/releases/tag/v0.2.1
+    SAS_VERSION = "0.3"  # Gamma release https://github.com/opera-adt/DSWX-SAR/releases/tag/v0.3
     """Version of the SAS wrapped by this PGE, should be updated as needed"""
 
     def __init__(self, pge_name, runconfig_path, **kwargs):
@@ -745,5 +793,6 @@ class DSWxS1Executor(DSWxS1PreProcessorMixin, DSWxS1PostProcessorMixin, PgeExecu
         # Used in base_pge.py to rename and keep track of files
         # renamed by the PGE
         self.rename_by_pattern_map = {
-            '*.tif*': self._geotiff_filename
+            '*.tif*': self._geotiff_filename,
+            '*.png': self._browse_filename
         }
