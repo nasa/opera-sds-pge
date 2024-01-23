@@ -58,7 +58,10 @@ class DispS1PreProcessorMixin(PreProcessorMixin):
         """
         super().run_preprocessor(**kwargs)
 
-        validate_disp_inputs(self.runconfig, self.logger, self.name)
+        # If debug mode is enabled, skip the input validation, since we might
+        # be working with only a partial set of inputs/ancillaries
+        if not self.runconfig.debug_switch:
+            validate_disp_inputs(self.runconfig, self.logger, self.name)
 
         validate_algorithm_parameters_config(self.name,
                                              self.runconfig.algorithm_parameters_schema_path,
@@ -85,21 +88,27 @@ class DispS1PreProcessorMixin(PreProcessorMixin):
             if splitext(tropo_file)[-1] == '.grb':
                 # change the extension to .nc
                 netcdf_file = join(scratch_dir, splitext(basename(tropo_file))[0] + '.nc')
+
                 # This list of will the new paths to the converted files in the in-memory runconfig file.
-                netcdf_file_list.append(netcdf_file)
                 grib_file_name = tropo_file
                 subprocess.run(
                     [
-                        "grib_to_netcdf",
+                        "/opt/conda/envs/eccodes/bin/grib_to_netcdf",
                         "-D",
                         "NC_FLOAT",
                         "-o",
                         netcdf_file,
                         grib_file_name[:-4],
                     ],
+                    env={'ENV_NAME': 'eccodes', 'LD_LIBRARY_PATH': '/opt/conda/envs/eccodes/lib'},
                     shell=False,
                     check=False,
                 )
+            else:
+                # no conversion necessary, carry NetCDF file along as-is
+                netcdf_file = tropo_file
+
+            netcdf_file_list.append(netcdf_file)
 
         # Update the in-memory runconfig instance
         self.runconfig.sas_config['dynamic_ancillary_file_group']['troposphere_files'] = netcdf_file_list
@@ -725,6 +734,8 @@ class DispS1Executor(DispS1PreProcessorMixin, DispS1PostProcessorMixin, PgeExecu
 
     LEVEL = "L3"
     """Processing Level for DISP-S1 Products"""
+
+    PGE_VERSION = "3.0.0-er.5.1"
 
     SAS_VERSION = "0.1.0"  # Beta release https://github.com/opera-adt/disp-s1/releases/tag/v0.1.0
     """Version of the SAS wrapped by this PGE, should be updated as needed"""

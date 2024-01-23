@@ -181,7 +181,10 @@ RunConfig:
         ProgramOptions: []
 
       DebugLevelGroup:
-        # Set to True to enable Debug mode (TODO this is currently a no-op)
+        # Set to True to enable Debug mode
+        # For the DISP-S1 PGE, enabling Debug mode will bypass the input product
+        # validation step, which can be useful when executing the PGE with
+        # an incomplete set of ancillary inputs (missing bursts, etc...)
         DebugSwitch: False
 
         # Set to True to have the PGE invoke the SAS/QA executables via
