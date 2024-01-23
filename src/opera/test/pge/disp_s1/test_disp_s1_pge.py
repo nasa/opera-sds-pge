@@ -213,7 +213,7 @@ class DispS1PgeTestCase(unittest.TestCase):
         expected_log_file = pge.logger.get_file_name()
         self.assertTrue(os.path.exists(expected_log_file))
 
-        # Lastly, check that the dummy output product was created and renamed
+        # Lastly, check that the dummy output products were created and renamed
         expected_disp_product = join(
             pge.runconfig.output_product_path,
             pge._netcdf_filename(
@@ -221,6 +221,12 @@ class DispS1PgeTestCase(unittest.TestCase):
             )
         )
         self.assertTrue(os.path.exists(expected_disp_product))
+
+        expected_compressed_cslc_product = join(
+            pge.runconfig.output_product_path,
+            pge._compressed_cslc_filename('compressed_t087_185683_iw2_20180222_20180330.h5')
+        )
+        self.assertTrue(os.path.exists(expected_compressed_cslc_product))
 
         # Open and read the log
         with open(expected_log_file, 'r', encoding='utf-8') as infile:
