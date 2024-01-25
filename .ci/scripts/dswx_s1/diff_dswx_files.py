@@ -36,21 +36,21 @@ def _parse_args():
         description='Compares sets DSWx-S1 products with the dswx_comparison.py script'
     )
     parser.add_argument('input dirs',
-        type=str,
-        nargs=2,
-        help='Expected_dir Output_dir')
+                        type=str,
+                        nargs=2,
+                        help='Expected_dir Output_dir')
 
-    print ("len(sys.argv) = ", len(sys.argv))
+    print("len(sys.argv) = ", len(sys.argv))
     if len(sys.argv) == 1:
         parser.print_help()
         sys.exit(0)
     else:
         if len(sys.argv) == 2:
-            print ("Missing Output_dir")
+            print("Missing Output_dir")
             sys.exit(-1)
         else:
-            print ("sys.argv[1] = ", sys.argv[1])
-            print ("sys.argv[2] = ", sys.argv[2])
+            print("sys.argv[1] = ", sys.argv[1])
+            print("sys.argv[2] = ", sys.argv[2])
 
     return sys.argv
 
@@ -120,14 +120,13 @@ def get_files(options):
         output_path = os.path.join(output_dir, out[i])
         cmd1 = "python3"
         cmd2 = "dswx_comparison.py"
-        command = cmd1 + ' ' + cmd2  + ' ' + expected_path + ' ' + output_path
+        command = cmd1 + ' ' + cmd2 + ' ' + expected_path + ' ' + output_path
         print(command)
         os.system(command)
 
 
 def main():
     options = _parse_args()
-
     get_files(options)
 
 

@@ -32,7 +32,7 @@ echo "TAG: $TAG"
 echo "SAS_IMAGE: $SAS_IMAGE"
 
 # Check that the .ci scripts directory exists
-if [ ! -d "${WORKSPACE}" ]; then
+if [ ! -d "${WORKSPACE}/.ci" ]; then
   echo "Error: the .ci directory doesn't exist at ${WORKSPACE}/.ci"
   exit 1
 fi
