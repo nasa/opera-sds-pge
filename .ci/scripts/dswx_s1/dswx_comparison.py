@@ -39,6 +39,7 @@ def _get_prefix_str(flag_same, flag_all_ok):
     else:
         return '[FAIL]'
 
+
 def _print_first_value_diff(image_1, image_2, prefix):
     """
     Print first value difference between two images.

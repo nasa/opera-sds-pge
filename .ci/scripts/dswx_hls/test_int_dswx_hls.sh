@@ -161,7 +161,7 @@ do
                                      -v "${expected_data_dir}":/exp:ro \
                                      -v "$SCRIPT_DIR":/scripts \
                                      --entrypoint python3 ${PGE_IMAGE}:"${PGE_TAG}" \
-                                     /scripts/dswx_compare_opera_pge.py \
+                                     /scripts/dswx_hls/dswx_compare_opera_pge.py \
                                      /out/"${output_file}" /exp/"${expected_file}" --metadata_exclude_list PRODUCT_VERSION)
                     echo "$docker_out"
 
