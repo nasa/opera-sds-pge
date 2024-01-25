@@ -23,13 +23,11 @@ RunConfig:
         ProgramPath: /bin/echo
         ProgramOptions:
         - hello world > dswx_ni_pge_test/output_dir/OPERA_L3_DSWx-NI_T18MVA_20200702T231843Z_20230317T190549Z_v0.1_B01_WTR.tif;
-        - /bin/echo hello world > dswx_ni_pge_test/output_dir/OPERA_L3_DSWx-NI_T18MVA_20200702T231843Z_20230317T190549Z_v0.1_B02_BWTR.tif;
-        - /bin/echo hello world > dswx_ni_pge_test/output_dir/OPERA_L3_DSWx-NI_T18MVA_20200702T231843Z_20230317T190549Z_v0.1_B03_CONF.tif;
         - /bin/echo DSWx-NI invoked with RunConfig
         ErrorCodeBase: 400000
         SchemaPath: pge/dswx_ni/schema/dswx_ni_sas_schema.yaml
         AlgorithmParametersSchemaPath: pge/dswx_ni/schema/algorithm_parameters_ni_schema.yaml
-        IsoTemplatePath: pge/dswx_ni/templates/OPERA_ISO_metadata_L3_DSWx_NI_template.xml.jinja2
+        IsoTemplatePath:
       QAExecutable:
         Enabled: false
         ProgramPath: null
