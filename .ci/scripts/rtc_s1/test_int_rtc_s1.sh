@@ -5,7 +5,7 @@ set -e
 umask 002
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
-. "$SCRIPT_DIR"/../test_int_util.sh
+. "$SCRIPT_DIR"/../util/test_int_util.sh
 . "$SCRIPT_DIR"/../util/util.sh
 
 # Parse args
