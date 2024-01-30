@@ -14,7 +14,7 @@ Testing all OPERA PGE docker images...
 TAG=$1
 
 # defaults
-[ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath $(dirname $(realpath $0))/../..)
+[ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath $(dirname $(realpath $0))/../../..)
 [ -z "${TAG}" ] && TAG="${USER}-dev"
 
 echo "WORKSPACE: $WORKSPACE"
@@ -28,11 +28,11 @@ fi
 
 # Build all of the Docker images
 BUILD_SCRIPTS_DIR=${WORKSPACE}/.ci/scripts
-${BUILD_SCRIPTS_DIR}/test_dswx_hls.sh --tag ${TAG} --workspace ${WORKSPACE}
-${BUILD_SCRIPTS_DIR}/test_cslc_s1.sh --tag ${TAG} --workspace ${WORKSPACE}
-${BUILD_SCRIPTS_DIR}/test_rtc_s1.sh --tag ${TAG} --workspace ${WORKSPACE}
-${BUILD_SCRIPTS_DIR}/test_dswx_s1.sh --tag ${TAG} --workspace ${WORKSPACE}
-${BUILD_SCRIPTS_DIR}/test_disp_s1.sh --tag ${TAG} --workspace ${WORKSPACE}
+${BUILD_SCRIPTS_DIR}/dswx_hls/test_dswx_hls.sh --tag ${TAG} --workspace ${WORKSPACE}
+${BUILD_SCRIPTS_DIR}/cslc_s1/test_cslc_s1.sh --tag ${TAG} --workspace ${WORKSPACE}
+${BUILD_SCRIPTS_DIR}/rtc_s1/test_rtc_s1.sh --tag ${TAG} --workspace ${WORKSPACE}
+${BUILD_SCRIPTS_DIR}/dswx_s1/test_dswx_s1.sh --tag ${TAG} --workspace ${WORKSPACE}
+${BUILD_SCRIPTS_DIR}/disp_s1/test_disp_s1.sh --tag ${TAG} --workspace ${WORKSPACE}
 
 echo 'Build Complete'
 

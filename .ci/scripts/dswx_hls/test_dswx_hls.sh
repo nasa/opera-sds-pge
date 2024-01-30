@@ -1,12 +1,12 @@
 #!/bin/bash
-# Script to execute unit tests on the OPERA DISP-S1 PGE Docker image
+# Script to execute unit tests on the OPERA DSWx-HLS PGE Docker image
 
 set -e
 
 # Source the build script utility functions
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
-. "${SCRIPT_DIR}"/util.sh
+. "${SCRIPT_DIR}"/../util/util.sh
 
 # Parse args
 parse_build_args "$@"
@@ -14,19 +14,19 @@ parse_build_args "$@"
 echo '
 =====================================
 
-Testing DISP-S1 PGE Docker image...
+Testing DSWx-HLS PGE Docker image...
 
 =====================================
 '
 
-PGE_NAME="disp_s1"
+PGE_NAME="dswx_hls"
 IMAGE="opera_pge/${PGE_NAME}"
 TEST_RESULTS_REL_DIR="test_results"
-CONTAINER_HOME="/home/mamba"
+CONTAINER_HOME="/home/conda"
 CONDA_ROOT="/opt/conda"
 
 # defaults
-[ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath $(dirname $(realpath $0))/../..)
+[ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath $(dirname $(realpath $0))/../../..)
 [ -z "${TAG}" ] && TAG="${USER}-dev"
 
 TEST_RESULTS_DIR="${WORKSPACE}/${TEST_RESULTS_REL_DIR}/${PGE_NAME}"
@@ -61,24 +61,24 @@ function set_perms {
 trap set_perms EXIT
 
 # linting and pep8 style check (configured by .flake8 and .pylintrc)
-${DOCKER_RUN} bash -c "source /usr/local/bin/_activate_current_env.sh; flake8 \
+${DOCKER_RUN} flake8 \
     --config ${CONTAINER_HOME}/opera/.flake8 \
     --jobs auto \
     --exit-zero \
     --application-import-names opera \
     --output-file /workspace/${TEST_RESULTS_REL_DIR}/${PGE_NAME}/flake8.log \
-    ${CONTAINER_HOME}/opera"
+    ${CONTAINER_HOME}/opera
 
-${DOCKER_RUN} bash -c "export HOME=/home/mamba/opera; source /usr/local/bin/_activate_current_env.sh; pylint \
+${DOCKER_RUN} pylint \
     --rcfile=${CONTAINER_HOME}/opera/.pylintrc \
     --jobs 0 \
     --exit-zero \
     --output=/workspace/${TEST_RESULTS_REL_DIR}/${PGE_NAME}/pylint.log \
     --enable-all-extensions \
-    ${CONTAINER_HOME}/opera"
+    ${CONTAINER_HOME}/opera
 
 # pytest (including code coverage)
-${DOCKER_RUN} bash -c "source /usr/local/bin/_activate_current_env.sh; pytest \
+${DOCKER_RUN} bash -c "pytest \
     --junit-xml=/workspace/${TEST_RESULTS_REL_DIR}/${PGE_NAME}/pytest-junit.xml \
     --cov=${CONTAINER_HOME}/opera/pge/base \
     --cov=${CONTAINER_HOME}/opera/pge/${PGE_NAME} \
@@ -91,6 +91,6 @@ ${DOCKER_RUN} bash -c "source /usr/local/bin/_activate_current_env.sh; pytest \
     /workspace/src/opera/test/scripts \
     /workspace/src/opera/test/util > /workspace/${TEST_RESULTS_REL_DIR}/${PGE_NAME}/pytest.log 2>&1"
 
-echo "DISP-S1 PGE Docker image test complete"
+echo "DSWx-HLS PGE Docker image test complete"
 
 exit 0

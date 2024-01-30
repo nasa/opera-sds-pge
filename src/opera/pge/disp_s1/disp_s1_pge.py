@@ -76,8 +76,9 @@ class DispS1PreProcessorMixin(PreProcessorMixin):
         section now points to the converted .nc files in the scratch directory.
 
         """
-        # Retrieve the troposphere weather model file group from the run config file
-        troposphere_model_files_list = self.runconfig.sas_config['dynamic_ancillary_file_group']['troposphere_files']
+        # Retrieve the troposphere weather model file group (if provided) from
+        # the run config file
+        troposphere_model_files_list = self.runconfig.sas_config['dynamic_ancillary_file_group'].get('troposphere_files', {})
 
         # Converted files will be stored in the scratch directory.
         scratch_dir = self.runconfig.sas_config['product_path_group']['scratch_path']

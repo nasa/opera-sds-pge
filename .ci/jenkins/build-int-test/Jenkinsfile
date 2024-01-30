@@ -29,7 +29,7 @@ pipeline {
                         DOCKER_IMAGE_SUFFIXES.tokenize(',').each { DOCKER_IMAGE_SUFFIX ->
                             echo "Building ${DOCKER_IMAGE_PREFIX}/${DOCKER_IMAGE_SUFFIX} docker image with tag ${DOCKER_TAG}"
                             sh label: "Build ${DOCKER_IMAGE_PREFIX}/${DOCKER_IMAGE_SUFFIX} OPERA Docker image",
-                               script: ".ci/scripts/build_${DOCKER_IMAGE_SUFFIX}.sh --tag $DOCKER_TAG"
+                               script: ".ci/scripts/${DOCKER_IMAGE_SUFFIX}/build_${DOCKER_IMAGE_SUFFIX}.sh --tag $DOCKER_TAG"
                         }
                     }
                 }
@@ -68,7 +68,7 @@ pipeline {
                            script: """#!/bin/bash
                            . /var/lib/jenkins/.bashrc
                            conda activate int_test_env
-                           .ci/scripts/test_int_${DOCKER_IMAGE_SUFFIX}.sh --tag ${DOCKER_TAG}
+                           .ci/scripts/${DOCKER_IMAGE_SUFFIX}/test_int_${DOCKER_IMAGE_SUFFIX}.sh --tag ${DOCKER_TAG}
                            """
 
                         echo "Test returned code ${statusCode}"
@@ -107,7 +107,7 @@ pipeline {
     post {
         always {
             echo "Cleaning up Docker images from local host"
-            sh ".ci/scripts/cleanup.sh ${DOCKER_TAG}"
+            sh ".ci/scripts/util/cleanup.sh ${DOCKER_TAG}"
             echo "Removing int test conda environment"
             sh "/usr/local/anaconda3/bin/conda env remove --name int_test_env"
             sh "/usr/local/anaconda3/bin/conda init --reverse"

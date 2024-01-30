@@ -16,6 +16,7 @@ COMPARISON_EXCEPTION_LIST = ['PROCESSING_DATETIME',
                              'INPUT_SHORELINE_SOURCE',
                              'SOFTWARE_VERSION']
 
+
 def _get_parser():
     parser = argparse.ArgumentParser(
         description='Compare two DSWx-SAR products',
@@ -29,12 +30,15 @@ def _get_parser():
 
     return parser
 
+
 def _get_prefix_str(flag_same, flag_all_ok):
     flag_all_ok[0] = flag_all_ok[0] and flag_same
+
     if flag_same:
         return '[OK]'
     else:
         return '[FAIL]'
+
 
 def _print_first_value_diff(image_1, image_2, prefix):
     """
@@ -57,13 +61,14 @@ def _print_first_value_diff(image_1, image_2, prefix):
                 flag_error_found = True
 
                 print(prefix + f'     * input 1 has value'
-                    f' "{image_1[i, j]}" in position'
-                    f' (x: {j}, y: {i})'
-                    f' whereas input 2 has value "{image_2[i, j]}"'
-                    ' in the same position.')
+                      f' "{image_1[i, j]}" in position'
+                      f' (x: {j}, y: {i})'
+                      f' whereas input 2 has value "{image_2[i, j]}"'
+                      ' in the same position.')
                 break
         if flag_error_found:
             break
+
 
 def _compare_dswx_sar_metadata(metadata_1, metadata_2):
     """
@@ -82,7 +87,7 @@ def _compare_dswx_sar_metadata(metadata_1, metadata_2):
         metadata_error_message = (
             f'* input 1 metadata has {len(metadata_1.keys())} entries'
             f' whereas input 2 metadata has {len(metadata_2.keys())} entries.')
-        
+
         set_1_m_2 = set(metadata_1.keys()) - set(metadata_2.keys())
         if len(set_1_m_2) > 0:
             metadata_error_message += (' Input 1 metadata has extra entries'
@@ -114,6 +119,7 @@ def _compare_dswx_sar_metadata(metadata_1, metadata_2):
             break
 
     return metadata_error_message, flag_same_metadata
+
 
 def compare_dswx_sar_products(file_1, file_2):
 
@@ -203,6 +209,7 @@ def compare_dswx_sar_products(file_1, file_2):
 
     return flag_all_ok[0]
 
+
 def main():
     parser = _get_parser()
 
@@ -215,5 +222,4 @@ def main():
 
 
 if __name__ == '__main__':
-
     main()

@@ -5,8 +5,8 @@ set -e
 umask 002
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
-. "$SCRIPT_DIR"/test_int_util.sh
-. "$SCRIPT_DIR"/util.sh
+. "$SCRIPT_DIR"/../util/test_int_util.sh
+. "$SCRIPT_DIR"/../util/util.sh
 
 # Parse args
 test_int_parse_args "$@"
@@ -25,7 +25,7 @@ SAMPLE_TIME=15
 # the latest available as defaults for use with the Jenkins pipeline call
 # INPUT/OUTPUT_DATA should be the name of the test data archive in s3://operasds-dev-pge/${PGE_NAME}/
 # RUNCONFIG should be the name of the runconfig in s3://operasds-dev-pge/${PGE_NAME}/
-[ -z "${WORKSPACE}" ] && WORKSPACE="$(realpath "$(dirname "$(realpath "$0")")"/../..)"
+[ -z "${WORKSPACE}" ] && WORKSPACE="$(realpath "$(dirname "$(realpath "$0")")"/../../..)"
 [ -z "${PGE_TAG}" ] && PGE_TAG="${USER}-dev"
 [ -z "${INPUT_DATA}" ] && INPUT_DATA="rtc_s1_delivery_5.1_final_1.0.1_expected_input.zip"
 [ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="rtc_s1_delivery_5.1_final_1.0.1_expected_output.zip"

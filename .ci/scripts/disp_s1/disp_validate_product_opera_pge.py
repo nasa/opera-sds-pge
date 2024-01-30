@@ -19,7 +19,6 @@ else:
 
 DSET_DEFAULT = "unwrapped_phase"
 
-
 # Opera PGE modifications to log errors and continue validation.
 '''
 class ValidationError(Exception):
@@ -85,7 +84,7 @@ def compare_groups(
     """
     # Check if group names match
     if set(golden_group.keys()) != set(test_group.keys()):
-        #raise ComparisonError(
+        # raise ComparisonError(
         ComparisonError(
             f"Group keys do not match: {set(golden_group.keys())} vs"
             f" {set(test_group.keys())}"
@@ -133,28 +132,28 @@ def _compare_datasets_attr(
     golden_dataset: h5py.Dataset, test_dataset: h5py.Dataset
 ) -> None:
     if golden_dataset.name != test_dataset.name:
-        #raise ComparisonError(
+        # raise ComparisonError(
         ComparisonError(
             f"Dataset names do not match: {golden_dataset.name} vs {test_dataset.name}"
         )
     name = golden_dataset.name
 
     if golden_dataset.shape != test_dataset.shape:
-        #raise ComparisonError(
+        # raise ComparisonError(
         ComparisonError(
             f"{name} shapes do not match: {golden_dataset.shape} vs"
             f" {test_dataset.shape}"
         )
 
     if golden_dataset.dtype != test_dataset.dtype:
-        #raise ComparisonError(
+        # raise ComparisonError(
         ComparisonError(
             f"{name} dtypes do not match: {golden_dataset.dtype} vs"
             f" {test_dataset.dtype}"
         )
 
     if golden_dataset.attrs.keys() != test_dataset.attrs.keys():
-        #raise ComparisonError(
+        # raise ComparisonError(
         ComparisonError(
             f"{name} attribute keys do not match: {golden_dataset.attrs.keys()} vs"
             f" {test_dataset.attrs.keys()}"
@@ -171,7 +170,7 @@ def _compare_datasets_attr(
         else:
             is_equal = val1 == val2
         if not is_equal:
-            #raise ComparisonError(
+            # raise ComparisonError(
             ComparisonError(
                 f"{name} attribute values for key '{attr_key}' do not match: "
                 f"{golden_dataset.attrs[attr_key]} vs {test_dataset.attrs[attr_key]}"
@@ -234,12 +233,12 @@ def _validate_conncomp_labels(
             "shape mismatch: test dataset and reference dataset must have the same"
             f" shape, got {test_dataset.shape} vs {ref_dataset.shape}"
         )
-        #raise ComparisonError(errmsg)
+        # raise ComparisonError(errmsg)
         ComparisonError(errmsg)
 
     if not (0.0 <= threshold <= 1.0):
         errmsg = f"threshold must be between 0 and 1, got {threshold}"
-        #raise ValueError(errmsg)
+        # raise ValueError(errmsg)
         ValueError(errmsg)
 
     # Total size of each dataset.
@@ -274,7 +273,7 @@ def _validate_conncomp_labels(
             " validation: insufficient area of overlap between test and reference"
             f" nonzero labels ({ratio} < {threshold})"
         )
-        #raise ComparisonError(errmsg)
+        # raise ComparisonError(errmsg)
         ComparisonError(errmsg)
 
 
@@ -323,7 +322,7 @@ def _validate_unwrapped_phase(
             "shape mismatch: test dataset and reference dataset must have the same"
             f" shape, got {test_dataset.shape} vs {ref_dataset.shape}"
         )
-        #raise ComparisonError(errmsg)
+        # raise ComparisonError(errmsg)
         ComparisonError(errmsg)
 
     if (test_dataset.shape != test_conncomps.shape) or (
@@ -333,17 +332,17 @@ def _validate_unwrapped_phase(
             "shape mismatch: unwrapped phase and connected component labels must have"
             " the same shape"
         )
-        #raise ValidationError(errmsg)
+        # raise ValidationError(errmsg)
         ValidationError(errmsg)
 
     if not (0.0 <= nan_threshold <= 1.0):
         errmsg = f"nan_threshold must be between 0 and 1, got {nan_threshold}"
-        #raise ValueError(errmsg)
+        # raise ValueError(errmsg)
         ValueError(errmsg)
 
     if atol < 0.0:
         errmsg = f"atol must be >= 0, got {atol}"
-        #raise ValueError(errmsg)
+        # raise ValueError(errmsg)
         ValueError(errmsg)
 
     # Get a mask of valid pixels (pixels that had nonzero connected component label) in
@@ -377,7 +376,7 @@ def _validate_unwrapped_phase(
             f"unwrapped phase dataset {test_dataset.name!r} failed validation: too"
             f" many nan values ({test_nan_frac} > {nan_threshold})"
         )
-        #raise ValidationError(errmsg)
+        # raise ValidationError(errmsg)
         ValidationError(errmsg)
 
     def rewrap(phi: np.ndarray) -> np.ndarray:
@@ -410,7 +409,7 @@ def _validate_unwrapped_phase(
             f"unwrapped phase dataset {test_dataset.name!r} failed validation: phase"
             " values were not congruent with reference dataset"
         )
-        #raise ComparisonError(errmsg)
+        # raise ComparisonError(errmsg)
         ComparisonError(errmsg)
 
 
@@ -444,7 +443,7 @@ def _validate_dataset(
     test = test_dataset[()]
     if golden.dtype.kind == "S":
         if not np.array_equal(golden, test):
-            #raise ComparisonError(f"Dataset {golden_dataset.name} values do not match")
+            # raise ComparisonError(f"Dataset {golden_dataset.name} values do not match")
             ComparisonError(f"Dataset {golden_dataset.name} values do not match")
         return
 
@@ -455,7 +454,7 @@ def _validate_dataset(
     # num_pixels = np.count_nonzero(~np.isnan(img_gold))  # do i want this?
     num_pixels = img_gold.size
     if num_failed / num_pixels > pixels_failed_threshold:
-        #raise ComparisonError(
+        # raise ComparisonError(
         ComparisonError(
             f"Dataset {golden_dataset.name} values do not match: Number of"
             f" pixels failed: {num_failed} / {num_pixels} ="
@@ -483,7 +482,7 @@ def _check_raster_geometadata(golden_file: Filename, test_file: Filename) -> Non
         val_golden = func(golden_file)  # type: ignore
         val_test = func(test_file)  # type: ignore
         if val_golden != val_test:
-            #raise ComparisonError(f"{func} does not match: {val_golden} vs {val_test}")
+            # raise ComparisonError(f"{func} does not match: {val_golden} vs {val_test}")
             ComparisonError(f"{func} does not match: {val_golden} vs {val_test}")
 
 
@@ -512,7 +511,7 @@ def _check_compressed_slc_dirs(golden: Filename, test: Filename) -> None:
         logger.info("No compressed SLC directory found in golden product.")
         return
     if not test_slc_dir.exists():
-        #raise ComparisonError(
+        # raise ComparisonError(
         ComparisonError(
             f"{test_slc_dir} does not exist, but {golden_slc_dir} exists."
         )
@@ -521,7 +520,7 @@ def _check_compressed_slc_dirs(golden: Filename, test: Filename) -> None:
     test_slc_names = [p.name for p in test_slc_dir.iterdir()]
 
     if set(golden_slc_names) != set(test_slc_names):
-        #raise ComparisonError(
+        # raise ComparisonError(
         ComparisonError(
             f"Compressed SLC directories do not match: {golden_slc_names} vs"
             f" {test_slc_names}"

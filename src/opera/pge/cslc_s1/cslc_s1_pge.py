@@ -11,7 +11,6 @@ from Sentinel-1 A/B (S1) PGE.
 """
 import glob
 import os.path
-import re
 from datetime import datetime
 from os import walk
 from os.path import getsize, join
