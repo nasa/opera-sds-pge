@@ -27,12 +27,17 @@ if [ ! -d "${WORKSPACE}/.ci" ]; then
 fi
 
 # Build all of the Docker images
+# options:
+# --tag: docker file tag (defaults to <user_name>-dev)
+# --workspace: path to the .ci directory in the user repository
+# --no-cleanup: (optional) disable the automatic deletion of the temporary working directory after the script completes.
+# --no-metrics: (optional) disable the metrics collection that occurs during PGE execution.
 BUILD_SCRIPTS_DIR=${WORKSPACE}/.ci/scripts
-${BUILD_SCRIPTS_DIR}/dswx_hls/test_dswx_hls.sh --tag ${TAG} --workspace ${WORKSPACE}
+${BUILD_SCRIPTS_DIR}/dswx_hls/test_dswx_hls.sh --tag ${TAG} --workspace ${WORKSPACE} --no-cleanup --no-metrics
 ${BUILD_SCRIPTS_DIR}/cslc_s1/test_cslc_s1.sh --tag ${TAG} --workspace ${WORKSPACE}
-${BUILD_SCRIPTS_DIR}/rtc_s1/test_rtc_s1.sh --tag ${TAG} --workspace ${WORKSPACE}
+${BUILD_SCRIPTS_DIR}/rtc_s1/test_rtc_s1.sh --tag ${TAG} --workspace ${WORKSPACE} --no-cleanup --no-metrics
 ${BUILD_SCRIPTS_DIR}/dswx_s1/test_dswx_s1.sh --tag ${TAG} --workspace ${WORKSPACE}
-${BUILD_SCRIPTS_DIR}/disp_s1/test_disp_s1.sh --tag ${TAG} --workspace ${WORKSPACE}
+${BUILD_SCRIPTS_DIR}/disp_s1/test_disp_s1.sh --tag ${TAG} --workspace ${WORKSPACE} --no-cleanup --no-metrics
 
 echo 'Build Complete'
 

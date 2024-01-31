@@ -36,12 +36,20 @@ parse_build_args()
   done
 }
 
+# Initialize flags
+DELETE_TEMP_FILES=true
+COLLECT_METRICS=true
+
+# optional arguments for the test scripts
+#   --no-cleanup: Disable the automatic deletion of the temporary working directory after the script completes.
+#   --no-metrics: Disable the metrics collection that occurs during PGE execution
+# e.g. ../test_dswx_hls.sh --tag ${TAG} --workspace ${WORKSPACE} --no-cleanup --no-metrics
 parse_test_args()
 {
   while [[ $# -gt 0 ]]; do
   case $1 in
     -h|--help)
-      echo "Usage: $(basename $0) [-h|--help] [-t|--tag <tag>] [-w|--workspace <path>]"
+      echo "Usage: $(basename $0) [-h|--help] [-t|--tag <tag>] [-w|--workspace <path>] [--no-cleanup] [--no-metrics]"
       exit 0
       ;;
     -t|--tag)
@@ -52,6 +60,51 @@ parse_test_args()
     -w|--workspace)
       WORKSPACE=$2
       shift
+      shift
+      ;;
+     --no-cleanup)
+      DELETE_TEMP_FILES=false
+      shift
+      ;;
+    --no-metrics)
+      COLLECT_METRICS=false
+      shift
+      ;;
+    -*|--*)
+      echo "Unknown arguments $1 $2, ignoring..."
+      shift
+      shift
+      ;;
+    *)
+      echo "Unknown argument $1, ignoring..."
+      shift
+      ;;
+  esac
+  done
+}()
+{
+  while [[ $# -gt 0 ]]; do
+  case $1 in
+    -h|--help)
+      echo "Usage: $(basename $0) [-h|--help] [-t|--tag <tag>] [-w|--workspace <path>] [--no-cleanup] [--no-metrics]"
+      exit 0
+      ;;
+    -t|--tag)
+      TAG=$2
+      shift
+      shift
+      ;;
+    -w|--workspace)
+      WORKSPACE=$2
+      shift
+      shift
+      ;;
+     --no-cleanup)
+      DELETE_TEMP_FILES=true
+      shift
+      ;;
+    --no-metrics)
+      COLLECT_METRICS=false
       shift
       ;;
     -*|--*)
@@ -68,11 +121,14 @@ parse_test_args()
 }
 
 build_script_cleanup() {
-  if [[ -z ${KEEP_TEMP_FILES} ]]; then
+  if $DELETE_TEMP_FILES; then
     echo "Cleaning up staging directory ${STAGING_DIR}..."
     rm -rf ${STAGING_DIR}
+  else
+    echo "--no-cleanup flag set: Skipping deletion of staging directory ${STAGING_DIR}."
   fi
 }
+
 
 copy_pge_files() {
   WORKSPACE=$1
@@ -121,6 +177,10 @@ copy_pge_files() {
 #     sample_time:  The time between sampling of the statistics.
 metrics_collection_start()
 {
+    if ! $COLLECT_METRICS; then
+        echo "--no-metrics flag is set: Skipping metrics collection."
+        return
+    fi
     echo "Start Metrics Collection"
     local pge=$1
     local container_name=$2
@@ -196,6 +256,10 @@ metrics_collection_start()
 #                  These intermediate file will be processed written to .csv files and deleted.
 metrics_collection_end()
 {
+    if ! $COLLECT_METRICS; then
+        echo "--no-metrics flag is set: Skipping metrics collection end."
+        return
+    fi
     local pge=$1
     local container=$2
     local exit_code=$3
