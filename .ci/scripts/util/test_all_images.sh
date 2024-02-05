@@ -29,7 +29,7 @@ fi
 # Build all of the Docker images
 # options:
 # --tag: docker file tag (defaults to <user_name>-dev)
-# --workspace: path to the .ci directory in the user repository
+# --workspace: defaults to the absolute path to the .ci directory
 # --no-cleanup: (optional) disable the automatic deletion of the temporary working directory after the script completes.
 # --no-metrics: (optional) disable the metrics collection that occurs during PGE execution.
 BUILD_SCRIPTS_DIR=${WORKSPACE}/.ci/scripts
