@@ -10,7 +10,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 . "$SCRIPT_DIR"/../util/util.sh
 
 # Parse args
-test_int_parse_args "$@"
+parse_test_args "$@"
 
 echo '
 ================================================

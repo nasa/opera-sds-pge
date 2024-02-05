@@ -63,44 +63,8 @@ parse_test_args()
       shift
       ;;
      --no-cleanup)
+      echo "Setting DELETE_TEMP_FILES to false"
       DELETE_TEMP_FILES=false
-      shift
-      ;;
-    --no-metrics)
-      COLLECT_METRICS=false
-      shift
-      ;;
-    -*|--*)
-      echo "Unknown arguments $1 $2, ignoring..."
-      shift
-      shift
-      ;;
-    *)
-      echo "Unknown argument $1, ignoring..."
-      shift
-      ;;
-  esac
-  done
-}
-{
-  while [[ $# -gt 0 ]]; do
-  case $1 in
-    -h|--help)
-      echo "Usage: $(basename $0) [-h|--help] [-t|--tag <tag>] [-w|--workspace <path>] [--no-cleanup] [--no-metrics]"
-      exit 0
-      ;;
-    -t|--tag)
-      TAG=$2
-      shift
-      shift
-      ;;
-    -w|--workspace)
-      WORKSPACE=$2
-      shift
-      shift
-      ;;
-     --no-cleanup)
-      DELETE_TEMP_FILES=true
       shift
       ;;
     --no-metrics)
