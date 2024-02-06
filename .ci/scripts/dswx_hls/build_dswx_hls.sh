@@ -69,7 +69,7 @@ else
 fi
 
 # Build the PGE docker image
-docker build ${PLATFORM} --rm --force-rm -t ${IMAGE}:${TAG} \
+docker build ${PLATFORM} --progress plain --rm --force-rm -t ${IMAGE}:${TAG} \
     --build-arg SAS_IMAGE=${SAS_IMAGE} \
     --build-arg BUILD_DATE_TIME=${BUILD_DATE_TIME} \
     --build-arg BUILD_VERSION=${TAG} \
