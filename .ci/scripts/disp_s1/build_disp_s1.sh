@@ -45,8 +45,6 @@ STAGING_DIR=$(mktemp -d -p ${WORKSPACE} docker_image_staging_XXXXXXXXXX)
 trap build_script_cleanup EXIT
 
 # Copy files to the staging area and build the PGE docker image
-mkdir -p ${STAGING_DIR}/opera/pge
-
 copy_pge_files $WORKSPACE $STAGING_DIR $PGE_NAME
 
 # Create a VERSION file in the staging area to track version and build time
