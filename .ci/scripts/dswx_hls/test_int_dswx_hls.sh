@@ -45,12 +45,6 @@ test_int_setup_test_data
 # Setup cleanup on exit
 trap test_int_trap_cleanup EXIT
 
-# overall_status values and their meaning
-# 0 - pass
-# 1 - failure to execute some part of this script
-# 2 - product validation failure
-overall_status=0
-
 # For each <data_set> directory, run the Docker image to produce a <data_set>/output_dir
 # directory and then compare the contents of the output and expected directories
 for data_set in l30_greenland s30_louisiana
@@ -69,7 +63,7 @@ do
 
     # make sure no output directory already exists
     if [ -d "$output_dir" ]; then
-        echo "Output directory $output_dir already exists (and should not). Removing directory."
+        echo "Output directory $output_dir already exists. Removing directory."
         rm -rf "${output_dir}"
     fi
 
@@ -81,7 +75,7 @@ do
 
     # make sure no scratch directory already exists
     if [ -d "$scratch_dir" ]; then
-        echo "Scratch directory $scratch_dir already exists (and should not). Removing directory.."
+        echo "Scratch directory $scratch_dir already exists. Removing directory."
         rm -rf "${scratch_dir}"
     fi
     echo "Creating scratch directory $scratch_dir."
@@ -93,12 +87,13 @@ do
     # Start metrics collection
     metrics_collection_start "$PGE_NAME" "$container_name" "$TEST_RESULTS_DIR" "$SAMPLE_TIME"
 
-    echo "Running Docker image ${PGE_IMAGE}:${PGE_TAG} for ${input_data_dir}"
+    echo "Running Docker image ${PGE_IMAGE}:${PGE_TAG} for ${data_set}"
     docker run --rm -u $UID:"$(id -g)" --name $container_name \
                 -v "${TMP_DIR}/runconfig":/home/conda/runconfig:ro \
                 -v "$input_data_dir":/home/conda/input_dir:ro \
                 -v "$output_dir":/home/conda/output_dir \
                 -v "$scratch_dir":/home/conda/scratch_dir \
+                -v "$expected_data_dir":/home/conda/expected_output_dir \
                 ${PGE_IMAGE}:"${PGE_TAG}" --file /home/conda/runconfig/"$RUNCONFIG"
 
     docker_exit_status=$?
@@ -110,85 +105,18 @@ do
     # by Jenkins with the other results
     cp "${output_dir}"/*.log "${TEST_RESULTS_DIR}"
 
+    # Copy the HTML-formatted comparison results as well
+    cp "${output_dir}"/test_int_dswx_hls_results.html "${TEST_RESULTS_DIR}"/test_int_dswx_hls_${data_set}_results.html
+
     if [ $docker_exit_status -ne 0 ]; then
         echo "docker exit indicates failure: ${docker_exit_status}"
         overall_status=1
     else
-        # Compare output files against expected files
-        for output_file in "$output_dir"/*
-        do
-            docker_out="N/A"
-            compare_result="N/A"
-            expected_file="N/A"
-
-            echo "output_file $output_file"
-            output_file=$(basename -- "$output_file")
-
-            if [[ "${output_file##*/}" == *.log ]]
-            then
-                echo "Not comparing log file ${output_file}"
-                compare_result="SKIPPED"
-
-            elif [[ "${output_file##*/}" == *.tif* ]]
-            then
-                for potential_product in B01_WTR B02_BWTR B03_CONF B04_DIAG B05_WTR-1 B06_WTR-2 B07_LAND B08_SHAD B09_CLOUD B10_DEM BROWSE
-                do
-                    if [[ "$output_file" == *"$potential_product"* ]]; then
-                        product=$potential_product
-                        break
-                    fi
-                done
-
-                echo "product is $product"
-
-                for potential_file in "$expected_data_dir"/*.tif*
-                do
-                    if [[ "$potential_file" == *"$product"* ]]; then
-                        echo "expected file is $potential_file"
-                        expected_file=$potential_file
-                        break
-                    fi
-                done
-
-                if [ ! -f "$expected_file" ]; then
-                    echo "No expected file found for product $product in expected directory $expected_data_dir"
-                    overall_status=1
-                else
-                    # compare output and expected files
-                    expected_file=$(basename -- "$expected_file")
-                    docker_out=$(docker run --rm -u conda:conda \
-                                     -v "${output_dir}":/out:ro \
-                                     -v "${expected_data_dir}":/exp:ro \
-                                     -v "$SCRIPT_DIR":/scripts \
-                                     --entrypoint python3 ${PGE_IMAGE}:"${PGE_TAG}" \
-                                     /scripts/dswx_compare_opera_pge.py \
-                                     /out/"${output_file}" /exp/"${expected_file}" --metadata_exclude_list PRODUCT_VERSION)
-                    echo "$docker_out"
-
-                    if [[ "$docker_out" == *"[FAIL]"* ]]; then
-                        echo "File comparison failed. Output and expected files differ for ${output_file}"
-                        compare_result="FAIL"
-                        overall_status=2
-                    elif [[ "$docker_out" == *"ERROR"* ]]; then
-                        echo "An error occurred during file comparison."
-                        compare_result="ERROR"
-                        overall_status=1
-                    else
-                        echo "File comparison passed for ${output_file}"
-                        compare_result="PASS"
-                    fi
-                fi
-            else
-                echo "Not comparing file ${output_file}"
-                compare_result="SKIPPED"
-            fi
-
-            docker_out="${docker_out//$'\n'/<br>}"
-            echo "<tr><td>${compare_result}</td><td><ul><li>Output: ${output_file}</li><li>Expected: ${expected_file}</li></ul></td><td>${docker_out}</td></tr>" >> "$RESULTS_FILE"
-        done
+        # Retrieve the return code written to disk by the comparison script
+        overall_status=$(cat "$output_dir/compare_dswx_hls_products.rc")
     fi
 done
-echo " "
+
 if [ $overall_status -ne 0 ]; then
     echo "Test FAILED."
 else
