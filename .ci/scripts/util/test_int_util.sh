@@ -76,16 +76,39 @@ test_int_setup_results_directory()
     echo "Test results output directory: ${TEST_RESULTS_DIR}"
     mkdir --parents ${TEST_RESULTS_DIR}
     chmod -R 775 ${TEST_RESULTS_DIR}
-    RESULTS_FILE="${TEST_RESULTS_DIR}/test_int_${PGE_NAME}_results.html"
+}
+
+initialize_html_results_file()
+{
+    local output_dir=$1
+    local pge_name=$2
+
+    RESULTS_FILE="${output_dir}/test_int_${pge_name}_results.html"
 
     # Add the initial HTML to the results file
-    results_html_init="<html><b>${PGE_NAME} product comparison results</b><p> \
+    results_html_init="<html><b>${pge_name} product comparison results</b><p> \
         <style>* {font-family: sans-serif;} \
         table {border-collapse: collapse;} \
         th,td {padding: 4px 6px; border: thin solid white} \
         tr:nth-child(even) {background-color: whitesmoke;} \
         </style><table>"
-    echo "${results_html_init}" > ${RESULTS_FILE}
+
+    echo "${results_html_init}" > "$RESULTS_FILE"
+}
+
+update_html_results_file()
+{
+    local compare_result=$1
+    local output_file=$2
+    local expected_file=$3
+    local compare_out=$4
+
+    echo "<tr><td>${compare_result}</td><td><ul><li>Output: ${output_file}</li><li>Expected: ${expected_file}</li></ul></td><td>${compare_out}</td></tr>" >> "$RESULTS_FILE"
+}
+
+finalize_html_results_file()
+{
+    echo "</table></html>" >> "$RESULTS_FILE"
 }
 
 test_int_setup_data_tmp_directory()
@@ -153,10 +176,8 @@ test_int_setup_test_data()
 
 test_int_trap_cleanup_temp_dir()
 {
-    # Finalize results HTML file and set permissions on data that was created during the test.
-
-    echo "</table></html>" >> $RESULTS_FILE
-
+    # set permissions on data that was created during the test to ensure we can
+    # delete said data outside of the container's file system
     DOCKER_RUN="docker run --rm -u $UID:$(id -g)"
 
     # Check options before exiting
