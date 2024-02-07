@@ -7,10 +7,15 @@
 
 # Base temp directory to use for file staging
 DEFAULT_TMP_ROOT="/data/tmp"
+DELETE_TEMP_FILES=true
+COLLECT_METRICS=true
 
 test_int_parse_args()
 {
     # Parse command line arguments and set global variables to be used in calling script
+    # optional arguments for the test scripts
+    #   --no-cleanup: Disable the automatic deletion of the temporary working directory after the script completes.
+    #   --no-metrics: Disable the metrics collection that occurs during PGE execution
     #
     while [[ $# -gt 0 ]]; do
     case $1 in
@@ -40,6 +45,20 @@ test_int_parse_args()
         ;;
       --temp-root)
         TMP_ROOT=$2
+        shift
+        shift
+        ;;
+      --no-cleanup)
+        echo "Setting DELETE_TEMP_FILES to false"
+        DELETE_TEMP_FILES=false
+        shift
+        ;;
+      --no-metrics)
+        COLLECT_METRICS=false
+        shift
+        ;;
+      -*|--*)
+        echo "Unknown arguments $1 $2, ignoring..."
         shift
         shift
         ;;
