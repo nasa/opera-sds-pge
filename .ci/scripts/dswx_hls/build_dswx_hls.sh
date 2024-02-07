@@ -42,14 +42,7 @@ fi
 STAGING_DIR=$(mktemp -d -p ${WORKSPACE} docker_image_staging_XXXXXXXXXX)
 
 # Configure a trap to clean up on exit regardless of whether the build succeeds
-function cleanup {
-  if [[ -z ${KEEP_TEMP_FILES} ]]; then
-    echo "Cleaning up staging directory ${STAGING_DIR}..."
-    rm -rf ${STAGING_DIR}
-  fi
-}
-
-trap cleanup EXIT
+trap build_script_cleanup EXIT
 
 # Copy files to the staging area and build the PGE docker image
 mkdir -p ${STAGING_DIR}/opera/pge
