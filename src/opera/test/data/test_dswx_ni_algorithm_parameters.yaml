@@ -1,0 +1,149 @@
+runconfig:
+    name: dswx_ni_workflow_algorithm
+
+    processing:
+        # dswx_workflow 'opera_dswx_ni', 'twele', 'opera_dswx_ni_inundated_vegetation'
+        dswx_workflow: 'opera_dswx_ni'
+        # valid values for polarizations
+        # empty for all polarizations found in RSLC
+        # [polarizations] for list of specific frequency(s) e.g. [HH, HV] or [HH]
+        polarizations: ['VV', 'VH']
+
+        # Specify the max_value for permanent water and no_data_value for invalid pixels
+        reference_water:
+            max_value: 100
+            no_data_value: 255
+            # value assuming the permanent water [0-1]
+            permanent_water_value: 0.9
+            # number of pixel to apply erosion for drought case
+            drought_erosion_pixel: 10
+            # number of pixel to apply dilation for flood case
+            flood_dilation_pixel: 16
+
+        hand:
+            mask_value: 200
+
+        mosaic:
+            mosaic_prefix: 'mosaic'
+            mosaic_cog_enable: True
+
+        # Flag to turn on/off the filtering for RTC image.
+        # The enhanced Lee filter is available.
+        filter:
+            enabled: True
+            # Window size for filtering.
+            window_size: 5
+
+        initial_threshold:
+            # Maximum tile size for initial threshold.
+            maximum_tile_size:
+                x: 400
+                y: 400
+            # Minimum tile size for initial threshold.
+            minimum_tile_size:
+                x: 40
+                y: 40
+            # tile selecting strategy to identify the boundary between water and nonwater
+            # ['twele', 'chini', 'bimodality', 'combined']
+            # 'combined' option applies all selection strategy
+            selection_method: 'combined'
+
+            # Thresholds to select tiles showing the boundary between water and nonwater
+            # using bimodality strategy.
+            # One values are required for twele method
+            tile_selection_twele: [0.09, 0.8, 0.97]
+            # Thresholds to select tiles showing the boundary between water and nonwater
+            # using bimodality strategy.
+            # One values are required for bimodality method
+            tile_selection_bimodality: 0.7
+            # Stratey to interpolate the tile-based thresholds.
+            # Currently, only 'smoothed' is available.
+            extending_method: 'gdal_grid'
+            # Thresholding algorithm for initial thresholds.
+            # Currently, 1) Otsu and 2) Kittler-Illingworth algorithms are available.
+            # ['otsu', 'ki']
+            threshold_method: 'ki'
+            # Flag to assume the trimodal distribution.
+            # If flag is false, the distribution is assumed to have bimodal distribution and
+            # estimate single threshold per tile. If True, the trimodal distribution is assumed,
+            # the lowest threshold is estimated.
+            multi_threshold: True
+
+            # Number of threads to run
+            # -1 represents the all available threads
+            number_cpu: 2
+            number_iterations: 1
+            tile_average: False
+
+        fuzzy_value:
+            hand:
+                # The units of the HAND is meters.
+                member_min: 0
+                member_max: 15
+            # membership bound for slope angle
+            slope:
+                # The units of the slope is degree.
+                member_min: 0.5
+                member_max: 15
+            # membership bound for reference water
+            reference_water:
+                # Minimum reference water value for membership
+                member_min: 0.8
+                # Maximum reference water value for membership
+                member_max: 0.95
+            # membership bound for area of initial water bodies
+            # area membership is only required for 'twele' workflow.
+            # area unit is pixel number.
+            area:
+                member_min: 0
+                member_max: 40
+            # Dark area is defined where cross-pol is lower than cross_land
+            # Water is defined where cross-pol is lower than cross_water
+            dark_area:
+                # Threshold [dB] for land in the dark area definition
+                cross_land: -18
+                # Threshold [dB] for water in the dark area definition
+                cross_water: -24
+            # High frequent water is defined based on two values
+            # water_min_value < high_frequent_water < water_max_value
+            high_frequent_water:
+                # Minimum value for high frequent water
+                water_min_value: 0.1
+                # Maximum value for high frequent water
+                water_max_value: 0.9
+
+        # Region growing options
+        region_growing:
+            # seed value for region growing start
+            initial_threshold: 0.81
+            # end value for region growing
+            relaxed_threshold: 0.51
+            line_per_block: 400
+
+        masking_ancillary:
+            # VV and VH threshold values for dark land candidates
+            co_pol_threshold: -14.6
+            cross_pol_threshold: -22.8
+            # reference water threshold value for dark land candidates
+            water_threshold:
+
+        refine_with_bimodality:
+            number_cpu: 1
+            minimum_pixel: 4
+            thresholds:
+                ashman: 1.5
+                Bhattacharyya_coefficient: 0.97
+                bm_coefficient: 0.7
+                surface_ratio: 0.1
+
+
+        inundated_vegetation:
+            enabled: True
+            dual_pol_ratio_max: 12
+            dual_pol_ratio_min: 7
+            dual_pol_ratio_threshold: 8
+            cross_pol_min: -26
+            line_per_block: 300
+
+        # debug mode is true, intermediate product is generated.
+        debug_mode: False

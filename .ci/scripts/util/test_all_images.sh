@@ -33,7 +33,7 @@ ${BUILD_SCRIPTS_DIR}/cslc_s1/test_cslc_s1.sh --tag ${TAG} --workspace ${WORKSPAC
 ${BUILD_SCRIPTS_DIR}/rtc_s1/test_rtc_s1.sh --tag ${TAG} --workspace ${WORKSPACE}
 ${BUILD_SCRIPTS_DIR}/dswx_s1/test_dswx_s1.sh --tag ${TAG} --workspace ${WORKSPACE}
 ${BUILD_SCRIPTS_DIR}/disp_s1/test_disp_s1.sh --tag ${TAG} --workspace ${WORKSPACE}
-
+${BUILD_SCRIPTS_DIR}/test_dswx_ni.sh --tag ${TAG} --workspace ${WORKSPACE}
 echo 'Build Complete'
 
 exit 0
