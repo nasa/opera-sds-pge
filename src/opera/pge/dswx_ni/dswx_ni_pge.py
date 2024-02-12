@@ -4,7 +4,7 @@
 ==============
 dswx_ni_pge.py
 ==============
-Module defining the implementation for the Co-registered Single Look Complex (DSWX)
+Module defining the implementation for the Dynamic Surface Water Extent (DSWX)
 from NISAR (NI) PGE.
 """
 
@@ -40,7 +40,6 @@ class DSWxNIPreProcessorMixin(PreProcessorMixin):
         super().run_preprocessor(**kwargs)
 
 
-
 class DSWxNIPostProcessorMixin(PostProcessorMixin):
     """
     Mixin class responsible for handling all post-processing steps for the DSWx-NI
@@ -69,8 +68,6 @@ class DSWxNIPostProcessorMixin(PostProcessorMixin):
         super().run_postprocessor(**kwargs)
 
 
-
-
 class DSWxNIExecutor(DSWxNIPreProcessorMixin, DSWxNIPostProcessorMixin, PgeExecutor):
     """
     Main class for execution of the DSWx-NI PGE, including the SAS layer.
@@ -79,7 +76,7 @@ class DSWxNIExecutor(DSWxNIPreProcessorMixin, DSWxNIPostProcessorMixin, PgeExecu
     of the SAS from the base PgeExecutor class.
     """
 
-    NAME = "DSWx"
+    NAME = "DSWx-NI"
     """Short name for the DSWx-NI PGE"""
 
     LEVEL = "L3"

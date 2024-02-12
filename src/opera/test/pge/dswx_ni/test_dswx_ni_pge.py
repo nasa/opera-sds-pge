@@ -85,7 +85,7 @@ class DswxNIPgeTestCase(unittest.TestCase):
         self.assertIsNone(pge.runconfig)
         self.assertIsNone(pge.logger)
 
-        # Kickoff execution of CSLC-NI PGE
+        # Kickoff execution of DSWx-NI PGE
         pge.run()
 
         # Check that the runconfig and logger were instantiated
