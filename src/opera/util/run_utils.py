@@ -209,7 +209,7 @@ def time_and_execute(command_line, logger, execute_via_shell=False):
 
     if run_result.returncode:
         error_msg = (f'Command "{" ".join(command_line)}" failed with exit '
-                     f'code {run_result.returncode}')
+                f'code {run_result.returncode},last N lines fsrom log: {}')
 
         logger.critical(module_name, ErrorCode.SAS_PROGRAM_FAILED, error_msg)
 

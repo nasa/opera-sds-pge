@@ -1,0 +1,55 @@
+F.E..........
+======================================================================
+ERROR: test_base_pge_execution (__main__.BasePgeTestCase)
+Test execution of the PgeExecutor class and its associated mixins using
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/rjb/new_repo/opera-sds-pge/src/opera/test/pge/base/test_base_pge.py", line 86, in test_base_pge_execution
+    pge.run()
+  File "/home/rjb/repos/opera-sds-pge/src/opera/pge/base/base_pge.py", line 760, in run
+    self.run_sas_executable(**kwargs)
+  File "/home/rjb/repos/opera-sds-pge/src/opera/pge/base/base_pge.py", line 739, in run_sas_executable
+    elapsed_time = time_and_execute(
+  File "/home/rjb/repos/opera-sds-pge/src/opera/util/run_utils.py", line 214, in time_and_execute
+    logger.critical(module_name, ErrorCode.SAS_PROGRAM_FAILED, error_msg)
+  File "/home/rjb/repos/opera-sds-pge/src/opera/util/logger.py", line 407, in critical
+    raise RuntimeError(description)
+RuntimeError: Command "/ u s r / b i n / e c h o   T h e r e ' s   b e e n   s o m e   s o r t   o f   e r r o r   / b i n / b a s h     - c   " E X I T   1 "   b a s e _ p g e _ t e s t / s c r a t c h / t e s t _ b a s e _ p g e _ c o n f i g _ e r r o r _ s a s . y a m l" failed with exit code 1
+
+======================================================================
+FAIL: test_assign_filename_exception (__main__.BasePgeTestCase)
+Test IOError exception in _assign_filename()
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/rjb/miniconda3/lib/python3.10/unittest/mock.py", line 1379, in patched
+    return func(*newargs, **newkeywargs)
+  File "/home/rjb/new_repo/opera-sds-pge/src/opera/test/pge/base/test_base_pge.py", line 392, in test_assign_filename_exception
+    self.assertIn(
+AssertionError: 'Failed to rename output file dswx_hls.tif, reason: Mock OSError from os.rename' not found in '2024-02-08T20:54:44.297699Z, Info, pge_init::logger.py, BasePge, 900001, /home/rjb/repos/opera-sds-pge/src/opera/pge/base/base_pge.py:66, "New Log file initialized to pge_20240208T205444.log"\n2024-02-08T20:54:44.297714Z, Info, pge_init::logger.py, BasePge, 900002, /home/rjb/repos/opera-sds-pge/src/opera/pge/base/base_pge.py:90, "Loading RunConfig file /home/rjb/new_repo/opera-sds-pge/src/opera/test/pge/base/../../data/test_base_pge_config.yaml"\n2024-02-08T20:54:44.303542Z, Info, pge_init::logger.py, BasePge, 900003, /home/rjb/repos/opera-sds-pge/src/opera/pge/base/base_pge.py:105, "Validating RunConfig file /home/rjb/new_repo/opera-sds-pge/src/opera/test/pge/base/../../data/test_base_pge_config.yaml"\n2024-02-08T20:54:44.309096Z, Info, pge_init::logger.py, BasePge, 900005, /home/rjb/repos/opera-sds-pge/src/opera/pge/base/base_pge.py:133, "Creating output product directory /home/rjb/new_repo/opera-sds-pge/src/opera/test/pge/base/test_base_pge_tng9lfv1temp/base_pge_test/outputs"\n2024-02-08T20:54:44.309222Z, Info, pge_init::logger.py, BasePge, 900005, /home/rjb/repos/opera-sds-pge/src/opera/pge/base/base_pge.py:139, "Creating scratch directory /home/rjb/new_repo/opera-sds-pge/src/opera/test/pge/base/test_base_pge_tng9lfv1temp/base_pge_test/scratch"\n2024-02-08T20:54:44.309256Z, Info, pge_init::logger.py, BasePge, 900006, /home/rjb/repos/opera-sds-pge/src/opera/pge/base/base_pge.py:143, "Directory setup complete"\n2024-02-08T20:54:44.309292Z, Info, BASE_PGE::base_pge.py, BasePge, 100004, /home/rjb/repos/opera-sds-pge/src/opera/pge/base/base_pge.py:171, "Log file configuration complete"\n2024-02-08T20:54:44.311400Z, Info, BASE_PGE::base_pge.py, BasePge, 100016, /home/rjb/repos/opera-sds-pge/src/opera/pge/base/base_pge.py:703, "SAS RunConfig created at base_pge_test/scratch/test_base_pge_config_sas.yaml"\n2024-02-08T20:54:44.311502Z, Debug, BASE_PGE::base_pge.py, BasePge, 101002, /home/rjb/repos/opera-sds-pge/src/opera/pge/base/base_pge.py:733, "SAS EXE command line: /usr/bin/echo There\'s been some sort of error /bin/bash  -c "EXIT 1" base_pge_test/scratch/test_base_pge_config_sas.yaml"\n2024-02-08T20:54:44.311509Z, Info, BASE_PGE::base_pge.py, BasePge, 100020, /home/rjb/repos/opera-sds-pge/src/opera/pge/base/base_pge.py:736, "Starting SAS executable"\n/bin/sh: -c: line 0: unexpected EOF while looking for matching `\'\'\n/bin/sh: -c: line 1: syntax error: unexpected end of file\n2024-02-08T20:54:44.313271Z, Critical, BASE_PGE::base_pge.py, time_and_execute::run_utils.py, 103013, /home/rjb/repos/opera-sds-pge/src/opera/util/run_utils.py:214, "Command "/ u s r / b i n / e c h o   T h e r e \' s   b e e n   s o m e   s o r t   o f   e r r o r   / b i n / b a s h     - c   " E X I T   1 "   b a s e _ p g e _ t e s t / s c r a t c h / t e s t _ b a s e _ p g e _ c o n f i g _ s a s . y a m l" failed with exit code 1"\n2024-02-08T20:54:44.313295Z, Info, BASE_PGE::base_pge.py, PgeLogger, 100009, /home/rjb/repos/opera-sds-pge/src/opera/util/logger.py:597, "overall.log_messages.debug: 1"\n2024-02-08T20:54:44.313302Z, Info, BASE_PGE::base_pge.py, PgeLogger, 100009, /home/rjb/repos/opera-sds-pge/src/opera/util/logger.py:597, "overall.log_messages.info: 9"\n2024-02-08T20:54:44.313308Z, Info, BASE_PGE::base_pge.py, PgeLogger, 100009, /home/rjb/repos/opera-sds-pge/src/opera/util/logger.py:597, "overall.log_messages.warning: 0"\n2024-02-08T20:54:44.313313Z, Info, BASE_PGE::base_pge.py, PgeLogger, 100009, /home/rjb/repos/opera-sds-pge/src/opera/util/logger.py:597, "overall.log_messages.critical: 1"\n2024-02-08T20:54:44.313413Z, Info, BASE_PGE::base_pge.py, PgeLogger, 100009, /home/rjb/repos/opera-sds-pge/src/opera/util/logger.py:602, "overall.os.cpu.seconds.sys: 0.043383"\n2024-02-08T20:54:44.313422Z, Info, BASE_PGE::base_pge.py, PgeLogger, 100009, /home/rjb/repos/opera-sds-pge/src/opera/util/logger.py:602, "overall.os.cpu.seconds.user: 0.199018"\n2024-02-08T20:54:44.313428Z, Info, BASE_PGE::base_pge.py, PgeLogger, 100009, /home/rjb/repos/opera-sds-pge/src/opera/util/logger.py:602, "overall.os.filesystem.reads: 0"\n2024-02-08T20:54:44.313433Z, Info, BASE_PGE::base_pge.py, PgeLogger, 100009, /home/rjb/repos/opera-sds-pge/src/opera/util/logger.py:602, "overall.os.filesystem.writes: 8"\n2024-02-08T20:54:44.313438Z, Info, BASE_PGE::base_pge.py, PgeLogger, 100009, /home/rjb/repos/opera-sds-pge/src/opera/util/logger.py:602, "overall.os.max_rss_kb.main_process: 34848"\n2024-02-08T20:54:44.313444Z, Info, BASE_PGE::base_pge.py, PgeLogger, 100009, /home/rjb/repos/opera-sds-pge/src/opera/util/logger.py:602, "overall.os.max_rss_kb.largest_child_process: 34848"\n2024-02-08T20:54:44.313451Z, Info, BASE_PGE::base_pge.py, PgeLogger, 100009, /home/rjb/repos/opera-sds-pge/src/opera/util/logger.py:602, "overall.os.peak_vm_kb.main_process: 52868"\n2024-02-08T20:54:44.313459Z, Info, BASE_PGE::base_pge.py, PgeLogger, 100009, /home/rjb/repos/opera-sds-pge/src/opera/util/logger.py:606, "overall.elapsed_seconds: 0.015802426263689995"\n'
+
+----------------------------------------------------------------------
+Ran 13 tests in 0.208s
+
+FAILED (failures=1, errors=1)
+Running preprocessor for PreProcessorMixin
+Starting SAS execution for PgeExecutor
+Running preprocessor for PreProcessorMixin
+Running preprocessor for PreProcessorMixin
+Starting SAS execution for PgeExecutor
+Running preprocessor for PreProcessorMixin
+Starting SAS execution for PgeExecutor
+Running preprocessor for PreProcessorMixin
+Running preprocessor for PreProcessorMixin
+Starting SAS execution for PgeExecutor
+Running postprocessor for PostProcessorMixin
+Running preprocessor for PreProcessorMixin
+Starting SAS execution for PgeExecutor
+Running preprocessor for PreProcessorMixin
+Starting SAS execution for PgeExecutor
+Running postprocessor for PostProcessorMixin
+Running preprocessor for PreProcessorMixin
+Starting SAS execution for PgeExecutor
+Running preprocessor for PreProcessorMixin
+Running preprocessor for PreProcessorMixin
+Starting SAS execution for PgeExecutor
+Running postprocessor for PostProcessorMixin

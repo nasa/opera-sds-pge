@@ -1,0 +1,65 @@
+RunConfig:
+  Name: OPERA-DSWX-S1-PGE-TEST-CONFIG
+  Groups:
+    PGE:
+      PGENameGroup:
+        PGEName: DSWX_S1_PGE
+      InputFilesGroup:
+        InputFilePaths:
+        - dswx_s1_pge_test/input_dir
+      DynamicAncillaryFilesGroup:
+        AncillaryFileMap:
+          dem_file: dswx_s1_pge_test/input_dir/dem.tif
+          hand_file: dswx_s1_pge_test/input_dir/hand.tif
+          reference_water_file: dswx_s1_pge_test/input_dir/reference_water.tif
+          world_cover: dswx_s1_pge_test/input_dir/worldcover.tif
+          shoreline_shapefile: dswx_s1_pge_test/input_dir/shoreline.shp
+      ProductPathGroup:
+        OutputProductPath: dswx_s1_pge_test/output_dir
+        ScratchPath: dswx_s1_pge_test/scratch_dir
+      PrimaryExecutable:
+        ProductIdentifier: DSWX_S1
+        ProductVersion: "1.0"
+        ProgramPath: /bin/echo
+        ProgramOptions:
+                - "There's been some sprort of error"
+                - /bin/bash -c "EXIT 1"
+        ErrorCodeBase: 400000
+        SchemaPath: pge/dswx_s1/schema/dswx_s1_sas_schema.yaml
+        AlgorithmParametersSchemaPath: pge/dswx_s1/schema/algorithm_parameters_s1_schema.yaml
+        IsoTemplatePath: pge/dswx_s1/templates/OPERA_ISO_metadata_L3_DSWx_S1_template.xml.jinja2
+      QAExecutable:
+        Enabled: false
+        ProgramPath: null
+        ProgramOptions: []
+      DebugLevelGroup:
+        DebugSwitch: false
+        ExecuteViaShell: true
+    SAS:
+      runconfig:
+        name: dswx_s1_workflow_default
+        groups:
+          pge_name_group:
+            pge_name: DSWX_S1_PGE
+          input_file_group:
+            input_file_path:
+            - dswx_s1_pge_test/input_dir
+          dynamic_ancillary_file_group:
+            dem_file: dswx_s1_pge_test/input_dir/dem.tif
+            dem_file_description: DEM
+            worldcover_file: dswx_s1_pge_test/input_dir/worldcover.tif
+            reference_water_file: dswx_s1_pge_test/input_dir/reference_water.tif
+            shoreline_shapefile: dswx_s1_pge_test/input_dir/shoreline.shp
+            hand_file: dswx_s1_pge_test/input_dir/hand.tif
+            algorithm_parameters: dswx_s1_pge_test/input_dir/test_dswx_s1_algorithm_parameters.yaml
+          static_ancillary_file_group:
+            static_ancillary_inputs_flag: True
+            mgrs_database_file: dswx_s1_pge_test/input_dir/MGRS_tile.sqlite
+            mgrs_collection_database_file: dswx_s1_pge_test/input_dir/MGRS_tile_collection.sqlite
+          primary_executable:
+            product_type: dswx_s1
+          product_path_group:
+            product_path: dswx_s1_pge_test/output_dir
+            scratch_path: dswx_s1_pge_test/scratch_dir
+            sas_output_path: dswx_s1_pge_test/output_dir
+          log_file: dswx_s1_pge_test/output_dir/test_log.log
