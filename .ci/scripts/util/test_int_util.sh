@@ -7,6 +7,8 @@
 
 # Base temp directory to use for file staging
 DEFAULT_TMP_ROOT="/data/tmp"
+DELETE_TEMP_FILES=true
+COLLECT_METRICS=true
 
 test_int_parse_args()
 {
@@ -41,6 +43,15 @@ test_int_parse_args()
       --temp-root)
         TMP_ROOT=$2
         shift
+        shift
+        ;;
+      --no-cleanup)
+        echo "Setting DELETE_TEMP_FILES to false"
+        DELETE_TEMP_FILES=false
+        shift
+        ;;
+      --no-metrics)
+        COLLECT_METRICS=false
         shift
         ;;
       -*|--*)
@@ -147,22 +158,34 @@ test_int_trap_cleanup()
 
     DOCKER_RUN="docker run --rm -u $UID:$(id -g)"
 
-    echo "Cleaning up before exit. Setting permissions for output files and directories."
-    ${DOCKER_RUN} -v ${TMP_DIR}:${TMP_DIR} --entrypoint /usr/bin/find ${PGE_IMAGE}:${PGE_TAG} ${TMP_DIR} -type d -exec chmod 775 {} +
-    ${DOCKER_RUN} -v ${TMP_DIR}:${TMP_DIR} --entrypoint /usr/bin/find ${PGE_IMAGE}:${PGE_TAG} ${TMP_DIR} -type f -exec chmod 664 {} +
-    cd ${TMP_ROOT}
-    rm -rf ${TMP_DIR}
+    # Check options before exiting
+    if $DELETE_TEMP_FILES; then
+        echo "Cleaning up before exit. Setting permissions for output files and directories."
+        ${DOCKER_RUN} -v ${TMP_DIR}:${TMP_DIR} --entrypoint /usr/bin/find ${PGE_IMAGE}:${PGE_TAG} ${TMP_DIR} -type d -exec chmod 775 {} +
+        ${DOCKER_RUN} -v ${TMP_DIR}:${TMP_DIR} --entrypoint /usr/bin/find ${PGE_IMAGE}:${PGE_TAG} ${TMP_DIR} -type f -exec chmod 664 {} +
+        cd ${TMP_ROOT}
+        rm -rf ${TMP_DIR}
+    else
+        echo "--no-cleanup flag set: Temporary directories will remain on disk."
+    fi
+}
 
-    # End background metrics collection
-    local stats_pid_file="${TEST_RESULTS_DIR}/${PGE_NAME}_metrics_stats_bg_pid.txt"
-    if [ -e ${stats_pid_file} ]
-    then
-        process_to_kill=$(cat "${stats_pid_file}")
-        if ps -p $process_to_kill > /dev/null
+test_end_metrics_collection()
+{
+    if $COLLECT_METRICS; then
+        # End background metrics collection
+        local stats_pid_file="${TEST_RESULTS_DIR}/${PGE_NAME}_metrics_stats_bg_pid.txt"
+        if [ -e ${stats_pid_file} ]
         then
-            kill $process_to_kill
-            wait $process_to_kill 2> /dev/null || true
-        fi
-        rm "${stats_pid_file}"
+            process_to_kill=$(cat "${stats_pid_file}")
+            if ps -p $process_to_kill > /dev/null
+            then
+                kill $process_to_kill
+                wait $process_to_kill 2> /dev/null || true
+            fi
+            rm "${stats_pid_file}"
+      fi
+     else
+         echo "--no-metrics flag set: Metrics collection is suspended. No need to stop collection."
     fi
 }
