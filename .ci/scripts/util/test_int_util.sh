@@ -8,7 +8,7 @@
 # Base temp directory to use for file staging
 DEFAULT_TMP_ROOT="/data/tmp"
 DELETE_TEMP_FILES=true
-COLLECT_METRICS=true
+COLLECT_METRICS=false
 
 test_int_parse_args()
 {
