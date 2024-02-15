@@ -46,7 +46,7 @@ test_int_parse_args()
         shift
         ;;
       --no-cleanup)
-        echo "Setting DELETE_TEMP_FILES to false"
+        echo "Setting DELETE_TEMP_FILES to false. Temp files will not be deleted"
         DELETE_TEMP_FILES=false
         shift
         ;;
