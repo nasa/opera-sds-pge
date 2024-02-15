@@ -69,7 +69,7 @@ class BasePgeTestCase(unittest.TestCase):
         SAS executable.
 
         """
-        runconfig_path = join(self.data_dir, 'test_base_pge_config_error.yaml')
+        runconfig_path = join(self.data_dir, 'test_base_pge_config.yaml')
 
         pge = PgeExecutor(pge_name='BasePgeTest', runconfig_path=runconfig_path)
 
