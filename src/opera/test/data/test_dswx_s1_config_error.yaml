@@ -22,12 +22,8 @@ RunConfig:
         ProductVersion: "1.0"
         ProgramPath: /bin/echo
         ProgramOptions:
-          - hello world > dswx_s1_pge_test/output_dir/OPERA_L3_DSWx-S1_T18MVA_20200702T231843Z_20230317T190549Z_v0.1_B01_WTR.tif;
-          - /bin/echo hello world > dswx_s1_pge_test/output_dir/OPERA_L3_DSWx-S1_T18MVA_20200702T231843Z_20230317T190549Z_v0.1_B02_BWTR.tif;
-          - /bin/echo hello world > dswx_s1_pge_test/output_dir/OPERA_L3_DSWx-S1_T18MVA_20200702T231843Z_20230317T190549Z_v0.1_B03_CONF.tif;
-          - /bin/echo hello world > dswx_s1_pge_test/output_dir/OPERA_L3_DSWx-S1_T18MVA_20200702T231843Z_20230317T190549Z_v0.1_B04_DIAG.tif;
-          - /bin/echo hello world > dswx_s1_pge_test/output_dir/OPERA_L3_DSWx-S1_T18MVA_20200702T231843Z_20230317T190549Z_v0.1_BROWSE.png;
-          - /bin/echo DSWx-S1 invoked with RunConfig
+        - "There's been some sprort of error"
+        - /bin/bash -c "EXIT 1"
         ErrorCodeBase: 400000
         SchemaPath: pge/dswx_s1/schema/dswx_s1_sas_schema.yaml
         AlgorithmParametersSchemaPath: pge/dswx_s1/schema/algorithm_parameters_s1_schema.yaml
@@ -38,7 +34,7 @@ RunConfig:
         ProgramOptions: []
       DebugLevelGroup:
         DebugSwitch: false
-        ExecuteViaShell: true  # Must be set to true for test to work
+        ExecuteViaShell: true
     SAS:
       runconfig:
         name: dswx_s1_workflow_default
@@ -66,6 +62,4 @@ RunConfig:
             product_path: dswx_s1_pge_test/output_dir
             scratch_path: dswx_s1_pge_test/scratch_dir
             sas_output_path: dswx_s1_pge_test/output_dir
-          browse_image_group:
-            save_browse: True
           log_file: dswx_s1_pge_test/output_dir/test_log.log

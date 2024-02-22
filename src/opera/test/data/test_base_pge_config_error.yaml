@@ -24,8 +24,8 @@ RunConfig:
         ProductIdentifier: EXAMPLE
         ProgramPath: echo
         ProgramOptions:
-          - 'hello world > base_pge_test/outputs/dswx_hls.tif;'
-          - '/bin/echo hello world' 
+           - "There's been some sort of error"
+           - /bin/bash  -c "EXIT 1"
         ErrorCodeBase: 100000
         SchemaPath: test/data/sample_sas_schema.yaml
         IsoTemplatePath: sample_iso_template.xml.jinja2
