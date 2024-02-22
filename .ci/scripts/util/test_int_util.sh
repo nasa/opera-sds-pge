@@ -7,8 +7,10 @@
 
 # Base temp directory to use for file staging
 DEFAULT_TMP_ROOT="/data/tmp"
+# Associated with the --no-cleanup switch (default=<delete temp files on exit>)
 DELETE_TEMP_FILES=true
-COLLECT_METRICS=false
+# Associated with the --no-metrics switch (default=<collect metrics>)
+COLLECT_METRICS=true
 
 test_int_parse_args()
 {
@@ -91,7 +93,7 @@ test_int_setup_data_tmp_directory()
 {
     # Create a temporary directory to allow Jenkins to write to it and avoid collisions
     # with other users
-    TMP_DIR=$(mktemp -dp ${TMP_ROOT})
+    TMP_DIR=$(mktemp -dp ${TMP_ROOT})q
     chmod 775 $TMP_DIR
 }
 
