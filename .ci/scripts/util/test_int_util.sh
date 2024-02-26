@@ -93,7 +93,7 @@ test_int_setup_data_tmp_directory()
 {
     # Create a temporary directory to allow Jenkins to write to it and avoid collisions
     # with other users
-    TMP_DIR=$(mktemp -dp ${TMP_ROOT})q
+    TMP_DIR=$(mktemp -dp ${TMP_ROOT})
     chmod 775 $TMP_DIR
 }
 
