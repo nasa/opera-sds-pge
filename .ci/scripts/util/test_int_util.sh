@@ -19,7 +19,7 @@ test_int_parse_args()
     while [[ $# -gt 0 ]]; do
     case $1 in
       -h|--help)
-        echo "Usage: $(basename $0) [-h|--help] [-t|--tag <tag>] [-i|--input-data <zip file>] [-e|--expected-data <zip file>] [--runconfig <runconfig .yaml file>] [--temp-root <path>]"
+        echo "Usage: $(basename $0) [-h|--help] [-t|--tag <tag>] [-i|--input-data <zip file>] [-e|--expected-data <zip file>] [--runconfig <runconfig .yaml file>] [--no-metrics] [--no-cleanup] [--temp-root <path>]"
         exit 0
         ;;
       -t|--tag)
