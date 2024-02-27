@@ -151,7 +151,7 @@ test_int_setup_test_data()
     fi
 }
 
-test_int_trap_cleanup_temp_dirs()
+test_int_trap_cleanup_temp_dir()
 {
     # Finalize results HTML file and set permissions on data that was created during the test.
 
