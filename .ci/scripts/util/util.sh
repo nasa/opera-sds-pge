@@ -122,7 +122,6 @@ copy_pge_files() {
 metrics_collection_start()
 {
   if $COLLECT_METRICS; then
-      echo "State of COLLECT_METRICS": $COLLECT_METRICS
       echo "Start Metrics Collection"
       local pge=$1
       local container_name=$2

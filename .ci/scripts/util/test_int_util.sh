@@ -48,7 +48,6 @@ test_int_parse_args()
         shift
         ;;
       --no-cleanup)
-        echo "Setting DELETE_TEMP_FILES to false. Temp files will not be deleted"
         DELETE_TEMP_FILES=false
         shift
         ;;
@@ -152,10 +151,10 @@ test_int_setup_test_data()
     fi
 }
 
-test_int_trap_cleanup()
+test_int_trap_cleanup_temp_dirs()
 {
     # Finalize results HTML file and set permissions on data that was created during the test.
-    #
+
     echo "</table></html>" >> $RESULTS_FILE
 
     DOCKER_RUN="docker run --rm -u $UID:$(id -g)"
@@ -172,7 +171,7 @@ test_int_trap_cleanup()
     fi
 }
 
-test_end_metrics_collection()
+test_int_trap_kill_metrics_pid()
 {
     if $COLLECT_METRICS; then
         # End background metrics collection
@@ -186,8 +185,15 @@ test_end_metrics_collection()
                 wait $process_to_kill 2> /dev/null || true
             fi
             rm "${stats_pid_file}"
-      fi
+        fi
      else
-         echo "--no-metrics flag set: Metrics collection is suspended. No need to stop collection."
+         echo "--no-metrics flag set"
     fi
+}
+
+# Clean up functions that are called on EXIT from test_int_<PGE>.sh scripts
+test_int_trap_cleanup()
+{
+  test_int_trap_cleanup_temp_dir
+  test_int_trap_kill_metrics_pid
 }
