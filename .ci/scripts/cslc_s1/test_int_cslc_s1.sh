@@ -31,6 +31,11 @@ SAMPLE_TIME=15
 [ -z "${RUNCONFIG}" ] && RUNCONFIG="opera_pge_cslc_s1_delivery_6.1_final_runconfig.yaml"
 [ -z "${TMP_ROOT}" ] && TMP_ROOT="$DEFAULT_TMP_ROOT"
 
+echo "***********************"
+echo "${PGE_TAG}"
+echo "***********************"
+
+
 # Create the test output directory in the workspace
 test_int_setup_results_directory
 

@@ -189,7 +189,7 @@ metrics_collection_start()
         echo "$(metrics_seconds)", "`$ds`", "`$dus`", "`$swu`", "`$ths`" >> "${metrics_stats}"; done } & \
       echo "$!" > "${stats_pid_file}"
   else
-    echo "--no-metrics flag set: Temporary suspend metrics collection."
+    echo "--no-metrics flag set: Suspend metrics collection."
   fi
 }
 
@@ -241,7 +241,7 @@ metrics_collection_end()
       echo "Docker exited with an error: metrics will not be processed or uploaded."
     fi
   else
-    echo "--no-metrics flag set: Metrics collection is suspended. No need to stop collection."
+    echo "--no-metrics flag set: call to metrics_collection_end(). Metrics collection is suspended."
   fi
 }
 
