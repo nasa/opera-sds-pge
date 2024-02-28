@@ -24,7 +24,7 @@ SAMPLE_TIME=15
 # Defaults, test data and runconfig files should be updated as-needed to use
 # the latest available as defaults for use with the Jenkins pipeline call.
 # Test data should be uploaded to  s3://operasds-dev-pge/${PGE_NAME}/
-[ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath "$(dirname "$(realpath "$0")")"/../..)
+[ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath "$(dirname "$(realpath "$0")")"/../../..)
 [ -z "${PGE_TAG}" ] && PGE_TAG="${USER}-dev"
 [ -z "${INPUT_DATA}" ] && INPUT_DATA="delivery_cslc_s1_final_0.5.1_expected_input_data.zip"
 [ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="delivery_cslc_s1_final_0.5.1_expected_output.zip"
