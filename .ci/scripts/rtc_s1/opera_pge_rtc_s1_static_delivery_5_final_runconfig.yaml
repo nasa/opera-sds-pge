@@ -1,0 +1,152 @@
+RunConfig:
+
+    Name: OPERA-RTC-S1-PGE-SAMPLE-CONFIG
+
+    Groups:
+        PGE:
+            PGENameGroup:
+                PGEName: RTC_S1_PGE
+
+            InputFilesGroup:
+                InputFilePaths:
+                    - /home/rtc_user/input_dir/S1B_IW_SLC__1SDV_20180504T104507_20180504T104535_010770_013AEE_919F.zip
+                    - /home/rtc_user/input_dir/S1B_OPER_AUX_POEORB_OPOD_20180524T110543_V20180503T225942_20180505T005942.EOF
+
+            DynamicAncillaryFilesGroup:
+                AncillaryFileMap:
+                    dem_file: /home/rtc_user/input_dir/dem.tif
+
+                    burst_database_file: /home/rtc_user/input_dir/burst_db_0.2.0_230831-bbox-only.sqlite
+
+            ProductPathGroup:
+                OutputProductPath: /home/rtc_user/output_dir
+
+                ScratchPath: /home/rtc_user/scratch_dir
+
+            PrimaryExecutable:
+                ProductIdentifier: RTC_S1
+
+                ProductVersion: "1.0"
+
+                ProgramPath: conda
+
+                ProgramOptions:
+                    - run
+                    - --no-capture-output
+                    - -n
+                    - RTC
+                    - rtc_s1.py
+
+                ErrorCodeBase: 300000
+
+                SchemaPath: /home/rtc_user/opera/pge/rtc_s1/schema/rtc_s1_sas_schema.yaml
+
+                IsoTemplatePath: /home/rtc_user/opera/pge/rtc_s1/templates/OPERA_ISO_metadata_L2_RTC_S1_template.xml.jinja2
+
+                DataValidityStartDate: 20140403
+
+            QAExecutable:
+                Enabled: False
+
+                ProgramPath:
+
+                ProgramOptions: []
+
+            DebugLevelGroup:
+                DebugSwitch: False
+
+                ExecuteViaShell: False
+
+        SAS:
+            runconfig:
+                name: rtc_s1_workflow_default
+
+                groups:
+                    pge_name_group:
+                        pge_name: RTC_S1_PGE
+
+                    input_file_group:
+                        safe_file_path:
+                            - /home/rtc_user/input_dir/S1B_IW_SLC__1SDV_20180504T104507_20180504T104535_010770_013AEE_919F.zip
+
+                        orbit_file_path:
+                            - /home/rtc_user/input_dir/S1B_OPER_AUX_POEORB_OPOD_20180524T110543_V20180503T225942_20180505T005942.EOF
+
+                        burst_id:
+                            - t069_147169_iw3
+                            - t069_147170_iw3
+                            - t069_147171_iw3
+                            - t069_147172_iw3
+                            - t069_147173_iw3
+                            - t069_147174_iw3
+                            - t069_147175_iw3
+                            - t069_147176_iw3
+                            - t069_147177_iw3
+                            - t069_147178_iw3
+
+                        source_data_access: "https://search.asf.alaska.edu/#/?dataset=SENTINEL-1&productTypes=SLC"
+
+                    dynamic_ancillary_file_group:
+                        dem_file: /home/rtc_user/input_dir/dem.tif
+                        dem_file_description: Digital Elevation Model (DEM) for the NASA OPERA project (v1.0) based on the Copernicus DEM 30-m and Copernicus 90-m referenced to the WGS84 ellipsoid
+
+                    static_ancillary_file_group:
+                        burst_database_file: /home/rtc_user/input_dir/burst_db_0.2.0_230831-bbox-only.sqlite
+
+                    product_group:
+                        product_version: "1.0"
+
+                        product_path: /home/rtc_user/output_dir
+
+                        scratch_path: /home/rtc_user/scratch_dir
+
+                        output_dir: /home/rtc_user/output_dir
+
+                        product_id:
+
+                        rtc_s1_static_validity_start_date: 20140403
+
+                        product_data_access: "https://search.asf.alaska.edu/#/?dataset=OPERA-S1&productTypes=RTC"
+
+                        save_bursts: True
+
+                        save_mosaics: False
+
+                        save_browse: True
+
+                        output_imagery_format: COG
+
+                        save_metadata: True
+
+                    primary_executable:
+                        product_type: RTC_S1_STATIC
+
+                    processing:
+
+                        check_ancillary_inputs_coverage: True
+
+                        polarization: dual-pol
+
+                        rtc:
+                            output_type: gamma0
+
+                        num_workers: 3
+
+                        geocoding:
+                            memory_mode: auto
+
+                            bursts_geogrid:
+                                top_left:
+                                    x:
+                                    y:
+                                bottom_right:
+                                    x:
+                                    y:
+
+                            estimated_geometric_accuracy_bias_x: 0.0
+                            estimated_geometric_accuracy_bias_y: 0.0
+                            estimated_geometric_accuracy_stddev_x: 0.0
+                            estimated_geometric_accuracy_stddev_y: 0.0
+
+                        mosaicking:
+                            mosaic_mode: first

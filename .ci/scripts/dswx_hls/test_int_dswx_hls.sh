@@ -25,7 +25,7 @@ SAMPLE_TIME=1
 # defaults, test data and runconfig files should be updated as-needed to use
 # the latest available as defaults for use with the Jenkins pipeline call
 # INPUT/OUTPUT_DATA should be the name of the corresponding archives in s3://operasds-dev-pge/dswx_hls/
-# RUNCONFIG should be the name of the runconfig in s3://operasds-dev-pge/dswx_hls/
+# RUNCONFIG should be the name of the latest runconfig in .ci/scripts/dswx_hls/
 [ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath "$(dirname "$(realpath "$0")")"/../..)
 [ -z "${PGE_TAG}" ] && PGE_TAG="${USER}-dev"
 [ -z "${INPUT_DATA}" ] && INPUT_DATA="dswx_hls_final_4.1_expected_input.zip"

@@ -43,18 +43,6 @@ test_int_setup_test_data
 # Setup cleanup on exit
 trap test_int_trap_cleanup EXIT
 
-# Download the RunConfig for the static layers workflow
-static_runconfig="opera_pge_cslc_s1_static_delivery_6.1_final_runconfig.yaml"
-local_static_runconfig="${TMP_DIR}/runconfig/${static_runconfig}"
-echo "Downloading s3://operasds-dev-pge/${PGE_NAME}/${static_runconfig} to ${local_static_runconfig}"
-aws s3 cp s3://operasds-dev-pge/${PGE_NAME}/${static_runconfig} ${local_static_runconfig} --no-progress
-
-# Pull in validation script from S3.
-# Current source is https://raw.githubusercontent.com/opera-adt/COMPASS/main/src/compass/utils/validate_product.py
-local_validate_script=${TMP_DIR}/validate_product.py
-echo "Downloading s3://operasds-dev-pge/${PGE_NAME}/validate_cslc_product_final_0.5.1.py to $local_validate_script"
-aws s3 cp s3://operasds-dev-pge/${PGE_NAME}/validate_cslc_product_final_0.5.1.py "$local_validate_script" --no-progress
-
 # overall_status values and their meanings
 # 0 - pass
 # 1 - failure to execute some part of this script
@@ -63,6 +51,18 @@ overall_status=0
 
 input_dir="${TMP_DIR}/${INPUT_DATA%.*}/input_data"
 runconfig_dir="${TMP_DIR}/runconfig"
+
+# Copy the RunConfig for the static layers workflow
+static_runconfig="opera_pge_cslc_s1_static_delivery_6.1_final_runconfig.yaml"
+local_static_runconfig="${SCRIPT_DIR}/runconfig/${static_runconfig}"
+echo "Copying runconfig file $local_static_runconfig to $runconfig_dir/"
+cp ${local_static_runconfig} ${runconfig_dir}
+
+# Pull in validation script from S3.
+# Current source is https://raw.githubusercontent.com/opera-adt/COMPASS/main/src/compass/utils/validate_product.py
+local_validate_script=${TMP_DIR}/validate_product.py
+echo "Downloading s3://operasds-dev-pge/${PGE_NAME}/validate_cslc_product_final_0.5.1.py to $local_validate_script"
+aws s3 cp s3://operasds-dev-pge/${PGE_NAME}/validate_cslc_product_final_0.5.1.py "$local_validate_script" --no-progress
 
 # the testdata reference metadata contains this path so we use it here
 output_dir="${TMP_DIR}/output_cslc_s1"

@@ -1,0 +1,98 @@
+RunConfig:
+    Name: OPERA-DSWX-HLS-PGE-INT-TEST-CONFIG
+
+    Groups:
+
+        PGE:
+            PGENameGroup:
+                PGEName: DSWX_HLS_PGE
+
+            InputFilesGroup:
+                InputFilePaths:
+                    - /home/conda/input_dir
+
+            DynamicAncillaryFilesGroup:
+                AncillaryFileMap:
+                    dem_file: /home/conda/input_dir/dem.tif
+                    landcover_file: /home/conda/input_dir/landcover.tif
+                    worldcover_file: /home/conda/input_dir/worldcover.tif
+
+            ProductPathGroup:
+                OutputProductPath: /home/conda/output_dir
+                ScratchPath: /home/conda/scratch_dir
+
+            PrimaryExecutable:
+                ProductIdentifier: DSWX_HLS
+                ProductVersion: 1.0
+                ProgramPath: python3
+                ProgramOptions:
+                    - /home/conda/proteus-1.0.1/bin/dswx_hls.py
+                    - --full-log-format
+                ErrorCodeBase: 100000
+                SchemaPath: pge/dswx_hls/schema/dswx_hls_sas_schema.yaml
+                IsoTemplatePath: pge/dswx_hls/templates/OPERA_ISO_metadata_L3_DSWx_HLS_template.xml.jinja2
+
+            QAExecutable:
+                Enabled: True
+                ProgramPath: /home/conda/opera/.ci/scripts/dswx_hls/compare_dswx_hls_products.sh
+                ProgramOptions: []
+
+            DebugLevelGroup:
+                DebugSwitch: False
+                ExecuteViaShell: False
+
+        SAS:
+            runconfig:
+                name: dswx_hls_workflow_default
+
+                groups:
+                    pge_name_group:
+                        pge_name: DSWX_HLS_PGE
+
+                    input_file_group:
+                        input_file_path:
+                            - /home/conda/input_dir
+
+                    dynamic_ancillary_file_group:
+                        dem_file: /home/conda/input_dir/dem.tif
+                        dem_file_description: Digital Elevation Model (DEM) for the NASA OPERA project (v1.0) based on the Copernicus DEM 30-m and Copernicus 90-m referenced to the WGS84 ellipsoid
+                        landcover_file: /home/conda/input_dir/landcover.tif
+                        landcover_file_description: Land Cover 100m - collection 3 - epoch 2019 discrete classification map
+                        worldcover_file: /home/conda/input_dir/worldcover.tif
+                        worldcover_file_description: ESA WorldCover 10m 2020 v1.0
+
+                    primary_executable:
+                        product_type: DSWX_HLS
+
+                    product_path_group:
+                        product_path: /home/conda/output_dir
+                        scratch_path: /home/conda/scratch_dir
+                        output_dir: /home/conda/output_dir
+                        product_id: dswx_hls
+                        product_version: 1.0
+
+                    processing:
+                        check_ancillary_inputs_coverage: True
+                        apply_ocean_masking: False
+
+                        save_wtr: True    # Layer 1 - WTR
+                        save_bwtr: True   # Layer 2 - BWTR
+                        save_conf: True   # Layer 3 - CONF
+                        save_diag: True   # Layer 4 - DIAG
+                        save_wtr_1: True   # Layer 5 - WTR-1
+                        save_wtr_2: True   # Layer 6 - WTR-2
+                        save_land: True   # Layer 7 - LAND
+                        save_shad: True   # Layer 8 - SHAD
+                        save_cloud: True  # Layer 9 - CLOUD
+                        save_dem: True   # Layer 10 - DEM
+                        save_rgb: False
+                        save_infrared_rgb: False
+
+                    browse_image_group:
+                        save_browse: True
+                        browse_image_height: 1024
+                        browse_image_width: 1024
+                        exclude_psw_aggressive_in_browse: False
+                        not_water_in_browse: 'white'
+                        cloud_in_browse: 'gray'
+                        snow_in_browse: 'cyan'

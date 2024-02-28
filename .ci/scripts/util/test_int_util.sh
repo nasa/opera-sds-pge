@@ -125,7 +125,7 @@ test_int_setup_test_data()
     #
     local_input_data_archive=${TMP_DIR}/${INPUT_DATA}
     local_expected_data_archive=${TMP_DIR}/${EXPECTED_DATA}
-    local_runconfig=${TMP_DIR}/${RUNCONFIG}
+    local_runconfig=${SCRIPT_DIR}/${RUNCONFIG}
 
     # Pull in test data and runconfig from S3
     echo "Downloading input data from s3://operasds-dev-pge/${PGE_NAME}/${INPUT_DATA} to $local_input_data_archive"
@@ -133,9 +133,6 @@ test_int_setup_test_data()
 
     echo "Downloading expected outputs from s3://operasds-dev-pge/${PGE_NAME}/${EXPECTED_DATA} to $local_expected_data_archive"
     aws s3 cp s3://operasds-dev-pge/${PGE_NAME}/${EXPECTED_DATA} $local_expected_data_archive --no-progress
-
-    echo "Downloading runconfig from s3://operasds-dev-pge/${PGE_NAME}/${RUNCONFIG} to $local_runconfig"
-    aws s3 cp s3://operasds-dev-pge/${PGE_NAME}/${RUNCONFIG} $local_runconfig --no-progress
 
     for local_testdata_archive in $local_input_data_archive $local_expected_data_archive
     do
@@ -166,8 +163,6 @@ test_int_setup_test_data()
 
         echo "Copying runconfig file $local_runconfig to $runconfig_dir/"
         cp $local_runconfig $runconfig_dir
-
-        rm -f $local_runconfig
     else
         echo "Unable to find runconfig file $local_runconfig"
         exit 1
