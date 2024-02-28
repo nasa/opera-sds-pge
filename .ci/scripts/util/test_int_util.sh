@@ -7,6 +7,10 @@
 
 # Base temp directory to use for file staging
 DEFAULT_TMP_ROOT="/data/tmp"
+# Associated with the --no-cleanup switch (default=<delete temp files on exit>)
+DELETE_TEMP_FILES=true
+# Associated with the --no-metrics switch (default=<collect metrics>)
+COLLECT_METRICS=true
 
 test_int_parse_args()
 {
@@ -15,7 +19,7 @@ test_int_parse_args()
     while [[ $# -gt 0 ]]; do
     case $1 in
       -h|--help)
-        echo "Usage: $(basename $0) [-h|--help] [-t|--tag <tag>] [-i|--input-data <zip file>] [-e|--expected-data <zip file>] [--runconfig <runconfig .yaml file>] [--temp-root <path>]"
+        echo "Usage: $(basename $0) [-h|--help] [-t|--tag <tag>] [-i|--input-data <zip file>] [-e|--expected-data <zip file>] [--runconfig <runconfig .yaml file>] [--no-metrics] [--no-cleanup] [--temp-root <path>]"
         exit 0
         ;;
       -t|--tag)
@@ -41,6 +45,14 @@ test_int_parse_args()
       --temp-root)
         TMP_ROOT=$2
         shift
+        shift
+        ;;
+      --no-cleanup)
+        DELETE_TEMP_FILES=false
+        shift
+        ;;
+      --no-metrics)
+        COLLECT_METRICS=false
         shift
         ;;
       -*|--*)
@@ -139,30 +151,49 @@ test_int_setup_test_data()
     fi
 }
 
-test_int_trap_cleanup()
+test_int_trap_cleanup_temp_dir()
 {
     # Finalize results HTML file and set permissions on data that was created during the test.
-    #
+
     echo "</table></html>" >> $RESULTS_FILE
 
     DOCKER_RUN="docker run --rm -u $UID:$(id -g)"
 
-    echo "Cleaning up before exit. Setting permissions for output files and directories."
-    ${DOCKER_RUN} -v ${TMP_DIR}:${TMP_DIR} --entrypoint /usr/bin/find ${PGE_IMAGE}:${PGE_TAG} ${TMP_DIR} -type d -exec chmod 775 {} +
-    ${DOCKER_RUN} -v ${TMP_DIR}:${TMP_DIR} --entrypoint /usr/bin/find ${PGE_IMAGE}:${PGE_TAG} ${TMP_DIR} -type f -exec chmod 664 {} +
-    cd ${TMP_ROOT}
-    rm -rf ${TMP_DIR}
-
-    # End background metrics collection
-    local stats_pid_file="${TEST_RESULTS_DIR}/${PGE_NAME}_metrics_stats_bg_pid.txt"
-    if [ -e ${stats_pid_file} ]
-    then
-        process_to_kill=$(cat "${stats_pid_file}")
-        if ps -p $process_to_kill > /dev/null
-        then
-            kill $process_to_kill
-            wait $process_to_kill 2> /dev/null || true
-        fi
-        rm "${stats_pid_file}"
+    # Check options before exiting
+    if $DELETE_TEMP_FILES; then
+        echo "Cleaning up before exit. Setting permissions for output files and directories."
+        ${DOCKER_RUN} -v ${TMP_DIR}:${TMP_DIR} --entrypoint /usr/bin/find ${PGE_IMAGE}:${PGE_TAG} ${TMP_DIR} -type d -exec chmod 775 {} +
+        ${DOCKER_RUN} -v ${TMP_DIR}:${TMP_DIR} --entrypoint /usr/bin/find ${PGE_IMAGE}:${PGE_TAG} ${TMP_DIR} -type f -exec chmod 664 {} +
+        cd ${TMP_ROOT}
+        rm -rf ${TMP_DIR}
+    else
+        echo "--no-cleanup flag set: Temporary directories will remain on disk."
     fi
+}
+
+test_int_trap_kill_metrics_pid()
+{
+    if $COLLECT_METRICS; then
+        # End background metrics collection
+        local stats_pid_file="${TEST_RESULTS_DIR}/${PGE_NAME}_metrics_stats_bg_pid.txt"
+        if [ -e ${stats_pid_file} ]
+        then
+            process_to_kill=$(cat "${stats_pid_file}")
+            if ps -p $process_to_kill > /dev/null
+            then
+                kill $process_to_kill
+                wait $process_to_kill 2> /dev/null || true
+            fi
+            rm "${stats_pid_file}"
+        fi
+     else
+         echo "--no-metrics flag set"
+    fi
+}
+
+# Clean up functions that are called on EXIT from test_int_<PGE>.sh scripts
+test_int_trap_cleanup()
+{
+  test_int_trap_cleanup_temp_dir
+  test_int_trap_kill_metrics_pid
 }
