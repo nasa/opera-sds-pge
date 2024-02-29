@@ -25,13 +25,17 @@ RunConfig:
         ProgramPath: bash
         ProgramOptions:
           - -c
-          - echo "Expected Error Message 1;"
-          - echo "Expected Error Message 2;"
-          - echo "Expected Error Message 3;"
-          - echo "Expected Error Message 4;"
-          - echo "Expected Error Message 5;"
-          - echo “Stack-trace here;”
-          - "exit 123"
+          - echo;
+          - echo sample traceback line1;
+          - echo sample traceback line2;
+          - echo sample traceback line3;
+          - echo sample traceback line4;
+          - echo sample traceback line5;
+          - echo sample traceback line6;
+          - echo sample traceback line7;
+          - echo sample traceback line8;
+          - echo sample traceback line9;
+          - exit 123;
         ErrorCodeBase: 100000
         SchemaPath: test/data/sample_sas_schema.yaml
         IsoTemplatePath: sample_iso_template.xml.jinja2
@@ -44,7 +48,7 @@ RunConfig:
 
       DebugLevelGroup:
         DebugSwitch: False
-        ExecuteViaShell: False
+        ExecuteViaShell: True
 
     SAS:
       input_subset:

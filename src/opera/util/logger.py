@@ -81,6 +81,7 @@ def default_log_file_name():
     log_datetime_str = time_util.get_time_for_filename(datetime.datetime.now())
     file_path = f"pge_{log_datetime_str}.log"
 
+    print ("file_path = ",file_path)
     return file_path
 
 
