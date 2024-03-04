@@ -76,16 +76,39 @@ test_int_setup_results_directory()
     echo "Test results output directory: ${TEST_RESULTS_DIR}"
     mkdir --parents ${TEST_RESULTS_DIR}
     chmod -R 775 ${TEST_RESULTS_DIR}
-    RESULTS_FILE="${TEST_RESULTS_DIR}/test_int_${PGE_NAME}_results.html"
+}
+
+initialize_html_results_file()
+{
+    local output_dir=$1
+    local pge_name=$2
+
+    RESULTS_FILE="${output_dir}/test_int_${pge_name}_results.html"
 
     # Add the initial HTML to the results file
-    results_html_init="<html><b>${PGE_NAME} product comparison results</b><p> \
+    results_html_init="<html><b>${pge_name} product comparison results</b><p> \
         <style>* {font-family: sans-serif;} \
         table {border-collapse: collapse;} \
         th,td {padding: 4px 6px; border: thin solid white} \
         tr:nth-child(even) {background-color: whitesmoke;} \
         </style><table>"
-    echo "${results_html_init}" > ${RESULTS_FILE}
+
+    echo "${results_html_init}" > "$RESULTS_FILE"
+}
+
+update_html_results_file()
+{
+    local compare_result=$1
+    local output_file=$2
+    local expected_file=$3
+    local compare_out=$4
+
+    echo "<tr><td>${compare_result}</td><td><ul><li>Output: ${output_file}</li><li>Expected: ${expected_file}</li></ul></td><td>${compare_out}</td></tr>" >> "$RESULTS_FILE"
+}
+
+finalize_html_results_file()
+{
+    echo "</table></html>" >> "$RESULTS_FILE"
 }
 
 test_int_setup_data_tmp_directory()
@@ -102,7 +125,7 @@ test_int_setup_test_data()
     #
     local_input_data_archive=${TMP_DIR}/${INPUT_DATA}
     local_expected_data_archive=${TMP_DIR}/${EXPECTED_DATA}
-    local_runconfig=${TMP_DIR}/${RUNCONFIG}
+    local_runconfig=${SCRIPT_DIR}/${RUNCONFIG}
 
     # Pull in test data and runconfig from S3
     echo "Downloading input data from s3://operasds-dev-pge/${PGE_NAME}/${INPUT_DATA} to $local_input_data_archive"
@@ -110,9 +133,6 @@ test_int_setup_test_data()
 
     echo "Downloading expected outputs from s3://operasds-dev-pge/${PGE_NAME}/${EXPECTED_DATA} to $local_expected_data_archive"
     aws s3 cp s3://operasds-dev-pge/${PGE_NAME}/${EXPECTED_DATA} $local_expected_data_archive --no-progress
-
-    echo "Downloading runconfig from s3://operasds-dev-pge/${PGE_NAME}/${RUNCONFIG} to $local_runconfig"
-    aws s3 cp s3://operasds-dev-pge/${PGE_NAME}/${RUNCONFIG} $local_runconfig --no-progress
 
     for local_testdata_archive in $local_input_data_archive $local_expected_data_archive
     do
@@ -143,8 +163,6 @@ test_int_setup_test_data()
 
         echo "Copying runconfig file $local_runconfig to $runconfig_dir/"
         cp $local_runconfig $runconfig_dir
-
-        rm -f $local_runconfig
     else
         echo "Unable to find runconfig file $local_runconfig"
         exit 1
@@ -153,10 +171,8 @@ test_int_setup_test_data()
 
 test_int_trap_cleanup_temp_dir()
 {
-    # Finalize results HTML file and set permissions on data that was created during the test.
-
-    echo "</table></html>" >> $RESULTS_FILE
-
+    # set permissions on data that was created during the test to ensure we can
+    # delete said data outside of the container's file system
     DOCKER_RUN="docker run --rm -u $UID:$(id -g)"
 
     # Check options before exiting

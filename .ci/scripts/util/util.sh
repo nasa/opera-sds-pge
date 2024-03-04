@@ -79,6 +79,9 @@ copy_pge_files() {
   STAGING_DIR=$2
   PGE_NAME=$3
 
+  mkdir -p ${STAGING_DIR}/opera/pge
+  mkdir -p ${STAGING_DIR}/opera/.ci/scripts
+
   cp ${WORKSPACE}/src/opera/__init__.py \
    ${STAGING_DIR}/opera/
 
@@ -99,6 +102,15 @@ copy_pge_files() {
 
   cp -r ${WORKSPACE}/src/opera/util \
         ${STAGING_DIR}/opera/
+
+  cp -r ${WORKSPACE}/.ci/scripts/${PGE_NAME} \
+        ${STAGING_DIR}/opera/.ci/scripts/
+
+  cp -r ${WORKSPACE}/.ci/scripts/metrics \
+        ${STAGING_DIR}/opera/.ci/scripts/
+
+  cp -r ${WORKSPACE}/.ci/scripts/util \
+        ${STAGING_DIR}/opera/.ci/scripts/
 
   cp ${WORKSPACE}/COPYING \
      ${STAGING_DIR}/opera
@@ -140,7 +152,6 @@ metrics_collection_start()
       # Initialize output files and statistics format
       metrics_stats="${results_dir}/${pge}_metrics_stats.csv"
       stats_pid_file="${results_dir}/${pge}_metrics_stats_bg_pid.txt"
-
 
       # initialize start seconds and the rest of the csv file's column titles
       METRICS_START_SECONDS=$SECONDS

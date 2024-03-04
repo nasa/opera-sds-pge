@@ -44,18 +44,6 @@ test_int_setup_test_data
 # Setup cleanup on exit
 trap test_int_trap_cleanup EXIT
 
-# Download the RunConfig for the static layers workflow
-static_runconfig="opera_pge_rtc_s1_static_delivery_5_final_runconfig.yaml"
-local_static_runconfig="${TMP_DIR}/runconfig/${static_runconfig}"
-echo "Downloading s3://operasds-dev-pge/${PGE_NAME}/${static_runconfig} to ${local_static_runconfig}"
-aws s3 cp s3://operasds-dev-pge/${PGE_NAME}/${static_runconfig} ${local_static_runconfig} --no-progress
-
-# Pull in product compare script from S3.
-# Current source is https://raw.githubusercontent.com/opera-adt/RTC/main/app/rtc_compare.py
-local_compare_script=${TMP_DIR}/rtc_compare.py
-echo "Downloading s3://operasds-dev-pge/${PGE_NAME}/rtc_compare_final_1.0.0.py to ${local_compare_script}"
-aws s3 cp s3://operasds-dev-pge/${PGE_NAME}/rtc_compare_calval_0.4.1.py "$local_compare_script"
-
 # overall_status values and their meaning
 # 0 - pass
 # 1 - failure to execute some part of this script
@@ -64,6 +52,18 @@ overall_status=0
 
 input_dir="${TMP_DIR}/${INPUT_DATA%.*}/input_dir"
 runconfig_dir="${TMP_DIR}/runconfig"
+
+# Copy the RunConfig for the static layers workflow
+static_runconfig="opera_pge_rtc_s1_static_delivery_5_final_runconfig.yaml"
+local_static_runconfig="${SCRIPT_DIR}/${static_runconfig}"
+echo "Copying runconfig file $local_static_runconfig to $runconfig_dir/"
+cp ${local_static_runconfig} ${runconfig_dir}
+
+# Pull in product compare script from S3.
+# Current source is https://raw.githubusercontent.com/opera-adt/RTC/main/app/rtc_compare.py
+local_compare_script=${TMP_DIR}/rtc_compare.py
+echo "Downloading s3://operasds-dev-pge/${PGE_NAME}/rtc_compare_final_1.0.0.py to ${local_compare_script}"
+aws s3 cp s3://operasds-dev-pge/${PGE_NAME}/rtc_compare_calval_0.4.1.py "$local_compare_script"
 
 # the testdata reference metadata contains this path so we use it here
 output_dir="${TMP_DIR}/rtc_s1_output_dir"

@@ -10,7 +10,6 @@ Post process the csv file returned when metric data is collected
 """
 
 import csv
-import datetime
 import os
 import sys
 
@@ -160,7 +159,7 @@ def make_lists(csv_file):
 
     Parameters
     ----------
-    csv_file : file
+    csv_file : str
         file used to capture either docker stats or miscellaneous OS measurements
 
     Returns
@@ -184,10 +183,7 @@ def main():
     # Remove lines that may have been recorded before Docker stated.
     stats_columns = "SECONDS,{{.Name}},CPU,{{.CPUPerc}},MEM,{{.MemUsage}},MEM_PERC,{{.MemPerc}},NET,{{.NetIO}},BLOCK,{{.BlockIO}},PIDS,{{.PIDs}},disk_used,swap_used,total_threads"
     expected_column_count = len(stats_columns.split(','))
-    print(f"expected cols {expected_column_count}")
     remove_unwanted_lines(stats_file, temp_stats, expected_column_count)
-
-    current_time = datetime.datetime.today().strftime('%Y%m%d_%H%M%S')
 
     # read files into lists
     stats_list = make_lists(temp_stats)

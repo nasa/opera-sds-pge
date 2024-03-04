@@ -1,0 +1,113 @@
+RunConfig:
+    Name: OPERA-CSLC-S1-PGE-INT-TEST-CONFIG
+
+    Groups:
+        PGE:
+            PGENameGroup:
+                PGEName: CSLC_S1_PGE
+
+            InputFilesGroup:
+                InputFilePaths:
+                    - /home/compass_user/input_dir/S1A_IW_SLC__1SDV_20220501T015035_20220501T015102_043011_0522A4_42CC.zip
+                    - /home/compass_user/input_dir/S1A_OPER_AUX_POEORB_OPOD_20220521T081912_V20220430T225942_20220502T005942.EOF
+
+            DynamicAncillaryFilesGroup:
+                AncillaryFileMap:
+                    dem_file: /home/compass_user/input_dir/dem_4326.tiff
+
+                    tec_file: /home/compass_user/input_dir/jplg1210.22i
+
+                    burst_database_file: /home/compass_user/input_dir/burst_db_0.2.0_230831-bbox-only.sqlite
+
+            ProductPathGroup:
+                OutputProductPath: /home/compass_user/output_dir
+
+                ScratchPath: /home/compass_user/scratch
+
+            PrimaryExecutable:
+                ProductIdentifier: CSLC_S1
+
+                ProductVersion: "1.0"
+
+                ProgramPath: conda
+
+                ProgramOptions:
+                    - run
+                    - -n
+                    - COMPASS
+                    - s1_cslc.py
+
+                ErrorCodeBase: 200000
+
+                SchemaPath: /home/compass_user/opera/pge/cslc_s1/schema/cslc_s1_sas_schema.yaml
+
+                IsoTemplatePath: /home/compass_user/opera/pge/cslc_s1/templates/OPERA_ISO_metadata_L2_CSLC_S1_template.xml.jinja2
+
+                DataValidityStartDate: 20140403
+
+            QAExecutable:
+                Enabled: False
+
+                ProgramPath:
+
+                ProgramOptions:
+
+            DebugLevelGroup:
+                DebugSwitch: False
+
+                ExecuteViaShell: False
+
+        SAS:
+            runconfig:
+                name: cslc_s1_workflow_default
+
+                groups:
+                    pge_name_group:
+                        pge_name: CSLC_S1_PGE
+
+                    input_file_group:
+                        safe_file_path:
+                            - /home/compass_user/input_dir/S1A_IW_SLC__1SDV_20220501T015035_20220501T015102_043011_0522A4_42CC.zip
+                        orbit_file_path:
+                            - /home/compass_user/input_dir/S1A_OPER_AUX_POEORB_OPOD_20220521T081912_V20220430T225942_20220502T005942.EOF
+                        burst_id:
+                            - t064_135518_iw1
+                            - t064_135519_iw1
+                            - t064_135520_iw1
+                            - t064_135521_iw1
+                            - t064_135522_iw1
+                            - t064_135523_iw1
+                            - t064_135524_iw1
+                            - t064_135525_iw1
+                            - t064_135526_iw1
+                            - t064_135527_iw1
+
+                    dynamic_ancillary_file_group:
+                        dem_file: /home/compass_user/input_dir/dem_4326.tiff
+                        tec_file: /home/compass_user/input_dir/jplg1210.22i
+
+                    static_ancillary_file_group:
+                        burst_database_file: /home/compass_user/input_dir/burst_db_0.2.0_230831-bbox-only.sqlite
+
+                    product_path_group:
+                        product_path: /home/compass_user/output_dir
+
+                        scratch_path: /home/compass_user/scratch
+
+                        sas_output_file: /home/compass_user/output_dir
+
+                        product_version: "1.0"
+
+                    primary_executable:
+                        product_type: CSLC_S1
+
+                    processing:
+                        polarization: co-pol
+                        geocoding:
+                            flatten: True
+                            x_posting: 5
+                            y_posting: 10
+                        geo2rdr:
+                            lines_per_block: 1000
+                            threshold: 1.0e-8
+                            numiter: 25

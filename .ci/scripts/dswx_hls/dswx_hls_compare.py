@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import argparse
 import numpy as np
 import os
@@ -6,7 +8,10 @@ from osgeo import gdal
 COMPARE_DSWX_HLS_PRODUCTS_ERROR_TOLERANCE_ATOL = 1e-6
 COMPARE_DSWX_HLS_PRODUCTS_ERROR_TOLERANCE_RTOL = 1e-5
 
-DEFAULT_METADATA_EXCLUDE_LIST = ['PROCESSING_DATETIME', 'DEM_SOURCE', 'LANDCOVER_SOURCE', 'WORLDCOVER_SOURCE']
+DEFAULT_METADATA_EXCLUDE_LIST = ['PROCESSING_DATETIME',
+                                 'DEM_SOURCE',
+                                 'LANDCOVER_SOURCE',
+                                 'WORLDCOVER_SOURCE']
 PREFIX = ' ' * 7
 
 
@@ -33,7 +38,7 @@ def _get_prefix_str(current_flag, flag_all_ok):
     return flag_all_ok, prefix_str
 
 
-def compare_dswx_hls_products(file_1, file_2, metadata_exclude_list=[]):
+def compare_dswx_hls_products(file_1, file_2, metadata_exclude_list):
     """
     Compare DSWx-HLS products in various ways
 
@@ -133,7 +138,7 @@ def compare_dswx_hls_products(file_1, file_2, metadata_exclude_list=[]):
 
     # compare metadata
     metadata_compare_message, flag_same_metadata = \
-        _compare_dswx_hls_metadata(metadata_1, metadata_2, metadata_exclude_list=metadata_exclude_list)
+        _compare_dswx_hls_metadata(metadata_1, metadata_2, metadata_exclude_list)
 
     flag_all_ok, flag_same_metadata_str = _get_prefix_str(flag_same_metadata, flag_all_ok)
     print(f'{flag_same_metadata_str}Comparing metadata')
@@ -144,7 +149,7 @@ def compare_dswx_hls_products(file_1, file_2, metadata_exclude_list=[]):
     return flag_all_ok
 
 
-def _compare_dswx_hls_metadata(metadata_1, metadata_2, metadata_exclude_list=[]):
+def _compare_dswx_hls_metadata(metadata_1, metadata_2, metadata_exclude_list):
     """
     Compare DSWx-HLS products' metadata
 
@@ -163,6 +168,7 @@ def _compare_dswx_hls_metadata(metadata_1, metadata_2, metadata_exclude_list=[])
         A string containing any metadata comparison failure messages
     flag_same_metadata: bool
         Flag indicating that metadata comparison succeeded
+
     """
     flag_same_metadata = True
     metadata_compare_message = ""
@@ -204,11 +210,10 @@ def _compare_dswx_hls_metadata(metadata_1, metadata_2, metadata_exclude_list=[])
 
 
 if __name__ == "__main__":
-
     desc = "Compare two DSWx-HLS product files."
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument('files', nargs=2, help="Product filenames to be compared.")
-    parser.add_argument('--metadata_exclude_list',
+    parser.add_argument('--metadata-exclude-list', '-x',
                         nargs='+',
                         help=("Metadata field names to ignore for purposes "
                               "of determining comparison success or failure."))
@@ -217,10 +222,11 @@ if __name__ == "__main__":
     file_2 = args.files[1]
 
     metadata_exclude_list = DEFAULT_METADATA_EXCLUDE_LIST
-    if args.metadata_exclude_list:
-        metadata_exclude_list += args.metadata_exclude_list
 
-    result = compare_dswx_hls_products(file_1, file_2, metadata_exclude_list=metadata_exclude_list)
+    if args.metadata_exclude_list:
+        metadata_exclude_list.extend(args.metadata_exclude_list)
+
+    result = compare_dswx_hls_products(file_1, file_2, metadata_exclude_list)
 
     if result is True:
         print("Comparison succeeded")
