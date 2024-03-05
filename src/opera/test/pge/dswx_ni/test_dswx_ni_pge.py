@@ -77,7 +77,7 @@ class DswxNIPgeTestCase(unittest.TestCase):
         pge = DSWxNIExecutor(pge_name="DswxNIPgeTest", runconfig_path=runconfig_path)
 
         # Check that basic attributes were initialized
-        self.assertEqual(pge.name, "DSWx")
+        self.assertEqual(pge.name, "DSWx-NI")
         self.assertEqual(pge.pge_name, "DswxNIPgeTest")
         self.assertEqual(pge.runconfig_path, runconfig_path)
 

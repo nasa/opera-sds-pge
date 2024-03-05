@@ -207,9 +207,12 @@ def time_and_execute(command_line, logger, execute_via_shell=False):
     # Append the stdout/stderr captured by the subprocess to our log
     logger.append(run_result.stdout.decode())
 
+    tail = run_result.stdout.decode().split('\n')
+    tail = "\n".join(tail[-20:])
+
     if run_result.returncode:
-        error_msg = (f'Command "{" ".join(command_line)}" failed with exit '
-                     f'code {run_result.returncode}')
+        error_msg = (f'Command "{str(command_line)}" failed with exit '
+                     f'code {run_result.returncode}, traceback: {tail}')
 
         logger.critical(module_name, ErrorCode.SAS_PROGRAM_FAILED, error_msg)
 

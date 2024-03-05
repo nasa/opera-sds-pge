@@ -25,7 +25,17 @@ RunConfig:
         ProgramPath: bash
         ProgramOptions:
           - -c
-          - "exit 123"
+          - echo;
+          - echo sample traceback line 1;
+          - echo sample traceback line 2;
+          - echo sample traceback line 3;
+          - echo sample traceback line 4;
+          - echo sample traceback line 5;
+          - echo sample traceback line 6;
+          - echo sample traceback line 7;
+          - echo sample traceback line 8;
+          - echo sample traceback line 9;
+          - exit 123;
         ErrorCodeBase: 100000
         SchemaPath: test/data/sample_sas_schema.yaml
         IsoTemplatePath: sample_iso_template.xml.jinja2
@@ -38,7 +48,7 @@ RunConfig:
 
       DebugLevelGroup:
         DebugSwitch: False
-        ExecuteViaShell: False
+        ExecuteViaShell: True
 
     SAS:
       input_subset:
