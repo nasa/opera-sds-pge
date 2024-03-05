@@ -211,13 +211,9 @@ def time_and_execute(command_line, logger, execute_via_shell=False):
     tail = "\n".join(tail[-20:])
 
     if run_result.returncode:
-        error_msg = (f'Command "{" ".join(command_line)}" failed with exit '
-                f'code {run_result.returncode}, traceback: {tail}')
+        error_msg = (f'Command "{str(command_line)}" failed with exit '
+                     f'code {run_result.returncode}, traceback: {tail}')
 
-#    if run_result.returncode:
-#    error_msg = (f'Command "{" ".join(command_line)}" failed with exit '
-#                     f'code {run_result.returncode}')
-#        print ("error_msg =  error_msg")
         logger.critical(module_name, ErrorCode.SAS_PROGRAM_FAILED, error_msg)
 
     stop_time = time.monotonic()

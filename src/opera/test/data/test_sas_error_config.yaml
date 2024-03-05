@@ -26,15 +26,15 @@ RunConfig:
         ProgramOptions:
           - -c
           - echo;
-          - echo sample traceback line1;
-          - echo sample traceback line2;
-          - echo sample traceback line3;
-          - echo sample traceback line4;
-          - echo sample traceback line5;
-          - echo sample traceback line6;
-          - echo sample traceback line7;
-          - echo sample traceback line8;
-          - echo sample traceback line9;
+          - echo sample traceback line 1;
+          - echo sample traceback line 2;
+          - echo sample traceback line 3;
+          - echo sample traceback line 4;
+          - echo sample traceback line 5;
+          - echo sample traceback line 6;
+          - echo sample traceback line 7;
+          - echo sample traceback line 8;
+          - echo sample traceback line 9;
           - exit 123;
         ErrorCodeBase: 100000
         SchemaPath: test/data/sample_sas_schema.yaml

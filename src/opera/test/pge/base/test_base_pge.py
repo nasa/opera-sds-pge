@@ -160,7 +160,7 @@ class BasePgeTestCase(unittest.TestCase):
         with self.assertRaises(RuntimeError) as err:
             pge.run()
 
-        self.assertIn('Failed with exit code 123',str(err.exception))
+        self.assertIn('failed with exit code 123',str(err.exception))
         self.assertIn('sample traceback line 2',str(err.exception))
 
         # Log should be fully initialized before SAS execution, so make sure it was

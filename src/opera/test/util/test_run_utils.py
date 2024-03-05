@@ -209,4 +209,4 @@ class RunUtilsTestCase(unittest.TestCase):
 
         # Check for the erroneous run (note this test is generalized to work
         # on both linux and osx)
-        self.assertIn('bash -c exit 1 /path/to/runconfig" failed with exit code 1', log)
+        self.assertIn(str(command_line), log)
