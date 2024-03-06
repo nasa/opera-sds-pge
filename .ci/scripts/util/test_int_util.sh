@@ -202,8 +202,6 @@ test_int_trap_kill_metrics_pid()
             fi
             rm "${stats_pid_file}"
         fi
-     else
-         echo "--no-metrics flag set"
     fi
 }
 
