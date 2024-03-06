@@ -28,9 +28,9 @@ SAMPLE_TIME=1
 # RUNCONFIG should be the name of the runconfig in s3://operasds-dev-pge/dswx_s1/
 [ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath "$(dirname "$(realpath "$0")")"/../../..)
 [ -z "${PGE_TAG}" ] && PGE_TAG="${USER}-dev"
-[ -z "${INPUT_DATA}" ] && INPUT_DATA="dswx_s1_gamma_0.3_expected_input.zip"
-[ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="dswx_s1_gamma_0.3_expected_output.zip"
-[ -z "${RUNCONFIG}" ] && RUNCONFIG="dswx_s1_gamma_0.3_runconfig.yaml"
+[ -z "${INPUT_DATA}" ] && INPUT_DATA="dswx_s1_calval_0.4_expected_input.zip"
+[ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="dswx_s1_calval_0.4_expected_output.zip"
+[ -z "${RUNCONFIG}" ] && RUNCONFIG="dswx_s1_calval_0.4_runconfig.yaml"
 [ -z "${TMP_ROOT}" ] && TMP_ROOT="$DEFAULT_TMP_ROOT"
 
 # Create the test output directory in the work space
@@ -93,7 +93,7 @@ metrics_collection_start "$PGE_NAME" "$container_name" "$TEST_RESULTS_DIR" "$SAM
 
 echo "Running Docker image ${PGE_IMAGE}:${PGE_TAG} for ${input_data_dir}"
 docker run --rm -u $UID:"$(id -g)" --name $container_name \
-            -w /home/dswx_user \
+            -w /home/dswx_user/scratch_dir \
             -v "${TMP_DIR}/runconfig":/home/dswx_user/runconfig:ro \
             -v "$input_data_dir":/home/dswx_user/input_dir:ro \
             -v "$output_dir":/home/dswx_user/output_dir \
@@ -113,6 +113,8 @@ if [ $docker_exit_status -ne 0 ]; then
     echo "docker exit indicates failure: ${docker_exit_status}"
     overall_status=1
 else
+    initialize_html_results_file "$output_dir" "$PGE_NAME"
+
     # Compare output files against expected files
     for output_file in "$output_dir"/*
     do
@@ -178,9 +180,13 @@ else
         # add html breaks to newlines
         compare_output=${compare_output//$'\n'/<br>$'\n'}
 
-        echo "<tr><td>${compare_result}</td><td><ul><li>Output: ${output_file}</li><li>Expected: ${expected_file}</li></ul></td><td>${compare_output}</td></tr>" >> "$RESULTS_FILE"
-        done
-    fi
+        update_html_results_file "${compare_result}" "${output_file}" "${expected_file}" "${compare_output}"
+    done
+
+    finalize_html_results_file
+    cp "${output_dir}"/test_int_dswx_s1_results.html "${TEST_RESULTS_DIR}"/test_int_dswx_s1_results.html
+
+fi
 
 echo " "
 if [ $overall_status -ne 0 ]; then
