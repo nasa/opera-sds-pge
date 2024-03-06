@@ -212,7 +212,7 @@ def time_and_execute(command_line, logger, execute_via_shell=False):
 
     if run_result.returncode:
         error_msg = (f'Command "{str(command_line)}" failed with exit '
-                     f'code {run_result.returncode}, traceback: {tail}')
+                     f'code {run_result.returncode}, traceback:\n{tail}')
 
         logger.critical(module_name, ErrorCode.SAS_PROGRAM_FAILED, error_msg)
 
