@@ -93,7 +93,6 @@ metrics_collection_start "$PGE_NAME" "$container_name" "$TEST_RESULTS_DIR" "$SAM
 
 echo "Running Docker image ${PGE_IMAGE}:${PGE_TAG} for ${input_data_dir}"
 docker run --rm -u $UID:"$(id -g)" --name $container_name \
-            -w /home/dswx_user/scratch_dir \
             -v "${TMP_DIR}/runconfig":/home/dswx_user/runconfig:ro \
             -v "$input_data_dir":/home/dswx_user/input_dir:ro \
             -v "$output_dir":/home/dswx_user/output_dir \
