@@ -148,7 +148,7 @@ RunConfig:
           static_ancillary_file_group:
             static_ancillary_inputs_flag: True
             mgrs_database_file: /home/dswx_user/input_dir/ancillary_data/MGRS_tile.sqlite
-            mgrs_collection_database_file: /home/dswx_user/input_dir/ancillary_data/MGRS_tile_collection.sqlite
+            mgrs_collection_database_file: /home/dswx_user/input_dir/ancillary_data/MGRS_tile_collection_v0.3.sqlite
 
           primary_executable:
             product_type: dswx_s1

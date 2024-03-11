@@ -6,6 +6,7 @@ dswx_s1_pge.py
 ==============
 Module defining the implementation for the Dynamic Surface Water Extent (DSWx)
 from Sentinel-1 A/B (S1) PGE.
+
 """
 
 import glob
@@ -784,7 +785,7 @@ class DSWxS1Executor(DSWxS1PreProcessorMixin, DSWxS1PostProcessorMixin, PgeExecu
     LEVEL = "L3"
     """Processing Level for DSWx-S1 Products"""
 
-    SAS_VERSION = "0.3"  # Gamma release https://github.com/opera-adt/DSWX-SAR/releases/tag/v0.3
+    SAS_VERSION = "0.4"  # Gamma release https://github.com/opera-adt/DSWX-SAR/releases/tag/v0.4
     """Version of the SAS wrapped by this PGE, should be updated as needed"""
 
     def __init__(self, pge_name, runconfig_path, **kwargs):
