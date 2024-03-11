@@ -184,7 +184,7 @@ if [ $overall_status -eq 0 ]; then
                                 -v "${expected_dir}":/exp:ro \
                                 --entrypoint /home/compass_user/miniconda3/envs/COMPASS/bin/python3 \
                                 ${PGE_IMAGE}:"${PGE_TAG}" \
-                                /working/validate_product.py \
+                                "${SCRIPT_DIR}"/../cslc/cslc_s1_compare.py \
                                 --ref-product ${ref_product} \
                                 --sec-product ${sec_product} \
                                 -p CSLC 2>&1) || docker_exit_status=$?
