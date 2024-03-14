@@ -50,7 +50,7 @@ def _get_parser():
     parser.add_argument('input_dirs',
                         type=str,
                         nargs=2,
-                        help='Input RTC products` directories')
+                        help='Input RTC products directories')
 
     return parser
 

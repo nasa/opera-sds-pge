@@ -148,7 +148,8 @@ cp "${output_dir}"/*.log "${TEST_RESULTS_DIR}"
 cp "${static_output_dir}"/*.log "${TEST_RESULTS_DIR}"
 
 if [ $overall_status -eq 0 ]; then
-    echo "<tr><th>Compare Result</th><th><ul><li>Expected file</li><li>Output file</li></ul></th><th>rtc_compare.py output</th></tr>" >> "$RESULTS_FILE"
+    initialize_html_results_file "$output_dir" "$PGE_NAME"
+    echo "<tr><th>Compare Result</th><th><ul><li>Expected file</li><li>Output file</li></ul></th><th>rtc_s1_compare.py output</th></tr>" >> "$RESULTS_FILE"
 
     declare -a burst_ids=("t069_147169_iw3"
                           "t069_147170_iw3"
@@ -182,7 +183,7 @@ if [ $overall_status -eq 0 ]; then
         echo "Output RTC files matching burst id are in $output_files"
         echo "Expected files are in $expected_files"
 
-        compare_output=$(python3 "${local_compare_script}" "${expected_files}" "${output_files}")
+        compare_output=$("${SCRIPT_DIR}"/../rtc_s1/rtc_s1_compare.py "${expected_files}" "${output_files}")
 
         echo "$compare_output"
         if [[ "$compare_output" != *"FAILED"* ]]; then
@@ -199,7 +200,7 @@ if [ $overall_status -eq 0 ]; then
 
         # add html breaks to newlines
         compare_output=${compare_output//$'\n'/<br>$'\n'}
-        echo "<tr><td>${rtc_compare_result}</td><td><ul><li>${expected_files}</li><li>${output_files}</li></ul></td><td>${compare_output}</td></tr>" >> "$RESULTS_FILE"
+        update_html_results_file "${rtc_compare_result}" "${expected_files}" "${output_files}" "${compare_output}"
 
         static_layers_compare_result="PENDING"
         expected_dir="${TMP_DIR}/${EXPECTED_DATA%.*}/expected_rtc_s1_static_output_dir"
@@ -216,7 +217,7 @@ if [ $overall_status -eq 0 ]; then
         echo "Output static layers matching burst id are in $output_static_files"
         echo "Expected files are in $expected_static_files"
 
-        compare_output=$(python3 "${local_compare_script}" "${expected_static_files}" "${output_static_files}")
+        compare_output=$("${SCRIPT_DIR}"/../rtc_s1/rtc_s1_compare.py "${expected_static_files}" "${output_static_files}")
 
         echo "$compare_output"
         if [[ "$compare_output" != *"FAILED"* ]]; then
@@ -233,9 +234,11 @@ if [ $overall_status -eq 0 ]; then
 
         # add html breaks to newlines
         compare_output=${compare_output//$'\n'/<br>$'\n'}
-        echo "<tr><td>${static_layers_compare_result}</td><td><ul><li>${expected_static_files}</li><li>${output_static_files}</li></ul></td><td>${compare_output}</td></tr>" >> "$RESULTS_FILE"
+        update_html_results_file "${static_layers_compare_result}" "${expected_static_files}" "${output_static_files}" "${compare_output}"
     done
 
+    finalize_html_results_file
+    cp "${output_dir}"/test_int_rtc_s1_results.html "${TEST_RESULTS_DIR}"/test_int_rtc_s1_results.html
 fi
 echo " "
 
