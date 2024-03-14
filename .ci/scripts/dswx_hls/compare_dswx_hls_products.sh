@@ -17,6 +17,8 @@ PGE_NAME="dswx_hls"
 
 initialize_html_results_file "$OUTPUT_DIR" "$PGE_NAME"
 
+echo "<tr><th>Compare Result</th><th><ul><li>Expected file</li><li>Output file</li></ul></th><th>dswx_hls_compare.py output</th></tr>" >> "$RESULTS_FILE"
+
 # overall_status values and their meaning
 # 0 - pass
 # 1 - failure to execute some part of this script
