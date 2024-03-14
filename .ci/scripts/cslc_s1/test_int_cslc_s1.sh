@@ -54,7 +54,7 @@ runconfig_dir="${TMP_DIR}/runconfig"
 
 # Copy the RunConfig for the static layers workflow
 static_runconfig="opera_pge_cslc_s1_static_delivery_6.1_final_runconfig.yaml"
-local_static_runconfig="${SCRIPT_DIR}/runconfig/${static_runconfig}"
+local_static_runconfig="${SCRIPT_DIR}/${static_runconfig}"
 echo "Copying runconfig file $local_static_runconfig to $runconfig_dir/"
 cp ${local_static_runconfig} ${runconfig_dir}
 
@@ -148,7 +148,8 @@ cp "${output_dir}"/*.log "${TEST_RESULTS_DIR}"
 cp "${static_output_dir}"/*.log "${TEST_RESULTS_DIR}"
 
 if [ $overall_status -eq 0 ]; then
-    echo "<tr><th>Compare Result</th><th><ul><li>Expected file</li><li>Output file</li></ul></th><th>validate_product.py output</th></tr>" >> "$RESULTS_FILE"
+    initialize_html_results_file "$output_dir" "$PGE_NAME"
+    echo "<tr><th>Compare Result</th><th><ul><li>Expected file</li><li>Output file</li></ul></th><th>cslc_s1_compare.py output</th></tr>" >> "$RESULTS_FILE"
 
     declare -a burst_ids=("t064_135518_iw1"
                           "t064_135519_iw1"
@@ -175,10 +176,10 @@ if [ $overall_status -eq 0 ]; then
 
         echo "Output CSLC file matching burst id is $output_file"
 
-        ref_product="/exp/${burst_id}/20220501/${burst_id}_20220501.h5"
-        sec_product="/out/$(basename ${output_file})"
+        ref_product="${expected_dir}/${burst_id}/20220501/${burst_id}_20220501.h5"
+        sec_product="${output_file}"
 
-	compare_out=$("${SCRIPT_DIR}"/../cslc_s1/cslc_s1_compare.py --ref-product ${ref_product} --sec-product ${sec_product} -p CSLC 2>&1) || compare_exit_status=$?
+        compare_out=$("${SCRIPT_DIR}"/../cslc_s1/cslc_s1_compare.py --ref-product ${ref_product} --sec-product ${sec_product} -p CSLC 2>&1) || compare_exit_status=$?
 
         echo "$compare_out"
         if [[ "$compare_out" != *"All CSLC product checks have passed"* ]]; then
@@ -195,7 +196,7 @@ if [ $overall_status -eq 0 ]; then
         fi
 
         compare_out="${compare_out//$'\n'/<br>}"
-        echo "<tr><td>${cslc_compare_result}</td><td><ul><li>${ref_product}</li><li>${sec_product}</li></ul></td><td>${compare_out}</td></tr>" >> "$RESULTS_FILE"
+        update_html_results_file "${cslc_compare_result}" "${ref_product}" "${sec_product}" "${compare_out}"
 
         static_layers_compare_result="PENDING"
         expected_dir="${TMP_DIR}/${EXPECTED_DATA%.*}/expected_output_s1_cslc_static"
@@ -205,10 +206,10 @@ if [ $overall_status -eq 0 ]; then
 
         echo "Output static layers file matching burst id is $output_file"
 
-        ref_product="/exp/${burst_id}/20220501/static_layers_${burst_id}.h5"
-        sec_product="/out/$(basename ${output_file})"
+        ref_product="${expected_dir}/${burst_id}/20220501/static_layers_${burst_id}.h5"
+        sec_product="${output_file}"
 
-	compare_out=$("${SCRIPT_DIR}"/../cslc_s1/cslc_s1_compare.py --ref-product ${ref_product} --sec-product ${sec_product} -p CSLC 2>&1) || compare_exit_status=$?
+        compare_out=$("${SCRIPT_DIR}"/../cslc_s1/cslc_s1_compare.py --ref-product ${ref_product} --sec-product ${sec_product} -p static_layers 2>&1) || compare_exit_status=$?
 
         echo "$compare_out"
         if [[ "$compare_out" != *"All CSLC product checks have passed"* ]]; then
@@ -225,8 +226,11 @@ if [ $overall_status -eq 0 ]; then
         fi
 
         compare_out="${compare_out//$'\n'/<br>}"
-        echo "<tr><td>${static_layers_compare_result}</td><td><ul><li>${ref_product}</li><li>${sec_product}</li></ul></td><td>${compare_out}</td></tr>" >> "$RESULTS_FILE"
+        update_html_results_file "${static_layers_compare_result}" "${ref_product}" "${sec_product}" "${compare_out}"
     done
+
+    finalize_html_results_file
+    cp "${output_dir}"/test_int_cslc_s1_results.html "${TEST_RESULTS_DIR}"/test_int_cslc_s1_results.html
 fi
 echo " "
 
