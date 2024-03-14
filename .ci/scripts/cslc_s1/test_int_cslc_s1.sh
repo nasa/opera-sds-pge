@@ -178,23 +178,14 @@ if [ $overall_status -eq 0 ]; then
         ref_product="/exp/${burst_id}/20220501/${burst_id}_20220501.h5"
         sec_product="/out/$(basename ${output_file})"
 
-        docker_out=$(docker run --rm -u compass_user:compass_user \
-                                -v "${TMP_DIR}":/working:ro \
-                                -v "${output_dir}":/out:ro \
-                                -v "${expected_dir}":/exp:ro \
-                                --entrypoint /home/compass_user/miniconda3/envs/COMPASS/bin/python3 \
-                                ${PGE_IMAGE}:"${PGE_TAG}" \
-                                "${SCRIPT_DIR}"/../cslc/cslc_s1_compare.py \
-                                --ref-product ${ref_product} \
-                                --sec-product ${sec_product} \
-                                -p CSLC 2>&1) || docker_exit_status=$?
+	compare_out=$("${SCRIPT_DIR}"/../cslc_s1/cslc_s1_compare.py --ref-product ${ref_product} --sec-product ${sec_product} -p CSLC 2>&1) || compare_exit_status=$?
 
-        echo "$docker_out"
-        if [[ "$docker_out" != *"All CSLC product checks have passed"* ]]; then
+        echo "$compare_out"
+        if [[ "$compare_out" != *"All CSLC product checks have passed"* ]]; then
             echo "Failure: All CSLC product checks DID NOT PASS"
             cslc_compare_result="FAIL"
             overall_status=2
-        elif [[ "$docker_out" != *"All CSLC metadata checks have passed"* ]]; then
+        elif [[ "$compare_out" != *"All CSLC metadata checks have passed"* ]]; then
             echo "Failure: All CSLC metadata checks DID NOT PASS"
             cslc_compare_result="FAIL"
             overall_status=2
@@ -203,8 +194,8 @@ if [ $overall_status -eq 0 ]; then
             cslc_compare_result="PASS"
         fi
 
-        docker_out="${docker_out//$'\n'/<br>}"
-        echo "<tr><td>${cslc_compare_result}</td><td><ul><li>${ref_product}</li><li>${sec_product}</li></ul></td><td>${docker_out}</td></tr>" >> "$RESULTS_FILE"
+        compare_out="${compare_out//$'\n'/<br>}"
+        echo "<tr><td>${cslc_compare_result}</td><td><ul><li>${ref_product}</li><li>${sec_product}</li></ul></td><td>${compare_out}</td></tr>" >> "$RESULTS_FILE"
 
         static_layers_compare_result="PENDING"
         expected_dir="${TMP_DIR}/${EXPECTED_DATA%.*}/expected_output_s1_cslc_static"
@@ -217,23 +208,14 @@ if [ $overall_status -eq 0 ]; then
         ref_product="/exp/${burst_id}/20220501/static_layers_${burst_id}.h5"
         sec_product="/out/$(basename ${output_file})"
 
-        docker_out=$(docker run --rm -u compass_user:compass_user \
-                                -v "${TMP_DIR}":/working:ro \
-                                -v "${static_output_dir}":/out:ro \
-                                -v "${expected_dir}":/exp:ro \
-                                --entrypoint /home/compass_user/miniconda3/envs/COMPASS/bin/python3 \
-                                ${PGE_IMAGE}:"${PGE_TAG}" \
-                                /working/validate_product.py \
-                                --ref-product ${ref_product} \
-                                --sec-product ${sec_product} \
-                                -p static_layers 2>&1) || docker_exit_status=$?
+	compare_out=$("${SCRIPT_DIR}"/../cslc_s1/cslc_s1_compare.py --ref-product ${ref_product} --sec-product ${sec_product} -p CSLC 2>&1) || compare_exit_status=$?
 
-        echo "$docker_out"
-        if [[ "$docker_out" != *"All CSLC product checks have passed"* ]]; then
+        echo "$compare_out"
+        if [[ "$compare_out" != *"All CSLC product checks have passed"* ]]; then
             echo "Failure: All CSLC product checks DID NOT PASS"
             static_layers_compare_result="FAIL"
             overall_status=2
-        elif [[ "$docker_out" != *"All CSLC metadata checks have passed"* ]]; then
+        elif [[ "$compare_out" != *"All CSLC metadata checks have passed"* ]]; then
             echo "Failure: All CSLC metadata checks DID NOT PASS"
             static_layers_compare_result="FAIL"
             overall_status=2
@@ -242,8 +224,8 @@ if [ $overall_status -eq 0 ]; then
             static_layers_compare_result="PASS"
         fi
 
-        docker_out="${docker_out//$'\n'/<br>}"
-        echo "<tr><td>${static_layers_compare_result}</td><td><ul><li>${ref_product}</li><li>${sec_product}</li></ul></td><td>${docker_out}</td></tr>" >> "$RESULTS_FILE"
+        compare_out="${compare_out//$'\n'/<br>}"
+        echo "<tr><td>${static_layers_compare_result}</td><td><ul><li>${ref_product}</li><li>${sec_product}</li></ul></td><td>${compare_out}</td></tr>" >> "$RESULTS_FILE"
     done
 fi
 echo " "
