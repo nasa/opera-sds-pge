@@ -363,9 +363,15 @@ def validate_disp_inputs(runconfig, logger, name):
         check_input_list(dyn_anc_file_group['troposphere_files'], logger, name,
                          valid_extensions=('.nc', '.h5', '.grb'), check_zero_size=True)
 
-    if 'frame_to_burst_json' in static_anc_file_group:
+    if ('frame_to_burst_json' in static_anc_file_group and
+            static_anc_file_group['frame_to_burst_json'] is not None):
         check_input(static_anc_file_group['frame_to_burst_json'], logger, name,
                     valid_extensions=('.json',), check_zero_size=True)
+
+    if ('reference_date_database_json' in static_anc_file_group and
+            static_anc_file_group['reference_date_database_json'] is not None):
+        check_input(static_anc_file_group['reference_date_database_json'], logger,
+                    name, valid_extensions=('.json',), check_zero_size=True)
 
 
 def validate_dswx_inputs(runconfig, logger, name, valid_extensions=None):

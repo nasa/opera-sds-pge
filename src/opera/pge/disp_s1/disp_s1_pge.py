@@ -9,7 +9,7 @@ Module defining the implementation for the Land-Surface Displacement (DISP) prod
 from Sentinel-1 A/B (S1-A/B) data.
 
 """
-
+import datetime
 import glob
 import os.path
 import subprocess
@@ -180,7 +180,7 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
 
             # Validate .png file(s)
             nc_file_no_ext, ext = splitext(basename(nc_file))
-            png_file = join(output_dir, f'{nc_file_no_ext}.png')
+            png_file = join(output_dir, f'{nc_file_no_ext}.unwrapped_phase.png')
 
             if not exists(png_file):
                 error_msg = f"Expected SAS output file {basename(png_file)} does not exist"
@@ -248,7 +248,7 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
         # the format FXXXXX
         frame_id = f"F{self.runconfig.sas_config['input_file_group']['frame_id']:05d}"
 
-        inter_disp_product_filename = splitext(inter_filename)[0] + ".nc"
+        inter_disp_product_filename = '.'.join(inter_filename.split('.')[:2] + ["nc"])
 
         # Check if we've already cached the product metadata corresponding to
         # this set of intermediate products (there can be multiple sets of
@@ -280,11 +280,15 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
         # the input satellite imagery for the first burst in the frame of the
         # reference product in the format YYYYMMDDTHHMMSSZ
         reference_date_time = disp_metadata['identification']['reference_datetime']
+        reference_date_time = datetime.datetime.strptime(reference_date_time, "%Y-%m-%d %H:%M:%S.%f")
+        reference_date_time = f"{get_time_for_filename(reference_date_time)}Z"
 
         # SecondaryDateTime: The acquisition sensing start date and time of
         # the input satellite imagery for the first burst in the frame of this
         # secondary product in the format YYYYMMDDTHHMMSSZ
         secondary_date_time = disp_metadata['identification']['secondary_datetime']
+        secondary_date_time = datetime.datetime.strptime(secondary_date_time, "%Y-%m-%d %H:%M:%S.%f")
+        secondary_date_time = f"{get_time_for_filename(secondary_date_time)}Z"
 
         # ProductVersion: OPERA DISP-S1 product version number with four
         # characters, including the letter “v” and two digits indicating the
@@ -546,18 +550,6 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
         # Extract all metadata assigned by the SAS at product creation time
         output_product_metadata = get_disp_s1_product_metadata(disp_product)
 
-        # TODO: temporary fields, remove once available from product metadata
-        # "identification/reference_datetime" is missing from
-        # the current delivery. We should assign a placeholder datetime in
-        # the meantime
-        output_product_metadata['identification']['reference_datetime'] = "20230101T000000Z"
-
-        # "identification/secondary_datetime" is missing from
-        # the current delivery. We should assign a placeholder datetime in
-        # the meantime
-        output_product_metadata['identification']['secondary_datetime'] = "20230101T000000Z"
-        # TODO: end temporary fields
-
         # Parse the image polygon coordinates to conform with gml
         bounding_polygon_wkt_str = output_product_metadata['identification']['bounding_polygon']
 
@@ -771,9 +763,7 @@ class DispS1Executor(DispS1PreProcessorMixin, DispS1PostProcessorMixin, PgeExecu
     LEVEL = "L3"
     """Processing Level for DISP-S1 Products"""
 
-    PGE_VERSION = "3.0.0-er.5.1"
-
-    SAS_VERSION = "0.1.0"  # Beta release https://github.com/opera-adt/disp-s1/releases/tag/v0.1.0
+    SAS_VERSION = "0.2.7"  # Gamma release https://github.com/opera-adt/disp-s1/releases/tag/v0.2.7
     """Version of the SAS wrapped by this PGE, should be updated as needed"""
 
     def __init__(self, pge_name, runconfig_path, **kwargs):
@@ -783,7 +773,7 @@ class DispS1Executor(DispS1PreProcessorMixin, DispS1PostProcessorMixin, PgeExecu
             {
                 # Note: ordering matters here!
                 '*.nc': self._netcdf_filename,
-                '*.png': self._browse_filename,
+                '*unwrapped_phase.png': self._browse_filename,
                 'compressed*.h5': self._compressed_cslc_filename
             }
         )
