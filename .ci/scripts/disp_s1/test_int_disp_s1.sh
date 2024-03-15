@@ -20,7 +20,7 @@ Integration Testing DISP-S1 PGE docker image...
 
 PGE_NAME="disp_s1"
 PGE_IMAGE="opera_pge/${PGE_NAME}"
-SAMPLE_TIME=2
+SAMPLE_TIME=15
 
 # defaults, test data and runconfig files should be updated as-needed to use
 # the latest available as defaults for use with the Jenkins pipeline call
@@ -28,9 +28,9 @@ SAMPLE_TIME=2
 # RUNCONFIG should be the name of the runconfig in s3://operasds-dev-pge/disp_s1/
 [ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath "$(dirname "$(realpath "$0")")"/../../..)
 [ -z "${PGE_TAG}" ] && PGE_TAG="${USER}-dev"
-[ -z "${INPUT_DATA}" ] && INPUT_DATA="disp_s1_r3_beta_expected_input.zip"
-[ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="disp_s1_r3_beta_expected_output.zip"
-[ -z "${RUNCONFIG}" ] && RUNCONFIG="opera_pge_disp_s1_r3_beta_runconfig.yaml"
+[ -z "${INPUT_DATA}" ] && INPUT_DATA="disp_s1_r4_gamma_expected_input.zip"
+[ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="disp_s1_r4_gamma_expected_output.zip"
+[ -z "${RUNCONFIG}" ] && RUNCONFIG="opera_pge_disp_s1_r4_gamma_runconfig.yaml"
 [ -z "${TMP_ROOT}" ] && TMP_ROOT="$DEFAULT_TMP_ROOT"
 
 # Create the test output directory in the work space
@@ -55,6 +55,12 @@ overall_status=0
 expected_dir="${TMP_DIR}/${EXPECTED_DATA%.*}/golden_output"
 input_dir="${TMP_DIR}/${INPUT_DATA%.*}"
 runconfig_dir="${TMP_DIR}/runconfig"
+
+# Copy the Algorithm Parameters RunConfig
+algo_runconfig="opera_pge_disp_s1_r4_gamma_algorithm_parameters.yaml"
+local_algo_runconfig="${SCRIPT_DIR}/${algo_runconfig}"
+echo "Copying runconfig file local_algo_runconfig to $runconfig_dir/"
+cp ${local_algo_runconfig} ${runconfig_dir}
 
 # the testdata reference metadata contains this path so we use it here
 output_dir="${TMP_DIR}/output_disp_s1"
@@ -105,11 +111,12 @@ if [ $docker_exit_status -ne 0 ]; then
     echo "docker exit indicates failure: ${docker_exit_status}"
     overall_status=1
 else
+    initialize_html_results_file "$output_dir" "$PGE_NAME"
     echo "<tr><th>Compare Result</th><th><ul><li>Expected file</li><li>Output file</li></ul></th><th>disp_validate_product_opera_pge.py output</th></tr>" >> "$RESULTS_FILE"
 
     output_file=$(ls ${output_dir}/OPERA_L3_DISP-S1_IW_F11114_VV_*T*Z_*T*Z_v0.2_*T*Z.nc)
     output_file=$(basename ${output_file})
-    expected_file="20221119_20221213.unw.nc"
+    expected_file="20221107_20221213.unw.nc"
 
     docker_out=$(docker run --rm \
                             -v "${output_dir}":/out:ro \
@@ -131,7 +138,11 @@ else
     fi
 
     docker_out="${docker_out//$'\n'/<br>}"
-    echo "<tr><td>${compare_result}</td><td><ul><li>Expected: ${expected_file}</li><li>Output: ${output_file}</li></ul></td><td>${docker_out}</td></tr>" >> "$RESULTS_FILE"
+    update_html_results_file "${compare_result}" "${output_file}" "${expected_file}" "${docker_out}"
+
+    finalize_html_results_file
+
+    cp "${output_dir}"/test_int_disp_s1_results.html "${TEST_RESULTS_DIR}"/test_int_disp_s1_results.html
 fi
 
 echo " "
