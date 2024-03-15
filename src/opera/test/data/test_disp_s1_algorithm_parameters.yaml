@@ -6,6 +6,10 @@ phase_linking:
   # Size of the ministack for sequential estimator.
   #   Type: integer.
   ministack_size: 1000
+  # Maximum number of compressed images to use in sequential estimator. If there are more
+  #   ministacks than this, the earliest CCSLCs will be left out of the later stacks.
+  #   Type: integer.
+  max_num_compressed: 5
   half_window:
     # Half window size (in pixels) for x direction.
     #   Type: integer.
@@ -18,7 +22,7 @@ phase_linking:
   use_evd: false
   # Beta regularization parameter for correlation matrix inversion. 0 is no regularization.
   #   Type: number.
-  beta: 0.01
+  beta: 0.00
   # Method for finding SHPs during phase linking.
   #   Type: string.
   #   Options: ['glrt', 'ks', 'kld', 'rect', 'rect'].
@@ -29,7 +33,7 @@ phase_linking:
 interferogram_network:
   # For single-reference network: Index of the reference image in the network.
   #   Type: integer | null.
-  reference_idx: 0
+  reference_idx:
   # Max `n` to form the nearest-`n` interferograms by index.
   #   Type: integer | null.
   max_bandwidth:
@@ -41,10 +45,6 @@ interferogram_network:
   indexes:
     -   - 0
         - -1
-  # Type of interferogram network to create from phase-linking results.
-  #   Type: string.
-  #   Options: ['single-reference', 'manual-index', 'max-bandwidth', 'max-temporal-baseline'].
-  network_type: single-reference
 unwrap_options:
   # Whether to run the unwrapping step after wrapped phase estimation.
   #   Type: boolean.
@@ -52,24 +52,35 @@ unwrap_options:
   # Phase unwrapping method.
   #   Type: string.
   #   Options: ['snaphu', 'icu', 'phass'].
-  unwrap_method: snaphu
-  # (for multiscale unwrapping) Number of tiles to split the unwrapping into (for multi-scale
-  #   unwrapping).
+  unwrap_method: phass
+  # Number of interferograms to unwrap in parallel.
+  #   Type: integer.
+  n_parallel_jobs: 5
+  # (`snaphu-py` or multiscale unwrapping) Number of tiles to split the inputs into.
   #   Type: array.
   ntiles:
-    - 5
-    - 5
+    - 1
+    - 1
   # (for multiscale unwrapping) Extra multilook factor to use for the coarse unwrap.
   #   Type: array.
   downsample_factor:
-    - 5
-    - 5
-  # Number of interferograms to unwrap in parallel.
+  # (for use in `snaphu-py`) Amount of tile overlap (in pixels) along the (row, col)
+  #   directions.
+  #   Type: array.
+  tile_overlap:
+    - 0
+    - 0
+  # (for snaphu) Number of tiles to unwrap in parallel for each interferogram.
   #   Type: integer.
-  n_parallel_jobs: 2
+  n_parallel_tiles: 1
   # Initialization method for SNAPHU.
   #   Type: string.
+  #   Options: ['mcf', 'mst'].
   init_method: mcf
+  # Statistical cost mode method for SNAPHU.
+  #   Type: string.
+  #   Options: ['defo', 'smooth'].
+  cost: smooth
 output_options:
   # Output (x, y) resolution (in units of input data).
   #   Type: object | null.
@@ -81,11 +92,11 @@ output_options:
   strides:
     x: 6
     y: 3
-  # Area of interest: (left, bottom, right, top) longitude/latitude e.g.
-  #   `bbox=(-150.2,65.0,-150.1,65.5)`.
+  # Area of interest: [left, bottom, right, top] coordinates. e.g.
+  #   `bbox=[-150.2,65.0,-150.1,65.5]`.
   #   Type: array | null.
   bounds:
-  # EPSG code for the `bounds`, if specified.
+  # EPSG code for the `bounds` coordinates, if specified.
   #   Type: integer.
   bounds_epsg: 4326
   # Options for `create_dataset` with h5py.
@@ -102,9 +113,23 @@ output_options:
   gtiff_creation_options:
     - COMPRESS=DEFLATE
     - ZLEVEL=4
+    - BIGTIFF=YES
     - TILED=YES
     - BLOCKXSIZE=128
     - BLOCKYSIZE=128
+  # Whether to add overviews to the output GeoTIFF files. This will increase file size, but
+  #   can be useful for visualizing the data with web mapping tools. See
+  #   https://gdal.org/programs/gdaladdo.html for more.
+  #   Type: boolean.
+  add_overviews: true
+  # List of overview levels to create (if `add_overviews=True`).
+  #   Type: array.
+  overview_levels:
+    - 4
+    - 8
+    - 16
+    - 32
+    - 64
 # Name of the subdataset to use in the input NetCDF files.
 #   Type: string.
-subdataset: //data/VV
+subdataset: /data/VV

@@ -127,36 +127,40 @@ class DispS1PgeTestCase(unittest.TestCase):
         """
         self.assertEqual(runconfig['ps_options']['amp_dispersion_threshold'], 0.25)
         self.assertEqual(runconfig['phase_linking']['ministack_size'], 1000)
-        self.assertEqual(runconfig['phase_linking']['beta'], 0.01)
+        self.assertEqual(runconfig['phase_linking']['max_num_compressed'], 5)
         self.assertEqual(runconfig['phase_linking']['half_window']['x'], 11)
         self.assertEqual(runconfig['phase_linking']['half_window']['y'], 5)
         self.assertEqual(runconfig['phase_linking']['use_evd'], False)
-        self.assertEqual(runconfig['phase_linking']['beta'], 0.01)
+        self.assertEqual(runconfig['phase_linking']['beta'], 0.00)
         self.assertEqual(runconfig['phase_linking']['shp_method'], 'glrt')
         self.assertEqual(runconfig['phase_linking']['shp_alpha'], 0.005)
-        self.assertEqual(runconfig['interferogram_network']['reference_idx'], 0)
+        self.assertEqual(runconfig['interferogram_network']['reference_idx'], None)
         self.assertEqual(runconfig['interferogram_network']['max_bandwidth'], None)
         self.assertEqual(runconfig['interferogram_network']['max_temporal_baseline'], None)
-        self.assertEqual(runconfig['interferogram_network']['indexes'], [[0, -1]])
-        self.assertEqual(runconfig['interferogram_network']['network_type'], 'single-reference')
+        self.assertListEqual(runconfig['interferogram_network']['indexes'], [[0, -1]])
         self.assertEqual(runconfig['unwrap_options']['run_unwrap'], True)
-        self.assertEqual(runconfig['unwrap_options']['unwrap_method'], 'snaphu')
-        self.assertEqual(runconfig['unwrap_options']['ntiles'], [5, 5])
-        self.assertEqual(runconfig['unwrap_options']['downsample_factor'], [5, 5])
-        self.assertEqual(runconfig['unwrap_options']['n_parallel_jobs'], 2)
+        self.assertEqual(runconfig['unwrap_options']['unwrap_method'], 'phass')
+        self.assertEqual(runconfig['unwrap_options']['n_parallel_jobs'], 5)
+        self.assertListEqual(runconfig['unwrap_options']['ntiles'], [1, 1])
+        self.assertEqual(runconfig['unwrap_options']['downsample_factor'], None)
+        self.assertListEqual(runconfig['unwrap_options']['tile_overlap'], [0, 0])
+        self.assertEqual(runconfig['unwrap_options']['n_parallel_tiles'], 1)
         self.assertEqual(runconfig['unwrap_options']['init_method'], 'mcf')
+        self.assertEqual(runconfig['unwrap_options']['cost'], 'smooth')
         self.assertEqual(runconfig['output_options']['output_resolution'], None)
         self.assertEqual(runconfig['output_options']['strides']['x'], 6)
         self.assertEqual(runconfig['output_options']['strides']['y'], 3)
         self.assertEqual(runconfig['output_options']['bounds'], None)
         self.assertEqual(runconfig['output_options']['bounds_epsg'], 4326)
-        self.assertEqual(runconfig['output_options']['hdf5_creation_options']['chunks'], [128, 128])
+        self.assertListEqual(runconfig['output_options']['hdf5_creation_options']['chunks'], [128, 128])
         self.assertEqual(runconfig['output_options']['hdf5_creation_options']['compression'], 'gzip')
         self.assertEqual(runconfig['output_options']['hdf5_creation_options']['compression_opts'], 4)
         self.assertEqual(runconfig['output_options']['hdf5_creation_options']['shuffle'], True)
-        self.assertEqual(runconfig['output_options']['gtiff_creation_options'],
-                         ['COMPRESS=DEFLATE', 'ZLEVEL=4', 'TILED=YES', 'BLOCKXSIZE=128', 'BLOCKYSIZE=128'])
-        self.assertEqual(runconfig['subdataset'], '//data/VV')
+        self.assertListEqual(runconfig['output_options']['gtiff_creation_options'],
+                         ['COMPRESS=DEFLATE', 'ZLEVEL=4', 'BIGTIFF=YES', 'TILED=YES', 'BLOCKXSIZE=128', 'BLOCKYSIZE=128'])
+        self.assertEqual(runconfig['output_options']['add_overviews'], True)
+        self.assertListEqual(runconfig['output_options']['overview_levels'], [4, 8, 16, 32, 64])
+        self.assertEqual(runconfig['subdataset'], '/data/VV')
 
     @patch.object(opera.pge.disp_s1.disp_s1_pge.subprocess, "run", mock_grib_to_netcdf)
     def test_disp_s1_pge_execution(self):
@@ -764,14 +768,14 @@ class DispS1PgeTestCase(unittest.TestCase):
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
 
-            self.assertIn("SAS output file 20180101_20180330.unw.png does not exist", log_contents)
+            self.assertIn("SAS output file 20180101_20180330.unw.unwrapped_phase.png does not exist", log_contents)
             shutil.rmtree(pge.runconfig.output_product_path)
 
             # PNG is zero sized
             runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']['ProgramOptions'] = \
                 ['-p disp_s1_pge_test/output_dir/compressed_slcs;',
                  'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.unw.nc bs=1M count=1;',
-                 'touch disp_s1_pge_test/output_dir/20180101_20180330.unw.png;',
+                 'touch disp_s1_pge_test/output_dir/20180101_20180330.unw.unwrapped_phase.png;',
                  '/bin/echo DISP-S1 invoked with RunConfig']
 
             with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
@@ -787,14 +791,14 @@ class DispS1PgeTestCase(unittest.TestCase):
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
 
-            self.assertIn("SAS output file 20180101_20180330.unw.png exists, but is empty", log_contents)
+            self.assertIn("SAS output file 20180101_20180330.unw.unwrapped_phase.png exists, but is empty", log_contents)
             shutil.rmtree(pge.runconfig.output_product_path)
 
             # compressed_slc directory does not exist
             runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']['ProgramOptions'] = \
                 ['-p disp_s1_pge_test/output_dir/not_compressed_slcs;',
                  'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.unw.nc bs=1M count=1;',
-                 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.unw.png bs=1M count=1;',
+                 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.unw.unwrapped_phase.png bs=1M count=1;',
                  '/bin/echo DISP-S1 invoked with RunConfig']
 
             with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
@@ -817,7 +821,7 @@ class DispS1PgeTestCase(unittest.TestCase):
             runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']['ProgramOptions'] = \
                 ['-p disp_s1_pge_test/output_dir/compressed_slcs;',
                  'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.unw.nc bs=1M count=1;',
-                 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.unw.png bs=1M count=1;',
+                 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.unw.unwrapped_phase.png bs=1M count=1;',
                  '/bin/echo DISP-S1 invoked with RunConfig']
 
             with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
@@ -840,7 +844,7 @@ class DispS1PgeTestCase(unittest.TestCase):
             runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']['ProgramOptions'] = \
                 ['-p disp_s1_pge_test/output_dir/compressed_slcs;',
                  'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.unw.nc bs=1M count=1;',
-                 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.unw.png bs=1M count=1;',
+                 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.unw.unwrapped_phase.png bs=1M count=1;',
                  'touch disp_s1_pge_test/output_dir/compressed_slcs/compressed_slc_t087_185684_iw2_20180222_20180330.h5;',   # noqa E501
                  '/bin/echo DISP-S1 invoked with RunConfig']
 

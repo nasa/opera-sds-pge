@@ -56,8 +56,8 @@ class H5UtilsTestCase(unittest.TestCase):
             self.assertEqual(product_output['identification']['bounding_polygon'],
                              "POLYGON ((-119.26 39.15, -119.32 39.16, -119.22 39.32, -119.26 39.15))")
             self.assertEqual(product_output['identification']['radar_wavelength'], 0.05546576)
-            self.assertEqual(product_output['metadata']['disp_s1_software_version'], "0.1.0")
-            self.assertEqual(product_output['metadata']['dolphin_software_version'], "0.5.1")
+            self.assertEqual(product_output['metadata']['disp_s1_software_version'], "0.2.7")
+            self.assertEqual(product_output['metadata']['dolphin_software_version'], "0.15.3")
             self.assertIn("input_file_group", product_output['metadata']['pge_runconfig'])
             self.assertIn("log_file", product_output['metadata']['pge_runconfig'])
 
