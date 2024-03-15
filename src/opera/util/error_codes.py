@@ -108,6 +108,7 @@ class ErrorCode(IntEnum):
     SAS_OUTPUT_FILE_HAS_MISSING_DATA = auto()
     LOGGED_CRITICAL_LINE = auto()
     DYNAMIC_IMPORT_FAILED = auto()
+    GRIB_TO_NETCDF_CONVERSION_FAILED = auto()
 
     @classmethod
     def describe(cls):

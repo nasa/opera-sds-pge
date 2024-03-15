@@ -92,19 +92,28 @@ class DispS1PreProcessorMixin(PreProcessorMixin):
 
                 # This list of will the new paths to the converted files in the in-memory runconfig file.
                 grib_file_name = tropo_file
-                subprocess.run(
+                result = subprocess.run(
                     [
                         "/opt/conda/envs/eccodes/bin/grib_to_netcdf",
                         "-D",
                         "NC_FLOAT",
                         "-o",
                         netcdf_file,
-                        grib_file_name[:-4],
+                        grib_file_name,
                     ],
                     env={'ENV_NAME': 'eccodes', 'LD_LIBRARY_PATH': '/opt/conda/envs/eccodes/lib'},
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
                     shell=False,
                     check=False,
                 )
+
+                if result.returncode != 0:
+                    error_msg = (
+                        f"Failed to convert GRIB file {tropo_file} to NetCDF, reason:\n"
+                        f"{result.stdout.decode()}"
+                    )
+                    self.logger.critical(self.name, ErrorCode.GRIB_TO_NETCDF_CONVERSION_FAILED, error_msg)
             else:
                 # no conversion necessary, carry NetCDF file along as-is
                 netcdf_file = tropo_file
