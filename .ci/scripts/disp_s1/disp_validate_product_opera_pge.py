@@ -1,21 +1,16 @@
 #!/usr/bin/env python
 import argparse
+import logging
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Optional
 
 import h5py
 import numpy as np
 from dolphin import io
-from dolphin._log import get_log
 from dolphin._types import Filename
 from numpy.typing import ArrayLike
 
-logger = get_log()
-
-if TYPE_CHECKING:
-    _SubparserType = argparse._SubParsersAction[argparse.ArgumentParser]
-else:
-    _SubparserType = Any
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 DSET_DEFAULT = "unwrapped_phase"
 
@@ -24,13 +19,10 @@ DSET_DEFAULT = "unwrapped_phase"
 class ValidationError(Exception):
     """Raised when a product fails a validation check."""
 
-    pass
-
 
 class ComparisonError(ValidationError):
     """Exception raised when two datasets do not match."""
 
-    pass
 '''
 validation_match = True
 
@@ -60,7 +52,7 @@ def compare_groups(
     test_group: h5py.Group,
     pixels_failed_threshold: float = 0.01,
     diff_threshold: float = 1e-5,
-    exclude_groups: list = []
+    exclude_groups: list = None
 ) -> None:
     """Compare all datasets in two HDF5 files that are not in the exclude_groups.
 
@@ -193,6 +185,7 @@ def _fmt_ratio(num: int, den: int, digits: int = 3) -> str:
     -------
     str
         A string representation of the input.
+
     """
     return f"{num}/{den} ({100.0 * num / den:.{digits}f}%)"
 
@@ -225,6 +218,7 @@ def _validate_conncomp_labels(
     ------
     ComparisonError
         If the intersecting area between the two masks was below the threshold.
+
     """
     logger.info("Checking connected component labels...")
 
@@ -314,6 +308,7 @@ def _validate_unwrapped_phase(
         If the NaN value count exceeded the specified threshold.
     ComparisonError
         If the two datasets were not congruent within the specified error tolerance.
+
     """
     logger.info("Checking unwrapped phase...")
 
@@ -347,8 +342,13 @@ def _validate_unwrapped_phase(
 
     # Get a mask of valid pixels (pixels that had nonzero connected component label) in
     # both the test & reference data.
-    test_valid_mask = np.not_equal(test_conncomps, 0)
-    ref_valid_mask = np.not_equal(ref_conncomps, 0)
+    test_nodata = test_conncomps.attrs["_FillValue"]
+    test_nodata_mask = np.not_equal(test_conncomps, test_nodata)
+    ref_nodata = ref_conncomps.attrs["_FillValue"]
+    ref_nodata_mask = np.not_equal(ref_conncomps, ref_nodata)
+
+    test_valid_mask = np.not_equal(test_conncomps, 0) & test_nodata_mask
+    ref_valid_mask = np.not_equal(ref_conncomps, 0) & ref_nodata_mask
     valid_mask = test_valid_mask & ref_valid_mask
 
     # Get the total valid area in both datasets.
@@ -438,6 +438,7 @@ def _validate_dataset(
     ------
     ComparisonError
         If the two datasets do not match.
+
     """
     golden = golden_dataset[()]
     test = test_dataset[()]
@@ -476,6 +477,7 @@ def _check_raster_geometadata(golden_file: Filename, test_file: Filename) -> Non
     ------
     ComparisonError
         If the two files do not match in their metadata
+
     """
     funcs = [io.get_raster_bounds, io.get_raster_crs, io.get_raster_gt]
     for func in funcs:
@@ -503,9 +505,10 @@ def _check_compressed_slc_dirs(golden: Filename, test: Filename) -> None:
     ------
     ComparisonError
         If file names do not match in their compressed SLC directories
+
     """
     golden_slc_dir = Path(golden).parent / "compressed_slcs"
-    test_slc_dir = Path(test).parent / "compressed_slcs"
+    test_slc_dir = Path(test).parent
 
     if not golden_slc_dir.exists():
         logger.info("No compressed SLC directory found in golden product.")
@@ -516,8 +519,10 @@ def _check_compressed_slc_dirs(golden: Filename, test: Filename) -> None:
             f"{test_slc_dir} does not exist, but {golden_slc_dir} exists."
         )
 
-    golden_slc_names = [p.name for p in golden_slc_dir.iterdir()]
-    test_slc_names = [p.name for p in test_slc_dir.iterdir()]
+    golden_slc_names = [p.name for p in golden_slc_dir.iterdir()
+                        if "compressed" in p.name and ".h5" in p.name]
+    test_slc_names = [p.name for p in test_slc_dir.iterdir()
+                      if "compressed" in p.name and ".h5" in p.name]
 
     if set(golden_slc_names) != set(test_slc_names):
         # raise ComparisonError(
@@ -527,7 +532,7 @@ def _check_compressed_slc_dirs(golden: Filename, test: Filename) -> None:
         )
 
 
-def compare(golden: Filename, test: Filename, data_dset: str = DSET_DEFAULT, exclude_groups: list = []) -> None:
+def compare(golden: Filename, test: Filename, data_dset: str = DSET_DEFAULT, exclude_groups: list = None) -> None:
     """Compare two HDF5 files for consistency."""
     logger.info("Comparing HDF5 contents...")
     with h5py.File(golden, "r") as hf_g, h5py.File(test, "r") as hf_t:
@@ -546,20 +551,12 @@ def compare(golden: Filename, test: Filename, data_dset: str = DSET_DEFAULT, exc
     _check_compressed_slc_dirs(golden, test)
 
 
-def get_parser(
-    subparser: Optional[_SubparserType] = None, subcommand_name: str = "run"
-) -> argparse.ArgumentParser:
+def get_parser() -> argparse.ArgumentParser:
     """Set up the command line interface."""
-    metadata = dict(
+    parser = argparse.ArgumentParser(
         description="Compare two HDF5 files for consistency.",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
-    if subparser:
-        # Used by the subparser to make a nested command line interface
-        parser = subparser.add_parser(subcommand_name, **metadata)  # type: ignore
-    else:
-        parser = argparse.ArgumentParser(**metadata)  # type: ignore
-
     parser.add_argument("--golden", help="The golden HDF5 file.", required=True)
     parser.add_argument(
         "--test", help="The test HDF5 file to be compared.", required=True

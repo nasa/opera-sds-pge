@@ -598,11 +598,15 @@ def create_test_disp_metadata_product(file_path):
                                                                   data=np.string_("POLYGON ((-119.26 39.15, -119.32 39.16, -119.22 39.32, -119.26 39.15))"))
         radar_wavelength_dset = identification_grp.create_dataset("radar_wavelength",
                                                                   data=0.05546576, dtype='float64')
+        reference_datetime_dset = identification_grp.create_dataset("reference_datetime",
+                                                                    data=np.string_("2022-11-07 00:00:00.000000"))
+        secondary_datetime_dset = identification_grp.create_dataset("secondary_datetime",
+                                                                    data=np.string_("2022-12-13 00:00:00.000000"))
 
         metadata_grp = outfile.create_group("/metadata")
         disp_s1_software_version_dset = metadata_grp.create_dataset("disp_s1_software_version",
-                                                                          data=np.string_("0.1.0"))
+                                                                          data=np.string_("0.2.7"))
         dolphin_software_version_dset = metadata_grp.create_dataset("dolphin_software_version",
-                                                                          data=np.string_("0.5.1"))
+                                                                          data=np.string_("0.15.3"))
         pge_runconfig_dset = metadata_grp.create_dataset("pge_runconfig",
                                                          data=np.string_(pge_runconfig_contents))

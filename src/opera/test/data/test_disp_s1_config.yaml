@@ -39,7 +39,7 @@ RunConfig:
                 ProgramOptions:
                     - '-p disp_s1_pge_test/output_dir/compressed_slcs;'
                     - 'python3 -c "from opera.util.h5_utils import create_test_disp_metadata_product; create_test_disp_metadata_product(\"disp_s1_pge_test/output_dir/20180101_20180330.unw.nc\")";'
-                    - 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.unw.png bs=1M count=1;'
+                    - 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.unw.unwrapped_phase.png bs=1M count=1;'
                     - 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/compressed_slcs/compressed_t087_185683_iw2_20180222_20180330.h5 bs=1M count=1;'
                     - 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/compressed_slcs/compressed_t087_185684_iw2_20180222_20180330.h5 bs=1M count=1;'
                     - '/bin/echo DISP-S1 invoked with RunConfig'
@@ -97,7 +97,6 @@ RunConfig:
 
             worker_settings:
                 gpu_enabled: true
-                n_workers: 32
                 threads_per_worker: 2
                 n_parallel_bursts: 1
                 block_shape:

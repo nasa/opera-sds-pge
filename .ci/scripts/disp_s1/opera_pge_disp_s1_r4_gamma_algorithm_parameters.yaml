@@ -55,7 +55,7 @@ unwrap_options:
   unwrap_method: phass
   # Number of interferograms to unwrap in parallel.
   #   Type: integer.
-  n_parallel_jobs: 5
+  n_parallel_jobs: 1
   # (`snaphu-py` or multiscale unwrapping) Number of tiles to split the inputs into.
   #   Type: array.
   ntiles:
