@@ -1,4 +1,4 @@
-# Sample RunConfig for use with the DISP-S1 PGE v3.0.0-er.5.0
+# Sample RunConfig for use with the DISP-S1 PGE v3.0.0-rc.2.0
 # This RunConfig should require minimal changes in order to be used with the
 # OPERA PCM.
 
@@ -22,8 +22,8 @@ RunConfig:
         # as well as the paths to any compressed CSLC-S1 products.
         # Paths must correspond to the file system within the Docker container
         InputFilePaths:
-          - /home/mamba/input_dir/compressed_t042_088905_iw1_20221107_20230506.h5
-          - /home/mamba/input_dir/compressed_t042_088906_iw1_20221107_20230506.h5
+          - /home/mamba/input_dir/compressed_t042_088905_iw1_20221107_20221107_20230506.h5
+          - /home/mamba/input_dir/compressed_t042_088906_iw1_20221107_20221107_20230506.h5
           - /home/mamba/input_dir/t042_088905_iw1_20221119.h5
           - /home/mamba/input_dir/t042_088906_iw1_20221119.h5
           - /home/mamba/input_dir/t042_088905_iw1_20221201.h5
@@ -43,7 +43,7 @@ RunConfig:
           # Path to the reference water mask file
           # Must be either a single .tif, .flg, or a .vrt that points to one
           # or more .tif files
-          mask_file: /home/mamba/input_dir/watermask.flg
+          mask_file: /home/mamba/input_dir/watermask.tif
 
           # Paths to Amplitude Dispersion files (1 per burst) for PS update calculation
           # All files should be in .tif format
@@ -67,51 +67,22 @@ RunConfig:
           # One file should be provided for each date covered by the set of input CSLCs
           # Files may be provided compressed (ending in .Z) or uncompressed (ending in .##i)
           ionosphere_files:
-            - /home/mamba/input_dir/jplg0060.23i.Z
-            - /home/mamba/input_dir/jplg0180.23i.Z
-            - /home/mamba/input_dir/jplg0300.23i.Z
-            - /home/mamba/input_dir/jplg0420.23i.Z
-            - /home/mamba/input_dir/jplg0540.23i.Z
-            - /home/mamba/input_dir/jplg0660.23i.Z
-            - /home/mamba/input_dir/jplg0780.23i.Z
-            - /home/mamba/input_dir/jplg0900.23i.Z
-            - /home/mamba/input_dir/jplg1020.23i.Z
-            - /home/mamba/input_dir/jplg1140.23i.Z
-            - /home/mamba/input_dir/jplg1260.23i.Z
-            - /home/mamba/input_dir/jplg1380.23i.Z
-            - /home/mamba/input_dir/jplg1500.23i.Z
-            - /home/mamba/input_dir/jplg1620.23i.Z
-            - /home/mamba/input_dir/jplg1860.23i.Z
-            - /home/mamba/input_dir/jplg1980.23i.Z
-            - /home/mamba/input_dir/jplg2100.23i.Z
-            - /home/mamba/input_dir/jplg3230.22i.Z
-            - /home/mamba/input_dir/jplg3350.22i.Z
-            - /home/mamba/input_dir/jplg3470.22i.Z
+            - /home/mamba/input_dir/jplg0060.23i
+            - /home/mamba/input_dir/jplg1860.23i
+            - /home/mamba/input_dir/jplg3110.22i
+            - /home/mamba/input_dir/jplg3230.22i
+            - /home/mamba/input_dir/jplg3350.22i
+            - /home/mamba/input_dir/jplg3470.22i
 
           # Paths to troposphere weather model files.
           # One file should be provided for each date covered by the set of input CSLCs
           # All files should be in GRIB (.grb), NetCDF (.nc) or HDF5 (.h5) format
           troposphere_files:
-            - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20221119_14.grb
-            - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20221201_14.grb
-            - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20221213_14.grb
-            - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230106_14.grb
-            - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230118_14.grb
-            - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230130_14.grb
-            - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230211_14.grb
-            - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230223_14.grb
-            - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230307_14.grb
-            - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230319_14.grb
-            - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230331_14.grb
-            - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230412_14.grb
-            - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230424_14.grb
-            - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230506_14.grb
-            - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230518_14.grb
-            - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230530_14.grb
-            - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230611_14.grb
-            - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230705_14.grb
-            - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230717_14.grb
-            - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230729_14.grb
+            - /home/mamba/input_dir/ERA5_N36_N41_W124_W118_20221107_14.grb
+            - /home/mamba/input_dir/ERA5_N36_N41_W124_W118_20221119_14.grb
+            - /home/mamba/input_dir/ERA5_N36_N41_W124_W118_20221201_14.grb
+            - /home/mamba/input_dir/ERA5_N36_N41_W124_W118_20221213_14.grb
+            - /home/mamba/input_dir/ERA5_N36_N41_W124_W118_20230506_14.grb
 
       ProductPathGroup:
         # Path to where output products should be stored
@@ -141,7 +112,8 @@ RunConfig:
         ProgramPath: disp-s1
 
         # List of command-line options to use with ProgramPath
-        ProgramOptions: []
+        ProgramOptions:
+          - run
 
         # The Error Code base value added to the offset values to make
         # error codes unique per-PGE
@@ -201,8 +173,8 @@ RunConfig:
         # REQUIRED: List of paths to CSLC files.
         #   Type: list.
         cslc_file_list:
-          - /home/mamba/input_dir/compressed_t042_088905_iw1_20221107_20230506.h5
-          - /home/mamba/input_dir/compressed_t042_088906_iw1_20221107_20230506.h5
+          - /home/mamba/input_dir/compressed_t042_088905_iw1_20221107_20221107_20230506.h5
+          - /home/mamba/input_dir/compressed_t042_088906_iw1_20221107_20221107_20230506.h5
           - /home/mamba/input_dir/t042_088905_iw1_20221119.h5
           - /home/mamba/input_dir/t042_088906_iw1_20221119.h5
           - /home/mamba/input_dir/t042_088905_iw1_20221201.h5
@@ -235,60 +207,35 @@ RunConfig:
         # Mask files (e.g water mask), where convention is 0 for no data/invalid, and 1 for
         #   data.
         #   Type: array.
-        mask_file: /home/mamba/input_dir/watermask.flg
+        mask_file: /home/mamba/input_dir/watermask.tif
         # Path to the DEM file covering full frame.
         #   Type: string.
         dem_file: /home/mamba/input_dir/dem.tif
         # List of Paths to TEC files in IONEX format for ionosphere correction.
         #   Type: string.
         ionosphere_files:
-          - /home/mamba/input_dir/jplg0060.23i.Z
-          - /home/mamba/input_dir/jplg0180.23i.Z
-          - /home/mamba/input_dir/jplg0300.23i.Z
-          - /home/mamba/input_dir/jplg0420.23i.Z
-          - /home/mamba/input_dir/jplg0540.23i.Z
-          - /home/mamba/input_dir/jplg0660.23i.Z
-          - /home/mamba/input_dir/jplg0780.23i.Z
-          - /home/mamba/input_dir/jplg0900.23i.Z
-          - /home/mamba/input_dir/jplg1020.23i.Z
-          - /home/mamba/input_dir/jplg1140.23i.Z
-          - /home/mamba/input_dir/jplg1260.23i.Z
-          - /home/mamba/input_dir/jplg1380.23i.Z
-          - /home/mamba/input_dir/jplg1500.23i.Z
-          - /home/mamba/input_dir/jplg1620.23i.Z
-          - /home/mamba/input_dir/jplg1860.23i.Z
-          - /home/mamba/input_dir/jplg1980.23i.Z
-          - /home/mamba/input_dir/jplg2100.23i.Z
-          - /home/mamba/input_dir/jplg3230.22i.Z
-          - /home/mamba/input_dir/jplg3350.22i.Z
-          - /home/mamba/input_dir/jplg3470.22i.Z
+          - /home/mamba/input_dir/jplg0060.23i
+          - /home/mamba/input_dir/jplg1860.23i
+          - /home/mamba/input_dir/jplg3110.22i
+          - /home/mamba/input_dir/jplg3230.22i
+          - /home/mamba/input_dir/jplg3350.22i
+          - /home/mamba/input_dir/jplg3470.22i
         # List of Paths to troposphere weather model files.
         #   Type: string.
         troposphere_files:
-          - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20221119_14.grb
-          - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20221201_14.grb
-          - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20221213_14.grb
-          - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230106_14.grb
-          - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230118_14.grb
-          - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230130_14.grb
-          - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230211_14.grb
-          - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230223_14.grb
-          - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230307_14.grb
-          - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230319_14.grb
-          - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230331_14.grb
-          - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230412_14.grb
-          - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230424_14.grb
-          - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230506_14.grb
-          - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230518_14.grb
-          - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230530_14.grb
-          - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230611_14.grb
-          - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230705_14.grb
-          - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230717_14.grb
-          - /home/mamba/input_dir/ERA5_N30_N40_W120_W110_20230729_14.grb
+          - /home/mamba/input_dir/ERA5_N36_N41_W124_W118_20221107_14.grb
+          - /home/mamba/input_dir/ERA5_N36_N41_W124_W118_20221119_14.grb
+          - /home/mamba/input_dir/ERA5_N36_N41_W124_W118_20221201_14.grb
+          - /home/mamba/input_dir/ERA5_N36_N41_W124_W118_20221213_14.grb
+          - /home/mamba/input_dir/ERA5_N36_N41_W124_W118_20230506_14.grb
       static_ancillary_file_group:
         # JSON file containing the mapping from frame_id to frame/burst information.
         #   Type: string | null.
         frame_to_burst_json: /home/mamba/input_dir/opera-s1-disp-frame-to-burst.json
+
+        # JSON file containing list of reference date changes for each frame
+        #   Type: string | null.
+        reference_date_database_json: /home/mamba/input_dir/opera-s1-disp-reference-date.json
       primary_executable:
         # Product type of the PGE. Should be one of: DISP_S1_FORWARD or DISP_S1_HISTORICAL
         #   Type: string.
@@ -314,10 +261,6 @@ RunConfig:
         # Whether to use GPU for processing (if available).
         #   Type: boolean.
         gpu_enabled: true
-        # (For non-GPU) Number of cpu cores to use for processing. Uses
-        #   `multiprocessing.cpu_count()` if not set.
-        #   Type: integer.
-        n_workers: 32
         # Number of threads to use per worker. This sets the OMP_NUM_THREADS environment variable.
         #   Type: integer.
         threads_per_worker: 2
