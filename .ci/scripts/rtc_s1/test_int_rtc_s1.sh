@@ -59,11 +59,11 @@ local_static_runconfig="${SCRIPT_DIR}/${static_runconfig}"
 echo "Copying runconfig file $local_static_runconfig to $runconfig_dir/"
 cp ${local_static_runconfig} ${runconfig_dir}
 
-# Pull in product compare script from S3.
-# Current source is https://raw.githubusercontent.com/opera-adt/RTC/main/app/rtc_compare.py
-local_compare_script=${TMP_DIR}/rtc_compare.py
-echo "Downloading s3://operasds-dev-pge/${PGE_NAME}/rtc_compare_final_1.0.0.py to ${local_compare_script}"
-aws s3 cp s3://operasds-dev-pge/${PGE_NAME}/rtc_compare_calval_0.4.1.py "$local_compare_script"
+### Pull in product compare script from S3.
+### Current source is https://raw.githubusercontent.com/opera-adt/RTC/main/app/rtc_compare.py
+###local_compare_script=${TMP_DIR}/rtc_compare.py
+##echo "Downloading s3://operasds-dev-pge/${PGE_NAME}/rtc_compare_final_1.0.0.py to ${local_compare_script}"
+##aws s3 cp s3://operasds-dev-pge/${PGE_NAME}/rtc_compare_calval_0.4.1.py "$local_compare_script"
 
 # the testdata reference metadata contains this path so we use it here
 output_dir="${TMP_DIR}/rtc_s1_output_dir"
@@ -147,96 +147,14 @@ fi
 cp "${output_dir}"/*.log "${TEST_RESULTS_DIR}"
 cp "${static_output_dir}"/*.log "${TEST_RESULTS_DIR}"
 
-if [ $overall_status -eq 0 ]; then
-    echo "<tr><th>Compare Result</th><th><ul><li>Expected file</li><li>Output file</li></ul></th><th>rtc_compare.py output</th></tr>" >> "$RESULTS_FILE"
 
-    declare -a burst_ids=("t069_147169_iw3"
-                          "t069_147170_iw3"
-                          "t069_147171_iw3"
-                          "t069_147172_iw3"
-                          "t069_147173_iw3"
-                          "t069_147174_iw3"
-                          "t069_147175_iw3"
-                          "t069_147176_iw3"
-                          "t069_147177_iw3"
-                          "t069_147178_iw3")
+echo "compare_rtc_s1_products.sh"
+compare_rtc_s1_products.sh
 
-    for burst_id in "${burst_ids[@]}"; do
-        rtc_compare_result="PENDING"
-        expected_dir="${TMP_DIR}/${EXPECTED_DATA%.*}/expected_rtc_s1_output_dir"
+echo "compare_rtc_s1_static_products.sh"
+compare_rtc_s1_static_products.sh
 
-        echo "-------------------------------------"
-        echo "Comparing results for burst id $burst_id"
 
-        burst_id_uppercase=${burst_id^^}
-        burst_id_replace_underscores=${burst_id_uppercase//_/-}
-        burst_id_pattern="OPERA_L2_RTC-S1_${burst_id_replace_underscores}_*"
-        output_files="${output_dir}/${burst_id}"
-        expected_files="${expected_dir}/${burst_id}"
-
-        # Move the products for the current burst ID into their own subdir to compare
-        # against the expected
-        mkdir -p "${output_files}"
-        mv ${output_dir}/${burst_id_pattern} ${output_files}
-
-        echo "Output RTC files matching burst id are in $output_files"
-        echo "Expected files are in $expected_files"
-
-        compare_output=$(python3 "${local_compare_script}" "${expected_files}" "${output_files}")
-
-        echo "$compare_output"
-        if [[ "$compare_output" != *"FAILED"* ]]; then
-            echo "Product validation was successful for $output_files"
-            rtc_compare_result="PASS"
-        else
-            echo "Failure: Some comparisons failed for $output_files"
-            rtc_compare_result="FAIL"
-            overall_status=2
-        fi
-
-        # remove ansi colors from string
-        compare_output="$(echo "$compare_output" | sed -e 's/\x1b\[[0-9;]*m//g')"
-
-        # add html breaks to newlines
-        compare_output=${compare_output//$'\n'/<br>$'\n'}
-        echo "<tr><td>${rtc_compare_result}</td><td><ul><li>${expected_files}</li><li>${output_files}</li></ul></td><td>${compare_output}</td></tr>" >> "$RESULTS_FILE"
-
-        static_layers_compare_result="PENDING"
-        expected_dir="${TMP_DIR}/${EXPECTED_DATA%.*}/expected_rtc_s1_static_output_dir"
-
-        static_burst_id_pattern="OPERA_L2_RTC-S1-STATIC_${burst_id_replace_underscores}_*.tif"
-        output_static_files="${static_output_dir}/${burst_id}"
-        expected_static_files="${expected_dir}/${burst_id}"
-
-        # Move the products for the current burst ID into their own subdir to compare
-        # against the expected
-        mkdir -p "${output_static_files}"
-        mv ${static_output_dir}/${static_burst_id_pattern} ${output_static_files}
-
-        echo "Output static layers matching burst id are in $output_static_files"
-        echo "Expected files are in $expected_static_files"
-
-        compare_output=$(python3 "${local_compare_script}" "${expected_static_files}" "${output_static_files}")
-
-        echo "$compare_output"
-        if [[ "$compare_output" != *"FAILED"* ]]; then
-            echo "Product validation was successful for $output_static_files"
-            static_layers_compare_result="PASS"
-        else
-            echo "Failure: Some comparisons failed for $output_static_files"
-            static_layers_compare_result="FAIL"
-            overall_status=2
-        fi
-
-        # remove ansi colors from string
-        compare_output="$(echo "$compare_output" | sed -e 's/\x1b\[[0-9;]*m//g')"
-
-        # add html breaks to newlines
-        compare_output=${compare_output//$'\n'/<br>$'\n'}
-        echo "<tr><td>${static_layers_compare_result}</td><td><ul><li>${expected_static_files}</li><li>${output_static_files}</li></ul></td><td>${compare_output}</td></tr>" >> "$RESULTS_FILE"
-    done
-
-fi
 echo " "
 
 if [ $overall_status -ne 0 ]; then
