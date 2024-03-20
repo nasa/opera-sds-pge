@@ -1,22 +1,21 @@
 #!/usr/bin/env python
-'''
-Collection of functions to compare 2 CSLC HDF5 contents and metadata
-'''
+"""Collection of functions to compare 2 CSLC HDF5 contents and metadata"""
 import argparse
 import os
 
 import h5py
+
 import numpy as np
+
 from osgeo import gdal
 
-#from compass.utils.h5_helpers import DATA_PATH, ROOT_PATH
-ROOT_PATH='/'
-DATA_PATH='/data'
+# from compass.utils.h5_helpers import DATA_PATH, ROOT_PATH
+ROOT_PATH = '/'
+DATA_PATH = '/data'
+
 
 def cmd_line_parser():
-    """
-    Command line parser
-    """
+    """Command line parser"""
     parser = argparse.ArgumentParser(
         description="""Validate reference and generated (secondary) S1 CSLC products""",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -44,7 +43,7 @@ def _grid_info_retrieve(path_h5, dataset_names, is_static_layer):
     dataset_names: list[str]
         List of names in grid group
     is_static_layer: bool
-        Whether or not path_h5 is static layer product
+        Whether path_h5 is a static layer product
 
     Returns
     -------
@@ -60,7 +59,7 @@ def _grid_info_retrieve(path_h5, dataset_names, is_static_layer):
     # Extract existing dataset names with h5py
     with h5py.File(path_h5, 'r') as h:
         datasets_found = [ds_name for ds_name in dataset_names
-                if ds_name in h[data_path]]
+                          if ds_name in h[data_path]]
 
     ds_name = datasets_found[0]
 
@@ -74,7 +73,7 @@ def _grid_info_retrieve(path_h5, dataset_names, is_static_layer):
 
 
 def compare_products(file_ref, file_sec, product_type):
-    '''
+    """
     Compare a reference and a newly generated
     (i.e., secondary) CSLC or static layer product
 
@@ -86,8 +85,7 @@ def compare_products(file_ref, file_sec, product_type):
         File path to generated product to use for comparison
     product_type: str
         Product type of CSLC or static_layers
-    '''
-
+    """
     # Check if file paths exits
     if not os.path.exists(file_ref):
         print(f'ERROR reference {product_type} product not found: {file_ref}')
@@ -256,7 +254,7 @@ def _compare_complex_slc_rasters(file_ref, file_sec, pols):
 
 
 def _get_group_item_paths(h5py_group):
-    '''
+    """
     Get paths for all datasets and groups nested within a h5py.Group
 
     Parameters
@@ -268,14 +266,14 @@ def _get_group_item_paths(h5py_group):
     -------
     paths: list[str]
         Paths of all items in given h5py.Group
-    '''
+    """
     paths = []
     h5py_group.visit(lambda path: paths.append(path))
     return paths
 
 
 def compare_cslc_metadata(file_ref, file_sec):
-    '''
+    """
     Compare reference and generated CSLC metadata
     Parameters
     ----------
@@ -283,8 +281,7 @@ def compare_cslc_metadata(file_ref, file_sec):
         File path to reference metadata file (golden dataset)
     file_sec: str
         File path to secondary metadata file to use for comparison
-    '''
-
+    """
     # Check if metadata files exists
     if not os.path.exists(file_ref):
         print(f'ERROR reference CSLC metadata not found: {file_ref}')
@@ -314,7 +311,7 @@ def compare_cslc_metadata(file_ref, file_sec):
 
 
 def main():
-    '''Entrypoint of the script'''
+    """Entrypoint of the script"""
     cmd = cmd_line_parser()
 
     # Check CSLC products
