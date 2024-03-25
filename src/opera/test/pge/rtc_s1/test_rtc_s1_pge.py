@@ -16,21 +16,16 @@ import tempfile
 import unittest
 from io import StringIO
 from os.path import abspath, join
-from unittest.mock import patch
-
-from pkg_resources import resource_filename
 
 import yaml
+from pkg_resources import resource_filename
 
-import opera.util.tiff_utils
 from opera.pge import RunConfig
 from opera.pge.rtc_s1.rtc_s1_pge import RtcS1Executor
 from opera.util import PgeLogger
 from opera.util.dataset_utils import get_sensor_from_spacecraft_name
 from opera.util.h5_utils import create_test_rtc_metadata_product
 from opera.util.h5_utils import get_rtc_s1_product_metadata
-from opera.util.mock_utils import mock_gdal_edit
-from opera.util.mock_utils import mock_save_as_cog
 
 
 class RtcS1PgeTestCase(unittest.TestCase):
@@ -93,8 +88,6 @@ class RtcS1PgeTestCase(unittest.TestCase):
         os.chdir(self.test_dir)
         self.working_dir.cleanup()
 
-    @patch.object(opera.util.tiff_utils, "gdal_edit", mock_gdal_edit)
-    @patch.object(opera.util.tiff_utils, "save_as_cog", mock_save_as_cog)
     def test_rtc_s1_pge_execution(self):
         """
         Test execution of the RtcS1Executor class and its associated mixins
@@ -156,43 +149,6 @@ class RtcS1PgeTestCase(unittest.TestCase):
 
         self.assertIn(f"RTC-S1 invoked with RunConfig {expected_sas_config_file}", log_contents)
 
-    @patch.object(opera.util.tiff_utils, "save_as_cog", mock_save_as_cog)
-    def test_static_layer_data_access_url_injection(self):
-        """Test injection of static data access URL into the output HDF5 product(s)"""
-        expected_url = 'https://search.asf.alaska.edu/#/?dataset=OPERA-S1&productTypes=RTC-STATIC&operaBurstID=T069-147170-IW1&end=2018-05-04'   # noqa E501
-
-        runconfig_path = join(self.data_dir, 'test_rtc_s1_config.yaml')
-
-        pge = RtcS1Executor(pge_name="RtcPgeTest", runconfig_path=runconfig_path)
-
-        # Evaluate the arguments to the gdal_edit call since we cannot actually
-        # update the dummy .tif files
-        def _patched_gdal_edit(args):
-            self.assertEqual(len(args), 4)
-            self.assertEqual(args[0], 'gdal_edit.py')
-            self.assertEqual(args[1], '-mo')
-            self.assertTrue(args[2].startswith('STATIC_LAYERS_DATA_ACCESS='))
-            self.assertTrue(args[2].endswith(expected_url))
-            self.assertTrue(args[3].endswith('.tif'))
-            return 0
-
-        with patch.object(opera.util.tiff_utils, "gdal_edit", _patched_gdal_edit):
-            pge.run()
-
-        # Grab the metadata generated from the PGE run
-        output_files = glob.glob(join(pge.runconfig.output_product_path, "*.h5"))
-
-        self.assertEqual(len(output_files), 1)
-
-        output_file = output_files[0]
-
-        rtc_metadata = get_rtc_s1_product_metadata(output_file)
-
-        self.assertIn('staticLayersDataAccess', rtc_metadata['identification'])
-        self.assertEqual(rtc_metadata['identification']['staticLayersDataAccess'], expected_url)
-
-    @patch.object(opera.util.tiff_utils, "gdal_edit", mock_gdal_edit)
-    @patch.object(opera.util.tiff_utils, "save_as_cog", mock_save_as_cog)
     def test_filename_application(self):
         """Test the filename convention applied to RTC output products"""
         runconfig_path = join(self.data_dir, 'test_rtc_s1_config.yaml')
@@ -250,8 +206,6 @@ class RtcS1PgeTestCase(unittest.TestCase):
 
         self.assertIn(f"{core_filename}_BROWSE.png", output_files)
 
-    @patch.object(opera.util.tiff_utils, "gdal_edit", mock_gdal_edit)
-    @patch.object(opera.util.tiff_utils, "save_as_cog", mock_save_as_cog)
     def test_static_layer_filename_application(self):
         """Test the filename convention applied to RTC static layer output products"""
         runconfig_path = join(self.data_dir, 'test_rtc_s1_static_config.yaml')
@@ -601,8 +555,6 @@ class RtcS1PgeTestCase(unittest.TestCase):
             if os.path.exists(test_runconfig_path):
                 os.unlink(test_runconfig_path)
 
-    @patch.object(opera.util.tiff_utils, "gdal_edit", mock_gdal_edit)
-    @patch.object(opera.util.tiff_utils, "save_as_cog", mock_save_as_cog)
     def test_no_burst_id(self):
         """Test _iso_metadata_filename with bad burst_id"""
         runconfig_path = join(self.data_dir, 'test_rtc_s1_config.yaml')
@@ -612,8 +564,6 @@ class RtcS1PgeTestCase(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             pge._iso_metadata_filename("bad_burst")
 
-    @patch.object(opera.util.tiff_utils, "gdal_edit", mock_gdal_edit)
-    @patch.object(opera.util.tiff_utils, "save_as_cog", mock_save_as_cog)
     def test_bad_iso_metadata_template(self):
         """Verify code when the QA application is enabled"""
         runconfig_path = join(self.data_dir, 'test_rtc_s1_config.yaml')
@@ -645,8 +595,6 @@ class RtcS1PgeTestCase(unittest.TestCase):
             if os.path.exists(test_runconfig_path):
                 os.unlink(test_runconfig_path)
 
-    @patch.object(opera.util.tiff_utils, "gdal_edit", mock_gdal_edit)
-    @patch.object(opera.util.tiff_utils, "save_as_cog", mock_save_as_cog)
     def test_qa_enabled(self):
         """Test the staging of the qa.log files."""
         # Verify code when the QA application is enabled

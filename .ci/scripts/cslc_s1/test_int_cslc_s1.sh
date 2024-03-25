@@ -26,9 +26,9 @@ SAMPLE_TIME=15
 # Test data should be uploaded to  s3://operasds-dev-pge/${PGE_NAME}/
 [ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath "$(dirname "$(realpath "$0")")"/../../..)
 [ -z "${PGE_TAG}" ] && PGE_TAG="${USER}-dev"
-[ -z "${INPUT_DATA}" ] && INPUT_DATA="delivery_cslc_s1_final_0.5.1_expected_input_data.zip"
-[ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="delivery_cslc_s1_final_0.5.1_expected_output.zip"
-[ -z "${RUNCONFIG}" ] && RUNCONFIG="opera_pge_cslc_s1_delivery_6.1_final_runconfig.yaml"
+[ -z "${INPUT_DATA}" ] && INPUT_DATA="cslc_s1_final_0.5.5_expected_input_data.zip"
+[ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="cslc_s1_final_0.5.5_expected_output.zip"
+[ -z "${RUNCONFIG}" ] && RUNCONFIG="opera_pge_cslc_s1_delivery_6.4_final_runconfig.yaml"
 [ -z "${TMP_ROOT}" ] && TMP_ROOT="$DEFAULT_TMP_ROOT"
 
 # Create the test output directory in the workspace
@@ -53,7 +53,7 @@ input_dir="${TMP_DIR}/${INPUT_DATA%.*}/input_data"
 runconfig_dir="${TMP_DIR}/runconfig"
 
 # Copy the RunConfig for the static layers workflow
-static_runconfig="opera_pge_cslc_s1_static_delivery_6.1_final_runconfig.yaml"
+static_runconfig="opera_pge_cslc_s1_static_delivery_6.4_final_runconfig.yaml"
 local_static_runconfig="${SCRIPT_DIR}/${static_runconfig}"
 echo "Copying runconfig file $local_static_runconfig to $runconfig_dir/"
 cp ${local_static_runconfig} ${runconfig_dir}

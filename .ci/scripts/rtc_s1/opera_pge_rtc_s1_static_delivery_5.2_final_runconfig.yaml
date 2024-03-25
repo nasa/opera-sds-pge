@@ -88,7 +88,7 @@ RunConfig:
 
                     dynamic_ancillary_file_group:
                         dem_file: /home/rtc_user/input_dir/dem.tif
-                        dem_file_description: "Digital Elevation Model (DEM) for the NASA OPERA project version 1.1 (v1.1) based on the Copernicus DEM 30-m and Copernicus 90-m referenced to the WGS84 ellipsoid"
+                        dem_file_description: Digital Elevation Model (DEM) for the NASA OPERA project (v1.0) based on the Copernicus DEM 30-m and Copernicus 90-m referenced to the WGS84 ellipsoid
 
                     static_ancillary_file_group:
                         burst_database_file: /home/rtc_user/input_dir/burst_db_0.2.0_230831-bbox-only.sqlite
@@ -108,6 +108,8 @@ RunConfig:
 
                         product_data_access: "https://search.asf.alaska.edu/#/?dataset=OPERA-S1&productTypes=RTC"
 
+                        static_layers_data_access: "https://search.asf.alaska.edu/#/?dataset=OPERA-S1&productTypes=RTC-STATIC&operaBurstID={burst_id}&end={end_date}"
+
                         save_bursts: True
 
                         save_mosaics: False
@@ -119,7 +121,7 @@ RunConfig:
                         save_metadata: True
 
                     primary_executable:
-                        product_type: RTC_S1
+                        product_type: RTC_S1_STATIC
 
                     processing:
 
@@ -130,23 +132,15 @@ RunConfig:
                         rtc:
                             output_type: gamma0
 
-                        num_workers: 0
+                        num_workers: 2
 
                         geocoding:
                             memory_mode: auto
 
-                            bursts_geogrid:
-                                top_left:
-                                    x:
-                                    y:
-                                bottom_right:
-                                    x:
-                                    y:
-
-                            estimated_geometric_accuracy_bias_x: 0.0
-                            estimated_geometric_accuracy_bias_y: 0.0
-                            estimated_geometric_accuracy_stddev_x: 0.0
-                            estimated_geometric_accuracy_stddev_y: 0.0
+                            estimated_geometric_accuracy_bias_x: -0.72
+                            estimated_geometric_accuracy_bias_y: -0.67
+                            estimated_geometric_accuracy_stddev_x: 0.70
+                            estimated_geometric_accuracy_stddev_y: 0.62
 
                         mosaicking:
                             mosaic_mode: first

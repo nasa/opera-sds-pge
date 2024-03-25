@@ -199,7 +199,6 @@ def time_and_execute(command_line, logger, execute_via_shell=False):
     if execute_via_shell:
         command_line = " ".join(command_line)
 
-    # TODO: support for timeout argument?
     run_result = subprocess.run(command_line, env=os.environ.copy(), check=False,
                                 stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                                 shell=execute_via_shell)

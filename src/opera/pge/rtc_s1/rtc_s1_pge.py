@@ -754,28 +754,6 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
             except ValueError as err:
                 self.logger.critical(self.name, ErrorCode.ISO_METADATA_RENDER_FAILED, str(err))
 
-        # We also need to create the URL for static layer data access
-        # This URL will be injected into metadata products after products
-        # have been renamed to meet naming conventions
-        url_template = (
-            "https://search.asf.alaska.edu/#/?dataset=OPERA-S1&"
-            "productTypes=RTC-STATIC&operaBurstID={burst_id}&end={sensor_date}"
-        )
-
-        burst_id = output_product_metadata['identification']['burstID']
-        burst_id = burst_id.upper().replace('_', '-')
-
-        acquisition_time = output_product_metadata['identification']['zeroDopplerStartTime']
-
-        if acquisition_time.endswith('Z'):
-            acquisition_time = acquisition_time[:-1]
-
-        sensor_date = datetime.strptime(acquisition_time, "%Y-%m-%dT%H:%M:%S.%f").strftime('%Y-%m-%d')
-
-        url = url_template.format(burst_id=burst_id, sensor_date=sensor_date)
-
-        output_product_metadata['identification']['staticLayersDataAccess'] = url
-
         return output_product_metadata
 
     def _create_custom_metadata(self):
@@ -874,11 +852,6 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
         for output_product in output_products:
             self._assign_filename(output_product, self.runconfig.output_product_path)
 
-        # Assign static layer data access URL to metadata product. We want to
-        # do this prior to the checksum generation for the catalog metadata
-        # since we are changing the contents of the files.
-        self._inject_static_data_access_url()
-
         # Write the catalog metadata to disk with the appropriate filename
         catalog_metadata = self._create_catalog_metadata()
 
@@ -938,65 +911,6 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
             # Log stream might be closed by this point so raise an Exception instead
             raise RuntimeError(msg)
 
-    def _inject_static_data_access_url(self):
-        """
-        Modifies all HDF5 metadata output products to inject the URL for
-        Static Layer Data Access. This is only performed for the baseline
-        RTC workflow.
-        """
-        self.logger.info(
-            self.name, ErrorCode.UPDATING_PRODUCT_METADATA,
-            'Injecting static layer data access URL into product metadata'
-        )
-
-        product_type = self.runconfig.product_type
-
-        # For baseline RTC products, we are creating a linkage to where the
-        # corresponding static layer product can be obtained
-        if product_type == "RTC_S1":
-            hdf5_path = "/identification/staticLayersDataAccess"
-            geotiff_key = "STATIC_LAYERS_DATA_ACCESS"
-        # For static layer RTC products, we are injecting a reference to where
-        # the current product can be obtained from (product data access)
-        else:
-            hdf5_path = "/identification/dataAccess"
-            geotiff_key = "PRODUCT_DATA_ACCESS"
-
-        output_products = self.runconfig.get_output_product_filenames()
-
-        # Iterate over all the HDF5 output products, by now they should all
-        # be staged within the top-level of the designated output directory
-        hdf5_products = list(filter(lambda filename: filename.endswith(".h5"), output_products))
-
-        for hdf5_product in hdf5_products:
-            burst_id = get_burst_id_from_file_name(hdf5_product)
-
-            # Get the static layer access URL we already assigned to the
-            # product metadata
-            product_metadata = self._burst_metadata_cache[burst_id]
-            url = product_metadata['identification']['staticLayersDataAccess']
-
-            # Modify the HDF5 file with the instantiated URL for this burst product
-            with h5py.File(hdf5_product, 'r+') as hf:
-                del hf[hdf5_path]
-                hf.create_dataset(
-                    hdf5_path, data=np.string_(url)
-                )
-
-        tif_products = list(filter(lambda filename: filename.endswith(".tif"), output_products))
-
-        for tif_product in tif_products:
-            burst_id = get_burst_id_from_file_name(tif_product)
-
-            product_metadata = self._burst_metadata_cache[burst_id]
-            url = product_metadata['identification']['staticLayersDataAccess']
-
-            kwargs = {geotiff_key: url}
-
-            set_geotiff_metadata(
-                tif_product, scratch_dir=self.runconfig.scratch_path, **kwargs
-            )
-
     def run_postprocessor(self, **kwargs):
         """
         Executes the post-processing steps for the RTC-S1 PGE.
@@ -1035,10 +949,10 @@ class RtcS1Executor(RtcS1PreProcessorMixin, RtcS1PostProcessorMixin, PgeExecutor
     LEVEL = "L2"
     """Processing Level for RTC-S1 Products"""
 
-    PGE_VERSION = "2.1.0"
+    PGE_VERSION = "2.1.1"
     """Version of the PGE (overrides default from base_pge)"""
 
-    SAS_VERSION = "1.0.1"  # Final release https://github.com/opera-adt/RTC/releases/tag/v1.0.1
+    SAS_VERSION = "1.0.2"  # Final release https://github.com/opera-adt/RTC/releases/tag/v1.0.2
     """Version of the SAS wrapped by this PGE, should be updated as needed"""
 
     SOURCE = "S1"
