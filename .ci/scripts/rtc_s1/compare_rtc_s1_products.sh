@@ -10,8 +10,8 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 . "$SCRIPT_DIR"/../util/test_int_util.sh
 
 # TODO: add validation that OUTPUT/EXPECTED exist within container
-OUTPUT_DIR="/home/conda/output_dir"
-EXPECTED_DIR="/home/conda/expected_output_dir"
+OUTPUT_DIR="/home/rtc_user/output_dir"
+EXPECTED_DIR="/home/rtc_user/expected_output_dir"
 PGE_NAME="rtc_s1"
 
 initialize_html_results_file "$OUTPUT_DIR" "$PGE_NAME"
