@@ -21,7 +21,7 @@ PGE_NAME="cslc_s1"
 # 2 - product validation failure
 overall_status=0
 
-initialize_html_results_file "$output_dir" "$PGE_NAME"
+initialize_html_results_file "$OUTPUT_DIR" "$PGE_NAME"
 echo "<tr><th>Compare Result</th><th><ul><li>Expected file</li><li>Output file</li></ul></th><th>cslc_s1_compare.py output</th></tr>" >> "$RESULTS_FILE"
 
 declare -a burst_ids=("t064_135518_iw1"
@@ -37,7 +37,7 @@ declare -a burst_ids=("t064_135518_iw1"
 
 for burst_id in "${burst_ids[@]}"; do
     static_layers_compare_result="PENDING"
-    expected_dir="${TMP_DIR}/${EXPECTED_DATA%.*}/expected_output_s1_cslc_static"
+    expected_dir="${TMP_DIR}/${EXPECTED_DIR%.*}/expected_output_s1_cslc_static"
 
     burst_id_pattern="OPERA_L2_CSLC-S1-STATIC_${burst_id_replace_underscores}_*.h5"
     output_file=`ls $static_output_dir/$burst_id_pattern`
