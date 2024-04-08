@@ -37,7 +37,7 @@ declare -a burst_ids=("t064_135518_iw1"
 
 for burst_id in "${burst_ids[@]}"; do
     cslc_compare_result="PENDING"
-    expected_dir="${TMP_DIR}/${EXPECTED_DIR%.*}/expected_output_s1_cslc"
+    expected_output_dir="${TMP_DIR}/${EXPECTED_DIR%.*}/expected_output_s1_cslc"
 
     echo "-------------------------------------"
     echo "Comparing results for burst id ${burst_id}"
@@ -45,11 +45,11 @@ for burst_id in "${burst_ids[@]}"; do
     burst_id_uppercase=${burst_id^^}
     burst_id_replace_underscores=${burst_id_uppercase//_/-}
     burst_id_pattern="OPERA_L2_CSLC-S1_${burst_id_replace_underscores}_*.h5"
-    output_file=`ls $output_dir/$burst_id_pattern`
+    output_file=`ls $OUTPUT_DIR/$burst_id_pattern`
 
     echo "Output CSLC file matching burst id is $output_file"
 
-    ref_product="${expected_dir}/${burst_id}/20220501/${burst_id}_20220501.h5"
+    ref_product="${expected_output_dir}/${burst_id}/20220501/${burst_id}_20220501.h5"
     sec_product="${output_file}"
 
     compare_out=$("${SCRIPT_DIR}"/../cslc_s1/cslc_s1_compare.py --ref-product ${ref_product} --sec-product ${sec_product} -p CSLC 2>&1) || compare_exit_status=$?

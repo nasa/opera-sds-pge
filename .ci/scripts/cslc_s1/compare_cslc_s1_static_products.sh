@@ -37,14 +37,14 @@ declare -a burst_ids=("t064_135518_iw1"
 
 for burst_id in "${burst_ids[@]}"; do
     static_layers_compare_result="PENDING"
-    expected_dir="${TMP_DIR}/${EXPECTED_DIR%.*}/expected_output_s1_cslc_static"
+    expected_output_dir="${TMP_DIR}/${EXPECTED_DIR%.*}/expected_output_s1_cslc_static"
 
     burst_id_pattern="OPERA_L2_CSLC-S1-STATIC_${burst_id_replace_underscores}_*.h5"
     output_file=`ls $static_output_dir/$burst_id_pattern`
 
     echo "Output static layers file matching burst id is $output_file"
 
-    ref_product="${expected_dir}/${burst_id}/20220501/static_layers_${burst_id}.h5"
+    ref_product="${expected_output_dir}/${burst_id}/20220501/static_layers_${burst_id}.h5"
     sec_product="${output_file}"
 
     compare_out=$("${SCRIPT_DIR}"/../cslc_s1/cslc_s1_compare.py --ref-product ${ref_product} --sec-product ${sec_product} -p static_layers 2>&1) || compare_exit_status=$?
@@ -68,7 +68,7 @@ for burst_id in "${burst_ids[@]}"; do
 done
 
 finalize_html_results_file
-cp "${output_dir}"/test_int_cslc_s1_results.html "${TEST_RESULTS_DIR}"/test_int_cslc_s1_results.html
+cp "${OUTPUT_DIR}"/test_int_cslc_s1_results.html "${TEST_RESULTS_DIR}"/test_int_cslc_s1_results.html
 
 # Write the status code to an RC file so the integration test script can pick
 # it up.
