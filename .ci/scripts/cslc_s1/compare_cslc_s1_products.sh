@@ -51,7 +51,7 @@ for burst_id in "${burst_ids[@]}"; do
 
     ref_product="${expected_output_dir}/${burst_id}/20220501/${burst_id}_20220501.h5"
 #    sec_product="${output_file}"
-    sec_product=$OUTPUT_DIR/${burst_id}/20220501/${burst_id}_20220501.h5"
+    sec_product="$OUTPUT_DIR/${burst_id}/20220501/${burst_id}_20220501.h5"
 
     compare_out=$("${SCRIPT_DIR}"/../cslc_s1/cslc_s1_compare.py --ref-product ${ref_product} --sec-product ${sec_product} -p CSLC 2>&1) || compare_exit_status=$?
 
@@ -77,6 +77,7 @@ finalize_html_results_file
 
 # Write the status code to an RC file so the integration test script can pick
 # it up.
+
 echo $overall_status > $OUTPUT_DIR/"compare_cslc_s1_products.rc"
 
 # Always want to return 0 even if some comparisons failed to avoid error handling
