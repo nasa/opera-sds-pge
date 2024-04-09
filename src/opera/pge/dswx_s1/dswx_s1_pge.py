@@ -150,12 +150,12 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
         Evaluates the output file(s) generated from SAS execution to ensure:
             - That the file(s) contains some content (size is greater than 0).
             - That the .tif output files (band data) end with 'B01_WTR',
-              'B02_BWTR', 'B03_CONF' or 'B04_DIAG'
+              'B02_BWTR', 'B03_CONF', 'B04_DIAG' or 'BROWSE'
             - That the there are the same number of each type of file, implying
               3 output bands per tile
 
         """
-        EXPECTED_NUM_BANDS: int = 4
+        EXPECTED_NUM_BANDS: int = 5
         band_dict = {}
         num_bands = []
         output_extension = '.tif'

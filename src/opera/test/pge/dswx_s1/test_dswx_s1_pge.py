@@ -278,7 +278,7 @@ class DswxS1PgeTestCase(unittest.TestCase):
 
         # Lastly, check that the dummy output products were created
         output_tif_files = glob.glob(join(pge.runconfig.output_product_path, "*.tif"))
-        self.assertEqual(len(output_tif_files), 4)
+        self.assertEqual(len(output_tif_files), 5)
 
         output_browse_files = glob.glob(join(pge.runconfig.output_product_path, "*.png"))
         self.assertEqual(len(output_browse_files), 1)
@@ -298,7 +298,7 @@ class DswxS1PgeTestCase(unittest.TestCase):
 
         pge.run()
 
-        image_files = glob.glob(join(pge.runconfig.output_product_path, "*.tif"))
+        image_files = glob.glob(join(pge.runconfig.output_product_path, "*_B0*.tif"))
 
         for image_file in image_files:
             file_name = pge._geotiff_filename(image_file)
@@ -755,8 +755,8 @@ class DswxS1PgeTestCase(unittest.TestCase):
             # Test a misnamed band file.  Post-processor should detect this and flag an error
             band_data = ('OPERA_L3_DSWx-S1_b1_B01_WTR.tif', 'OPERA_L3_DSWx-S1_b1_B02_BWTR.tif',
                          'OPERA_L3_DSWx-S1_b1_B03_CONF.tif', 'OPERA_L3_DSWx-S1_b1_B04_DIAG.tif',
-                         'OPERA_L3_DSWx-S1_b2_B01_WTR.tif', 'OPERA_L3_DSWx-S1_b2_B02_BWTR.tif',
-                         'OPERA_L3_DSWx-S1_b2_B04_DIAG.tif')
+                         'OPERA_L3_DSWx-S1_b1_BROWSE.tif', 'OPERA_L3_DSWx-S1_b2_B01_WTR.tif',
+                         'OPERA_L3_DSWx-S1_b2_B02_BWTR.tif', 'OPERA_L3_DSWx-S1_b2_B04_DIAG.tif')
             self.generate_band_data_output(band_data, clear=True)
 
             with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
