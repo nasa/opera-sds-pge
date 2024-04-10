@@ -10,6 +10,7 @@ from Sentinel-1 A/B (S1) PGE.
 """
 
 import glob
+import os.path
 from datetime import datetime
 from os.path import abspath, basename, dirname, exists, getsize, join, splitext
 
@@ -388,6 +389,9 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
             The file name to assign to browse image created by this PGE.
 
         """
+        # Save the extension of the intermediate filename
+        inter_ext = os.path.splitext(inter_filename)[-1]
+
         # Find one of the tif files corresponding to the provided browse image
         # based on the tile ID
         tile_id = basename(inter_filename).split('_')[3]
@@ -407,7 +411,7 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
         tile_filename = self._tile_filename(tif_files[0])
 
         # Add the portion specific to browse images
-        return f"{tile_filename}_BROWSE.png"
+        return f"{tile_filename}_BROWSE{inter_ext}"
 
     def _ancillary_filename(self):
         """
@@ -797,6 +801,6 @@ class DSWxS1Executor(DSWxS1PreProcessorMixin, DSWxS1PostProcessorMixin, PgeExecu
         # Used in base_pge.py to rename and keep track of files
         # renamed by the PGE
         self.rename_by_pattern_map = {
-            '*.tif*': self._geotiff_filename,
-            '*.png': self._browse_filename
+            '*B0*.tif*': self._geotiff_filename,
+            '*BROWSE*': self._browse_filename
         }
