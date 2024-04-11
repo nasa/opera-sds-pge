@@ -59,12 +59,6 @@ local_static_runconfig="${SCRIPT_DIR}/${static_runconfig}"
 echo "Copying runconfig file $local_static_runconfig to $runconfig_dir/"
 cp ${local_static_runconfig} ${runconfig_dir}
 
-### Pull in product compare script from S3.
-### Current source is https://raw.githubusercontent.com/opera-adt/RTC/main/app/rtc_compare.py
-###local_compare_script=${TMP_DIR}/rtc_compare.py
-##echo "Downloading s3://operasds-dev-pge/${PGE_NAME}/rtc_compare_final_1.0.0.py to ${local_compare_script}"
-##aws s3 cp s3://operasds-dev-pge/${PGE_NAME}/rtc_compare_calval_0.4.1.py "$local_compare_script"
-
 # the testdata reference metadata contains this path so we use it here
 output_dir="${TMP_DIR}/rtc_s1_output_dir"
 static_output_dir="${TMP_DIR}/rtc_s1_static_output_dir"
@@ -90,7 +84,7 @@ fi
 echo "Creating scratch directory $scratch_dir."
 mkdir -p --mode=777 "$scratch_dir"
 
-
+expected_dir="${TMP_DIR}/${EXPECTED_DATA%.*}/"
 container_name="${PGE_NAME}"
 
 # Start metrics collection
@@ -104,6 +98,7 @@ docker run --rm -u $UID:"$(id -g)" --env OMP_NUM_THREADS=3 \
                 -v "${input_dir}"/:/home/rtc_user/input_dir:ro \
                 -v "${output_dir}":/home/rtc_user/output_dir \
                 -v "${scratch_dir}":/home/rtc_user/scratch_dir \
+                -v "${expected_dir}":/home/rtc_user/expected_output_dir:ro \
                 ${PGE_IMAGE}:"${PGE_TAG}" --file /home/rtc_user/runconfig/${RUNCONFIG}
 
 docker_exit_status=$?
@@ -130,6 +125,7 @@ docker run --rm -u $UID:"$(id -g)" --env OMP_NUM_THREADS=3 \
            -v "${input_dir}"/:/home/rtc_user/input_dir:ro \
            -v "${static_output_dir}":/home/rtc_user/output_dir \
            -v "${scratch_dir}":/home/rtc_user/scratch_dir \
+           -v "${expected_dir}":/home/rtc_user/expected_output_dir:ro \
            ${PGE_IMAGE}:"${PGE_TAG}" --file /home/rtc_user/runconfig/"$static_runconfig"
 
 docker_exit_status=$?
@@ -137,18 +133,27 @@ docker_exit_status=$?
 # End metrics collection
 metrics_collection_end "${PGE_NAME}_static" "$container_name" "$docker_exit_status" "$TEST_RESULTS_DIR"
 
-if [ $docker_exit_status -ne 0 ]; then
-    echo "docker exit indicates failure: ${docker_exit_status}"
-    overall_status=1
-fi
-
 # Copy the PGE/SAS log file(s) to the test results directory so it can be archived
 # by Jenkins with the other results
 cp "${output_dir}"/*.log "${TEST_RESULTS_DIR}"
 cp "${static_output_dir}"/*.log "${TEST_RESULTS_DIR}"
 
-if [ $overall_status -ne 0 ]; then
+# Copy the HTML-formatted comparison results as well
+cp "${output_dir}"/test_int_rtc_s1_results.html "${TEST_RESULTS_DIR}"/test_int_rtc_s1_results.html
+cp "${static_output_dir}"/test_int_rtc_s1_results.html "${TEST_RESULTS_DIR}"/test_int_rtc_s1_static_results.html
+
+if [ $docker_exit_status -ne 0 ]; then
+    echo "docker exit indicates failure: ${docker_exit_status}"
+    overall_status=1
+else
+  # Retrieve the return codes written to disk by the comparison script
+  baseline_status=$(cat "$output_dir/compare_rtc_s1_products.rc")
+  static_status=$(cat "$static_output_dir/compare_rtc_s1_static_products.rc")
+fi
+
+if [ $baseline_status -ne 0 ] || [ $static_status -ne 0 ]; then
     echo "Test FAILED."
+    overall_status=1
 else
     echo "Test PASSED."
 fi
