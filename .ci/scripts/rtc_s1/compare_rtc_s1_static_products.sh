@@ -36,21 +36,25 @@ declare -a burst_ids=("t069_147169_iw3"
 update_html_results_file "${rtc_compare_result}" "${expected_files}" "${output_files}" "${compare_output}"
 
 static_layers_compare_result="PENDING"
-expected_dir="${TMP_DIR}/${EXPECTED_DIR}/expected_rtc_s1_static_output_dir"
+expected_dir="${TMP_DIR}/${EXPECTED_DIR%.*}/expected_rtc_s1_static_output_dir"
 
-static_burst_id_pattern="OPERA_L2_RTC-S1-STATIC_${burst_id_replace_underscores}_*.tif"
-output_static_files="${STATIC_OUTPUT_DIR}/${burst_id}"
-expected_static_files="${EXPECTED_DIR}/${burst_id}"
+#static_burst_id_pattern="OPERA_L2_RTC-S1-STATIC_${burst_id_replace_underscores}_*.tif"
+#output_static_files="${STATIC_OUTPUT_DIR}/${burst_id}"
+#expected_static_files="${EXPECTED_DIR}/${burst_id}"
 
 # Move the products for the current burst ID into their own subdir to compare
 # against the expected
-mkdir -p "${output_static_files}"
-mv ${STATIC_OUTPUT_DIR}/${static_burst_id_pattern} ${output_static_files}
+#mkdir -p "${output_static_files}"
+#mv ${STATIC_OUTPUT_DIR}/${static_burst_id_pattern} ${output_static_files}
 
-echo "Output static layers matching burst id are in $output_static_files"
-echo "Expected files are in $expected_static_files"
+#echo "Output static layers matching burst id are in $output_static_files"
+#echo "Expected files are in $expected_static_files"
 
-compare_output=$("${SCRIPT_DIR}"/../rtc_s1/rtc_s1_compare.py "${expected_static_files}" "${output_static_files}")
+ref_product="${expected_dir}/${burst_id}/20180504/static_layers_${burst_id}.h5"
+sec_product="${STATIC_OUTPUT_DIR}/${burst_id}/20180504/static_layers_${burst_id}.h5"
+
+#compare_output=$("${SCRIPT_DIR}"/../rtc_s1/rtc_s1_compare.py "${expected_static_files}" "${output_static_files}")
+compare_output=$("${SCRIPT_DIR}"/../rtc_s1/rtc_s1_compare.py --ref-product ${ref_product} --sec-product ${sec_product} -p static_layers 2>&1) || compare_exit_status=$?
 
 echo "$compare_output"
 if [[ "$compare_output" != *"FAILED"* ]]; then
