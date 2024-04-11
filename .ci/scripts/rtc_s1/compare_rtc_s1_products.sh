@@ -60,7 +60,7 @@ for burst_id in "${burst_ids[@]}"; do
     sec_product="$OUTPUT_DIR/${burst_id}/20180504/${burst_id}_20180504.h5"
 #    compare_output=$(python3 "${local_compare_script}" "${expected_files}" "${output_files}")
 
-    compare_out=$("${SCRIPT_DIR}"/../rtc_s1/rtc_s1_compare.py --ref-product ${ref_product} --sec-product ${sec_product} -p RTC 2>&1) || compare_exit_status=$?
+    compare_out=$("${SCRIPT_DIR}"/rtc_s1_compare.py --ref-product ${ref_product} --sec-product ${sec_product} -p RTC 2>&1) || compare_exit_status=$?
 
     echo "$compare_output"
     if [[ "$compare_output" != *"FAILED"* ]]; then
