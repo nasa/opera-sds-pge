@@ -61,6 +61,10 @@ cp ${local_static_runconfig} ${runconfig_dir}
 # the testdata reference metadata contains this path so we use it here
 output_dir="${TMP_DIR}/output_cslc_s1"
 static_output_dir="${TMP_DIR}/output_cslc_s1_static"
+# set up expected output directories for both runs
+expected_data_basename=$(basename -- "$EXPECTED_DATA")
+expected_data_dir="${TMP_DIR}/${expected_data_basename%.*}/expected_output_s1_cslc"
+expected_static_data_dir="${TMP_DIR}/${expected_data_basename%.*}/expected_output_s1_cslc_static"
 
 # make sure no output directory already exists
 if [ -d "$output_dir" ]; then
@@ -98,6 +102,7 @@ docker run --rm -u $UID:"$(id -g)" --env OMP_NUM_THREADS=$((num_cores-1)) \
                 -v "${input_dir}":/home/compass_user/input_dir:ro \
                 -v "${output_dir}":/home/compass_user/output_dir \
                 -v "${scratch_dir}":/home/compass_user/scratch_s1_cslc \
+                -v "${expected_data_dir}":/home/compass_user/expected_output_dir \
                 ${PGE_IMAGE}:"${PGE_TAG}" --file /home/compass_user/runconfig/"$RUNCONFIG"
 
 docker_exit_status=$?
@@ -124,6 +129,7 @@ docker run --rm -u $UID:"$(id -g)" --env OMP_NUM_THREADS=$((num_cores-1)) \
                 -v "${input_dir}":/home/compass_user/input_dir:ro \
                 -v "${static_output_dir}":/home/compass_user/output_dir \
                 -v "${scratch_dir}":/home/compass_user/scratch_s1_cslc \
+                -v "${expected_static_data_dir}":/home/compass_user/expected_output_dir \
                 ${PGE_IMAGE}:"${PGE_TAG}" --file /home/compass_user/runconfig/"$static_runconfig"
 
 docker_exit_status=$?
@@ -140,6 +146,9 @@ fi
 # by Jenkins with the other results
 cp "${output_dir}"/*.log "${TEST_RESULTS_DIR}"
 cp "${static_output_dir}"/*.log "${TEST_RESULTS_DIR}"
+
+cp "${output_dir}"/test_int_cslc_s1_results.html "${TEST_RESULTS_DIR}"/test_int_cslc_s1_results.html
+cp "${static_output_dir}"/test_int_cslc_s1_results.html "${TEST_RESULTS_DIR}"/test_int_cslc_s1_static_results.html
 
 if [ $overall_status -ne 0 ]; then
     echo "Test FAILED."

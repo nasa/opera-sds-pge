@@ -68,7 +68,6 @@ for burst_id in "${burst_ids[@]}"; do
 done
 
 finalize_html_results_file
-cp "${OUTPUT_DIR}"/test_int_cslc_s1_results.html "${TEST_RESULTS_DIR}"/test_int_cslc_s1_results.html
 
 # Write the status code to an RC file so the integration test script can pick
 # it up.
