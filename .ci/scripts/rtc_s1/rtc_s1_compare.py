@@ -780,42 +780,55 @@ def main():
 
     args = parser.parse_args()
 
+    results_dict = {}
+
     file_list_1 = glob.glob(os.path.join(args.input_dirs[0], '*tif'))
-    file_list_1 += glob.glob(os.path.join(args.input_dirs[0], '*h5'))
-    # file_list_1 += glob.glob(os.path.join(args.input_dirs[0], '*png'))
-
-    print('file_list (directory 1):', file_list_1)
-
     file_list_2 = glob.glob(os.path.join(args.input_dirs[1], '*tif'))
-    file_list_2 += glob.glob(os.path.join(args.input_dirs[1], '*h5'))
-    # file_list_2 += glob.glob(os.path.join(args.input_dirs[1], '*png'))
-
-    print('file_list (directory 2):', file_list_2)
 
     if len(file_list_1) != len(file_list_2):
-        error_msg = 'ERROR the number of files from the two inputs differ:\n'
+        error_msg = 'WARNING the number of .tif files from the two inputs differ:\n'
         error_msg += f'Directory 1: {file_list_1}\n'
         error_msg += f'Directory 2: {file_list_2}'
-        raise RuntimeError(error_msg)
-
-    results_dict = {}
-    for file_1 in file_list_1:
-
-        # If tif, it has layer suffix:
-        if file_1.endswith('.tif'):
+        print(error_msg)
+    else:
+        for file_1 in file_list_1:
+            # If tif, it has layer suffix:
             layer_suffix = file_1.split('_v')[-1].split('_', maxsplit=1)[-1]
             file_2 = [s for s in file_list_2
                       if s.endswith(layer_suffix)][0]
-        else:
+
+            if not file_2:
+                error_msg = 'ERROR tif file not found: ' + file_2
+                raise RuntimeError(error_msg)
+
+            # compare .tif and .png files
+            print('*******************************************************')
+            print('*************   TESTING (GeoTIFF file)   **************')
+            print('*******************************************************')
+            print('*** file 1:', file_1)
+            print('*** file 2:', file_2)
+            print('-------------------------------------------------------')
+            basename= os.path.basename(file_1)
+            results_dict[basename] = compare_rtc_s1_products(file_1, file_2)
+
+    file_list_1 = glob.glob(os.path.join(args.input_dirs[0], '*h5'))
+    file_list_2 = glob.glob(os.path.join(args.input_dirs[1], '*h5'))
+
+    if len(file_list_1) != len(file_list_2):
+        error_msg = 'WARNING the number of .h5 files from the two inputs differ:\n'
+        error_msg += f'Directory 1: {file_list_1}\n'
+        error_msg += f'Directory 2: {file_list_2}'
+        print(error_msg)
+    else:
+        for file_1 in file_list_1:
             file_extension = file_1.split('.')[-1]
             file_2 = [s for s in file_list_2
                       if s.endswith(file_extension)][0]
 
-        if not file_2:
-            error_msg = 'ERROR file not found: ' + file_2
-            raise RuntimeError(error_msg)
+            if not file_2:
+                error_msg = 'ERROR hdf5 file not found: ' + file_2
+                raise RuntimeError(error_msg)
 
-        if file_1.endswith('.h5'):
             # compare HDF5 files ('*h5')
             print('*******************************************************')
             print('************      TESTING (HDF5 file)      ************')
@@ -823,20 +836,9 @@ def main():
             print('*** file 1:', file_1)
             print('*** file 2:', file_2)
             print('-------------------------------------------------------')
-            basename_1 = os.path.basename(file_1)
-            results_dict[basename_1] = compare_rtc_hdf5_files(
+            basename = os.path.basename(file_1)
+            results_dict[basename] = compare_rtc_hdf5_files(
                 file_1, file_2, LIST_EXCLUDE_COMPARISON)
-            continue
-
-        # compare .tif and .png files
-        print('*******************************************************')
-        print('*************   TESTING (GeoTIFF file)   **************')
-        print('*******************************************************')
-        print('*** file 1:', file_1)
-        print('*** file 2:', file_2)
-        print('-------------------------------------------------------')
-        basename_2 = os.path.basename(file_1)
-        results_dict[basename_2] = compare_rtc_s1_products(file_1, file_2)
 
     print('*******************************************************')
     print('************         Overall results       ************')
