@@ -37,13 +37,13 @@ declare -a burst_ids=("t064_135518_iw1"
 
 for burst_id in "${burst_ids[@]}"; do
     static_layers_compare_result="PENDING"
-    expected_output_dir="${TMP_DIR}/${EXPECTED_DIR%.*}/expected_output_s1_cslc_static"
+    expected_output_dir="${EXPECTED_DIR}/expected_output_s1_cslc_static"
 
     # The same test cases are always used so the name can be hard-coded
     ref_product="${expected_output_dir}/${burst_id}/20220501/static_layers_${burst_id}.h5"
     sec_product="${OUTPUT_DIR}/${burst_id}/20220501/static_layers_${burst_id}.h5"
 
-    compare_out=$("${SCRIPT_DIR}"/../cslc_s1/cslc_s1_compare.py --ref-product ${ref_product} --sec-product ${sec_product} -p static_layers 2>&1) || compare_exit_status=$?
+    compare_out=$("${SCRIPT_DIR}"/cslc_s1_compare.py --ref-product ${ref_product} --sec-product ${sec_product} -p static_layers 2>&1) || compare_exit_status=$?
 
     echo "$compare_out"
     if [[ "$compare_out" != *"All CSLC product checks have passed"* ]]; then
