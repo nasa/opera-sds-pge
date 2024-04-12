@@ -39,11 +39,7 @@ for burst_id in "${burst_ids[@]}"; do
     static_layers_compare_result="PENDING"
     expected_output_dir="${TMP_DIR}/${EXPECTED_DIR%.*}/expected_output_s1_cslc_static"
 
-#    burst_id_pattern="OPERA_L2_CSLC-S1-STATIC_${burst_id_replace_underscores}_*.h5"
-#    output_file=`ls $static_output_dir/$burst_id_pattern`
-
-#    echo "Output static layers file matching burst id is $output_file"
-
+    # The same test cases are always used so the name can be hard-coded
     ref_product="${expected_output_dir}/${burst_id}/20220501/static_layers_${burst_id}.h5"
     sec_product="${OUTPUT_DIR}/${burst_id}/20220501/static_layers_${burst_id}.h5"
 
@@ -69,10 +65,8 @@ done
 
 finalize_html_results_file
 
-# Write the status code to an RC file so the integration test script can pick
-# it up.
+# Write the status code to an RC file so the integration test script can pick it up.
 echo $overall_status > $OUTPUT_DIR/"compare_cslc_s1_products.rc"
 
-# Always want to return 0 even if some comparisons failed to avoid error handling
-# logic in the PGE
+# Always want to return 0 even if some comparisons failed to avoid error handling logic in the PGE
 exit 0
