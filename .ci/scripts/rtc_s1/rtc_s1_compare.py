@@ -22,6 +22,10 @@ LIST_EXCLUDE_COMPARISON = \
      '//metadata/processingInformation/inputs/configFiles',
      '//metadata/processingInformation/inputs/demSource',
      '//metadata/processingInformation/inputs/orbitFiles',
+     '//metadata/qa/geometricAccuracy/stddev/x',
+     '//metadata/qa/geometricAccuracy/bias/x',
+     '//metadata/qa/geometricAccuracy/stddev/y',
+     '//metadata/qa/geometricAccuracy/bias/y',
      '//identification/processingDateTime',
      '//identification/productVersion'
      ]
@@ -33,11 +37,16 @@ LIST_EXCLUDE_COMPARISON_PRODUCT = \
      'PRODUCT_VERSION',
      'ISCE3_VERSION',
      'S1_READER_VERSION',
-     'INPUTS_ANNOTATION_FILES',
-     'INPUTS_CONFIG_FILES',
-     'INPUTS_DEM_SOURCE',
-     'INPUTS_ORBIT_FILES',
-     'PROCESSING_DATETIME'
+     'INPUT_ANNOTATION_FILES',
+     'INPUT_CONFIG_FILES',
+     'INPUT_DEM_SOURCE',
+     'INPUT_ORBIT_FILES',
+     'PROCESSING_DATETIME',
+     'PRODUCT_DATA_ACCESS',
+     'QA_GEOMETRIC_ACCURACY_BIAS_X',
+     'QA_GEOMETRIC_ACCURACY_BIAS_Y',
+     'QA_GEOMETRIC_ACCURACY_STDDEV_X',
+     'QA_GEOMETRIC_ACCURACY_STDDEV_Y',
      ]
 
 
@@ -795,11 +804,13 @@ def main():
             # If tif, it has layer suffix:
             layer_suffix = file_1.split('_v')[-1].split('_', maxsplit=1)[-1]
             file_2 = [s for s in file_list_2
-                      if s.endswith(layer_suffix)][0]
+                      if s.split('_v')[-1].split('_', maxsplit=1)[-1] == layer_suffix]
 
             if not file_2:
-                error_msg = 'ERROR tif file not found: ' + file_2
+                error_msg = f'ERROR matching tif file not found for {file_1}'
                 raise RuntimeError(error_msg)
+
+            file_2 = file_2[0]
 
             # compare .tif and .png files
             print('*******************************************************')
@@ -823,11 +834,13 @@ def main():
         for file_1 in file_list_1:
             file_extension = file_1.split('.')[-1]
             file_2 = [s for s in file_list_2
-                      if s.endswith(file_extension)][0]
+                      if s.endswith(file_extension)]
 
             if not file_2:
-                error_msg = 'ERROR hdf5 file not found: ' + file_2
+                error_msg = f'ERROR matching hdf5 file not found for {file_1}'
                 raise RuntimeError(error_msg)
+
+            file_2 = file_2[0]
 
             # compare HDF5 files ('*h5')
             print('*******************************************************')
