@@ -78,7 +78,7 @@ copy_pge_files() {
   WORKSPACE=$1
   STAGING_DIR=$2
   PGE_NAME=$3
-
+  echo "Copying PGE files."
   mkdir -p ${STAGING_DIR}/opera/pge
   mkdir -p ${STAGING_DIR}/opera/.ci/scripts
 

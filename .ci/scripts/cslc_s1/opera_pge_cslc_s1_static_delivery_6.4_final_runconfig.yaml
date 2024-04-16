@@ -46,11 +46,9 @@ RunConfig:
                 DataValidityStartDate: 20140403
 
             QAExecutable:
-                Enabled: False
-
-                ProgramPath:
-
-                ProgramOptions:
+                Enabled: True
+                ProgramPath: /home/compass_user/opera/.ci/scripts/cslc_s1/compare_cslc_s1_static_products.sh
+                ProgramOptions: []
 
             DebugLevelGroup:
                 DebugSwitch: False

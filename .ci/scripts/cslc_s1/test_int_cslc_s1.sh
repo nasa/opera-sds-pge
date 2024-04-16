@@ -58,15 +58,13 @@ local_static_runconfig="${SCRIPT_DIR}/${static_runconfig}"
 echo "Copying runconfig file $local_static_runconfig to $runconfig_dir/"
 cp ${local_static_runconfig} ${runconfig_dir}
 
-# Pull in validation script from S3.
-# Current source is https://raw.githubusercontent.com/opera-adt/COMPASS/main/src/compass/utils/validate_product.py
-local_validate_script=${TMP_DIR}/validate_product.py
-echo "Downloading s3://operasds-dev-pge/${PGE_NAME}/validate_cslc_product_final_0.5.1.py to $local_validate_script"
-aws s3 cp s3://operasds-dev-pge/${PGE_NAME}/validate_cslc_product_final_0.5.1.py "$local_validate_script" --no-progress
-
 # the testdata reference metadata contains this path so we use it here
 output_dir="${TMP_DIR}/output_cslc_s1"
 static_output_dir="${TMP_DIR}/output_cslc_s1_static"
+
+# set up expected output directories for both runs
+expected_data_basename=$(basename -- "$EXPECTED_DATA")
+expected_data_dir="${TMP_DIR}/${expected_data_basename%.*}"
 
 # make sure no output directory already exists
 if [ -d "$output_dir" ]; then
@@ -104,6 +102,7 @@ docker run --rm -u $UID:"$(id -g)" --env OMP_NUM_THREADS=$((num_cores-1)) \
                 -v "${input_dir}":/home/compass_user/input_dir:ro \
                 -v "${output_dir}":/home/compass_user/output_dir \
                 -v "${scratch_dir}":/home/compass_user/scratch_s1_cslc \
+                -v "${expected_data_dir}":/home/compass_user/expected_output_dir \
                 ${PGE_IMAGE}:"${PGE_TAG}" --file /home/compass_user/runconfig/"$RUNCONFIG"
 
 docker_exit_status=$?
@@ -130,6 +129,7 @@ docker run --rm -u $UID:"$(id -g)" --env OMP_NUM_THREADS=$((num_cores-1)) \
                 -v "${input_dir}":/home/compass_user/input_dir:ro \
                 -v "${static_output_dir}":/home/compass_user/output_dir \
                 -v "${scratch_dir}":/home/compass_user/scratch_s1_cslc \
+                -v "${expected_data_dir}":/home/compass_user/expected_output_dir \
                 ${PGE_IMAGE}:"${PGE_TAG}" --file /home/compass_user/runconfig/"$static_runconfig"
 
 docker_exit_status=$?
@@ -147,92 +147,8 @@ fi
 cp "${output_dir}"/*.log "${TEST_RESULTS_DIR}"
 cp "${static_output_dir}"/*.log "${TEST_RESULTS_DIR}"
 
-if [ $overall_status -eq 0 ]; then
-    initialize_html_results_file "$output_dir" "$PGE_NAME"
-    echo "<tr><th>Compare Result</th><th><ul><li>Expected file</li><li>Output file</li></ul></th><th>cslc_s1_compare.py output</th></tr>" >> "$RESULTS_FILE"
-
-    declare -a burst_ids=("t064_135518_iw1"
-                          "t064_135519_iw1"
-                          "t064_135520_iw1"
-                          "t064_135521_iw1"
-                          "t064_135522_iw1"
-                          "t064_135523_iw1"
-                          "t064_135524_iw1"
-                          "t064_135525_iw1"
-                          "t064_135526_iw1"
-                          "t064_135527_iw1")
-
-    for burst_id in "${burst_ids[@]}"; do
-        cslc_compare_result="PENDING"
-        expected_dir="${TMP_DIR}/${EXPECTED_DATA%.*}/expected_output_s1_cslc"
-
-        echo "-------------------------------------"
-        echo "Comparing results for burst id ${burst_id}"
-
-        burst_id_uppercase=${burst_id^^}
-        burst_id_replace_underscores=${burst_id_uppercase//_/-}
-        burst_id_pattern="OPERA_L2_CSLC-S1_${burst_id_replace_underscores}_*.h5"
-        output_file=`ls $output_dir/$burst_id_pattern`
-
-        echo "Output CSLC file matching burst id is $output_file"
-
-        ref_product="${expected_dir}/${burst_id}/20220501/${burst_id}_20220501.h5"
-        sec_product="${output_file}"
-
-        compare_out=$("${SCRIPT_DIR}"/../cslc_s1/cslc_s1_compare.py --ref-product ${ref_product} --sec-product ${sec_product} -p CSLC 2>&1) || compare_exit_status=$?
-
-        echo "$compare_out"
-        if [[ "$compare_out" != *"All CSLC product checks have passed"* ]]; then
-            echo "Failure: All CSLC product checks DID NOT PASS"
-            cslc_compare_result="FAIL"
-            overall_status=2
-        elif [[ "$compare_out" != *"All CSLC metadata checks have passed"* ]]; then
-            echo "Failure: All CSLC metadata checks DID NOT PASS"
-            cslc_compare_result="FAIL"
-            overall_status=2
-        else
-            echo "Product validation was successful"
-            cslc_compare_result="PASS"
-        fi
-
-        compare_out="${compare_out//$'\n'/<br>}"
-        update_html_results_file "${cslc_compare_result}" "${ref_product}" "${sec_product}" "${compare_out}"
-
-        static_layers_compare_result="PENDING"
-        expected_dir="${TMP_DIR}/${EXPECTED_DATA%.*}/expected_output_s1_cslc_static"
-
-        burst_id_pattern="OPERA_L2_CSLC-S1-STATIC_${burst_id_replace_underscores}_*.h5"
-        output_file=`ls $static_output_dir/$burst_id_pattern`
-
-        echo "Output static layers file matching burst id is $output_file"
-
-        ref_product="${expected_dir}/${burst_id}/20220501/static_layers_${burst_id}.h5"
-        sec_product="${output_file}"
-
-        compare_out=$("${SCRIPT_DIR}"/../cslc_s1/cslc_s1_compare.py --ref-product ${ref_product} --sec-product ${sec_product} -p static_layers 2>&1) || compare_exit_status=$?
-
-        echo "$compare_out"
-        if [[ "$compare_out" != *"All CSLC product checks have passed"* ]]; then
-            echo "Failure: All CSLC product checks DID NOT PASS"
-            static_layers_compare_result="FAIL"
-            overall_status=2
-        elif [[ "$compare_out" != *"All CSLC metadata checks have passed"* ]]; then
-            echo "Failure: All CSLC metadata checks DID NOT PASS"
-            static_layers_compare_result="FAIL"
-            overall_status=2
-        else
-            echo "Product validation was successful"
-            static_layers_compare_result="PASS"
-        fi
-
-        compare_out="${compare_out//$'\n'/<br>}"
-        update_html_results_file "${static_layers_compare_result}" "${ref_product}" "${sec_product}" "${compare_out}"
-    done
-
-    finalize_html_results_file
-    cp "${output_dir}"/test_int_cslc_s1_results.html "${TEST_RESULTS_DIR}"/test_int_cslc_s1_results.html
-fi
-echo " "
+cp "${output_dir}"/test_int_cslc_s1_results.html "${TEST_RESULTS_DIR}"/test_int_cslc_s1_results.html
+cp "${static_output_dir}"/test_int_cslc_s1_results.html "${TEST_RESULTS_DIR}"/test_int_cslc_s1_static_results.html
 
 if [ $overall_status -ne 0 ]; then
     echo "Test FAILED."
