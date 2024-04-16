@@ -46,9 +46,9 @@ RunConfig:
                 DataValidityStartDate: 20140403
 
             QAExecutable:
-                Enabled: False
+                Enabled: True
 
-                ProgramPath:
+                ProgramPath: /home/rtc_user/opera/.ci/scripts/rtc_s1/compare_rtc_s1_static_products.sh
 
                 ProgramOptions: []
 
