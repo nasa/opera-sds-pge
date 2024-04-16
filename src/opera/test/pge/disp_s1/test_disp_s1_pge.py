@@ -227,11 +227,14 @@ class DispS1PgeTestCase(unittest.TestCase):
         )
         self.assertTrue(os.path.exists(expected_disp_product))
 
-        expected_compressed_cslc_product = join(
-            pge.runconfig.output_product_path,
-            pge._compressed_cslc_filename('compressed_t087_185683_iw2_20180222_20180330.h5')
-        )
-        self.assertTrue(os.path.exists(expected_compressed_cslc_product))
+        for compressed_cslc in [
+            'compressed_t042_088905_iw1_20221107_20221119_20221213.h5',
+            'compressed_t042_088906_iw1_20221107_20221119_20221213.h5']:
+            expected_compressed_cslc_product = join(
+                pge.runconfig.output_product_path,
+                pge._compressed_cslc_filename(compressed_cslc)
+            )
+            self.assertTrue(os.path.exists(expected_compressed_cslc_product))
 
         # Open and read the log
         with open(expected_log_file, 'r', encoding='utf-8') as infile:
@@ -268,6 +271,25 @@ class DispS1PgeTestCase(unittest.TestCase):
             rf'\d{{8}}T\d{{6}}Z_\d{{8}}T\d{{6}}Z_'
             rf'v{disp_metadata["identification"]["product_version"]}_'
             rf'\d{{8}}T\d{{6}}Z.nc'
+        )
+
+        # Repeat tests for the Compressed CSLC product
+        h5_files = glob.glob(join(output_dir, '*.h5'))
+        h5_file = sorted(h5_files)[0]
+
+        expected_ccslc_filename = pge._compressed_cslc_filename(
+            inter_filename="disp_s1_pge_test/output_dir/compressed_slcs/compressed_t042_088905_iw1_20221107_20221119_20221213.h5"
+        )
+
+        self.assertEqual(os.path.basename(h5_file), expected_ccslc_filename)
+
+        self.assertRegex(
+            expected_ccslc_filename,
+            rf'{pge.PROJECT}_L2_COMPRESSED-CSLC-S1_'
+            rf'\w{{4}}-\w{{6}}-\w{{3}}_'
+            rf'\d{{8}}T\d{{6}}Z_\d{{8}}T\d{{6}}Z_'
+            rf'\d{{8}}T\d{{6}}Z_\d{{8}}T\d{{6}}Z_'
+            rf'VV_v1.0.h5'
         )
 
     @patch.object(opera.pge.disp_s1.disp_s1_pge.subprocess, "run", mock_grib_to_netcdf)
