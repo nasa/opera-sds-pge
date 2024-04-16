@@ -805,7 +805,7 @@ class DispS1Executor(DispS1PreProcessorMixin, DispS1PostProcessorMixin, PgeExecu
     LEVEL = "L3"
     """Processing Level for DISP-S1 Products"""
 
-    SAS_VERSION = "0.2.7"  # Gamma release https://github.com/opera-adt/disp-s1/releases/tag/v0.2.7
+    SAS_VERSION = "0.2.8"  # Gamma release https://github.com/opera-adt/disp-s1/releases/tag/v0.2.8
     """Version of the SAS wrapped by this PGE, should be updated as needed"""
 
     def __init__(self, pge_name, runconfig_path, **kwargs):
