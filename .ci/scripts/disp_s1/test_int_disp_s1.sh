@@ -28,8 +28,8 @@ SAMPLE_TIME=15
 # RUNCONFIG should be the name of the runconfig in s3://operasds-dev-pge/disp_s1/
 [ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath "$(dirname "$(realpath "$0")")"/../../..)
 [ -z "${PGE_TAG}" ] && PGE_TAG="${USER}-dev"
-[ -z "${INPUT_DATA}" ] && INPUT_DATA="disp_s1_r4_gamma_expected_input.zip"
-[ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="disp_s1_r4_gamma_expected_output.zip"
+[ -z "${INPUT_DATA}" ] && INPUT_DATA="disp_s1_r4.1_gamma_expected_input.zip"
+[ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="disp_s1_r4.1_gamma_expected_output.zip"
 [ -z "${RUNCONFIG}" ] && RUNCONFIG="opera_pge_disp_s1_r4_gamma_runconfig.yaml"
 [ -z "${TMP_ROOT}" ] && TMP_ROOT="$DEFAULT_TMP_ROOT"
 
@@ -124,7 +124,7 @@ else
                             -v "$SCRIPT_DIR":/scripts \
                             --entrypoint /opt/conda/bin/python ${PGE_IMAGE}:"${PGE_TAG}" \
                             /scripts/disp_validate_product_opera_pge.py \
-                            --golden /exp/${expected_file} --test /out/${output_file} \
+                            --golden /exp/forward/${expected_file} --test /out/${output_file} \
                             --exclude_groups pge_runconfig)
     echo "$docker_out"
 

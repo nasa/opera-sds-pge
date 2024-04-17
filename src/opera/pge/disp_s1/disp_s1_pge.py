@@ -12,6 +12,7 @@ from Sentinel-1 A/B (S1-A/B) data.
 import datetime
 import glob
 import os.path
+import re
 import subprocess
 from collections import OrderedDict
 from os import listdir
@@ -389,7 +390,48 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
             The file name to assign to compressed CSLC product(s) created by this PGE.
 
         """
-        return os.path.basename(inter_filename)
+        level = "L2"
+        name = "COMPRESSED-CSLC-S1"
+
+        ccslc_regex = ("compressed_(?P<burst_id>\w{4}_\w{6}_\w{3})_"
+                       "(?P<ref_date>\d{8})_"
+                       "(?P<start_date>\d{8})_"
+                       "(?P<stop_date>\d{8})[.](?P<ext>h5)$")
+
+        result = re.match(ccslc_regex, os.path.basename(inter_filename))
+
+        if not result:
+            raise ValueError(
+                f"Compressed CSLC file {inter_filename} does not conform to "
+                f"expected file pattern"
+            )
+
+        # Cannonicalize the burst ID
+        burst_id = result.groupdict()["burst_id"]
+        burst_id = burst_id.upper().replace('_', '-')
+
+        # Get the dates from the parsed intermediate filename
+        ref_date = result.groupdict()["ref_date"]
+        start_date = result.groupdict()["start_date"]
+        stop_date = result.groupdict()["stop_date"]
+
+        # Get the production time
+        prod_time = f"{get_time_for_filename(self.production_datetime)}Z"
+
+        # Polarization should be fixed for all CSLC-derived products
+        polarization = "VV"
+
+        # Product version hardcoded to 1.0 for now since CCSLCs are not
+        # intended for widespread distribution
+        product_version = "1.0"
+
+        # Carry the file extension over from the original filename
+        ext = result.groupdict()["ext"]
+
+        return (f"{self.PROJECT}_{level}_{name}_{burst_id}_"
+                f"{ref_date}T000000Z_{start_date}T000000Z_"
+                f"{stop_date}T000000Z_{prod_time}_"
+                f"{polarization}_v{product_version}.{ext}")
 
     def _ancillary_filename(self):
         """
@@ -763,7 +805,7 @@ class DispS1Executor(DispS1PreProcessorMixin, DispS1PostProcessorMixin, PgeExecu
     LEVEL = "L3"
     """Processing Level for DISP-S1 Products"""
 
-    SAS_VERSION = "0.2.7"  # Gamma release https://github.com/opera-adt/disp-s1/releases/tag/v0.2.7
+    SAS_VERSION = "0.2.8"  # Gamma release https://github.com/opera-adt/disp-s1/releases/tag/v0.2.8
     """Version of the SAS wrapped by this PGE, should be updated as needed"""
 
     def __init__(self, pge_name, runconfig_path, **kwargs):
