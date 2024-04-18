@@ -209,7 +209,7 @@ RunConfig:
             # SAS writes the output product(s) to the following file
             sas_output_path: /home/dswx_user/output_dir
 
-            product_version: 0.1
+            product_version: "0.1"
 
             # DSWx-S1 product format
             output_imagery_format: 'COG'
