@@ -62,4 +62,6 @@ RunConfig:
             product_path: dswx_ni_pge_test/output_dir
             scratch_path: dswx_ni_pge_test/scratch_dir
             sas_output_path: dswx_ni_pge_test/output_dir
+          browse_image_group:
+            save_browse: true
           log_file: dswx_ni_pge_test/output_dir/test_log.log
