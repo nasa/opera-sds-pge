@@ -9,6 +9,7 @@ Unit tests for the pge/dswx_ni/dswx_ni_pge.py module.
 
 import glob
 import os
+import shutil
 import tempfile
 import unittest
 from io import StringIO
@@ -54,9 +55,24 @@ class DswxNIPgeTestCase(unittest.TestCase):
         input_dir = join(self.working_dir.name, "dswx_ni_pge_test/input_dir")
         os.makedirs(input_dir, exist_ok=True)
 
+        # Copy the algorithm_parameters config file into the test input directory.
+        shutil.copy(join(self.data_dir, 'test_dswx_ni_algorithm_parameters.yaml'), input_dir)
+
+        # Create the input dir expected by the test RunConfig and add a
+        # dummy input file
         self.input_file = tempfile.NamedTemporaryFile(
-            dir=input_dir, prefix="test_input_", suffix=".tiff"
+            dir=input_dir, prefix="test_input_", suffix=".h5"
         )
+
+        # Create dummy versions of the expected ancillary inputs
+        for ancillary_file in ('dem.tif', 'worldcover.tif',
+                               'reference_water.tif', 'shoreline.shp',
+                               'shoreline.dbf', 'shoreline.prj',
+                               'shoreline.shx', 'hand.tif',
+                               'MGRS_tile.sqlite', 'MGRS_tile_collection.sqlite'):
+            os.system(
+                f"touch {join(input_dir, ancillary_file)}"
+            )
 
         os.chdir(self.working_dir.name)
 
@@ -110,7 +126,10 @@ class DswxNIPgeTestCase(unittest.TestCase):
 
         # Lastly, check that the dummy output products were created
         slc_files = glob.glob(join(pge.runconfig.output_product_path, "*.tif"))
-        self.assertEqual(len(slc_files), 1)
+        self.assertEqual(len(slc_files), 4)
+
+        output_browse_files = glob.glob(join(pge.runconfig.output_product_path, "*.png"))
+        self.assertEqual(len(output_browse_files), 1)
 
         # Open and read the log
         with open(expected_log_file, 'r', encoding='utf-8') as infile:
