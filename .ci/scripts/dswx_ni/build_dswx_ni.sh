@@ -49,7 +49,8 @@ mkdir -p ${STAGING_DIR}/opera/pge
 
 copy_pge_files $WORKSPACE $STAGING_DIR $PGE_NAME
 
-mkdir -p ${STAGING_DIR}/opera/pge/dswx_ni; cp -r ${WORKSPACE}/src/opera/pge/dswx_ni/dswx_ni_pge.py  ${STAGING_DIR}/opera/pge/dswx_ni/
+# DSWx-NI PGE inherits from DSWx-S1 code, so it needs to be included in the container as well
+mkdir -p ${STAGING_DIR}/opera/pge/dswx_s1; cp -r ${WORKSPACE}/src/opera/pge/dswx_s1/dswx_s1_pge.py ${STAGING_DIR}/opera/pge/dswx_s1/
 
 # Create a VERSION file in the staging area to track version and build time
 printf "pge_version: ${TAG}\npge_build_datetime: ${BUILD_DATE_TIME}\n" \
