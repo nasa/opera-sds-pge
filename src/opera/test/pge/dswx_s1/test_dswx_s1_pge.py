@@ -63,13 +63,11 @@ class DswxS1PgeTestCase(unittest.TestCase):
         test_input_dir = join(self.working_dir.name, "dswx_s1_pge_test/input_dir")
         os.makedirs(test_input_dir, exist_ok=True)
 
-        self.input_file = tempfile.NamedTemporaryFile(
-            dir=test_input_dir, prefix="test_h5_", suffix=".h5"
-        )
-
         # Copy the algorithm_parameters config file into the test input directory.
         shutil.copy(join(self.data_dir, 'test_dswx_s1_algorithm_parameters.yaml'), test_input_dir)
 
+        # Create the input dir expected by the test RunConfig and add a
+        # dummy input file
         self.input_file = tempfile.NamedTemporaryFile(
             dir=test_input_dir, prefix="test_h5_", suffix=".h5"
         )
