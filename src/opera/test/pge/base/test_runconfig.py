@@ -43,7 +43,7 @@ class RunconfigTestCase(unittest.TestCase):
         self.assertEqual(runconfig.name, "OPERA-SAMPLE-PGE-SAS-CONFIG")
         self.assertEqual(runconfig.pge_name, "EXAMPLE_PGE")
         self.assertListEqual(runconfig.input_files, ["input/input_file01.h5", "input/input_file02.h5"])
-        self.assertDictEqual(runconfig.ancillary_file_map, {"DEMFile": "input/input_dem.vrt"})
+        self.assertDictEqual(runconfig.ancillary_file_map, {"DEMFile": "input/input_dem.vrt", 'IonosphereFiles': None})
         self.assertEqual(runconfig.output_product_path, "outputs/")
         self.assertEqual(runconfig.scratch_path, "temp/")
         self.assertEqual(runconfig.product_identifier, "EXAMPLE")
@@ -82,6 +82,13 @@ class RunconfigTestCase(unittest.TestCase):
         # this test
         self.assertIsInstance(runconfig.sas_config, dict)
 
+        # Ensure empty ancillary fields are filtered out of list returned
+        # from get_ancillary_filenames()
+        ancillary_filenames = runconfig.get_ancillary_filenames()
+
+        self.assertIn("input/input_dem.vrt", ancillary_filenames)
+        self.assertNotIn(None, ancillary_filenames)
+
     def test_pge_only_config_parse_and_validate(self):
         """
         Test basic parsing and validation of an input RunConfig that only
@@ -103,6 +110,13 @@ class RunconfigTestCase(unittest.TestCase):
 
         # Check that None was assigned for SAS config section
         self.assertIsNone(runconfig.sas_config)
+
+        # Ensure empty ancillary fields are filtered out of list returned
+        # from get_ancillary_filenames()
+        ancillary_filenames = runconfig.get_ancillary_filenames()
+
+        self.assertIn("input/input_dem.vrt", ancillary_filenames)
+        self.assertNotIn(None, ancillary_filenames)
 
     def test_strict_mode_validation(self):
         """Test validation of a RunConfig with strict_mode both enabled and disabled"""

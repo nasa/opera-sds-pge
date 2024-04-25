@@ -442,7 +442,7 @@ class RunConfig:
         for ancillary_mapping in self.ancillary_file_map.values():
             if isinstance(ancillary_mapping, list):
                 result.extend(ancillary_mapping)
-            else:
+            elif ancillary_mapping is not None:
                 result.append(ancillary_mapping)
 
         return result
