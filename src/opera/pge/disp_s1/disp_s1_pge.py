@@ -337,7 +337,7 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
             The file name to assign to browse image created by this PGE.
 
         """
-        browse_image_filename = f"{self._core_filename(inter_filename)}.png"
+        browse_image_filename = f"{self._core_filename(inter_filename)}_BROWSE.png"
 
         return browse_image_filename
 

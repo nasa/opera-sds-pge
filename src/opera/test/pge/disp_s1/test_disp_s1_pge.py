@@ -207,6 +207,7 @@ class DispS1PgeTestCase(unittest.TestCase):
         self.assertTrue(os.path.exists(expected_catalog_metadata_file))
 
         expected_inter_filename = abspath("disp_s1_pge_test/output_dir/20180101_20180330.unw.nc")
+        expected_browse_filename = abspath("disp_s1_pge_test/output_dir/20180101_20180330.unw.unwrapped_phase.png")
 
         # Check that the ISO metadata file was created and all placeholders were
         # filled in
@@ -226,6 +227,14 @@ class DispS1PgeTestCase(unittest.TestCase):
             )
         )
         self.assertTrue(os.path.exists(expected_disp_product))
+
+        expected_browse_product = join(
+            pge.runconfig.output_product_path,
+            pge._browse_filename(
+                inter_filename=expected_browse_filename
+            )
+        )
+        self.assertTrue(os.path.exists(expected_browse_product))
 
         for compressed_cslc in [
             'compressed_t042_088905_iw1_20221107_20221119_20221213.h5',
@@ -271,6 +280,22 @@ class DispS1PgeTestCase(unittest.TestCase):
             rf'\d{{8}}T\d{{6}}Z_\d{{8}}T\d{{6}}Z_'
             rf'v{disp_metadata["identification"]["product_version"]}_'
             rf'\d{{8}}T\d{{6}}Z.nc'
+        )
+
+        png_files = glob.glob(join(output_dir, '*.png'))
+        png_file = png_files[0]
+
+        expected_browse_filename = pge._browse_filename(
+            inter_filename=abspath("disp_s1_pge_test/output_dir/20180101_20180330.unw.unwrapped_phase.png")
+        )
+
+        self.assertRegex(
+            expected_browse_filename,
+            rf'{pge.PROJECT}_{pge.LEVEL}_{pge.NAME}_'
+            rf'IW_F{disp_metadata["identification"]["frame_id"]:05d}_VV_'
+            rf'\d{{8}}T\d{{6}}Z_\d{{8}}T\d{{6}}Z_'
+            rf'v{disp_metadata["identification"]["product_version"]}_'
+            rf'\d{{8}}T\d{{6}}Z_BROWSE.png'
         )
 
         # Repeat tests for the Compressed CSLC product
