@@ -976,6 +976,7 @@
                             </gmd:description>
                         </gmd:LI_Source>
                     </gmd:source>
+                    {%- if run_config.Groups.PGE.DynamicAncillaryFilesGroup.AncillaryFileMap.amplitude_dispersion_files is not none %}
                     {%- for amplitude_dispersion_file in run_config.Groups.PGE.DynamicAncillaryFilesGroup.AncillaryFileMap.amplitude_dispersion_files %}
                     <gmd:source>
                         <gmd:LI_Source>
@@ -985,6 +986,8 @@
                         </gmd:LI_Source>
                     </gmd:source>
                     {%- endfor %}
+                    {%- endif %}
+                    {%- if run_config.Groups.PGE.DynamicAncillaryFilesGroup.AncillaryFileMap.amplitude_mean_files is not none %}
                     {%- for amplitude_mean_file in run_config.Groups.PGE.DynamicAncillaryFilesGroup.AncillaryFileMap.amplitude_mean_files %}
                     <gmd:source>
                         <gmd:LI_Source>
@@ -994,6 +997,8 @@
                         </gmd:LI_Source>
                     </gmd:source>
                     {%- endfor %}
+                    {%- endif %}
+                    {%- if run_config.Groups.PGE.DynamicAncillaryFilesGroup.AncillaryFileMap.static_layers_files is not none %}
                     {%- for static_layers_file in run_config.Groups.PGE.DynamicAncillaryFilesGroup.AncillaryFileMap.static_layers_files %}
                     <gmd:source>
                         <gmd:LI_Source>
@@ -1003,6 +1008,8 @@
                         </gmd:LI_Source>
                     </gmd:source>
                     {%- endfor %}
+                    {%- endif %}
+                    {%- if run_config.Groups.PGE.DynamicAncillaryFilesGroup.AncillaryFileMap.ionosphere_files is not none %}
                     {%- for ionosphere_file in run_config.Groups.PGE.DynamicAncillaryFilesGroup.AncillaryFileMap.ionosphere_files %}
                     <gmd:source>
                         <gmd:LI_Source>
@@ -1012,6 +1019,8 @@
                         </gmd:LI_Source>
                     </gmd:source>
                     {%- endfor %}
+                    {%- endif %}
+                    {%- if run_config.Groups.PGE.DynamicAncillaryFilesGroup.AncillaryFileMap.troposphere_files is not none %}
                     {%- for troposphere_file in run_config.Groups.PGE.DynamicAncillaryFilesGroup.AncillaryFileMap.troposphere_files %}
                     <gmd:source>
                         <gmd:LI_Source>
@@ -1021,6 +1030,7 @@
                         </gmd:LI_Source>
                     </gmd:source>
                     {%- endfor %}
+                    {%- endif %}
                 </gmd:LI_Lineage>
             </gmd:lineage>
         </gmd:DQ_DataQuality>
