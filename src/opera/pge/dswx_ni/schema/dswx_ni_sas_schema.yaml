@@ -1,3 +1,7 @@
+#
+# Yamale schema for the DSWx-NI SAS Configuration
+#
+
 runconfig:
     name: str()
 
@@ -27,7 +31,7 @@ runconfig:
 
             # Height Above Nearest Drainage (optional)
             hand_file: str(required=True)
-            
+
             # HAND description
             hand_file_description: str(required=False)
 
@@ -43,10 +47,10 @@ runconfig:
             # NOAA GSHHS shapefile description
             shoreline_shapefile_description: str(required=False)
 
-            # algorithm parameter 
+            # algorithm parameter
             algorithm_parameters: str(required=True)
 
-            # placeholder for inundated vegettion 
+            # placeholder for inundated vegettion
             mean_backscattering: str(required=False)
             standard_deviation_backscattering: str(required=False)
 
@@ -66,10 +70,10 @@ runconfig:
         product_path_group:
             # Directory where PGE will place results
             product_path: str()
-       
+
             # Directory where SAS can write temporary data
             scratch_path: str()
-       
+
             # Intermediate file name.  SAS writes the output product to the following file.
             # After the SAS completes, the PGE wrapper renames the product file
             # according to proper file naming conventions.
@@ -110,22 +114,22 @@ runconfig:
             # Flag to collapse water classes if set to True. Default is True.
             flag_collapse_wtr_classes: bool(required=False)
 
-            # Flag to exclude inundated vegetation from processing if set to True. 
+            # Flag to exclude inundated vegetation from processing if set to True.
             exclude_inundated_vegetation: bool(required=False)
 
-            # Flag to set non-water pixels to NoData value if set to True. 
+            # Flag to set non-water pixels to NoData value if set to True.
             set_not_water_to_nodata: bool(required=False)
 
-            # Flag to set HAND mask pixels to NoData value if set to True. 
+            # Flag to set HAND mask pixels to NoData value if set to True.
             set_hand_mask_to_nodata: bool(required=False)
 
-            # Flag to set layover and shadow pixels to NoData value if set to True. 
+            # Flag to set layover and shadow pixels to NoData value if set to True.
             set_layover_shadow_to_nodata: bool(required=False)
-            
-            # Flag to set ocean-masked pixels to NoData value if set to True. 
+
+            # Flag to set ocean-masked pixels to NoData value if set to True.
             set_ocean_masked_to_nodata: bool(required=False)
 
-            # Flag to save Geotiff to output directory if set to True. 
+            # Flag to save Geotiff to output directory if set to True.
             save_tif_to_output: bool(required=False)
 
         log_file: str(required=False)
