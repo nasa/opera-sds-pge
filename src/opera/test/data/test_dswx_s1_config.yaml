@@ -27,6 +27,7 @@ RunConfig:
           - /bin/echo hello world > dswx_s1_pge_test/output_dir/OPERA_L3_DSWx-S1_T18MVA_20200702T231843Z_20230317T190549Z_v0.1_B03_CONF.tif;
           - /bin/echo hello world > dswx_s1_pge_test/output_dir/OPERA_L3_DSWx-S1_T18MVA_20200702T231843Z_20230317T190549Z_v0.1_B04_DIAG.tif;
           - /bin/echo hello world > dswx_s1_pge_test/output_dir/OPERA_L3_DSWx-S1_T18MVA_20200702T231843Z_20230317T190549Z_v0.1_BROWSE.png;
+          - /bin/echo hello world > dswx_s1_pge_test/output_dir/OPERA_L3_DSWx-S1_T18MVA_20200702T231843Z_20230317T190549Z_v0.1_BROWSE.tif;
           - /bin/echo DSWx-S1 invoked with RunConfig
         ErrorCodeBase: 400000
         SchemaPath: pge/dswx_s1/schema/dswx_s1_sas_schema.yaml

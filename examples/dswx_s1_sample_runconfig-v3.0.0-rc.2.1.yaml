@@ -1,4 +1,4 @@
-# Sample RunConfig for use with the DSWx-S1 PGE v3.0.0-rc.2.0
+# Sample RunConfig for use with the DSWx-S1 PGE v3.0.0-rc.2.1
 # This RunConfig should require minimal changes in order to be used with the
 # OPERA PCM.
 
@@ -209,7 +209,7 @@ RunConfig:
             # SAS writes the output product(s) to the following file
             sas_output_path: /home/dswx_user/output_dir
 
-            product_version: 0.1
+            product_version: "0.1"
 
             # DSWx-S1 product format
             output_imagery_format: 'COG'

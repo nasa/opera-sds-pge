@@ -63,7 +63,7 @@ RunConfig:
 
       PrimaryExecutable:
         ProductIdentifier: DSWX_S1
-        ProductVersion: "0.1"
+        ProductVersion: "0.4"
         ProgramPath: python3
         ProgramOptions:
           - /home/dswx_user/OPERA/DSWX-SAR/src/dswx_sar/dswx_s1.py
@@ -157,7 +157,7 @@ RunConfig:
             product_path: /home/dswx_user/output_dir
             scratch_path: /home/dswx_user/scratch_dir
             sas_output_path: /home/dswx_user/output_dir
-            product_version: 0.1
+            product_version: "0.4"
             output_imagery_format: 'COG'
 
           browse_image_group:
@@ -170,5 +170,6 @@ RunConfig:
             set_hand_mask_to_nodata: False
             set_layover_shadow_to_nodata: False
             set_ocean_masked_to_nodata: False
+            save_tif_to_output: True
 
           log_file: /home/dswx_user/output_dir/dswx-s1.log

@@ -337,7 +337,7 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
             The file name to assign to browse image created by this PGE.
 
         """
-        browse_image_filename = f"{self._core_filename(inter_filename)}.png"
+        browse_image_filename = f"{self._core_filename(inter_filename)}_BROWSE.png"
 
         return browse_image_filename
 
@@ -373,9 +373,11 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
         Returns the file name to use for compressed CSLC files produced by the
         DISP-S1 PGE.
 
-        The current convention is to maintain the filename assigned by the DISP-S1
-        SAS, but this function is still required to ensure the compressed CSLC products
-        are moved to the output directory defined by the RunConfig.
+        The compressed CSLC filename for the DISP-S1 PGE consists of:
+
+             <Project>_<Level>_COMPRESSED-CSLC-S1_<BurstID>_<ReferenceDateTime>_\
+             <FirstDateTime>_<LastDateTime>_<ProductGenerationDateTime>_\
+             <Polarization>_<ProductVersion>.h5
 
         Parameters
         ----------

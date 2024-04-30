@@ -15,6 +15,7 @@ RunConfig:
       DynamicAncillaryFilesGroup:
         AncillaryFileMap:
           DEMFile: input/input_dem.vrt
+          IonosphereFiles:
 
       ProductPathGroup:
         OutputProductPath: outputs/
