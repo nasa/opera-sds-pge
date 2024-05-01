@@ -23,6 +23,7 @@ RunConfig:
         ProgramPath: mkdir
         ProgramOptions:
           - '-p dswx_ni_pge_test/output_dir;'
+          # Create dummy output files containing 1 mb of random data each, but with the expected file names
           - 'dd if=/dev/urandom of=dswx_ni_pge_test/output_dir/OPERA_L3_DSWx-NI_T11SLS_20110226T061749Z_20240329T181033Z_LSAR_30_v0.1_B01_WTR.tif bs=1M count=1;'
           - 'dd if=/dev/urandom of=dswx_ni_pge_test/output_dir/OPERA_L3_DSWx-NI_T11SLS_20110226T061749Z_20240329T181033Z_LSAR_30_v0.1_B02_BWTR.tif bs=1M count=1;'
           - 'dd if=/dev/urandom of=dswx_ni_pge_test/output_dir/OPERA_L3_DSWx-NI_T11SLS_20110226T061749Z_20240329T181033Z_LSAR_30_v0.1_B03_CONF.tif count=1;'

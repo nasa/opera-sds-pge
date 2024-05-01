@@ -43,6 +43,7 @@ COPY --chown=dswx_user:dswx_user ${PGE_SOURCE_DIR} ${PGE_DEST_DIR}
 # Switch to root for installing into Conda Env
 USER 0:0
 
+# Set the default shell to run commands within the Conda environment named "DSXW-SAR" using bash
 SHELL ["conda", "run", "-n", "DSWX-SAR", "/bin/bash", "-c"]
 
 # Install dependencies into existing Conda Env
