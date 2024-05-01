@@ -10,28 +10,29 @@ from NISAR (NI) PGE.
 
 from opera.pge.base.base_pge import PgeExecutor
 from opera.pge.base.base_pge import PostProcessorMixin
-from opera.pge.base.base_pge import PreProcessorMixin
+from opera.pge.dswx_s1.dswx_s1_pge import DSWxS1PreProcessorMixin
 
-
-class DSWxNIPreProcessorMixin(PreProcessorMixin):
+class DSWxNIPreProcessorMixin(DSWxS1PreProcessorMixin):
     """
     Mixin class responsible for handling all pre-processing steps for the DSWX-NI
     PGE. The pre-processing phase is defined as all steps necessary prior
     to SAS execution.
-    In addition to the base functionality inherited from PreProcessorMixin, this
-    mixin adds an input validation step to ensure that input(s) defined by the
-    RunConfig exist and are valid.
 
-     """
+    This particular pre-processor inherits its functionality from the DSWx-S1
+    pre-processor class, as both PGE's share a similar interface.
+
+    """
 
     _pre_mixin_name = "DSWxNIPreProcessorMixin"
+    _valid_input_extensions = (".h5",)
 
     def run_preprocessor(self, **kwargs):
         """
         Executes the pre-processing steps for DSWx-NI PGE initialization.
-        The DswxS1PreProcessorMixin version of this class performs all actions
-        of the base PreProcessorMixin class, and adds an input validation step for
-        the inputs defined within the RunConfig (TODO).
+        The DSWxNIPreProcessorMixin version of this class performs all actions
+        of the DSWxS1PreProcessorMixin class. Parameterization of the validation
+        functions is handled via specialized class attributes (i.e. _valid_input_extensions)
+
         Parameters
         ----------
         **kwargs: dict

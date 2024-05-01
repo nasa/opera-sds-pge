@@ -41,6 +41,7 @@ class DSWxS1PreProcessorMixin(PreProcessorMixin):
     """
 
     _pre_mixin_name = "DSWxS1PreProcessorMixin"
+    _valid_input_extensions = (".tif", ".h5")
 
     def _validate_dynamic_ancillary_inputs(self):
         """
@@ -119,7 +120,8 @@ class DSWxS1PreProcessorMixin(PreProcessorMixin):
         super().run_preprocessor(**kwargs)
 
         validate_dswx_inputs(
-            self.runconfig, self.logger, self.runconfig.pge_name, valid_extensions=(".tif", ".h5")
+            self.runconfig, self.logger, self.runconfig.pge_name,
+            valid_extensions=self._valid_input_extensions
         )
         validate_algorithm_parameters_config(self.name,
                                              self.runconfig.algorithm_parameters_schema_path,

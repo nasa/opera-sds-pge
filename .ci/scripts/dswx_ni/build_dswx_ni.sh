@@ -24,7 +24,7 @@ BUILD_DATE_TIME=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
 # defaults, SAS image should be updated as necessary for new image releases from ADT
 [ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath $(dirname $(realpath $0))/../../..)
 [ -z "${TAG}" ] && TAG="${USER}-dev"
-[ -z "${SAS_IMAGE}" ] && SAS_IMAGE="artifactory-fn.jpl.nasa.gov:16001/gov/nasa/jpl/opera/adt/opera/dswx-ni:beta_0.2.1"
+[ -z "${SAS_IMAGE}" ] && SAS_IMAGE="artifactory-fn.jpl.nasa.gov:16001/gov/nasa/jpl/opera/adt/opera/dswx-ni:interface_0.1"
 
 echo "WORKSPACE: $WORKSPACE"
 echo "IMAGE: $IMAGE"
@@ -48,6 +48,9 @@ trap build_script_cleanup EXIT
 mkdir -p ${STAGING_DIR}/opera/pge
 
 copy_pge_files $WORKSPACE $STAGING_DIR $PGE_NAME
+
+# DSWx-NI PGE inherits from DSWx-S1 code, so it needs to be included in the container as well
+mkdir -p ${STAGING_DIR}/opera/pge/dswx_s1; cp -r ${WORKSPACE}/src/opera/pge/dswx_s1/dswx_s1_pge.py ${STAGING_DIR}/opera/pge/dswx_s1/
 
 # Create a VERSION file in the staging area to track version and build time
 printf "pge_version: ${TAG}\npge_build_datetime: ${BUILD_DATE_TIME}\n" \

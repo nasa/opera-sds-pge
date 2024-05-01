@@ -12,6 +12,8 @@ runconfig:
         input_file_group:
             # REQUIRED - list of RTC products (directory or files)
             input_file_path: list(str(), min=1)
+            # Placeholder for historical GCOV data
+            input_file_path_historical: list(str(), min=1, required=False)
 
         dynamic_ancillary_file_group:
             # Digital elevation model
@@ -48,7 +50,12 @@ runconfig:
             # algorithm parameter
             algorithm_parameters: str(required=True)
 
+            # placeholder for inundated vegettion
+            mean_backscattering: str(required=False)
+            standard_deviation_backscattering: str(required=False)
+
         static_ancillary_file_group:
+
             static_ancillary_inputs_flag: bool(required=False)
 
             # MGRS database sqlite file
@@ -74,6 +81,9 @@ runconfig:
 
             product_version: num(required=False)
 
+            # Specify the MGRS tile collection ID
+            output_mgrs_collection_id: str(required=False)
+
             # DSWx-NI product format (default is 'COG')
             output_imagery_format: enum('GTiff', 'COG', required=False)
 
@@ -82,5 +92,44 @@ runconfig:
 
             # DSWx-NI Compression bits for COG
             output_imagery_nbits: int(min=1, required=False)
+
+            # DSWx-NI output spacing
+            output_spacing: num(min=1, required=False)
+
+        browse_image_group:
+            # Save a full-res Cloud-Optimized GEOTIFF DSWx-NI browse image and
+            # a modified-resolution PNG of the browse image for DSWx-NI
+            save_browse: bool(required=False)
+
+            # Setting `browse_image_height` and `browse_image_width` equal
+            # will maintain this original DSWx-NI aspect ratio
+            # of 3660 pixels x 3660 pixels for the PNG browse image.
+            # If these fields are left empty, 1024 x 1024 will be used.
+            # Height in pixels for the PNG browse image
+            browse_image_height: int(min=1, required=False)
+
+            # Width in pixels for the PNG browse image
+            browse_image_width: int(min=1, required=False)
+
+            # Flag to collapse water classes if set to True. Default is True.
+            flag_collapse_wtr_classes: bool(required=False)
+
+            # Flag to exclude inundated vegetation from processing if set to True.
+            exclude_inundated_vegetation: bool(required=False)
+
+            # Flag to set non-water pixels to NoData value if set to True.
+            set_not_water_to_nodata: bool(required=False)
+
+            # Flag to set HAND mask pixels to NoData value if set to True.
+            set_hand_mask_to_nodata: bool(required=False)
+
+            # Flag to set layover and shadow pixels to NoData value if set to True.
+            set_layover_shadow_to_nodata: bool(required=False)
+
+            # Flag to set ocean-masked pixels to NoData value if set to True.
+            set_ocean_masked_to_nodata: bool(required=False)
+
+            # Flag to save Geotiff to output directory if set to True.
+            save_tif_to_output: bool(required=False)
 
         log_file: str(required=False)
