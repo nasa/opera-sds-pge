@@ -1,0 +1,232 @@
+# Sample RunConfig for use with the DSWx-NI PGE v4.0.0-er.1.0
+# This RunConfig should require minimal changes in order to be used with the
+# OPERA PCM.
+
+RunConfig:
+  # Name for the RunConfig, may be any string
+  Name: OPERA-DSWX-NI-PGE-SAMPLE-CONFIG
+
+  Groups:
+    # PGE-specific RunConfig section
+    # This section is only used by the PGE, however, paths to inputs/outputs
+    # should align with the similar sections of the SAS RunConfig
+    PGE:
+      PGENameGroup:
+        # Name of the PGE for use with this RunConfig, should always be
+        # DSWX_NI_PGE when using with the DSWx-NI PGE
+        PGEName: DSWX_NI_PGE
+
+      InputFilesGroup:
+        # List of input files/directories
+        # Must be a list of the input HDF5 GCOV NISAR products
+        InputFilePaths: [
+          /home/dswx_user/input_dir/ALPSRP271200660_gcov.h5,
+          /home/dswx_user/input_dir/ALPSRP271200670_gcov.h5
+        ]
+
+      DynamicAncillaryFilesGroup:
+        # Map of ancillary file types to paths to the file
+        # Paths must correspond to the file system within the Docker container
+        AncillaryFileMap:
+          # Path to the Digital Elevation Model
+          # Must be either a single .tif, or a .vrt that points to one
+          # or more .tif files
+          dem_file: /home/dswx_user/input_dir/dem.tif
+
+          # Path to the Discrete Classification Map
+          # Must point to a single .tif, or a .vrt that points to one or
+          # more .tif files
+          hand_file: /home/dswx_user/input_dir/hand.tif
+
+          # Path to the reference water map
+          # Must point to a single .tif, or a .vrt that points to one or
+          # more .tif files
+          reference_water_file: /home/dswx_user/input_dir/reference_water.tif
+
+          # Path to the Worldcover map
+          # Must point to a single .tif, or a .vrt that points to one or
+          # more .tif files
+          worldcover_file: /home/dswx_user/input_dir/worldcover.tif
+
+      ProductPathGroup:
+        # Path to where output products should be stored
+        # Must correspond to the file system within the Docker container,
+        # and must have write permissions for the User/Group used with
+        # the "Docker run" command
+        OutputProductPath: /home/dswx_user/output_dir
+
+        # Path to a scratch directory for the PGE and SAS to store
+        # intermediate files that will not be needed after PGE execution
+        # completes
+        # Must correspond to the file system within the Docker container,
+        # and must have write permissions for the User/Group used with
+        # the "Docker run" command
+        ScratchPath: /home/dswx_user/scratch_dir
+
+      PrimaryExecutable:
+        # Identifier for the PGE executable, should always be DSWX_NI for
+        # this PGE
+        ProductIdentifier: DSWX_NI
+
+        # Product version specific to output products
+        ProductVersion: "0.1"
+
+        # Path to the executable to run, path must be reachable from
+        # within the Docker container (i.e. findable with a "which" command)
+        ProgramPath: python3
+
+        # List of command-line options to use with ProgramPath
+        ProgramOptions:
+          - /home/dswx_user/OPERA/DSWX-SAR/src/dswx_sar/dswx_ni.py
+
+        # The Error Code base value added to the offset values to make
+        # error codes unique per-PGE
+        ErrorCodeBase: 600000
+
+        # Path to the Yamale schema used to validate the SAS portion
+        # of the RunConfig
+        # Path should correspond to the file system within the Docker
+        # container, and typically should reference a schema file bundled
+        # with the opera_pge installation directory within the container
+        # Consult the Docker image build scripts for more info
+        SchemaPath: /home/dswx_user/opera/pge/dswx_ni/schema/dswx_ni_sas_schema.yaml
+
+        # Path to the Yamale schema used specifically to validate the
+        # algorithm parameters config, which is stored within a separate
+        # yaml file referenced within the SAS portion of this RunConfig
+        AlgorithmParametersSchemaPath: /home/dswx_user/opera/pge/dswx_ni/schema/algorithm_parameters_ni_schema.yaml
+
+        # Path to the Jinja2 template used to generate the ISO xml
+        # metadata file
+        # Path should correspond to the file system within the Docker
+        # container, and typically should reference a template file bundled
+        # with the opera_pge installation directory within the container
+        # Consult the Docker image build scripts for more info
+        # TODO: add once available
+        IsoTemplatePath:
+
+      QAExecutable:
+        # Set to True to enable execution of an additional "Quality Assurance"
+        # application after SAS execution has completed
+        Enabled: False
+
+        # Path to the executable to run, path must be reachable from
+        # within the Docker container (i.e. findable with a "which" command)
+        ProgramPath:
+
+        # List of command-line options to use with ProgramPath
+        ProgramOptions:
+
+      DebugLevelGroup:
+        # Set to True to enable Debug mode (TODO this is currently a no-op)
+        DebugSwitch: False
+
+        # Set to True to have the PGE invoke the SAS/QA executables via
+        # a shell, rather than a Python subprocess
+        # This allows shell-style syntax to be used in ProgramPath and
+        # ProgramOptions, which can be useful for testing
+        ExecuteViaShell: False
+
+    # SAS-specific RunConfig section
+    # Prior to SAS execution by the PGE, the section below starting at "runconfig"
+    # is isolated into its own YAML file for use with the SAS
+    SAS:
+      runconfig:
+        name: dswx_ni_workflow_default
+
+        groups:
+          pge_name_group:
+            pge_name: DSWX_NI_PGE
+
+          input_file_group:
+            input_file_path: [
+              /home/dswx_user/input_dir/ALPSRP271200660_gcov.h5,
+              /home/dswx_user/input_dir/ALPSRP271200670_gcov.h5
+            ]
+
+            # Placeholder for historical GCOV data
+            input_file_historical_path:
+
+            # Specify the MGRS tile collection ID
+            input_mgrs_collection_id: MS_131_19
+
+          dynamic_ancillary_file_group:
+            # Digital elevation model (Required)
+            dem_file: /home/dswx_user/input_dir/dem.tif
+
+            # Digital elevation model source description
+            dem_file_description: 'Copernicus DEM GLO-30 2021 WGS84'
+
+            # ESA WorldCover map file
+            worldcover_file: /home/dswx_user/input_dir/worldcover.tif
+
+            # ESA WorldCover map description
+            worldcover_file_description: 'ESA WorldCover 10m 2020 v1.0'
+
+            # Reference water body map (Required)
+            # e.g., Pekel's water occurrence or seasonality map
+            reference_water_file: /home/dswx_user/input_dir/reference_water.tif
+
+            # Reference water description
+            reference_water_file_description: 'JRC Global Surface Water - collection from 1984 to 2021'
+
+            # Height Above Nearest Drainage (Required)
+            hand_file: /home/dswx_user/input_dir/hand.tif
+
+            # HAND description
+            hand_file_description: 'ASF HAND GLO30'
+
+            # placeholders for inundated vegetation
+            mean_backscattering:
+            standard_deviation_backscattering:
+
+            # Separate runconfig file for algorithm parameters
+            algorithm_parameters: /home/dswx_user/input_dir/algorithm_parameter_ni.yaml
+
+          static_ancillary_file_group:
+            static_ancillary_inputs_flag: True
+
+            # MGRS database sqlite file
+            mgrs_database_file: /home/dswx_user/input_dir/MGRS_tile.sqlite
+
+            # MGRS collection database sqlite file
+            mgrs_collection_database_file: /home/dswx_user/input_dir/MGRS_collection_db_DSWx-NI_v0.1.sqlite
+
+          primary_executable:
+            product_type: dswx_ni
+
+          product_path_group:
+            # Directory where PGE will place results
+            product_path: /home/dswx_user/output_dir
+
+            # Directory where SAS can write temporary data
+            scratch_path: /home/dswx_user/scratch_dir
+
+            # SAS writes the output product(s) to the following file
+            sas_output_path: /home/dswx_user/output_dir
+
+            # TODO: this should become a string once SAS schema is fixed
+            product_version: 0.1
+
+            # DSWx-NI product format
+            output_imagery_format: 'COG'
+
+          browse_image_group:
+            # Save a full-res Cloud-Optimized GEOTIFF DSWx-NI browse image and
+            # a modified-resolution PNG of the browse image for DSWx-NI
+            save_browse: True
+
+            # Setting `browse_image_height` and `browse_image_width` equal
+            # will maintain this original DSWx-NI aspect ratio
+            # of 3660 pixels x 3660 pixels for the PNG browse image.
+            # If these fields are left empty, 1024 x 1024 will be used.
+            # Height in pixels for the PNG browse image
+            browse_image_height: 1024
+
+            # Width in pixels for the PNG browse image
+            browse_image_width: 1024
+
+            # Save the full-res GeoTIFF Browse image in addition to the PNG
+            save_tif_to_output: True
+
+          log_file: /home/dswx_user/output_dir/dswx-ni.log

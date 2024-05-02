@@ -83,6 +83,9 @@ class DSWxNIExecutor(DSWxNIPreProcessorMixin, DSWxNIPostProcessorMixin, PgeExecu
     LEVEL = "L3"
     """Processing Level for DSWx-NI Products"""
 
+    PGE_VERSION = "4.0.0-er.1.0"
+    """Version of the PGE (overrides default from base_pge)"""
+
     SAS_VERSION = "0.1"
     """Version of the SAS wrapped by this PGE, should be updated as needed"""
 
