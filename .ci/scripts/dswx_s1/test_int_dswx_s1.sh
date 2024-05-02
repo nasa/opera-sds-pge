@@ -57,8 +57,8 @@ input_data_basename=$(basename -- "$INPUT_DATA")
 input_data_dir="${TMP_DIR}/${input_data_basename%.*}/input_dir"
 
 expected_data_basename=$(basename -- "$EXPECTED_DATA")
-# JH changed /expected_output to /expected_output_dir below
-expected_data_dir="${TMP_DIR}/${expected_data_basename%.*}/expected_output_dir"
+
+expected_data_dir="${TMP_DIR}/${expected_data_basename%.*}/expected_output"
 
 echo "Input data directory: ${input_data_dir}"
 echo "Expected data directory: ${expected_data_dir}"
