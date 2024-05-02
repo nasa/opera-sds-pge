@@ -11,8 +11,8 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 . "$SCRIPT_DIR"/../util/test_int_util.sh
 
 OUTPUT_DIR="/home/dswx_user/output_dir"
-# changed 'expected_output_dir' to 'expected_output'
-EXPECTED_DIR="/home/dswx_user/expected_output"
+
+EXPECTED_DIR="/home/dswx_user/expected_output_dir"
 PGE_NAME="dswx_s1"
 
 # Validate that OUTPUT_DIR and EXPECTED_DIR exist within the container
