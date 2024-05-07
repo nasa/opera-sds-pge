@@ -32,7 +32,7 @@ SAMPLE_TIME=1
 [ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="dswx_s1_calval_0.4.2_expected_output.zip"
 [ -z "${RUNCONFIG}" ] && RUNCONFIG="dswx_s1_calval_0.4.2_runconfig.yaml"
 [ -z "${TMP_ROOT}" ] && TMP_ROOT="$DEFAULT_TMP_ROOT"
-
+:q
 # Create the test output directory in the work space
 test_int_setup_results_directory
 
@@ -58,7 +58,8 @@ input_data_dir="${TMP_DIR}/${input_data_basename%.*}/input_dir"
 
 expected_data_basename=$(basename -- "$EXPECTED_DATA")
 
-expected_data_dir="${TMP_DIR}/${expected_data_basename%.*}/expected_output_dir"
+# Must match directory name in the temp directory structure
+expected_data_dir="${TMP_DIR}/${expected_data_basename%.*}/expected_output"
 
 echo "Input data directory: ${input_data_dir}"
 echo "Expected data directory: ${expected_data_dir}"
@@ -98,7 +99,7 @@ docker run --rm -u $UID:"$(id -g)" --name $container_name \
             -v "$input_data_dir":/home/dswx_user/input_dir:ro \
             -v "$output_dir":/home/dswx_user/output_dir \
             -v "$scratch_dir":/home/dswx_user/scratch_dir \
-            -v "$expected_output_dir":/home/dswx_user/expected_output_dir \
+            -v "$expected_data_dir":/home/dswx_user/expected_output_dir \
             ${PGE_IMAGE}:"${PGE_TAG}" --file /home/dswx_user/runconfig/"$RUNCONFIG"
 
 docker_exit_status=$?
