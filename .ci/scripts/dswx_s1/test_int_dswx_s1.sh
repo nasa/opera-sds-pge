@@ -58,7 +58,7 @@ input_data_dir="${TMP_DIR}/${input_data_basename%.*}/input_dir"
 
 expected_data_basename=$(basename -- "$EXPECTED_DATA")
 
-expected_data_dir="${TMP_DIR}/${expected_data_basename%.*}/expected_output"
+expected_data_dir="${TMP_DIR}/${expected_data_basename%.*}/expected_output_dir"
 
 echo "Input data directory: ${input_data_dir}"
 echo "Expected data directory: ${expected_data_dir}"
