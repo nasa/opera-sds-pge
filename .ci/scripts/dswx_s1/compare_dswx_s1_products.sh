@@ -13,6 +13,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 OUTPUT_DIR="/home/dswx_user/output_dir"
 
 EXPECTED_DIR="/home/dswx_user/expected_output_dir"
+
 PGE_NAME="dswx_s1"
 
 # Validate that OUTPUT_DIR and EXPECTED_DIR exist within the container

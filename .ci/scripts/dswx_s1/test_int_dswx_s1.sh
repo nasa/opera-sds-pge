@@ -98,7 +98,7 @@ docker run --rm -u $UID:"$(id -g)" --name $container_name \
             -v "$input_data_dir":/home/dswx_user/input_dir:ro \
             -v "$output_dir":/home/dswx_user/output_dir \
             -v "$scratch_dir":/home/dswx_user/scratch_dir \
-            -v "$expected_output_dir":/home/dswx_user/expected_output \
+            -v "$expected_output_dir":/home/dswx_user/expected_output_dir \
             ${PGE_IMAGE}:"${PGE_TAG}" --file /home/dswx_user/runconfig/"$RUNCONFIG"
 
 docker_exit_status=$?
