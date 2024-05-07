@@ -98,7 +98,6 @@ do
 done
 
 finalize_html_results_file
-cp "${output_dir}"/test_int_dswx_s1_results.html "${TEST_RESULTS_DIR}"/test_int_dswx_s1_results.html
 
 # Write the status code to an RC file so the integration test script can pick it up.
 echo $overall_status > $OUTPUT_DIR/"compare_dswx_s1_products.rc"
