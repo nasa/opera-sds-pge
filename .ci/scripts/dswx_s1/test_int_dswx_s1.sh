@@ -32,7 +32,7 @@ SAMPLE_TIME=1
 [ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="dswx_s1_calval_0.4.2_expected_output.zip"
 [ -z "${RUNCONFIG}" ] && RUNCONFIG="dswx_s1_calval_0.4.2_runconfig.yaml"
 [ -z "${TMP_ROOT}" ] && TMP_ROOT="$DEFAULT_TMP_ROOT"
-:q
+
 # Create the test output directory in the work space
 test_int_setup_results_directory
 
@@ -58,7 +58,6 @@ input_data_dir="${TMP_DIR}/${input_data_basename%.*}/input_dir"
 
 expected_data_basename=$(basename -- "$EXPECTED_DATA")
 
-# Must match directory name in the temp directory structure
 expected_data_dir="${TMP_DIR}/${expected_data_basename%.*}/expected_output"
 
 echo "Input data directory: ${input_data_dir}"
