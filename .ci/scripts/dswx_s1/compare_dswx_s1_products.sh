@@ -27,10 +27,10 @@ if [ ! -d "$EXPECTED_DIR" ]; then
     exit 1
 fi
 
-initialize_html_results_file "$output_dir" "$PGE_NAME"
+initialize_html_results_file "$OUTPUT_DIR" "$PGE_NAME"
 
 # Compare output files against expected files
-for output_file in "$output_dir"/*
+for output_file in "$OUTPUT_DIR"/*
 do
     compare_output="N/A"
     compare_result="N/A"
@@ -57,7 +57,7 @@ do
 
         echo "tile code is $tile_code"
 
-        for potential_file in "$expected_data_dir"/*.tif*
+        for potential_file in "$EXPECTED_DIR"/*.tif*
         do
             if [[ "$potential_file" == *"$tile_code"*"$product"* ]]; then
                 echo "expected file is $potential_file"
@@ -67,14 +67,14 @@ do
         done
 
         if [ ! -f "$expected_file" ]; then
-            echo "No expected file found for product $product in expected directory $expected_data_dir"
+            echo "No expected file found for product type $product in expected directory $EXPECTED_DIR"
             overall_status=1
             compare_result="FAIL"
             compare_output="FAILED"
         else
            # compare output and expected files
            echo "python3 dswx_comparison.py $(basename -- ${expected_file}) ${output_file}"
-           compare_output=$(python3 $SCRIPT_DIR/dswx_comparison.py ${expected_file} ${output_dir}/${output_file})
+           compare_output=$(python3 $SCRIPT_DIR/dswx_comparison.py ${expected_file} $OUTPUT_DIR/${output_file})
            echo "$compare_output"
         fi
 
@@ -100,6 +100,7 @@ done
 finalize_html_results_file
 
 # Write the status code to an RC file so the integration test script can pick it up.
+# shellcheck disable=SC1073
 echo $overall_status > $OUTPUT_DIR/"compare_dswx_s1_products.rc"
 
 # Always want to return 0 even if some comparisons failed to avoid error handling logic in the PGE
