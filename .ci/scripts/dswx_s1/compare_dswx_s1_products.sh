@@ -39,7 +39,7 @@ do
     echo "output_file $output_file"
     output_file=$(basename -- "$output_file")
 
-    if [[ "${output_file##*/}" == *.tif* ]]
+    if [[ "${output_file##*/}" == *B0*.tif* ]]
     then
         for potential_product in B01_WTR B02_BWTR B03_CONF B04_DIAG
         do
@@ -57,7 +57,7 @@ do
 
         echo "tile code is $tile_code"
 
-        for potential_file in "$EXPECTED_DIR"/*.tif*
+        for potential_file in "$EXPECTED_DIR"/*B0*.tif*
         do
             if [[ "$potential_file" == *"$tile_code"*"$product"* ]]; then
                 echo "expected file is $potential_file"
