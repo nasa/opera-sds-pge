@@ -57,6 +57,7 @@ input_data_basename=$(basename -- "$INPUT_DATA")
 input_data_dir="${TMP_DIR}/${input_data_basename%.*}/input_dir"
 
 expected_data_basename=$(basename -- "$EXPECTED_DATA")
+
 expected_data_dir="${TMP_DIR}/${expected_data_basename%.*}/expected_output"
 
 echo "Input data directory: ${input_data_dir}"
@@ -97,6 +98,7 @@ docker run --rm -u $UID:"$(id -g)" --name $container_name \
             -v "$input_data_dir":/home/dswx_user/input_dir:ro \
             -v "$output_dir":/home/dswx_user/output_dir \
             -v "$scratch_dir":/home/dswx_user/scratch_dir \
+            -v "$expected_data_dir":/home/dswx_user/expected_output_dir \
             ${PGE_IMAGE}:"${PGE_TAG}" --file /home/dswx_user/runconfig/"$RUNCONFIG"
 
 docker_exit_status=$?
@@ -107,84 +109,12 @@ metrics_collection_end "$PGE_NAME" "$container_name" "$docker_exit_status" "$TES
 # Copy the PGE/SAS log file(s) to the test results directory so it can be archived
 # by Jenkins with the other results
 cp "${output_dir}"/*.log "${TEST_RESULTS_DIR}"
+# Copy the results.html file to the same directory
+cp "${output_dir}"/test_int_dswx_s1_results.html "${TEST_RESULTS_DIR}"/test_int_dswx_s1_results.html
 
 if [ $docker_exit_status -ne 0 ]; then
     echo "docker exit indicates failure: ${docker_exit_status}"
     overall_status=1
-else
-    initialize_html_results_file "$output_dir" "$PGE_NAME"
-
-    # Compare output files against expected files
-    for output_file in "$output_dir"/*
-    do
-        compare_output="N/A"
-        compare_result="N/A"
-        expected_file="N/A"
-
-        echo "output_file $output_file"
-        output_file=$(basename -- "$output_file")
-
-        if [[ "${output_file##*/}" == *B0*.tif* ]]
-        then
-            for potential_product in B01_WTR B02_BWTR B03_CONF B04_DIAG
-            do
-                if [[ "$output_file" == *"$potential_product"* ]]; then
-                    product=$potential_product
-                    break
-                fi
-            done
-
-            echo "product is $product"
-
-            # Parse the tile code from the filename
-            IFS='_' read -ra ARR <<< "$output_file"
-            tile_code=${ARR[3]}
-
-            echo "tile code is $tile_code"
-
-            for potential_file in "$expected_data_dir"/*B0*.tif*
-            do
-                if [[ "$potential_file" == *"$tile_code"*"$product"* ]]; then
-                    echo "expected file is $potential_file"
-                    expected_file=$potential_file
-                    break
-                fi
-            done
-
-            if [ ! -f "$expected_file" ]; then
-                echo "No expected file found for product $product in expected directory $expected_data_dir"
-                overall_status=1
-                compare_result="FAIL"
-                compare_output="FAILED"
-            else
-               # compare output and expected files
-               echo "python3 dswx_comparison.py $(basename -- ${expected_file}) ${output_file}"
-               compare_output=$(python3 $SCRIPT_DIR/dswx_comparison.py ${expected_file} ${output_dir}/${output_file})
-               echo "$compare_output"
-            fi
-
-            if [[ "$compare_output" != *"FAIL"* ]]; then
-                echo "Product validation was successful for $output_file"
-                compare_result="PASS"
-            else
-                echo "Failure: Some comparisons failed for $output_file"
-                compare_result="FAIL"
-                overall_status=2
-            fi
-        else
-            echo "Not comparing file ${output_file}"
-            compare_result="SKIPPED"
-        fi
-
-        # add html breaks to newlines
-        compare_output=${compare_output//$'\n'/<br>$'\n'}
-
-        update_html_results_file "${compare_result}" "${output_file}" "${expected_file}" "${compare_output}"
-    done
-
-    finalize_html_results_file
-    cp "${output_dir}"/test_int_dswx_s1_results.html "${TEST_RESULTS_DIR}"/test_int_dswx_s1_results.html
-
 fi
 
 echo " "

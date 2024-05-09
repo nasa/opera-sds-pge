@@ -73,9 +73,9 @@ RunConfig:
         IsoTemplatePath: /home/dswx_user/opera/pge/dswx_s1/templates/OPERA_ISO_metadata_L3_DSWx_S1_template.xml.jinja2
 
       QAExecutable:
-        Enabled: False
-        ProgramPath:
-        ProgramOptions:
+        Enabled: True
+        ProgramPath: /home/dswx_user/opera/.ci/scripts/dswx_s1/compare_dswx_s1_products.sh
+        ProgramOptions: []
 
       DebugLevelGroup:
         DebugSwitch: False
