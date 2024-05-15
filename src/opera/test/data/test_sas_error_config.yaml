@@ -26,42 +26,38 @@ RunConfig:
         ProgramOptions:
           - -c
           - echo START;
-          - echo sample traceback line 2;
-          - echo Traceback \(most recent call last):;
-          - echo File "/usr/lib/python2.7/runpy.py", line 174, in _run_module_as_main;
-          - echo "__main__", fname, loader, pkg_name);
-          - echo File "/usr/lib/python2.7/runpy.py", line 72, in _run_code;
-          - echo exec code in run_globals;
-          - echo File "/root/env/common/test/test/__main__.py", line 5, in <module>;
-          - echo main();
-          - echo File "/root/env/common/test/test/cli/parser.py", line 55, in main;
-          - echo run_script(args);
-          - echo File "/root/env/common/test/test/cli/runner.py", line 124, in run_script;
-          - echo exec_script(args.script, scope=globals(), root=True);
-          - echo File "/root/workspace/group/test_regression_utils.py", line 123, in exec_script;
-          - echo cli_exec_script(*args,**kwargs);
-          - echo File "/root/env/common/test/test/cli/runner.py", line 186, in exec_script;
-          - echo exec(compile(code, scriptpath, 'exec')) in scope;
-          - echo File "shiju_12.py", line 30, in <module>;
-          - echo File "/root/moaworkspace/group/testscript/utils/shiju_public.py", line 37, in shiju_move;
-          - echo EndOfStream;
-          - echo EndOfStream;
-          - echo Traceback (most recent call last):;
-          - echo File "/usr/lib/python2.7/runpy.py", line 174, in _run_module_as_main;
-          - echo "__main__", fname, loader, pkg_name);
-          - echo File "/usr/lib/python2.7/runpy.py", line 72, in _run_code;
-          - echo exec code in run_globals;
-          - echo File "/root/env/common/test/test/__main__.py", line 5, in <module>;
-          - echo main();
-          - echo File "/root/env/common/test/test/cli/parser.py", line 55, in main;
-          - echo run_script(args);
-          - echo File "/root/env/common/test/test/cli/runner.py", line 124, in run_script;
-          - echo exec_script(args.script, scope=globals(), root=True);
-          - echo File "/root/env/common/test/test/cli/runner.py", line 186, in exec_script;
-          - echo exec(compile(code, scriptpath, 'exec')) in scope;
-          - echo File "/root/env/common/mator/mator/mator.py", line 520, in start;
-          - echo raise IOError("RPC server not started!");
-          - failed with exit code 123;
+          - echo "Traceback (most recent call last):";
+          - echo "  File \"/usr/lib/python2.7/runpy.py\", line 174, in _run_module_as_main";
+          - echo "    \"__main__\", fname, loader, pkg_name)";
+          - echo "  File \"/usr/lib/python2.7/runpy.py\", line 72, in _run_code";
+          - echo "    exec code in run_globals";
+          - echo "  File \"/root/env/common/test/test/__main__.py\", line 5, in <module>";
+          - echo "    main()";
+          - echo "  File \"/root/env/common/test/test/cli/parser.py\", line 55, in main";
+          - echo "    run_script(args)";
+          - echo "  File \"/root/env/common/test/test/cli/runner.py\", line 124, in run_script";
+          - echo "    exec_script(args.script, scope=globals(), root=True)";
+          - echo "  File \"/root/workspace/group/test_regression_utils.py\", line 123, in exec_script";
+          - echo "    cli_exec_script(*args,**kwargs)";
+          - echo "  File \"/root/env/common/test/test/cli/runner.py\", line 186, in exec_script";
+          - echo "    exec(compile(code, scriptpath, 'exec')) in scope";
+          - echo "  File \"/usr/lib/python2.7/runpy.py\", line 174, in _run_module_as_main";
+          - echo "    \"__main__\", fname, loader, pkg_name)";
+          - echo "  File \"/usr/lib/python2.7/runpy.py\", line 72, in _run_code";
+          - echo "    exec code in run_globals";
+          - echo "  File \"/root/env/common/test/test/__main__.py\", line 5, in <module>";
+          - echo "    main()";
+          - echo "  File \"/root/env/common/test/test/cli/parser.py\", line 55, in main";
+          - echo "    run_script(args)";
+          - echo "  File \"/root/env/common/test/test/cli/runner.py\", line 124, in run_script";
+          - echo "    exec_script(args.script, scope=globals(), root=True)";
+          - echo "  File \"/root/env/common/test/test/cli/runner.py\", line 186, in exec_script";
+          - echo "    exec(compile(code, scriptpath, 'exec')) in scope";
+          - echo "  File \"/root/env/common/mator/mator/mator.py\", line 520, in start";
+          - echo "    raise IOError(\"RPC server not started!\")";
+          - >-
+            echo "IOError: RPC server not started!";
+          - exit 123;
         ErrorCodeBase: 100000
         SchemaPath: test/data/sample_sas_schema.yaml
         IsoTemplatePath: sample_iso_template.xml.jinja2
