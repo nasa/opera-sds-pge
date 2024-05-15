@@ -29,6 +29,7 @@ RunConfig:
           - 'dd if=/dev/urandom of=dswx_ni_pge_test/output_dir/OPERA_L3_DSWx-NI_T11SLS_20110226T061749Z_20240329T181033Z_LSAR_30_v0.1_B03_CONF.tif count=1;'
           - 'dd if=/dev/urandom of=dswx_ni_pge_test/output_dir/OPERA_L3_DSWx-NI_T11SLS_20110226T061749Z_20240329T181033Z_LSAR_30_v0.1_B04_DIAG.tif bs=1M count=1;'
           - 'dd if=/dev/urandom of=dswx_ni_pge_test/output_dir/OPERA_L3_DSWx-NI_T11SLS_20110226T061749Z_20240329T181033Z_LSAR_30_v0.1_BROWSE.png bs=1M count=1;'
+          - 'dd if=/dev/urandom of=dswx_ni_pge_test/output_dir/OPERA_L3_DSWx-NI_T11SLS_20110226T061749Z_20240329T181033Z_LSAR_30_v0.1_BROWSE.tif bs=1M count=1;'
           - '/bin/echo DSWx-NI invoked with RunConfig'
         ErrorCodeBase: 400000
         SchemaPath: pge/dswx_ni/schema/dswx_ni_sas_schema.yaml
@@ -69,5 +70,5 @@ RunConfig:
             scratch_path: dswx_ni_pge_test/scratch_dir
             sas_output_path: dswx_ni_pge_test/output_dir
           browse_image_group:
-            save_browse: true
+            save_browse: True
           log_file: dswx_ni_pge_test/output_dir/test_log.log
