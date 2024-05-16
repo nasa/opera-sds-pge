@@ -235,15 +235,19 @@ def time_and_execute(command_line, logger, execute_via_shell=False):
                                 stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                                 shell=execute_via_shell)
 
-    # Append the stdout/stderr captured by the subprocess to our log
+    # Append the full stdout/stderr captured by the subprocess to our log
     logger.append(run_result.stdout.decode())
 
-    tail = run_result.stdout.decode().split('\n')
-    tail = "\n".join(tail[-20:])
-
     if run_result.returncode:
+        # Parse out the traceback stack(s) from the log to include with the error
+        # message that will be propagated back to an SDS operator
+        traceback_match = get_traceback_from_log(run_result.stdout.decode())
+
         error_msg = (f'Command "{str(command_line)}" failed with exit '
-                     f'code {run_result.returncode}, traceback:\n{tail}')
+                     f'code {run_result.returncode}')
+
+        if traceback_match:
+            error_msg += f', Traceback from log:\n{traceback_match.string}'
 
         logger.critical(module_name, ErrorCode.SAS_PROGRAM_FAILED, error_msg)
 
