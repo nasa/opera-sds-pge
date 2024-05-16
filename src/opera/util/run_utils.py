@@ -10,6 +10,8 @@ subsystem.
 
 """
 
+import re
+import traceback
 import hashlib
 import os
 import shutil
