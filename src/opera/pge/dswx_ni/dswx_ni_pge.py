@@ -9,14 +9,11 @@ from NISAR (NI) PGE.
 """
 
 from os.path import join
-from datetime import datetime
 
 from opera.pge.base.base_pge import PgeExecutor
-from opera.pge.base.base_pge import PostProcessorMixin
 from opera.pge.dswx_s1.dswx_s1_pge import DSWxS1PreProcessorMixin, DSWxS1PostProcessorMixin
-from opera.util.dataset_utils import get_sensor_from_spacecraft_name
 from opera.util.error_codes import ErrorCode
-from opera.util.time import get_time_for_filename
+from opera.util.input_validation import validate_dswx_inputs
 
 
 class DSWxNIPreProcessorMixin(DSWxS1PreProcessorMixin):
@@ -46,6 +43,11 @@ class DSWxNIPreProcessorMixin(DSWxS1PreProcessorMixin):
             Any keyword arguments needed by the pre-processor
         """
         super().run_preprocessor(**kwargs)
+
+        validate_dswx_inputs(
+            self.runconfig, self.logger, self.runconfig.pge_name,
+            valid_extensions=self._valid_input_extensions
+        )
 
 
 class DSWxNIPostProcessorMixin(DSWxS1PostProcessorMixin):

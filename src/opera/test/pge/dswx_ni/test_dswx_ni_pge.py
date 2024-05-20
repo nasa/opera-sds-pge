@@ -174,6 +174,107 @@ class DswxNIPgeTestCase(unittest.TestCase):
 
         self.assertIn(f"DSWx-NI invoked with RunConfig {expected_sas_config_file}", log_contents)
 
+    def test_dswx_ni_pge_input_validation(self):
+        """Test the input validation checks made by DSWxNIPreProcessorMixin."""
+        runconfig_path = join(self.data_dir, 'test_dswx_ni_config.yaml')
+        test_runconfig_path = join(self.data_dir, 'invalid_dswx_ni_runconfig.yaml')
+
+        with open(runconfig_path, 'r', encoding='utf-8') as stream:
+            runconfig_dict = yaml.safe_load(stream)
+
+        input_files_group = runconfig_dict['RunConfig']['Groups']['PGE']['InputFilesGroup']
+
+        # Test that a non-existent file path is detected by pre-processor
+        input_files_group['InputFilePaths'] = ['temp/non_existent_file.h5']
+
+        with open(test_runconfig_path, 'w', encoding='utf-8') as input_path:
+            yaml.safe_dump(runconfig_dict, input_path, sort_keys=False)
+
+        try:
+            pge = DSWxNIExecutor(pge_name="DSWxNIPgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            # Config validation occurs before the log is fully initialized, but the
+            # initial log file should still exist and contain details of the validation
+            # error
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            # Open the log file, and check that the validation error details were captured
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn(f"Could not locate specified input file/directory "
+                          f"{abspath('temp/non_existent_file.h5')}", log_contents)
+
+            # Test that an input directory with no .tif files is caught
+            input_files_group['InputFilePaths'] = ['dswx_ni_pge_test/scratch_dir']
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as out_file:
+                yaml.safe_dump(runconfig_dict, out_file, sort_keys=False)
+
+            pge = DSWxNIExecutor(pge_name="DSWxNIPgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn(f"Input directory {abspath('dswx_ni_pge_test/scratch_dir')} "
+                          f"does not contain any .h5 files", log_contents)
+
+            # Test that an input directory with no .h5 files is caught
+            input_files_group['InputFilePaths'] = ['dswx_ni_pge_test/scratch_dir']
+
+            os.system(f"touch {abspath('dswx_ni_pge_test/scratch_dir/test.tiff')}")
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as out_file:
+                yaml.safe_dump(runconfig_dict, out_file, sort_keys=False)
+
+            pge = DSWxNIExecutor(pge_name="DSWxNIPgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn(f"Input directory {abspath('dswx_ni_pge_test/scratch_dir')} "
+                          f"does not contain any .h5 files", log_contents)
+
+            # Lastly, check that a file that exists but is not a tif or a h5 is caught
+            input_files_group['InputFilePaths'] = [runconfig_path]
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as runconfig_fh:
+                yaml.safe_dump(runconfig_dict, runconfig_fh, sort_keys=False)
+
+            pge = DSWxNIExecutor(pge_name="DSWxNIPgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn(f"Input file {abspath(runconfig_path)} does not have "
+                          f"an expected extension", log_contents)
+
+        finally:
+            if os.path.exists(test_runconfig_path):
+                os.unlink(test_runconfig_path)
+
     def test_dswx_ni_pge_output_validation(self):
         """Test the output validation checks made by DSWxNIPostProcessorMixin."""
         runconfig_path = join(self.data_dir, 'test_dswx_ni_config.yaml')
