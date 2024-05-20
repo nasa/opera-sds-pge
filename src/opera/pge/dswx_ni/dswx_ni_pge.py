@@ -44,11 +44,6 @@ class DSWxNIPreProcessorMixin(DSWxS1PreProcessorMixin):
         """
         super().run_preprocessor(**kwargs)
 
-        validate_dswx_inputs(
-            self.runconfig, self.logger, self.runconfig.pge_name,
-            valid_extensions=self._valid_input_extensions
-        )
-
 
 class DSWxNIPostProcessorMixin(DSWxS1PostProcessorMixin):
     """
