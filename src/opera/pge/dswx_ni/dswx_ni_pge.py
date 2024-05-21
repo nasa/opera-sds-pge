@@ -6,6 +6,7 @@ dswx_ni_pge.py
 ==============
 Module defining the implementation for the Dynamic Surface Water Extent (DSWX)
 from NISAR (NI) PGE.
+
 """
 
 from os.path import join
@@ -13,6 +14,7 @@ from os.path import join
 from opera.pge.base.base_pge import PgeExecutor
 from opera.pge.dswx_s1.dswx_s1_pge import DSWxS1PreProcessorMixin, DSWxS1PostProcessorMixin
 from opera.util.error_codes import ErrorCode
+from opera.util.time import get_time_for_filename
 
 
 class DSWxNIPreProcessorMixin(DSWxS1PreProcessorMixin):
@@ -85,14 +87,16 @@ class DSWxNIPostProcessorMixin(DSWxS1PostProcessorMixin):
         # Metadata fields we need for ancillary file name should be equivalent
         # across all tiles, so just take the first set of cached metadata as
         # a representative
-        # TODO - temporarily hard coded 'sensor' and 'processing_time"
-        sensor = 'LSAR'
+        sensor = 'LSAR'  # fixed for NISAR-based products
         pixel_spacing = "30"  # fixed for tile-based products
 
-        processing_time = '20240116T231311Z'
+        # TODO - for now, use the PGE production time, but ideally this should
+        #        eventually match the production time assigned by the SAS, which
+        #        should be present in the product metadata
+        production_time = get_time_for_filename(self.production_datetime)
 
-        if not processing_time.endswith('Z'):
-            processing_time = f'{processing_time}Z'
+        if not production_time.endswith('Z'):
+            production_time = f'{production_time}Z'
 
         product_version = str(self.runconfig.product_version)
 
@@ -100,7 +104,7 @@ class DSWxNIPostProcessorMixin(DSWxS1PostProcessorMixin):
             product_version = f'v{product_version}'
 
         ancillary_filename = (
-            f"{self.PROJECT}_{self.LEVEL}_{self.NAME}_{processing_time}_"
+            f"{self.PROJECT}_{self.LEVEL}_{self.NAME}_{production_time}_"
             f"{sensor}_{pixel_spacing}_{product_version}"
         )
 
