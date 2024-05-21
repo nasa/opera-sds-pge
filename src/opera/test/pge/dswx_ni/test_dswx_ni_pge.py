@@ -17,6 +17,8 @@ from os.path import abspath, join
 
 from pkg_resources import resource_filename
 
+import yaml
+
 from opera.pge import RunConfig
 from opera.pge.dswx_ni.dswx_ni_pge import DSWxNIExecutor
 from opera.util import PgeLogger
@@ -74,6 +76,9 @@ class DswxNIPgeTestCase(unittest.TestCase):
                 f"touch {join(input_dir, ancillary_file)}"
             )
 
+        # Create the output directories expected by the test Runconfig file
+        self.test_output_dir = abspath(join(self.working_dir.name, "dswx_ni_pge_test/output_dir"))
+        os.makedirs(self.test_output_dir, exist_ok=True)
         os.chdir(self.working_dir.name)
 
     def tearDown(self) -> None:
@@ -81,6 +86,38 @@ class DswxNIPgeTestCase(unittest.TestCase):
         os.chdir(self.test_dir)
         self.input_file.close()
         self.working_dir.cleanup()
+
+    def generate_band_data_output(self, band_data, empty_file=False, clear=True):
+        """
+        Add files to the output directory.
+
+        Parameters
+        ----------
+        band_data: tuple of str
+            Files to add to the output directory.
+        empty_file: bool
+            if 'True' do not add text to the file (leave empty)
+            if 'False' (default) add 'Test data string' to the file
+        clear : bool
+            Clear the output directory before writing new files (default=True)
+
+        """
+        # example of band data passed to method:
+        # band_data = ('OPERA_L3_DSWx-NI_band_1_B01_WTR.tif', 'OPERA_L3_DSWx-NI_band_1_B02_BWTR.tif',
+        #              'OPERA_L3_DSWx-NI_band_1_B03_CONF.tif', 'OPERA_L3_DSWx-NI_band_2_B01_WTR.tif',
+        #              'OPERA_L3_DSWx-NI_band_2_B02_BWTR.tif', 'OPERA_L3_DSWx-NI_band_2_B03_CONF.tif')
+
+        if clear:
+            path = self.test_output_dir
+            for file_path in glob.glob(f"{path}/*.tif"):
+                os.unlink(file_path)
+
+        # Add files to the output directory
+        for band_output_file in band_data:
+            if not empty_file:
+                os.system(f"echo 'Test data string' >> {join(self.test_output_dir, band_output_file)}")
+            else:
+                os.system(f"touch {join(self.test_output_dir, band_output_file)}")
 
     def test_dswx_ni_pge_execution(self):
         """
@@ -126,7 +163,7 @@ class DswxNIPgeTestCase(unittest.TestCase):
 
         # Lastly, check that the dummy output products were created
         slc_files = glob.glob(join(pge.runconfig.output_product_path, "*.tif"))
-        self.assertEqual(len(slc_files), 4)
+        self.assertEqual(len(slc_files), 5)
 
         output_browse_files = glob.glob(join(pge.runconfig.output_product_path, "*.png"))
         self.assertEqual(len(output_browse_files), 1)
@@ -136,6 +173,221 @@ class DswxNIPgeTestCase(unittest.TestCase):
             log_contents = infile.read()
 
         self.assertIn(f"DSWx-NI invoked with RunConfig {expected_sas_config_file}", log_contents)
+
+    def test_dswx_ni_pge_input_validation(self):
+        """Test the input validation checks made by DSWxNIPreProcessorMixin."""
+        runconfig_path = join(self.data_dir, 'test_dswx_ni_config.yaml')
+        test_runconfig_path = join(self.data_dir, 'invalid_dswx_ni_runconfig.yaml')
+
+        with open(runconfig_path, 'r', encoding='utf-8') as stream:
+            runconfig_dict = yaml.safe_load(stream)
+
+        input_files_group = runconfig_dict['RunConfig']['Groups']['PGE']['InputFilesGroup']
+
+        # Test that a non-existent file path is detected by pre-processor
+        input_files_group['InputFilePaths'] = ['temp/non_existent_file.h5']
+
+        with open(test_runconfig_path, 'w', encoding='utf-8') as input_path:
+            yaml.safe_dump(runconfig_dict, input_path, sort_keys=False)
+
+        try:
+            pge = DSWxNIExecutor(pge_name="DSWxNIPgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            # Config validation occurs before the log is fully initialized, but the
+            # initial log file should still exist and contain details of the validation
+            # error
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            # Open the log file, and check that the validation error details were captured
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn(f"Could not locate specified input file/directory "
+                          f"{abspath('temp/non_existent_file.h5')}", log_contents)
+
+            # Test that an input directory with no .tif files is caught
+            input_files_group['InputFilePaths'] = ['dswx_ni_pge_test/scratch_dir']
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as out_file:
+                yaml.safe_dump(runconfig_dict, out_file, sort_keys=False)
+
+            pge = DSWxNIExecutor(pge_name="DSWxNIPgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn(f"Input directory {abspath('dswx_ni_pge_test/scratch_dir')} "
+                          f"does not contain any .h5 files", log_contents)
+
+            # Test that an input directory with no .h5 files is caught
+            input_files_group['InputFilePaths'] = ['dswx_ni_pge_test/scratch_dir']
+
+            os.system(f"touch {abspath('dswx_ni_pge_test/scratch_dir/test.tiff')}")
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as out_file:
+                yaml.safe_dump(runconfig_dict, out_file, sort_keys=False)
+
+            pge = DSWxNIExecutor(pge_name="DSWxNIPgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn(f"Input directory {abspath('dswx_ni_pge_test/scratch_dir')} "
+                          f"does not contain any .h5 files", log_contents)
+
+            # Lastly, check that a file that exists but is not a tif or a h5 is caught
+            input_files_group['InputFilePaths'] = [runconfig_path]
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as runconfig_fh:
+                yaml.safe_dump(runconfig_dict, runconfig_fh, sort_keys=False)
+
+            pge = DSWxNIExecutor(pge_name="DSWxNIPgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn(f"Input file {abspath(runconfig_path)} does not have "
+                          f"an expected extension", log_contents)
+
+        finally:
+            if os.path.exists(test_runconfig_path):
+                os.unlink(test_runconfig_path)
+
+    def test_dswx_ni_pge_output_validation(self):
+        """Test the output validation checks made by DSWxNIPostProcessorMixin."""
+        runconfig_path = join(self.data_dir, 'test_dswx_ni_config.yaml')
+        test_runconfig_path = join(self.data_dir, 'invalid_dswx_ni_runconfig.yaml')
+
+        with open(runconfig_path, 'r', encoding='utf-8') as stream:
+            runconfig_dict = yaml.safe_load(stream)
+
+        primary_executable_group = runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']
+
+        # Set up an input directory empty of .tif files
+        band_data = ()
+        self.generate_band_data_output(band_data, clear=True)
+
+        # Test with a SAS command that does not produce any output file,
+        # post-processor should detect that expected output is missing
+        primary_executable_group['ProgramPath'] = 'echo'
+        primary_executable_group['ProgramOptions'] = ['hello world']
+
+        with open(test_runconfig_path, 'w', encoding='utf-8') as config_fh:
+            yaml.safe_dump(runconfig_dict, config_fh, sort_keys=False)
+
+        try:
+            pge = DSWxNIExecutor(pge_name="DSWxNIPgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn("No SAS output file(s) with '.tif' extension found",
+                          log_contents)
+
+            # Test with a SAS command that produces the expected output files, but
+            # with empty files (size 0 bytes). Post-processor should detect this
+            # and flag an error
+            band_data = ('OPERA_L3_DSWx-NI_b1_B01_WTR.tif',)
+            self.generate_band_data_output(band_data, empty_file=True, clear=False)
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+                yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+
+            pge = DSWxNIExecutor(pge_name="DSWxNIPgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_output_file = 'dswx_ni_pge_test/output_dir/OPERA_L3_DSWx-NI_b1_B01_WTR.tif'
+            self.assertTrue(os.path.exists(expected_output_file))
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn(f"SAS output file {abspath(expected_output_file)} was "
+                          f"created, but is empty", log_contents)
+
+            # Test a missing band type.  Post-processor should detect this and flag an error
+            band_data = ('OPERA_L3_DSWx-NI_b1_B01_WTR.tif', 'OPERA_L3_DSWx-NI_b1_B02_BWTR.tif',
+                         'OPERA_L3_DSWx-NI_b1_B03_CONF.tif')
+            self.generate_band_data_output(band_data, clear=True)
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+                yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+
+            pge = DSWxNIExecutor(pge_name="DSWxNIPgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn("Invalid SAS output file, wrong number of bands,",
+                          log_contents)
+
+            # Test for missing or extra band files
+            # Test a misnamed band file.  Post-processor should detect this and flag an error
+            band_data = ('OPERA_L3_DSWx-NI_b1_B01_WTR.tif', 'OPERA_L3_DSWx-NI_b1_B02_BWTR.tif',
+                         'OPERA_L3_DSWx-NI_b1_B03_CONF.tif', 'OPERA_L3_DSWx-NI_b1_B04_DIAG.tif',
+                         'OPERA_L3_DSWx-NI_b1_BROWSE.tif', 'OPERA_L3_DSWx-NI_b2_B01_WTR.tif',
+                         'OPERA_L3_DSWx-NI_b2_B02_BWTR.tif', 'OPERA_L3_DSWx-NI_b2_B04_DIAG.tif')
+            self.generate_band_data_output(band_data, clear=True)
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+                yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+
+            pge = DSWxNIExecutor(pge_name="DSWxNIPgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn("Missing or extra band files: number of band files per band:",
+                          log_contents)
+
+        finally:
+            if os.path.exists(test_runconfig_path):
+                os.unlink(test_runconfig_path)
 
 
 if __name__ == "__main__":
