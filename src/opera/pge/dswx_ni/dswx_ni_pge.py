@@ -144,14 +144,6 @@ class DSWxNIPostProcessorMixin(DSWxS1PostProcessorMixin):
         output product location with the appropriate file names.
 
         """
-        # Gather the list of output files produced by the SAS
-        output_products = self.runconfig.get_output_product_filenames()
-
-        # For each output file name, assign the final file name matching the
-        # expected conventions
-        for output_product in output_products:
-            self._assign_filename(output_product, self.runconfig.output_product_path)
-
         # Write the catalog metadata to disk with the appropriate filename
         catalog_metadata = self._create_catalog_metadata()
 
