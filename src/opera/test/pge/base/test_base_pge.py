@@ -160,8 +160,14 @@ class BasePgeTestCase(unittest.TestCase):
         with self.assertRaises(RuntimeError) as err:
             pge.run()
 
-        self.assertIn('failed with exit code 123',str(err.exception))
-        self.assertIn('sample traceback line 2',str(err.exception))
+        expected_error_code = 123
+
+        # Ensure both the return code and the trackback stack parsed from the log
+        # are present in the exception message that would be reported to an SDS operator
+        self.assertIn(f'failed with exit code {expected_error_code}', str(err.exception))
+        self.assertIn('Traceback from log', str(err.exception))
+        self.assertIn('Traceback (most recent call last):', str(err.exception))
+        self.assertIn('IOError: RPC server not started!', str(err.exception))
 
         # Log should be fully initialized before SAS execution, so make sure it was
         # moved where we expect.
@@ -172,9 +178,9 @@ class BasePgeTestCase(unittest.TestCase):
         with open(expected_log_file, 'r', encoding='utf-8') as infile:
             log_contents = infile.read()
 
-        expected_error_code = 123
-
         self.assertIn(f"failed with exit code {expected_error_code}", log_contents)
+        self.assertIn('Traceback (most recent call last):', log_contents)
+        self.assertIn('IOError: RPC server not started!', log_contents)
 
     def test_sas_qa_execution(self):
         """
