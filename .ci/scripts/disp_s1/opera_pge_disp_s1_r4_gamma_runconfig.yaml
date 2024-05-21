@@ -60,8 +60,8 @@ RunConfig:
         IsoTemplatePath: /home/mamba/opera/pge/disp_s1/templates/OPERA_ISO_metadata_L3_DISP_S1_template.xml.jinja2
 
       QAExecutable:
-        Enabled: False
-        ProgramPath:
+        Enabled: True
+        ProgramPath: /home/mamba/opera/.ci/scripts/disp_s1/compare_disp_s1_products.sh
         ProgramOptions: []
 
       DebugLevelGroup:

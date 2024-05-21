@@ -52,9 +52,14 @@ trap test_int_trap_cleanup EXIT
 overall_status=0
 
 # There is only 1 expected output directory for DISP-S1
-expected_dir="${TMP_DIR}/${EXPECTED_DATA%.*}/golden_output"
+
 input_dir="${TMP_DIR}/${INPUT_DATA%.*}"
 runconfig_dir="${TMP_DIR}/runconfig"
+
+expected_data_dir="${TMP_DIR}/${EXPECTED_DATA%.*}/golden_output"
+
+echo "Input data directory: ${input_dir}"
+echo "Expected data directory: ${expected_data_dir}"
 
 # Copy the Algorithm Parameters RunConfig
 algo_runconfig="opera_pge_disp_s1_r4_gamma_algorithm_parameters.yaml"
@@ -89,13 +94,13 @@ container_name="${PGE_NAME}-PID$$"
 # Start metrics collection
 metrics_collection_start "$PGE_NAME" "$container_name" "$TEST_RESULTS_DIR" "$SAMPLE_TIME"
 
-echo "Running Docker image ${PGE_IMAGE}:${PGE_TAG}"
-
+echo "Running Docker image ${PGE_IMAGE}:${PGE_TAG} for ${input_dir}"
 docker run --rm -u $UID:"$(id -g)" --name $container_name \
            -v ${runconfig_dir}:/home/mamba/runconfig \
            -v ${input_dir}:/home/mamba/input_dir \
            -v ${output_dir}:/home/mamba/output_dir \
            -v ${scratch_dir}:/home/mamba/scratch_dir \
+           -v ${expected_data_dir}/forward:/home/mamba/expected_output_dir \
            ${PGE_IMAGE}:"${PGE_TAG}" --file /home/mamba/runconfig/"$RUNCONFIG"
 
 docker_exit_status=$?
@@ -106,46 +111,17 @@ metrics_collection_end "$PGE_NAME" "$container_name" "$docker_exit_status" "$TES
 # Copy the PGE/SAS log file(s) to the test results directory so it can be archived
 # by Jenkins with the other results
 cp "${output_dir}"/*.log "${TEST_RESULTS_DIR}"
+# Copy the results.html file to the same directory
+cp "${output_dir}"/test_int_disp_s1_results.html "${TEST_RESULTS_DIR}"/test_int_disp_s1_results.html
 
 if [ $docker_exit_status -ne 0 ]; then
     echo "docker exit indicates failure: ${docker_exit_status}"
     overall_status=1
 else
-    initialize_html_results_file "$output_dir" "$PGE_NAME"
-    echo "<tr><th>Compare Result</th><th><ul><li>Expected file</li><li>Output file</li></ul></th><th>disp_validate_product_opera_pge.py output</th></tr>" >> "$RESULTS_FILE"
-
-    output_file=$(ls ${output_dir}/OPERA_L3_DISP-S1_IW_F11114_VV_*T*Z_*T*Z_v0.2_*T*Z.nc)
-    output_file=$(basename ${output_file})
-    expected_file="20221107_20221213.unw.nc"
-
-    docker_out=$(docker run --rm \
-                            -v "${output_dir}":/out:ro \
-                            -v "${expected_dir}":/exp:ro \
-                            -v "$SCRIPT_DIR":/scripts \
-                            --entrypoint /opt/conda/bin/python ${PGE_IMAGE}:"${PGE_TAG}" \
-                            /scripts/disp_validate_product_opera_pge.py \
-                            --golden /exp/forward/${expected_file} --test /out/${output_file} \
-                            --exclude_groups pge_runconfig)
-    echo "$docker_out"
-
-    if [[ "$docker_out" == *"ERROR"* ]]; then
-        echo "File comparison failed. Output and expected files differ for ${output_file}"
-        compare_result="FAIL"
-        overall_status=2
-    else
-        echo "File comparison passed for ${output_file}"
-        compare_result="PASS"
-    fi
-
-    docker_out="${docker_out//$'\n'/<br>}"
-    update_html_results_file "${compare_result}" "${output_file}" "${expected_file}" "${docker_out}"
-
-    finalize_html_results_file
-
-    cp "${output_dir}"/test_int_disp_s1_results.html "${TEST_RESULTS_DIR}"/test_int_disp_s1_results.html
+    # Retrieve the return code written to disk by the comparison script
+    overall_status=$(cat "$output_dir/compare_disp_s1_products.rc")
 fi
 
-echo " "
 if [ $overall_status -ne 0 ]; then
     echo "Test FAILED."
 else

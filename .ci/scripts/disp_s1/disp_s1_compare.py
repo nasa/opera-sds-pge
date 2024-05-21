@@ -508,7 +508,7 @@ def _check_compressed_slc_dirs(golden: Filename, test: Filename) -> None:
 
     """
     golden_slc_dir = Path(golden).parent / "compressed_slcs"
-    test_slc_dir = Path(test).parent
+    test_slc_dir = Path(test).parent / "compressed_slcs"
 
     if not golden_slc_dir.exists():
         logger.info("No compressed SLC directory found in golden product.")
