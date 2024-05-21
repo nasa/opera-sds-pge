@@ -13,7 +13,6 @@ from os.path import join
 from opera.pge.base.base_pge import PgeExecutor
 from opera.pge.dswx_s1.dswx_s1_pge import DSWxS1PreProcessorMixin, DSWxS1PostProcessorMixin
 from opera.util.error_codes import ErrorCode
-from opera.util.input_validation import validate_dswx_inputs
 
 
 class DSWxNIPreProcessorMixin(DSWxS1PreProcessorMixin):
@@ -53,7 +52,7 @@ class DSWxNIPostProcessorMixin(DSWxS1PostProcessorMixin):
     In addition to the base functionality inherited from PostProcessorMixin, this
     mixin adds an output validation step inherited from DSWxS1PostProcessorMixin
     to ensure that the output file(s) defined by the RunConfig exist and are
-    valid (TODO).
+    valid.
     """
 
     _post_mixin_name = "DSWxNIPostProcessorMixin"
@@ -188,7 +187,7 @@ class DSWxNIPostProcessorMixin(DSWxS1PostProcessorMixin):
         The DSWxNIPostProcessorMixin version of this method performs the same
         steps as the base PostProcessorMixin, but inserts a step to perform
         output product validation (inherited from DSWxS1PostProcessorMixin) prior
-        to staging and renaming of the output files (TODO).
+        to staging and renaming of the output files (partially developed).
 
         Parameters
         ----------
