@@ -81,7 +81,7 @@ RunConfig:
 
         frame_id: 11114
       dynamic_ancillary_file_group:
-        algorithm_parameters_file: /home/mamba/runconfig/opera_pge_disp_s1_r4_gamma_algorithm_parameters.yaml
+        algorithm_parameters_file: /home/mamba/runconfig/opera_pge_disp_s1_r4_gamma_algorithm_parameters_forward.yaml
         amplitude_dispersion_files:
           - /home/mamba/input_dir/dynamic_ancillary_files/ps_files/t042_088905_iw1_amp_dispersion.tif
           - /home/mamba/input_dir/dynamic_ancillary_files/ps_files/t042_088906_iw1_amp_dispersion.tif

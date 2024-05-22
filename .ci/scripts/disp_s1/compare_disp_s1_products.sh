@@ -72,7 +72,7 @@ do
                           --exclude_groups pge_runconfig)
             echo "$compare_out"
 
-            if [[ "$compare_out" == *"ERROR"* ]]; then
+            if echo "$compare_out" | grep -q "do not match"; then
                 echo "File comparison failed. Output and expected files differ for ${output_file}"
                 compare_result="FAIL"
                 overall_status=2
