@@ -67,12 +67,11 @@ do
             echo "No expected file found for product $output_file in expected directory $EXPECTED_DIR"
             overall_status=1
         else
-            compare_out=$("$SCRIPT_DIR"/disp_s1_compare.py \
-                          --golden "${expected_file}" --test "${OUTPUT_DIR}/${output_file}" \
-                          --exclude_groups pge_runconfig)
-            echo "$compare_out"
+            compare_out=$(${SCRIPT_DIR}/disp_s1_compare.py \
+                --golden "${expected_file}" --test "${OUTPUT_DIR}/${output_file}" \
+                --exclude_groups pge_runconfig) || compare_exit_status=$?
 
-            if echo "$compare_out" | grep -q "do not match"; then
+            if [[ $compare_exit_status -ne 0 ]]; then
                 echo "File comparison failed. Output and expected files differ for ${output_file}"
                 compare_result="FAIL"
                 overall_status=2
