@@ -9,6 +9,8 @@ from NISAR (NI) PGE.
 
 """
 
+import re
+
 from os.path import join
 
 from opera.pge.base.base_pge import PgeExecutor
@@ -59,6 +61,29 @@ class DSWxNIPostProcessorMixin(DSWxS1PostProcessorMixin):
 
     _post_mixin_name = "DSWxNIPostProcessorMixin"
     _cached_core_filename = None
+
+    def _validate_output_product_filenames(self):
+        """
+        Test method to verify the regular expression used to
+        validate the output product file names assigned by the SAS
+        This method will validate that the filename has the acceptable name
+        through a regular expression.  If the pattern does not match
+        """
+
+        validated_product_filenames = []
+        pattern = re.compile(
+            r'(?P<project>OPERA)_(?P<level>L3)_(?P<product_type>DSWx)-(?P<source>NI)_(?P<tile_id>T[^\W_]{5})_'
+            r'(?P<acquisition_ts>\d{8}T\d{6}Z)_(?P<creation_ts>\d{8}T\d{6}Z)_(?P<sensor>LSAR)_(?P<spacing>30)_'
+            r'(?P<product_version>v\d+[.]\d+)(_(?P<band_index>B\d{2})_'
+            r'(?P<band_name>WTR|BWTR|CONF|DIAG)|_BROWSE)?[.](?P<ext>tif|tiff|png)$')
+
+        for output_file in self.runconfig.get_output_product_filenames():
+            if pattern.match(output_file.split('/')[-1]):
+                validated_product_filenames.append(output_file)
+            else:
+                error_msg = (f"Output file {output_file} does not match the output prodict "
+                             f"naming convention.")
+                self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
 
     def _ancillary_filename(self):
         """
@@ -193,6 +218,9 @@ class DSWxNIPostProcessorMixin(DSWxS1PostProcessorMixin):
         print(f'Running postprocessor for {self._post_mixin_name}')
 
         self._run_sas_qa_executable()
+
+        self._validate_output_product_filenames()
+
         self._validate_output()
         # TODO - stage_output_files()  is only partially implemented
         self._stage_output_files()
