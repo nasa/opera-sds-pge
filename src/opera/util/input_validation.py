@@ -166,10 +166,15 @@ def get_burst_id_set(input_file_group : list, logger, name) -> set:
     """
     burst_ids = set()
     for index in input_file_group:
-        reg_ex = r't\w{3}_\d{6}_iw[1|2|3]'
+        reg_ex = r'[t|T]\w{3}[-|_]\d{6}[-|_][I|i][W|w][1|2|3]'
         match = re.search(reg_ex, index)
         if match:
-            burst_ids.add(re.findall(reg_ex, index)[0])
+            burst_id = re.findall(reg_ex, index)[0]
+
+            # canonicalize the burst ID before adding to set
+            burst_id = burst_id.replace("_", "-").upper()
+
+            burst_ids.add(burst_id)
         else:
             msg = f'Input file present without properly formatted burst_id: {index}'
             logger.critical(name, ErrorCode.INVALID_INPUT, msg)
