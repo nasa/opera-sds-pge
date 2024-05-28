@@ -8,14 +8,14 @@ RunConfig:
 
       InputFilesGroup:
         InputFilePaths:
-          - /home/mamba/input_dir/input_slcs/compressed_t042_088905_iw1_20221107_20221107_20230506.h5
-          - /home/mamba/input_dir/input_slcs/compressed_t042_088906_iw1_20221107_20221107_20230506.h5
-          - /home/mamba/input_dir/input_slcs/t042_088905_iw1_20221119.h5
-          - /home/mamba/input_dir/input_slcs/t042_088906_iw1_20221119.h5
-          - /home/mamba/input_dir/input_slcs/t042_088905_iw1_20221201.h5
-          - /home/mamba/input_dir/input_slcs/t042_088906_iw1_20221201.h5
-          - /home/mamba/input_dir/input_slcs/t042_088905_iw1_20221213.h5
-          - /home/mamba/input_dir/input_slcs/t042_088906_iw1_20221213.h5
+          - /home/mamba/input_dir/input_slcs/OPERA_L2_COMPRESSED-CSLC-S1_T042-088905-IW1_20221107T000000Z_20221107T000000Z_20230506T000000Z_20230507T000000Z_VV_v1.0.h5
+          - /home/mamba/input_dir/input_slcs/OPERA_L2_COMPRESSED-CSLC-S1_T042-088906-IW1_20221107T000000Z_20221107T000000Z_20230506T000000Z_20230507T000000Z_VV_v1.0.h5
+          - /home/mamba/input_dir/input_slcs/OPERA_L2_CSLC-S1_T042-088905-IW1_20221119T000000Z_20221120T000000Z_S1A_VV_v1.0.h5
+          - /home/mamba/input_dir/input_slcs/OPERA_L2_CSLC-S1_T042-088906-IW1_20221119T000000Z_20221120T000000Z_S1A_VV_v1.0.h5
+          - /home/mamba/input_dir/input_slcs/OPERA_L2_CSLC-S1_T042-088905-IW1_20221201T000000Z_20221202T000000Z_S1A_VV_v1.0.h5
+          - /home/mamba/input_dir/input_slcs/OPERA_L2_CSLC-S1_T042-088906-IW1_20221201T000000Z_20221202T000000Z_S1A_VV_v1.0.h5
+          - /home/mamba/input_dir/input_slcs/OPERA_L2_CSLC-S1_T042-088905-IW1_20221213T000000Z_20221214T000000Z_S1A_VV_v1.0.h5
+          - /home/mamba/input_dir/input_slcs/OPERA_L2_CSLC-S1_T042-088906-IW1_20221213T000000Z_20221214T000000Z_S1A_VV_v1.0.h5
 
       DynamicAncillaryFilesGroup:
         AncillaryFileMap:
@@ -28,8 +28,8 @@ RunConfig:
             - /home/mamba/input_dir/dynamic_ancillary_files/ps_files/t042_088905_iw1_amp_mean.tif
             - /home/mamba/input_dir/dynamic_ancillary_files/ps_files/t042_088906_iw1_amp_mean.tif
           static_layers_files:
-            - /home/mamba/input_dir/dynamic_ancillary_files/static_layers/static_layers_t042_088905_iw1.h5
-            - /home/mamba/input_dir/dynamic_ancillary_files/static_layers/static_layers_t042_088906_iw1.h5
+            - /home/mamba/input_dir/dynamic_ancillary_files/static_layers/OPERA_L2_CSLC-S1-STATIC_T042-088905-IW1_20140403_S1A_VV_v1.0.h5
+            - /home/mamba/input_dir/dynamic_ancillary_files/static_layers/OPERA_L2_CSLC-S1-STATIC_T042-088906-IW1_20140403_S1A_VV_v1.0.h5
           ionosphere_files:
             - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg0060.23i
             - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg1860.23i
@@ -70,18 +70,18 @@ RunConfig:
     SAS:
       input_file_group:
         cslc_file_list:
-          - /home/mamba/input_dir/input_slcs/compressed_t042_088905_iw1_20221107_20221107_20230506.h5
-          - /home/mamba/input_dir/input_slcs/compressed_t042_088906_iw1_20221107_20221107_20230506.h5
-          - /home/mamba/input_dir/input_slcs/t042_088905_iw1_20221119.h5
-          - /home/mamba/input_dir/input_slcs/t042_088906_iw1_20221119.h5
-          - /home/mamba/input_dir/input_slcs/t042_088905_iw1_20221201.h5
-          - /home/mamba/input_dir/input_slcs/t042_088906_iw1_20221201.h5
-          - /home/mamba/input_dir/input_slcs/t042_088905_iw1_20221213.h5
-          - /home/mamba/input_dir/input_slcs/t042_088906_iw1_20221213.h5
+          - /home/mamba/input_dir/input_slcs/OPERA_L2_COMPRESSED-CSLC-S1_T042-088905-IW1_20221107T000000Z_20221107T000000Z_20230506T000000Z_20230507T000000Z_VV_v1.0.h5
+          - /home/mamba/input_dir/input_slcs/OPERA_L2_COMPRESSED-CSLC-S1_T042-088906-IW1_20221107T000000Z_20221107T000000Z_20230506T000000Z_20230507T000000Z_VV_v1.0.h5
+          - /home/mamba/input_dir/input_slcs/OPERA_L2_CSLC-S1_T042-088905-IW1_20221119T000000Z_20221120T000000Z_S1A_VV_v1.0.h5
+          - /home/mamba/input_dir/input_slcs/OPERA_L2_CSLC-S1_T042-088906-IW1_20221119T000000Z_20221120T000000Z_S1A_VV_v1.0.h5
+          - /home/mamba/input_dir/input_slcs/OPERA_L2_CSLC-S1_T042-088905-IW1_20221201T000000Z_20221202T000000Z_S1A_VV_v1.0.h5
+          - /home/mamba/input_dir/input_slcs/OPERA_L2_CSLC-S1_T042-088906-IW1_20221201T000000Z_20221202T000000Z_S1A_VV_v1.0.h5
+          - /home/mamba/input_dir/input_slcs/OPERA_L2_CSLC-S1_T042-088905-IW1_20221213T000000Z_20221214T000000Z_S1A_VV_v1.0.h5
+          - /home/mamba/input_dir/input_slcs/OPERA_L2_CSLC-S1_T042-088906-IW1_20221213T000000Z_20221214T000000Z_S1A_VV_v1.0.h5
 
         frame_id: 11114
       dynamic_ancillary_file_group:
-        algorithm_parameters_file: /home/mamba/runconfig/opera_pge_disp_s1_r4_gamma_algorithm_parameters_forward.yaml
+        algorithm_parameters_file: /home/mamba/runconfig/opera_pge_disp_s1_r4.2_gamma_algorithm_parameters_forward.yaml
         amplitude_dispersion_files:
           - /home/mamba/input_dir/dynamic_ancillary_files/ps_files/t042_088905_iw1_amp_dispersion.tif
           - /home/mamba/input_dir/dynamic_ancillary_files/ps_files/t042_088906_iw1_amp_dispersion.tif
@@ -89,8 +89,8 @@ RunConfig:
           - /home/mamba/input_dir/dynamic_ancillary_files/ps_files/t042_088905_iw1_amp_mean.tif
           - /home/mamba/input_dir/dynamic_ancillary_files/ps_files/t042_088906_iw1_amp_mean.tif
         static_layers_files:
-          - /home/mamba/input_dir/dynamic_ancillary_files/static_layers/static_layers_t042_088905_iw1.h5
-          - /home/mamba/input_dir/dynamic_ancillary_files/static_layers/static_layers_t042_088906_iw1.h5
+          - /home/mamba/input_dir/dynamic_ancillary_files/static_layers/OPERA_L2_CSLC-S1-STATIC_T042-088905-IW1_20140403_S1A_VV_v1.0.h5
+          - /home/mamba/input_dir/dynamic_ancillary_files/static_layers/OPERA_L2_CSLC-S1-STATIC_T042-088906-IW1_20140403_S1A_VV_v1.0.h5
         mask_file: /home/mamba/input_dir/dynamic_ancillary_files/watermask.tif
         dem_file: /home/mamba/input_dir/dynamic_ancillary_files/dem.tif
         ionosphere_files:
