@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera.util package &mdash; opera-sds-pge 3.0.0-rc.2.1 documentation</title>
+  <title>opera.util package &mdash; opera-sds-pge 3.0.0-rc.2.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
 
@@ -15,7 +15,7 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=4d28127d"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=7ad09817"></script>
         <script src="_static/doctools.js?v=888ff710"></script>
         <script src="_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="_static/js/theme.js"></script>
@@ -37,7 +37,7 @@
             opera-sds-pge
           </a>
               <div class="version">
-                3.0.0-rc.2.1
+                3.0.0-rc.2.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -939,6 +939,28 @@ with subprocess.run.</p>
 <dt class="sig sig-object py" id="opera.util.run_utils.get_extension">
 <span class="sig-prename descclassname"><span class="pre">opera.util.run_utils.</span></span><span class="sig-name descname"><span class="pre">get_extension</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/opera/util/run_utils.html#get_extension"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opera.util.run_utils.get_extension" title="Permalink to this definition"></a></dt>
 <dd><p>Returns the file extension (including the dot) of the provided file name.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="opera.util.run_utils.get_traceback_from_log">
+<span class="sig-prename descclassname"><span class="pre">opera.util.run_utils.</span></span><span class="sig-name descname"><span class="pre">get_traceback_from_log</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log_contents</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/opera/util/run_utils.html#get_traceback_from_log"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opera.util.run_utils.get_traceback_from_log" title="Permalink to this definition"></a></dt>
+<dd><p>Utilizes a regular expression to parse and return a traceback stack from
+provided log contents.</p>
+<p class="rubric">Notes</p>
+<p>The regular expression used with this function was derived from the following
+Stack Exchange answer: <a class="reference external" href="https://stackoverflow.com/a/53658873">https://stackoverflow.com/a/53658873</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>log_contents</strong> (<em>str</em>) – The log contents to parse for a traceback stack.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>traceback_match</strong> – The result of the regex search for a traceback. If none could be found,
+None will be returned.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>re.Match</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">

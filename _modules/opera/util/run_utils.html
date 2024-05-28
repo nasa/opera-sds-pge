@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera.util.run_utils &mdash; opera-sds-pge 3.0.0-rc.2.1 documentation</title>
+  <title>opera.util.run_utils &mdash; opera-sds-pge 3.0.0-rc.2.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
 
@@ -14,7 +14,7 @@
   
         <script src="../../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=4d28127d"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=7ad09817"></script>
         <script src="../../../_static/doctools.js?v=888ff710"></script>
         <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -34,7 +34,7 @@
             opera-sds-pge
           </a>
               <div class="version">
-                3.0.0-rc.2.1
+                3.0.0-rc.2.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -92,6 +92,7 @@
 
 <span class="kn">import</span> <span class="nn">hashlib</span>
 <span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">subprocess</span>
 <span class="kn">import</span> <span class="nn">time</span>
@@ -130,6 +131,37 @@
 <div class="viewcode-block" id="get_extension"><a class="viewcode-back" href="../../../opera.util.html#opera.util.run_utils.get_extension">[docs]</a><span class="k">def</span> <span class="nf">get_extension</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns the file extension (including the dot) of the provided file name.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">file_name</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="get_traceback_from_log"><a class="viewcode-back" href="../../../opera.util.html#opera.util.run_utils.get_traceback_from_log">[docs]</a><span class="k">def</span> <span class="nf">get_traceback_from_log</span><span class="p">(</span><span class="n">log_contents</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Utilizes a regular expression to parse and return a traceback stack from</span>
+<span class="sd">    provided log contents.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The regular expression used with this function was derived from the following</span>
+<span class="sd">    Stack Exchange answer: https://stackoverflow.com/a/53658873</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    log_contents : str</span>
+<span class="sd">        The log contents to parse for a traceback stack.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">        traceback_match : re.Match</span>
+<span class="sd">            The result of the regex search for a traceback. If none could be found,</span>
+<span class="sd">            None will be returned.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">exception_pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+        <span class="sa">r</span><span class="s2">&quot;Traceback \(most recent call last\):(?:\n.*)+?\n(.*?(?:Exception|Error):)\s*(.+)&quot;</span>
+    <span class="p">)</span>
+
+    <span class="n">trackback_match</span> <span class="o">=</span> <span class="n">exception_pattern</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">log_contents</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">trackback_match</span></div>
 
 
 <div class="viewcode-block" id="create_sas_command_line"><a class="viewcode-back" href="../../../opera.util.html#opera.util.run_utils.create_sas_command_line">[docs]</a><span class="k">def</span> <span class="nf">create_sas_command_line</span><span class="p">(</span><span class="n">sas_program_path</span><span class="p">,</span> <span class="n">sas_runconfig_path</span><span class="p">,</span>
@@ -283,15 +315,19 @@
                                 <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">STDOUT</span><span class="p">,</span>
                                 <span class="n">shell</span><span class="o">=</span><span class="n">execute_via_shell</span><span class="p">)</span>
 
-    <span class="c1"># Append the stdout/stderr captured by the subprocess to our log</span>
+    <span class="c1"># Append the full stdout/stderr captured by the subprocess to our log</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">run_result</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">decode</span><span class="p">())</span>
 
-    <span class="n">tail</span> <span class="o">=</span> <span class="n">run_result</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-    <span class="n">tail</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tail</span><span class="p">[</span><span class="o">-</span><span class="mi">20</span><span class="p">:])</span>
-
     <span class="k">if</span> <span class="n">run_result</span><span class="o">.</span><span class="n">returncode</span><span class="p">:</span>
+        <span class="c1"># Parse out the traceback stack(s) from the log to include with the error</span>
+        <span class="c1"># message that will be propagated back to an SDS operator</span>
+        <span class="n">traceback_match</span> <span class="o">=</span> <span class="n">get_traceback_from_log</span><span class="p">(</span><span class="n">run_result</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">decode</span><span class="p">())</span>
+
         <span class="n">error_msg</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Command &quot;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">command_line</span><span class="p">)</span><span class="si">}</span><span class="s1">&quot; failed with exit &#39;</span>
-                     <span class="sa">f</span><span class="s1">&#39;code </span><span class="si">{</span><span class="n">run_result</span><span class="o">.</span><span class="n">returncode</span><span class="si">}</span><span class="s1">, traceback:</span><span class="se">\n</span><span class="si">{</span><span class="n">tail</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                     <span class="sa">f</span><span class="s1">&#39;code </span><span class="si">{</span><span class="n">run_result</span><span class="o">.</span><span class="n">returncode</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">traceback_match</span><span class="p">:</span>
+            <span class="n">error_msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;, Traceback from log:</span><span class="se">\n</span><span class="si">{</span><span class="n">traceback_match</span><span class="o">.</span><span class="n">string</span><span class="si">}</span><span class="s1">&#39;</span>
 
         <span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="n">module_name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">SAS_PROGRAM_FAILED</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">)</span>
 
