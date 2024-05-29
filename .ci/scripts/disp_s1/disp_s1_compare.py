@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import argparse
 import logging
+import sys
 from pathlib import Path
 
 import h5py
@@ -508,7 +509,7 @@ def _check_compressed_slc_dirs(golden: Filename, test: Filename) -> None:
 
     """
     golden_slc_dir = Path(golden).parent / "compressed_slcs"
-    test_slc_dir = Path(test).parent
+    test_slc_dir = Path(test).parent / "compressed_slcs"
 
     if not golden_slc_dir.exists():
         logger.info("No compressed SLC directory found in golden product.")
@@ -544,11 +545,17 @@ def compare(golden: Filename, test: Filename, data_dset: str = DSET_DEFAULT, exc
         io.format_nc_filename(test, data_dset),
     )
 
+    logger.info("Comparing Compressed CSLC products...")
+    _check_compressed_slc_dirs(golden, test)
+
     if validation_match:
         logger.info(f"Files {golden} and {test} match.")
+        result = 0
     else:
         logger.error(f"Files {golden} and {test} do not match.")
-    _check_compressed_slc_dirs(golden, test)
+        result = 1
+
+    return result
 
 
 def get_parser() -> argparse.ArgumentParser:
@@ -574,4 +581,4 @@ def get_parser() -> argparse.ArgumentParser:
 if __name__ == "__main__":
     parser = get_parser()
     args = parser.parse_args()
-    compare(args.golden, args.test, args.data_dset, args.exclude_groups)
+    sys.exit(compare(args.golden, args.test, args.data_dset, args.exclude_groups))

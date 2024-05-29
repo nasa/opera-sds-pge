@@ -30,7 +30,7 @@ SAMPLE_TIME=15
 [ -z "${PGE_TAG}" ] && PGE_TAG="${USER}-dev"
 [ -z "${INPUT_DATA}" ] && INPUT_DATA="disp_s1_r4.1_gamma_expected_input.zip"
 [ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="disp_s1_r4.1_gamma_expected_output.zip"
-[ -z "${RUNCONFIG}" ] && RUNCONFIG="opera_pge_disp_s1_r4_gamma_runconfig.yaml"
+[ -z "${RUNCONFIG}" ] && RUNCONFIG="opera_pge_disp_s1_r4_gamma_runconfig_forward.yaml"
 [ -z "${TMP_ROOT}" ] && TMP_ROOT="$DEFAULT_TMP_ROOT"
 
 # Create the test output directory in the work space
@@ -51,101 +51,85 @@ trap test_int_trap_cleanup EXIT
 # 2 - product validation failure
 overall_status=0
 
-# There is only 1 expected output directory for DISP-S1
-expected_dir="${TMP_DIR}/${EXPECTED_DATA%.*}/golden_output"
 input_dir="${TMP_DIR}/${INPUT_DATA%.*}"
 runconfig_dir="${TMP_DIR}/runconfig"
 
-# Copy the Algorithm Parameters RunConfig
-algo_runconfig="opera_pge_disp_s1_r4_gamma_algorithm_parameters.yaml"
-local_algo_runconfig="${SCRIPT_DIR}/${algo_runconfig}"
-echo "Copying runconfig file local_algo_runconfig to $runconfig_dir/"
-cp ${local_algo_runconfig} ${runconfig_dir}
+expected_data_dir="${TMP_DIR}/${EXPECTED_DATA%.*}/golden_output"
 
-# the testdata reference metadata contains this path so we use it here
-output_dir="${TMP_DIR}/output_disp_s1"
+echo "Input data directory: ${input_dir}"
+echo "Expected data directory: ${expected_data_dir}"
 
-# make sure no output directory already exists
-if [ -d "$output_dir" ]; then
-    echo "Output directory $output_dir already exists (and should not). Removing directory."
-    rm -rf "${output_dir}"
-fi
-echo "Creating output directory $output_dir."
-mkdir -p "$output_dir"
+# Copy the RunConfig for the historical workflow
+historical_runconfig="opera_pge_disp_s1_r4_gamma_runconfig_historical.yaml"
+local_historical_runconfig="${SCRIPT_DIR}/${historical_runconfig}"
+echo "Copying runconfig file $local_historical_runconfig to $runconfig_dir"
+cp ${local_historical_runconfig} ${runconfig_dir}
 
-# the testdata reference metadata contains this path so we use it here
-scratch_dir="${TMP_DIR}/scratch_disp_s1"
+# Run integration tests for DISP-S1 in both "forward" and "historical" modes
+for mode in forward historical
+do
+    output_dir="${TMP_DIR}/output_disp_s1/${mode}"
 
-# make sure no scratch directory already exists
-if [ -d "$scratch_dir" ]; then
-    echo "Scratch directory $scratch_dir already exists (and should not). Removing directory."
-    rm -rf "${scratch_dir}"
-fi
-echo "Creating scratch directory $scratch_dir."
-mkdir -p --mode=777 "$scratch_dir"
-
-container_name="${PGE_NAME}-PID$$"
-
-# Start metrics collection
-metrics_collection_start "$PGE_NAME" "$container_name" "$TEST_RESULTS_DIR" "$SAMPLE_TIME"
-
-echo "Running Docker image ${PGE_IMAGE}:${PGE_TAG}"
-
-docker run --rm -u $UID:"$(id -g)" --name $container_name \
-           -v ${runconfig_dir}:/home/mamba/runconfig \
-           -v ${input_dir}:/home/mamba/input_dir \
-           -v ${output_dir}:/home/mamba/output_dir \
-           -v ${scratch_dir}:/home/mamba/scratch_dir \
-           ${PGE_IMAGE}:"${PGE_TAG}" --file /home/mamba/runconfig/"$RUNCONFIG"
-
-docker_exit_status=$?
-
-# End metrics collection
-metrics_collection_end "$PGE_NAME" "$container_name" "$docker_exit_status" "$TEST_RESULTS_DIR"
-
-# Copy the PGE/SAS log file(s) to the test results directory so it can be archived
-# by Jenkins with the other results
-cp "${output_dir}"/*.log "${TEST_RESULTS_DIR}"
-
-if [ $docker_exit_status -ne 0 ]; then
-    echo "docker exit indicates failure: ${docker_exit_status}"
-    overall_status=1
-else
-    initialize_html_results_file "$output_dir" "$PGE_NAME"
-    echo "<tr><th>Compare Result</th><th><ul><li>Expected file</li><li>Output file</li></ul></th><th>disp_validate_product_opera_pge.py output</th></tr>" >> "$RESULTS_FILE"
-
-    output_file=$(ls ${output_dir}/OPERA_L3_DISP-S1_IW_F11114_VV_*T*Z_*T*Z_v0.2_*T*Z.nc)
-    output_file=$(basename ${output_file})
-    expected_file="20221107_20221213.unw.nc"
-
-    docker_out=$(docker run --rm \
-                            -v "${output_dir}":/out:ro \
-                            -v "${expected_dir}":/exp:ro \
-                            -v "$SCRIPT_DIR":/scripts \
-                            --entrypoint /opt/conda/bin/python ${PGE_IMAGE}:"${PGE_TAG}" \
-                            /scripts/disp_validate_product_opera_pge.py \
-                            --golden /exp/forward/${expected_file} --test /out/${output_file} \
-                            --exclude_groups pge_runconfig)
-    echo "$docker_out"
-
-    if [[ "$docker_out" == *"ERROR"* ]]; then
-        echo "File comparison failed. Output and expected files differ for ${output_file}"
-        compare_result="FAIL"
-        overall_status=2
-    else
-        echo "File comparison passed for ${output_file}"
-        compare_result="PASS"
+    # make sure no output directory already exists
+    if [ -d "$output_dir" ]; then
+        echo "Output directory $output_dir already exists (and should not). Removing directory."
+        rm -rf "${output_dir}"
     fi
 
-    docker_out="${docker_out//$'\n'/<br>}"
-    update_html_results_file "${compare_result}" "${output_file}" "${expected_file}" "${docker_out}"
+    echo "Creating output directory $output_dir."
+    mkdir -p "$output_dir"
 
-    finalize_html_results_file
+    scratch_dir="${TMP_DIR}/scratch_disp_s1/${mode}"
 
-    cp "${output_dir}"/test_int_disp_s1_results.html "${TEST_RESULTS_DIR}"/test_int_disp_s1_results.html
-fi
+    # make sure no scratch directory already exists
+    if [ -d "$scratch_dir" ]; then
+        echo "Scratch directory $scratch_dir already exists (and should not). Removing directory."
+        rm -rf "${scratch_dir}"
+    fi
+    echo "Creating scratch directory $scratch_dir."
+    mkdir -p --mode=777 "$scratch_dir"
 
-echo " "
+    # Copy the Algorithm Parameters RunConfigs
+    algo_runconfig="opera_pge_disp_s1_r4_gamma_algorithm_parameters_${mode}.yaml"
+    local_algo_runconfig="${SCRIPT_DIR}/${algo_runconfig}"
+    echo "Copying runconfig file $local_algo_runconfig to $runconfig_dir"
+    cp ${local_algo_runconfig} ${runconfig_dir}
+
+    container_name="${PGE_NAME}-${mode}-PID$$"
+
+    # Start metrics collection
+    metrics_collection_start "$PGE_NAME" "$container_name" "$TEST_RESULTS_DIR" "$SAMPLE_TIME"
+
+    echo "Running Docker image ${PGE_IMAGE}:${PGE_TAG} for ${mode} mode"
+    docker run --rm -u $UID:"$(id -g)" --name $container_name \
+               -v ${runconfig_dir}:/home/mamba/runconfig \
+               -v ${input_dir}:/home/mamba/input_dir \
+               -v ${output_dir}:/home/mamba/output_dir \
+               -v ${scratch_dir}:/home/mamba/scratch_dir \
+               -v ${expected_data_dir}/${mode}:/home/mamba/expected_output_dir \
+               ${PGE_IMAGE}:"${PGE_TAG}" --file /home/mamba/runconfig/opera_pge_disp_s1_r4_gamma_runconfig_${mode}.yaml
+
+    docker_exit_status=$?
+
+    # End metrics collection
+    metrics_collection_end "$PGE_NAME" "$container_name" "$docker_exit_status" "$TEST_RESULTS_DIR"
+
+    # Copy the PGE/SAS log file(s) to the test results directory so it can be archived
+    # by Jenkins with the other results
+    cp "${output_dir}"/*.log "${TEST_RESULTS_DIR}"
+
+    # Copy the results.html file to the same directory
+    cp "${output_dir}"/test_int_disp_s1_results.html "${TEST_RESULTS_DIR}"/test_int_disp_s1_${mode}_results.html
+
+    if [ $docker_exit_status -ne 0 ]; then
+        echo "docker exit indicates failure: ${docker_exit_status}"
+        overall_status=1
+    else
+        # Retrieve the return code written to disk by the comparison script
+        overall_status=$(cat "$output_dir/compare_disp_s1_products.rc")
+    fi
+done
+
 if [ $overall_status -ne 0 ]; then
     echo "Test FAILED."
 else
