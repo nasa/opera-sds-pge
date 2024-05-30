@@ -420,8 +420,22 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
         # Get the production time
         prod_time = f"{get_time_for_filename(self.production_datetime)}Z"
 
-        # Polarization should be fixed for all CSLC-derived products
-        polarization = "VV"
+        # Polarization: polarization of the input bursts
+        # derived from product metadata of the input CSLC files
+        cslc_file_list = self.runconfig.sas_config['input_file_group']['cslc_file_list']
+
+        # Search for a CSLC file containing the metadata we expect
+        for cslc_file in cslc_file_list:
+            try:
+                cslc_metadata = get_cslc_s1_product_metadata(abspath(cslc_file))
+                polarization = cslc_metadata["processing_information"]["input_burst_metadata"]["polarization"]
+                break
+            except Exception:
+                continue
+        else:
+            raise RuntimeError(
+                'No input CSLC file contains the expected polarization information.'
+            )
 
         # Product version hardcoded to 1.0 for now since CCSLCs are not
         # intended for widespread distribution
