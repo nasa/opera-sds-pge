@@ -19,22 +19,27 @@ RunConfig:
         ScratchPath: dswx_ni_pge_test/scratch_dir
       PrimaryExecutable:
         ProductIdentifier: DSWX_NI
-        ProductVersion: "1.0"
+        ProductVersion: '1.0'
         ProgramPath: mkdir
         ProgramOptions:
-          - '-p dswx_ni_pge_test/output_dir;'
-          # Create dummy output files containing 1 mb of random data each, but with the expected file names
-          - 'dd if=/dev/urandom of=dswx_ni_pge_test/output_dir/OPERA_L3_DSWx-NI_T11SLS_20110226T061749Z_20240329T181033Z_LSAR_30_v0.1_B01_WTR.tif bs=1M count=1;'
-          - 'dd if=/dev/urandom of=dswx_ni_pge_test/output_dir/OPERA_L3_DSWx-NI_T11SLS_20110226T061749Z_20240329T181033Z_LSAR_30_v0.1_B02_BWTR.tif bs=1M count=1;'
-          - 'dd if=/dev/urandom of=dswx_ni_pge_test/output_dir/OPERA_L3_DSWx-NI_T11SLS_20110226T061749Z_20240329T181033Z_LSAR_30_v0.1_B03_CONF.tif count=1;'
-          - 'dd if=/dev/urandom of=dswx_ni_pge_test/output_dir/OPERA_L3_DSWx-NI_T11SLS_20110226T061749Z_20240329T181033Z_LSAR_30_v0.1_B04_DIAG.tif bs=1M count=1;'
-          - 'dd if=/dev/urandom of=dswx_ni_pge_test/output_dir/OPERA_L3_DSWx-NI_T11SLS_20110226T061749Z_20240329T181033Z_LSAR_30_v0.1_BROWSE.png bs=1M count=1;'
-          - 'dd if=/dev/urandom of=dswx_ni_pge_test/output_dir/OPERA_L3_DSWx-NI_T11SLS_20110226T061749Z_20240329T181033Z_LSAR_30_v0.1_BROWSE.tif bs=1M count=1;'
-          - '/bin/echo DSWx-NI invoked with RunConfig'
+        - -p dswx_ni_pge_test/output_dir;
+        - dd if=/dev/urandom of=dswx_ni_pge_test/output_dir/OPERA_L3_DSWx-NI_T11SLS_20110226T061749Z_20240329T181033Z_LSAR_30_v0.1_B01_WTR.tif
+          bs=1M count=1;
+        - dd if=/dev/urandom of=dswx_ni_pge_test/output_dir/OPERA_L3_DSWx-NI_T11SLS_20110226T061749Z_20240329T181033Z_LSAR_30_v0.1_B02_BWTR.tif
+          bs=1M count=1;
+        - dd if=/dev/urandom of=dswx_ni_pge_test/output_dir/OPERA_L3_DSWx-NI_T11SLS_20110226T061749Z_20240329T181033Z_LSAR_30_v0.1_B03_CONF.tif
+          count=1;
+        - dd if=/dev/urandom of=dswx_ni_pge_test/output_dir/OPERA_L3_DSWx-NI_T11SLS_20110226T061749Z_20240329T181033Z_LSAR_30_v0.1_B04_DIAG.tif
+          bs=1M count=1;
+        - dd if=/dev/urandom of=dswx_ni_pge_test/output_dir/OPERA_L3_DSWx-NI_T11SLS_20110226T061749Z_20240329T181033Z_LSAR_30_v0.1_BROWSE.png
+          bs=1M count=1;
+        - dd if=/dev/urandom of=dswx_ni_pge_test/output_dir/OPERA_L3_DSWx-NI_T11SLS_20110226T061749Z_20240329T181033Z_LSAR_30_v0.1_BROWSE.tif
+          bs=1M count=1;
+        - /bin/echo DSWx-NI invoked with RunConfig
         ErrorCodeBase: 400000
         SchemaPath: pge/dswx_ni/schema/dswx_ni_sas_schema.yaml
         AlgorithmParametersSchemaPath: pge/dswx_ni/schema/algorithm_parameters_ni_schema.yaml
-        IsoTemplatePath:
+        IsoTemplatePath: null
       QAExecutable:
         Enabled: false
         ProgramPath: null
@@ -60,7 +65,7 @@ RunConfig:
             hand_file: dswx_ni_pge_test/input_dir/hand.tif
             algorithm_parameters: dswx_ni_pge_test/input_dir/test_dswx_ni_algorithm_parameters.yaml
           static_ancillary_file_group:
-            static_ancillary_inputs_flag: True
+            static_ancillary_inputs_flag: true
             mgrs_database_file: dswx_ni_pge_test/input_dir/MGRS_tile.sqlite
             mgrs_collection_database_file: dswx_ni_pge_test/input_dir/MGRS_tile_collection.sqlite
           primary_executable:
@@ -70,5 +75,5 @@ RunConfig:
             scratch_path: dswx_ni_pge_test/scratch_dir
             sas_output_path: dswx_ni_pge_test/output_dir
           browse_image_group:
-            save_browse: True
+            save_browse: true
           log_file: dswx_ni_pge_test/output_dir/test_log.log

@@ -10,11 +10,10 @@ from NISAR (NI) PGE.
 """
 
 import re
-
 from os.path import join
 
 from opera.pge.base.base_pge import PgeExecutor
-from opera.pge.dswx_s1.dswx_s1_pge import DSWxS1PreProcessorMixin, DSWxS1PostProcessorMixin
+from opera.pge.dswx_s1.dswx_s1_pge import DSWxS1PostProcessorMixin, DSWxS1PreProcessorMixin
 from opera.util.error_codes import ErrorCode
 from opera.util.time import get_time_for_filename
 
@@ -69,7 +68,6 @@ class DSWxNIPostProcessorMixin(DSWxS1PostProcessorMixin):
         This method will validate that the filename has the acceptable name
         through a regular expression.  If the pattern does not match
         """
-
         validated_product_filenames = []
         pattern = re.compile(
             r'(?P<project>OPERA)_(?P<level>L3)_(?P<product_type>DSWx)-(?P<source>NI)_(?P<tile_id>T[^\W_]{5})_'
@@ -81,7 +79,7 @@ class DSWxNIPostProcessorMixin(DSWxS1PostProcessorMixin):
             if pattern.match(output_file.split('/')[-1]):
                 validated_product_filenames.append(output_file)
             else:
-                error_msg = (f"Output file {output_file} does not match the output prodict "
+                error_msg = (f"Output file {output_file} does not match the output predict "
                              f"naming convention.")
                 self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
 
@@ -218,8 +216,6 @@ class DSWxNIPostProcessorMixin(DSWxS1PostProcessorMixin):
         print(f'Running postprocessor for {self._post_mixin_name}')
 
         self._run_sas_qa_executable()
-
-        self._validate_output_product_filenames()
 
         self._validate_output()
         # TODO - stage_output_files()  is only partially implemented
