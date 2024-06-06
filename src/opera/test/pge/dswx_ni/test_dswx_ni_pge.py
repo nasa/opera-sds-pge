@@ -119,7 +119,6 @@ class DswxNIPgeTestCase(unittest.TestCase):
             else:
                 os.system(f"touch {join(self.test_output_dir, band_output_file)}")
 
-    # @unittest.skip("SKIP")
     def test_dswx_ni_pge_execution(self):
         """
         Test execution of the DswxNIExecutor class and its associated mixins
@@ -403,6 +402,7 @@ class DswxNIPgeTestCase(unittest.TestCase):
 
         pge = DSWxNIExecutor(pge_name="DSWxNIPgeTest", runconfig_path=runconfig_path)
 
+        # Running the preprocessor allows the test access to the RunConfig file
         pge.run_preprocessor()
 
         pge._validate_output_product_filenames()

@@ -10,7 +10,7 @@ from NISAR (NI) PGE.
 """
 
 import re
-from os.path import join
+from os.path import basename, join
 
 from opera.pge.base.base_pge import PgeExecutor
 from opera.pge.dswx_s1.dswx_s1_pge import DSWxS1PostProcessorMixin, DSWxS1PreProcessorMixin
@@ -63,10 +63,16 @@ class DSWxNIPostProcessorMixin(DSWxS1PostProcessorMixin):
 
     def _validate_output_product_filenames(self):
         """
-        Test method to verify the regular expression used to
-        validate the output product file names assigned by the SAS
-        This method will validate that the filename has the acceptable name
-        through a regular expression.  If the pattern does not match
+        This method validates output product file names assigned by the SAS
+        via a regular expression.  The output product file names should follow
+        this conventions:
+
+         <PROJECT>_<LEVEL>_<PRODUCT TYPE>_<SOURCE>_<TILE ID>_<ACQUISITION TIMESTAMP>_
+         <CREATION TIMESTAMP>_<SENSOR>_<SPACING>_<PRODUCT VERSION>_<BAND INDEX>_
+         <BAND NAME>_<FILE EXTENSION>
+
+         If the pattern does not match a critical error will cause a RuntimeError.
+
         """
         validated_product_filenames = []
         pattern = re.compile(
@@ -76,9 +82,7 @@ class DSWxNIPostProcessorMixin(DSWxS1PostProcessorMixin):
             r'(?P<band_name>WTR|BWTR|CONF|DIAG)|_BROWSE)?[.](?P<ext>tif|tiff|png)$')
 
         for output_file in self.runconfig.get_output_product_filenames():
-            if pattern.match(output_file.split('/')[-1]):
-                validated_product_filenames.append(output_file)
-            else:
+            if not pattern.match(basename(output_file)):
                 error_msg = (f"Output file {output_file} does not match the output predict "
                              f"naming convention.")
                 self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
