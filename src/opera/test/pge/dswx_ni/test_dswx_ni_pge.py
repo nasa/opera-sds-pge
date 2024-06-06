@@ -447,7 +447,7 @@ class DswxNIPgeTestCase(unittest.TestCase):
         with open(expected_log_file, 'r', encoding='utf-8') as infile:
             log_contents = infile.read()
 
-        self.assertIn('does not match the output predict naming convention.', log_contents)
+        self.assertIn('does not match the output naming convention.', log_contents)
 
         # This time take out the 'Z' in the last entry
         band_data = ('OPERA_L3_DSWx-NI_T12345_20210101T120000Z_20210101T120000Z_LSAR_30_v1.0_B01_WTR.tif',
@@ -472,7 +472,7 @@ class DswxNIPgeTestCase(unittest.TestCase):
         with open(expected_log_file, 'r', encoding='utf-8') as infile:
             log_contents = infile.read()
 
-        self.assertIn('does not match the output predict naming convention.', log_contents)
+        self.assertIn('does not match the output naming convention.', log_contents)
 
 
 if __name__ == "__main__":

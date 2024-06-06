@@ -69,7 +69,7 @@ class DSWxNIPostProcessorMixin(DSWxS1PostProcessorMixin):
 
          <PROJECT>_<LEVEL>_<PRODUCT TYPE>_<SOURCE>_<TILE ID>_<ACQUISITION TIMESTAMP>_
          <CREATION TIMESTAMP>_<SENSOR>_<SPACING>_<PRODUCT VERSION>_<BAND INDEX>_
-         <BAND NAME>_<FILE EXTENSION>
+         <BAND NAME>.<FILE EXTENSION>
 
          If the pattern does not match a critical error will cause a RuntimeError.
 
@@ -83,7 +83,7 @@ class DSWxNIPostProcessorMixin(DSWxS1PostProcessorMixin):
 
         for output_file in self.runconfig.get_output_product_filenames():
             if not pattern.match(basename(output_file)):
-                error_msg = (f"Output file {output_file} does not match the output predict "
+                error_msg = (f"Output file {output_file} does not match the output "
                              f"naming convention.")
                 self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
 
