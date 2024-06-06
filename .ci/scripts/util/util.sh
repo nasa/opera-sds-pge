@@ -103,10 +103,10 @@ copy_pge_files() {
   cp -r ${WORKSPACE}/src/opera/util \
         ${STAGING_DIR}/opera/
 
-  cp -r ${WORKSPACE}/.ci/scripts/${PGE_NAME} \
+  cp -rL ${WORKSPACE}/.ci/scripts/${PGE_NAME} \
         ${STAGING_DIR}/opera/.ci/scripts/
 
-  cp -r ${WORKSPACE}/.ci/scripts/metrics \
+  cp -r  ${WORKSPACE}/.ci/scripts/metrics \
         ${STAGING_DIR}/opera/.ci/scripts/
 
   cp -r ${WORKSPACE}/.ci/scripts/util \
