@@ -21,6 +21,17 @@ PGE_NAME="cslc_s1"
 # 2 - product validation failure
 overall_status=0
 
+# Validate that OUTPUT_DIR and EXPECTED_DIR exist within the container
+if [ ! -d "$OUTPUT_DIR" ]; then
+    echo "Error: Output directory '$OUTPUT_DIR' does not exist." >&2
+    exit 1
+fi
+
+if [ ! -d "$EXPECTED_DIR" ]; then
+    echo "Error: Expected directory '$EXPECTED_DIR' does not exist." >&2
+    exit 1
+fi
+
 initialize_html_results_file "$OUTPUT_DIR" "$PGE_NAME"
 echo "<tr><th>Compare Result</th><th><ul><li>Expected file</li><li>Output file</li></ul></th><th>cslc_s1_compare.py output</th></tr>" >> "$RESULTS_FILE"
 

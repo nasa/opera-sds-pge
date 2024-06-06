@@ -14,6 +14,17 @@ OUTPUT_DIR="/home/rtc_user/output_dir"
 EXPECTED_DIR="/home/rtc_user/expected_output_dir"
 PGE_NAME="rtc_s1"
 
+# Validate that OUTPUT_DIR and EXPECTED_DIR exist within the container
+if [ ! -d "$OUTPUT_DIR" ]; then
+    echo "Error: Output directory '$OUTPUT_DIR' does not exist." >&2
+    exit 1
+fi
+
+if [ ! -d "$EXPECTED_DIR" ]; then
+    echo "Error: Expected directory '$EXPECTED_DIR' does not exist." >&2
+    exit 1
+fi
+
 initialize_html_results_file "$OUTPUT_DIR" "$PGE_NAME"
 
 # overall_status values and their meaning
