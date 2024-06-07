@@ -9,10 +9,11 @@ from NISAR (NI) PGE.
 
 """
 
-from os.path import join
+import re
+from os.path import basename, join
 
 from opera.pge.base.base_pge import PgeExecutor
-from opera.pge.dswx_s1.dswx_s1_pge import DSWxS1PreProcessorMixin, DSWxS1PostProcessorMixin
+from opera.pge.dswx_s1.dswx_s1_pge import DSWxS1PostProcessorMixin, DSWxS1PreProcessorMixin
 from opera.util.error_codes import ErrorCode
 from opera.util.time import get_time_for_filename
 
@@ -59,6 +60,32 @@ class DSWxNIPostProcessorMixin(DSWxS1PostProcessorMixin):
 
     _post_mixin_name = "DSWxNIPostProcessorMixin"
     _cached_core_filename = None
+
+    def _validate_output_product_filenames(self):
+        """
+        This method validates output product file names assigned by the SAS
+        via a regular expression.  The output product file names should follow
+        this conventions:
+
+         <PROJECT>_<LEVEL>_<PRODUCT TYPE>_<SOURCE>_<TILE ID>_<ACQUISITION TIMESTAMP>_
+         <CREATION TIMESTAMP>_<SENSOR>_<SPACING>_<PRODUCT VERSION>_<BAND INDEX>_
+         <BAND NAME>.<FILE EXTENSION>
+
+         If the pattern does not match a critical error will cause a RuntimeError.
+
+        """
+        validated_product_filenames = []
+        pattern = re.compile(
+            r'(?P<project>OPERA)_(?P<level>L3)_(?P<product_type>DSWx)-(?P<source>NI)_(?P<tile_id>T[^\W_]{5})_'
+            r'(?P<acquisition_ts>\d{8}T\d{6}Z)_(?P<creation_ts>\d{8}T\d{6}Z)_(?P<sensor>LSAR)_(?P<spacing>30)_'
+            r'(?P<product_version>v\d+[.]\d+)(_(?P<band_index>B\d{2})_'
+            r'(?P<band_name>WTR|BWTR|CONF|DIAG)|_BROWSE)?[.](?P<ext>tif|tiff|png)$')
+
+        for output_file in self.runconfig.get_output_product_filenames():
+            if not pattern.match(basename(output_file)):
+                error_msg = (f"Output file {output_file} does not match the output "
+                             f"naming convention.")
+                self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
 
     def _ancillary_filename(self):
         """
@@ -193,6 +220,7 @@ class DSWxNIPostProcessorMixin(DSWxS1PostProcessorMixin):
         print(f'Running postprocessor for {self._post_mixin_name}')
 
         self._run_sas_qa_executable()
+
         self._validate_output()
         # TODO - stage_output_files()  is only partially implemented
         self._stage_output_files()

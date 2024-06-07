@@ -285,7 +285,7 @@ class DswxNIPgeTestCase(unittest.TestCase):
 
         primary_executable_group = runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']
 
-        # Set up an input directory empty of .tif files
+        # Set up an output directory with no .tif files
         band_data = ()
         self.generate_band_data_output(band_data, clear=True)
 
@@ -388,6 +388,91 @@ class DswxNIPgeTestCase(unittest.TestCase):
         finally:
             if os.path.exists(test_runconfig_path):
                 os.unlink(test_runconfig_path)
+
+    def test_dswx_ni_pge_validate_output_product_filenames(self):
+        """Test the _validate_output_product_filenames() method in DSWxNIPostProcessorMixin."""
+        # for the nominal test use the output file names from the test runconfig file.
+        runconfig_path = join(self.data_dir, 'test_dswx_ni_config.yaml')
+
+        with open(runconfig_path, 'r', encoding='utf-8') as stream:
+            runconfig_dict = yaml.safe_load(stream)
+
+        with open(runconfig_path, 'w', encoding='utf-8') as outfile:
+            yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+
+        pge = DSWxNIExecutor(pge_name="DSWxNIPgeTest", runconfig_path=runconfig_path)
+
+        # Running the preprocessor allows the test access to the RunConfig file
+        pge.run_preprocessor()
+
+        pge._validate_output_product_filenames()
+
+        # Verify good test data before triggering errors
+        band_data = ('OPERA_L3_DSWx-NI_T12345_20210101T120000Z_20210101T120000Z_LSAR_30_v1.0_B01_WTR.tif',
+                     'OPERA_L3_DSWx-NI_T12345_20210101T120000Z_20210101T120000Z_LSAR_30_v1.0_B02_BWTR.tif',
+                     'OPERA_L3_DSWx-NI_T12345_20210101T120000Z_20210101T120000Z_LSAR_30_v1.0_B03_CONF.tif',
+                     'OPERA_L3_DSWx-NI_T11SLS_20110226T061749Z_20240329T181033Z_LSAR_30_v0.1_B04_DIAG.tif',
+                     'OPERA_L3_DSWx-NI_T12345_20210101T120000Z_20210101T120000Z_LSAR_30_v1.0_BROWSE.tif',
+                     'OPERA_L3_DSWx-NI_T12345_20210101T120000Z_20210101T120000Z_LSAR_30_v1.0_BROWSE.png')
+
+        self.generate_band_data_output(band_data, clear=True)
+
+        pge = DSWxNIExecutor(pge_name="DSWxNIPgeTest", runconfig_path=runconfig_path)
+
+        pge.run_preprocessor()
+
+        pge._validate_output_product_filenames()
+
+        # Change an extension name to an illegal extension
+        band_data = ('OPERA_L3_DSWx-NI_T12345_20210101T120000Z_20210101T120000Z_LSAR_30_v1.0_B01_WTR.jpg',
+                     'OPERA_L3_DSWx-NI_T12345_20210101T120000Z_20210101T120000Z_LSAR_30_v1.0_B02_BWTR.tif',
+                     'OPERA_L3_DSWx-NI_T12345_20210101T120000Z_20210101T120000Z_LSAR_30_v1.0_B03_CONF.tif',
+                     'OPERA_L3_DSWx-NI_T11SLS_20110226T061749Z_20240329T181033Z_LSAR_30_v0.1_B04_DIAG.tif',
+                     'OPERA_L3_DSWx-NI_T12345_20210101T120000Z_20210101T120000Z_LSAR_30_v1.0_BROWSE.tif',
+                     'OPERA_L3_DSWx-NI_T12345_20210101T120000Z_20210101T120000Z_LSAR_30_v1.0_BROWSE.png')
+
+        self.generate_band_data_output(band_data, clear=True)
+
+        pge = DSWxNIExecutor(pge_name="DSWxNIPgeTest", runconfig_path=runconfig_path)
+
+        pge.run_preprocessor()
+
+        with self.assertRaises(RuntimeError):
+            pge._validate_output_product_filenames()
+
+        # Note: the log files exists because the critical() method in the PgeLogger class save it to disk.
+        expected_log_file = pge.logger.get_file_name()
+        self.assertTrue(os.path.exists(expected_log_file))
+
+        with open(expected_log_file, 'r', encoding='utf-8') as infile:
+            log_contents = infile.read()
+
+        self.assertIn('does not match the output naming convention.', log_contents)
+
+        # This time take out the 'Z' in the last entry
+        band_data = ('OPERA_L3_DSWx-NI_T12345_20210101T120000Z_20210101T120000Z_LSAR_30_v1.0_B01_WTR.tif',
+                     'OPERA_L3_DSWx-NI_T12345_20210101T120000Z_20210101T120000Z_LSAR_30_v1.0_B02_BWTR.tif',
+                     'OPERA_L3_DSWx-NI_T12345_20210101T120000Z_20210101T120000Z_LSAR_30_v1.0_B03_CONF.tif',
+                     'OPERA_L3_DSWx-NI_T11SLS_20110226T061749Z_20240329T181033Z_LSAR_30_v0.1_B04_DIAG.tif',
+                     'OPERA_L3_DSWx-NI_T12345_20210101T120000Z_20210101T120000Z_LSAR_30_v1.0_BROWSE.tif',
+                     'OPERA_L3_DSWx-NI_T12345_20210101T120000_20210101T120000_LSAR_30_v1.0_BROWSE.png')
+
+        self.generate_band_data_output(band_data, clear=True)
+
+        pge = DSWxNIExecutor(pge_name="DSWxNIPgeTest", runconfig_path=runconfig_path)
+
+        pge.run_preprocessor()
+
+        with self.assertRaises(RuntimeError):
+            pge._validate_output_product_filenames()
+
+        expected_log_file = pge.logger.get_file_name()
+        self.assertTrue(os.path.exists(expected_log_file))
+
+        with open(expected_log_file, 'r', encoding='utf-8') as infile:
+            log_contents = infile.read()
+
+        self.assertIn('does not match the output naming convention.', log_contents)
 
 
 if __name__ == "__main__":
