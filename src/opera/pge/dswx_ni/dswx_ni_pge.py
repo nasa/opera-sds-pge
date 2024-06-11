@@ -74,7 +74,6 @@ class DSWxNIPostProcessorMixin(DSWxS1PostProcessorMixin):
          If the pattern does not match a critical error will cause a RuntimeError.
 
         """
-        validated_product_filenames = []
         pattern = re.compile(
             r'(?P<project>OPERA)_(?P<level>L3)_(?P<product_type>DSWx)-(?P<source>NI)_(?P<tile_id>T[^\W_]{5})_'
             r'(?P<acquisition_ts>\d{8}T\d{6}Z)_(?P<creation_ts>\d{8}T\d{6}Z)_(?P<sensor>LSAR)_(?P<spacing>30)_'
