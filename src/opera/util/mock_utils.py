@@ -188,6 +188,45 @@ class MockGdal:  # pragma: no cover
             """
             return deepcopy(self.dummy_metadata)
 
+    # pylint: disable=all
+    class MockDSWxNIGdalDataset:
+        """
+        Mock class for gdal.Dataset objects, as returned from an Open call.
+        For use when mocking metadata from DSWx-NI GeoTIFF products
+        """
+
+        def __init__(self):
+            self.dummy_metadata = {
+                'AREA_OR_POINT': 'Area',
+                'CONTACT_INFORMATION': 'operasds@jpl.nasa.gov',
+                'DSWX_PRODUCT_VERSION': '0.1',
+                'INPUT_DEM_SOURCE': 'Copernicus DEM GLO-30 2021 WGS84',
+                'INPUT_HAND_SOURCE': 'ASF HAND GLO30',
+                'INPUT_REFERENCE_WATER_SOURCE': 'JRC Global Surface Water - collection from '
+                                                '1984 to 2021',
+                'INPUT_WORLDCOVER_SOURCE': 'ESA WorldCover 10m 2020 v1.0',
+                'INSTITUTION': 'NASA JPL',
+                'LAYOVER_SHADOW_COVERAGE': '0.0001',
+                'PROCESSING_DATETIME': '2024-01-16T23:13:11Z',
+                'PRODUCT_LEVEL': '3',
+                'PRODUCT_SOURCE': 'L2_NISAR_GCOV',
+                'PRODUCT_TYPE': 'DSWx-NI',
+                'PROJECT': 'OPERA',
+                'SENSOR': 'LSAR',
+                'SENSING_END_TIME': '2023-12-13T12:12:39Z',
+                'SENSING_START_TIME': '2023-12-13T12:12:27Z',
+                'SOFTWARE_VERSION': '0.1',
+                'SPACECRAFT_NAME': 'NISAR',
+                'SPATIAL_COVERAGE': '0.2441'
+            }
+
+        def GetMetadata(self):
+            """
+            Returns a subset of dummy metadata expected by the PGE.
+            This function should be updated as needed for requisite metadata fields.
+            """
+            return deepcopy(self.dummy_metadata)
+
     @staticmethod
     def Open(filename):
         """Mock implementation for gdal.Open. Returns an instance of the mock Dataset."""
@@ -200,6 +239,8 @@ class MockGdal:  # pragma: no cover
 
         if 'dswx_s1' in file_name or 'dswx-s1' in file_name:
             return MockGdal.MockDSWxS1GdalDataset()
+        elif 'dswx_ni' in file_name or 'dswx-ni' in file_name:
+            return MockGdal.MockDSWxNIGdalDataset()
         elif 'rtc_s1' in file_name or 'rtc-s1' in file_name:
             return MockGdal.MockRtcS1GdalDataset()
         else:
