@@ -102,8 +102,7 @@ RunConfig:
         # container, and typically should reference a template file bundled
         # with the opera_pge installation directory within the container
         # Consult the Docker image build scripts for more info
-        # TODO: add once available
-        IsoTemplatePath:
+        IsoTemplatePath: /home/dswx_user/opera/pge/dswx_ni/templates/OPERA_ISO_metadata_L3_DSWx_NI_template.xml.jinja2
 
       QAExecutable:
         # Set to True to enable execution of an additional "Quality Assurance"
