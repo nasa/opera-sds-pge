@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
-
+"""Compare DSWX-HLS products"""
 import argparse
-import numpy as np
 import os
+
+import numpy as np
+
 from osgeo import gdal
 
 COMPARE_DSWX_HLS_PRODUCTS_ERROR_TOLERANCE_ATOL = 1e-6
@@ -16,7 +18,7 @@ PREFIX = ' ' * 7
 
 
 def _get_prefix_str(current_flag, flag_all_ok):
-    """ Return an updated cumulative flag status and an OK/FAIL string for the current flag
+    """Return an updated cumulative flag status and an OK/FAIL string for the current flag
 
     Parameters
     ----------
@@ -56,7 +58,6 @@ def compare_dswx_hls_products(file_1, file_2, metadata_exclude_list):
     flag_all_ok: bool
         Overall comparison status
     """
-
     if not os.path.isfile(file_1):
         print(f'ERROR file not found: {file_1}')
         return False

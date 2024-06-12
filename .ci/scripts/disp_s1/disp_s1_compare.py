@@ -1,13 +1,16 @@
 #!/usr/bin/env python
+"""Compare DISP-S1 products"""
 import argparse
 import logging
 import sys
 from pathlib import Path
 
-import h5py
-import numpy as np
 from dolphin import io
 from dolphin._types import Filename
+
+import h5py
+
+import numpy as np
 from numpy.typing import ArrayLike
 
 logging.basicConfig(level=logging.INFO)
@@ -29,21 +32,25 @@ validation_match = True
 
 
 def validation_failed():
+    """Set flag to indicate validation failure"""
     global validation_match
     validation_match = False
 
 
 def ValidationError(msg):
+    """Handler function for validation failure"""
     logger.error(msg)
     validation_failed()
 
 
 def ComparisonError(msg):
+    """Handler function for comparison failure"""
     logger.error(msg)
     validation_failed()
 
 
 def ValueError(msg):
+    """Handler function for value error"""
     logger.error(msg)
     validation_failed()
 

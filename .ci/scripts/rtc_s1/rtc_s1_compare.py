@@ -1,12 +1,15 @@
 #!/usr/bin/env python
-
-import os
-from osgeo import gdal
+"""Compare RTC-S1 products"""
 import argparse
-import itertools
-import h5py
-import numpy as np
 import glob
+import itertools
+import os
+
+import h5py
+
+import numpy as np
+
+from osgeo import gdal
 
 PASSED_STR = '[PASS] '
 FAILED_STR = '[FAIL]'
@@ -65,24 +68,25 @@ def _get_parser():
 
 
 def _unpack_array(val_in, hdf5_obj_in):
-    '''
+    """
     Unpack the array of array into ordinary numpy array.
     Convert an HDF5 object reference into the path it is pointing to.
 
     For internal use in this script.
 
-    Parameter:
-    -----------
+    Parameter
+    ---------
     val_in: np.ndarray
         numpy array to unpack
     hdf5_obj_in:
         Source HDF5 object of `val_in`
 
-    Return:
+    Return
+    ------
     val_out: np.ndarray
         unpacked array
 
-    '''
+    """
     list_val_in = list(itertools.chain.from_iterable(val_in))
 
     list_val_out = [None] * len(list_val_in)
@@ -97,17 +101,16 @@ def _unpack_array(val_in, hdf5_obj_in):
 
 
 def print_data_difference(val_1, val_2, indent=4):
-    '''
+    """
     Print out the difference of the data whose dimension is >= 1
 
     Parameters
-    -----------
+    ----------
     val_1, val_2: np.array
         Data that has difference to each other
     indent: int
         Number of spaces for indentation
-    '''
-
+    """
     str_indent = ' ' * indent + '-'
 
     # printout the difference
@@ -147,13 +150,13 @@ def print_data_difference(val_1, val_2, indent=4):
     num_pixel_nan_discrepancy = mask_nan_discrepancy.sum()
     index_pixel_nan_discrepancy = np.where(mask_nan_discrepancy)
     print(f'{str_indent} Found {num_pixel_nan_discrepancy} '
-        'NaN inconsistencies between input arrays. '
-        'First index of the discrepancy: '
-        f'[{index_pixel_nan_discrepancy[0][0]}]')
+          'NaN inconsistencies between input arrays. '
+          'First index of the discrepancy: '
+          f'[{index_pixel_nan_discrepancy[0][0]}]')
     print(f'{str_indent} val_1[{index_pixel_nan_discrepancy[0][0]}] = '
-        f'{val_1[index_pixel_nan_discrepancy[0][0]]}')
+          f'{val_1[index_pixel_nan_discrepancy[0][0]]}')
     print(f'{str_indent} val_2[{index_pixel_nan_discrepancy[0][0]}] = '
-        f'{val_2[index_pixel_nan_discrepancy[0][0]]}')
+          f'{val_2[index_pixel_nan_discrepancy[0][0]]}')
 
     # Operations to print out further info regarding the discrapancy
     num_nan_both = np.logical_and(mask_nan_val_1, mask_nan_val_2).sum()
@@ -167,11 +170,10 @@ def print_data_difference(val_1, val_2, indent=4):
 
 
 def get_list_dataset_attrs_keys(hdf_obj_1: h5py.Group,
-                                key_in: str='/',
-                                list_dataset_so_far: list=None,
-                                list_attrs_so_far: list=None):
-
-    '''
+                                key_in: str = '/',
+                                list_dataset_so_far: list = None,
+                                list_attrs_so_far: list = None):
+    r"""
     Recursively traverse the datasets and attributes within the input HDF5 group.
     Returns the list of keys for datasets and attributes.
 
@@ -190,16 +192,15 @@ def get_list_dataset_attrs_keys(hdf_obj_1: h5py.Group,
     list_attrs_so_far: list
         list of the attribute path/keys that have found so far
 
-    Return:
-    -------
+    Return
+    ------
     list_dataset_so_far : list
         List of datasets keys found for given HDF5 group
     list_attrs_so_far : list
         List of attributes found for given HDF5 group.
         Each attribute is identified by its path and key (attribute name).
 
-    '''
-
+    """
     # default values for the lists
     if list_dataset_so_far is None:
         list_dataset_so_far = []
@@ -227,14 +228,14 @@ def get_list_dataset_attrs_keys(hdf_obj_1: h5py.Group,
 def compare_hdf5_elements(hdf5_obj_1, hdf5_obj_2, str_key, is_attr=False,
                           id_key=None, total_key=None,
                           print_passed_element=True,
-                          list_exclude: list=None):
-    '''
+                          list_exclude: list = None):
+    r"""
     Compare the dataset or attribute defined by `str_key`
     NOTE: For attributes, the path and the key are
     separated by newline character ('\n')
 
     Parameters
-    -----------
+    ----------
     hdf5_obj_1: h5py.Group
         The 1st HDF5 object to compare
     hdf5_obj_2: h5py.Group
@@ -245,6 +246,8 @@ def compare_hdf5_elements(hdf5_obj_1, hdf5_obj_2, str_key, is_attr=False,
         Designate if `str_key` is for dataset or attribute
     id_key: int
         index of the key in the list. Optional for printout purpose.
+    total_key: int
+        The total number of unique dataset keys that are common between the 2 files.
     id_key: int
         total number of the list. Optional for printout purpose.
     print_passed_element: bool, default = True
@@ -252,13 +255,10 @@ def compare_hdf5_elements(hdf5_obj_1, hdf5_obj_2, str_key, is_attr=False,
     list_exclude: list(str)
         Absolute paths of the elements to be excluded from the comparison
 
-
-    Return:
-    -------
-    _: True when the dataset / attribute are equivalent; False otherwise
-    '''
-
-
+    Return
+    ------
+       True when the dataset / attribute are equivalent; False otherwise
+    """
     if id_key is None or total_key is None:
         str_order = ''
     else:
@@ -338,7 +338,7 @@ def compare_hdf5_elements(hdf5_obj_1, hdf5_obj_2, str_key, is_attr=False,
                     print(f'{PASSED_STR} ', str_message_data_location)
             else:
                 print(f'{FAILED_STR} ', str_message_data_location)
-                print( '    - numerical scalar. Failed to pass the test. '
+                print('    - numerical scalar. Failed to pass the test. '
                       f'Relative tolerance = {RTC_S1_PRODUCTS_ERROR_REL_TOLERANCE}, '
                       f'Absolute tolerance = {RTC_S1_PRODUCTS_ERROR_ABS_TOLERANCE}')
                 print(f'    - 1st value: {val_1}')
@@ -352,7 +352,7 @@ def compare_hdf5_elements(hdf5_obj_1, hdf5_obj_2, str_key, is_attr=False,
                 print(f'{PASSED_STR} ', str_message_data_location)
         else:
             print(f'{FAILED_STR} ', str_message_data_location)
-            print( '    - non-numerical scalar. Failed to pass the test.')
+            print('     - non-numerical scalar. Failed to pass the test.')
             print(f'    - 1st value: {val_1}')
             print(f'    - 2nd value: {val_2}\n')
         return return_val
@@ -390,7 +390,6 @@ def compare_hdf5_elements(hdf5_obj_1, hdf5_obj_2, str_key, is_attr=False,
             print_data_difference(val_1, val_2)
         return return_val
 
-
     if len(shape_val_1) >= 2:
         return_val = np.allclose(val_1,
                                  val_2,
@@ -415,26 +414,25 @@ def compare_hdf5_elements(hdf5_obj_1, hdf5_obj_2, str_key, is_attr=False,
 
 
 def compare_rtc_hdf5_files(file_1: str, file_2: str,
-                           list_elements_to_exclude: list=None):
-    '''
+                           list_elements_to_exclude: list = None):
+    """
     Compare the two RTC products (in HDF5) if they are equivalent
     within acceptable difference
 
     Parameters
-    -----------
+    ----------
     file_1, file_2: str
         Path to the RTC products (in HDF5)
     list_elements_to_exclude: list(str)
         Absolute paths to the elements to be excluded from the comparison
 
-    Return:
-    -------
-    _: bool
-        `True` if the two products are equivalent; `False` otherwise
+    Return
+    ------
+       bool
+         `True` if the two products are equivalent; `False` otherwise
 
-    '''
-
-    with h5py.File(file_1,'r') as hdf5_in_1, h5py.File(file_2,'r') as hdf5_in_2:
+    """
+    with h5py.File(file_1, 'r') as hdf5_in_1, h5py.File(file_2, 'r') as hdf5_in_2:
         list_dataset_1, list_attrs_1 = get_list_dataset_attrs_keys(hdf5_in_1)
         set_dataset_1 = set(list_dataset_1)
         set_attrs_1 = set(list_attrs_1)
@@ -503,9 +501,9 @@ def compare_rtc_hdf5_files(file_1: str, file_2: str,
             list_dataset_1st_only.sort()
             list_dataset_2nd_only = list(set_dataset_2 - set_dataset_1)
             list_dataset_2nd_only.sort()
-            print('    '+'\n    '.join(list_dataset_1st_only))
+            print('    ' + '\n    '.join(list_dataset_1st_only))
             print('\nIn the 2st HDF5, not in the 1nd data:')
-            print('    '+'\n    '.join(list_dataset_2nd_only))
+            print('    ' + '\n    '.join(list_dataset_2nd_only))
 
         # Print out the attribute structure discrepancy if there are any.
         # Omitting the print out when the dataset structure is not identical
@@ -518,12 +516,12 @@ def compare_rtc_hdf5_files(file_1: str, file_2: str,
                   'Attribute structure not identical.')
             print('In the 1st HDF5, not in the 2nd data:')
             print('\r    ' +
-                  '\r    '.join(list_attrs_1st_only).\
+                  '\r    '.join(list_attrs_1st_only).
                   replace('\n', ',\tattr: ').replace('\r', '\n'))
 
             print('\nIn the 2nd HDF5, not in the 1st data:')
             print('\r    ' +
-                  '\r    '.join(list_attrs_2nd_only).\
+                  '\r    '.join(list_attrs_2nd_only).
                   replace('\n', ',\tattr: ').replace('\r', '\n'))
 
         # Print the test summary
@@ -533,11 +531,11 @@ def compare_rtc_hdf5_files(file_1: str, file_2: str,
         if flag_identical_dataset_structure:
             print(f'    {PASSED_STR} Same dataset structure confirmed.')
         else:
-            print( f'    {FAILED_STR} '
+            print(f'    {FAILED_STR} '
                   f'{len(list_dataset_1st_only)} datasets from the 1st HDF are'
-                   ' not found in the 2nd file.\n'
+                  ' not found in the 2nd file.\n'
                   f'            {len(list_dataset_2nd_only)} datasets from the 2nd HDF are'
-                   ' not found in the 1st file.')
+                  ' not found in the 1st file.')
 
         # Attributes structure
         if flag_identical_attrs_structure:
@@ -545,9 +543,9 @@ def compare_rtc_hdf5_files(file_1: str, file_2: str,
         else:
             print(f'    {FAILED_STR} '
                   f'{len(list_attrs_1st_only)} attributes from the 1st HDF are'
-                   ' not found in the 2nd file.\n'
+                  ' not found in the 2nd file.\n'
                   f'            {len(list_attrs_2nd_only)} attributes from the 2nd HDF are'
-                   ' not found in the 1st file.')
+                  ' not found in the 1st file.')
 
         # Closeness of the common dataset
         if all(list_flag_identical_dataset):
@@ -581,28 +579,29 @@ def compare_rtc_hdf5_files(file_1: str, file_2: str,
 
 
 def _get_prefix_str(flag_same, flag_all_ok):
-    '''
+    """
     Returns the prefix string for a comparison test, either the contents
     of PASSED_STR or the FAILED_STR.
 
     Parameters
-    -----------
+    ----------
     flag_same: bool
         Result of the comparison test
     flag_all_ok: list(bool)
         Mutable list of booleans that will hold the overall test status
 
-    Return:
-    -------
-    _: str
-        Prefix string for the given comparison test
+    Return
+    ------
+       str
+         Prefix string for the given comparison test
 
-    '''
+    """
     flag_all_ok[0] = flag_all_ok[0] and flag_same
     return f'{PASSED_STR} ' if flag_same else f'{FAILED_STR} '
 
 
 def compare_rtc_s1_products(file_1, file_2):
+    """Compare two GeoTIFF files for consistency."""
     if not os.path.isfile(file_1):
         print(f'ERROR file not found: {file_1}')
         return False
@@ -625,7 +624,7 @@ def compare_rtc_s1_products(file_1, file_2):
     nbands_2 = layer_gdal_dataset_2.RasterCount
 
     # compare number of bands
-    flag_same_nbands =  nbands_1 == nbands_2
+    flag_same_nbands = nbands_1 == nbands_2
     flag_same_nbands_str = _get_prefix_str(flag_same_nbands, flag_all_ok)
     prefix = ' ' * 7
     print(f'{flag_same_nbands_str}Comparing number of bands')
@@ -694,8 +693,8 @@ def _compare_rtc_s1_metadata(metadata_1, metadata_2):
     """
     Compare RTC-S1 products' metadata
 
-       Parameters
-       ----------
+    Parameters
+    ----------
        metadata_1 : dict
             Metadata of the first RTC-S1 product
        metadata_2: dict
@@ -749,8 +748,8 @@ def _print_first_value_diff(image_1, image_2, prefix):
     """
     Print first value difference between two images.
 
-       Parameters
-       ----------
+    Parameters
+    ----------
        image_1 : numpy.ndarray
             First input image
        image_2: numpy.ndarray
@@ -782,9 +781,7 @@ def _print_first_value_diff(image_1, image_2, prefix):
 
 
 def main():
-    '''
-    main function of the RTC product comparison script
-    '''
+    """Main function of the RTC product comparison script"""
     parser = _get_parser()
 
     args = parser.parse_args()
@@ -819,7 +816,7 @@ def main():
             print('*** file 1:', file_1)
             print('*** file 2:', file_2)
             print('-------------------------------------------------------')
-            basename= os.path.basename(file_1)
+            basename = os.path.basename(file_1)
             results_dict[basename] = compare_rtc_s1_products(file_1, file_2)
 
     file_list_1 = glob.glob(os.path.join(args.input_dirs[0], '*h5'))
