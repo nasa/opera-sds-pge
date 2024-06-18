@@ -10,7 +10,6 @@ umask 002
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 . "$SCRIPT_DIR"/../util/test_int_util.sh
 
-# TODO: add validation that OUTPUT/EXPECTED exist within container
 OUTPUT_DIR="/home/compass_user/output_dir"
 EXPECTED_DIR="/home/compass_user/expected_output_dir"
 PGE_NAME="cslc_s1"
