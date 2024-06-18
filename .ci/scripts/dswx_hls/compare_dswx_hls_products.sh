@@ -10,10 +10,20 @@ umask 002
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 . "$SCRIPT_DIR"/../util/test_int_util.sh
 
-# TODO: add validation that OUTPUT/EXPECTED exist within container
 OUTPUT_DIR="/home/conda/output_dir"
 EXPECTED_DIR="/home/conda/expected_output_dir"
 PGE_NAME="dswx_hls"
+
+# Validate that OUTPUT_DIR and EXPECTED_DIR exist within the container
+if [ ! -d "$OUTPUT_DIR" ]; then
+    echo "Error: Output directory '$OUTPUT_DIR' does not exist." >&2
+    exit 1
+fi
+
+if [ ! -d "$EXPECTED_DIR" ]; then
+    echo "Error: Expected directory '$EXPECTED_DIR' does not exist." >&2
+    exit 1
+fi
 
 initialize_html_results_file "$OUTPUT_DIR" "$PGE_NAME"
 
