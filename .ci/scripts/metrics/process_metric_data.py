@@ -173,15 +173,16 @@ def make_lists(csv_file):
 
 def main():
     """Main program in process_metric_data.py"""
-    container_info = sys.argv[1]
-    container_name = sys.argv[2]
+    # container_info = sys.argv[1]
+    # container_name = sys.argv[2]
     stats_file = sys.argv[3]
     output_file = sys.argv[4]
 
     temp_stats = "temp_opera_docker_stats.csv"
 
     # Remove lines that may have been recorded before Docker stated.
-    stats_columns = "SECONDS,{{.Name}},CPU,{{.CPUPerc}},MEM,{{.MemUsage}},MEM_PERC,{{.MemPerc}},NET,{{.NetIO}},BLOCK,{{.BlockIO}},PIDS,{{.PIDs}},disk_used,swap_used,total_threads"
+    stats_columns = "SECONDS,{{.Name}},CPU,{{.CPUPerc}},MEM,{{.MemUsage}},MEM_PERC,{{.MemPerc}},NET,{{.NetIO}},BLOCK," \
+                    "{{.BlockIO}},PIDS,{{.PIDs}},disk_used,swap_used,total_threads "
     expected_column_count = len(stats_columns.split(','))
     remove_unwanted_lines(stats_file, temp_stats, expected_column_count)
 
@@ -190,7 +191,8 @@ def main():
 
     if stats_list:
         # Write out the docker stats file
-        output_columns = "Seconds, Name, PIDs, CPU, Memory, MemoryP, NetSend, NetRecv, DiskRead, DiskWrite, Disk, Swap, Threads, LastLogLine"
+        output_columns = "Seconds, Name, PIDs, CPU, Memory, MemoryP, NetSend, NetRecv, DiskRead, DiskWrite, Disk, " \
+                         "Swap, Threads, LastLogLine "
         with open(output_file, 'w') as out_file:
             out_file.write(f"{output_columns}\n")
             for stats_row in stats_list:
@@ -201,6 +203,7 @@ def main():
 
     # Remove temporary files
     os.remove(temp_stats)
+
 
 if __name__ == "__main__":
     main()

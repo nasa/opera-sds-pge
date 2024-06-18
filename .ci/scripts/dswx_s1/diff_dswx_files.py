@@ -25,7 +25,7 @@ def _parse_args():
     if only one argument is given, it gives a warning message and aborts.
 
     Returns
-    --------
+    -------
     result : <-1 if FAIL>
              <0 if HELP>
              <list - string if PASS>
@@ -61,16 +61,16 @@ def get_files(options):
     compares them file by file.
 
     Notes
-    ------
+    -----
     Calls external python script, dswx_comparison.py, to perform the file comparison.
 
     Parameters
-    ------------
+    ----------
     options : <list - string>
        Directory names of expected_dir and output
 
     Returns
-    --------
+    -------
     result : <-1 if FAIL>
          FAILS if number of files in 2 directories are 0, or unequal.
 
@@ -126,6 +126,7 @@ def get_files(options):
 
 
 def main():
+    """Get options and start"""
     options = _parse_args()
     get_files(options)
 

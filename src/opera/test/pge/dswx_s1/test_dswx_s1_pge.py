@@ -156,7 +156,8 @@ class DswxS1PgeTestCase(unittest.TestCase):
                          ['Bare sparse vegetation', 'Urban', 'Moss and lichen'])
         self.assertEqual(runconfig['processing']['masking_ancillary']['land_cover_darkland_extension_list'],
                          ['Grassland', 'Shrubs'])
-        self.assertListEqual(runconfig['processing']['masking_ancillary']['land_cover_water_label'], ['Permanent water bodies'])
+        self.assertListEqual(runconfig['processing']['masking_ancillary']['land_cover_water_label'],
+                             ['Permanent water bodies'])
         self.assertEqual(runconfig['processing']['masking_ancillary']['co_pol_threshold'], -14.6)
         self.assertEqual(runconfig['processing']['masking_ancillary']['cross_pol_threshold'], -22.8)
         self.assertEqual(runconfig['processing']['masking_ancillary']['water_threshold'], 0.05)

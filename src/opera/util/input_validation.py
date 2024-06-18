@@ -139,7 +139,7 @@ def validate_slc_s1_inputs(runconfig, logger, name):
             logger.critical(name, ErrorCode.INVALID_INPUT, error_msg)
 
 
-def get_burst_id_set(input_file_group : list, logger, name) -> set:
+def get_burst_id_set(input_file_group: list, logger, name) -> set:
     """
     Compiles a set of burst_ids from a list of files defined in the runconfig file.
     Each file in the list should have a burst_id in the file name.
@@ -182,8 +182,8 @@ def get_burst_id_set(input_file_group : list, logger, name) -> set:
     return burst_ids
 
 
-def check_disp_s1_ancillary_burst_ids(cslc_input_burst_ids : set,
-                                      ancillary_file_list : list, logger, name):
+def check_disp_s1_ancillary_burst_ids(cslc_input_burst_ids: set,
+                                      ancillary_file_list: list, logger, name):
     # pylint: disable=C0103
     """
     Verify burst_ids from the ancillary input files:
@@ -214,7 +214,7 @@ def check_disp_s1_ancillary_burst_ids(cslc_input_burst_ids : set,
 
     """
     nl, tab, dtab = '\n', '\t', '\t\t'   # used to format log output in fstrings.
-    ancillary_burst_ids : set = get_burst_id_set(ancillary_file_list, logger, name)
+    ancillary_burst_ids: set = get_burst_id_set(ancillary_file_list, logger, name)
 
     # Test none of the ancillary inputs have the same burst ID
     if len(ancillary_burst_ids) != len(ancillary_file_list):
@@ -271,8 +271,8 @@ def get_cslc_input_burst_id_set(cslc_input_file_list, logger, name):
                                              cslc_input_file_list))
     single_input_file_list = list(set(cslc_input_file_list) - set(compressed_input_file_list))
 
-    compressed_file_burst_id_set : set = get_burst_id_set(compressed_input_file_list, logger, name)
-    single_file_burst_id_set : set = get_burst_id_set(single_input_file_list, logger, name)
+    compressed_file_burst_id_set: set = get_burst_id_set(compressed_input_file_list, logger, name)
+    single_file_burst_id_set: set = get_burst_id_set(single_input_file_list, logger, name)
 
     # Case 1:  uncompressed files only in cslc inputs
     if len(compressed_file_burst_id_set) == 0:

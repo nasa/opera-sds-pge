@@ -70,7 +70,7 @@ class DispS1PreProcessorMixin(PreProcessorMixin):
                                              self.logger)
         # TODO gamma version of SAS seems to only support .grb format files,
         #      reenable NetCDF format is ever supported/desired
-        #self.convert_troposphere_model_files()
+        # self.convert_troposphere_model_files()
 
     def convert_troposphere_model_files(self):
         """
@@ -81,7 +81,8 @@ class DispS1PreProcessorMixin(PreProcessorMixin):
         """
         # Retrieve the troposphere weather model file group (if provided) from
         # the run config file
-        troposphere_model_files_list = self.runconfig.sas_config['dynamic_ancillary_file_group'].get('troposphere_files', {})
+        troposphere_model_files_list = \
+            self.runconfig.sas_config['dynamic_ancillary_file_group'].get('troposphere_files', {})
 
         # Converted files will be stored in the scratch directory.
         scratch_dir = self.runconfig.sas_config['product_path_group']['scratch_path']
@@ -395,10 +396,10 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
         level = "L2"
         name = "COMPRESSED-CSLC-S1"
 
-        ccslc_regex = ("compressed_(?P<burst_id>\w{4}_\w{6}_\w{3})_"
-                       "(?P<ref_date>\d{8})_"
-                       "(?P<start_date>\d{8})_"
-                       "(?P<stop_date>\d{8})[.](?P<ext>h5)$")
+        ccslc_regex = (r'compressed_(?P<burst_id>\w{4}_\w{6}_\w{3})_'
+                       r'(?P<ref_date>\d{8})_'
+                       r'(?P<start_date>\d{8})_'
+                       r'(?P<stop_date>\d{8})[.](?P<ext>h5)$')
 
         result = re.match(ccslc_regex, os.path.basename(inter_filename))
 

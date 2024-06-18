@@ -17,8 +17,9 @@ import unittest
 from io import StringIO
 from os.path import abspath, join
 
-import yaml
 from pkg_resources import resource_filename
+
+import yaml
 
 from opera.pge import RunConfig
 from opera.pge.rtc_s1.rtc_s1_pge import RtcS1Executor

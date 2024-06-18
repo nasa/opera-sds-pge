@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-#
-
+"""Compare DSWX products"""
 import argparse
 import os
-import sys
+
 import numpy as np
+
 from osgeo import gdal
 
 COMPARE_DSWX_SAR_PRODUCTS_ERROR_TOLERANCE = 1e-6
@@ -44,14 +44,14 @@ def _print_first_value_diff(image_1, image_2, prefix):
     """
     Print first value difference between two images.
 
-       Parameters
-       ----------
+    Parameters
+    ----------
        image_1 : numpy.ndarray
-            First input image
+          First input image
        image_2: numpy.ndarray
-            Second input image
+          Second input image
        prefix: str
-            Prefix to the message printed to the user
+          Prefix to the message printed to the user
     """
     flag_error_found = False
     for i in range(image_1.shape[0]):
@@ -74,8 +74,8 @@ def _compare_dswx_sar_metadata(metadata_1, metadata_2):
     """
     Compare DSWx-SAR products' metadata
 
-       Parameters
-       ----------
+    Parameters
+    ----------
        metadata_1 : dict
             Metadata of the first DSWx-SAR product
        metadata_2: dict
@@ -122,7 +122,16 @@ def _compare_dswx_sar_metadata(metadata_1, metadata_2):
 
 
 def compare_dswx_sar_products(file_1, file_2):
+    """
+    Compare DSWx-SAR products
 
+    Parameters
+    ----------
+       file_1 : dict
+            First DSWx-SAR product
+       file_2: dict
+            Second DSWx-SAR product
+    """
     if not os.path.isfile(file_1):
         print(f'ERROR file not found: {file_1}')
         return False
@@ -150,7 +159,7 @@ def compare_dswx_sar_products(file_1, file_2):
     nbands_2 = layer_gdal_dataset_2.RasterCount
 
     # compare number of bands
-    flag_same_nbands =  nbands_1 == nbands_2
+    flag_same_nbands = nbands_1 == nbands_2
     flag_same_nbands_str = _get_prefix_str(flag_same_nbands, flag_all_ok)
     prefix = ' ' * 7
     print(f'{flag_same_nbands_str}Comparing number of bands')
@@ -167,7 +176,7 @@ def compare_dswx_sar_products(file_1, file_2):
         image_1 = gdal_band_1.ReadAsArray()
         image_2 = gdal_band_2.ReadAsArray()
         flag_bands_are_equal = np.allclose(
-            image_1, image_2, atol = COMPARE_DSWX_SAR_PRODUCTS_ERROR_TOLERANCE,
+            image_1, image_2, atol=COMPARE_DSWX_SAR_PRODUCTS_ERROR_TOLERANCE,
             equal_nan=True)
         flag_bands_are_equal_str = _get_prefix_str(flag_bands_are_equal,
                                                    flag_all_ok)
@@ -211,6 +220,7 @@ def compare_dswx_sar_products(file_1, file_2):
 
 
 def main():
+    """Parse arguments and compare 2 files"""
     parser = _get_parser()
 
     args = parser.parse_args()
