@@ -14,14 +14,17 @@ import tempfile
 import unittest
 from io import StringIO
 from os.path import abspath, join
+from unittest.mock import patch
 
 from pkg_resources import resource_filename
 
 import yaml
 
+import opera.util.tiff_utils
 from opera.pge import RunConfig
 from opera.pge.dswx_ni.dswx_ni_pge import DSWxNIExecutor
 from opera.util import PgeLogger
+from opera.util.mock_utils import MockGdal
 
 
 class DswxNIPgeTestCase(unittest.TestCase):
@@ -156,6 +159,21 @@ class DswxNIPgeTestCase(unittest.TestCase):
         # Check that a RunConfig for the SAS was isolated within the scratch directory
         expected_sas_config_file = join(pge.runconfig.scratch_path, 'test_dswx_ni_config_sas.yaml')
         self.assertTrue(os.path.exists(expected_sas_config_file))
+
+        # Check that the catalog metadata file was created in the output directory
+        expected_catalog_metadata_file = join(
+            pge.runconfig.output_product_path, pge._catalog_metadata_filename())
+        self.assertTrue(os.path.exists(expected_catalog_metadata_file))
+
+        # Check that the ISO metadata file was created and filled in as expected
+        expected_iso_metadata_file = join(
+            pge.runconfig.output_product_path, pge._iso_metadata_filename(tile_id='T11SLS'))
+        self.assertTrue(os.path.exists(expected_iso_metadata_file))
+
+        with open(expected_iso_metadata_file, 'r', encoding='utf-8') as infile:
+            iso_contents = infile.read()
+
+        self.assertNotIn('!Not found!', iso_contents)
 
         # Check that the log file was created and moved into the output directory
         expected_log_file = pge.logger.get_file_name()
@@ -408,12 +426,12 @@ class DswxNIPgeTestCase(unittest.TestCase):
         pge._validate_output_product_filenames()
 
         # Verify good test data before triggering errors
-        band_data = ('OPERA_L3_DSWx-NI_T12345_20210101T120000Z_20210101T120000Z_LSAR_30_v1.0_B01_WTR.tif',
-                     'OPERA_L3_DSWx-NI_T12345_20210101T120000Z_20210101T120000Z_LSAR_30_v1.0_B02_BWTR.tif',
-                     'OPERA_L3_DSWx-NI_T12345_20210101T120000Z_20210101T120000Z_LSAR_30_v1.0_B03_CONF.tif',
-                     'OPERA_L3_DSWx-NI_T11SLS_20110226T061749Z_20240329T181033Z_LSAR_30_v0.1_B04_DIAG.tif',
-                     'OPERA_L3_DSWx-NI_T12345_20210101T120000Z_20210101T120000Z_LSAR_30_v1.0_BROWSE.tif',
-                     'OPERA_L3_DSWx-NI_T12345_20210101T120000Z_20210101T120000Z_LSAR_30_v1.0_BROWSE.png')
+        band_data = ('OPERA_L3_DSWx-NI_T11SLS_20210101T120000Z_20210101T120000Z_LSAR_30_v1.0_B01_WTR.tif',
+                     'OPERA_L3_DSWx-NI_T11SLS_20210101T120000Z_20210101T120000Z_LSAR_30_v1.0_B02_BWTR.tif',
+                     'OPERA_L3_DSWx-NI_T11SLS_20210101T120000Z_20210101T120000Z_LSAR_30_v1.0_B03_CONF.tif',
+                     'OPERA_L3_DSWx-NI_T11SLS_20210101T120000Z_20210101T120000Z_LSAR_30_v0.1_B04_DIAG.tif',
+                     'OPERA_L3_DSWx-NI_T11SLS_20210101T120000Z_20210101T120000Z_LSAR_30_v1.0_BROWSE.tif',
+                     'OPERA_L3_DSWx-NI_T11SLS_20210101T120000Z_20210101T120000Z_LSAR_30_v1.0_BROWSE.png')
 
         self.generate_band_data_output(band_data, clear=True)
 
@@ -424,12 +442,12 @@ class DswxNIPgeTestCase(unittest.TestCase):
         pge._validate_output_product_filenames()
 
         # Change an extension name to an illegal extension
-        band_data = ('OPERA_L3_DSWx-NI_T12345_20210101T120000Z_20210101T120000Z_LSAR_30_v1.0_B01_WTR.jpg',
-                     'OPERA_L3_DSWx-NI_T12345_20210101T120000Z_20210101T120000Z_LSAR_30_v1.0_B02_BWTR.tif',
-                     'OPERA_L3_DSWx-NI_T12345_20210101T120000Z_20210101T120000Z_LSAR_30_v1.0_B03_CONF.tif',
+        band_data = ('OPERA_L3_DSWx-NI_T11SLS_20210101T120000Z_20210101T120000Z_LSAR_30_v1.0_B01_WTR.jpg',
+                     'OPERA_L3_DSWx-NI_T11SLS_20210101T120000Z_20210101T120000Z_LSAR_30_v1.0_B02_BWTR.tif',
+                     'OPERA_L3_DSWx-NI_T11SLS_20210101T120000Z_20210101T120000Z_LSAR_30_v1.0_B03_CONF.tif',
                      'OPERA_L3_DSWx-NI_T11SLS_20110226T061749Z_20240329T181033Z_LSAR_30_v0.1_B04_DIAG.tif',
-                     'OPERA_L3_DSWx-NI_T12345_20210101T120000Z_20210101T120000Z_LSAR_30_v1.0_BROWSE.tif',
-                     'OPERA_L3_DSWx-NI_T12345_20210101T120000Z_20210101T120000Z_LSAR_30_v1.0_BROWSE.png')
+                     'OPERA_L3_DSWx-NI_T11SLS_20210101T120000Z_20210101T120000Z_LSAR_30_v1.0_BROWSE.tif',
+                     'OPERA_L3_DSWx-NI_T11SLS_20210101T120000Z_20210101T120000Z_LSAR_30_v1.0_BROWSE.png')
 
         self.generate_band_data_output(band_data, clear=True)
 
@@ -450,12 +468,12 @@ class DswxNIPgeTestCase(unittest.TestCase):
         self.assertIn('does not match the output naming convention.', log_contents)
 
         # This time take out the 'Z' in the last entry
-        band_data = ('OPERA_L3_DSWx-NI_T12345_20210101T120000Z_20210101T120000Z_LSAR_30_v1.0_B01_WTR.tif',
-                     'OPERA_L3_DSWx-NI_T12345_20210101T120000Z_20210101T120000Z_LSAR_30_v1.0_B02_BWTR.tif',
-                     'OPERA_L3_DSWx-NI_T12345_20210101T120000Z_20210101T120000Z_LSAR_30_v1.0_B03_CONF.tif',
+        band_data = ('OPERA_L3_DSWx-NI_T11SLS_20210101T120000Z_20210101T120000Z_LSAR_30_v1.0_B01_WTR.tif',
+                     'OPERA_L3_DSWx-NI_T11SLS_20210101T120000Z_20210101T120000Z_LSAR_30_v1.0_B02_BWTR.tif',
+                     'OPERA_L3_DSWx-NI_T11SLS_20210101T120000Z_20210101T120000Z_LSAR_30_v1.0_B03_CONF.tif',
                      'OPERA_L3_DSWx-NI_T11SLS_20110226T061749Z_20240329T181033Z_LSAR_30_v0.1_B04_DIAG.tif',
-                     'OPERA_L3_DSWx-NI_T12345_20210101T120000Z_20210101T120000Z_LSAR_30_v1.0_BROWSE.tif',
-                     'OPERA_L3_DSWx-NI_T12345_20210101T120000_20210101T120000_LSAR_30_v1.0_BROWSE.png')
+                     'OPERA_L3_DSWx-NI_T11SLS_20210101T120000Z_20210101T120000Z_LSAR_30_v1.0_BROWSE.tif',
+                     'OPERA_L3_DSWx-NI_T11SLS_20210101T120000_20210101T120000_LSAR_30_v1.0_BROWSE.png')
 
         self.generate_band_data_output(band_data, clear=True)
 
@@ -474,6 +492,68 @@ class DswxNIPgeTestCase(unittest.TestCase):
 
         self.assertIn('does not match the output naming convention.', log_contents)
 
+    @patch.object(opera.util.tiff_utils, "gdal", MockGdal)
+    def test_iso_metadata_creation(self):
+        """
+        Mock ISO metadata is created when the PGE post processor runs.
+        Successful creation of metadata is verified in test_dswx_s1_pge_execution().
+        This test will verify that error conditions are caught.
+        """
+        runconfig_path = join(self.data_dir, 'test_dswx_ni_config.yaml')
+
+        pge = DSWxNIExecutor(pge_name="DSWxNIPgeTest", runconfig_path=runconfig_path)
+
+        # Run only the pre-processor steps to ingest the runconfig and set
+        # up directories
+        pge.run_preprocessor()
+
+        output_dir = join(os.curdir, 'dswx_ni_pge_test/output_dir')
+        dummy_tif_file = join(
+            output_dir, 'OPERA_L3_DSWx-NI_T11SLS_20110226T061749Z_20240329T181033Z_LSAR_30_v0.1_B01_WTR.tif'
+        )
+
+        with open(dummy_tif_file, 'w') as outfile:
+            outfile.write('dummy dswx data')
+
+        dswx_ni_metadata = pge._collect_dswx_ni_product_metadata(dummy_tif_file)
+
+        # Initialize the core filename for the catalog metadata generation step
+        pge._core_filename()
+
+        # Render ISO metadata using the sample metadata
+        iso_metadata = pge._create_iso_metadata(dswx_ni_metadata)
+
+        # Rendered template should not have any missing placeholders
+        self.assertNotIn('!Not found!', iso_metadata)
+
+        # Test bad iso_template_path
+        test_runconfig_path = join(self.data_dir, 'invalid_dswx_ni_runconfig.yaml')
+
+        with open(runconfig_path, 'r', encoding='utf-8') as infile:
+            runconfig_dict = yaml.safe_load(infile)
+
+        primary_executable = runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']
+        primary_executable['IsoTemplatePath'] = "pge/dswx_ni/templates/OPERA_ISO_metadata_L3_DSWx_NI_template.xml"
+
+        with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+            yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+
+        try:
+            pge = DSWxNIExecutor(pge_name="DswxS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn("Could not load ISO template", log_contents)
+        finally:
+            if os.path.exists(test_runconfig_path):
+                os.unlink(test_runconfig_path)
 
 if __name__ == "__main__":
     unittest.main()
