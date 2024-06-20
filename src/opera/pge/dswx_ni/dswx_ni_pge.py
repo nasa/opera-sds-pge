@@ -326,10 +326,9 @@ class DSWxNIPostProcessorMixin(DSWxS1PostProcessorMixin):
         """
         print(f'Running postprocessor for {self._post_mixin_name}')
 
-        self._run_sas_qa_executable()
-
         self._validate_output()
         self._validate_output_product_filenames()
+        self._run_sas_qa_executable()
         self._stage_output_files()
 
 
