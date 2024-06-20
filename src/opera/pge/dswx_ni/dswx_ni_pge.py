@@ -326,10 +326,9 @@ class DSWxNIPostProcessorMixin(DSWxS1PostProcessorMixin):
         """
         print(f'Running postprocessor for {self._post_mixin_name}')
 
-        self._run_sas_qa_executable()
-
         self._validate_output()
         self._validate_output_product_filenames()
+        self._run_sas_qa_executable()
         self._stage_output_files()
 
 
@@ -346,9 +345,6 @@ class DSWxNIExecutor(DSWxNIPreProcessorMixin, DSWxNIPostProcessorMixin, PgeExecu
 
     LEVEL = "L3"
     """Processing Level for DSWx-NI Products"""
-
-    PGE_VERSION = "4.0.0-er.1.0"
-    """Version of the PGE (overrides default from base_pge)"""
 
     SAS_VERSION = "0.1"
     """Version of the SAS wrapped by this PGE, should be updated as needed"""
