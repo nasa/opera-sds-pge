@@ -228,4 +228,4 @@ RunConfig:
             # Save the full-res GeoTIFF Browse image in addition to the PNG
             save_tif_to_output: True
 
-          log_file: /home/dswx_user/output_dir/dswx-ni.log
+          log_file: /home/dswx_user/scratch_dir/dswx-ni.log
