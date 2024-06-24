@@ -6,15 +6,17 @@
 #
 # usage:
 #     run_metrics.sh <pge_name> <runconfig> <data_dir> <container home> <image name> <image tag> <sample time>
-#     Eg. bash run_metrics.sh  DSWX_HLS_PGE  dswx_hls.yaml  /Users/..../test_datasets  /home/conda  opera/proteus cal_val_3.1 5
+#     Eg. bash run_metrics.sh  DSWX_S1_PGE  dswx_s1.yaml  /tmp/srjb  /home/dswx_user  opera/dswx-s1 cal_val_0.4.2 5
 #
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 . "$SCRIPT_DIR"/../util/test_int_util.sh
 . "$SCRIPT_DIR"/../util/util.sh
 
-# TODO: validate number of provided arguments matches expected,
+# validate number of provided arguments matches expected,
 #       and print help usage (or set defaults) if wrong
+
+parse_args "$@"
 PGE_NAME=$1        # PGE name
 RUNCONFIG=$2       # Runconfig file path
 DATA_DIR=$3        # Directory to get input and write output from PGE
