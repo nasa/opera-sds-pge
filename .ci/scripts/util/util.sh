@@ -1,5 +1,23 @@
 #!/bin/bash
 
+parse_args()
+{
+  if [ $# -eq 1 ]; then 
+     if [ $1 == "--help" ] || [ $1 == "-h" ]; then
+	echo "Usage: $(basename $0) PGE_NAME RUNCONFIG DATA_DIR CONTAINER_HOME PGE_IMAGE PGE_TAG SAMPLE_TIME"
+       	exit 0
+     else
+	echo "$1 is too few arguments"	
+	exit 0
+     fi
+   fi
+   if [ $# -lt 7 ]; then
+	echo "Too few arguments - require 7"
+	echo "Usage: $(basename $0) PGE_NAME RUNCONFIG DATA_DIR CONTAINER_HOME PGE_IMAGE PGE_TAG SAMPLE_TIME"
+        exit 0
+   fi
+}
+
 parse_build_args()
 {
   while [[ $# -gt 0 ]]; do
