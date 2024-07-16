@@ -61,7 +61,7 @@ pipeline {
         stage('Scan image(s) for vulnerabilities'){
             steps{
                 echo "Scanning ${DOCKER_IMAGE_PREFIX} docker images with tag ${DOCKER_TAG} for patchable vulnerabilities"
-                sh label: 'Update Grype DB'
+                sh label: 'Update Grype DB',
                    script: "grype db update"
                 script{
                     DOCKER_IMAGE_SUFFIXES.tokenize(',').each { DOCKER_IMAGE_SUFFIX ->
