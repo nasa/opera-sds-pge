@@ -167,7 +167,7 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
         pattern = re.compile(
             r'(?P<file_id>(?P<project>OPERA)_(?P<level>L3)_(?P<product_type>DSWx)-(?P<source>S1)_'
             r'(?P<tile_id>T[^\W_]{5})_(?P<acquisition_ts>\d{8}T\d{6}Z)_(?P<creation_ts>\d{8}T\d{6}Z)_'
-            r'(?P<sensor>S1A)_(?P<spacing>30)_(?P<product_version>v\d+[.]\d+))(_(?P<band_index>B\d{2})_'
+            r'(?P<sensor>S1A|S1B)_(?P<spacing>30)_(?P<product_version>v\d+[.]\d+))(_(?P<band_index>B\d{2})_'
             r'(?P<band_name>WTR|BWTR|CONF|DIAG)|_BROWSE)?[.](?P<ext>tif|tiff|png)$'
         )
 
@@ -182,6 +182,13 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
                 file_id = match_result.groupdict()['file_id']
 
                 if tile_id not in self._tile_metadata_cache:
+                    dswx_metadata = self._collect_dswx_s1_product_metadata(output_file)
+
+                    # TODO: kludge since SAS hardcodes SPACECRAFT_NAME to "Sentinel-1A/B"
+                    dswx_metadata['SPACECRAFT_NAME'] = ("Sentinel-1A"
+                                                        if match_result.groupdict()['sensor'] == "S1A"
+                                                        else "Sentinel-1B")
+
                     # Cache the metadata for this product for use when generating the ISO XML
                     self._tile_metadata_cache[tile_id] = self._collect_dswx_s1_product_metadata(output_file)
 
@@ -572,14 +579,6 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
         each tile product covered by the input region.
 
         """
-        # Gather the list of output files produced by the SAS
-        output_products = self.runconfig.get_output_product_filenames()
-
-        # For each output file name, assign the final file name matching the
-        # expected conventions
-        for output_product in output_products:
-            self._assign_filename(output_product, self.runconfig.output_product_path)
-
         # Write the catalog metadata to disk with the appropriate filename
         catalog_metadata = self._create_catalog_metadata()
 
@@ -685,6 +684,4 @@ class DSWxS1Executor(DSWxS1PreProcessorMixin, DSWxS1PostProcessorMixin, PgeExecu
 
         # Used in base_pge.py to rename and keep track of files
         # renamed by the PGE
-        self.rename_by_pattern_map = {
-            '*BROWSE*': self._browse_filename
-        }
+        self.rename_by_pattern_map = {}
