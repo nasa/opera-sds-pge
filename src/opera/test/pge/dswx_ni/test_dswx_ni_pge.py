@@ -412,12 +412,6 @@ class DswxNIPgeTestCase(unittest.TestCase):
         # for the nominal test use the output file names from the test runconfig file.
         runconfig_path = join(self.data_dir, 'test_dswx_ni_config.yaml')
 
-        with open(runconfig_path, 'r', encoding='utf-8') as stream:
-            runconfig_dict = yaml.safe_load(stream)
-
-        with open(runconfig_path, 'w', encoding='utf-8') as outfile:
-            yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
-
         pge = DSWxNIExecutor(pge_name="DSWxNIPgeTest", runconfig_path=runconfig_path)
 
         # Running the preprocessor allows the test access to the RunConfig file
