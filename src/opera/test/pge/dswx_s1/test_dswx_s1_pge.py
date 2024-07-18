@@ -300,7 +300,8 @@ class DswxS1PgeTestCase(unittest.TestCase):
         image_files = glob.glob(join(pge.runconfig.output_product_path, "*_B0*.tif"))
 
         for image_file in image_files:
-            file_name = pge._geotiff_filename(image_file)
+            # TODO this was deleted
+            # file_name = pge._geotiff_filename(image_file)
             md = MockGdal.MockDSWxS1GdalDataset().GetMetadata()
             # TODO: kludge since SAS hardcodes SPACECRAFT_NAME to "Sentinel-1A/B"
             md['SPACECRAFT_NAME'] = 'Sentinel-1B'

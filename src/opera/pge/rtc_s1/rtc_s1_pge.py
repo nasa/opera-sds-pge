@@ -954,6 +954,8 @@ class RtcS1Executor(RtcS1PreProcessorMixin, RtcS1PostProcessorMixin, PgeExecutor
     def __init__(self, pge_name, runconfig_path, **kwargs):
         super().__init__(pge_name, runconfig_path, **kwargs)
 
+        # Used in base_pge.py to rename and keep track of files
+        # renamed by the PGE
         self.rename_by_pattern_map = {
             # Note: Order matters here
             "*_VV.tif": self._rtc_geotiff_filename,

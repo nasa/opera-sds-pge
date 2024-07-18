@@ -11,6 +11,7 @@ from Sentinel-1 A/B (S1) PGE.
 
 import glob
 import os.path
+import re
 from datetime import datetime
 from os.path import abspath, basename, dirname, exists, getsize, join, splitext
 
@@ -148,6 +149,46 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
     _tile_metadata_cache = {}
     _tile_filename_cache = {}
 
+    def _validate_output_product_filenames(self):
+        """
+        This method validates output product file names assigned by the SAS
+        via a regular expression. The output product file names should follow
+        this convention:
+
+            <PROJECT>_<LEVEL>_<PRODUCT TYPE>_<SOURCE>_<TILE ID>_<ACQUISITION TIMESTAMP>_
+            <CREATION TIMESTAMP>_<SENSOR>_<SPACING>_<PRODUCT VERSION>_<BAND INDEX>_
+            <BAND NAME>.<FILE EXTENSION>
+
+        If the pattern does not match a critical error will cause a RuntimeError.
+        If the pattern does match, this function will also read the product metadata
+        from the GeoTIFF product, and cache it for later use.
+
+        """
+        pattern = re.compile(
+            r'(?P<file_id>(?P<project>OPERA)_(?P<level>L3)_(?P<product_type>DSWx)-(?P<source>S1)_'
+            r'(?P<tile_id>T[^\W_]{5})_(?P<acquisition_ts>\d{8}T\d{6}Z)_(?P<creation_ts>\d{8}T\d{6}Z)_'
+            r'(?P<sensor>S1A)_(?P<spacing>30)_(?P<product_version>v\d+[.]\d+))(_(?P<band_index>B\d{2})_'
+            r'(?P<band_name>WTR|BWTR|CONF|DIAG)|_BROWSE)?[.](?P<ext>tif|tiff|png)$'
+        )
+
+        for output_file in self.runconfig.get_output_product_filenames():
+            match_result = pattern.match(basename(output_file))
+            if not match_result:
+                error_msg = (f"Output file {output_file} does not match the output "
+                             f"naming convention.")
+                self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
+            else:
+                tile_id = match_result.groupdict()['tile_id']
+                file_id = match_result.groupdict()['file_id']
+
+                if tile_id not in self._tile_metadata_cache:
+                    # Cache the metadata for this product for use when generating the ISO XML
+                    self._tile_metadata_cache[tile_id] = self._collect_dswx_s1_product_metadata(output_file)
+
+                if tile_id not in self._tile_filename_cache:
+                    # Cache the core filename for use when naming the ISO XML file
+                    self._tile_filename_cache[tile_id] = file_id
+
     def _validate_output(self):
         """
         Evaluates the output file(s) generated from SAS execution to ensure:
@@ -207,166 +248,6 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
 
             self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
 
-    def _core_filename(self, inter_filename=None):
-        """
-        Returns the core file name component for products produced by the
-        DSWx-S1 PGE.
-
-        The core file name component of the DSWx-S1 PGE consists of:
-
-        <PROJECT>_<LEVEL>_<PGE NAME>
-
-        Callers of this function are responsible for assignment of any other
-        product-specific fields, such as the file extension.
-
-        Notes
-        -----
-        On first call to this function, the returned core filename is cached
-        for subsequent calls. This allows the core filename to be easily reused
-        across product types without needing to provide inter_filename for each
-        subsequent call.
-
-        Parameters
-        ----------
-        inter_filename : str, optional
-            The intermediate filename of the output product to generate the
-            core filename for. This parameter may be used to inspect the file
-            in order to derive any necessary components of the returned filename.
-            Once the core filename is cached upon first call to this function,
-            this parameter may be omitted.
-
-        Returns
-        -------
-        core_filename : str
-            The core file name component to assign to products created by this PGE.
-
-        """
-        # Check if the core filename has already been generated and cached,
-        # and return it if so
-        if self._cached_core_filename is not None:
-            return self._cached_core_filename
-
-        # Assign the core file name to the cached class attribute
-        self._cached_core_filename = (
-            f"{self.PROJECT}_{self.LEVEL}_{self.NAME}"
-        )
-
-        return self._cached_core_filename
-
-    def _tile_filename(self, inter_filename=None):
-        """
-        Returns the file name to use for MGRS tile-based DSWx products produced
-        by this PGE.
-
-        The filename for the DSWx-S1 tile products consists of:
-
-        <Core filename>_<TILE ID>_<ACQ TIMETAG>_<PROD TIMETAG>_<SENSOR>_<SPACING>_<PRODUCT VERSION>
-
-        Where <Core filename> is returned by DSWxS1PostProcessorMixin._core_filename()
-
-        Callers of this function are responsible for assignment of any other
-        product-specific fields, such as the file extension.
-
-        Parameters
-        ----------
-        inter_filename : str, optional
-            The intermediate filename of the output product to generate the
-            core filename for. This parameter may be used to inspect the file
-            in order to derive any necessary components of the returned filename.
-            Once the core filename is cached upon first call to this function,
-            this parameter may be omitted.
-
-        Returns
-        -------
-        tile_filename : str
-            The filename component to assign to tile-based products created by
-            this PGE.
-
-        """
-        core_filename = self._core_filename(inter_filename)
-
-        # The tile ID should be included within the intermediate filename,
-        # extract it and prepare it for use within the final filename
-        tile_id = basename(inter_filename).split('_')[3]
-
-        if tile_id in self._tile_metadata_cache:
-            dswx_metadata = self._tile_metadata_cache[tile_id]
-        else:
-            # Collect the metadata from the GeoTIFF output product
-            dswx_metadata = self._collect_dswx_s1_product_metadata(inter_filename)
-
-            # TODO: kludge since SAS hardcodes SPACECRAFT_NAME to "Sentinel-1A/B"
-            dswx_metadata['SPACECRAFT_NAME'] = "Sentinel-1A" if "S1A" in inter_filename else "Sentinel-1B"
-
-            self._tile_metadata_cache[tile_id] = dswx_metadata
-
-        spacecraft_name = dswx_metadata['SPACECRAFT_NAME']
-        sensor = get_sensor_from_spacecraft_name(spacecraft_name)
-        pixel_spacing = "30"  # fixed for tile-based products
-
-        acquisition_time = get_time_for_filename(
-            datetime.strptime(dswx_metadata['RTC_SENSING_START_TIME'], '%Y-%m-%dT%H:%M:%SZ')
-        )
-
-        if not acquisition_time.endswith('Z'):
-            acquisition_time = f'{acquisition_time}Z'
-
-        processing_time = get_time_for_filename(
-            datetime.strptime(dswx_metadata['PROCESSING_DATETIME'], '%Y-%m-%dT%H:%M:%SZ')
-        )
-
-        if not processing_time.endswith('Z'):
-            processing_time = f'{processing_time}Z'
-
-        product_version = str(self.runconfig.product_version)
-
-        if not product_version.startswith('v'):
-            product_version = f'v{product_version}'
-
-        tile_filename = (
-            f"{core_filename}_{tile_id}_{acquisition_time}_{processing_time}_"
-            f"{sensor}_{pixel_spacing}_{product_version}"
-        )
-
-        # Cache the file name for this tile ID, so it can be used with the
-        # ISO metadata later.
-        self._tile_filename_cache[tile_id] = tile_filename
-
-        return tile_filename
-
-    def _geotiff_filename(self, inter_filename):
-        """
-        Returns the file name to use for GeoTIFF's produced by the DSWx-S1 PGE.
-
-        The GeoTIFF filename for the DSWx-S1 PGE consists of:
-
-            <Tile filename>_<Band Index>_<Band Name>.tif
-
-        Where <Tile filename> is returned by DSWxS1PostProcessorMixin._tile_filename()
-        and <Band Index> and <Band Name> are determined from the name of the
-        intermediate geotiff file to be renamed.
-
-        Parameters
-        ----------
-        inter_filename : str
-            The intermediate filename of the output GeoTIFF to generate
-            a filename for. This parameter may be used to inspect the file
-            in order to derive any necessary components of the returned filename.
-
-        Returns
-        -------
-        geotiff_filename : str
-            The file name to assign to GeoTIFF product(s) created by this PGE.
-
-        """
-        tile_filename = self._tile_filename(inter_filename)
-
-        # Specific output product band index and name should be the last parts
-        # of the filename before the extension, delimited by underscores
-        band_idx, band_name = splitext(inter_filename)[0].split("_")[-2:]
-
-        return f"{tile_filename}_{band_idx}_{band_name}.tif"
-
     def _browse_filename(self, inter_filename):
         """
         Returns the file name to use for the PNG browse image produced by
@@ -410,7 +291,7 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
         # since we need to extract product metadata to form the correct filename.
         # We can use the first tif file in the list, since they should all have
         # the same metadata.
-        tile_filename = self._tile_filename(tif_files[0])
+        tile_filename = self._tile_filename_cache[tile_id]
 
         # Add the portion specific to browse images
         return f"{tile_filename}_BROWSE{inter_ext}"
@@ -618,11 +499,12 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
             metadata Jinja2 template.
 
         """
+        core_filename = f"{self.PROJECT}_{self.LEVEL}_{self.NAME}"
         custom_metadata = {
-            'ISO_OPERA_FilePackageName': self._core_filename(),
-            'ISO_OPERA_ProducerGranuleId': self._core_filename(),
+            'ISO_OPERA_FilePackageName': core_filename,
+            'ISO_OPERA_ProducerGranuleId': core_filename,
             'MetadataProviderAction': "creation",
-            'GranuleFilename': self._core_filename(),
+            'GranuleFilename': core_filename,
             'ISO_OPERA_ProjectKeywords': ['OPERA', 'JPL', 'DSWx', 'Dynamic', 'Surface', 'Water', 'Extent'],
             'ISO_OPERA_PlatformKeywords': ['S1'],
             'ISO_OPERA_InstrumentKeywords': ['Sentinel 1 A/B']
@@ -773,6 +655,7 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
         """
         self._run_sas_qa_executable()
         self._validate_output()
+        self._validate_output_product_filenames()
         self._stage_output_files()
 
 
@@ -803,6 +686,5 @@ class DSWxS1Executor(DSWxS1PreProcessorMixin, DSWxS1PostProcessorMixin, PgeExecu
         # Used in base_pge.py to rename and keep track of files
         # renamed by the PGE
         self.rename_by_pattern_map = {
-            '*B0*.tif*': self._geotiff_filename,
             '*BROWSE*': self._browse_filename
         }
