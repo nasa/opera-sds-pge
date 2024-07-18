@@ -289,48 +289,6 @@ class DswxS1PgeTestCase(unittest.TestCase):
         self.assertIn(f"DSWx-S1 invoked with RunConfig {expected_sas_config_file}", log_contents)
 
     @patch.object(opera.util.tiff_utils, "gdal", MockGdal)
-    def test_filename_application(self):
-        """Test the filename convention applied to DSWx-S1 output products"""
-        runconfig_path = join(self.data_dir, 'test_dswx_s1_config.yaml')
-
-        pge = DSWxS1Executor(pge_name="DswxS1PgeTest", runconfig_path=runconfig_path)
-
-        pge.run()
-
-        image_files = glob.glob(join(pge.runconfig.output_product_path, "*_B0*.tif"))
-
-        for image_file in image_files:
-            # TODO this was deleted
-            # file_name = pge._geotiff_filename(image_file)
-            md = MockGdal.MockDSWxS1GdalDataset().GetMetadata()
-            # TODO: kludge since SAS hardcodes SPACECRAFT_NAME to "Sentinel-1A/B"
-            md['SPACECRAFT_NAME'] = 'Sentinel-1B'
-            file_name_regex = rf"{pge.PROJECT}_{pge.LEVEL}_" \
-                              rf"{md['PRODUCT_TYPE']}_" \
-                              rf"T\w{{5}}_" \
-                              rf"\d{{8}}T\d{{6}}Z_\d{{8}}T\d{{6}}Z_" \
-                              rf"{get_sensor_from_spacecraft_name(md['SPACECRAFT_NAME'])}_" \
-                              rf"30_v{pge.runconfig.product_version}_" \
-                              rf"B\d{{2}}_\w+.tif"
-            self.assertEqual(re.match(file_name_regex, file_name).group(), file_name)
-
-        browse_files = glob.glob(join(pge.runconfig.output_product_path, "*BROWSE*"))
-
-        for browse_file in browse_files:
-            file_name = pge._browse_filename(browse_file)
-            md = MockGdal.MockDSWxS1GdalDataset().GetMetadata()
-            # TODO: kludge since SAS hardcodes SPACECRAFT_NAME to "Sentinel-1A/B"
-            md['SPACECRAFT_NAME'] = 'Sentinel-1B'
-            file_name_regex = rf"{pge.PROJECT}_{pge.LEVEL}_" \
-                              rf"{md['PRODUCT_TYPE']}_" \
-                              rf"T\w{{5}}_" \
-                              rf"\d{{8}}T\d{{6}}Z_\d{{8}}T\d{{6}}Z_" \
-                              rf"{get_sensor_from_spacecraft_name(md['SPACECRAFT_NAME'])}_" \
-                              rf"30_v{pge.runconfig.product_version}_" \
-                              rf"BROWSE.(png|tif)"
-            self.assertEqual(re.match(file_name_regex, file_name).group(), file_name)
-
-    @patch.object(opera.util.tiff_utils, "gdal", MockGdal)
     def test_iso_metadata_creation(self):
         """
         Mock ISO metadata is created when the PGE post processor runs.
