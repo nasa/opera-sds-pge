@@ -67,13 +67,28 @@ pipeline {
                 sh label: 'Update Grype DB',
                    script: "grype db update"
                 script{
+                    def indexFiles = []
+                    def reportTitles = []
+
                     DOCKER_IMAGE_SUFFIXES.tokenize(',').each { DOCKER_IMAGE_SUFFIX ->
                         echo "Checking ${DOCKER_IMAGE_PREFIX}/${DOCKER_IMAGE_SUFFIX} docker image with tag ${DOCKER_TAG}"
                         sh label: "Check ${DOCKER_IMAGE_PREFIX}/${DOCKER_IMAGE_SUFFIX} OPERA Docker image",
                            script: """
-                           grype ${DOCKER_IMAGE_PREFIX}/${DOCKER_IMAGE_SUFFIX}:$DOCKER_TAG --only-fixed --file test_results/${DOCKER_IMAGE_SUFFIX}_vulnerabilities.json -o json
+                           grype ${DOCKER_IMAGE_PREFIX}/${DOCKER_IMAGE_SUFFIX}:$DOCKER_TAG --only-fixed --file test_results/${DOCKER_IMAGE_SUFFIX}/vulnerabilities.html -o template -t .ci/jenkins/html.tmpl
                            """
+                        //archiveArtifacts artifacts: 'test_results/*_vulnerabilities.json', fingerprint: true
+
+                        indexFiles << test_results/${DOCKER_IMAGE_SUFFIX}/vulnerabilities.html
+                        reportTitles << "${DOCKER_IMAGE_SUFFIX} Vulnerabilities Scan Report"
                     }
+
+                    publishHTML([allowMissing: true,
+                                 alwaysLinkToLastBuild: true,
+                                 keepAll: true,
+                                 reportDir: "test_results",
+                                 reportFiles: indexFiles.join(','),
+                                 reportName: "Vulnerabilities",
+                                 reportTitles: reportTitles.join(',')])
                 }
             }
         }
