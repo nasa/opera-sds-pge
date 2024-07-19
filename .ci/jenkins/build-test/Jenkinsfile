@@ -76,14 +76,6 @@ pipeline {
                     }
 
                     archiveArtifacts artifacts: 'test_results/**/vulnerabilities.html', fingerprint: true
-
-                    // publishHTML([allowMissing: true,
-                    //              alwaysLinkToLastBuild: true,
-                    //              keepAll: true,
-                    //              reportDir: "test_results",
-                    //              reportFiles: indexFiles.join(','),
-                    //              reportName: "Vulnerabilities",
-                    //              reportTitles: reportTitles.join(',')])
                 }
             }
         }
