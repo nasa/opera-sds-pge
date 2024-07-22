@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>opera.pge.dswx_ni.dswx_ni_pge &mdash; opera-sds-pge 4.0.0-er.2.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=ad3cec08"></script>
+        <script src="../../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            opera-sds-pge
+          </a>
+              <div class="version">
+                4.0.0-er.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../readme.html">opera-sds-pge</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">opera</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../authors.html">Credits</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">opera-sds-pge</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">opera.pge.dswx_ni.dswx_ni_pge</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for opera.pge.dswx_ni.dswx_ni_pge</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">==============</span>
+<span class="sd">dswx_ni_pge.py</span>
+<span class="sd">==============</span>
+<span class="sd">Module defining the implementation for the Dynamic Surface Water Extent (DSWX)</span>
+<span class="sd">from NISAR (NI) PGE.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">basename</span><span class="p">,</span> <span class="n">join</span>
+
+<span class="kn">from</span> <span class="nn">opera.pge.base.base_pge</span> <span class="kn">import</span> <span class="n">PgeExecutor</span>
+<span class="kn">from</span> <span class="nn">opera.pge.dswx_s1.dswx_s1_pge</span> <span class="kn">import</span> <span class="n">DSWxS1PostProcessorMixin</span><span class="p">,</span> <span class="n">DSWxS1PreProcessorMixin</span>
+<span class="kn">from</span> <span class="nn">opera.util.error_codes</span> <span class="kn">import</span> <span class="n">ErrorCode</span>
+<span class="kn">from</span> <span class="nn">opera.util.geo_utils</span> <span class="kn">import</span> <span class="n">get_geographic_boundaries_from_mgrs_tile</span>
+<span class="kn">from</span> <span class="nn">opera.util.mock_utils</span> <span class="kn">import</span> <span class="n">MockGdal</span>
+<span class="kn">from</span> <span class="nn">opera.util.time</span> <span class="kn">import</span> <span class="n">get_time_for_filename</span>
+
+
+<div class="viewcode-block" id="DSWxNIPreProcessorMixin"><a class="viewcode-back" href="../../../../opera.pge.dswx_ni.html#opera.pge.dswx_ni.dswx_ni_pge.DSWxNIPreProcessorMixin">[docs]</a><span class="k">class</span> <span class="nc">DSWxNIPreProcessorMixin</span><span class="p">(</span><span class="n">DSWxS1PreProcessorMixin</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Mixin class responsible for handling all pre-processing steps for the DSWX-NI</span>
+<span class="sd">    PGE. The pre-processing phase is defined as all steps necessary prior</span>
+<span class="sd">    to SAS execution.</span>
+
+<span class="sd">    This particular pre-processor inherits its functionality from the DSWx-S1</span>
+<span class="sd">    pre-processor class, as both PGE&#39;s share a similar interface.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_pre_mixin_name</span> <span class="o">=</span> <span class="s2">&quot;DSWxNIPreProcessorMixin&quot;</span>
+    <span class="n">_valid_input_extensions</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;.h5&quot;</span><span class="p">,)</span>
+
+<div class="viewcode-block" id="DSWxNIPreProcessorMixin.run_preprocessor"><a class="viewcode-back" href="../../../../opera.pge.dswx_ni.html#opera.pge.dswx_ni.dswx_ni_pge.DSWxNIPreProcessorMixin.run_preprocessor">[docs]</a>    <span class="k">def</span> <span class="nf">run_preprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Executes the pre-processing steps for DSWx-NI PGE initialization.</span>
+<span class="sd">        The DSWxNIPreProcessorMixin version of this class performs all actions</span>
+<span class="sd">        of the DSWxS1PreProcessorMixin class. Parameterization of the validation</span>
+<span class="sd">        functions is handled via specialized class attributes (i.e. _valid_input_extensions)</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        **kwargs: dict</span>
+<span class="sd">            Any keyword arguments needed by the pre-processor</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">run_preprocessor</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="DSWxNIPostProcessorMixin"><a class="viewcode-back" href="../../../../opera.pge.dswx_ni.html#opera.pge.dswx_ni.dswx_ni_pge.DSWxNIPostProcessorMixin">[docs]</a><span class="k">class</span> <span class="nc">DSWxNIPostProcessorMixin</span><span class="p">(</span><span class="n">DSWxS1PostProcessorMixin</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Mixin class responsible for handling all post-processing steps for the DSWx-NI</span>
+<span class="sd">    PGE. The post-processing phase is defined as all steps required after SAS</span>
+<span class="sd">    execution has completed, prior to handover of output products to PCM.</span>
+<span class="sd">    In addition to the base functionality inherited from PostProcessorMixin, this</span>
+<span class="sd">    mixin adds an output validation step inherited from DSWxS1PostProcessorMixin</span>
+<span class="sd">    to ensure that the output file(s) defined by the RunConfig exist and are</span>
+<span class="sd">    valid.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_post_mixin_name</span> <span class="o">=</span> <span class="s2">&quot;DSWxNIPostProcessorMixin&quot;</span>
+    <span class="n">_cached_core_filename</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">_tile_metadata_cache</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">_tile_filename_cache</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span> <span class="nf">_validate_output_product_filenames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method validates output product file names assigned by the SAS</span>
+<span class="sd">        via a regular expression. The output product file names should follow</span>
+<span class="sd">        this conventions:</span>
+
+<span class="sd">            &lt;PROJECT&gt;_&lt;LEVEL&gt;_&lt;PRODUCT TYPE&gt;_&lt;SOURCE&gt;_&lt;TILE ID&gt;_&lt;ACQUISITION TIMESTAMP&gt;_</span>
+<span class="sd">            &lt;CREATION TIMESTAMP&gt;_&lt;SENSOR&gt;_&lt;SPACING&gt;_&lt;PRODUCT VERSION&gt;_&lt;BAND INDEX&gt;_</span>
+<span class="sd">            &lt;BAND NAME&gt;.&lt;FILE EXTENSION&gt;</span>
+
+<span class="sd">        If the pattern does not match a critical error will cause a RuntimeError.</span>
+<span class="sd">        If the pattern does match, this function will also read the product metadata</span>
+<span class="sd">        from the GeoTIFF product, and cache it for later use.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+            <span class="sa">r</span><span class="s1">&#39;(?P&lt;file_id&gt;(?P&lt;project&gt;OPERA)_(?P&lt;level&gt;L3)_(?P&lt;product_type&gt;DSWx)-(?P&lt;source&gt;NI)_(?P&lt;tile_id&gt;T[^\W_]</span><span class="si">{5}</span><span class="s1">)_&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;(?P&lt;acquisition_ts&gt;\d</span><span class="si">{8}</span><span class="s1">T\d</span><span class="si">{6}</span><span class="s1">Z)_(?P&lt;creation_ts&gt;\d</span><span class="si">{8}</span><span class="s1">T\d</span><span class="si">{6}</span><span class="s1">Z)_(?P&lt;sensor&gt;LSAR)_(?P&lt;spacing&gt;30)_&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;(?P&lt;product_version&gt;v\d+[.]\d+))(_(?P&lt;band_index&gt;B\d</span><span class="si">{2}</span><span class="s1">)_&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;(?P&lt;band_name&gt;WTR|BWTR|CONF|DIAG)|_BROWSE)?[.](?P&lt;ext&gt;tif|tiff|png)$&#39;</span>
+        <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">output_file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">get_output_product_filenames</span><span class="p">():</span>
+            <span class="n">match_result</span> <span class="o">=</span> <span class="n">pattern</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">basename</span><span class="p">(</span><span class="n">output_file</span><span class="p">))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">match_result</span><span class="p">:</span>
+                <span class="n">error_msg</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Output file </span><span class="si">{</span><span class="n">output_file</span><span class="si">}</span><span class="s2"> does not match the output &quot;</span>
+                             <span class="sa">f</span><span class="s2">&quot;naming convention.&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INVALID_OUTPUT</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">tile_id</span> <span class="o">=</span> <span class="n">match_result</span><span class="o">.</span><span class="n">groupdict</span><span class="p">()[</span><span class="s1">&#39;tile_id&#39;</span><span class="p">]</span>
+                <span class="n">file_id</span> <span class="o">=</span> <span class="n">match_result</span><span class="o">.</span><span class="n">groupdict</span><span class="p">()[</span><span class="s1">&#39;file_id&#39;</span><span class="p">]</span>
+
+                <span class="k">if</span> <span class="n">tile_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tile_metadata_cache</span><span class="p">:</span>
+                    <span class="c1"># Cache the metadata for this product for use when generating the ISO XML</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_tile_metadata_cache</span><span class="p">[</span><span class="n">tile_id</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_collect_dswx_ni_product_metadata</span><span class="p">(</span><span class="n">output_file</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">tile_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tile_filename_cache</span><span class="p">:</span>
+                    <span class="c1"># Cache the core filename for use when naming the ISO XML file</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_tile_filename_cache</span><span class="p">[</span><span class="n">tile_id</span><span class="p">]</span> <span class="o">=</span>  <span class="n">file_id</span>
+
+    <span class="k">def</span> <span class="nf">_ancillary_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Helper method to derive the core component of the file names for the</span>
+<span class="sd">        ancillary products associated to a PGE job (catalog metadata, log file,</span>
+<span class="sd">        etc...).</span>
+
+<span class="sd">        The core file name component for DSWx-NI ancillary products consists of:</span>
+
+<span class="sd">        &lt;PROJECT&gt;_&lt;LEVEL&gt;_&lt;PGE NAME&gt;_&lt;PROD TIMETAG&gt;_&lt;SENSOR&gt;_&lt;SPACING&gt;_&lt;PRODUCT VERSION&gt;</span>
+
+<span class="sd">        Since these files are not specific to any particular tile processed for</span>
+<span class="sd">        a DSWx-NI job, fields such as tile ID and acquisition time are omitted from</span>
+<span class="sd">        this file pattern.</span>
+
+<span class="sd">        Also note that this does not include a file extension, which should be</span>
+<span class="sd">        added to the return value of this method by any callers to distinguish</span>
+<span class="sd">        the different formats of ancillary outputs produced by this PGE.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ancillary_filename : str</span>
+<span class="sd">            The file name component to assign to ancillary products created by this PGE.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Metadata fields we need for ancillary file name should be equivalent</span>
+        <span class="c1"># across all tiles, so just take the first set of cached metadata as</span>
+        <span class="c1"># a representative</span>
+        <span class="n">sensor</span> <span class="o">=</span> <span class="s1">&#39;LSAR&#39;</span>  <span class="c1"># fixed for NISAR-based products</span>
+        <span class="n">pixel_spacing</span> <span class="o">=</span> <span class="s2">&quot;30&quot;</span>  <span class="c1"># fixed for tile-based products</span>
+
+        <span class="c1"># TODO - for now, use the PGE production time, but ideally this should</span>
+        <span class="c1">#        eventually match the production time assigned by the SAS, which</span>
+        <span class="c1">#        should be present in the product metadata</span>
+        <span class="n">production_time</span> <span class="o">=</span> <span class="n">get_time_for_filename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">production_datetime</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">production_time</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;Z&#39;</span><span class="p">):</span>
+            <span class="n">production_time</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">production_time</span><span class="si">}</span><span class="s1">Z&#39;</span>
+
+        <span class="n">product_version</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">product_version</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">product_version</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;v&#39;</span><span class="p">):</span>
+            <span class="n">product_version</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;v</span><span class="si">{</span><span class="n">product_version</span><span class="si">}</span><span class="s1">&#39;</span>
+
+        <span class="n">ancillary_filename</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">PROJECT</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">LEVEL</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">NAME</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">production_time</span><span class="si">}</span><span class="s2">_&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sensor</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">pixel_spacing</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">product_version</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">ancillary_filename</span>
+
+    <span class="k">def</span> <span class="nf">_collect_dswx_ni_product_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">geotiff_product</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gathers the available metadata from an output DSWx-NI product for</span>
+<span class="sd">        use in filling out the ISO metadata template for the DSWx-NI PGE.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        geotiff_product : str</span>
+<span class="sd">            Path the GeoTIFF product to collect metadata from.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        output_product_metadata : dict</span>
+<span class="sd">            Dictionary containing DSWx-S1 output product metadata, formatted</span>
+<span class="sd">            for use with the ISO metadata Jinja2 template.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Extract all metadata assigned by the SAS at product creation time</span>
+        <span class="c1"># TODO: current DSWx-NI GeoTIFF products do not contain any metadata</span>
+        <span class="c1">#       so just use the mock set for the time being</span>
+        <span class="n">output_product_metadata</span> <span class="o">=</span> <span class="n">MockGdal</span><span class="o">.</span><span class="n">MockDSWxNIGdalDataset</span><span class="p">()</span><span class="o">.</span><span class="n">GetMetadata</span><span class="p">()</span>
+
+        <span class="c1"># Get the Military Grid Reference System (MGRS) tile code and zone</span>
+        <span class="c1"># identifier from the intermediate file name</span>
+        <span class="n">mgrs_tile_id</span> <span class="o">=</span> <span class="n">basename</span><span class="p">(</span><span class="n">geotiff_product</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="mi">3</span><span class="p">]</span>
+
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;tileCode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mgrs_tile_id</span>
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;zoneIdentifier&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mgrs_tile_id</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
+
+        <span class="c1"># Translate the MGRS tile ID to a lat/lon bounding box</span>
+        <span class="p">(</span><span class="n">lat_min</span><span class="p">,</span>
+         <span class="n">lat_max</span><span class="p">,</span>
+         <span class="n">lon_min</span><span class="p">,</span>
+         <span class="n">lon_max</span><span class="p">)</span> <span class="o">=</span> <span class="n">get_geographic_boundaries_from_mgrs_tile</span><span class="p">(</span><span class="n">mgrs_tile_id</span><span class="p">)</span>
+
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;geospatial_lon_min&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lon_min</span>
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;geospatial_lon_max&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lon_max</span>
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;geospatial_lat_min&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lat_min</span>
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;geospatial_lat_max&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lat_max</span>
+
+        <span class="c1"># Add some fields on the dimensions of the data. These values should</span>
+        <span class="c1"># be the same for all DSWx-NI products, and were derived from the</span>
+        <span class="c1"># ADT product spec</span>
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;xCoordinates&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="mi">3660</span><span class="p">,</span>  <span class="c1"># pixels</span>
+            <span class="s1">&#39;spacing&#39;</span><span class="p">:</span> <span class="mi">30</span>  <span class="c1"># meters/pixel</span>
+        <span class="p">}</span>
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;yCoordinates&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="mi">3660</span><span class="p">,</span>  <span class="c1"># pixels</span>
+            <span class="s1">&#39;spacing&#39;</span><span class="p">:</span> <span class="mi">30</span>  <span class="c1"># meters/pixel</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">output_product_metadata</span>
+
+    <span class="k">def</span> <span class="nf">_create_custom_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates the &quot;custom data&quot; dictionary used with the ISO metadata rendering.</span>
+
+<span class="sd">        Custom data contains all metadata information needed for the ISO template</span>
+<span class="sd">        that is not found within any of the other metadata sources (such as the</span>
+<span class="sd">        RunConfig, output product(s), or catalog metadata).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        custom_metadata : dict</span>
+<span class="sd">            Dictionary containing the custom metadata as expected by the ISO</span>
+<span class="sd">            metadata Jinja2 template.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">custom_metadata</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;ISO_OPERA_FilePackageName&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_core_filename</span><span class="p">(),</span>
+            <span class="s1">&#39;ISO_OPERA_ProducerGranuleId&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_core_filename</span><span class="p">(),</span>
+            <span class="s1">&#39;MetadataProviderAction&#39;</span><span class="p">:</span> <span class="s2">&quot;creation&quot;</span><span class="p">,</span>
+            <span class="s1">&#39;GranuleFilename&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_core_filename</span><span class="p">(),</span>
+            <span class="s1">&#39;ISO_OPERA_ProjectKeywords&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;OPERA&#39;</span><span class="p">,</span> <span class="s1">&#39;JPL&#39;</span><span class="p">,</span> <span class="s1">&#39;DSWx&#39;</span><span class="p">,</span> <span class="s1">&#39;Dynamic&#39;</span><span class="p">,</span> <span class="s1">&#39;Surface&#39;</span><span class="p">,</span> <span class="s1">&#39;Water&#39;</span><span class="p">,</span> <span class="s1">&#39;Extent&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;ISO_OPERA_PlatformKeywords&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;NI&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;ISO_OPERA_InstrumentKeywords&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;NISAR&#39;</span><span class="p">]</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">custom_metadata</span>
+
+    <span class="k">def</span> <span class="nf">_stage_output_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This is not a complete module. It has been reduced so that the .log file</span>
+<span class="sd">        will be saved to disk.</span>
+
+<span class="sd">        Ensures that all output products produced by both the SAS and this PGE</span>
+<span class="sd">        are staged to the output location defined by the RunConfig. This includes</span>
+<span class="sd">        reassignment of file names to meet the file-naming conventions required</span>
+<span class="sd">        by the PGE.</span>
+
+<span class="sd">        In addition to staging of the output products created by the SAS, this</span>
+<span class="sd">        function is also responsible for ensuring the catalog metadata, ISO</span>
+<span class="sd">        metadata, and combined PGE/SAS log are also written to the expected</span>
+<span class="sd">        output product location with the appropriate file names.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Write the catalog metadata to disk with the appropriate filename</span>
+        <span class="n">catalog_metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_catalog_metadata</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">catalog_metadata</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">catalog_metadata</span><span class="o">.</span><span class="n">get_schema_file_path</span><span class="p">()):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Failed to create valid catalog metadata, reason(s):</span><span class="se">\n</span><span class="s2"> </span><span class="si">{</span><span class="n">catalog_metadata</span><span class="o">.</span><span class="n">get_error_msg</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INVALID_CATALOG_METADATA</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+
+        <span class="n">cat_meta_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_catalog_metadata_filename</span><span class="p">()</span>
+        <span class="n">cat_meta_filepath</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">output_product_path</span><span class="p">,</span> <span class="n">cat_meta_filename</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">CREATING_CATALOG_METADATA</span><span class="p">,</span>
+                         <span class="sa">f</span><span class="s2">&quot;Writing Catalog Metadata to </span><span class="si">{</span><span class="n">cat_meta_filepath</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">catalog_metadata</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">cat_meta_filepath</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Failed to write catalog metadata file </span><span class="si">{</span><span class="n">cat_meta_filepath</span><span class="si">}</span><span class="s2">, reason: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">CATALOG_METADATA_CREATION_FAILED</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+
+        <span class="c1"># Generate the ISO metadata for use with product submission to DAAC(s)</span>
+        <span class="c1"># For DSWX-S1, each tile-set is assigned an ISO xml file</span>
+        <span class="k">for</span> <span class="n">tile_id</span><span class="p">,</span> <span class="n">tile_metadata</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tile_metadata_cache</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">iso_metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_iso_metadata</span><span class="p">(</span><span class="n">tile_metadata</span><span class="p">)</span>
+
+            <span class="n">iso_meta_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iso_metadata_filename</span><span class="p">(</span><span class="n">tile_id</span><span class="p">)</span>
+            <span class="n">iso_meta_filepath</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">output_product_path</span><span class="p">,</span> <span class="n">iso_meta_filename</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">iso_metadata</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">RENDERING_ISO_METADATA</span><span class="p">,</span>
+                                 <span class="sa">f</span><span class="s2">&quot;Writing ISO Metadata to </span><span class="si">{</span><span class="n">iso_meta_filepath</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">iso_meta_filepath</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
+                    <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">iso_metadata</span><span class="p">)</span>
+
+        <span class="c1"># Write the QA application log to disk with the appropriate filename,</span>
+        <span class="c1"># if necessary</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">qa_enabled</span><span class="p">:</span>
+            <span class="n">qa_log_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_qa_log_filename</span><span class="p">()</span>
+            <span class="n">qa_log_filepath</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">output_product_path</span><span class="p">,</span> <span class="n">qa_log_filename</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">qa_logger</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">qa_log_filepath</span><span class="p">)</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_finalize_log</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">qa_logger</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Failed to write QA log file to </span><span class="si">{</span><span class="n">qa_log_filepath</span><span class="si">}</span><span class="s2">, reason: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">LOG_FILE_CREATION_FAILED</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+
+        <span class="c1"># Lastly, write the combined PGE/SAS log to disk with the appropriate filename</span>
+        <span class="n">log_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log_filename</span><span class="p">()</span>
+        <span class="n">log_filepath</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">output_product_path</span><span class="p">,</span> <span class="n">log_filename</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">log_filepath</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_finalize_log</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Failed to write log file to </span><span class="si">{</span><span class="n">log_filepath</span><span class="si">}</span><span class="s2">, reason: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+
+            <span class="c1"># Log stream might be closed by this point so raise an Exception instead</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+<div class="viewcode-block" id="DSWxNIPostProcessorMixin.run_postprocessor"><a class="viewcode-back" href="../../../../opera.pge.dswx_ni.html#opera.pge.dswx_ni.dswx_ni_pge.DSWxNIPostProcessorMixin.run_postprocessor">[docs]</a>    <span class="k">def</span> <span class="nf">run_postprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Executes the post-processing steps for the DSWx-NI PGE.</span>
+<span class="sd">        The DSWxNIPostProcessorMixin version of this method performs the same</span>
+<span class="sd">        steps as the base PostProcessorMixin, but inserts a step to perform</span>
+<span class="sd">        output product validation (inherited from DSWxS1PostProcessorMixin) prior</span>
+<span class="sd">        to staging and renaming of the output files (partially developed).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        **kwargs: dict</span>
+<span class="sd">            Any keyword arguments needed by the post-processor</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Running postprocessor for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_post_mixin_name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_output</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_output_product_filenames</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_run_sas_qa_executable</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stage_output_files</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="DSWxNIExecutor"><a class="viewcode-back" href="../../../../opera.pge.dswx_ni.html#opera.pge.dswx_ni.dswx_ni_pge.DSWxNIExecutor">[docs]</a><span class="k">class</span> <span class="nc">DSWxNIExecutor</span><span class="p">(</span><span class="n">DSWxNIPreProcessorMixin</span><span class="p">,</span> <span class="n">DSWxNIPostProcessorMixin</span><span class="p">,</span> <span class="n">PgeExecutor</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Main class for execution of the DSWx-NI PGE, including the SAS layer.</span>
+<span class="sd">    This class essentially rolls up the DSWx-specific pre- and post-processor</span>
+<span class="sd">    functionality, while inheriting all other functionality for setup and execution</span>
+<span class="sd">    of the SAS from the base PgeExecutor class.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">NAME</span> <span class="o">=</span> <span class="s2">&quot;DSWx-NI&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Short name for the DSWx-NI PGE&quot;&quot;&quot;</span>
+
+    <span class="n">LEVEL</span> <span class="o">=</span> <span class="s2">&quot;L3&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Processing Level for DSWx-NI Products&quot;&quot;&quot;</span>
+
+    <span class="n">SAS_VERSION</span> <span class="o">=</span> <span class="s2">&quot;0.1&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Version of the SAS wrapped by this PGE, should be updated as needed&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pge_name</span><span class="p">,</span> <span class="n">runconfig_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">pge_name</span><span class="p">,</span> <span class="n">runconfig_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">rename_by_pattern_map</span> <span class="o">=</span> <span class="p">{}</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021-2023 California Institute of Technology.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
