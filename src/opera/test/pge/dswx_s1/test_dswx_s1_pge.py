@@ -286,6 +286,7 @@ class DswxS1PgeTestCase(unittest.TestCase):
 
         self.assertIn(f"DSWx-S1 invoked with RunConfig {expected_sas_config_file}", log_contents)
 
+    @patch.object(opera.util.tiff_utils, "gdal", MockGdal)
     def test_dswx_s1_pge_validate_output_product_filenames(self):
         """Test the _validate_output_product_filenames() method in DSWxS1PostProcessorMixin."""
         # for the nominal test use the output file names from the test runconfig file.

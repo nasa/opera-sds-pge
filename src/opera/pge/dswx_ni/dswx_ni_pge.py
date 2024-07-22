@@ -224,9 +224,10 @@ class DSWxNIPostProcessorMixin(DSWxS1PostProcessorMixin):
             metadata Jinja2 template.
 
         """
-        core_filename = f"{self.PROJECT}_{self .LEVEL}_{self.NAME}"
+        core_filename = f"{self.PROJECT}_{self.LEVEL}_{self.NAME}"
+
         custom_metadata = {
-            'ISO_OPERA_FilePackageName': self._core_filename,
+            'ISO_OPERA_FilePackageName': core_filename,
             'ISO_OPERA_ProducerGranuleId': core_filename,
             'MetadataProviderAction': "creation",
             'GranuleFilename': core_filename,
@@ -324,9 +325,9 @@ class DSWxNIPostProcessorMixin(DSWxS1PostProcessorMixin):
         """
         print(f'Running postprocessor for {self._post_mixin_name}')
 
-        self._run_sas_qa_executable()
         self._validate_output()
         self._validate_output_product_filenames()
+        self._run_sas_qa_executable()
         self._stage_output_files()
 
 

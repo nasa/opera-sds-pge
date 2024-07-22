@@ -457,6 +457,7 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
 
         """
         core_filename = f"{self.PROJECT}_{self.LEVEL}_{self.NAME}"
+
         custom_metadata = {
             'ISO_OPERA_FilePackageName': core_filename,
             'ISO_OPERA_ProducerGranuleId': core_filename,
@@ -602,9 +603,9 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
             Any keyword arguments needed by the post-processor
 
         """
-        self._run_sas_qa_executable()
         self._validate_output()
         self._validate_output_product_filenames()
+        self._run_sas_qa_executable()
         self._stage_output_files()
 
 
