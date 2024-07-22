@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Vulnerability Report</title>
+
+    <!-- Template Metadata-->
+    <meta name="author" content="grype">
+    <meta name="version" content="1.0.0">
+</head>
+{{/* Initialize counters */}}
+{{- $CountCritical := 0 }}
+{{- $CountHigh := 0 }}
+{{- $CountMedium := 0 }}
+{{- $CountLow := 0}}
+{{- $CountUnknown := 0 }}
+
+{{/* Create a list */}}
+{{- $FilteredMatches := list }}
+
+{{/* Loop through all vulns limit output and set count*/}}
+{{- range $vuln := .Matches }}
+    {{/* Use this filter to exclude severity if needed */}}
+    {{- if or (eq $vuln.Vulnerability.Severity "Critical") (eq $vuln.Vulnerability.Severity "High") (eq $vuln.Vulnerability.Severity "Medium") (eq $vuln.Vulnerability.Severity "Low") (eq $vuln.Vulnerability.Severity "Unknown") }}
+        {{- $FilteredMatches = append $FilteredMatches $vuln }}
+        {{- if eq $vuln.Vulnerability.Severity "Critical" }}
+            {{- $CountCritical = add $CountCritical 1 }}
+        {{- else if eq $vuln.Vulnerability.Severity "High" }}
+            {{- $CountHigh = add $CountHigh 1 }}
+        {{- else if eq $vuln.Vulnerability.Severity "Medium" }}
+            {{- $CountMedium = add $CountMedium 1 }}
+        {{- else if eq $vuln.Vulnerability.Severity "Low" }}
+            {{- $CountLow = add $CountLow 1 }}
+        {{- else }}
+            {{- $CountUnknown = add $CountUnknown 1 }}
+        {{- end }}
+    {{- end }}
+{{- end }}
+
+<body>
+    <h1>Container Vulnerability Report</h1>
+    <p><strong>Name:</strong> {{- if eq (.Source.Type) "image" -}} {{.Source.Target.UserInput}}
+        {{- else if eq (.Source.Type) "directory" -}} {{.Source.Target}}
+        {{- else if eq (.Source.Type) "file" -}} {{.Source.Target}}
+        {{- else -}} unknown
+        {{- end -}}</p>
+    <p><strong>Type:</strong> {{ .Source.Type }}</p>
+    <p><strong>Date:</strong> <span>{{.Descriptor.Timestamp}}</span></p>
+    <table style="width:100%">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Version</th>
+                <th>Type</th>
+                <th>Vulnerability</th>
+                <th>Severity</th>
+                <th>State</th>
+                <th>Fixed In</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{- range $FilteredMatches }}
+            <tr>
+                <td>{{.Artifact.Name}}</td>
+                <td>{{.Artifact.Version}}</td>
+                <td>{{.Artifact.Type}}</td>
+                <td>
+                    <a href="{{.Vulnerability.DataSource}}">{{.Vulnerability.ID}}</a>
+                </td>
+                <td>{{.Vulnerability.Severity}}</td>
+                <td>{{.Vulnerability.Fix.State}}</td>
+                <td>
+                    {{- if .Vulnerability.Fix.Versions }}
+                    <ul>
+                        {{- range .Vulnerability.Fix.Versions }}
+                        <li>{{ . }}</li>
+                        {{- end }}
+                    </ul>
+                    {{- else }}
+                    N/A
+                    {{- end }}
+                </td>
+            </tr>
+            {{end}}
+        </tbody>
+    </table>
+</body>
+
+</html>

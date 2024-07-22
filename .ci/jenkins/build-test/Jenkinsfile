@@ -58,6 +58,27 @@ pipeline {
                 }
             }
         }
+        stage('Scan image(s) for vulnerabilities'){
+            environment{
+                TMPDIR = '/data/tmp'
+            }
+            steps{
+                echo "Scanning ${DOCKER_IMAGE_PREFIX} docker images with tag ${DOCKER_TAG} for patchable vulnerabilities"
+                sh label: 'Update Grype DB',
+                   script: "grype db update"
+                script{
+                    DOCKER_IMAGE_SUFFIXES.tokenize(',').each { DOCKER_IMAGE_SUFFIX ->
+                        echo "Checking ${DOCKER_IMAGE_PREFIX}/${DOCKER_IMAGE_SUFFIX} docker image with tag ${DOCKER_TAG}"
+                        sh label: "Check ${DOCKER_IMAGE_PREFIX}/${DOCKER_IMAGE_SUFFIX} OPERA Docker image",
+                           script: """
+                           grype ${DOCKER_IMAGE_PREFIX}/${DOCKER_IMAGE_SUFFIX}:$DOCKER_TAG --only-fixed -o template -t .ci/jenkins/grype_html.tmpl --file test_results/${DOCKER_IMAGE_SUFFIX}/grype_vulnerabilities.html
+                           """
+                    }
+
+                    archiveArtifacts artifacts: 'test_results/**/grype_vulnerabilities.html', fingerprint: true
+                }
+            }
+        }
     }
     post {
         always {
