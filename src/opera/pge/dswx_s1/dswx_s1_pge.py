@@ -9,11 +9,9 @@ from Sentinel-1 A/B (S1) PGE.
 
 """
 
-import glob
-import os.path
 import re
 from datetime import datetime
-from os.path import abspath, basename, dirname, exists, getsize, join, splitext
+from os.path import abspath, basename, exists, getsize, join, splitext
 
 import opera.util.input_validation as input_validation
 from opera.pge.base.base_pge import PgeExecutor
@@ -254,54 +252,6 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
                         f"band: {num_bands}"
 
             self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
-
-    def _browse_filename(self, inter_filename):
-        """
-        Returns the file name to use for the PNG browse image produced by
-        the DSWx-S1 PGE.
-
-        The browse image filename for the DSWx-S1 PGE consists of:
-
-            <Tile filename>_BROWSE.png
-
-        Where <Tile filename> is returned by DSWxS1PostProcessorMixin._tile_filename().
-
-        Parameters
-        ----------
-        inter_filename : str
-            The intermediate filename of the output browse image from which to
-            generate a filename. This parameter may be used to inspect the
-            file in order to derive any necessary components of the returned filename.
-
-        Returns
-        -------
-        browse_image_filename : str
-            The file name to assign to browse image created by this PGE.
-
-        """
-        # Save the extension of the intermediate filename
-        inter_ext = os.path.splitext(inter_filename)[-1]
-
-        # Find one of the tif files corresponding to the provided browse image
-        # based on the tile ID
-        tile_id = basename(inter_filename).split('_')[3]
-
-        tif_pattern = f"*{tile_id}*.tif*"
-
-        tif_files = list(glob.glob(join(dirname(inter_filename), tif_pattern)))
-
-        if not len(tif_files):
-            error_msg = f"Could not find any .tif files corresponding to browse image {inter_filename}"
-            self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
-
-        # Now we derive the core (tile) filename using the tif file(s) we located,
-        # since we need to extract product metadata to form the correct filename.
-        # We can use the first tif file in the list, since they should all have
-        # the same metadata.
-        tile_filename = self._tile_filename_cache[tile_id]
-
-        # Add the portion specific to browse images
-        return f"{tile_filename}_BROWSE{inter_ext}"
 
     def _ancillary_filename(self):
         """
