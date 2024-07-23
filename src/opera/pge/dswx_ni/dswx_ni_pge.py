@@ -69,7 +69,7 @@ class DSWxNIPostProcessorMixin(DSWxS1PostProcessorMixin):
         """
         This method validates output product file names assigned by the SAS
         via a regular expression. The output product file names should follow
-        this conventions:
+        this convention:
 
             <PROJECT>_<LEVEL>_<PRODUCT TYPE>_<SOURCE>_<TILE ID>_<ACQUISITION TIMESTAMP>_
             <CREATION TIMESTAMP>_<SENSOR>_<SPACING>_<PRODUCT VERSION>_<BAND INDEX>_
@@ -81,9 +81,9 @@ class DSWxNIPostProcessorMixin(DSWxS1PostProcessorMixin):
 
         """
         pattern = re.compile(
-            r'(?P<file_id>(?P<project>OPERA)_(?P<level>L3)_(?P<product_type>DSWx)-(?P<source>NI)_(?P<tile_id>T[^\W_]{5})_'
-            r'(?P<acquisition_ts>\d{8}T\d{6}Z)_(?P<creation_ts>\d{8}T\d{6}Z)_(?P<sensor>LSAR)_(?P<spacing>30)_'
-            r'(?P<product_version>v\d+[.]\d+))(_(?P<band_index>B\d{2})_'
+            r'(?P<file_id>(?P<project>OPERA)_(?P<level>L3)_(?P<product_type>DSWx)-(?P<source>NI)_'
+            r'(?P<tile_id>T[^\W_]{5})_(?P<acquisition_ts>\d{8}T\d{6}Z)_(?P<creation_ts>\d{8}T\d{6}Z)_'
+            r'(?P<sensor>LSAR)_(?P<spacing>30)_(?P<product_version>v\d+[.]\d+))(_(?P<band_index>B\d{2})_'
             r'(?P<band_name>WTR|BWTR|CONF|DIAG)|_BROWSE)?[.](?P<ext>tif|tiff|png)$'
         )
 
@@ -103,7 +103,7 @@ class DSWxNIPostProcessorMixin(DSWxS1PostProcessorMixin):
 
                 if tile_id not in self._tile_filename_cache:
                     # Cache the core filename for use when naming the ISO XML file
-                    self._tile_filename_cache[tile_id] =  file_id
+                    self._tile_filename_cache[tile_id] = file_id
 
     def _ancillary_filename(self):
         """
@@ -224,11 +224,13 @@ class DSWxNIPostProcessorMixin(DSWxS1PostProcessorMixin):
             metadata Jinja2 template.
 
         """
+        core_filename = f"{self.PROJECT}_{self.LEVEL}_{self.NAME}"
+
         custom_metadata = {
-            'ISO_OPERA_FilePackageName': self._core_filename(),
-            'ISO_OPERA_ProducerGranuleId': self._core_filename(),
+            'ISO_OPERA_FilePackageName': core_filename,
+            'ISO_OPERA_ProducerGranuleId': core_filename,
             'MetadataProviderAction': "creation",
-            'GranuleFilename': self._core_filename(),
+            'GranuleFilename': core_filename,
             'ISO_OPERA_ProjectKeywords': ['OPERA', 'JPL', 'DSWx', 'Dynamic', 'Surface', 'Water', 'Extent'],
             'ISO_OPERA_PlatformKeywords': ['NI'],
             'ISO_OPERA_InstrumentKeywords': ['NISAR']
@@ -238,9 +240,6 @@ class DSWxNIPostProcessorMixin(DSWxS1PostProcessorMixin):
 
     def _stage_output_files(self):
         """
-        This is not a complete module. It has been reduced so that the .log file
-        will be saved to disk.
-
         Ensures that all output products produced by both the SAS and this PGE
         are staged to the output location defined by the RunConfig. This includes
         reassignment of file names to meet the file-naming conventions required

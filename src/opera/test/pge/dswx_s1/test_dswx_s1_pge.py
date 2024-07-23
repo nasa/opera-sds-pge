@@ -9,7 +9,6 @@ Unit tests for the pge/dswx_s1/dswx_s1_pge.py module.
 
 import glob
 import os
-import re
 import shutil
 import tempfile
 import unittest
@@ -25,7 +24,6 @@ import opera.util.tiff_utils
 from opera.pge import RunConfig
 from opera.pge.dswx_s1.dswx_s1_pge import DSWxS1Executor
 from opera.util import PgeLogger
-from opera.util.dataset_utils import get_sensor_from_spacecraft_name
 from opera.util.mock_utils import MockGdal
 
 
@@ -289,45 +287,84 @@ class DswxS1PgeTestCase(unittest.TestCase):
         self.assertIn(f"DSWx-S1 invoked with RunConfig {expected_sas_config_file}", log_contents)
 
     @patch.object(opera.util.tiff_utils, "gdal", MockGdal)
-    def test_filename_application(self):
-        """Test the filename convention applied to DSWx-S1 output products"""
+    def test_dswx_s1_pge_validate_output_product_filenames(self):
+        """Test the _validate_output_product_filenames() method in DSWxS1PostProcessorMixin."""
+        # for the nominal test use the output file names from the test runconfig file.
         runconfig_path = join(self.data_dir, 'test_dswx_s1_config.yaml')
 
-        pge = DSWxS1Executor(pge_name="DswxS1PgeTest", runconfig_path=runconfig_path)
+        pge = DSWxS1Executor(pge_name="DSWxS1PgeTest", runconfig_path=runconfig_path)
 
-        pge.run()
+        # Running the preprocessor allows the test access to the RunConfig file
+        pge.run_preprocessor()
 
-        image_files = glob.glob(join(pge.runconfig.output_product_path, "*_B0*.tif"))
+        pge._validate_output_product_filenames()
 
-        for image_file in image_files:
-            file_name = pge._geotiff_filename(image_file)
-            md = MockGdal.MockDSWxS1GdalDataset().GetMetadata()
-            # TODO: kludge since SAS hardcodes SPACECRAFT_NAME to "Sentinel-1A/B"
-            md['SPACECRAFT_NAME'] = 'Sentinel-1B'
-            file_name_regex = rf"{pge.PROJECT}_{pge.LEVEL}_" \
-                              rf"{md['PRODUCT_TYPE']}_" \
-                              rf"T\w{{5}}_" \
-                              rf"\d{{8}}T\d{{6}}Z_\d{{8}}T\d{{6}}Z_" \
-                              rf"{get_sensor_from_spacecraft_name(md['SPACECRAFT_NAME'])}_" \
-                              rf"30_v{pge.runconfig.product_version}_" \
-                              rf"B\d{{2}}_\w+.tif"
-            self.assertEqual(re.match(file_name_regex, file_name).group(), file_name)
+        # Verify good test data before triggering errors
+        band_data = ('OPERA_L3_DSWx-S1_T11SLS_20210101T120000Z_20210101T120000Z_S1A_30_v1.0_B01_WTR.tif',
+                     'OPERA_L3_DSWx-S1_T11SLS_20210101T120000Z_20210101T120000Z_S1A_30_v1.0_B02_BWTR.tif',
+                     'OPERA_L3_DSWx-S1_T11SLS_20210101T120000Z_20210101T120000Z_S1A_30_v1.0_B03_CONF.tif',
+                     'OPERA_L3_DSWx-S1_T11SLS_20210101T120000Z_20210101T120000Z_S1A_30_v0.1_B04_DIAG.tif',
+                     'OPERA_L3_DSWx-S1_T11SLS_20210101T120000Z_20210101T120000Z_S1A_30_v1.0_BROWSE.tif',
+                     'OPERA_L3_DSWx-S1_T11SLS_20210101T120000Z_20210101T120000Z_S1A_30_v1.0_BROWSE.png')
 
-        browse_files = glob.glob(join(pge.runconfig.output_product_path, "*BROWSE*"))
+        self.generate_band_data_output(band_data, clear=True)
 
-        for browse_file in browse_files:
-            file_name = pge._browse_filename(browse_file)
-            md = MockGdal.MockDSWxS1GdalDataset().GetMetadata()
-            # TODO: kludge since SAS hardcodes SPACECRAFT_NAME to "Sentinel-1A/B"
-            md['SPACECRAFT_NAME'] = 'Sentinel-1B'
-            file_name_regex = rf"{pge.PROJECT}_{pge.LEVEL}_" \
-                              rf"{md['PRODUCT_TYPE']}_" \
-                              rf"T\w{{5}}_" \
-                              rf"\d{{8}}T\d{{6}}Z_\d{{8}}T\d{{6}}Z_" \
-                              rf"{get_sensor_from_spacecraft_name(md['SPACECRAFT_NAME'])}_" \
-                              rf"30_v{pge.runconfig.product_version}_" \
-                              rf"BROWSE.(png|tif)"
-            self.assertEqual(re.match(file_name_regex, file_name).group(), file_name)
+        pge = DSWxS1Executor(pge_name="DSWxS1PgeTest", runconfig_path=runconfig_path)
+
+        pge.run_preprocessor()
+
+        pge._validate_output_product_filenames()
+
+        # Change an extension name to an illegal extension
+        band_data = ('OPERA_L3_DSWx-S1_T11SLS_20210101T120000Z_20210101T120000Z_S1A_30_v1.0_B01_WTR.jpg',
+                     'OPERA_L3_DSWx-S1_T11SLS_20210101T120000Z_20210101T120000Z_S1A_30_v1.0_B02_BWTR.tif',
+                     'OPERA_L3_DSWx-S1_T11SLS_20210101T120000Z_20210101T120000Z_S1A_30_v1.0_B03_CONF.tif',
+                     'OPERA_L3_DSWx-S1_T11SLS_20110226T061749Z_20240329T181033Z_S1A_30_v0.1_B04_DIAG.tif',
+                     'OPERA_L3_DSWx-S1_T11SLS_20210101T120000Z_20210101T120000Z_S1A_30_v1.0_BROWSE.tif',
+                     'OPERA_L3_DSWx-S1_T11SLS_20210101T120000Z_20210101T120000Z_S1A_30_v1.0_BROWSE.png')
+
+        self.generate_band_data_output(band_data, clear=True)
+
+        pge = DSWxS1Executor(pge_name="DSWxS1PgeTest", runconfig_path=runconfig_path)
+
+        pge.run_preprocessor()
+
+        with self.assertRaises(RuntimeError):
+            pge._validate_output_product_filenames()
+
+        # Note: the log files exists because the critical() method in the PgeLogger class save it to disk.
+        expected_log_file = pge.logger.get_file_name()
+        self.assertTrue(os.path.exists(expected_log_file))
+
+        with open(expected_log_file, 'r', encoding='utf-8') as infile:
+            log_contents = infile.read()
+
+        self.assertIn('does not match the output naming convention.', log_contents)
+
+        # This time take out the 'Z' in the last entry
+        band_data = ('OPERA_L3_DSWx-S1_T11SLS_20210101T120000Z_20210101T120000Z_S1B_30_v1.0_B01_WTR.tif',
+                     'OPERA_L3_DSWx-S1_T11SLS_20210101T120000Z_20210101T120000Z_S1B_30_v1.0_B02_BWTR.tif',
+                     'OPERA_L3_DSWx-S1_T11SLS_20210101T120000Z_20210101T120000Z_S1B_30_v1.0_B03_CONF.tif',
+                     'OPERA_L3_DSWx-S1_T11SLS_20110226T061749Z_20240329T181033Z_S1B_30_v0.1_B04_DIAG.tif',
+                     'OPERA_L3_DSWx-S1_T11SLS_20210101T120000Z_20210101T120000Z_S1B_30_v1.0_BROWSE.tif',
+                     'OPERA_L3_DSWx-S1_T11SLS_20210101T120000_20210101T120000_S1B_30_v1.0_BROWSE.png')
+
+        self.generate_band_data_output(band_data, clear=True)
+
+        pge = DSWxS1Executor(pge_name="DSWxS1PgeTest", runconfig_path=runconfig_path)
+
+        pge.run_preprocessor()
+
+        with self.assertRaises(RuntimeError):
+            pge._validate_output_product_filenames()
+
+        expected_log_file = pge.logger.get_file_name()
+        self.assertTrue(os.path.exists(expected_log_file))
+
+        with open(expected_log_file, 'r', encoding='utf-8') as infile:
+            log_contents = infile.read()
+
+        self.assertIn('does not match the output naming convention.', log_contents)
 
     @patch.object(opera.util.tiff_utils, "gdal", MockGdal)
     def test_iso_metadata_creation(self):
