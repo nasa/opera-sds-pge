@@ -300,8 +300,8 @@ class PostProcessorMixin:
             'PGE_Name': self.runconfig.pge_name,
             'PGE_Version': self.PGE_VERSION,
             'SAS_Version': self.SAS_VERSION,
-            'Input_Files': self.runconfig.get_input_filenames(),
-            'Ancillary_Files': self.runconfig.get_ancillary_filenames(),
+            'Input_Files': list(map(basename, self.runconfig.get_input_filenames())),
+            'Ancillary_Files': list(map(basename, self.runconfig.get_ancillary_filenames())),
             'Production_DateTime': get_catalog_metadata_datetime_str(self.production_datetime),
             'Output_Product_Checksums': self._checksum_output_products()
         }
