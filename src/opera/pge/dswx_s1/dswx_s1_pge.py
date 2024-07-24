@@ -521,13 +521,11 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
     def _stage_output_files(self):
         """
         Ensures that all output products produced by both the SAS and this PGE
-        are staged to the output location defined by the RunConfig. This includes
-        reassignment of file names to meet the file-naming conventions required
-        by the PGE.
+        are staged to the output location defined by the RunConfig.
 
-        This version of the method performs the same steps as the base PGE
-        implementation, except that an ISO xml metadata file is rendered for
-        each tile product covered by the input region.
+        For DSWx-S1, this only includes the ancillary outputs created by the PGE
+        (catalog metadata, ISO XML, etc.), since the DSWx-S1 performs its own
+        file name application and staging to the output directory.
 
         """
         # Write the catalog metadata to disk with the appropriate filename
