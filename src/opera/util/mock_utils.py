@@ -114,22 +114,24 @@ class MockGdal:  # pragma: no cover
             self.dummy_metadata = {
                 'AREA_OR_POINT': 'Area',
                 'CONTACT_INFORMATION': 'operasds@jpl.nasa.gov',
-                'DSWX_PRODUCT_VERSION': '0.1',
+                'DSWX_PRODUCT_VERSION': '1.0',
                 'INPUT_DEM_SOURCE': 'Copernicus DEM GLO-30 2021 WGS84',
+                'INPUT_GLAD_CLASSIFICATION_SOURCE': 'GLAD Global Land Cover 2020',
                 'INPUT_HAND_SOURCE': 'ASF HAND GLO30',
-                'INPUT_REFERENCE_WATER_SOURCE': 'JRC Global Surface Water - collection from '
-                                                '1984 to 2021',
+                'INPUT_REFERENCE_WATER_SOURCE': 'JRC Global Surface Water - collection from 1984 to 2021',
                 'INPUT_SHORELINE_SOURCE': 'NOAA GSHHS Level 1 resolution f - GSHHS_f_L1',
                 'INPUT_WORLDCOVER_SOURCE': 'ESA WorldCover 10m 2020 v1.0',
                 'INSTITUTION': 'NASA JPL',
-                'LAYOVER_SHADOW_COVERAGE': '0.0001',
+                'LAYOVER_SHADOW_COVERAGE': '0.37',
                 'MGRS_COLLECTION_ACTUAL_NUMBER_OF_BURSTS': '40',
                 'MGRS_COLLECTION_EXPECTED_NUMBER_OF_BURSTS': '40',
                 'MGRS_COLLECTION_MISSING_NUMBER_OF_BURSTS': '0',
-                'PROCESSING_DATETIME': '2024-01-16T23:13:11Z',
-                'PROCESSING_INFORMATION_FILTER': 'Enhanced Lee filter',
+                'MGRS_POL_MODE': 'DV_POL',
+                'POLARIZATION': "['VV', 'VH']",
+                'PROCESSING_DATETIME': '2024-07-17T19:40:25Z',
+                'PROCESSING_INFORMATION_FILTER': 'bregman',
                 'PROCESSING_INFORMATION_FILTER_ENABLED': 'True',
-                'PROCESSING_INFORMATION_FILTER_WINDOW_SIZE': '5',
+                'PROCESSING_INFORMATION_FILTER_OPTION': "{'lambda': 20}",
                 'PROCESSING_INFORMATION_FUZZY_VALUE_AREA': '[0, 40]',
                 'PROCESSING_INFORMATION_FUZZY_VALUE_DARK_AREA': '[-18, -24]',
                 'PROCESSING_INFORMATION_FUZZY_VALUE_HAND': '[0, 15]',
@@ -137,20 +139,23 @@ class MockGdal:  # pragma: no cover
                 'PROCESSING_INFORMATION_FUZZY_VALUE_REFERENCE_WATER': '[0.8, 0.95]',
                 'PROCESSING_INFORMATION_FUZZY_VALUE_SLOPE': '[0.5, 15]',
                 'PROCESSING_INFORMATION_INUNDATED_VEGETATION': 'True',
+                'PROCESSING_INFORMATION_INUNDATED_VEGETATION_AREA_DATA_TYPE': 'GLAD',
                 'PROCESSING_INFORMATION_INUNDATED_VEGETATION_CROSS_POL_MIN': '-26',
                 'PROCESSING_INFORMATION_INUNDATED_VEGETATION_DUAL_POL_RATIO_MAX': '12',
                 'PROCESSING_INFORMATION_INUNDATED_VEGETATION_DUAL_POL_RATIO_MIN': '7',
                 'PROCESSING_INFORMATION_INUNDATED_VEGETATION_DUAL_POL_RATIO_THRESHOLD': '8',
+                'PROCESSING_INFORMATION_INUNDATED_VEGETATION_FILTER': 'lee',
+                'PROCESSING_INFORMATION_INUNDATED_VEGETATION_TARGET_CLASS': "['112-124', '200-207', '19-24', '125-148', '19']",
                 'PROCESSING_INFORMATION_MASKING_ANCILLARY_CO_POL_THRESHOLD': '-14.6',
                 'PROCESSING_INFORMATION_MASKING_ANCILLARY_CROSS_POL_THRESHOLD': '-22.8',
                 'PROCESSING_INFORMATION_MASKING_ANCILLARY_WATER_THRESHOLD': '0.05',
-                'PROCESSING_INFORMATION_POLARIZATION': "['VV', 'VH']",
                 'PROCESSING_INFORMATION_REFINE_BIMODALITY_MINIMUM_PIXEL': '4',
                 'PROCESSING_INFORMATION_REFINE_BIMODALITY_THRESHOLD': '[1.5, 0.97, 0.7, 0.1]',
                 'PROCESSING_INFORMATION_REGION_GROWING_INITIAL_SEED': '0.81',
                 'PROCESSING_INFORMATION_REGION_GROWING_RELAXED_THRESHOLD': '0.51',
                 'PROCESSING_INFORMATION_THRESHOLDING': 'Kittler-Illingworth',
                 'PROCESSING_INFORMATION_THRESHOLD_BIMODALITY': '0.7',
+                'PROCESSING_INFORMATION_THRESHOLD_BOUNDS': '[[-28, -11], [-28, -18]]',
                 'PROCESSING_INFORMATION_THRESHOLD_MULTI_THRESHOLD': 'True',
                 'PROCESSING_INFORMATION_THRESHOLD_TILE_AVERAGE': 'True',
                 'PROCESSING_INFORMATION_THRESHOLD_TILE_SELECTION': "['chini', 'bimodality']",
@@ -160,14 +165,12 @@ class MockGdal:  # pragma: no cover
                 'PRODUCT_TYPE': 'DSWx-S1',
                 'PROJECT': 'OPERA',
                 'RTC_ABSOLUTE_ORBIT_NUMBER': '51636',
-                'RTC_BURST_ID': 't114_243013_iw1, t114_243014_iw1, t114_243015_iw1, '
-                                't114_243016_iw1',
+                'RTC_BURST_ID': 't114_243013_iw1, t114_243014_iw1, t114_243015_iw1, t114_243016_iw1',
                 'RTC_INPUT_L1_SLC_GRANULES': 'S1A_IW_SLC__1SDV_20231213T121214_20231213T121243_051636_063C28_8D5C.zip',
-                'RTC_INPUT_LIST':
-                    "['OPERA_L2_RTC-S1_T114-243016-IW1_20231213T121235Z_20231213T184607Z_S1A_30_v1.0_VV.tif', "
-                    "'OPERA_L2_RTC-S1_T114-243015-IW1_20231213T121233Z_20231213T184607Z_S1A_30_v1.0_VV.tif', "
-                    "'OPERA_L2_RTC-S1_T114-243013-IW1_20231213T121227Z_20231213T184607Z_S1A_30_v1.0_VV.tif', "
-                    "'OPERA_L2_RTC-S1_T114-243014-IW1_20231213T121230Z_20231213T184607Z_S1A_30_v1.0_VV.tif']",
+                'RTC_INPUT_LIST': "['OPERA_L2_RTC-S1_T114-243016-IW1_20231213T121235Z_20231213T184607Z_S1A_30_v1.0_VV.tif', "
+                                   "'OPERA_L2_RTC-S1_T114-243015-IW1_20231213T121233Z_20231213T184607Z_S1A_30_v1.0_VV.tif', "
+                                   "'OPERA_L2_RTC-S1_T114-243013-IW1_20231213T121227Z_20231213T184607Z_S1A_30_v1.0_VV.tif', "
+                                   "'OPERA_L2_RTC-S1_T114-243014-IW1_20231213T121230Z_20231213T184607Z_S1A_30_v1.0_VV.tif']",
                 'RTC_ORBIT_PASS_DIRECTION': 'ascending',
                 'RTC_PRODUCT_VERSION': '1.0',
                 'RTC_QA_RFI_INFO_AVAILABLE': 'True',
@@ -176,9 +179,9 @@ class MockGdal:  # pragma: no cover
                 'RTC_SENSING_START_TIME': '2023-12-13T12:12:27Z',
                 'RTC_TRACK_NUMBER': '114',
                 'SENSOR': 'IW',
-                'SOFTWARE_VERSION': '0.3',
+                'SOFTWARE_VERSION': '1.0',
                 'SPACECRAFT_NAME': 'Sentinel-1A/B',
-                'SPATIAL_COVERAGE': '0.2441'
+                'SPATIAL_COVERAGE': '0.2502'
             }
 
         def GetMetadata(self):
