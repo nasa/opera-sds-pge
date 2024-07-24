@@ -758,6 +758,48 @@
                                                 <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
                                             </eos:type>
                                             <eos:name>
+                                                <gco:CharacterString>MGRSPolMode</gco:CharacterString>
+                                            </eos:name>
+                                            <eos:description>
+                                                <gco:CharacterString>MGRS Polarization Mode</gco:CharacterString>
+                                            </eos:description>
+                                            <eos:dataType>
+                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
+                                            </eos:dataType>
+                                        </eos:EOS_AdditionalAttributeDescription>
+                                    </eos:reference>
+                                    <eos:value>
+                                        <gco:CharacterString>{{ product_output.MGRS_POL_MODE }}{# ISO_OPERA_mgrsPolMode #}</gco:CharacterString>
+                                    </eos:value>
+                                </eos:AdditionalAttribute>
+                                <eos:AdditionalAttribute>
+                                    <eos:reference>
+                                        <eos:EOS_AdditionalAttributeDescription>
+                                            <eos:type>
+                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
+                                            </eos:type>
+                                            <eos:name>
+                                                <gco:CharacterString>Polarization</gco:CharacterString>
+                                            </eos:name>
+                                            <eos:description>
+                                                <gco:CharacterString>List of RTC-S1 polarizations used for DSWx-S1 products</gco:CharacterString>
+                                            </eos:description>
+                                            <eos:dataType>
+                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
+                                            </eos:dataType>
+                                        </eos:EOS_AdditionalAttributeDescription>
+                                    </eos:reference>
+                                    <eos:value>
+                                        <gco:CharacterString>{{ product_output.POLARIZATION|list|tojson }}{# ISO_OPERA_polarization #}</gco:CharacterString>
+                                    </eos:value>
+                                </eos:AdditionalAttribute>
+                                <eos:AdditionalAttribute>
+                                    <eos:reference>
+                                        <eos:EOS_AdditionalAttributeDescription>
+                                            <eos:type>
+                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
+                                            </eos:type>
+                                            <eos:name>
                                                 <gco:CharacterString>ProcessingDateTime</gco:CharacterString>
                                             </eos:name>
                                             <eos:description>
@@ -821,18 +863,18 @@
                                                 <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingParameter">processingParameter</eos:EOS_AdditionalAttributeTypeCode>
                                             </eos:type>
                                             <eos:name>
-                                                <gco:CharacterString>ProcessingInformationWindowSize</gco:CharacterString>
+                                                <gco:CharacterString>ProcessingInformationFilterOptions</gco:CharacterString>
                                             </eos:name>
                                             <eos:description>
-                                                <gco:CharacterString>Filtering window size</gco:CharacterString>
+                                                <gco:CharacterString>Options used to filter the input RTC</gco:CharacterString>
                                             </eos:description>
                                             <eos:dataType>
-                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="int">int</eos:EOS_AdditionalAttributeDataTypeCode>
+                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
                                             </eos:dataType>
                                         </eos:EOS_AdditionalAttributeDescription>
                                     </eos:reference>
                                     <eos:value>
-                                        <gco:CharacterString>{{ product_output.PROCESSING_INFORMATION_FILTER_WINDOW_SIZE }}{# ISO_OPERA_processingInformationFilterWindowSize #}</gco:CharacterString>
+                                        <gco:CharacterString>{{ product_output.PROCESSING_INFORMATION_FILTER_OPTION|tojson }}{# ISO_OPERA_processingInformationFilterOption #}</gco:CharacterString>
                                     </eos:value>
                                 </eos:AdditionalAttribute>
                                 <eos:AdditionalAttribute>
@@ -989,6 +1031,27 @@
                                                 <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingParameter">processingParameter</eos:EOS_AdditionalAttributeTypeCode>
                                             </eos:type>
                                             <eos:name>
+                                                <gco:CharacterString>ProcessingInformationInundatedVegetationAreaDataType</gco:CharacterString>
+                                            </eos:name>
+                                            <eos:description>
+                                                <gco:CharacterString>The type of area used for inundated vegetation mapping</gco:CharacterString>
+                                            </eos:description>
+                                            <eos:dataType>
+                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
+                                            </eos:dataType>
+                                        </eos:EOS_AdditionalAttributeDescription>
+                                    </eos:reference>
+                                    <eos:value>
+                                        <gco:CharacterString>{{ product_output.PROCESSING_INFORMATION_INUNDATED_VEGETATION_AREA_DATA_TYPE }}{# ISO_OPERA_processingInformationInundatedVegetation #}</gco:CharacterString>
+                                    </eos:value>
+                                </eos:AdditionalAttribute>
+                                <eos:AdditionalAttribute>
+                                    <eos:reference>
+                                        <eos:EOS_AdditionalAttributeDescription>
+                                            <eos:type>
+                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingParameter">processingParameter</eos:EOS_AdditionalAttributeTypeCode>
+                                            </eos:type>
+                                            <eos:name>
                                                 <gco:CharacterString>ProcessingInformationInundatedVegetationCrossPolMin</gco:CharacterString>
                                             </eos:name>
                                             <eos:description>
@@ -1073,6 +1136,48 @@
                                                 <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingParameter">processingParameter</eos:EOS_AdditionalAttributeTypeCode>
                                             </eos:type>
                                             <eos:name>
+                                                <gco:CharacterString>ProcessingInformationInundatedVegetationFilter</gco:CharacterString>
+                                            </eos:name>
+                                            <eos:description>
+                                                <gco:CharacterString>Filter used with inundated vegetation mapping</gco:CharacterString>
+                                            </eos:description>
+                                            <eos:dataType>
+                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
+                                            </eos:dataType>
+                                        </eos:EOS_AdditionalAttributeDescription>
+                                    </eos:reference>
+                                    <eos:value>
+                                        <gco:CharacterString>{{ product_output.PROCESSING_INFORMATION_INUNDATED_VEGETATION_FILTER }}{# ISO_OPERA_processingInformationInundatedVegetationFilter #}</gco:CharacterString>
+                                    </eos:value>
+                                </eos:AdditionalAttribute>
+                                <eos:AdditionalAttribute>
+                                    <eos:reference>
+                                        <eos:EOS_AdditionalAttributeDescription>
+                                            <eos:type>
+                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingParameter">processingParameter</eos:EOS_AdditionalAttributeTypeCode>
+                                            </eos:type>
+                                            <eos:name>
+                                                <gco:CharacterString>ProcessingInformationInundatedVegetationTargetClass</gco:CharacterString>
+                                            </eos:name>
+                                            <eos:description>
+                                                <gco:CharacterString>Target class values used with inundated vegetation mapping</gco:CharacterString>
+                                            </eos:description>
+                                            <eos:dataType>
+                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
+                                            </eos:dataType>
+                                        </eos:EOS_AdditionalAttributeDescription>
+                                    </eos:reference>
+                                    <eos:value>
+                                        <gco:CharacterString>{{ product_output.PROCESSING_INFORMATION_INUNDATED_VEGETATION_TARGET_CLASS|list|tojson }}{# ISO_OPERA_processingInformationInundatedVegetationFilter #}</gco:CharacterString>
+                                    </eos:value>
+                                </eos:AdditionalAttribute>
+                                <eos:AdditionalAttribute>
+                                    <eos:reference>
+                                        <eos:EOS_AdditionalAttributeDescription>
+                                            <eos:type>
+                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingParameter">processingParameter</eos:EOS_AdditionalAttributeTypeCode>
+                                            </eos:type>
+                                            <eos:name>
                                                 <gco:CharacterString>ProcessingInformationMaskingAncillaryCoPolThreshold</gco:CharacterString>
                                             </eos:name>
                                             <eos:description>
@@ -1127,27 +1232,6 @@
                                     </eos:reference>
                                     <eos:value>
                                         <gco:CharacterString>{{ product_output.PROCESSING_INFORMATION_MASKING_ANCILLARY_WATER_THRESHOLD }}{# ISO_OPERA_processingInformationMaskingAncillaryWaterThreshold #}</gco:CharacterString>
-                                    </eos:value>
-                                </eos:AdditionalAttribute>
-                                <eos:AdditionalAttribute>
-                                    <eos:reference>
-                                        <eos:EOS_AdditionalAttributeDescription>
-                                            <eos:type>
-                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
-                                            </eos:type>
-                                            <eos:name>
-                                                <gco:CharacterString>ProcessingInformationPolarization</gco:CharacterString>
-                                            </eos:name>
-                                            <eos:description>
-                                                <gco:CharacterString>List of RTC-S1 polarizations used for DSWx-S1 products</gco:CharacterString>
-                                            </eos:description>
-                                            <eos:dataType>
-                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
-                                            </eos:dataType>
-                                        </eos:EOS_AdditionalAttributeDescription>
-                                    </eos:reference>
-                                    <eos:value>
-                                        <gco:CharacterString>{{ product_output.PROCESSING_INFORMATION_POLARIZATION|list|tojson }}{# ISO_OPERA_processingInformationPolarization #}</gco:CharacterString>
                                     </eos:value>
                                 </eos:AdditionalAttribute>
                                 <eos:AdditionalAttribute>
@@ -1283,6 +1367,27 @@
                                                 <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingParameter">processingParameter</eos:EOS_AdditionalAttributeTypeCode>
                                             </eos:type>
                                             <eos:name>
+                                                <gco:CharacterString>ProcessingInformationThresholdBounds</gco:CharacterString>
+                                            </eos:name>
+                                            <eos:description>
+                                                <gco:CharacterString>Thresholding algorithm boundary values</gco:CharacterString>
+                                            </eos:description>
+                                            <eos:dataType>
+                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
+                                            </eos:dataType>
+                                        </eos:EOS_AdditionalAttributeDescription>
+                                    </eos:reference>
+                                    <eos:value>
+                                        <gco:CharacterString>{{ product_output.PROCESSING_INFORMATION_THRESHOLD_BOUNDS }}{# ISO_OPERA_processingInformationThresholdBounds #}</gco:CharacterString>
+                                    </eos:value>
+                                </eos:AdditionalAttribute>
+                                <eos:AdditionalAttribute>
+                                    <eos:reference>
+                                        <eos:EOS_AdditionalAttributeDescription>
+                                            <eos:type>
+                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingParameter">processingParameter</eos:EOS_AdditionalAttributeTypeCode>
+                                            </eos:type>
+                                            <eos:name>
                                                 <gco:CharacterString>ProcessingInformationThresholdMultiThreshold</gco:CharacterString>
                                             </eos:name>
                                             <eos:description>
@@ -1304,7 +1409,7 @@
                                                 <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingParameter">processingParameter</eos:EOS_AdditionalAttributeTypeCode>
                                             </eos:type>
                                             <eos:name>
-                                                <gco:CharacterString>ProcessingInformationTileAverage</gco:CharacterString>
+                                                <gco:CharacterString>ProcessingInformationThresholdTileAverage</gco:CharacterString>
                                             </eos:name>
                                             <eos:description>
                                                 <gco:CharacterString>Indicates whether averaging of thresholds within a tile is enabled or not.</gco:CharacterString>
@@ -1881,6 +1986,13 @@
                     <gmd:source>
                         <gmd:LI_Source>
                             <gmd:description>
+                                <gco:CharacterString>GLAD Classification - {{ product_output.INPUT_GLAD_CLASSIFICATION_SOURCE }}{# ISO_OPERA_gladClassificationSource #}</gco:CharacterString>
+                            </gmd:description>
+                        </gmd:LI_Source>
+                    </gmd:source>
+                    <gmd:source>
+                        <gmd:LI_Source>
+                            <gmd:description>
                                 <gco:CharacterString>Worldcover File - {{ product_output.INPUT_WORLDCOVER_SOURCE }}{# ISO_OPERA_worldcoverSource #}</gco:CharacterString>
                             </gmd:description>
                         </gmd:LI_Source>
@@ -1889,13 +2001,6 @@
                         <gmd:LI_Source>
                             <gmd:description>
                                 <gco:CharacterString>Reference Water File - {{ product_output.INPUT_REFERENCE_WATER_SOURCE }}{# ISO_OPERA_refWaterSource #}</gco:CharacterString>
-                            </gmd:description>
-                        </gmd:LI_Source>
-                    </gmd:source>
-                    <gmd:source>
-                        <gmd:LI_Source>
-                            <gmd:description>
-                                <gco:CharacterString>Shoreline Shape File - {{ product_output.INPUT_SHORELINE_SOURCE }}{# ISO_OPERA_shorelineSource #}</gco:CharacterString>
                             </gmd:description>
                         </gmd:LI_Source>
                     </gmd:source>
