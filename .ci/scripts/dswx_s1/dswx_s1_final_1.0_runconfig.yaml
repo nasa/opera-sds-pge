@@ -55,6 +55,7 @@ RunConfig:
           dem_file: /home/dswx_user/input_dir/ancillary_data/dem.tif
           hand_file: /home/dswx_user/input_dir/ancillary_data/hand.tif
           reference_water_file: /home/dswx_user/input_dir/ancillary_data/reference_water.tif
+          glad_classification_file: /home/dswx_user/input_dir/ancillary_data/glad.tif
           worldcover_file: /home/dswx_user/input_dir/ancillary_data/worldcover.tif
 
       ProductPathGroup:
@@ -63,7 +64,7 @@ RunConfig:
 
       PrimaryExecutable:
         ProductIdentifier: DSWX_S1
-        ProductVersion: "0.4"
+        ProductVersion: "1.0"
         ProgramPath: python3
         ProgramOptions:
           - /home/dswx_user/OPERA/DSWX-SAR/src/dswx_sar/dswx_s1.py
@@ -139,6 +140,8 @@ RunConfig:
             worldcover_file_description: 'ESA WorldCover 10m 2020 v1.0'
             reference_water_file: /home/dswx_user/input_dir/ancillary_data/reference_water.tif
             reference_water_file_description: 'JRC Global Surface Water - collection from 1984 to 2021'
+            glad_classification_file: /home/dswx_user/input_dir/ancillary_data/glad.tif
+            glad_classification_file_description: 'GLAD Global Land Cover 2020'
             hand_file: /home/dswx_user/input_dir/ancillary_data/hand.tif
             hand_file_description: 'ASF HAND GLO30'
             shoreline_shapefile:
@@ -157,7 +160,7 @@ RunConfig:
             product_path: /home/dswx_user/output_dir
             scratch_path: /home/dswx_user/scratch_dir
             sas_output_path: /home/dswx_user/output_dir
-            product_version: "0.4"
+            product_version: "1.0"
             output_imagery_format: 'COG'
 
           browse_image_group:
@@ -167,9 +170,9 @@ RunConfig:
             flag_collapse_wtr_classes: True
             exclude_inundated_vegetation: False
             set_not_water_to_nodata: False
-            set_hand_mask_to_nodata: False
-            set_layover_shadow_to_nodata: False
+            set_hand_mask_to_nodata: True
+            set_layover_shadow_to_nodata: True
             set_ocean_masked_to_nodata: False
             save_tif_to_output: True
 
-          log_file: /home/dswx_user/output_dir/dswx-s1.log
+          log_file:
