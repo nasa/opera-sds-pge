@@ -1034,6 +1034,8 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pge_name</span><span class="p">,</span> <span class="n">runconfig_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">pge_name</span><span class="p">,</span> <span class="n">runconfig_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
+        <span class="c1"># Used in base_pge.py to rename and keep track of files</span>
+        <span class="c1"># renamed by the PGE</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">rename_by_pattern_map</span> <span class="o">=</span> <span class="p">{</span>
             <span class="c1"># Note: Order matters here</span>
             <span class="s2">&quot;*_VV.tif&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rtc_geotiff_filename</span><span class="p">,</span>

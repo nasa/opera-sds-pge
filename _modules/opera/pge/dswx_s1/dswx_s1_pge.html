@@ -89,10 +89,9 @@
 
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">glob</span>
-<span class="kn">import</span> <span class="nn">os.path</span>
+<span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
-<span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">abspath</span><span class="p">,</span> <span class="n">basename</span><span class="p">,</span> <span class="n">dirname</span><span class="p">,</span> <span class="n">exists</span><span class="p">,</span> <span class="n">getsize</span><span class="p">,</span> <span class="n">join</span><span class="p">,</span> <span class="n">splitext</span>
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">abspath</span><span class="p">,</span> <span class="n">basename</span><span class="p">,</span> <span class="n">exists</span><span class="p">,</span> <span class="n">getsize</span><span class="p">,</span> <span class="n">join</span><span class="p">,</span> <span class="n">splitext</span>
 
 <span class="kn">import</span> <span class="nn">opera.util.input_validation</span> <span class="k">as</span> <span class="nn">input_validation</span>
 <span class="kn">from</span> <span class="nn">opera.pge.base.base_pge</span> <span class="kn">import</span> <span class="n">PgeExecutor</span>
@@ -228,6 +227,53 @@
     <span class="n">_tile_metadata_cache</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">_tile_filename_cache</span> <span class="o">=</span> <span class="p">{}</span>
 
+    <span class="k">def</span> <span class="nf">_validate_output_product_filenames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method validates output product file names assigned by the SAS</span>
+<span class="sd">        via a regular expression. The output product file names should follow</span>
+<span class="sd">        this convention:</span>
+
+<span class="sd">            &lt;PROJECT&gt;_&lt;LEVEL&gt;_&lt;PRODUCT TYPE&gt;_&lt;SOURCE&gt;_&lt;TILE ID&gt;_&lt;ACQUISITION TIMESTAMP&gt;_</span>
+<span class="sd">            &lt;CREATION TIMESTAMP&gt;_&lt;SENSOR&gt;_&lt;SPACING&gt;_&lt;PRODUCT VERSION&gt;_&lt;BAND INDEX&gt;_</span>
+<span class="sd">            &lt;BAND NAME&gt;.&lt;FILE EXTENSION&gt;</span>
+
+<span class="sd">        If the pattern does not match a critical error will cause a RuntimeError.</span>
+<span class="sd">        If the pattern does match, this function will also read the product metadata</span>
+<span class="sd">        from the GeoTIFF product, and cache it for later use.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+            <span class="sa">r</span><span class="s1">&#39;(?P&lt;file_id&gt;(?P&lt;project&gt;OPERA)_(?P&lt;level&gt;L3)_(?P&lt;product_type&gt;DSWx)-(?P&lt;source&gt;S1)_&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;(?P&lt;tile_id&gt;T[^\W_]</span><span class="si">{5}</span><span class="s1">)_(?P&lt;acquisition_ts&gt;\d</span><span class="si">{8}</span><span class="s1">T\d</span><span class="si">{6}</span><span class="s1">Z)_(?P&lt;creation_ts&gt;\d</span><span class="si">{8}</span><span class="s1">T\d</span><span class="si">{6}</span><span class="s1">Z)_&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;(?P&lt;sensor&gt;S1A|S1B)_(?P&lt;spacing&gt;30)_(?P&lt;product_version&gt;v\d+[.]\d+))(_(?P&lt;band_index&gt;B\d</span><span class="si">{2}</span><span class="s1">)_&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;(?P&lt;band_name&gt;WTR|BWTR|CONF|DIAG)|_BROWSE)?[.](?P&lt;ext&gt;tif|tiff|png)$&#39;</span>
+        <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">output_file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">get_output_product_filenames</span><span class="p">():</span>
+            <span class="n">match_result</span> <span class="o">=</span> <span class="n">pattern</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">basename</span><span class="p">(</span><span class="n">output_file</span><span class="p">))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">match_result</span><span class="p">:</span>
+                <span class="n">error_msg</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Output file </span><span class="si">{</span><span class="n">output_file</span><span class="si">}</span><span class="s2"> does not match the output &quot;</span>
+                             <span class="sa">f</span><span class="s2">&quot;naming convention.&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INVALID_OUTPUT</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">tile_id</span> <span class="o">=</span> <span class="n">match_result</span><span class="o">.</span><span class="n">groupdict</span><span class="p">()[</span><span class="s1">&#39;tile_id&#39;</span><span class="p">]</span>
+                <span class="n">file_id</span> <span class="o">=</span> <span class="n">match_result</span><span class="o">.</span><span class="n">groupdict</span><span class="p">()[</span><span class="s1">&#39;file_id&#39;</span><span class="p">]</span>
+
+                <span class="k">if</span> <span class="n">tile_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tile_metadata_cache</span><span class="p">:</span>
+                    <span class="n">dswx_metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_collect_dswx_s1_product_metadata</span><span class="p">(</span><span class="n">output_file</span><span class="p">)</span>
+
+                    <span class="c1"># TODO: kludge since SAS hardcodes SPACECRAFT_NAME to &quot;Sentinel-1A/B&quot;</span>
+                    <span class="n">dswx_metadata</span><span class="p">[</span><span class="s1">&#39;SPACECRAFT_NAME&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Sentinel-1A&quot;</span>
+                                                        <span class="k">if</span> <span class="n">match_result</span><span class="o">.</span><span class="n">groupdict</span><span class="p">()[</span><span class="s1">&#39;sensor&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;S1A&quot;</span>
+                                                        <span class="k">else</span> <span class="s2">&quot;Sentinel-1B&quot;</span><span class="p">)</span>
+
+                    <span class="c1"># Cache the metadata for this product for use when generating the ISO XML</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_tile_metadata_cache</span><span class="p">[</span><span class="n">tile_id</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_collect_dswx_s1_product_metadata</span><span class="p">(</span><span class="n">output_file</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">tile_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tile_filename_cache</span><span class="p">:</span>
+                    <span class="c1"># Cache the core filename for use when naming the ISO XML file</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_tile_filename_cache</span><span class="p">[</span><span class="n">tile_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">file_id</span>
+
     <span class="k">def</span> <span class="nf">_validate_output</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Evaluates the output file(s) generated from SAS execution to ensure:</span>
@@ -286,214 +332,6 @@
                         <span class="sa">f</span><span class="s2">&quot;band: </span><span class="si">{</span><span class="n">num_bands</span><span class="si">}</span><span class="s2">&quot;</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INVALID_OUTPUT</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">_core_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inter_filename</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns the core file name component for products produced by the</span>
-<span class="sd">        DSWx-S1 PGE.</span>
-
-<span class="sd">        The core file name component of the DSWx-S1 PGE consists of:</span>
-
-<span class="sd">        &lt;PROJECT&gt;_&lt;LEVEL&gt;_&lt;PGE NAME&gt;</span>
-
-<span class="sd">        Callers of this function are responsible for assignment of any other</span>
-<span class="sd">        product-specific fields, such as the file extension.</span>
-
-<span class="sd">        Notes</span>
-<span class="sd">        -----</span>
-<span class="sd">        On first call to this function, the returned core filename is cached</span>
-<span class="sd">        for subsequent calls. This allows the core filename to be easily reused</span>
-<span class="sd">        across product types without needing to provide inter_filename for each</span>
-<span class="sd">        subsequent call.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        inter_filename : str, optional</span>
-<span class="sd">            The intermediate filename of the output product to generate the</span>
-<span class="sd">            core filename for. This parameter may be used to inspect the file</span>
-<span class="sd">            in order to derive any necessary components of the returned filename.</span>
-<span class="sd">            Once the core filename is cached upon first call to this function,</span>
-<span class="sd">            this parameter may be omitted.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        core_filename : str</span>
-<span class="sd">            The core file name component to assign to products created by this PGE.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># Check if the core filename has already been generated and cached,</span>
-        <span class="c1"># and return it if so</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cached_core_filename</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cached_core_filename</span>
-
-        <span class="c1"># Assign the core file name to the cached class attribute</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_cached_core_filename</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">PROJECT</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">LEVEL</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">NAME</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="p">)</span>
-
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cached_core_filename</span>
-
-    <span class="k">def</span> <span class="nf">_tile_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inter_filename</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns the file name to use for MGRS tile-based DSWx products produced</span>
-<span class="sd">        by this PGE.</span>
-
-<span class="sd">        The filename for the DSWx-S1 tile products consists of:</span>
-
-<span class="sd">        &lt;Core filename&gt;_&lt;TILE ID&gt;_&lt;ACQ TIMETAG&gt;_&lt;PROD TIMETAG&gt;_&lt;SENSOR&gt;_&lt;SPACING&gt;_&lt;PRODUCT VERSION&gt;</span>
-
-<span class="sd">        Where &lt;Core filename&gt; is returned by DSWxS1PostProcessorMixin._core_filename()</span>
-
-<span class="sd">        Callers of this function are responsible for assignment of any other</span>
-<span class="sd">        product-specific fields, such as the file extension.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        inter_filename : str, optional</span>
-<span class="sd">            The intermediate filename of the output product to generate the</span>
-<span class="sd">            core filename for. This parameter may be used to inspect the file</span>
-<span class="sd">            in order to derive any necessary components of the returned filename.</span>
-<span class="sd">            Once the core filename is cached upon first call to this function,</span>
-<span class="sd">            this parameter may be omitted.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        tile_filename : str</span>
-<span class="sd">            The filename component to assign to tile-based products created by</span>
-<span class="sd">            this PGE.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">core_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_core_filename</span><span class="p">(</span><span class="n">inter_filename</span><span class="p">)</span>
-
-        <span class="c1"># The tile ID should be included within the intermediate filename,</span>
-        <span class="c1"># extract it and prepare it for use within the final filename</span>
-        <span class="n">tile_id</span> <span class="o">=</span> <span class="n">basename</span><span class="p">(</span><span class="n">inter_filename</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="mi">3</span><span class="p">]</span>
-
-        <span class="k">if</span> <span class="n">tile_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tile_metadata_cache</span><span class="p">:</span>
-            <span class="n">dswx_metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tile_metadata_cache</span><span class="p">[</span><span class="n">tile_id</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># Collect the metadata from the GeoTIFF output product</span>
-            <span class="n">dswx_metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_collect_dswx_s1_product_metadata</span><span class="p">(</span><span class="n">inter_filename</span><span class="p">)</span>
-
-            <span class="c1"># TODO: kludge since SAS hardcodes SPACECRAFT_NAME to &quot;Sentinel-1A/B&quot;</span>
-            <span class="n">dswx_metadata</span><span class="p">[</span><span class="s1">&#39;SPACECRAFT_NAME&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Sentinel-1A&quot;</span> <span class="k">if</span> <span class="s2">&quot;S1A&quot;</span> <span class="ow">in</span> <span class="n">inter_filename</span> <span class="k">else</span> <span class="s2">&quot;Sentinel-1B&quot;</span>
-
-            <span class="bp">self</span><span class="o">.</span><span class="n">_tile_metadata_cache</span><span class="p">[</span><span class="n">tile_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">dswx_metadata</span>
-
-        <span class="n">spacecraft_name</span> <span class="o">=</span> <span class="n">dswx_metadata</span><span class="p">[</span><span class="s1">&#39;SPACECRAFT_NAME&#39;</span><span class="p">]</span>
-        <span class="n">sensor</span> <span class="o">=</span> <span class="n">get_sensor_from_spacecraft_name</span><span class="p">(</span><span class="n">spacecraft_name</span><span class="p">)</span>
-        <span class="n">pixel_spacing</span> <span class="o">=</span> <span class="s2">&quot;30&quot;</span>  <span class="c1"># fixed for tile-based products</span>
-
-        <span class="n">acquisition_time</span> <span class="o">=</span> <span class="n">get_time_for_filename</span><span class="p">(</span>
-            <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">dswx_metadata</span><span class="p">[</span><span class="s1">&#39;RTC_SENSING_START_TIME&#39;</span><span class="p">],</span> <span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">T%H:%M:%SZ&#39;</span><span class="p">)</span>
-        <span class="p">)</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">acquisition_time</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;Z&#39;</span><span class="p">):</span>
-            <span class="n">acquisition_time</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">acquisition_time</span><span class="si">}</span><span class="s1">Z&#39;</span>
-
-        <span class="n">processing_time</span> <span class="o">=</span> <span class="n">get_time_for_filename</span><span class="p">(</span>
-            <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">dswx_metadata</span><span class="p">[</span><span class="s1">&#39;PROCESSING_DATETIME&#39;</span><span class="p">],</span> <span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">T%H:%M:%SZ&#39;</span><span class="p">)</span>
-        <span class="p">)</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">processing_time</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;Z&#39;</span><span class="p">):</span>
-            <span class="n">processing_time</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">processing_time</span><span class="si">}</span><span class="s1">Z&#39;</span>
-
-        <span class="n">product_version</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">product_version</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">product_version</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;v&#39;</span><span class="p">):</span>
-            <span class="n">product_version</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;v</span><span class="si">{</span><span class="n">product_version</span><span class="si">}</span><span class="s1">&#39;</span>
-
-        <span class="n">tile_filename</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">core_filename</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">tile_id</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">acquisition_time</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">processing_time</span><span class="si">}</span><span class="s2">_&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sensor</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">pixel_spacing</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">product_version</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="p">)</span>
-
-        <span class="c1"># Cache the file name for this tile ID, so it can be used with the</span>
-        <span class="c1"># ISO metadata later.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_tile_filename_cache</span><span class="p">[</span><span class="n">tile_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">tile_filename</span>
-
-        <span class="k">return</span> <span class="n">tile_filename</span>
-
-    <span class="k">def</span> <span class="nf">_geotiff_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inter_filename</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns the file name to use for GeoTIFF&#39;s produced by the DSWx-S1 PGE.</span>
-
-<span class="sd">        The GeoTIFF filename for the DSWx-S1 PGE consists of:</span>
-
-<span class="sd">            &lt;Tile filename&gt;_&lt;Band Index&gt;_&lt;Band Name&gt;.tif</span>
-
-<span class="sd">        Where &lt;Tile filename&gt; is returned by DSWxS1PostProcessorMixin._tile_filename()</span>
-<span class="sd">        and &lt;Band Index&gt; and &lt;Band Name&gt; are determined from the name of the</span>
-<span class="sd">        intermediate geotiff file to be renamed.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        inter_filename : str</span>
-<span class="sd">            The intermediate filename of the output GeoTIFF to generate</span>
-<span class="sd">            a filename for. This parameter may be used to inspect the file</span>
-<span class="sd">            in order to derive any necessary components of the returned filename.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        geotiff_filename : str</span>
-<span class="sd">            The file name to assign to GeoTIFF product(s) created by this PGE.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">tile_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tile_filename</span><span class="p">(</span><span class="n">inter_filename</span><span class="p">)</span>
-
-        <span class="c1"># Specific output product band index and name should be the last parts</span>
-        <span class="c1"># of the filename before the extension, delimited by underscores</span>
-        <span class="n">band_idx</span><span class="p">,</span> <span class="n">band_name</span> <span class="o">=</span> <span class="n">splitext</span><span class="p">(</span><span class="n">inter_filename</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span>
-
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">tile_filename</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">band_idx</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">band_name</span><span class="si">}</span><span class="s2">.tif&quot;</span>
-
-    <span class="k">def</span> <span class="nf">_browse_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inter_filename</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns the file name to use for the PNG browse image produced by</span>
-<span class="sd">        the DSWx-S1 PGE.</span>
-
-<span class="sd">        The browse image filename for the DSWx-S1 PGE consists of:</span>
-
-<span class="sd">            &lt;Tile filename&gt;_BROWSE.png</span>
-
-<span class="sd">        Where &lt;Tile filename&gt; is returned by DSWxS1PostProcessorMixin._tile_filename().</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        inter_filename : str</span>
-<span class="sd">            The intermediate filename of the output browse image from which to</span>
-<span class="sd">            generate a filename. This parameter may be used to inspect the</span>
-<span class="sd">            file in order to derive any necessary components of the returned filename.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        browse_image_filename : str</span>
-<span class="sd">            The file name to assign to browse image created by this PGE.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># Save the extension of the intermediate filename</span>
-        <span class="n">inter_ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">inter_filename</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-
-        <span class="c1"># Find one of the tif files corresponding to the provided browse image</span>
-        <span class="c1"># based on the tile ID</span>
-        <span class="n">tile_id</span> <span class="o">=</span> <span class="n">basename</span><span class="p">(</span><span class="n">inter_filename</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="mi">3</span><span class="p">]</span>
-
-        <span class="n">tif_pattern</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;*</span><span class="si">{</span><span class="n">tile_id</span><span class="si">}</span><span class="s2">*.tif*&quot;</span>
-
-        <span class="n">tif_files</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">dirname</span><span class="p">(</span><span class="n">inter_filename</span><span class="p">),</span> <span class="n">tif_pattern</span><span class="p">)))</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">tif_files</span><span class="p">):</span>
-            <span class="n">error_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Could not find any .tif files corresponding to browse image </span><span class="si">{</span><span class="n">inter_filename</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INVALID_OUTPUT</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">)</span>
-
-        <span class="c1"># Now we derive the core (tile) filename using the tif file(s) we located,</span>
-        <span class="c1"># since we need to extract product metadata to form the correct filename.</span>
-        <span class="c1"># We can use the first tif file in the list, since they should all have</span>
-        <span class="c1"># the same metadata.</span>
-        <span class="n">tile_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tile_filename</span><span class="p">(</span><span class="n">tif_files</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-
-        <span class="c1"># Add the portion specific to browse images</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">tile_filename</span><span class="si">}</span><span class="s2">_BROWSE</span><span class="si">{</span><span class="n">inter_ext</span><span class="si">}</span><span class="s2">&quot;</span>
 
     <span class="k">def</span> <span class="nf">_ancillary_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -698,11 +536,13 @@
 <span class="sd">            metadata Jinja2 template.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">core_filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">PROJECT</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">LEVEL</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">NAME</span><span class="si">}</span><span class="s2">&quot;</span>
+
         <span class="n">custom_metadata</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">&#39;ISO_OPERA_FilePackageName&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_core_filename</span><span class="p">(),</span>
-            <span class="s1">&#39;ISO_OPERA_ProducerGranuleId&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_core_filename</span><span class="p">(),</span>
+            <span class="s1">&#39;ISO_OPERA_FilePackageName&#39;</span><span class="p">:</span> <span class="n">core_filename</span><span class="p">,</span>
+            <span class="s1">&#39;ISO_OPERA_ProducerGranuleId&#39;</span><span class="p">:</span> <span class="n">core_filename</span><span class="p">,</span>
             <span class="s1">&#39;MetadataProviderAction&#39;</span><span class="p">:</span> <span class="s2">&quot;creation&quot;</span><span class="p">,</span>
-            <span class="s1">&#39;GranuleFilename&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_core_filename</span><span class="p">(),</span>
+            <span class="s1">&#39;GranuleFilename&#39;</span><span class="p">:</span> <span class="n">core_filename</span><span class="p">,</span>
             <span class="s1">&#39;ISO_OPERA_ProjectKeywords&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;OPERA&#39;</span><span class="p">,</span> <span class="s1">&#39;JPL&#39;</span><span class="p">,</span> <span class="s1">&#39;DSWx&#39;</span><span class="p">,</span> <span class="s1">&#39;Dynamic&#39;</span><span class="p">,</span> <span class="s1">&#39;Surface&#39;</span><span class="p">,</span> <span class="s1">&#39;Water&#39;</span><span class="p">,</span> <span class="s1">&#39;Extent&#39;</span><span class="p">],</span>
             <span class="s1">&#39;ISO_OPERA_PlatformKeywords&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;S1&#39;</span><span class="p">],</span>
             <span class="s1">&#39;ISO_OPERA_InstrumentKeywords&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Sentinel 1 A/B&#39;</span><span class="p">]</span>
@@ -770,14 +610,6 @@
 <span class="sd">        each tile product covered by the input region.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># Gather the list of output files produced by the SAS</span>
-        <span class="n">output_products</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">get_output_product_filenames</span><span class="p">()</span>
-
-        <span class="c1"># For each output file name, assign the final file name matching the</span>
-        <span class="c1"># expected conventions</span>
-        <span class="k">for</span> <span class="n">output_product</span> <span class="ow">in</span> <span class="n">output_products</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_assign_filename</span><span class="p">(</span><span class="n">output_product</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">output_product_path</span><span class="p">)</span>
-
         <span class="c1"># Write the catalog metadata to disk with the appropriate filename</span>
         <span class="n">catalog_metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_catalog_metadata</span><span class="p">()</span>
 
@@ -851,8 +683,9 @@
 <span class="sd">            Any keyword arguments needed by the post-processor</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_run_sas_qa_executable</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_output</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_output_product_filenames</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_run_sas_qa_executable</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_stage_output_files</span><span class="p">()</span></div></div>
 
 
@@ -882,10 +715,7 @@
 
         <span class="c1"># Used in base_pge.py to rename and keep track of files</span>
         <span class="c1"># renamed by the PGE</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">rename_by_pattern_map</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">&#39;*B0*.tif*&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geotiff_filename</span><span class="p">,</span>
-            <span class="s1">&#39;*BROWSE*&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_browse_filename</span>
-        <span class="p">}</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rename_by_pattern_map</span> <span class="o">=</span> <span class="p">{}</span></div>
 </pre></div>
 
            </div>

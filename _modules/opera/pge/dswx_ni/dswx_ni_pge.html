@@ -149,7 +149,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method validates output product file names assigned by the SAS</span>
 <span class="sd">        via a regular expression. The output product file names should follow</span>
-<span class="sd">        this conventions:</span>
+<span class="sd">        this convention:</span>
 
 <span class="sd">            &lt;PROJECT&gt;_&lt;LEVEL&gt;_&lt;PRODUCT TYPE&gt;_&lt;SOURCE&gt;_&lt;TILE ID&gt;_&lt;ACQUISITION TIMESTAMP&gt;_</span>
 <span class="sd">            &lt;CREATION TIMESTAMP&gt;_&lt;SENSOR&gt;_&lt;SPACING&gt;_&lt;PRODUCT VERSION&gt;_&lt;BAND INDEX&gt;_</span>
@@ -161,9 +161,9 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
-            <span class="sa">r</span><span class="s1">&#39;(?P&lt;file_id&gt;(?P&lt;project&gt;OPERA)_(?P&lt;level&gt;L3)_(?P&lt;product_type&gt;DSWx)-(?P&lt;source&gt;NI)_(?P&lt;tile_id&gt;T[^\W_]</span><span class="si">{5}</span><span class="s1">)_&#39;</span>
-            <span class="sa">r</span><span class="s1">&#39;(?P&lt;acquisition_ts&gt;\d</span><span class="si">{8}</span><span class="s1">T\d</span><span class="si">{6}</span><span class="s1">Z)_(?P&lt;creation_ts&gt;\d</span><span class="si">{8}</span><span class="s1">T\d</span><span class="si">{6}</span><span class="s1">Z)_(?P&lt;sensor&gt;LSAR)_(?P&lt;spacing&gt;30)_&#39;</span>
-            <span class="sa">r</span><span class="s1">&#39;(?P&lt;product_version&gt;v\d+[.]\d+))(_(?P&lt;band_index&gt;B\d</span><span class="si">{2}</span><span class="s1">)_&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;(?P&lt;file_id&gt;(?P&lt;project&gt;OPERA)_(?P&lt;level&gt;L3)_(?P&lt;product_type&gt;DSWx)-(?P&lt;source&gt;NI)_&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;(?P&lt;tile_id&gt;T[^\W_]</span><span class="si">{5}</span><span class="s1">)_(?P&lt;acquisition_ts&gt;\d</span><span class="si">{8}</span><span class="s1">T\d</span><span class="si">{6}</span><span class="s1">Z)_(?P&lt;creation_ts&gt;\d</span><span class="si">{8}</span><span class="s1">T\d</span><span class="si">{6}</span><span class="s1">Z)_&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;(?P&lt;sensor&gt;LSAR)_(?P&lt;spacing&gt;30)_(?P&lt;product_version&gt;v\d+[.]\d+))(_(?P&lt;band_index&gt;B\d</span><span class="si">{2}</span><span class="s1">)_&#39;</span>
             <span class="sa">r</span><span class="s1">&#39;(?P&lt;band_name&gt;WTR|BWTR|CONF|DIAG)|_BROWSE)?[.](?P&lt;ext&gt;tif|tiff|png)$&#39;</span>
         <span class="p">)</span>
 
@@ -183,7 +183,7 @@
 
                 <span class="k">if</span> <span class="n">tile_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tile_filename_cache</span><span class="p">:</span>
                     <span class="c1"># Cache the core filename for use when naming the ISO XML file</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_tile_filename_cache</span><span class="p">[</span><span class="n">tile_id</span><span class="p">]</span> <span class="o">=</span>  <span class="n">file_id</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_tile_filename_cache</span><span class="p">[</span><span class="n">tile_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">file_id</span>
 
     <span class="k">def</span> <span class="nf">_ancillary_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -304,11 +304,13 @@
 <span class="sd">            metadata Jinja2 template.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">core_filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">PROJECT</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">LEVEL</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">NAME</span><span class="si">}</span><span class="s2">&quot;</span>
+
         <span class="n">custom_metadata</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">&#39;ISO_OPERA_FilePackageName&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_core_filename</span><span class="p">(),</span>
-            <span class="s1">&#39;ISO_OPERA_ProducerGranuleId&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_core_filename</span><span class="p">(),</span>
+            <span class="s1">&#39;ISO_OPERA_FilePackageName&#39;</span><span class="p">:</span> <span class="n">core_filename</span><span class="p">,</span>
+            <span class="s1">&#39;ISO_OPERA_ProducerGranuleId&#39;</span><span class="p">:</span> <span class="n">core_filename</span><span class="p">,</span>
             <span class="s1">&#39;MetadataProviderAction&#39;</span><span class="p">:</span> <span class="s2">&quot;creation&quot;</span><span class="p">,</span>
-            <span class="s1">&#39;GranuleFilename&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_core_filename</span><span class="p">(),</span>
+            <span class="s1">&#39;GranuleFilename&#39;</span><span class="p">:</span> <span class="n">core_filename</span><span class="p">,</span>
             <span class="s1">&#39;ISO_OPERA_ProjectKeywords&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;OPERA&#39;</span><span class="p">,</span> <span class="s1">&#39;JPL&#39;</span><span class="p">,</span> <span class="s1">&#39;DSWx&#39;</span><span class="p">,</span> <span class="s1">&#39;Dynamic&#39;</span><span class="p">,</span> <span class="s1">&#39;Surface&#39;</span><span class="p">,</span> <span class="s1">&#39;Water&#39;</span><span class="p">,</span> <span class="s1">&#39;Extent&#39;</span><span class="p">],</span>
             <span class="s1">&#39;ISO_OPERA_PlatformKeywords&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;NI&#39;</span><span class="p">],</span>
             <span class="s1">&#39;ISO_OPERA_InstrumentKeywords&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;NISAR&#39;</span><span class="p">]</span>
@@ -318,9 +320,6 @@
 
     <span class="k">def</span> <span class="nf">_stage_output_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This is not a complete module. It has been reduced so that the .log file</span>
-<span class="sd">        will be saved to disk.</span>
-
 <span class="sd">        Ensures that all output products produced by both the SAS and this PGE</span>
 <span class="sd">        are staged to the output location defined by the RunConfig. This includes</span>
 <span class="sd">        reassignment of file names to meet the file-naming conventions required</span>
