@@ -52,7 +52,7 @@ class DSWxS1PreProcessorMixin(PreProcessorMixin):
             self.runconfig.sas_config['runconfig']['groups']['dynamic_ancillary_file_group']
 
         for key, value in dynamic_ancillary_file_group_dict.items():
-            if key in ('dem_file', 'reference_water_file', 'worldcover_file', 'hand_file'):
+            if key in ('dem_file', 'glad_classification_file', 'reference_water_file', 'worldcover_file', 'hand_file'):
                 input_validation.check_input(
                     value, self.logger, self.name, valid_extensions=('.tif', '.tiff', '.vrt')
                 )
@@ -75,7 +75,7 @@ class DSWxS1PreProcessorMixin(PreProcessorMixin):
 
             elif key in ('dem_file_description', 'worldcover_file_description',
                          'reference_water_file_description', 'hand_file_description',
-                         'shoreline_shapefile_description'):
+                         'glad_classification_file_description', 'shoreline_shapefile_description'):
                 # these fields are included in the SAS input paths, but are not
                 # actually file paths, so skip them
                 continue

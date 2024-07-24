@@ -71,7 +71,7 @@ class DswxS1PgeTestCase(unittest.TestCase):
         )
 
         # Create dummy versions of the expected ancillary inputs
-        for ancillary_file in ('dem.tif', 'worldcover.tif',
+        for ancillary_file in ('dem.tif', 'worldcover.tif', 'glad.tif',
                                'reference_water.tif', 'shoreline.shp',
                                'shoreline.dbf', 'shoreline.prj',
                                'shoreline.shx', 'hand.tif',

@@ -54,7 +54,7 @@ RunConfig:
             dem_file: dswx_s1_pge_test/input_dir/dem.tif
             dem_file_description: DEM
             worldcover_file: dswx_s1_pge_test/input_dir/worldcover.tif
-            glad_classification_file: dswx_s1_test/input_dir/glad.tif
+            glad_classification_file: dswx_s1_pge_test/input_dir/glad.tif
             reference_water_file: dswx_s1_pge_test/input_dir/reference_water.tif
             shoreline_shapefile: dswx_s1_pge_test/input_dir/shoreline.shp
             hand_file: dswx_s1_pge_test/input_dir/hand.tif
