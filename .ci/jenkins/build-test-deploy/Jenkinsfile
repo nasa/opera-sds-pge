@@ -162,8 +162,7 @@ pipeline {
                            git push --set-upstream origin gh-pages
                            '''
                     }
-
-                    deleteDir
+                    deleteDir()
                 }
 
             }
