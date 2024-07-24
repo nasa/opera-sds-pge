@@ -44,6 +44,11 @@ RunConfig:
           # more .tif files
           hand_file: /home/dswx_user/input_dir/ancillary_data/hand.tif
 
+          # GLAD classification map file
+          # Must point to a single .tif, or a .vrt that points to one or
+          # more .tif files
+          glad_classification_file: /home/dswx_user/input_dir/ancillary_data/glad.tif
+
           # Path to the reference water map
           # Must point to a single .tif, or a .vrt that points to one or
           # more .tif files
@@ -178,6 +183,12 @@ RunConfig:
             # Reference water description
             reference_water_file_description: 'JRC Global Surface Water - collection from 1984 to 2021'
 
+            # GLAD classification map file
+            glad_classification_file: /home/dswx_user/input_dir/ancillary_data/glad.tif
+
+            # GLAD classification map file description
+            glad_classification_file_description: 'GLAD Global Land Cover 2020'
+
             # Height Above Nearest Drainage (Required)
             hand_file: /home/dswx_user/input_dir/ancillary_data/hand.tif
 
@@ -194,7 +205,7 @@ RunConfig:
             mgrs_database_file: /home/dswx_user/input_dir/ancillary_data/MGRS_tile.sqlite
 
             # MGRS collection database sqlite file
-            mgrs_collection_database_file: /home/dswx_user/input_dir/ancillary_data/MGRS_tile_collection.sqlite
+            mgrs_collection_database_file: /home/dswx_user/input_dir/ancillary_data/MGRS_tile_collection_v0.3.sqlite
 
           primary_executable:
             product_type: dswx_s1
@@ -209,7 +220,7 @@ RunConfig:
             # SAS writes the output product(s) to the following file
             sas_output_path: /home/dswx_user/output_dir
 
-            product_version: "0.1"
+            product_version: "1.0"
 
             # DSWx-S1 product format
             output_imagery_format: 'COG'
@@ -228,5 +239,26 @@ RunConfig:
 
             # Width in pixels for the PNG browse image
             browse_image_width: 1024
+
+            # Flag to collapse water classes if set to True. Default is True.
+            flag_collapse_wtr_classes: True
+
+            # Flag to exclude inundated vegetation from processing if set to True.
+            exclude_inundated_vegetation: False
+
+            # Flag to set non-water pixels to NoData value if set to True.
+            set_not_water_to_nodata: False
+
+            # Flag to set HAND mask pixels to NoData value if set to True.
+            set_hand_mask_to_nodata: True
+
+            # Flag to set layover and shadow pixels to NoData value if set to True.
+            set_layover_shadow_to_nodata: True
+
+            # Flag to set ocean-masked pixels to NoData value if set to True.
+            set_ocean_masked_to_nodata: False
+
+            # Include a .tif version of the browse image, in addition to the .png
+            save_tif_to_output: False
 
           log_file: /home/dswx_user/output_dir/dswx-s1.log

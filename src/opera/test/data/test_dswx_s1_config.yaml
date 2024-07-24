@@ -11,6 +11,7 @@ RunConfig:
         AncillaryFileMap:
           dem_file: dswx_s1_pge_test/input_dir/dem.tif
           hand_file: dswx_s1_pge_test/input_dir/hand.tif
+          glad_classification_file: dswx_s1_test/input_dir/glad.tif
           reference_water_file: dswx_s1_pge_test/input_dir/reference_water.tif
           world_cover: dswx_s1_pge_test/input_dir/worldcover.tif
           shoreline_shapefile: dswx_s1_pge_test/input_dir/shoreline.shp
@@ -22,12 +23,12 @@ RunConfig:
         ProductVersion: "1.0"
         ProgramPath: /bin/echo
         ProgramOptions:
-          - hello world > dswx_s1_pge_test/output_dir/OPERA_L3_DSWx-S1_T18MVA_20200702T231843Z_20230317T190549Z_S1A_30_v0.1_B01_WTR.tif;
-          - /bin/echo hello world > dswx_s1_pge_test/output_dir/OPERA_L3_DSWx-S1_T18MVA_20200702T231843Z_20230317T190549Z_S1A_30_v0.1_B02_BWTR.tif;
-          - /bin/echo hello world > dswx_s1_pge_test/output_dir/OPERA_L3_DSWx-S1_T18MVA_20200702T231843Z_20230317T190549Z_S1A_30_v0.1_B03_CONF.tif;
-          - /bin/echo hello world > dswx_s1_pge_test/output_dir/OPERA_L3_DSWx-S1_T18MVA_20200702T231843Z_20230317T190549Z_S1A_30_v0.1_B04_DIAG.tif;
-          - /bin/echo hello world > dswx_s1_pge_test/output_dir/OPERA_L3_DSWx-S1_T18MVA_20200702T231843Z_20230317T190549Z_S1A_30_v0.1_BROWSE.png;
-          - /bin/echo hello world > dswx_s1_pge_test/output_dir/OPERA_L3_DSWx-S1_T18MVA_20200702T231843Z_20230317T190549Z_S1A_30_v0.1_BROWSE.tif;
+          - hello world > dswx_s1_pge_test/output_dir/OPERA_L3_DSWx-S1_T18MVA_20200702T231843Z_20230317T190549Z_S1A_30_v1.0_B01_WTR.tif;
+          - /bin/echo hello world > dswx_s1_pge_test/output_dir/OPERA_L3_DSWx-S1_T18MVA_20200702T231843Z_20230317T190549Z_S1A_30_v1.0_B02_BWTR.tif;
+          - /bin/echo hello world > dswx_s1_pge_test/output_dir/OPERA_L3_DSWx-S1_T18MVA_20200702T231843Z_20230317T190549Z_S1A_30_v1.0_B03_CONF.tif;
+          - /bin/echo hello world > dswx_s1_pge_test/output_dir/OPERA_L3_DSWx-S1_T18MVA_20200702T231843Z_20230317T190549Z_S1A_30_v1.0_B04_DIAG.tif;
+          - /bin/echo hello world > dswx_s1_pge_test/output_dir/OPERA_L3_DSWx-S1_T18MVA_20200702T231843Z_20230317T190549Z_S1A_30_v1.0_BROWSE.png;
+          - /bin/echo hello world > dswx_s1_pge_test/output_dir/OPERA_L3_DSWx-S1_T18MVA_20200702T231843Z_20230317T190549Z_S1A_30_v1.0_BROWSE.tif;
           - /bin/echo DSWx-S1 invoked with RunConfig
         ErrorCodeBase: 400000
         SchemaPath: pge/dswx_s1/schema/dswx_s1_sas_schema.yaml
@@ -53,6 +54,7 @@ RunConfig:
             dem_file: dswx_s1_pge_test/input_dir/dem.tif
             dem_file_description: DEM
             worldcover_file: dswx_s1_pge_test/input_dir/worldcover.tif
+            glad_classification_file: dswx_s1_test/input_dir/glad.tif
             reference_water_file: dswx_s1_pge_test/input_dir/reference_water.tif
             shoreline_shapefile: dswx_s1_pge_test/input_dir/shoreline.shp
             hand_file: dswx_s1_pge_test/input_dir/hand.tif
