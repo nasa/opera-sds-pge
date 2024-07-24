@@ -13,6 +13,8 @@ pipeline {
             steps {
                 echo "Cleaning up data/tmp directories"
                 sh 'rm -rf /data/tmp/tmp.*'
+                echo "Cleaning up old Docker data"
+                sh 'docker system prune'
             }
         }
     }
