@@ -145,22 +145,26 @@ pipeline {
         stage('Push OPERA PGE HTML documentation to GitHub Pages') {
             when { expression { return params.PUBLISH_DOCS } }
             steps {
-                git branch: 'gh-pages',
-                    changelog: false,
-                    poll: false,
-                    url: 'https://github.com/nasa/opera-sds-pge'
+                dir('/data/tmp/tmp.gh-pages'){
+                    git branch: 'gh-pages',
+                        changelog: false,
+                        poll: false,
+                        url: 'https://github.com/nasa/opera-sds-pge'
 
-                withCredentials([string(credentialsId: params.GITHUB_OAUTH_TOKEN, variable: 'TOKEN')]) {
-                    sh label: 'Updating gh-pages branch with latest HTML docs',
-                       script: '''#!/bin/bash
-                       cp -rf ./docs/_build/html/* .
-                       git add .
-                       git add -u
-                       git commit -m "HTML docs update by Jenkins"
-                       git remote set-url origin https://${TOKEN}@github.com/nasa/opera-sds-pge.git
-                       git push --set-upstream origin gh-pages
-                       '''
+                    withCredentials([string(credentialsId: params.GITHUB_OAUTH_TOKEN, variable: 'TOKEN')]) {
+                        sh label: 'Updating gh-pages branch with latest HTML docs',
+                           script: '''#!/bin/bash
+                           cp -rf ${WORKSPACE}/docs/_build/html/* .
+                           git add .
+                           git add -u
+                           git commit -m "HTML docs update by Jenkins"
+                           git remote set-url origin https://${TOKEN}@github.com/nasa/opera-sds-pge.git
+                           git push --set-upstream origin gh-pages
+                           '''
+                    }
+                    deleteDir()
                 }
+
             }
         }
         // TODO: revisit once latexpdf is working on CI system
