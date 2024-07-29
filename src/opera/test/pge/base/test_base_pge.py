@@ -259,7 +259,7 @@ class BasePgeTestCase(unittest.TestCase):
                         data = json.load(outfile)
 
                     for expected_file in expected_input_files:
-                        self.assertIn(expected_file, data["Input_Files"])
+                        self.assertIn(os.path.basename(expected_file), data["Input_Files"])
 
     def test_geotiff_filename(self):
         """Test _geotiff_filename() method"""

@@ -23,6 +23,7 @@ from opera.util.geo_utils import get_geographic_boundaries_from_mgrs_tile
 from opera.util.input_validation import validate_algorithm_parameters_config
 from opera.util.input_validation import validate_dswx_inputs
 from opera.util.render_jinja2 import render_jinja2
+from opera.util.run_utils import get_checksum
 from opera.util.tiff_utils import get_geotiff_metadata
 from opera.util.time import get_time_for_filename
 
@@ -52,7 +53,7 @@ class DSWxS1PreProcessorMixin(PreProcessorMixin):
             self.runconfig.sas_config['runconfig']['groups']['dynamic_ancillary_file_group']
 
         for key, value in dynamic_ancillary_file_group_dict.items():
-            if key in ('dem_file', 'reference_water_file', 'worldcover_file', 'hand_file'):
+            if key in ('dem_file', 'glad_classification_file', 'reference_water_file', 'worldcover_file', 'hand_file'):
                 input_validation.check_input(
                     value, self.logger, self.name, valid_extensions=('.tif', '.tiff', '.vrt')
                 )
@@ -75,7 +76,7 @@ class DSWxS1PreProcessorMixin(PreProcessorMixin):
 
             elif key in ('dem_file_description', 'worldcover_file_description',
                          'reference_water_file_description', 'hand_file_description',
-                         'shoreline_shapefile_description'):
+                         'glad_classification_file_description', 'shoreline_shapefile_description'):
                 # these fields are included in the SAS input paths, but are not
                 # actually file paths, so skip them
                 continue
@@ -252,6 +253,40 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
                         f"band: {num_bands}"
 
             self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
+
+    def _checksum_output_products(self):
+        """
+        Generates a dictionary mapping output product file names to the
+        corresponding MD5 checksum digest of the file's contents.
+
+        The products to generate checksums for are determined by scanning
+        the output product location specified by the RunConfig. Any files
+        within the directory that have the expected file extensions for output
+        products are then picked up for checksum generation.
+
+        Returns
+        -------
+        checksums : dict
+            Mapping of output product file names to MD5 checksums of said
+            products.
+
+        """
+        output_products = self.runconfig.get_output_product_filenames()
+
+        # Filter out any files that do not end with the expected extensions
+        expected_extensions = ('.tif', '.png')
+        filtered_output_products = filter(
+            lambda product: splitext(product)[-1] in expected_extensions,
+            output_products
+        )
+
+        # Generate checksums on the filtered product list
+        checksums = {
+            basename(output_product): get_checksum(output_product)
+            for output_product in filtered_output_products
+        }
+
+        return checksums
 
     def _ancillary_filename(self):
         """
@@ -521,13 +556,11 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
     def _stage_output_files(self):
         """
         Ensures that all output products produced by both the SAS and this PGE
-        are staged to the output location defined by the RunConfig. This includes
-        reassignment of file names to meet the file-naming conventions required
-        by the PGE.
+        are staged to the output location defined by the RunConfig.
 
-        This version of the method performs the same steps as the base PGE
-        implementation, except that an ISO xml metadata file is rendered for
-        each tile product covered by the input region.
+        For DSWx-S1, this only includes the ancillary outputs created by the PGE
+        (catalog metadata, ISO XML, etc.), since the DSWx-S1 performs its own
+        file name application and staging to the output directory.
 
         """
         # Write the catalog metadata to disk with the appropriate filename
@@ -627,7 +660,7 @@ class DSWxS1Executor(DSWxS1PreProcessorMixin, DSWxS1PostProcessorMixin, PgeExecu
     PGE_VERSION = "3.0.0-rc.2.1"
     """Version of the PGE (overrides default from base_pge)"""
 
-    SAS_VERSION = "0.4.2"  # CalVal release https://github.com/opera-adt/DSWX-SAR/releases/tag/v0.4.2
+    SAS_VERSION = "1.0"  # Final release https://github.com/opera-adt/DSWX-SAR/releases/tag/v1.0
     """Version of the SAS wrapped by this PGE, should be updated as needed"""
 
     def __init__(self, pge_name, runconfig_path, **kwargs):

@@ -48,8 +48,19 @@ runconfig:
         # The enhanced Lee filter is available.
         filter:
             enabled: True
+            method: bregman
+            block_pad: 300
+            lee_filter:
+                window_size: 3
+            guided_filter:
+                radius: 1
+                eps: 3
+                ddepth: -1
+            bregman:
+                lambda_value: 20
+            anisotropic_diffusion:
+                weight: 1
             # Window size for filtering.
-            window_size: 5
             line_per_block: 1000
 
         initial_threshold:
@@ -85,8 +96,8 @@ runconfig:
             # using the statics of the rtc image. If the values are out of the given range,
             # adopt these values instead of the computed values
             threshold_bounds:
-                co_pol: [-28, -8]
-                cross_pol: [-28, -14]
+                co_pol: [-28, -11]
+                cross_pol: [-28, -18]
             # Flag to assume the trimodal distribution.
             # If flag is false, the distribution is assumed to have bimodal distribution and
             # estimate single threshold per tile. If True, the trimodal distribution is assumed,
@@ -176,12 +187,12 @@ runconfig:
             # pixels with HAND threshold is masked out.
             hand_variation_threshold: 2.5
             line_per_block: 400
-            number_cpu: 1
+            number_cpu: -1
 
         refine_with_bimodality:
             minimum_pixel: 4
             lines_per_block: 500
-            number_cpu: 1
+            number_cpu: -1
             thresholds:
                 ashman: 1.5
                 Bhattacharyya_coefficient: 0.97
@@ -197,8 +208,25 @@ runconfig:
             dual_pol_ratio_threshold: 8
             cross_pol_min: -26
             line_per_block: 300
-            target_land_cover: ['Herbaceous wetland']
-
+            target_area_file_type: 'auto'
+            target_worldcover_class: ['Herbaceous wetland']
+            target_glad_class: ['112-124', '200-207', '19-24', '125-148', '19']
+            filter:
+                enabled: True
+                method: lee
+                block_pad: 300
+                lee_filter:
+                    window_size: 3
+                guided_filter:
+                    radius: 1
+                    eps: 3
+                    ddepth: -1
+                bregman:
+                    lambda_value: 20
+                anisotropic_diffusion:
+                    weight: 1
+                # Window size for filtering.
+                line_per_block: 1000
         # debug mode is true, intermediate product is generated.
         debug_mode: False
 
