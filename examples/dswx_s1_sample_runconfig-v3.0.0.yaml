@@ -1,4 +1,4 @@
-# Sample RunConfig for use with the DSWx-S1 PGE v3.0.0-rc.2.1
+# Sample RunConfig for use with the DSWx-S1 PGE v3.0.0
 # This RunConfig should require minimal changes in order to be used with the
 # OPERA PCM.
 
@@ -80,7 +80,7 @@ RunConfig:
         ProductIdentifier: DSWX_S1
 
         # Product version specific to output products
-        ProductVersion: "0.1"
+        ProductVersion: "1.0"
 
         # Path to the executable to run, path must be reachable from
         # within the Docker container (i.e. findable with a "which" command)
@@ -260,5 +260,3 @@ RunConfig:
 
             # Include a .tif version of the browse image, in addition to the .png
             save_tif_to_output: False
-
-          log_file: /home/dswx_user/output_dir/dswx-s1.log
