@@ -83,6 +83,8 @@ pipeline {
             steps{
                 sh label: "Secrets scan",
                    script: """
+                   #!/bin/bash
+
                     if [ ! -f .secrets.baseline ] ;
                     then
                         # This generated baseline file will only be temporarily available on the GitHub side and will not appear in the user's local files.
@@ -104,6 +106,14 @@ pipeline {
                         --exclude-files '\\.git.*' \
                     # break build when new secrets discovered
                     # function compares baseline/new secrets w/o listing results -- success(0) when new secret found
+                    """
+
+                archiveArtifacts artifacts: ".secrets.new", allowEmptyArchive: true, fingerprint: true
+
+                sh label: "Compare scan result to baseline",
+                   script: """
+                   #!/bin/bash
+
                     source .ci/scripts/util/compare_secrets_baselines.sh
                     # test baseline versus new secret files
                     if compare_secrets .secrets.baseline .secrets.new;
