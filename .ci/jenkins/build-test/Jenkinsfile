@@ -81,7 +81,7 @@ pipeline {
         }
         stage('Scan for possible secrets'){
             steps{
-                sh label: "Secrets scan"
+                sh label: "Secrets scan",
                    script: """
                     if [ ! -f .secrets.baseline ] ;
                     then
