@@ -152,6 +152,7 @@ pipeline {
             echo 'Unstable :/'
         }
         failure {
+            archiveArtifacts artifacts: ".secrets.diff", allowEmptyArchive: true, fingerprint: true
             echo 'Failed :('
         }
         changed {
