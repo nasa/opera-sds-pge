@@ -24,7 +24,7 @@ pipeline {
         stage('Scan for possible secrets'){
             steps{
                 sh label: "Secrets scan",
-                   script: """
+                   script: '''
                    #!/bin/bash
 
                     if [ ! -f .secrets.baseline ] ;
@@ -43,23 +43,25 @@ pipeline {
                     # backup list of known secrets
                     cp -pr .secrets.baseline .secrets.new
                     # find secrets in the repository
-                    detect-secrets scan --disable-plugin AbsolutePathDetectorExperimental --all-files --baseline .secrets.new \
-                        --exclude-files '\\.secrets..*' \
-                        --exclude-files '\\.git.*' \
-                        --exclude-files 'test_results'
+                    detect-secrets scan --disable-plugin AbsolutePathDetectorExperimental --all-files --baseline .secrets.new --exclude-files '\\.secrets..*' --exclude-files '\\.git.*' --exclude-files 'test_results'
                     # break build when new secrets discovered
                     # function compares baseline/new secrets w/o listing results -- success(0) when new secret found
-                    """
+
+                    jq -r '.results | keys[] as $key | "\\($key),\\(.[$key] | .[] | .hashed_secret)"' ".secrets.baseline" | sort > /data/tmp/.secrets.1
+                    jq -r '.results | keys[] as $key | "\\($key),\\(.[$key] | .[] | .hashed_secret)"' ".secrets.new" | sort > /data/tmp/.secrets.2
+
+                    diff /data/tmp/.secrets.1 /data/tmp/.secrets.2 > .secrets.diff || true
+                    '''
 
                 archiveArtifacts artifacts: ".secrets.new", allowEmptyArchive: true, fingerprint: true
+                archiveArtifacts artifacts: ".secrets.diff", allowEmptyArchive: true, fingerprint: true
 
                 sh label: "Compare scan result to baseline",
                    script: """
                    #!/bin/bash
 
-                    source .ci/scripts/util/compare_secrets_baselines.sh
                     # test baseline versus new secret files
-                    if compare_secrets .secrets.baseline .secrets.new;
+                    if grep -q '>' < .secrets.diff;
                     then
                         echo "⚠️ Attention Required! ⚠️" >&2
                         echo "New secrets have been detected in your recent commit. Due to security concerns, we cannot display detailed information here and we cannot proceed until this issue is resolved." >&2
