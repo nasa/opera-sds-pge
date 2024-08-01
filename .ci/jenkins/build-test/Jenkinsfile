@@ -27,6 +27,8 @@ pipeline {
                    script: '''
                    #!/bin/bash
 
+                   set +x
+
                     if [ ! -f .secrets.baseline ] ;
                     then
                         # This generated baseline file will only be temporarily available on the GitHub side and will not appear in the user's local files.
@@ -59,6 +61,8 @@ pipeline {
                 sh label: "Compare scan result to baseline",
                    script: """
                    #!/bin/bash
+
+                   set +x
 
                     # test baseline versus new secret files
                     if grep -q '>' < .secrets.diff;
