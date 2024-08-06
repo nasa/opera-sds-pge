@@ -182,6 +182,8 @@ RunConfig:
             # Separate runconfig file for algorithm parameters
             algorithm_parameters: /home/dswx_user/input_dir/algorithm_parameter_ni.yaml
 
+            glad_classification_file: /home/dswx_user/input_dir/glad_classification.tif
+
           static_ancillary_file_group:
             static_ancillary_inputs_flag: True
 
