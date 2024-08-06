@@ -28,9 +28,6 @@ runconfig:
         hand:
             mask_value: 200
 
-        partial_surface_water:
-            enabled: True
-
         ocean_mask:
             # Flag to apply ocean mask
             mask_enabled: False
@@ -46,11 +43,6 @@ runconfig:
             #   - average : overlapped areas are averaged.
             #   - first : choose one burst without average.
             mosaic_mode: 'first'
-            resamp_required: False
-            resamp_method: 'nearest'
-            resamp_out_res: 30
-            read_row_blk_size: 1000
-            read_col_blk_size: 1100
 
         # Flag to turn on/off the filtering for RTC image.
         # The enhanced Lee filter is available.
@@ -217,8 +209,8 @@ runconfig:
             cross_pol_min: -26
             line_per_block: 300
             target_area_file_type: 'auto'
-            target_worldcover_class: ['Herbaceous wetland', 'Tree Cover', 'Shrubs', 'Grassland', 'Mangrove', 'Moss and lichen', 'Crop']
-            target_glad_class: ['112-124', '200-207', '125-148']
+            target_worldcover_class: ['Herbaceous wetland']
+            target_glad_class: ['112-124', '200-207', '19-24', '125-148', '19']
             filter:
                 enabled: True
                 method: lee

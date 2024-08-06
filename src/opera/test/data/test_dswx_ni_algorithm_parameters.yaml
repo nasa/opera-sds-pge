@@ -28,6 +28,9 @@ runconfig:
         hand:
             mask_value: 200
 
+        partial_surface_water:
+            enabled: True
+
         ocean_mask:
             # Flag to apply ocean mask
             mask_enabled: False
@@ -45,6 +48,9 @@ runconfig:
             mosaic_mode: 'first'
             read_row_blk_size: 1000
             read_col_blk_size: 1100
+            resamp_required: False
+            resamp_method: 'nearest'
+            resamp_out_res: 30
 
         # Flag to turn on/off the filtering for RTC image.
         # The enhanced Lee filter is available.
