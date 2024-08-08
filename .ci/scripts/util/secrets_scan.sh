@@ -32,9 +32,19 @@ fi
 # backup list of known secrets
 cp -pr ${WORKSPACE}/.secrets.baseline ${WORKSPACE}/.secrets.new
 # find secrets in the repository
-detect-secrets scan -C ${WORKSPACE} --disable-plugin AbsolutePathDetectorExperimental --all-files \
-               --baseline ${WORKSPACE}/.secrets.new --exclude-files '\.secrets..*' --exclude-files '\.git.*' \
-               --exclude-files 'test_results'
+detect-secrets scan -C ${WORKSPACE} \
+                    --disable-plugin AbsolutePathDetectorExperimental \
+                    --all-files \
+                    --baseline ${WORKSPACE}/.secrets.new \
+                    --exclude-files '\.secrets..*' \
+                    --exclude-files '\.git.*' \
+                    --exclude-files 'test_results' \
+                    --exclude-files '\.pytest_cache' \
+                    --exclude-files '\.venv' \
+                    --exclude-files 'venv' \
+                    --exclude-files 'dist' \
+                    --exclude-files 'build' \
+                    --exclude-files '.*\.egg-info'
 # break build when new secrets discovered
 # function compares baseline/new secrets w/o listing results -- success(0) when new secret found
 
