@@ -61,9 +61,10 @@ RunConfig:
             dem_file_description: DEM
             worldcover_file: dswx_ni_pge_test/input_dir/worldcover.tif
             reference_water_file: dswx_ni_pge_test/input_dir/reference_water.tif
-            shoreline_shapefile: dswx_ni_pge_test/input_dir/shoreline.shp
+            shoreline_shapefile:
             hand_file: dswx_ni_pge_test/input_dir/hand.tif
             algorithm_parameters: dswx_ni_pge_test/input_dir/test_dswx_ni_algorithm_parameters.yaml
+            glad_classification_file: dswx_ni_pge_test/input_dir/glad_classification.tif
           static_ancillary_file_group:
             static_ancillary_inputs_flag: true
             mgrs_database_file: dswx_ni_pge_test/input_dir/MGRS_tile.sqlite
