@@ -22,7 +22,7 @@ then
     # Scanning an empty folder to generate an initial .secrets.baseline without secrets in the results.
     echo "⚠️ No existing .secrets.baseline file detected. Creating a new blank baseline file."
     mkdir -p ${WORKSPACE}/empty-dir
-    detect-secrets scan -C ${WORKSPACE}/empty-dir > ${WORKSPACE}/.secrets.baseline
+    detect-secrets -C ${WORKSPACE}/empty-dir scan > ${WORKSPACE}/.secrets.baseline
     echo "✅ Blank .secrets.baseline file created successfully."
     rm -r ${WORKSPACE}/empty-dir
 else
@@ -32,7 +32,7 @@ fi
 # backup list of known secrets
 cp -pr ${WORKSPACE}/.secrets.baseline ${WORKSPACE}/.secrets.new
 # find secrets in the repository
-detect-secrets scan -C ${WORKSPACE} \
+detect-secrets -C ${WORKSPACE} scan \
                     --disable-plugin AbsolutePathDetectorExperimental \
                     --all-files \
                     --baseline ${WORKSPACE}/.secrets.new \
