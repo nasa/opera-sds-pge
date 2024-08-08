@@ -21,6 +21,18 @@ pipeline {
                      required: true)
     }
     stages {
+        stage('Scan for possible secrets'){
+            steps{
+                sh label: "Secrets scan",
+                   script: ".ci/scripts/util/secrets_scan.sh"
+
+                archiveArtifacts artifacts: ".secrets.new", allowEmptyArchive: true, fingerprint: true
+                archiveArtifacts artifacts: ".secrets.diff", allowEmptyArchive: true, fingerprint: true
+
+                sh label: "Compare scan result to baseline",
+                   script: ".ci/scripts/util/secrets_scan_compare.sh"
+            }
+        }
         stage('Build OPERA PGE Docker image(s)') {
             steps {
                 script {
@@ -93,6 +105,7 @@ pipeline {
             echo 'Unstable :/'
         }
         failure {
+            archiveArtifacts artifacts: ".secrets.diff", allowEmptyArchive: true, fingerprint: true
             echo 'Failed :('
         }
         changed {
