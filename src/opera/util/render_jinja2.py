@@ -19,6 +19,14 @@ from opera.util.error_codes import ErrorCode
 from opera.util.logger import PgeLogger
 
 
+XML_TYPES = {
+    str: 'string',
+    int: 'int',
+    float: 'float',
+    bool: 'boolean',
+}
+
+
 def _make_undefined_handler_class(logger: PgeLogger):
     """
     Factory function, returns a child class of the jinja2.Undefined class for
@@ -128,3 +136,11 @@ def render_jinja2(template_filename: str, input_data: dict, logger: PgeLogger = 
     rendered_text = template.render(input_data)
 
     return rendered_text
+
+
+def python_type_to_xml_type(obj) -> str:
+    if not isinstance(obj, type):
+        obj = type(obj)
+
+    return XML_TYPES[obj]
+
