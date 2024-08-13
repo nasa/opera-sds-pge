@@ -9,6 +9,7 @@ from Sentinel-1 A/B (S1) PGE.
 
 """
 
+import json
 import re
 from datetime import datetime
 from os.path import abspath, basename, exists, getsize, join, splitext
@@ -22,7 +23,7 @@ from opera.util.error_codes import ErrorCode
 from opera.util.geo_utils import get_geographic_boundaries_from_mgrs_tile
 from opera.util.input_validation import validate_algorithm_parameters_config
 from opera.util.input_validation import validate_dswx_inputs
-from opera.util.render_jinja2 import render_jinja2
+from opera.util.render_jinja2 import render_jinja2, python_type_to_xml_type
 from opera.util.run_utils import get_checksum
 from opera.util.tiff_utils import get_geotiff_metadata
 from opera.util.time import get_time_for_filename
@@ -424,6 +425,46 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
         """
         return self._ancillary_filename() + ".qa.log"
 
+    def _augment_measured_parameters(self, measured_parameters):
+        """
+        Augment the measured parameters dict into a dict of dicts containing the needed fields for the MeasuredParameters
+        section of the ISO XML file.
+
+        Parameters
+        ----------
+        measured_parameters : dict
+            The GeoTIFF metadata from the output product. See get_geotiff_metadata()
+
+        Returns
+        -------
+        augmented_parameters : dict
+            The metadata fields converted to a list with name, value, types, etc
+        """
+        augmented_parameters = dict()
+
+        for name, value in measured_parameters.items():
+            if isinstance(value, list):
+                value = json.dumps(value)
+
+            data_type = python_type_to_xml_type(type(value))
+
+            # TODO: This is hardcoded for now, but we should eventually try to guess this
+            attr_type = 'processingInformation'
+
+            # TODO: Filling this attribute is also on the back burner for now
+            attr_description = '!Description TBD!'
+
+            attr_name = (name.title()
+                         .replace('Mgrs', 'MGRS')
+                         .replace('Dswx', 'DSWx')
+                         .replace('_', '')
+                         )
+
+            augmented_parameters[name] = (dict(name=attr_name, value=value, attr_type=attr_type,
+                                               attr_description=attr_description, data_type=data_type))
+
+        return augmented_parameters
+
     def _collect_dswx_s1_product_metadata(self, geotiff_product):
         """
         Gathers the available metadata from an output DSWx-S1 product for
@@ -441,8 +482,11 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
             for use with the ISO metadata Jinja2 template.
 
         """
+        output_product_metadata = dict()
+
         # Extract all metadata assigned by the SAS at product creation time
-        output_product_metadata = get_geotiff_metadata(geotiff_product)
+        measured_parameters = get_geotiff_metadata(geotiff_product)
+        output_product_metadata['MeasuredParameters'] = self._augment_measured_parameters(measured_parameters)
 
         # Get the Military Grid Reference System (MGRS) tile code and zone
         # identifier from the intermediate file name
