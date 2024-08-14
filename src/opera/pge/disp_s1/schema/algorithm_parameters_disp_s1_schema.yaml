@@ -21,6 +21,10 @@ phase_linking:
     shp_method: enum('glrt', 'ks', 'kld', 'rect')
     # Significance level (probability of false alarm) for SHP tests.
     shp_alpha: num(min=0.0, max=1.0)
+    # StBAS parameter to include only nearest-N interferograms forphase linking. A
+    #   `baseline_lag` of `n` will only include the closest`n` interferograms. `baseline_line`
+    #   must be positive.
+    baseline_lag: any(int(min=0), null())
 interferogram_network:
     # For single-reference network: Index of the reference image in the network.
     reference_idx: any(int(), null())
@@ -33,22 +37,89 @@ interferogram_network:
 unwrap_options:
     # Whether to run the unwrapping step after wrapped phase estimation.
     run_unwrap: bool()
+    # Whether to run Goldstein filtering step on wrapped interferogram.
+    run_goldstein: bool()
+    # Whether to run interpolation step on wrapped interferogram.
+    run_interpolation: bool()
     # Phase unwrapping method.
-    unwrap_method: enum('snaphu', 'icu', 'phass')
+    unwrap_method: enum('snaphu', 'icu', 'phass', 'spurt', 'whirlwind')
     # Number of interferograms to unwrap in parallel.
     n_parallel_jobs: int()
-    # (snaphu-py or multiscale unwrapping) Number of tiles to split the inputs into
-    ntiles: list()
-    # (for multiscale unwrapping) Extra multilook factor to use for the coarse unwrap.
-    downsample_factor: any(list(int(), min=2, max=2), null())
-    # (for use in snaphu-py) Amount of tile overlap (in pixels) along the (row, col) directions.
-    tile_overlap: list(int(), min=2, max=2)
-    # (for snaphu) Number of tiles to unwrap in parallel for each interferogram.
-    n_parallel_tiles: int()
-    # Initialization method for SNAPHU.
-    init_method: enum('mcf', 'mst')
-    # Statistical cost mode method for SNAPHU.
-    cost: enum('defo', 'smooth')
+    # Set wrapped phase/correlation to 0 where mask is 0 before unwrapping. .
+    zero_where_masked: bool()
+    preprocess_options:
+        # Adaptive phase (Goldstein) filter exponent parameter.
+        alpha: num(min=0.0, max=1.0)
+        # (for interpolation) Maximum radius to find scatterers.
+        max_radius: int(min=0)
+        # Threshold on the correlation raster to use for interpolation. Pixels with less than this
+        #   value are replaced by a weighted combination of neighboring pixels.
+        interpolation_cor_threshold: num(min=0.0, max=1.0)
+    snaphu_options:
+        # Number of tiles to split the inputs into using SNAPHU's internal tiling.
+        ntiles: list()
+        # Amount of tile overlap (in pixels) along the (row, col) directions.
+        tile_overlap: list(int(), min=2, max=2)
+        # Number of tiles to unwrap in parallel for each interferogram.
+        n_parallel_tiles: int()
+        # Initialization method for SNAPHU.
+        init_method: enum('mcf', 'mst')
+        # Statistical cost mode method for SNAPHU.
+        cost: enum('defo', 'smooth')
+    tophu_options:
+        # Number of tiles to split the inputs into.
+        ntiles: list()
+        # Extra multilook factor to use for the coarse unwrap.
+        downsample_factor: any(list(int(), min=2, max=2), null())
+        # Initialization method for SNAPHU.
+        init_method: enum('mcf', 'mst')
+        # Statistical cost mode method for SNAPHU.
+        cost: enum('defo', 'smooth')
+    spurt_options:
+        # Temporal coherence to pick pixels used on an irregular grid.
+        temporal_coherence_threshold: num(min=0.0, max=1.0)
+        general_settings:
+            # Tile up data spatially.
+            use_tiles: bool()
+        tiler_settings:
+            # Maximum number of tiles allowed.
+            max_tiles: int(min=1)
+            # Number of points used for determining tiles based on density.
+            #   Type: integer.
+            target_points_for_generation: int(min=0)
+            # Target points per tile when generating tiles.
+            target_points_per_tile: int(min=0)
+            # Dilation factor of non-overlapping tiles. 0.05 would lead to 5 percent dilation of the
+            #   tile.
+            dilation_factor: num(min=0.0)
+        solver_settings:
+            # Number of workers for temporal unwrapping in parallel. Set value to <=0 to let workflow
+            #   use default workers (ncpus - 1).
+            t_worker_count: int()
+            # Number of workers for spatial unwrapping in parallel. Set value to <=0 to let workflow use
+            #   (ncpus - 1).
+            s_worker_count: int()
+            # Temporal unwrapping operations over spatial links are performed in batches and each batch
+            #   is solved in parallel.
+            links_per_batch: int(min=0)
+            # Temporal unwrapping costs.
+            #   Options: ['constant', 'distance', 'centroid'].
+            t_cost_type: enum('constant', 'distance', 'centroid')
+            # Scale factor used to compute edge costs for temporal unwrapping.
+            t_cost_scale: num(min=0.0)
+            # Spatial unwrapping costs.
+            #   Options: ['constant', 'distance', 'centroid'].
+            s_cost_type: enum('constant', 'distance', 'centroid')
+            # Scale factor used to compute edge costs for spatial unwrapping.
+            s_cost_scale: num(min=0.0)
+        merger_settings:
+            # Minimum number of overlap pixels to be considered valid.
+            min_overlap_points: int()
+            # Currently, only 'dirichlet' is supported.
+            method: enum('dirichlet')
+            # Method used to estimate bulk offset between tiles.
+            #   Options: ['integer', 'L2'].
+            bulk_method: enum('integer', 'L2')
 output_options:
     # Output (x, y) resolution (in units of input data).
     output_resolution: any(include('x_y_object'), null())
