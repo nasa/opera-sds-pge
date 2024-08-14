@@ -68,9 +68,6 @@ class DispS1PreProcessorMixin(PreProcessorMixin):
                                              self.runconfig.algorithm_parameters_schema_path,
                                              self.runconfig.algorithm_parameters_file_config_path,
                                              self.logger)
-        # TODO gamma version of SAS seems to only support .grb format files,
-        #      reenable NetCDF format is ever supported/desired
-        # self.convert_troposphere_model_files()
 
     def convert_troposphere_model_files(self):
         """
