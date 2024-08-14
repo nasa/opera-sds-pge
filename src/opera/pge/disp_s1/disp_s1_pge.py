@@ -149,7 +149,7 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
         Evaluates the output files generated from SAS execution to ensure:
             - That one expected .nc file exists in the output directory designated
               by the RunConfig and is non-zero in size
-            - A .png file corresponding to the expected output .nc product exists
+            - .png files corresponding to the expected output .nc product exists
               alongside and is non-zero in size
             - If the SAS runconfig has the product_path_group.save_compressed_slc
               flag set to True, validate that a "compressed_slcs" directory
@@ -182,14 +182,18 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
 
             # Validate .png file(s)
             nc_file_no_ext, ext = splitext(basename(nc_file))
-            png_file = join(output_dir, f'{nc_file_no_ext}.unwrapped_phase.png')
+            png_files = [
+                join(output_dir, f'{nc_file_no_ext}.displacement.png'),
+                join(output_dir, f'{nc_file_no_ext}.short_wavelength_displacement.png')
+            ]
 
-            if not exists(png_file):
-                error_msg = f"Expected SAS output file {basename(png_file)} does not exist"
-                self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
-            elif not getsize(png_file):
-                error_msg = f"SAS output file {basename(png_file)} exists, but is empty"
-                self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
+            for png_file in png_files:
+                if not exists(png_file):
+                    error_msg = f"Expected SAS output file {basename(png_file)} does not exist"
+                    self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
+                elif not getsize(png_file):
+                    error_msg = f"SAS output file {basename(png_file)} exists, but is empty"
+                    self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
 
         save_compressed_slc = self.runconfig.sas_config['product_path_group']['save_compressed_slc']
         if save_compressed_slc:
@@ -250,7 +254,7 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
         # the format FXXXXX
         frame_id = f"F{self.runconfig.sas_config['input_file_group']['frame_id']:05d}"
 
-        inter_disp_product_filename = '.'.join(inter_filename.split('.')[:2] + ["nc"])
+        inter_disp_product_filename = '.'.join(inter_filename.split('.')[:1] + ["nc"])
 
         # Check if we've already cached the product metadata corresponding to
         # this set of intermediate products (there can be multiple sets of
@@ -835,7 +839,7 @@ class DispS1Executor(DispS1PreProcessorMixin, DispS1PostProcessorMixin, PgeExecu
             {
                 # Note: ordering matters here!
                 '*.nc': self._netcdf_filename,
-                '*unwrapped_phase.png': self._browse_filename,
+                '*.displacement.png': self._browse_filename,
                 'compressed*.h5': self._compressed_cslc_filename
             }
         )
