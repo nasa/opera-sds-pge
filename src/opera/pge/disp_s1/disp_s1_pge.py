@@ -825,7 +825,7 @@ class DispS1Executor(DispS1PreProcessorMixin, DispS1PostProcessorMixin, PgeExecu
     PGE_VERSION = "3.0.0-rc.2.2"
     """Version of the PGE (overrides default from base_pge)"""
 
-    SAS_VERSION = "0.2.8"  # Gamma release https://github.com/opera-adt/disp-s1/releases/tag/v0.2.8
+    SAS_VERSION = "0.4.2"  # Gamma release https://github.com/opera-adt/disp-s1/releases/tag/v0.4.2
     """Version of the SAS wrapped by this PGE, should be updated as needed"""
 
     def __init__(self, pge_name, runconfig_path, **kwargs):
