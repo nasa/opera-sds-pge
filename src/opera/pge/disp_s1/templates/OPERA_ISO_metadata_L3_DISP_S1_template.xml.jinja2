@@ -976,28 +976,6 @@
                             </gmd:description>
                         </gmd:LI_Source>
                     </gmd:source>
-                    {%- if run_config.Groups.PGE.DynamicAncillaryFilesGroup.AncillaryFileMap.amplitude_dispersion_files is not none %}
-                    {%- for amplitude_dispersion_file in run_config.Groups.PGE.DynamicAncillaryFilesGroup.AncillaryFileMap.amplitude_dispersion_files %}
-                    <gmd:source>
-                        <gmd:LI_Source>
-                            <gmd:description>
-                                <gco:CharacterString>Amplitude Dispersion File - {{ amplitude_dispersion_file }}{# ISO_OPERA_amplitudeDispersionFile #}</gco:CharacterString>
-                            </gmd:description>
-                        </gmd:LI_Source>
-                    </gmd:source>
-                    {%- endfor %}
-                    {%- endif %}
-                    {%- if run_config.Groups.PGE.DynamicAncillaryFilesGroup.AncillaryFileMap.amplitude_mean_files is not none %}
-                    {%- for amplitude_mean_file in run_config.Groups.PGE.DynamicAncillaryFilesGroup.AncillaryFileMap.amplitude_mean_files %}
-                    <gmd:source>
-                        <gmd:LI_Source>
-                            <gmd:description>
-                                <gco:CharacterString>Amplitude Mean File - {{ amplitude_mean_file }}{# ISO_OPERA_amplitudeMeanFile #}</gco:CharacterString>
-                            </gmd:description>
-                        </gmd:LI_Source>
-                    </gmd:source>
-                    {%- endfor %}
-                    {%- endif %}
                     {%- if run_config.Groups.PGE.DynamicAncillaryFilesGroup.AncillaryFileMap.static_layers_files is not none %}
                     {%- for static_layers_file in run_config.Groups.PGE.DynamicAncillaryFilesGroup.AncillaryFileMap.static_layers_files %}
                     <gmd:source>
