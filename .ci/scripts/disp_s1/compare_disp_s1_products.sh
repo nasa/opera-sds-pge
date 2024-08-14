@@ -43,10 +43,11 @@ do
     compare_out="N/A"
     compare_result="N/A"
     expected_file="N/A"
+    compare_exit_status=0
 
     echo "Evaluating output file $output_file"
 
-    if [[ "${output_file##*/}" == *.unw.nc ]]
+    if [[ "${output_file##*/}" == *.nc ]]
     then
         output_file=$(basename ${output_file})
         output_file_dates="${output_file%%.*}"
@@ -54,9 +55,9 @@ do
         echo "Output product date range is ${output_file_dates}"
 
         # Find the matching expected output product based on date range
-        for potential_file in "$EXPECTED_DIR"/*.unw.nc
+        for potential_file in "$EXPECTED_DIR"/*.nc
         do
-            if [[ "$potential_file" == *"${output_file_dates}.unw.nc" ]]; then
+            if [[ "$potential_file" == *"${output_file_dates}.nc" ]]; then
                 expected_file=$potential_file
                 echo "Expected output file is $expected_file"
                 break
