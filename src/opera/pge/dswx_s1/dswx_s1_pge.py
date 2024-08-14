@@ -316,14 +316,14 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
         # Metadata fields we need for ancillary file name should be equivalent
         # across all tiles, so just take the first set of cached metadata as
         # a representative
-        dswx_metadata = list(self._tile_metadata_cache.values())[0]
+        dswx_metadata = list(self._tile_metadata_cache.values())[0]['MeasuredParameters']
 
-        spacecraft_name = dswx_metadata['SPACECRAFT_NAME']
+        spacecraft_name = dswx_metadata['SPACECRAFT_NAME']['value']
         sensor = get_sensor_from_spacecraft_name(spacecraft_name)
         pixel_spacing = "30"  # fixed for tile-based products
 
         processing_time = get_time_for_filename(
-            datetime.strptime(dswx_metadata['PROCESSING_DATETIME'], '%Y-%m-%dT%H:%M:%SZ')
+            datetime.strptime(dswx_metadata['PROCESSING_DATETIME']['value'], '%Y-%m-%dT%H:%M:%SZ')
         )
 
         if not processing_time.endswith('Z'):
