@@ -5,18 +5,16 @@ import logging
 import sys
 from pathlib import Path
 
+import h5py
+import numpy as np
 from dolphin import io
 from dolphin._types import Filename
-
-import h5py
-
-import numpy as np
 from numpy.typing import ArrayLike
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-DSET_DEFAULT = "unwrapped_phase"
+DSET_DEFAULT = "displacement"
 
 # Opera PGE modifications to log errors and continue validation.
 '''
@@ -110,10 +108,10 @@ def compare_groups(
 
             if key == "connected_component_labels":
                 _validate_conncomp_labels(test_dataset, golden_dataset)
-            elif key == "unwrapped_phase":
+            elif key == "displacement":
                 test_conncomps = test_group["connected_component_labels"]
                 golden_conncomps = golden_group["connected_component_labels"]
-                _validate_unwrapped_phase(
+                _validate_displacement(
                     test_dataset,
                     golden_dataset,
                     test_conncomps,
@@ -137,6 +135,7 @@ def _compare_datasets_attr(
             f"Dataset names do not match: {golden_dataset.name} vs {test_dataset.name}"
         )
     name = golden_dataset.name
+    is_version_dset = "version" in golden_dataset.name
 
     if golden_dataset.shape != test_dataset.shape:
         # raise ComparisonError(
@@ -145,7 +144,8 @@ def _compare_datasets_attr(
             f" {test_dataset.shape}"
         )
 
-    if golden_dataset.dtype != test_dataset.dtype:
+    # Skip the dtype check for version datasets (we will just print these)
+    if golden_dataset.dtype != test_dataset.dtype and not is_version_dset:
         # raise ComparisonError(
         ComparisonError(
             f"{name} dtypes do not match: {golden_dataset.dtype} vs"
@@ -279,15 +279,16 @@ def _validate_conncomp_labels(
         ComparisonError(errmsg)
 
 
-def _validate_unwrapped_phase(
+def _validate_displacement(
     test_dataset: h5py.Dataset,
     ref_dataset: h5py.Dataset,
     test_conncomps: ArrayLike,
     ref_conncomps: ArrayLike,
     nan_threshold: float = 0.01,
-    atol: float = 1e-6,
+    atol: float = 1e-5,
+    wavelength: float = 299_792_458 / 5.405e9,
 ) -> None:
-    """Validate unwrapped phase values against a reference dataset.
+    """Validate displacement values against a reference dataset.
 
     Checks that the phase values in the test dataset are congruent with the reference
     dataset -- that is, their values are approximately the same modulo 2pi.
@@ -295,9 +296,9 @@ def _validate_unwrapped_phase(
     Parameters
     ----------
     test_dataset : h5py.Dataset
-        HDF5 dataset containing unwrapped phase values to be validated.
+        HDF5 dataset containing displacement values to be validated.
     ref_dataset : h5py.Dataset
-        HDF5 dataset containing unwrapped phase values to use as reference. Must have
+        HDF5 dataset containing displacement values to use as reference. Must have
         the same shape as `test_dataset`.
     test_conncomps : array_like
         Connected component labels associated with `test_dataset`.
@@ -308,7 +309,10 @@ def _validate_unwrapped_phase(
         connected component label). Must be in the interval [0, 1]. Defaults to 0.01.
     atol : float, optional
         Maximum allowable absolute error between the re-wrapped reference and test
-        values, in radians. Must be nonnegative. Defaults to 1e-6.
+        values, in meters. Must be nonnegative. Defaults to 1e-5.
+    wavelength : float, optional
+        Sensor wavelength to convert displacement to phase and rewrap.
+        Default is Sentinel-1 wavelength (speed of light / center frequency).
 
     Raises
     ------
@@ -318,7 +322,7 @@ def _validate_unwrapped_phase(
         If the two datasets were not congruent within the specified error tolerance.
 
     """
-    logger.info("Checking unwrapped phase...")
+    logger.info("Checking displacement...")
 
     if test_dataset.shape != ref_dataset.shape:
         errmsg = (
@@ -332,7 +336,7 @@ def _validate_unwrapped_phase(
         ref_dataset.shape != ref_conncomps.shape
     ):
         errmsg = (
-            "shape mismatch: unwrapped phase and connected component labels must have"
+            "shape mismatch: displacement and connected component labels must have"
             " the same shape"
         )
         # raise ValidationError(errmsg)
@@ -381,7 +385,7 @@ def _validate_unwrapped_phase(
 
     if test_nan_frac > nan_threshold:
         errmsg = (
-            f"unwrapped phase dataset {test_dataset.name!r} failed validation: too"
+            f"displacement dataset {test_dataset.name!r} failed validation: too"
             f" many nan values ({test_nan_frac} > {nan_threshold})"
         )
         # raise ValidationError(errmsg)
@@ -394,7 +398,7 @@ def _validate_unwrapped_phase(
     # Compute the difference between the test & reference values and wrap it to the
     # interval (-pi, pi].
     diff = np.subtract(ref_dataset, test_dataset)
-    wrapped_diff = rewrap(diff)
+    wrapped_diff = rewrap(diff * (-4 * np.pi) / wavelength)
 
     # Mask out invalid pixels and NaN-valued pixels.
     wrapped_diff = wrapped_diff[valid_mask & ~nan_mask]
@@ -406,7 +410,8 @@ def _validate_unwrapped_phase(
     logger.info(f"Mean absolute re-wrapped phase error: {mean_abs_err:.5f} rad")
     logger.info(f"Max absolute re-wrapped phase error: {max_abs_err:.5f} rad")
 
-    noncongruent_count = np.sum(abs_wrapped_diff > atol)
+    atol_radians = atol * 4 * np.pi / wavelength
+    noncongruent_count = np.sum(abs_wrapped_diff > atol_radians)
     logger.info(
         "Non-congruent pixel count:"
         f" {_fmt_ratio(noncongruent_count, wrapped_diff.size)}"
@@ -451,9 +456,14 @@ def _validate_dataset(
     golden = golden_dataset[()]
     test = test_dataset[()]
     if golden.dtype.kind == "S":
+        if "version" in golden_dataset.name:
+            logger.info(f"{golden_dataset.name}: {golden} vs. {test}")
+            return
         if not np.array_equal(golden, test):
-            # raise ComparisonError(f"Dataset {golden_dataset.name} values do not match")
-            ComparisonError(f"Dataset {golden_dataset.name} values do not match")
+            msg = f"Dataset {golden_dataset.name} values do not match:"
+            msg += f" {golden = } vs. {test = }"
+            #raise ComparisonError(msg)
+            ComparisonError(msg)
         return
 
     img_gold = np.ma.masked_invalid(golden)
