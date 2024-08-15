@@ -189,7 +189,7 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
                                                         else "Sentinel-1B")
 
                     # Cache the metadata for this product for use when generating the ISO XML
-                    self._tile_metadata_cache[tile_id] = self._collect_dswx_s1_product_metadata(output_file)
+                    self._tile_metadata_cache[tile_id] = dswx_metadata
 
                 if tile_id not in self._tile_filename_cache:
                     # Cache the core filename for use when naming the ISO XML file
