@@ -324,6 +324,7 @@ def validate_disp_inputs(runconfig, logger, name):
     )
 
     if ('static_layers_files' in dyn_anc_file_group and
+            isinstance(dyn_anc_file_group['static_layers_files'], list) and
             len(dyn_anc_file_group['static_layers_files']) > 0):
         check_input_list(dyn_anc_file_group['static_layers_files'], logger, name,
                          valid_extensions=('.h5',), check_zero_size=True)
@@ -340,12 +341,14 @@ def validate_disp_inputs(runconfig, logger, name):
         check_input(dyn_anc_file_group['dem_file'], logger, name,
                     valid_extensions=('.tif', '.tiff', '.vrt'), check_zero_size=True)
 
-    if ('ionosphere_files' in dyn_anc_file_group
-            and len(dyn_anc_file_group['ionosphere_files']) > 0):
+    if ('ionosphere_files' in dyn_anc_file_group and
+            isinstance(dyn_anc_file_group['ionosphere_files'], list) and
+            len(dyn_anc_file_group['ionosphere_files']) > 0):
         check_input_list(dyn_anc_file_group['ionosphere_files'], logger, name,
                          check_zero_size=True)
 
     if ('troposphere_files' in dyn_anc_file_group and
+            isinstance(dyn_anc_file_group['troposphere_files'], list) and
             len(dyn_anc_file_group['troposphere_files']) > 0):
         check_input_list(dyn_anc_file_group['troposphere_files'], logger, name,
                          valid_extensions=('.nc', '.h5', '.grb'), check_zero_size=True)
