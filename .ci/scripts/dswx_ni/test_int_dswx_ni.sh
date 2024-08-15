@@ -30,7 +30,7 @@ SAMPLE_TIME=1
 [ -z "${PGE_TAG}" ] && PGE_TAG="${USER}-dev"
 [ -z "${INPUT_DATA}" ] && INPUT_DATA="dswx_ni_beta_0.2_expected_input.zip"
 [ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="dswx_ni_beta_0.2_expected_output.zip"
-[ -z "${RUNCONFIG}" ] && RUNCONFIG="opera_pge_dswx_ni_delivery_0.1_interface_runconfig.yaml"
+[ -z "${RUNCONFIG}" ] && RUNCONFIG="opera_pge_dswx_ni_delivery_0.2_beta_runconfig.yaml"
 [ -z "${TMP_ROOT}" ] && TMP_ROOT="$DEFAULT_TMP_ROOT"
 
 # Create the test output directory in the work space
