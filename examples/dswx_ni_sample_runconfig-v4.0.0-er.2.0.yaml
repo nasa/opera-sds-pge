@@ -48,6 +48,10 @@ RunConfig:
           # more .tif files
           worldcover_file: /home/dswx_user/input_dir/worldcover.tif
 
+          # Path to GLAD land cover map
+          # Optional .tif file
+          glad_classification_file: /home/dswx_user/input_dir/glad_classification.tif
+
       ProductPathGroup:
         # Path to where output products should be stored
         # Must correspond to the file system within the Docker container,
@@ -181,6 +185,8 @@ RunConfig:
 
             # Separate runconfig file for algorithm parameters
             algorithm_parameters: /home/dswx_user/input_dir/algorithm_parameter_ni.yaml
+
+            glad_classification_file: /home/dswx_user/input_dir/glad_classification.tif
 
           static_ancillary_file_group:
             static_ancillary_inputs_flag: True

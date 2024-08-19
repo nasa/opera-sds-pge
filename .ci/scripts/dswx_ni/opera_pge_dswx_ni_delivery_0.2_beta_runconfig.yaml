@@ -48,6 +48,8 @@ RunConfig:
           # more .tif files
           worldcover_file: /home/dswx_user/input_dir/ancillary_data/worldcover.tif
 
+          glad_classification_file: /home/dswx_user/input_dir/ancillary_data/glad_classification.tif
+
       ProductPathGroup:
         # Path to where output products should be stored
         # Must correspond to the file system within the Docker container,
@@ -175,6 +177,8 @@ RunConfig:
             # HAND description
             hand_file_description: 'ASF HAND GLO30'
 
+            glad_classification_file: /home/dswx_user/input_dir/ancillary_data/glad_classification.tif
+
             # placeholders for inundated vegetation
             mean_backscattering:
             standard_deviation_backscattering:
@@ -205,7 +209,7 @@ RunConfig:
             sas_output_path: /home/dswx_user/output_dir
 
             # TODO: this should become a string once SAS schema is fixed
-            product_version: 0.1
+            product_version: 0.2
 
             # DSWx-NI product format
             output_imagery_format: 'COG'
@@ -224,6 +228,24 @@ RunConfig:
 
             # Width in pixels for the PNG browse image
             browse_image_width: 1024
+
+            # Flag to collapse water classes if set to True. Default is True.
+            flag_collapse_wtr_classes: True
+
+            # Flag to exclude inundated vegetation from processing if set to True.
+            exclude_inundated_vegetation:  False
+
+            # Flag to set non-water pixels to NoData value if set to True.
+            set_not_water_to_nodata: False
+
+            # Flag to set HAND mask pixels to NoData value if set to True.
+            set_hand_mask_to_nodata: True
+
+            # Flag to set layover and shadow pixels to NoData value if set to True.
+            set_layover_shadow_to_nodata: True
+
+            # Flag to set ocean-masked pixels to NoData value if set to True.
+            set_ocean_masked_to_nodata: False
 
             # Save the full-res GeoTIFF Browse image in addition to the PNG
             save_tif_to_output: True
