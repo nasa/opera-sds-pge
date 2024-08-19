@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera.pge.dswx_s1.dswx_s1_pge &mdash; opera-sds-pge 4.0.0-er.2.0 documentation</title>
+  <title>opera.pge.dswx_s1.dswx_s1_pge &mdash; opera-sds-pge 4.0.0-er.3.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
 
@@ -14,7 +14,7 @@
   
         <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=ad3cec08"></script>
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=dce9a651"></script>
         <script src="../../../../_static/doctools.js?v=888ff710"></script>
         <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../../../_static/js/theme.js"></script>
@@ -34,7 +34,7 @@
             opera-sds-pge
           </a>
               <div class="version">
-                4.0.0-er.2.0
+                4.0.0-er.3.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
@@ -103,6 +103,7 @@
 <span class="kn">from</span> <span class="nn">opera.util.input_validation</span> <span class="kn">import</span> <span class="n">validate_algorithm_parameters_config</span>
 <span class="kn">from</span> <span class="nn">opera.util.input_validation</span> <span class="kn">import</span> <span class="n">validate_dswx_inputs</span>
 <span class="kn">from</span> <span class="nn">opera.util.render_jinja2</span> <span class="kn">import</span> <span class="n">render_jinja2</span>
+<span class="kn">from</span> <span class="nn">opera.util.run_utils</span> <span class="kn">import</span> <span class="n">get_checksum</span>
 <span class="kn">from</span> <span class="nn">opera.util.tiff_utils</span> <span class="kn">import</span> <span class="n">get_geotiff_metadata</span>
 <span class="kn">from</span> <span class="nn">opera.util.time</span> <span class="kn">import</span> <span class="n">get_time_for_filename</span>
 
@@ -132,7 +133,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">sas_config</span><span class="p">[</span><span class="s1">&#39;runconfig&#39;</span><span class="p">][</span><span class="s1">&#39;groups&#39;</span><span class="p">][</span><span class="s1">&#39;dynamic_ancillary_file_group&#39;</span><span class="p">]</span>
 
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">dynamic_ancillary_file_group_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;dem_file&#39;</span><span class="p">,</span> <span class="s1">&#39;reference_water_file&#39;</span><span class="p">,</span> <span class="s1">&#39;worldcover_file&#39;</span><span class="p">,</span> <span class="s1">&#39;hand_file&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;dem_file&#39;</span><span class="p">,</span> <span class="s1">&#39;glad_classification_file&#39;</span><span class="p">,</span> <span class="s1">&#39;reference_water_file&#39;</span><span class="p">,</span> <span class="s1">&#39;worldcover_file&#39;</span><span class="p">,</span> <span class="s1">&#39;hand_file&#39;</span><span class="p">):</span>
                 <span class="n">input_validation</span><span class="o">.</span><span class="n">check_input</span><span class="p">(</span>
                     <span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">valid_extensions</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;.tif&#39;</span><span class="p">,</span> <span class="s1">&#39;.tiff&#39;</span><span class="p">,</span> <span class="s1">&#39;.vrt&#39;</span><span class="p">)</span>
                 <span class="p">)</span>
@@ -155,7 +156,7 @@
 
             <span class="k">elif</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;dem_file_description&#39;</span><span class="p">,</span> <span class="s1">&#39;worldcover_file_description&#39;</span><span class="p">,</span>
                          <span class="s1">&#39;reference_water_file_description&#39;</span><span class="p">,</span> <span class="s1">&#39;hand_file_description&#39;</span><span class="p">,</span>
-                         <span class="s1">&#39;shoreline_shapefile_description&#39;</span><span class="p">):</span>
+                         <span class="s1">&#39;glad_classification_file_description&#39;</span><span class="p">,</span> <span class="s1">&#39;shoreline_shapefile_description&#39;</span><span class="p">):</span>
                 <span class="c1"># these fields are included in the SAS input paths, but are not</span>
                 <span class="c1"># actually file paths, so skip them</span>
                 <span class="k">continue</span>
@@ -268,7 +269,7 @@
                                                         <span class="k">else</span> <span class="s2">&quot;Sentinel-1B&quot;</span><span class="p">)</span>
 
                     <span class="c1"># Cache the metadata for this product for use when generating the ISO XML</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_tile_metadata_cache</span><span class="p">[</span><span class="n">tile_id</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_collect_dswx_s1_product_metadata</span><span class="p">(</span><span class="n">output_file</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_tile_metadata_cache</span><span class="p">[</span><span class="n">tile_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">dswx_metadata</span>
 
                 <span class="k">if</span> <span class="n">tile_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tile_filename_cache</span><span class="p">:</span>
                     <span class="c1"># Cache the core filename for use when naming the ISO XML file</span>
@@ -332,6 +333,40 @@
                         <span class="sa">f</span><span class="s2">&quot;band: </span><span class="si">{</span><span class="n">num_bands</span><span class="si">}</span><span class="s2">&quot;</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INVALID_OUTPUT</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_checksum_output_products</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generates a dictionary mapping output product file names to the</span>
+<span class="sd">        corresponding MD5 checksum digest of the file&#39;s contents.</span>
+
+<span class="sd">        The products to generate checksums for are determined by scanning</span>
+<span class="sd">        the output product location specified by the RunConfig. Any files</span>
+<span class="sd">        within the directory that have the expected file extensions for output</span>
+<span class="sd">        products are then picked up for checksum generation.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        checksums : dict</span>
+<span class="sd">            Mapping of output product file names to MD5 checksums of said</span>
+<span class="sd">            products.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">output_products</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">get_output_product_filenames</span><span class="p">()</span>
+
+        <span class="c1"># Filter out any files that do not end with the expected extensions</span>
+        <span class="n">expected_extensions</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;.tif&#39;</span><span class="p">,</span> <span class="s1">&#39;.png&#39;</span><span class="p">)</span>
+        <span class="n">filtered_output_products</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">product</span><span class="p">:</span> <span class="n">splitext</span><span class="p">(</span><span class="n">product</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">expected_extensions</span><span class="p">,</span>
+            <span class="n">output_products</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Generate checksums on the filtered product list</span>
+        <span class="n">checksums</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">basename</span><span class="p">(</span><span class="n">output_product</span><span class="p">):</span> <span class="n">get_checksum</span><span class="p">(</span><span class="n">output_product</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">output_product</span> <span class="ow">in</span> <span class="n">filtered_output_products</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">checksums</span>
 
     <span class="k">def</span> <span class="nf">_ancillary_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -601,13 +636,11 @@
     <span class="k">def</span> <span class="nf">_stage_output_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Ensures that all output products produced by both the SAS and this PGE</span>
-<span class="sd">        are staged to the output location defined by the RunConfig. This includes</span>
-<span class="sd">        reassignment of file names to meet the file-naming conventions required</span>
-<span class="sd">        by the PGE.</span>
+<span class="sd">        are staged to the output location defined by the RunConfig.</span>
 
-<span class="sd">        This version of the method performs the same steps as the base PGE</span>
-<span class="sd">        implementation, except that an ISO xml metadata file is rendered for</span>
-<span class="sd">        each tile product covered by the input region.</span>
+<span class="sd">        For DSWx-S1, this only includes the ancillary outputs created by the PGE</span>
+<span class="sd">        (catalog metadata, ISO XML, etc.), since the DSWx-S1 performs its own</span>
+<span class="sd">        file name application and staging to the output directory.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Write the catalog metadata to disk with the appropriate filename</span>
@@ -704,10 +737,10 @@
     <span class="n">LEVEL</span> <span class="o">=</span> <span class="s2">&quot;L3&quot;</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Processing Level for DSWx-S1 Products&quot;&quot;&quot;</span>
 
-    <span class="n">PGE_VERSION</span> <span class="o">=</span> <span class="s2">&quot;3.0.0-rc.2.1&quot;</span>
+    <span class="n">PGE_VERSION</span> <span class="o">=</span> <span class="s2">&quot;3.0.0&quot;</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Version of the PGE (overrides default from base_pge)&quot;&quot;&quot;</span>
 
-    <span class="n">SAS_VERSION</span> <span class="o">=</span> <span class="s2">&quot;0.4.2&quot;</span>  <span class="c1"># CalVal release https://github.com/opera-adt/DSWX-SAR/releases/tag/v0.4.2</span>
+    <span class="n">SAS_VERSION</span> <span class="o">=</span> <span class="s2">&quot;1.0&quot;</span>  <span class="c1"># Final release https://github.com/opera-adt/DSWX-SAR/releases/tag/v1.0</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Version of the SAS wrapped by this PGE, should be updated as needed&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pge_name</span><span class="p">,</span> <span class="n">runconfig_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -725,7 +758,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2021-2023 California Institute of Technology.</p>
+    <p>&#169; Copyright 2021-2024 California Institute of Technology.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
