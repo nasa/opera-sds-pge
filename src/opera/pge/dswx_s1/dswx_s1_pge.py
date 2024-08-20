@@ -189,10 +189,6 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
                         "Sentinel-1A" if match_result.groupdict()['sensor'] == "S1A" else "Sentinel-1B"
 
                     # Cache the metadata for this product for use when generating the ISO XML
-                    # self._tile_metadata_cache[tile_id] = self._collect_dswx_s1_product_metadata(output_file)
-
-                    # Not sure why _collect_dswx_s1_product_metadata is called again to cache when the metadata
-                    # is explicitly modified
                     self._tile_metadata_cache[tile_id] = dswx_metadata
 
                 if tile_id not in self._tile_filename_cache:

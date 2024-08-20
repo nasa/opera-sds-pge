@@ -8,13 +8,13 @@ runconfig:
 
         # Polarizations to be used for DSWx-SAR
         # [polarizations] for list of specific frequency(s) e.g. [VV, VH] or [VV]
-        # 'dual-pol', 'co-pol', 'cross-pol' will search the polarizations Input GeoTiff files have. 
-        # For example, 'co-pol' uses ['HH'], ['VV'], or ['HH', 'VV'] by looking at the input data. 
+        # 'dual-pol', 'co-pol', 'cross-pol' will search the polarizations Input GeoTiff files have.
+        # For example, 'co-pol' uses ['HH'], ['VV'], or ['HH', 'VV'] by looking at the input data.
         polarizations: any(list(str(min=2, max=10), min=1, max=4), str(min=4, max=4), null(), required=False)
         # Additional for polarimetric computations to be performed in specific polarization modes (co/cross and co + cross)
         polarimetric_option: any(list(enum('ratio', 'span'), min=1, max=2), enum('ratio', 'span'), null(), required=False)
 
-        # Specifiy the max_value for permanent water and no_data_value for invalid pixels
+        # Specify the max_value for permanent water and no_data_value for invalid pixels
         reference_water:
             max_value: num(required=False)
             no_data_value: num(required=False)
@@ -24,6 +24,10 @@ runconfig:
 
         hand:
             mask_value: num(required=False)
+
+        partial_surface_water:
+            enabled: bool(required=False)
+            threshold: int(min=0, required=False)
 
         ocean_mask:
             # Flag to apply ocean mask
@@ -37,14 +41,38 @@ runconfig:
             mosaic_prefix: str(required=False)
             mosaic_cog_enable: bool(required=False)
             mosaic_mode: str(required=False)
+            resamp_required: bool(required=False)
+            resamp_method: str(required=False)
+            resamp_out_res: num(required=False)
             read_row_blk_size: int(min=1, required=False)
             read_col_blk_size: int(min=1, required=False)
+
         # Flag to turn on/off the filtering for RTC image.
         # The enhanced Lee filter is available.
         filter:
             enabled: bool(required=False)
-            window_size: num(min=1, max=999, required=False)
+            method: str(required=False)
             line_per_block: num(min=1, required=False)
+            block_pad: num(min=1, required=False)
+            lee_filter:
+                window_size: num(min=1, required=False)
+            guided_filter:
+                # Radius of the kernel used in the Guided Filter.
+                radius: num(min=1, required=False)
+                # Regularization parameter in Guided Filter to smooth within
+                # a radius. Default is 3.
+                eps: num(required=False)
+                # The depth of the output image.
+                ddepth: num(required=False)
+            bregman:
+                # The regularization parameter for TV Bregman denoising.
+                # It controls the amount of smoothing. Higher values
+                # produce more smoothed results.
+                lambda_value: num(required=False)
+            anisotropic_diffusion:
+                # Denoising weight. The greater the weight, the more
+                # denoising (at the expense of fidelity to image).
+                weight: num(required=False)
 
         initial_threshold:
             # Maximum tile size for initial threshold.
@@ -86,12 +114,12 @@ runconfig:
             # estimate single threshold per tile. If True, the trimodal distribution is assumed,
             # the lowest threshold is estimated.
             multi_threshold: bool(required=False)
-            # Flag to adjust threshold where two gaussian distribution is not overlapped. 
+            # Flag to adjust threshold where two gaussian distribution are not overlapped.
             # If 'adjust_if_nonoverlap' is enabled,
             # start to search the alternative threshold when two distributions are not
             # overlapped. The 'low_dist_percentile' is the percentile of
             # the low distribution and 'high_dist_percentile' is the percentile of
-            # the high distribution. Both values should be within range of 0 to 1. 
+            # the high distribution. Both values should be within range of 0 to 1.
             adjust_if_nonoverlap: bool(required=False)
             low_dist_percentile: num(required=False, min=0, max=1)
             high_dist_percentile: num(required=False, min=0, max=1)
@@ -149,12 +177,12 @@ runconfig:
             line_per_block: num(min=1, required=False)
 
         masking_ancillary:
-            # Land covers that behaves like dark lands in DSWx-SAR. 
-            # The elements should be in given landcover file. 
+            # Land covers that behaves like dark lands in DSWx-SAR.
+            # The elements should be in given landcover file.
             # The elements will be masked out during this step.
             land_cover_darkland_list: list(required=False)
             # The elements is considered as the dark land candidates
-            # where these elemtns are spatially connected to the dark land.
+            # where these elements are spatially connected to the dark land.
             land_cover_darkland_extension_list: list(required=False)
             land_cover_water_label: list(required=False)
             # VV and VH threshold values for dark land candidates
@@ -169,7 +197,7 @@ runconfig:
             extended_darkland_water_buffer: int(required=False, min=0)
             # Assuming the height of the water/land boundaries has low
             # variation, the standard deviation is estimated along the boundaries
-            # and removed if the std is high. 
+            # and removed if the std is high.
             hand_variation_mask: bool(required=False)
             # pixels with HAND threshold is masked out.
             hand_variation_threshold: num(min=0, max=100, required=False)
@@ -195,7 +223,29 @@ runconfig:
             dual_pol_ratio_threshold: num(min=0, max=30, required=False)
             cross_pol_min: num(min=-30, max=10, required=False)
             line_per_block: num(min=1, required=False)
-            # Land covers where the inundated vegetation is detected. 
-            target_land_cover: list(required=False)
+            # If 'auto' is selected and GLAD is available, GLAD will be
+            # used for inundated vegetation. In the 'auto' option,
+            # GLAD is not provided, then WorldCover will be used to extract
+            # the target areas.
+            target_area_file_type: enum('WorldCover', 'GLAD', 'auto')
+            # Land covers where the inundated vegetation is detected.
+            target_worldcover_class: list(required=False)
+            target_glad_class: list(required=False)
+            filter:
+                enabled: bool(required=False)
+                method: str(required=False)
+                line_per_block: num(min=1, required=False)
+                block_pad: num(min=1, required=False)
+                lee_filter:
+                    window_size: num(min=1, required=False)
+                guided_filter:
+                    radius: num(min=1, required=False)
+                    eps: num(required=False)
+                    ddepth: num(required=False)
+                bregman:
+                    lambda_value: num(required=False)
+                anisotropic_diffusion:
+                    weight: num(required=False)
+
         # If debug mode is true, intermediate product is generated.
         debug_mode: bool(required=False)

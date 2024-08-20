@@ -25,6 +25,7 @@ from opera.pge import RunConfig
 from opera.pge.dswx_ni.dswx_ni_pge import DSWxNIExecutor
 from opera.util import PgeLogger
 from opera.util.mock_utils import MockGdal
+from opera.util.input_validation import validate_algorithm_parameters_config
 
 
 class DswxNIPgeTestCase(unittest.TestCase):
@@ -70,7 +71,7 @@ class DswxNIPgeTestCase(unittest.TestCase):
         )
 
         # Create dummy versions of the expected ancillary inputs
-        for ancillary_file in ('dem.tif', 'worldcover.tif',
+        for ancillary_file in ('dem.tif', 'worldcover.tif', 'glad_classification.tif',
                                'reference_water.tif', 'shoreline.shp',
                                'shoreline.dbf', 'shoreline.prj',
                                'shoreline.shx', 'hand.tif',
@@ -490,7 +491,7 @@ class DswxNIPgeTestCase(unittest.TestCase):
     def test_iso_metadata_creation(self):
         """
         Mock ISO metadata is created when the PGE post processor runs.
-        Successful creation of metadata is verified in test_dswx_s1_pge_execution().
+        Successful creation of metadata is verified in test_dswx_ni_pge_execution().
         This test will verify that error conditions are caught.
         """
         runconfig_path = join(self.data_dir, 'test_dswx_ni_config.yaml')
@@ -533,7 +534,7 @@ class DswxNIPgeTestCase(unittest.TestCase):
             yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
 
         try:
-            pge = DSWxNIExecutor(pge_name="DswxS1PgeTest", runconfig_path=test_runconfig_path)
+            pge = DSWxNIExecutor(pge_name="DswxNiPgeTest", runconfig_path=test_runconfig_path)
 
             with self.assertRaises(RuntimeError):
                 pge.run()
@@ -548,6 +549,202 @@ class DswxNIPgeTestCase(unittest.TestCase):
         finally:
             if os.path.exists(test_runconfig_path):
                 os.unlink(test_runconfig_path)
+
+    def test_dswx_ni_pge_ancillary_input_validation(self):
+        """Test validation checks made on the set of ancillary input files"""
+        runconfig_path = join(self.data_dir, 'test_dswx_ni_config.yaml')
+        test_runconfig_path = join(self.data_dir, 'invalid_dswx_ni_runconfig.yaml')
+
+        with open(runconfig_path, 'r', encoding='utf-8') as stream:
+            runconfig_dict = yaml.safe_load(stream)
+
+        ancillary_file_group_dict = \
+            runconfig_dict['RunConfig']['Groups']['SAS']['runconfig']['groups']['dynamic_ancillary_file_group']
+
+        # Test an invalid (missing) ancillary file
+        ancillary_file_group_dict['dem_file'] = 'non_existent_dem.tif'
+
+        with open(test_runconfig_path, 'w', encoding='utf-8') as input_path:
+            yaml.safe_dump(runconfig_dict, input_path, sort_keys=False)
+
+        try:
+            pge = DSWxNIExecutor(pge_name="DSWxNiPgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            # Config validation occurs before the log is fully initialized, but the
+            # initial log file should still exist and contain details of the validation
+            # error
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            # Open the log file, and check that the validation error details were captured
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn("Could not locate specified input non_existent_dem.tif.", log_contents)
+
+            # Reset to valid dem path
+            ancillary_file_group_dict['dem_file'] = 'dswx_ni_pge_test/input_dir/dem.tif'
+
+            # Test with an unexpected file extension (should be 'tif', 'tiff', or 'vrt)
+            os.system("touch dswx_ni_pge_test/input_dir/worldcover.png")
+            ancillary_file_group_dict['worldcover_file'] = 'dswx_ni_pge_test/input_dir/worldcover.png'
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as input_path:
+                yaml.safe_dump(runconfig_dict, input_path, sort_keys=False)
+
+            pge = DSWxNIExecutor(pge_name="DSWxNiPgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            # Open the log file, and check that the validation error details were captured
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn("Input file dswx_ni_pge_test/input_dir/worldcover.png "
+                          "does not have an expected file extension.", log_contents)
+
+            # Reset to valid worldcover_file path
+            ancillary_file_group_dict['worldcover_file'] = 'dswx_ni_pge_test/input_dir/worldcover.tif'
+
+            # Test with incomplete shoreline shapefile set
+            os.system("touch dswx_ni_pge_test/input_dir/missing_shoreline.shp")
+            ancillary_file_group_dict['shoreline_shapefile'] = 'dswx_ni_pge_test/input_dir/missing_shoreline.shp'
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as input_path:
+                yaml.safe_dump(runconfig_dict, input_path, sort_keys=False)
+
+            pge = DSWxNIExecutor(pge_name="DSWxNiPgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            # Open the log file, and check that the validation error details were captured
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn("Additional shapefile dswx_ni_pge_test/input_dir/missing_shoreline.dbf "
+                          "could not be located", log_contents)
+        finally:
+
+            if os.path.exists(test_runconfig_path):
+                os.unlink(test_runconfig_path)
+
+    def test_dswx_ni_pge_validate_algorithm_parameters_config(self):
+        """Test basic parsing and validation of an algorithm parameters RunConfig file"""
+        runconfig_path = join(self.data_dir, 'test_dswx_ni_config.yaml')
+
+        self.runconfig = RunConfig(runconfig_path)
+
+        algorithm_parameters_runconfig = self.runconfig.algorithm_parameters_file_config_path
+        algorithm_parameters_schema_path = self.runconfig.algorithm_parameters_schema_path
+
+        pge = DSWxNIExecutor(pge_name="DswxNiPgeTest", runconfig_path=runconfig_path)
+
+        # Kickoff execution of DSWX-NI PGE
+        pge.run()
+
+        self.assertEqual(algorithm_parameters_runconfig, pge.runconfig.algorithm_parameters_file_config_path)
+        # parse the run config file
+        runconfig_dict = self.runconfig._parse_algorithm_parameters_run_config_file \
+            (pge.runconfig.algorithm_parameters_file_config_path)  # noqa E211
+        # Check the properties of the algorithm parameters RunConfig to ensure they match as expected
+        validate_algorithm_parameters_config(
+            pge.name,
+            algorithm_parameters_schema_path,
+            algorithm_parameters_runconfig,
+            pge.logger
+        )
+
+    @patch.object(opera.util.tiff_utils, "gdal", MockGdal)
+    def test_dswx_ni_pge_bad_algorithm_parameters_schema_path(self):
+        """
+        Test for invalid path in the optional 'AlgorithmParametersSchemaPath'
+        section of in the PGE runconfig file.
+        section of the runconfig file.  Also test for no AlgorithmParametersSchemaPath
+        """
+        runconfig_path = join(self.data_dir, 'test_dswx_ni_config.yaml')
+        test_runconfig_path = join(self.data_dir, 'invalid_dswx_ni_config.yaml')
+
+        with open(runconfig_path, 'r', encoding='utf-8') as infile:
+            runconfig_dict = yaml.safe_load(infile)
+
+        runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']['AlgorithmParametersSchemaPath'] = \
+            'test/data/test_algorithm_parameters_non_existent.yaml'  # noqa E211
+
+        with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+            yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+
+        try:
+            pge = DSWxNIExecutor(pge_name="DswxNiPgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+        finally:
+            if os.path.exists(test_runconfig_path):
+                os.unlink(test_runconfig_path)
+
+        # Verify that None is returned when 'AlgorithmParametersSchemaPath' is set to None
+        with open(runconfig_path, 'r', encoding='utf-8') as infile:
+            runconfig_dict = yaml.safe_load(infile)
+
+        runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']['AlgorithmParametersSchemaPath'] = None
+
+        with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+            yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+
+        try:
+            pge = DSWxNIExecutor(pge_name="DswxNiPgeTest", runconfig_path=test_runconfig_path)
+
+            pge.run()
+
+            # Check that the log file was created and moved into the output directory
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            # Open and read the log
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn("No algorithm_parameters_schema_path provided in runconfig file", log_contents)
+
+        finally:
+            if os.path.exists(test_runconfig_path):
+                os.unlink(test_runconfig_path)
+
+    def test_dswx_ni_pge_bad_algorithm_parameters_path(self):
+        """Test for invalid path to 'algorithm_parameters' in SAS runconfig file"""
+        runconfig_path = join(self.data_dir, 'test_dswx_ni_config.yaml')
+        test_runconfig_path = join(self.data_dir, 'invalid_dswx_ni_config.yaml')
+
+        with open(runconfig_path, 'r', encoding='utf-8') as infile:
+            runconfig_dict = yaml.safe_load(infile)
+
+        runconfig_dict['RunConfig']['Groups']['SAS']['runconfig']['groups']['dynamic_ancillary_file_group'] \
+            ['algorithm_parameters'] = 'test/data/test_algorithm_parameters_non_existent.yaml'  # noqa E211
+
+        with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+            yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+
+        try:
+            pge = DSWxNIExecutor(pge_name="DswxNiPgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+        finally:
+            if os.path.exists(test_runconfig_path):
+                os.unlink(test_runconfig_path)
+
+
 
 if __name__ == "__main__":
     unittest.main()

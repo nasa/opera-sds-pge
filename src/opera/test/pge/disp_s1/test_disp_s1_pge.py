@@ -98,8 +98,6 @@ class DispS1PgeTestCase(unittest.TestCase):
         # Create non-empty dummy input files expected by test runconfig
         dummy_input_files = ['compressed_slc_t087_185678_iw2_20180101_20180210.h5',
                              'dem.tif', 'water_mask.tif',
-                             't087_185678_iw2_amp_dispersion.tif',
-                             't087_185678_iw2_amp_mean.tif',
                              't087_185678_iw2_topo.h5',
                              'jplg0410.18i.Z',
                              'GMAO_tropo_20180210T000000_ztd.nc',
@@ -132,22 +130,48 @@ class DispS1PgeTestCase(unittest.TestCase):
         self.assertEqual(runconfig['phase_linking']['half_window']['x'], 11)
         self.assertEqual(runconfig['phase_linking']['half_window']['y'], 5)
         self.assertEqual(runconfig['phase_linking']['use_evd'], False)
-        self.assertEqual(runconfig['phase_linking']['beta'], 0.00)
+        self.assertEqual(runconfig['phase_linking']['beta'], 0.0)
         self.assertEqual(runconfig['phase_linking']['shp_method'], 'glrt')
         self.assertEqual(runconfig['phase_linking']['shp_alpha'], 0.005)
+        self.assertEqual(runconfig['phase_linking']['baseline_lag'], None)
         self.assertEqual(runconfig['interferogram_network']['reference_idx'], None)
         self.assertEqual(runconfig['interferogram_network']['max_bandwidth'], None)
         self.assertEqual(runconfig['interferogram_network']['max_temporal_baseline'], None)
         self.assertListEqual(runconfig['interferogram_network']['indexes'], [[0, -1]])
         self.assertEqual(runconfig['unwrap_options']['run_unwrap'], True)
+        self.assertEqual(runconfig['unwrap_options']['run_goldstein'], False)
+        self.assertEqual(runconfig['unwrap_options']['run_interpolation'], False)
         self.assertEqual(runconfig['unwrap_options']['unwrap_method'], 'phass')
-        self.assertEqual(runconfig['unwrap_options']['n_parallel_jobs'], 5)
-        self.assertListEqual(runconfig['unwrap_options']['ntiles'], [1, 1])
-        self.assertEqual(runconfig['unwrap_options']['downsample_factor'], None)
-        self.assertListEqual(runconfig['unwrap_options']['tile_overlap'], [0, 0])
-        self.assertEqual(runconfig['unwrap_options']['n_parallel_tiles'], 1)
-        self.assertEqual(runconfig['unwrap_options']['init_method'], 'mcf')
-        self.assertEqual(runconfig['unwrap_options']['cost'], 'smooth')
+        self.assertEqual(runconfig['unwrap_options']['n_parallel_jobs'], 1)
+        self.assertEqual(runconfig['unwrap_options']['zero_where_masked'], False)
+        self.assertEqual(runconfig['unwrap_options']['preprocess_options']['alpha'], 0.5)
+        self.assertEqual(runconfig['unwrap_options']['preprocess_options']['max_radius'], 51)
+        self.assertEqual(runconfig['unwrap_options']['preprocess_options']['interpolation_cor_threshold'], 0.5)
+        self.assertListEqual(runconfig['unwrap_options']['snaphu_options']['ntiles'], [5, 5])
+        self.assertListEqual(runconfig['unwrap_options']['snaphu_options']['tile_overlap'], [0, 0])
+        self.assertEqual(runconfig['unwrap_options']['snaphu_options']['n_parallel_tiles'], 1)
+        self.assertEqual(runconfig['unwrap_options']['snaphu_options']['init_method'], 'mcf')
+        self.assertEqual(runconfig['unwrap_options']['snaphu_options']['cost'], 'smooth')
+        self.assertListEqual(runconfig['unwrap_options']['tophu_options']['ntiles'], [5, 5])
+        self.assertListEqual(runconfig['unwrap_options']['tophu_options']['downsample_factor'], [5, 5])
+        self.assertEqual(runconfig['unwrap_options']['tophu_options']['init_method'], 'mcf')
+        self.assertEqual(runconfig['unwrap_options']['tophu_options']['cost'], 'smooth')
+        self.assertEqual(runconfig['unwrap_options']['spurt_options']['temporal_coherence_threshold'], 0.6)
+        self.assertEqual(runconfig['unwrap_options']['spurt_options']['general_settings']['use_tiles'], True)
+        self.assertEqual(runconfig['unwrap_options']['spurt_options']['tiler_settings']['max_tiles'], 16)
+        self.assertEqual(runconfig['unwrap_options']['spurt_options']['tiler_settings']['target_points_for_generation'], 120000)
+        self.assertEqual(runconfig['unwrap_options']['spurt_options']['tiler_settings']['target_points_per_tile'],800000)
+        self.assertEqual(runconfig['unwrap_options']['spurt_options']['tiler_settings']['dilation_factor'],0.05)
+        self.assertEqual(runconfig['unwrap_options']['spurt_options']['solver_settings']['t_worker_count'], 1)
+        self.assertEqual(runconfig['unwrap_options']['spurt_options']['solver_settings']['s_worker_count'], 1)
+        self.assertEqual(runconfig['unwrap_options']['spurt_options']['solver_settings']['links_per_batch'], 50000)
+        self.assertEqual(runconfig['unwrap_options']['spurt_options']['solver_settings']['t_cost_type'], 'constant')
+        self.assertEqual(runconfig['unwrap_options']['spurt_options']['solver_settings']['t_cost_scale'], 100.0)
+        self.assertEqual(runconfig['unwrap_options']['spurt_options']['solver_settings']['s_cost_type'], 'constant')
+        self.assertEqual(runconfig['unwrap_options']['spurt_options']['solver_settings']['s_cost_scale'], 100.0)
+        self.assertEqual(runconfig['unwrap_options']['spurt_options']['merger_settings']['min_overlap_points'], 25)
+        self.assertEqual(runconfig['unwrap_options']['spurt_options']['merger_settings']['method'], 'dirichlet')
+        self.assertEqual(runconfig['unwrap_options']['spurt_options']['merger_settings']['bulk_method'], 'L2')
         self.assertEqual(runconfig['output_options']['output_resolution'], None)
         self.assertEqual(runconfig['output_options']['strides']['x'], 6)
         self.assertEqual(runconfig['output_options']['strides']['y'], 3)
@@ -158,8 +182,8 @@ class DispS1PgeTestCase(unittest.TestCase):
         self.assertEqual(runconfig['output_options']['hdf5_creation_options']['compression_opts'], 4)
         self.assertEqual(runconfig['output_options']['hdf5_creation_options']['shuffle'], True)
         self.assertListEqual(runconfig['output_options']['gtiff_creation_options'],
-                             ['COMPRESS=DEFLATE', 'ZLEVEL=4', 'BIGTIFF=YES',
-                              'TILED=YES', 'BLOCKXSIZE=128', 'BLOCKYSIZE=128'])
+                             ['COMPRESS=lzw', 'ZLEVEL=4', 'BIGTIFF=yes',
+                              'TILED=yes', 'INTERLEAVE=band', 'BLOCKXSIZE=128', 'BLOCKYSIZE=128'])
         self.assertEqual(runconfig['output_options']['add_overviews'], True)
         self.assertListEqual(runconfig['output_options']['overview_levels'], [4, 8, 16, 32, 64])
         self.assertEqual(runconfig['subdataset'], '/data/VV')
@@ -208,8 +232,8 @@ class DispS1PgeTestCase(unittest.TestCase):
             pge.runconfig.output_product_path, pge._catalog_metadata_filename())
         self.assertTrue(os.path.exists(expected_catalog_metadata_file))
 
-        expected_inter_filename = abspath("disp_s1_pge_test/output_dir/20180101_20180330.unw.nc")
-        expected_browse_filename = abspath("disp_s1_pge_test/output_dir/20180101_20180330.unw.unwrapped_phase.png")
+        expected_inter_filename = abspath("disp_s1_pge_test/output_dir/20170217_20170430.nc")
+        expected_browse_filename = abspath("disp_s1_pge_test/output_dir/20170217_20170430.displacement.png")
 
         # Check that the ISO metadata file was created and all placeholders were
         # filled in
@@ -238,8 +262,8 @@ class DispS1PgeTestCase(unittest.TestCase):
         )
         self.assertTrue(os.path.exists(expected_browse_product))
 
-        for compressed_cslc in ['compressed_t042_088905_iw1_20221107_20221119_20221213.h5',
-                                'compressed_t042_088906_iw1_20221107_20221119_20221213.h5']:
+        for compressed_cslc in ['compressed_t027_056725_iw1_20170217_20170217_20170430.h5',
+                                'compressed_t027_056726_iw1_20170217_20170217_20170430.h5']:
             expected_compressed_cslc_product = join(
                 pge.runconfig.output_product_path,
                 pge._compressed_cslc_filename(compressed_cslc)
@@ -267,7 +291,7 @@ class DispS1PgeTestCase(unittest.TestCase):
         nc_file = nc_files[0]
 
         expected_disp_filename = pge._netcdf_filename(
-            inter_filename=abspath("disp_s1_pge_test/output_dir/20180101_20180330.unw.nc")
+            inter_filename=abspath("disp_s1_pge_test/output_dir/20170217_20170430.nc")
         )
 
         self.assertEqual(os.path.basename(nc_file), expected_disp_filename)
@@ -284,7 +308,7 @@ class DispS1PgeTestCase(unittest.TestCase):
         )
 
         expected_browse_filename = pge._browse_filename(
-            inter_filename=abspath("disp_s1_pge_test/output_dir/20180101_20180330.unw.unwrapped_phase.png")
+            inter_filename=abspath("disp_s1_pge_test/output_dir/20170217_20170430.displacement.png")
         )
 
         self.assertRegex(
@@ -302,7 +326,7 @@ class DispS1PgeTestCase(unittest.TestCase):
 
         expected_ccslc_filename = pge._compressed_cslc_filename(
             inter_filename="disp_s1_pge_test/output_dir/compressed_slcs/"
-                           "compressed_t042_088905_iw1_20221107_20221119_20221213.h5"
+                           "compressed_t027_056725_iw1_20170217_20170217_20170430.h5"
         )
 
         self.assertEqual(os.path.basename(h5_file), expected_ccslc_filename)
@@ -333,7 +357,7 @@ class DispS1PgeTestCase(unittest.TestCase):
         # Create a sample metadata file within the output directory of the PGE
         output_dir = join(os.curdir, "disp_s1_pge_test/output_dir")
 
-        disp_metadata_path = join(output_dir, '20180101_20180330.unw.nc')
+        disp_metadata_path = join(output_dir, '20170217_20170430.nc')
 
         create_test_disp_metadata_product(disp_metadata_path)
 
@@ -672,57 +696,6 @@ class DispS1PgeTestCase(unittest.TestCase):
         logger = PgeLogger()
         validate_disp_inputs(runconfig, logger, "DISP-S1")
 
-        # Test an ancillary file group with an acceptable busrt id that does not match a cslc burst id
-        cslc_file_list = add_text_to_file(get_sample_input_files('compressed')
-                                          + get_sample_input_files('uncompressed'))
-        sas_config['input_file_group']['cslc_file_list'] = cslc_file_list
-        sas_config['dynamic_ancillary_file_group'] = {}
-
-        # Burst id 't087_185684_iw1' does not match a cslc burst id and will cause an error
-        amplitude_dispersion_files = add_text_to_file(['t087_185683_iw2_amp_dispersion.tif',
-                                                       't087_185684_iw1_amp_dispersion.tif'])
-        sas_config['dynamic_ancillary_file_group']['amplitude_dispersion_files'] = amplitude_dispersion_files
-        runconfig = MockRunConfig(sas_config)
-        logger = PgeLogger()
-
-        with self.assertRaises(RuntimeError):
-            validate_disp_inputs(runconfig, logger, "DISP-S1")
-
-        # Check to see that the RuntimeError is as expected
-        logger.close_log_stream()
-        log_file = logger.get_file_name()
-        self.assertTrue(exists(log_file))
-
-        with open(log_file, 'r', encoding='utf-8') as lfile:
-            log = lfile.read()
-
-        self.assertIn('Set of input CSLC burst IDs do not match the set of ancillary burst IDs: ', log)
-
-        # Test for an ancillary file that does not have a unique burst id
-        cslc_file_list = add_text_to_file(get_sample_input_files('compressed')
-                                          + get_sample_input_files('uncompressed'))
-        sas_config['input_file_group']['cslc_file_list'] = cslc_file_list
-        sas_config['dynamic_ancillary_file_group'] = {}
-
-        # Two files have the same burst id ('t087_185683_iw2'): this will cause an error
-        amplitude_dispersion_files = add_text_to_file(['t087_185683_iw2_amp_dispersion.tif',
-                                                       't087_185683_iw2_amp_dispersion.tif',
-                                                       't087_185684_iw1_amp_dispersion.tif'])
-        sas_config['dynamic_ancillary_file_group']['amplitude_dispersion_files'] = amplitude_dispersion_files
-        runconfig = MockRunConfig(sas_config)
-        logger = PgeLogger()
-
-        with self.assertRaises(RuntimeError):
-            validate_disp_inputs(runconfig, logger, "DISP-S1")
-
-        # Check to see that the RuntimeError is as expected
-        logger.close_log_stream()
-        log_file = logger.get_file_name()
-        self.assertTrue(exists(log_file))
-        with open(log_file, 'r', encoding='utf-8') as lfile:
-            log = lfile.read()
-        self.assertIn("Duplicate burst ID's in ancillary file list.", log)
-
     @patch.object(opera.pge.disp_s1.disp_s1_pge.subprocess, "run", mock_grib_to_netcdf)
     def test_disp_s1_pge_validate_product_output(self):
         """Test off-nominal output conditions"""
@@ -756,8 +729,8 @@ class DispS1PgeTestCase(unittest.TestCase):
             # Too many .nc files
             runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']['ProgramOptions'] = \
                 ['-p disp_s1_pge_test/output_dir/compressed_slcs;',
-                 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.unw.nc bs=1M count=1;',
-                 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180331.unw.nc bs=1M count=1; echo ']
+                 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.nc bs=1M count=1;',
+                 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180331.nc bs=1M count=1; echo ']
 
             with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
                 yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
@@ -778,7 +751,7 @@ class DispS1PgeTestCase(unittest.TestCase):
             # Empty product file
             runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']['ProgramOptions'] = \
                 ['-p disp_s1_pge_test/output_dir/compressed_slcs;',
-                 'touch disp_s1_pge_test/output_dir/20180101_20180330.unw.nc; echo ']
+                 'touch disp_s1_pge_test/output_dir/20180101_20180330.nc; echo ']
 
             with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
                 yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
@@ -793,13 +766,13 @@ class DispS1PgeTestCase(unittest.TestCase):
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
 
-            self.assertIn("SAS output file 20180101_20180330.unw.nc exists, but is empty", log_contents)
+            self.assertIn("SAS output file 20180101_20180330.nc exists, but is empty", log_contents)
             shutil.rmtree(pge.runconfig.output_product_path)
 
             # PNG file is missing
             runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']['ProgramOptions'] = \
                 ['-p disp_s1_pge_test/output_dir/compressed_slcs;',
-                 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.unw.nc bs=1M count=1;',
+                 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.nc bs=1M count=1;',
                  '/bin/echo DISP-S1 invoked with RunConfig']
 
             with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
@@ -815,14 +788,14 @@ class DispS1PgeTestCase(unittest.TestCase):
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
 
-            self.assertIn("SAS output file 20180101_20180330.unw.unwrapped_phase.png does not exist", log_contents)
+            self.assertIn("SAS output file 20180101_20180330.displacement.png does not exist", log_contents)
             shutil.rmtree(pge.runconfig.output_product_path)
 
             # PNG is zero sized
             runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']['ProgramOptions'] = \
                 ['-p disp_s1_pge_test/output_dir/compressed_slcs;',
-                 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.unw.nc bs=1M count=1;',
-                 'touch disp_s1_pge_test/output_dir/20180101_20180330.unw.unwrapped_phase.png;',
+                 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.nc bs=1M count=1;',
+                 'touch disp_s1_pge_test/output_dir/20180101_20180330.displacement.png;',
                  '/bin/echo DISP-S1 invoked with RunConfig']
 
             with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
@@ -838,15 +811,16 @@ class DispS1PgeTestCase(unittest.TestCase):
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
 
-            self.assertIn("SAS output file 20180101_20180330.unw.unwrapped_phase.png exists, but is empty",
+            self.assertIn("SAS output file 20180101_20180330.displacement.png exists, but is empty",
                           log_contents)
             shutil.rmtree(pge.runconfig.output_product_path)
 
             # compressed_slc directory does not exist
             runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']['ProgramOptions'] = \
                 ['-p disp_s1_pge_test/output_dir/not_compressed_slcs;',
-                 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.unw.nc bs=1M count=1;',
-                 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.unw.unwrapped_phase.png '
+                 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.nc bs=1M count=1;',
+                 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.displacement.png bs=1M count=1;',
+                 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.short_wavelength_displacement.png bs=1M count=1;',
                  'bs=1M count=1;', '/bin/echo DISP-S1 invoked with RunConfig']
 
             with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
@@ -868,8 +842,9 @@ class DispS1PgeTestCase(unittest.TestCase):
             # compressed_slc directory exists but is empty
             runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']['ProgramOptions'] = \
                 ['-p disp_s1_pge_test/output_dir/compressed_slcs;',
-                 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.unw.nc bs=1M count=1;',
-                 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.unw.unwrapped_phase.png '
+                 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.nc bs=1M count=1;',
+                 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.displacement.png bs=1M count=1;',
+                 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.short_wavelength_displacement.png bs=1M count=1;',
                  'bs=1M count=1;', '/bin/echo DISP-S1 invoked with RunConfig']
 
             with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
@@ -891,11 +866,10 @@ class DispS1PgeTestCase(unittest.TestCase):
             # File in compressed_slc directory is zero sized
             runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']['ProgramOptions'] = \
                 ['-p disp_s1_pge_test/output_dir/compressed_slcs;',
-                 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.unw.nc bs=1M count=1;',
-                 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.unw.unwrapped_phase.png '
-                 'bs=1M count=1;',
-                 'touch disp_s1_pge_test/output_dir/compressed_slcs/'
-                 'compressed_slc_t087_185684_iw2_20180222_20180330.h5;',
+                 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.nc bs=1M count=1;',
+                 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.displacement.png bs=1M count=1;',
+                 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.short_wavelength_displacement.png bs=1M count=1;',
+                 'touch disp_s1_pge_test/output_dir/compressed_slcs/compressed_slc_t087_185684_iw2_20180222_20180330.h5;',
                  # noqa E501
                  '/bin/echo DISP-S1 invoked with RunConfig']
 

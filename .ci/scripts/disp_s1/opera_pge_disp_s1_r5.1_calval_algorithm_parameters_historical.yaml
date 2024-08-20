@@ -5,7 +5,7 @@ ps_options:
 phase_linking:
   # Size of the ministack for sequential estimator.
   #   Type: integer.
-  ministack_size: 1000
+  ministack_size: 15
   # Maximum number of compressed images to use in sequential estimator. If there are more
   #   ministacks than this, the earliest CCSLCs will be left out of the later stacks.
   #   Type: integer.
@@ -38,7 +38,7 @@ phase_linking:
 interferogram_network:
   # For single-reference network: Index of the reference image in the network.
   #   Type: integer | null.
-  reference_idx:
+  reference_idx: 0
   # Max `n` to form the nearest-`n` interferograms by index.
   #   Type: integer | null.
   max_bandwidth:
@@ -48,8 +48,6 @@ interferogram_network:
   # For manual-index network: list of (ref_idx, sec_idx) defining the interferograms to form.
   #   Type: array | null.
   indexes:
-    -   - 0
-        - -1
 unwrap_options:
   # Whether to run the unwrapping step after wrapped phase estimation.
   #   Type: boolean.
