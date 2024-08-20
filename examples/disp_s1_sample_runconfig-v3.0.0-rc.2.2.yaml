@@ -45,18 +45,6 @@ RunConfig:
           # or more .tif files
           mask_file: /home/mamba/input_dir/watermask.tif
 
-          # Paths to Amplitude Dispersion files (1 per burst) for PS update calculation
-          # All files should be in .tif format
-          amplitude_dispersion_files:
-            - /home/mamba/input_dir/t042_088905_iw1_amp_dispersion.tif
-            - /home/mamba/input_dir/t042_088906_iw1_amp_dispersion.tif
-
-          # Paths to Amplitude Mean files (1 per burst) for PS update calculation
-          # All files should be in .tif format
-          amplitude_mean_files:
-            - /home/mamba/input_dir/t042_088905_iw1_amp_mean.tif
-            - /home/mamba/input_dir/t042_088906_iw1_amp_mean.tif
-
           # Paths to the incidence/azimuth-angle CSLC static layer files (1 per burst)
           # All files should be in HDF5 (.h5) format
           static_layers_files:
@@ -189,16 +177,6 @@ RunConfig:
         # REQUIRED: Path to file containing SAS algorithm parameters.
         #   Type: string.
         algorithm_parameters_file: /home/mamba/input_dir/algorithm_parameters_forward.yaml
-        # Paths to existing Amplitude Dispersion file (1 per burst) for PS update calculation.
-        #   Type: list.
-        amplitude_dispersion_files:
-          - /home/mamba/input_dir/t042_088905_iw1_amp_dispersion.tif
-          - /home/mamba/input_dir/t042_088906_iw1_amp_dispersion.tif
-        # Paths to an existing Amplitude Mean files (1 per burst) for PS update calculation.
-        #   Type: list.
-        amplitude_mean_files:
-          - /home/mamba/input_dir/t042_088905_iw1_amp_mean.tif
-          - /home/mamba/input_dir/t042_088906_iw1_amp_mean.tif
         # Paths to the incidence/azimuth-angle files (1 per burst).
         #   Type: list.
         static_layers_files:
@@ -252,7 +230,7 @@ RunConfig:
         sas_output_path: /home/mamba/output_dir
         # Version of the product.
         #   Type: string.
-        product_version: "0.2"
+        product_version: "0.4"
         # Whether the SAS should output and save the Compressed SLCs in addition to the standard
         #   product output.
         #   Type: boolean.

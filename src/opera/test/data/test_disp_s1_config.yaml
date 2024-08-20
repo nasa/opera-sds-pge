@@ -15,10 +15,6 @@ RunConfig:
                 AncillaryFileMap:
                     dem_file: disp_s1_pge_test/input_dir/dem.tif
                     mask_file: disp_s1_pge_test/input_dir/water_mask.tif
-                    amplitude_dispersion_files:
-                        - disp_s1_pge_test/input_dir/t087_185678_iw2_amp_dispersion.tif
-                    amplitude_mean_files:
-                        - disp_s1_pge_test/input_dir/t087_185678_iw2_amp_mean.tif
                     static_layers_files:
                         - disp_s1_pge_test/input_dir/t087_185678_iw2_topo.h5
                     ionosphere_files:
@@ -34,14 +30,15 @@ RunConfig:
 
             PrimaryExecutable:
                 ProductIdentifier: DISP_S1
-                ProductVersion: "0.2"
+                ProductVersion: "0.4"
                 ProgramPath: mkdir
                 ProgramOptions:
                     - '-p disp_s1_pge_test/output_dir/compressed_slcs;'
-                    - 'python3 -c "from opera.util.h5_utils import create_test_disp_metadata_product; create_test_disp_metadata_product(\"disp_s1_pge_test/output_dir/20180101_20180330.unw.nc\")";'
-                    - 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.unw.unwrapped_phase.png bs=1M count=1;'
-                    - 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/compressed_slcs/compressed_t042_088905_iw1_20221107_20221119_20221213.h5 bs=1M count=1;'
-                    - 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/compressed_slcs/compressed_t042_088906_iw1_20221107_20221119_20221213.h5 bs=1M count=1;'
+                    - 'python3 -c "from opera.util.h5_utils import create_test_disp_metadata_product; create_test_disp_metadata_product(\"disp_s1_pge_test/output_dir/20170217_20170430.nc\")";'
+                    - 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20170217_20170430.displacement.png bs=1M count=1;'
+                    - 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20170217_20170430.short_wavelength_displacement.png bs=1M count=1;'
+                    - 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/compressed_slcs/compressed_t027_056725_iw1_20170217_20170217_20170430.h5 bs=1M count=1;'
+                    - 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/compressed_slcs/compressed_t027_056726_iw1_20170217_20170217_20170430.h5 bs=1M count=1;'
                     - '/bin/echo DISP-S1 invoked with RunConfig'
                 ErrorCodeBase: 500000
                 SchemaPath: pge/disp_s1/schema/disp_s1_sas_schema.yaml
@@ -69,10 +66,6 @@ RunConfig:
                 algorithm_parameters_file: disp_s1_pge_test/input_dir/test_disp_s1_algorithm_parameters.yaml
                 dem_file: disp_s1_pge_test/input_dir/dem.tif
                 mask_file: disp_s1_pge_test/input_dir/water_mask.tif
-                amplitude_dispersion_files:
-                    - disp_s1_pge_test/input_dir/t087_185678_iw2_amp_dispersion.tif
-                amplitude_mean_files:
-                    - disp_s1_pge_test/input_dir/t087_185678_iw2_amp_mean.tif
                 static_layers_files:
                     - disp_s1_pge_test/input_dir/t087_185678_iw2_topo.h5
                 ionosphere_files:
@@ -92,7 +85,7 @@ RunConfig:
                 product_path: disp_s1_pge_test/output_dir
                 scratch_path: disp_s1_pge_test/scratch_dir
                 sas_output_path: disp_s1_pge_test/output_dir
-                product_version: "0.2"
+                product_version: "0.4"
                 save_compressed_slc: true
 
             worker_settings:

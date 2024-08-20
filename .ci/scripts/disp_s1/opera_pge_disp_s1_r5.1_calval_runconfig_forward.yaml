@@ -1,0 +1,286 @@
+RunConfig:
+  Name: OPERA-DISP-S1-PGE-INT-TEST-CONFIG
+
+  Groups:
+    PGE:
+      PGENameGroup:
+        PGEName: DISP_S1_PGE
+
+      InputFilesGroup:
+        InputFilePaths:
+          - /home/mamba/input_dir/input_slcs/OPERA_L2_CSLC-S1_T027-056725-IW1_20170217T132750Z_20240625T060850Z_S1A_VV_v1.1.h5
+          - /home/mamba/input_dir/input_slcs/OPERA_L2_CSLC-S1_T027-056726-IW1_20170217T132752Z_20240625T060850Z_S1A_VV_v1.1.h5
+          - /home/mamba/input_dir/input_slcs/OPERA_L2_CSLC-S1_T027-056725-IW1_20170301T132749Z_20240625T090210Z_S1A_VV_v1.1.h5
+          - /home/mamba/input_dir/input_slcs/OPERA_L2_CSLC-S1_T027-056726-IW1_20170301T132752Z_20240625T090210Z_S1A_VV_v1.1.h5
+          - /home/mamba/input_dir/input_slcs/OPERA_L2_CSLC-S1_T027-056725-IW1_20170313T132750Z_20240625T121542Z_S1A_VV_v1.1.h5
+          - /home/mamba/input_dir/input_slcs/OPERA_L2_CSLC-S1_T027-056726-IW1_20170313T132753Z_20240625T121542Z_S1A_VV_v1.1.h5
+          - /home/mamba/input_dir/input_slcs/OPERA_L2_CSLC-S1_T027-056725-IW1_20170325T132750Z_20240625T163704Z_S1A_VV_v1.1.h5
+          - /home/mamba/input_dir/input_slcs/OPERA_L2_CSLC-S1_T027-056726-IW1_20170325T132753Z_20240625T163704Z_S1A_VV_v1.1.h5
+          - /home/mamba/input_dir/input_slcs/OPERA_L2_CSLC-S1_T027-056725-IW1_20170406T132750Z_20240625T225442Z_S1A_VV_v1.1.h5
+          - /home/mamba/input_dir/input_slcs/OPERA_L2_CSLC-S1_T027-056726-IW1_20170406T132753Z_20240625T225442Z_S1A_VV_v1.1.h5
+          - /home/mamba/input_dir/input_slcs/OPERA_L2_CSLC-S1_T027-056725-IW1_20170418T132751Z_20240626T003055Z_S1A_VV_v1.1.h5
+          - /home/mamba/input_dir/input_slcs/OPERA_L2_CSLC-S1_T027-056726-IW1_20170418T132754Z_20240626T003055Z_S1A_VV_v1.1.h5
+          - /home/mamba/input_dir/input_slcs/OPERA_L2_CSLC-S1_T027-056725-IW1_20170430T132752Z_20240626T015700Z_S1A_VV_v1.1.h5
+          - /home/mamba/input_dir/input_slcs/OPERA_L2_CSLC-S1_T027-056726-IW1_20170430T132754Z_20240626T015700Z_S1A_VV_v1.1.h5
+
+      DynamicAncillaryFilesGroup:
+        AncillaryFileMap:
+          dem_file: /home/mamba/input_dir/dynamic_ancillary_files/dem.tif
+          mask_file: /home/mamba/input_dir/dynamic_ancillary_files/water_mask.tif
+          static_layers_files:
+            - /home/mamba/input_dir/dynamic_ancillary_files/static_layers/OPERA_L2_CSLC-S1-STATIC_T027-056725-IW1_20140403_S1A_v1.0.h5
+            - /home/mamba/input_dir/dynamic_ancillary_files/static_layers/OPERA_L2_CSLC-S1-STATIC_T027-056726-IW1_20140403_S1A_v1.0.h5
+          ionosphere_files:
+            - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg0070.18i
+            - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg0190.18i
+            - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg0310.18i
+            - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg0430.18i
+            - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg0480.17i
+            - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg0550.18i
+            - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg0600.17i
+            - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg0670.18i
+            - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg0720.17i
+            - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg0790.18i
+            - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg0840.17i
+            - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg0910.18i
+            - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg0960.17i
+            - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg1030.18i
+            - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg1080.17i
+            - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg1150.18i
+            - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg1200.17i
+            - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg1270.18i
+            - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg1320.17i
+            - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg1390.18i
+            - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg1440.17i
+            - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg1510.18i
+            - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg1560.17i
+            - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg1630.18i
+            - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg1750.18i
+            - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg1800.17i
+            - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg1870.18i
+            - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg1920.17i
+            - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg1990.18i
+            - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg2040.17i
+            - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg2110.18i
+            - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg2160.17i
+            - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg2280.17i
+            - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg2400.17i
+            - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg2520.17i
+            - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg2640.17i
+            - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg2760.17i
+            - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg2880.17i
+            - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg3000.17i
+            - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg3120.17i
+            - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg3190.18i
+            - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg3240.17i
+            - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg3360.17i
+            - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg3480.17i
+            - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg3600.17i
+          troposphere_files:
+            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1487289600000000000.nc
+            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1488326400000000000.nc
+            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1489363200000000000.nc
+            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1490400000000000000.nc
+            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1491436800000000000.nc
+            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1492473600000000000.nc
+            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1493510400000000000.nc
+            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1494547200000000000.nc
+            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1495584000000000000.nc
+            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1496620800000000000.nc
+            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1498694400000000000.nc
+            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1499731200000000000.nc
+            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1500768000000000000.nc
+            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1501804800000000000.nc
+            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1502841600000000000.nc
+            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1503878400000000000.nc
+            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1504915200000000000.nc
+            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1505952000000000000.nc
+            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1506988800000000000.nc
+            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1508025600000000000.nc
+            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1509062400000000000.nc
+            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1510099200000000000.nc
+            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1511136000000000000.nc
+            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1512172800000000000.nc
+            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1513209600000000000.nc
+            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1514246400000000000.nc
+            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1515283200000000000.nc
+            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1516320000000000000.nc
+            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1517356800000000000.nc
+            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1518393600000000000.nc
+            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1519430400000000000.nc
+            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1520467200000000000.nc
+            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1521504000000000000.nc
+            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1522540800000000000.nc
+            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1523577600000000000.nc
+            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1524614400000000000.nc
+            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1525651200000000000.nc
+            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1526688000000000000.nc
+            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1527724800000000000.nc
+            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1528761600000000000.nc
+            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1529798400000000000.nc
+            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1530835200000000000.nc
+            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1531872000000000000.nc
+            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1532908800000000000.nc
+            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1542240000000000000.nc
+
+      ProductPathGroup:
+        OutputProductPath: /home/mamba/output_dir
+        ScratchPath: /home/mamba/scratch_dir
+
+      PrimaryExecutable:
+        ProductIdentifier: DISP_S1
+        ProductVersion: "0.4"
+        ProgramPath: disp-s1
+        ProgramOptions:
+          - run
+        ErrorCodeBase: 500000
+        SchemaPath: /home/mamba/opera/pge/disp_s1/schema/disp_s1_sas_schema.yaml
+        AlgorithmParametersSchemaPath: /home/mamba/opera/pge/disp_s1/schema/algorithm_parameters_disp_s1_schema.yaml
+        IsoTemplatePath: /home/mamba/opera/pge/disp_s1/templates/OPERA_ISO_metadata_L3_DISP_S1_template.xml.jinja2
+
+      QAExecutable:
+        Enabled: True
+        ProgramPath: /home/mamba/opera/.ci/scripts/disp_s1/compare_disp_s1_products.sh
+        ProgramOptions: []
+
+      DebugLevelGroup:
+        DebugSwitch: False
+        ExecuteViaShell: False
+    SAS:
+      input_file_group:
+        cslc_file_list:
+          - /home/mamba/input_dir/input_slcs/OPERA_L2_CSLC-S1_T027-056725-IW1_20170217T132750Z_20240625T060850Z_S1A_VV_v1.1.h5
+          - /home/mamba/input_dir/input_slcs/OPERA_L2_CSLC-S1_T027-056726-IW1_20170217T132752Z_20240625T060850Z_S1A_VV_v1.1.h5
+          - /home/mamba/input_dir/input_slcs/OPERA_L2_CSLC-S1_T027-056725-IW1_20170301T132749Z_20240625T090210Z_S1A_VV_v1.1.h5
+          - /home/mamba/input_dir/input_slcs/OPERA_L2_CSLC-S1_T027-056726-IW1_20170301T132752Z_20240625T090210Z_S1A_VV_v1.1.h5
+          - /home/mamba/input_dir/input_slcs/OPERA_L2_CSLC-S1_T027-056725-IW1_20170313T132750Z_20240625T121542Z_S1A_VV_v1.1.h5
+          - /home/mamba/input_dir/input_slcs/OPERA_L2_CSLC-S1_T027-056726-IW1_20170313T132753Z_20240625T121542Z_S1A_VV_v1.1.h5
+          - /home/mamba/input_dir/input_slcs/OPERA_L2_CSLC-S1_T027-056725-IW1_20170325T132750Z_20240625T163704Z_S1A_VV_v1.1.h5
+          - /home/mamba/input_dir/input_slcs/OPERA_L2_CSLC-S1_T027-056726-IW1_20170325T132753Z_20240625T163704Z_S1A_VV_v1.1.h5
+          - /home/mamba/input_dir/input_slcs/OPERA_L2_CSLC-S1_T027-056725-IW1_20170406T132750Z_20240625T225442Z_S1A_VV_v1.1.h5
+          - /home/mamba/input_dir/input_slcs/OPERA_L2_CSLC-S1_T027-056726-IW1_20170406T132753Z_20240625T225442Z_S1A_VV_v1.1.h5
+          - /home/mamba/input_dir/input_slcs/OPERA_L2_CSLC-S1_T027-056725-IW1_20170418T132751Z_20240626T003055Z_S1A_VV_v1.1.h5
+          - /home/mamba/input_dir/input_slcs/OPERA_L2_CSLC-S1_T027-056726-IW1_20170418T132754Z_20240626T003055Z_S1A_VV_v1.1.h5
+          - /home/mamba/input_dir/input_slcs/OPERA_L2_CSLC-S1_T027-056725-IW1_20170430T132752Z_20240626T015700Z_S1A_VV_v1.1.h5
+          - /home/mamba/input_dir/input_slcs/OPERA_L2_CSLC-S1_T027-056726-IW1_20170430T132754Z_20240626T015700Z_S1A_VV_v1.1.h5
+
+        frame_id: 7091
+      dynamic_ancillary_file_group:
+        algorithm_parameters_file: /home/mamba/runconfig/opera_pge_disp_s1_r5.1_calval_algorithm_parameters_forward.yaml
+        static_layers_files:
+          - /home/mamba/input_dir/dynamic_ancillary_files/static_layers/OPERA_L2_CSLC-S1-STATIC_T027-056725-IW1_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/dynamic_ancillary_files/static_layers/OPERA_L2_CSLC-S1-STATIC_T027-056726-IW1_20140403_S1A_v1.0.h5
+        mask_file: /home/mamba/input_dir/dynamic_ancillary_files/water_mask.tif
+        dem_file: /home/mamba/input_dir/dynamic_ancillary_files/dem.tif
+        ionosphere_files:
+          - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg0070.18i
+          - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg0190.18i
+          - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg0310.18i
+          - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg0430.18i
+          - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg0480.17i
+          - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg0550.18i
+          - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg0600.17i
+          - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg0670.18i
+          - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg0720.17i
+          - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg0790.18i
+          - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg0840.17i
+          - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg0910.18i
+          - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg0960.17i
+          - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg1030.18i
+          - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg1080.17i
+          - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg1150.18i
+          - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg1200.17i
+          - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg1270.18i
+          - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg1320.17i
+          - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg1390.18i
+          - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg1440.17i
+          - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg1510.18i
+          - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg1560.17i
+          - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg1630.18i
+          - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg1750.18i
+          - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg1800.17i
+          - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg1870.18i
+          - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg1920.17i
+          - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg1990.18i
+          - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg2040.17i
+          - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg2110.18i
+          - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg2160.17i
+          - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg2280.17i
+          - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg2400.17i
+          - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg2520.17i
+          - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg2640.17i
+          - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg2760.17i
+          - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg2880.17i
+          - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg3000.17i
+          - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg3120.17i
+          - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg3190.18i
+          - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg3240.17i
+          - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg3360.17i
+          - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg3480.17i
+          - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg3600.17i
+        troposphere_files:
+          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1487289600000000000.nc
+          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1488326400000000000.nc
+          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1489363200000000000.nc
+          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1490400000000000000.nc
+          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1491436800000000000.nc
+          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1492473600000000000.nc
+          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1493510400000000000.nc
+          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1494547200000000000.nc
+          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1495584000000000000.nc
+          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1496620800000000000.nc
+          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1498694400000000000.nc
+          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1499731200000000000.nc
+          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1500768000000000000.nc
+          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1501804800000000000.nc
+          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1502841600000000000.nc
+          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1503878400000000000.nc
+          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1504915200000000000.nc
+          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1505952000000000000.nc
+          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1506988800000000000.nc
+          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1508025600000000000.nc
+          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1509062400000000000.nc
+          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1510099200000000000.nc
+          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1511136000000000000.nc
+          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1512172800000000000.nc
+          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1513209600000000000.nc
+          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1514246400000000000.nc
+          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1515283200000000000.nc
+          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1516320000000000000.nc
+          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1517356800000000000.nc
+          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1518393600000000000.nc
+          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1519430400000000000.nc
+          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1520467200000000000.nc
+          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1521504000000000000.nc
+          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1522540800000000000.nc
+          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1523577600000000000.nc
+          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1524614400000000000.nc
+          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1525651200000000000.nc
+          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1526688000000000000.nc
+          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1527724800000000000.nc
+          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1528761600000000000.nc
+          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1529798400000000000.nc
+          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1530835200000000000.nc
+          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1531872000000000000.nc
+          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1532908800000000000.nc
+          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1542240000000000000.nc
+
+      static_ancillary_file_group:
+        frame_to_burst_json: /home/mamba/input_dir/static_ancillary_files/opera-s1-disp-0.5.0-frame-to-burst.json.zip
+        reference_date_database_json:
+      primary_executable:
+        product_type: DISP_S1_FORWARD
+      product_path_group:
+        product_path: /home/mamba/output_dir
+        scratch_path: /home/mamba/scratch_dir
+        sas_output_path: /home/mamba/output_dir
+        product_version: "0.4"
+        save_compressed_slc: true
+      worker_settings:
+        gpu_enabled: false
+        threads_per_worker: 1
+        n_parallel_bursts: 1
+        block_shape:
+          - 512
+          - 512
+      log_file: /home/mamba/output_dir/sas_logfile.log

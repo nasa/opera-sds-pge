@@ -323,24 +323,6 @@ def validate_disp_inputs(runconfig, logger, name):
         logger, name
     )
 
-    if ('amplitude_dispersion_files' in dyn_anc_file_group and
-            len(dyn_anc_file_group['amplitude_dispersion_files']) > 0):
-        check_input_list(dyn_anc_file_group['amplitude_dispersion_files'], logger, name,
-                         valid_extensions=('.tif', '.tiff'), check_zero_size=True)
-        check_disp_s1_ancillary_burst_ids(cslc_burst_id_set,
-                                          dyn_anc_file_group['amplitude_dispersion_files'],
-                                          logger,
-                                          name)
-
-    if ('amplitude_mean_files' in dyn_anc_file_group and
-            len(dyn_anc_file_group['amplitude_mean_files']) > 0):
-        check_input_list(dyn_anc_file_group['amplitude_mean_files'], logger, name,
-                         valid_extensions=('.tif', '.tiff'), check_zero_size=True)
-        check_disp_s1_ancillary_burst_ids(cslc_burst_id_set,
-                                          dyn_anc_file_group['amplitude_mean_files'],
-                                          logger,
-                                          name)
-
     if ('static_layers_files' in dyn_anc_file_group and
             len(dyn_anc_file_group['static_layers_files']) > 0):
         check_input_list(dyn_anc_file_group['static_layers_files'], logger, name,
@@ -371,7 +353,7 @@ def validate_disp_inputs(runconfig, logger, name):
     if ('frame_to_burst_json' in static_anc_file_group and
             static_anc_file_group['frame_to_burst_json'] is not None):
         check_input(static_anc_file_group['frame_to_burst_json'], logger, name,
-                    valid_extensions=('.json',), check_zero_size=True)
+                    valid_extensions=('.json', '.zip'), check_zero_size=True)
 
     if ('reference_date_database_json' in static_anc_file_group and
             static_anc_file_group['reference_date_database_json'] is not None):
