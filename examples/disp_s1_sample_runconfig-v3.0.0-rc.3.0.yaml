@@ -1,4 +1,4 @@
-# Sample RunConfig for use with the DISP-S1 PGE v3.0.0-rc.2.2
+# Sample RunConfig for use with the DISP-S1 PGE v3.0.0-rc.3.0
 # This RunConfig should require minimal changes in order to be used with the
 # OPERA PCM.
 
@@ -93,7 +93,7 @@ RunConfig:
         ProductIdentifier: DISP_S1
 
         # Product version specific to output products
-        ProductVersion: "0.2"
+        ProductVersion: "0.4"
 
         # Path to the executable to run, path must be reachable from
         # within the Docker container (i.e. findable with a "which" command)
