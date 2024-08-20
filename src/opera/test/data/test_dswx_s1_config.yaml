@@ -50,6 +50,7 @@ RunConfig:
           input_file_group:
             input_file_path:
             - dswx_s1_pge_test/input_dir
+            input_mgrs_collection_id: MS_123_45
           dynamic_ancillary_file_group:
             dem_file: dswx_s1_pge_test/input_dir/dem.tif
             dem_file_description: DEM
