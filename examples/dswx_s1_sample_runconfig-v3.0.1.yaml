@@ -1,4 +1,4 @@
-# Sample RunConfig for use with the DSWx-S1 PGE v3.0.0
+# Sample RunConfig for use with the DSWx-S1 PGE v3.0.1
 # This RunConfig should require minimal changes in order to be used with the
 # OPERA PCM.
 
@@ -162,6 +162,9 @@ RunConfig:
               /home/dswx_user/input_dir/rtc_data/t047_100910_iw2,
               /home/dswx_user/input_dir/rtc_data/t047_100910_iw3
             ]
+
+            # Specify the MGRS tile collection ID
+            input_mgrs_collection_id: MS_114_28
           dynamic_ancillary_file_group:
             # Digital elevation model (Required)
             dem_file: /home/dswx_user/input_dir/ancillary_data/dem.tif
