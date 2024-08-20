@@ -133,6 +133,8 @@ RunConfig:
               /home/dswx_user/input_dir/RTC/T114-243003-IW3,
               /home/dswx_user/input_dir/RTC/T114-243009-IW1
             ]
+
+            input_mgrs_collection_id: MS_114_28
           dynamic_ancillary_file_group:
             dem_file: /home/dswx_user/input_dir/ancillary_data/dem.tif
             dem_file_description: 'Copernicus DEM GLO-30 2021 WGS84'
