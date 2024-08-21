@@ -300,7 +300,7 @@ class BasePgeTestCase(unittest.TestCase):
             log_contents
         )
 
-    def create_sas_command_line_mock(self, sas_program_path='', sas_runconfig_filepath='',
+    def create_sas_command_line_mock(self, logger, name, sas_program_path='', sas_runconfig_filepath='',
                                      sas_program_options=None):
         """Mock run_util.create_qa_command_line()"""
         raise OSError("Mock OSError from run_utils.create_sas_command_line")
@@ -327,7 +327,7 @@ class BasePgeTestCase(unittest.TestCase):
             log_contents
         )
 
-    def create_qa_command_line_mock(self, qa_program_path='./', qa_program_options=None):
+    def create_qa_command_line_mock(self, logger, name, qa_program_path='./', qa_program_options=None):
         """Mock function for run_utils.create_qa_command_line that always raises OSError"""
         raise OSError("Mock OSError from run_utils.create_qa_command_line")
 
@@ -456,7 +456,7 @@ class BasePgeTestCase(unittest.TestCase):
 
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
-            self.assertIn("Starting SAS QA executable", log_contents)
+            self.assertIn("Configured executable from the RunConfig could not be found", log_contents)
 
         finally:
             if exists(test_runconfig_path):

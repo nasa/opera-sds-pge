@@ -234,7 +234,7 @@ class PostProcessorMixin:
             qa_program_options = self.runconfig.qa_program_options
 
             try:
-                command_line = create_qa_command_line(qa_program_path, qa_program_options)
+                command_line = create_qa_command_line(self.logger, self.name, qa_program_path, qa_program_options)
             except OSError as err:
                 self.logger.critical(self.name, ErrorCode.QA_SAS_PROGRAM_FAILED,
                                      f'Failed to create QA command line, reason: {str(err)}')
@@ -724,7 +724,7 @@ class PgeExecutor(PreProcessorMixin, PostProcessorMixin):
 
         try:
             command_line = create_sas_command_line(
-                sas_program_path, sas_runconfig_filepath, sas_program_options
+                self.logger, self.name, sas_program_path, sas_runconfig_filepath, sas_program_options
             )
         except OSError as err:
             self.logger.critical(self.name, ErrorCode.SAS_PROGRAM_FAILED,

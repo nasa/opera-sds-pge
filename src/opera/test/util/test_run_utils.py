@@ -72,10 +72,11 @@ class RunUtilsTestCase(unittest.TestCase):
         # Make a command from something locally available on PATH (findable
         # by a which call)
         cmd = 'echo'
+        pge_name = "name_of_pge"
         runconfig_path = '/path/to/runconfig'
         options = ['Hello from test_create_sas_command_line function.', '--']
 
-        command_line = create_sas_command_line(cmd, runconfig_path, options)
+        command_line = create_sas_command_line(self.logger, pge_name, cmd, runconfig_path, options)
 
         self.assertIsInstance(command_line, list)
         self.assertEqual(len(command_line), 4)
@@ -90,35 +91,15 @@ class RunUtilsTestCase(unittest.TestCase):
         for option in options:
             self.assertIn(option, command_line)
 
-        # Make a command using python module name (not findable with which)
-        cmd = 'unittest'
-        options = ['--verbose', '--']
-
-        command_line = create_sas_command_line(cmd, runconfig_path, options)
-
-        self.assertIsInstance(command_line, list)
-        self.assertEqual(len(command_line), 6)
-
-        # Check that python3 was assigned as the executable
-        self.assertEqual(command_line[0], 'python3')
-        self.assertEqual(command_line[1], '-m')
-        self.assertEqual(command_line[2], cmd)
-
-        # Check that the runconfig path was appended as the final input argument
-        self.assertEqual(command_line[-1], runconfig_path)
-
-        # Check that each option made it into the command line
-        for option in options:
-            self.assertIn(option, command_line)
-
     def test_create_qa_command_line(self):
         """Tests for run_utils.create_qa_command_line()"""
         # Make a command from something locally available on PATH (findable by a
         # which call)
         cmd = 'echo'
+        pge_name = "name_of_pge"
         options = ['Hello from test_create_qa_command_line function.']
 
-        command_line = create_qa_command_line(cmd, options)
+        command_line = create_qa_command_line(self.logger, pge_name, cmd, options)
 
         self.assertIsInstance(command_line, list)
         self.assertEqual(len(command_line), 2)
@@ -127,24 +108,6 @@ class RunUtilsTestCase(unittest.TestCase):
         self.assertEqual(command_line[0], shutil.which(cmd))
 
         # Check that the option(s) made it into the command line
-        for option in options:
-            self.assertIn(option, command_line)
-
-        # Make a command using a python module name (not findable with which)
-        cmd = 'unittest'
-        options = ['--verbose', '--', 'opera.test.test_run_utils']
-
-        command_line = create_qa_command_line(cmd, options)
-
-        self.assertIsInstance(command_line, list)
-        self.assertEqual(len(command_line), 6)
-
-        # Check that python3 was assigned as the executable
-        self.assertEqual(command_line[0], 'python3')
-        self.assertEqual(command_line[1], '-m')
-        self.assertEqual(command_line[2], cmd)
-
-        # Check that each option made it into the command line
         for option in options:
             self.assertIn(option, command_line)
 
@@ -159,26 +122,29 @@ class RunUtilsTestCase(unittest.TestCase):
     def test_create_sas_command_line_exception(self):
         """Test exception handling for create_sas_command_line() function"""
         cmd = ''
+        pge_name = "name_of_pge"
         runconfig_path = ''
         options = ['Hello from test_create_sas_command_line function.', '--']
         with self.assertRaises(OSError):
-            create_sas_command_line(cmd, runconfig_path, options)
+            create_sas_command_line(self.logger, pge_name, cmd, runconfig_path, options)
 
     @patch.object(os, 'access', _access_mock)
     def test_qa_command_line_exception(self):
         """Test exception handling for create_qa_command_line() function"""
+        pge_name = "name_of_pge"
         cmd = ''
         options = ['Hello from test_create_qa_command_line function.']
         with self.assertRaises(OSError):
-            create_qa_command_line(cmd, options)
+            create_qa_command_line(self.logger, pge_name, cmd, options)
 
     def test_time_and_execute(self):
         """Tests for run_utils.time_and_execute()"""
         program_path = 'echo'
+        pge_name = "name_of_pge"
         program_options = ['Hello from test_time_and_execute function.', '--']
         runconfig_filepath = '/path/to/runconfig'
 
-        command_line = create_sas_command_line(program_path, runconfig_filepath, program_options)
+        command_line = create_sas_command_line(self.logger, pge_name, program_path, runconfig_filepath, program_options)
 
         # Execute a valid command
         elapsed_time = time_and_execute(command_line, self.logger, execute_via_shell=False)
@@ -188,7 +154,7 @@ class RunUtilsTestCase(unittest.TestCase):
         program_path = 'bash'
         program_options = ['-c', 'exit 1']
 
-        command_line = create_sas_command_line(program_path, runconfig_filepath, program_options)
+        command_line = create_sas_command_line(self.logger, pge_name, program_path, runconfig_filepath, program_options)
 
         with self.assertRaises(RuntimeError):
             time_and_execute(command_line, self.logger, execute_via_shell=False)
