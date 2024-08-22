@@ -445,13 +445,13 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
             if isinstance(value, list):
                 value = json.dumps(value)
 
-            data_type = python_type_to_xml_type(type(value))
+            data_type = python_type_to_xml_type(value)
 
             # TODO: This is hardcoded for now, but we should eventually try to guess this
             attr_type = 'processingInformation'
 
             # TODO: Filling this attribute is also on the back burner for now
-            attr_description = '!Description TBD!'
+            attr_description = f'TBA: Description for {name}'
 
             attr_name = (name.title()
                          .replace('Mgrs', 'MGRS')

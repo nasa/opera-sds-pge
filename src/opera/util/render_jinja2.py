@@ -12,7 +12,7 @@ Adapted by: Jim Hofman
 """
 
 import os
-
+import re
 import jinja2
 
 from opera.util.error_codes import ErrorCode
@@ -25,6 +25,9 @@ XML_TYPES = {
     float: 'float',
     bool: 'boolean',
 }
+
+INTEGER_PATTERN = re.compile(r'^[+-]?\d+$')
+FLOATING_POINT_PATTERN = re.compile(r'^[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?$')
 
 
 def _make_undefined_handler_class(logger: PgeLogger):
@@ -139,6 +142,14 @@ def render_jinja2(template_filename: str, input_data: dict, logger: PgeLogger = 
 
 
 def python_type_to_xml_type(obj) -> str:
+    if isinstance(obj, str):
+        if obj.lower() in ['true', 'false']:
+            obj = obj == 'true'
+        elif re.match(INTEGER_PATTERN, obj) is not None:
+            obj = int(obj)
+        elif re.match(FLOATING_POINT_PATTERN, obj) is not None:
+            obj = float(obj)
+
     if not isinstance(obj, type):
         obj = type(obj)
 
