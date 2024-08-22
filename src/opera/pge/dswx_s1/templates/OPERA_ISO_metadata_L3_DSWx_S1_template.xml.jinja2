@@ -533,8 +533,8 @@
                         <gmd:EX_TemporalExtent id="boundingTemporalExtent">
                             <gmd:extent>
                                 <gml:TimePeriod gml:id="DSWx_Time_Range">
-                                    <gml:beginPosition>{{ product_output.RTC_SENSING_START_TIME }}{# ISO_OPERA_sensingTimeStart #}</gml:beginPosition>
-                                    <gml:endPosition>{{ product_output.RTC_SENSING_END_TIME}}{# ISO_OPERA_sensingTimeEnd #}</gml:endPosition>
+                                    <gml:beginPosition>{{ product_output.MeasuredParameters.RTC_SENSING_START_TIME.value }}{# ISO_OPERA_sensingTimeStart #}</gml:beginPosition>
+                                    <gml:endPosition>{{ product_output.MeasuredParameters.RTC_SENSING_END_TIME.value }}{# ISO_OPERA_sensingTimeEnd #}</gml:endPosition>
                                 </gml:TimePeriod>
                             </gmd:extent>
                         </gmd:EX_TemporalExtent>
@@ -721,35 +721,35 @@
                     <gmd:source>
                         <gmd:LI_Source>
                             <gmd:description>
-                                <gco:CharacterString>Reference DEM - {{ product_output.INPUT_DEM_SOURCE }}{# ISO_OPERA_digitalElevationModelSource #}</gco:CharacterString>
+                                <gco:CharacterString>Reference DEM - {{ product_output.MeasuredParameters.INPUT_DEM_SOURCE.value }}{# ISO_OPERA_digitalElevationModelSource #}</gco:CharacterString>
                             </gmd:description>
                         </gmd:LI_Source>
                     </gmd:source>
                     <gmd:source>
                         <gmd:LI_Source>
                             <gmd:description>
-                                <gco:CharacterString>GLAD Classification - {{ product_output.INPUT_GLAD_CLASSIFICATION_SOURCE }}{# ISO_OPERA_gladClassificationSource #}</gco:CharacterString>
+                                <gco:CharacterString>GLAD Classification - {{ product_output.MeasuredParameters.INPUT_GLAD_CLASSIFICATION_SOURCE.value }}{# ISO_OPERA_gladClassificationSource #}</gco:CharacterString>
                             </gmd:description>
                         </gmd:LI_Source>
                     </gmd:source>
                     <gmd:source>
                         <gmd:LI_Source>
                             <gmd:description>
-                                <gco:CharacterString>Worldcover File - {{ product_output.INPUT_WORLDCOVER_SOURCE }}{# ISO_OPERA_worldcoverSource #}</gco:CharacterString>
+                                <gco:CharacterString>Worldcover File - {{ product_output.MeasuredParameters.INPUT_WORLDCOVER_SOURCE.value }}{# ISO_OPERA_worldcoverSource #}</gco:CharacterString>
                             </gmd:description>
                         </gmd:LI_Source>
                     </gmd:source>
                     <gmd:source>
                         <gmd:LI_Source>
                             <gmd:description>
-                                <gco:CharacterString>Reference Water File - {{ product_output.INPUT_REFERENCE_WATER_SOURCE }}{# ISO_OPERA_refWaterSource #}</gco:CharacterString>
+                                <gco:CharacterString>Reference Water File - {{ product_output.MeasuredParameters.INPUT_REFERENCE_WATER_SOURCE.value }}{# ISO_OPERA_refWaterSource #}</gco:CharacterString>
                             </gmd:description>
                         </gmd:LI_Source>
                     </gmd:source>
                     <gmd:source>
                         <gmd:LI_Source>
                             <gmd:description>
-                                <gco:CharacterString>HAND File - {{ product_output.INPUT_HAND_SOURCE }}{# ISO_OPERA_handSource #}</gco:CharacterString>
+                                <gco:CharacterString>HAND File - {{ product_output.MeasuredParameters.INPUT_HAND_SOURCE.value }}{# ISO_OPERA_handSource #}</gco:CharacterString>
                             </gmd:description>
                         </gmd:LI_Source>
                     </gmd:source>
