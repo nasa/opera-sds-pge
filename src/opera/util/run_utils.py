@@ -84,7 +84,7 @@ def get_traceback_from_log(log_contents):
     return trackback_match
 
 
-def create_sas_command_line(logger, pge_name, sas_program_path, sas_runconfig_path,
+def create_sas_command_line(sas_program_path, sas_runconfig_path,
                             sas_program_options=None):
     """
     Forms the appropriate command line for executing a SAS from the parameters
@@ -97,10 +97,6 @@ def create_sas_command_line(logger, pge_name, sas_program_path, sas_runconfig_pa
 
     Parameters
     ----------
-    logger :  PGELogger
-        The PGELogger instance
-    pge_name : str
-        PGE name
     sas_program_path : str
         The path to the SAS executable to be invoked by the returned command line.
     sas_runconfig_path : str
@@ -136,8 +132,8 @@ def create_sas_command_line(logger, pge_name, sas_program_path, sas_runconfig_pa
                 raise OSError(f"Requested SAS program path {sas_program_path} exists, "
                               f"but does not have execute permissions.")
         else:
-            error_msg = "Configured executable from the RunConfig could not be found"
-            logger.critical(pge_name, ErrorCode.EXECUTABLE_FROM_RUNCONFIG_NOT_FOUND, error_msg)
+            raise OSError(f"Could not find the configured SAS executable from the RunConfig file "
+                          f"with path {sas_program_path}")
 
     # Add any provided arguments
     if sas_program_options:
@@ -149,7 +145,7 @@ def create_sas_command_line(logger, pge_name, sas_program_path, sas_runconfig_pa
     return command_line
 
 
-def create_qa_command_line(logger, pge_name, qa_program_path, qa_program_options=None):
+def create_qa_command_line(qa_program_path, qa_program_options=None):
     """
     Forms the appropriate command line for executing a SAS Quality Assurance (QA)
     application from parameters obtained from the RunConfig.
@@ -161,10 +157,6 @@ def create_qa_command_line(logger, pge_name, qa_program_path, qa_program_options
 
     Parameters
     ----------
-    logger :  PGELogger
-        The PGELogger instance
-    pge_name : str
-        PGE name
     qa_program_path : str
         The path to the QA executable to be invoked by the returned command line.
     qa_program_options : list[str], optional
@@ -197,8 +189,8 @@ def create_qa_command_line(logger, pge_name, qa_program_path, qa_program_options
                 raise OSError(f"Requested QA program path {qa_program_path} exists, "
                               f"but does not have execute permissions.")
         else:
-            error_msg = "Configured executable from the RunConfig could not be found"
-            logger.critical(pge_name, ErrorCode.EXECUTABLE_FROM_RUNCONFIG_NOT_FOUND, error_msg)
+            raise OSError(f"Could not find the configured QA executable from the RunConfig file "
+                          f"with path {qa_program_path}")
 
     # Add any provided arguments
     if qa_program_options:

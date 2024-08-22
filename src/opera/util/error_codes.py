@@ -109,7 +109,6 @@ class ErrorCode(IntEnum):
     LOGGED_CRITICAL_LINE = auto()
     DYNAMIC_IMPORT_FAILED = auto()
     GRIB_TO_NETCDF_CONVERSION_FAILED = auto()
-    EXECUTABLE_FROM_RUNCONFIG_NOT_FOUND = auto()
 
     @classmethod
     def describe(cls):
