@@ -131,9 +131,9 @@ def create_sas_command_line(sas_program_path, sas_runconfig_path,
             if not os.access(executable_path, mode=os.X_OK):
                 raise OSError(f"Requested SAS program path {sas_program_path} exists, "
                               f"but does not have execute permissions.")
-        # Otherwise, sas_program_path might be a python module path
         else:
-            command_line = ['python3', '-m', sas_program_path]
+            raise OSError(f"Could not find the configured SAS executable from the RunConfig file "
+                          f"with path {sas_program_path}")
 
     # Add any provided arguments
     if sas_program_options:
@@ -188,9 +188,9 @@ def create_qa_command_line(qa_program_path, qa_program_options=None):
             if not os.access(executable_path, mode=os.X_OK):
                 raise OSError(f"Requested QA program path {qa_program_path} exists, "
                               f"but does not have execute permissions.")
-        # Otherwise, qa_program_path might be a python module path
         else:
-            command_line = ['python3', '-m', qa_program_path]
+            raise OSError(f"Could not find the configured QA executable from the RunConfig file "
+                          f"with path {qa_program_path}")
 
     # Add any provided arguments
     if qa_program_options:

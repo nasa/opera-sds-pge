@@ -188,7 +188,8 @@ class DswxS1PgeTestCase(unittest.TestCase):
         self.assertEqual(runconfig['processing']['inundated_vegetation']['cross_pol_min'], -26)
         self.assertEqual(runconfig['processing']['inundated_vegetation']['line_per_block'], 300)
         self.assertEqual(runconfig['processing']['inundated_vegetation']['target_area_file_type'], 'auto')
-        self.assertEqual(runconfig['processing']['inundated_vegetation']['target_worldcover_class'], ['Herbaceous wetland'])
+        self.assertEqual(runconfig['processing']['inundated_vegetation']['target_worldcover_class'],
+                                  ['Herbaceous wetland'])
         self.assertEqual(runconfig['processing']['inundated_vegetation']['target_glad_class'],
                          ['112-124', '200-207', '19-24', '125-148', '19'])
         self.assertEqual(runconfig['processing']['inundated_vegetation']['filter']['enabled'], True)
@@ -199,7 +200,8 @@ class DswxS1PgeTestCase(unittest.TestCase):
         self.assertEqual(runconfig['processing']['inundated_vegetation']['filter']['guided_filter']['eps'], 3)
         self.assertEqual(runconfig['processing']['inundated_vegetation']['filter']['guided_filter']['ddepth'], -1)
         self.assertEqual(runconfig['processing']['inundated_vegetation']['filter']['bregman']['lambda_value'], 20)
-        self.assertEqual(runconfig['processing']['inundated_vegetation']['filter']['anisotropic_diffusion']['weight'], 1)
+        self.assertEqual(runconfig['processing']['inundated_vegetation']['filter']['anisotropic_diffusion']
+                                  ['weight'], 1)
         self.assertEqual(runconfig['processing']['inundated_vegetation']['filter']['line_per_block'], 1000)
         self.assertEqual(runconfig['processing']['debug_mode'], False)
 

@@ -745,6 +745,5 @@ class DswxNIPgeTestCase(unittest.TestCase):
                 os.unlink(test_runconfig_path)
 
 
-
 if __name__ == "__main__":
     unittest.main()

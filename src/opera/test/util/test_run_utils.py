@@ -90,27 +90,6 @@ class RunUtilsTestCase(unittest.TestCase):
         for option in options:
             self.assertIn(option, command_line)
 
-        # Make a command using python module name (not findable with which)
-        cmd = 'unittest'
-        options = ['--verbose', '--']
-
-        command_line = create_sas_command_line(cmd, runconfig_path, options)
-
-        self.assertIsInstance(command_line, list)
-        self.assertEqual(len(command_line), 6)
-
-        # Check that python3 was assigned as the executable
-        self.assertEqual(command_line[0], 'python3')
-        self.assertEqual(command_line[1], '-m')
-        self.assertEqual(command_line[2], cmd)
-
-        # Check that the runconfig path was appended as the final input argument
-        self.assertEqual(command_line[-1], runconfig_path)
-
-        # Check that each option made it into the command line
-        for option in options:
-            self.assertIn(option, command_line)
-
     def test_create_qa_command_line(self):
         """Tests for run_utils.create_qa_command_line()"""
         # Make a command from something locally available on PATH (findable by a
@@ -130,24 +109,6 @@ class RunUtilsTestCase(unittest.TestCase):
         for option in options:
             self.assertIn(option, command_line)
 
-        # Make a command using a python module name (not findable with which)
-        cmd = 'unittest'
-        options = ['--verbose', '--', 'opera.test.test_run_utils']
-
-        command_line = create_qa_command_line(cmd, options)
-
-        self.assertIsInstance(command_line, list)
-        self.assertEqual(len(command_line), 6)
-
-        # Check that python3 was assigned as the executable
-        self.assertEqual(command_line[0], 'python3')
-        self.assertEqual(command_line[1], '-m')
-        self.assertEqual(command_line[2], cmd)
-
-        # Check that each option made it into the command line
-        for option in options:
-            self.assertIn(option, command_line)
-
     def _access_mock(self, executable_path='./', mode=os.F_OK):
         """Mock os.access with os.F_OK returning True and os.X_OK returning False"""
         if mode == os.F_OK:
@@ -157,7 +118,7 @@ class RunUtilsTestCase(unittest.TestCase):
 
     @patch.object(os, 'access', _access_mock)
     def test_create_sas_command_line_exception(self):
-        """Test exception handling for create_sas_command_line() function"""
+        """Test exception handling for create_sas_command_line() function with non-executable file"""
         cmd = ''
         runconfig_path = ''
         options = ['Hello from test_create_sas_command_line function.', '--']
@@ -166,7 +127,31 @@ class RunUtilsTestCase(unittest.TestCase):
 
     @patch.object(os, 'access', _access_mock)
     def test_qa_command_line_exception(self):
-        """Test exception handling for create_qa_command_line() function"""
+        """Test exception handling for create_qa_command_line() function with non-executable file"""
+        cmd = ''
+        options = ['Hello from test_create_qa_command_line function.']
+        with self.assertRaises(OSError):
+            create_qa_command_line(cmd, options)
+
+    def _access_mock_no_file(self, executable_path='./', mode=os.F_OK):
+        """Mock os.access with os.F_OK returning False and os.X_OK returning False"""
+        if mode == os.F_OK:
+            return False
+        if mode == os.X_OK:
+            return False
+
+    @patch.object(os, 'access', _access_mock_no_file)
+    def test_create_sas_command_line_exception_no_file(self):
+        """Test exception handling for create_sas_command_line() function with no executable file present"""
+        cmd = ''
+        runconfig_path = ''
+        options = ['Hello from test_create_sas_command_line function.', '--']
+        with self.assertRaises(OSError):
+            create_sas_command_line(cmd, runconfig_path, options)
+
+    @patch.object(os, 'access', _access_mock_no_file)
+    def test_qa_command_line_exception_no_file(self):
+        """Test exception handling for create_qa_command_line() function with no executable file present"""
         cmd = ''
         options = ['Hello from test_create_qa_command_line function.']
         with self.assertRaises(OSError):
