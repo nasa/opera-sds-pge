@@ -8,6 +8,10 @@ pipeline {
                      returnStdout: true,
                      script: 'echo ${GIT_BRANCH##*/}'
                      ).trim()}"""
+        RUN_ID = """${sh(
+                 returnStdout: true,
+                 script: 'echo $$'
+                 ).trim()}"""
     }
     parameters {
         // TODO: update default value as newer PGE's are added
@@ -103,10 +107,10 @@ pipeline {
             steps{
                 sh label: 'Download and install',
                    script: """#!/bin/bash
-                     mkdir -p /var/lib/jenkins/miniconda3
-                     wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O /var/lib/jenkins/miniconda3/miniconda.sh
-                     bash /var/lib/jenkins/miniconda3/miniconda.sh -b -u -p ~/miniconda3
-                     rm /var/lib/jenkins/miniconda3/miniconda.sh
+                     mkdir -p /var/lib/jenkins/conda_installs/${RUN_ID}/miniconda3
+                     wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O /var/lib/jenkins/conda_installs/${RUN_ID}/miniconda3/miniconda.sh
+                     bash /var/lib/jenkins/conda_installs/${RUN_ID}/miniconda3/miniconda.sh -b -u -p /var/lib/jenkins/conda_installs/${RUN_ID}/miniconda3
+                     rm /var/lib/jenkins/conda_installs/${RUN_ID}/miniconda3/miniconda.sh
                    """
             }
         }
@@ -116,10 +120,10 @@ pipeline {
                 script {
                     echo "Installing Sphinx Dependencies"
                     sh label: 'Installing conda environment for Sphinx',
-                       script: '''#!/bin/bash
-                         /var/lib/jenkins/miniconda3/bin/conda create -n sphinx_env python=3.8 pip
-                         /var/lib/jenkins/miniconda3/bin/conda init bash
-                    '''
+                       script: """#!/bin/bash
+                         /var/lib/jenkins/conda_installs/${RUN_ID}/miniconda3/bin/conda create -n sphinx_env python=3.8 pip
+                         /var/lib/jenkins/conda_installs/${RUN_ID}/miniconda3/bin/conda init bash
+                    """
 
                     sh label: 'Installing Sphinx to conda environment',
                        script: '''#!/bin/bash
@@ -277,9 +281,9 @@ pipeline {
             echo "Cleaning up Docker images from local host"
             sh ".ci/scripts/util/cleanup.sh ${DOCKER_TAG}"
             echo "Removing Sphinx build environment"
-            sh "/var/lib/jenkins/miniconda3/bin/conda env remove --name int_test_env"
-            sh "/var/lib/jenkins/miniconda3/bin/conda init --reverse"
-            sh "rm -rf /var/lib/jenkins/miniconda3"
+            sh "/var/lib/jenkins/conda_installs/${RUN_ID}/miniconda3/bin/conda env remove --yes --name sphinx_env"
+            sh "/var/lib/jenkins/conda_installs/${RUN_ID}/miniconda3/bin/conda init --reverse"
+            sh "rm -rf /var/lib/jenkins/conda_installs/${RUN_ID}/"
             deleteDir()
         }
         success {
