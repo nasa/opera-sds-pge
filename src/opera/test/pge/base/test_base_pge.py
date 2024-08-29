@@ -456,7 +456,7 @@ class BasePgeTestCase(unittest.TestCase):
 
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
-            self.assertIn("Starting SAS QA executable", log_contents)
+            self.assertIn("Could not find the configured QA executable from the RunConfig file", log_contents)
 
         finally:
             if exists(test_runconfig_path):
