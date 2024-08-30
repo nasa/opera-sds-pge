@@ -148,9 +148,6 @@
                                              <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">algorithm_parameters_schema_path</span><span class="p">,</span>
                                              <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">algorithm_parameters_file_config_path</span><span class="p">,</span>
                                              <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span></div>
-        <span class="c1"># TODO gamma version of SAS seems to only support .grb format files,</span>
-        <span class="c1">#      reenable NetCDF format is ever supported/desired</span>
-        <span class="c1"># self.convert_troposphere_model_files()</span>
 
 <div class="viewcode-block" id="DispS1PreProcessorMixin.convert_troposphere_model_files"><a class="viewcode-back" href="../../../../opera.pge.disp_s1.html#opera.pge.disp_s1.disp_s1_pge.DispS1PreProcessorMixin.convert_troposphere_model_files">[docs]</a>    <span class="k">def</span> <span class="nf">convert_troposphere_model_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -229,7 +226,7 @@
 <span class="sd">        Evaluates the output files generated from SAS execution to ensure:</span>
 <span class="sd">            - That one expected .nc file exists in the output directory designated</span>
 <span class="sd">              by the RunConfig and is non-zero in size</span>
-<span class="sd">            - A .png file corresponding to the expected output .nc product exists</span>
+<span class="sd">            - .png files corresponding to the expected output .nc product exists</span>
 <span class="sd">              alongside and is non-zero in size</span>
 <span class="sd">            - If the SAS runconfig has the product_path_group.save_compressed_slc</span>
 <span class="sd">              flag set to True, validate that a &quot;compressed_slcs&quot; directory</span>
@@ -262,14 +259,18 @@
 
             <span class="c1"># Validate .png file(s)</span>
             <span class="n">nc_file_no_ext</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">splitext</span><span class="p">(</span><span class="n">basename</span><span class="p">(</span><span class="n">nc_file</span><span class="p">))</span>
-            <span class="n">png_file</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">nc_file_no_ext</span><span class="si">}</span><span class="s1">.unwrapped_phase.png&#39;</span><span class="p">)</span>
+            <span class="n">png_files</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">nc_file_no_ext</span><span class="si">}</span><span class="s1">.displacement.png&#39;</span><span class="p">),</span>
+                <span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">nc_file_no_ext</span><span class="si">}</span><span class="s1">.short_wavelength_displacement.png&#39;</span><span class="p">)</span>
+            <span class="p">]</span>
 
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">exists</span><span class="p">(</span><span class="n">png_file</span><span class="p">):</span>
-                <span class="n">error_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Expected SAS output file </span><span class="si">{</span><span class="n">basename</span><span class="p">(</span><span class="n">png_file</span><span class="p">)</span><span class="si">}</span><span class="s2"> does not exist&quot;</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INVALID_OUTPUT</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="ow">not</span> <span class="n">getsize</span><span class="p">(</span><span class="n">png_file</span><span class="p">):</span>
-                <span class="n">error_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SAS output file </span><span class="si">{</span><span class="n">basename</span><span class="p">(</span><span class="n">png_file</span><span class="p">)</span><span class="si">}</span><span class="s2"> exists, but is empty&quot;</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INVALID_OUTPUT</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">png_file</span> <span class="ow">in</span> <span class="n">png_files</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">exists</span><span class="p">(</span><span class="n">png_file</span><span class="p">):</span>
+                    <span class="n">error_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Expected SAS output file </span><span class="si">{</span><span class="n">basename</span><span class="p">(</span><span class="n">png_file</span><span class="p">)</span><span class="si">}</span><span class="s2"> does not exist&quot;</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INVALID_OUTPUT</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="ow">not</span> <span class="n">getsize</span><span class="p">(</span><span class="n">png_file</span><span class="p">):</span>
+                    <span class="n">error_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SAS output file </span><span class="si">{</span><span class="n">basename</span><span class="p">(</span><span class="n">png_file</span><span class="p">)</span><span class="si">}</span><span class="s2"> exists, but is empty&quot;</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INVALID_OUTPUT</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">)</span>
 
         <span class="n">save_compressed_slc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">sas_config</span><span class="p">[</span><span class="s1">&#39;product_path_group&#39;</span><span class="p">][</span><span class="s1">&#39;save_compressed_slc&#39;</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">save_compressed_slc</span><span class="p">:</span>
@@ -330,7 +331,7 @@
         <span class="c1"># the format FXXXXX</span>
         <span class="n">frame_id</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;F</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">sas_config</span><span class="p">[</span><span class="s1">&#39;input_file_group&#39;</span><span class="p">][</span><span class="s1">&#39;frame_id&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">05d</span><span class="si">}</span><span class="s2">&quot;</span>
 
-        <span class="n">inter_disp_product_filename</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">inter_filename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[:</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;nc&quot;</span><span class="p">])</span>
+        <span class="n">inter_disp_product_filename</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">inter_filename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[:</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;nc&quot;</span><span class="p">])</span>
 
         <span class="c1"># Check if we&#39;ve already cached the product metadata corresponding to</span>
         <span class="c1"># this set of intermediate products (there can be multiple sets of</span>
@@ -902,11 +903,10 @@
     <span class="n">LEVEL</span> <span class="o">=</span> <span class="s2">&quot;L3&quot;</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Processing Level for DISP-S1 Products&quot;&quot;&quot;</span>
 
-    <span class="n">PGE_VERSION</span> <span class="o">=</span> <span class="s2">&quot;3.0.0-rc.2.2&quot;</span>
+    <span class="n">PGE_VERSION</span> <span class="o">=</span> <span class="s2">&quot;3.0.0-rc.3.0&quot;</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Version of the PGE (overrides default from base_pge)&quot;&quot;&quot;</span>
 
-    <span class="n">SAS_VERSION</span> <span class="o">=</span> <span class="s2">&quot;0.2.8&quot;</span>  <span class="c1"># Gamma release https://github.com/opera-adt/disp-s1/releases/tag/v0.2.8</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Version of the SAS wrapped by this PGE, should be updated as needed&quot;&quot;&quot;</span>
+    <span class="n">SAS_VERSION</span> <span class="o">=</span> <span class="s2">&quot;0.4.2&quot;</span>  <span class="c1"># Gamma release https://github.com/opera-adt/disp-s1/releases/tag/v0.4.2</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pge_name</span><span class="p">,</span> <span class="n">runconfig_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">pge_name</span><span class="p">,</span> <span class="n">runconfig_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -915,7 +915,7 @@
             <span class="p">{</span>
                 <span class="c1"># Note: ordering matters here!</span>
                 <span class="s1">&#39;*.nc&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_netcdf_filename</span><span class="p">,</span>
-                <span class="s1">&#39;*unwrapped_phase.png&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_browse_filename</span><span class="p">,</span>
+                <span class="s1">&#39;*.displacement.png&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_browse_filename</span><span class="p">,</span>
                 <span class="s1">&#39;compressed*.h5&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compressed_cslc_filename</span>
             <span class="p">}</span>
         <span class="p">)</span></div>

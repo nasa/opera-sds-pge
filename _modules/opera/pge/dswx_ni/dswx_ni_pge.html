@@ -289,13 +289,19 @@
 
         <span class="k">return</span> <span class="n">output_product_metadata</span>
 
-    <span class="k">def</span> <span class="nf">_create_custom_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_create_custom_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tile_filename</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates the &quot;custom data&quot; dictionary used with the ISO metadata rendering.</span>
 
 <span class="sd">        Custom data contains all metadata information needed for the ISO template</span>
 <span class="sd">        that is not found within any of the other metadata sources (such as the</span>
 <span class="sd">        RunConfig, output product(s), or catalog metadata).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        tile_filename : str</span>
+<span class="sd">            Tile filename to be used as the granule identifier within the</span>
+<span class="sd">            custom metadata.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -304,13 +310,11 @@
 <span class="sd">            metadata Jinja2 template.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">core_filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">PROJECT</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">LEVEL</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">NAME</span><span class="si">}</span><span class="s2">&quot;</span>
-
         <span class="n">custom_metadata</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">&#39;ISO_OPERA_FilePackageName&#39;</span><span class="p">:</span> <span class="n">core_filename</span><span class="p">,</span>
-            <span class="s1">&#39;ISO_OPERA_ProducerGranuleId&#39;</span><span class="p">:</span> <span class="n">core_filename</span><span class="p">,</span>
+            <span class="s1">&#39;ISO_OPERA_FilePackageName&#39;</span><span class="p">:</span> <span class="n">tile_filename</span><span class="p">,</span>
+            <span class="s1">&#39;ISO_OPERA_ProducerGranuleId&#39;</span><span class="p">:</span> <span class="n">tile_filename</span><span class="p">,</span>
             <span class="s1">&#39;MetadataProviderAction&#39;</span><span class="p">:</span> <span class="s2">&quot;creation&quot;</span><span class="p">,</span>
-            <span class="s1">&#39;GranuleFilename&#39;</span><span class="p">:</span> <span class="n">core_filename</span><span class="p">,</span>
+            <span class="s1">&#39;GranuleFilename&#39;</span><span class="p">:</span> <span class="n">tile_filename</span><span class="p">,</span>
             <span class="s1">&#39;ISO_OPERA_ProjectKeywords&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;OPERA&#39;</span><span class="p">,</span> <span class="s1">&#39;JPL&#39;</span><span class="p">,</span> <span class="s1">&#39;DSWx&#39;</span><span class="p">,</span> <span class="s1">&#39;Dynamic&#39;</span><span class="p">,</span> <span class="s1">&#39;Surface&#39;</span><span class="p">,</span> <span class="s1">&#39;Water&#39;</span><span class="p">,</span> <span class="s1">&#39;Extent&#39;</span><span class="p">],</span>
             <span class="s1">&#39;ISO_OPERA_PlatformKeywords&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;NI&#39;</span><span class="p">],</span>
             <span class="s1">&#39;ISO_OPERA_InstrumentKeywords&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;NISAR&#39;</span><span class="p">]</span>
@@ -352,8 +356,8 @@
 
         <span class="c1"># Generate the ISO metadata for use with product submission to DAAC(s)</span>
         <span class="c1"># For DSWX-S1, each tile-set is assigned an ISO xml file</span>
-        <span class="k">for</span> <span class="n">tile_id</span><span class="p">,</span> <span class="n">tile_metadata</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tile_metadata_cache</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="n">iso_metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_iso_metadata</span><span class="p">(</span><span class="n">tile_metadata</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">tile_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tile_metadata_cache</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">iso_metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_iso_metadata</span><span class="p">(</span><span class="n">tile_id</span><span class="p">)</span>
 
             <span class="n">iso_meta_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iso_metadata_filename</span><span class="p">(</span><span class="n">tile_id</span><span class="p">)</span>
             <span class="n">iso_meta_filepath</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">output_product_path</span><span class="p">,</span> <span class="n">iso_meta_filename</span><span class="p">)</span>
