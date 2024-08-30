@@ -476,13 +476,19 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
 
         return output_product_metadata
 
-    def _create_custom_metadata(self):
+    def _create_custom_metadata(self, tile_filename):
         """
         Creates the "custom data" dictionary used with the ISO metadata rendering.
 
         Custom data contains all metadata information needed for the ISO template
         that is not found within any of the other metadata sources (such as the
         RunConfig, output product(s), or catalog metadata).
+
+        Parameters
+        ----------
+        tile_filename : str
+            Tile filename to be used as the granule identifier within the
+            custom metadata.
 
         Returns
         -------
@@ -491,13 +497,11 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
             metadata Jinja2 template.
 
         """
-        core_filename = f"{self.PROJECT}_{self.LEVEL}_{self.NAME}"
-
         custom_metadata = {
-            'ISO_OPERA_FilePackageName': core_filename,
-            'ISO_OPERA_ProducerGranuleId': core_filename,
+            'ISO_OPERA_FilePackageName': tile_filename,
+            'ISO_OPERA_ProducerGranuleId': tile_filename,
             'MetadataProviderAction': "creation",
-            'GranuleFilename': core_filename,
+            'GranuleFilename': tile_filename,
             'ISO_OPERA_ProjectKeywords': ['OPERA', 'JPL', 'DSWx', 'Dynamic', 'Surface', 'Water', 'Extent'],
             'ISO_OPERA_PlatformKeywords': ['S1'],
             'ISO_OPERA_InstrumentKeywords': ['Sentinel 1 A/B']
@@ -505,7 +509,7 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
 
         return custom_metadata
 
-    def _create_iso_metadata(self, tile_metadata):
+    def _create_iso_metadata(self, tile_id):
         """
         Creates a rendered version of the ISO metadata template for DSWX-S1
         output products using metadata from the following locations:
@@ -517,9 +521,9 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
 
         Parameters
         ----------
-        tile_metadata : dict
-            The product metadata corresponding to a specific tile product to
-            be included as the "product_output" metadata in the rendered ISO xml.
+        tile_id : str
+            MGRS tile identifier used to look up the metadata used to instantiate
+            the ISO template.
 
         Returns
         -------
@@ -528,13 +532,19 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
             the sourced metadata dictionaries.
 
         """
+        if tile_id not in self._tile_metadata_cache or tile_id not in self._tile_filename_cache:
+            raise RuntimeError(f"No file name or metadata cached for tile ID {tile_id}")
+
+        tile_metadata = self._tile_metadata_cache[tile_id]
+        tile_filename = self._tile_filename_cache[tile_id]
+
         runconfig_dict = self.runconfig.asdict()
 
         product_output_dict = tile_metadata
 
         catalog_metadata_dict = self._create_catalog_metadata().asdict()
 
-        custom_data_dict = self._create_custom_metadata()
+        custom_data_dict = self._create_custom_metadata(tile_filename)
 
         iso_metadata = {
             'run_config': runconfig_dict,
@@ -584,8 +594,8 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
 
         # Generate the ISO metadata for use with product submission to DAAC(s)
         # For DSWX-S1, each tile-set is assigned an ISO xml file
-        for tile_id, tile_metadata in self._tile_metadata_cache.items():
-            iso_metadata = self._create_iso_metadata(tile_metadata)
+        for tile_id in self._tile_metadata_cache.keys():
+            iso_metadata = self._create_iso_metadata(tile_id)
 
             iso_meta_filename = self._iso_metadata_filename(tile_id)
             iso_meta_filepath = join(self.runconfig.output_product_path, iso_meta_filename)
