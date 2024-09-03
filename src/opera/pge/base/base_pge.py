@@ -15,7 +15,9 @@ from datetime import datetime
 from fnmatch import fnmatch
 from functools import lru_cache
 from os.path import abspath, basename, exists, join, splitext
+from textwrap import dedent
 
+import yamale
 from yamale import YamaleError
 
 import yaml
@@ -177,6 +179,39 @@ class PreProcessorMixin:
             self.qa_logger.info(self.name, ErrorCode.LOG_FILE_INIT_COMPLETE,
                                 'Log file configuration complete')
 
+    def _validate_iso_descriptions(self):
+        """
+        If given, check if the run-config description file exists and is valid
+        """
+        description_file = self.runconfig.iso_measured_parameter_descriptions
+
+        if description_file is not None:
+            description_file = abspath(description_file)
+
+            if not exists(description_file):
+                msg = f'Could not load description file {description_file}, file does not exist.'
+                self.logger.critical(self.name, ErrorCode.ISO_METADATA_DESCRIPTIONS_CONFIG_NOT_FOUND, msg)
+
+            # Schema maps parameter names to maps which contain descriptions. Using this approach to facilitate adding
+            # any new fields as needed, eg attribute type, data type override, etc
+            schema = yamale.make_schema(content=dedent("""
+            parameters: map(include('parameter'), key=str())
+            ---
+            parameter:
+                description: str()
+            """))
+
+            data = yamale.make_data(description_file)
+
+            try:
+                yamale.validate(schema, data)
+            except yamale.YamaleError as error:
+                msg = f'The provided measured parameters description config is of invalid format: {error}'
+                self.logger.critical(self.name, ErrorCode.ISO_METADATA_DESCRIPTIONS_CONFIG_INVALID, msg)
+        else:
+            msg = 'Measured parameters descriptions were not provided'
+            self.logger.warning(self.name, ErrorCode.ISO_METADATA_NO_DESCRIPTIONS, msg)
+
     def run_preprocessor(self, **kwargs):  # pylint: disable=unused-argument
         """
         Executes the pre-processing steps for PGE initialization.
@@ -196,6 +231,7 @@ class PreProcessorMixin:
         self._initialize_logger()
         self._load_runconfig()
         self._validate_runconfig()
+        self._validate_iso_descriptions()
         self._initialize_qa_logger()
         self._setup_directories()
         self._configure_logger()
