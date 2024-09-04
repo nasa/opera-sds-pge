@@ -24,8 +24,8 @@ import opera.util.tiff_utils
 from opera.pge import RunConfig
 from opera.pge.dswx_ni.dswx_ni_pge import DSWxNIExecutor
 from opera.util import PgeLogger
-from opera.util.mock_utils import MockGdal
 from opera.util.input_validation import validate_algorithm_parameters_config
+from opera.util.mock_utils import MockGdal
 
 
 class DswxNIPgeTestCase(unittest.TestCase):

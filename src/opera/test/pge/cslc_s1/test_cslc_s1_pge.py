@@ -15,7 +15,7 @@ import stat
 import tempfile
 import unittest
 from io import StringIO
-from os.path import abspath, join
+from os.path import abspath, exists, join
 
 from pkg_resources import resource_filename
 
@@ -354,6 +354,19 @@ class CslcS1PgeTestCase(unittest.TestCase):
         self.assertNotIn('!Not found!', iso_metadata)
 
         os.unlink(cslc_metadata_path)
+
+        # Test no file from which to extract data
+        cslc_metadata_path = join(output_dir, 'No_file.nc')
+
+        with self.assertRaises(RuntimeError):
+            pge._collect_cslc_product_metadata(cslc_metadata_path)
+
+        # Verify the proper Runtime error message
+        log_file = pge.logger.get_file_name()
+        self.assertTrue(exists(log_file))
+        with open(log_file, 'r', encoding='utf-8') as l_file:
+            log = l_file.read()
+        self.assertIn(f'Could not extract metadata from {cslc_metadata_path}:', log)
 
     def test_cslc_s1_pge_input_validation(self):
         """Test the input validation checks."""

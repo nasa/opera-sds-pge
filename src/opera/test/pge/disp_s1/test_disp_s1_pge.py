@@ -159,9 +159,11 @@ class DispS1PgeTestCase(unittest.TestCase):
         self.assertEqual(runconfig['unwrap_options']['spurt_options']['temporal_coherence_threshold'], 0.6)
         self.assertEqual(runconfig['unwrap_options']['spurt_options']['general_settings']['use_tiles'], True)
         self.assertEqual(runconfig['unwrap_options']['spurt_options']['tiler_settings']['max_tiles'], 16)
-        self.assertEqual(runconfig['unwrap_options']['spurt_options']['tiler_settings']['target_points_for_generation'], 120000)
-        self.assertEqual(runconfig['unwrap_options']['spurt_options']['tiler_settings']['target_points_per_tile'],800000)
-        self.assertEqual(runconfig['unwrap_options']['spurt_options']['tiler_settings']['dilation_factor'],0.05)
+        self.assertEqual(runconfig['unwrap_options']['spurt_options']['tiler_settings']['target_points_for_generation'],
+                         120000)
+        self.assertEqual(runconfig['unwrap_options']['spurt_options']['tiler_settings']['target_points_per_tile'],
+                         800000)
+        self.assertEqual(runconfig['unwrap_options']['spurt_options']['tiler_settings']['dilation_factor'], 0.05)
         self.assertEqual(runconfig['unwrap_options']['spurt_options']['solver_settings']['t_worker_count'], 1)
         self.assertEqual(runconfig['unwrap_options']['spurt_options']['solver_settings']['s_worker_count'], 1)
         self.assertEqual(runconfig['unwrap_options']['spurt_options']['solver_settings']['links_per_batch'], 50000)
@@ -366,6 +368,21 @@ class DispS1PgeTestCase(unittest.TestCase):
         iso_metadata = pge._create_iso_metadata(disp_metadata)
 
         self.assertNotIn('!Not found!', iso_metadata)
+
+        os.unlink(disp_metadata_path)
+
+        # Test no file from which to extract data
+        disp_metadata_path = join(output_dir, 'No_file.nc')
+
+        with self.assertRaises(RuntimeError):
+            pge._collect_disp_s1_product_metadata(disp_metadata_path)
+
+        # Verify the proper Runtime error message
+        log_file = pge.logger.get_file_name()
+        self.assertTrue(exists(log_file))
+        with open(log_file, 'r', encoding='utf-8') as l_file:
+            log = l_file.read()
+        self.assertIn(f'Could not extract metadata from {disp_metadata_path}:', log)
 
     def test_validate_algorithm_parameters_config(self):
         """Test basic parsing and validation of an algorithm parameters RunConfig file"""
@@ -820,8 +837,8 @@ class DispS1PgeTestCase(unittest.TestCase):
                 ['-p disp_s1_pge_test/output_dir/not_compressed_slcs;',
                  'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.nc bs=1M count=1;',
                  'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.displacement.png bs=1M count=1;',
-                 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.short_wavelength_displacement.png bs=1M count=1;',
-                 'bs=1M count=1;', '/bin/echo DISP-S1 invoked with RunConfig']
+                 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.short_wavelength_displacement.png'
+                 ' bs=1M count=1;', 'bs=1M count=1;', '/bin/echo DISP-S1 invoked with RunConfig']
 
             with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
                 yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
@@ -844,7 +861,8 @@ class DispS1PgeTestCase(unittest.TestCase):
                 ['-p disp_s1_pge_test/output_dir/compressed_slcs;',
                  'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.nc bs=1M count=1;',
                  'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.displacement.png bs=1M count=1;',
-                 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.short_wavelength_displacement.png bs=1M count=1;',
+                 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.'
+                 'short_wavelength_displacement.png bs=1M count=1;',
                  'bs=1M count=1;', '/bin/echo DISP-S1 invoked with RunConfig']
 
             with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
@@ -868,8 +886,10 @@ class DispS1PgeTestCase(unittest.TestCase):
                 ['-p disp_s1_pge_test/output_dir/compressed_slcs;',
                  'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.nc bs=1M count=1;',
                  'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.displacement.png bs=1M count=1;',
-                 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.short_wavelength_displacement.png bs=1M count=1;',
-                 'touch disp_s1_pge_test/output_dir/compressed_slcs/compressed_slc_t087_185684_iw2_20180222_20180330.h5;',
+                 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.short_wavelength_displacement.'
+                 'png bs=1M count=1;',
+                 'touch disp_s1_pge_test/output_dir/compressed_slcs/'
+                 'compressed_slc_t087_185684_iw2_20180222_20180330.h5;',
                  # noqa E501
                  '/bin/echo DISP-S1 invoked with RunConfig']
 

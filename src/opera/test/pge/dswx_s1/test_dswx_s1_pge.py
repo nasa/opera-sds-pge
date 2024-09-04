@@ -447,9 +447,28 @@ class DswxS1PgeTestCase(unittest.TestCase):
                 log_contents = infile.read()
 
             self.assertIn("Could not load ISO template", log_contents)
+
         finally:
             if os.path.exists(test_runconfig_path):
                 os.unlink(test_runconfig_path)
+
+        # Test no file from which to extract data
+        pge = DSWxS1Executor(pge_name="DSWxS1PgeTest", runconfig_path=runconfig_path)
+
+        # Run only the pre-processor steps to ingest the runconfig and setup directories
+        pge.run_preprocessor()
+
+        dswx_s1_metadata = join(output_dir, 'No_file.nc')
+
+        with self.assertRaises(RuntimeError):
+            pge._collect_dswx_s1_product_metadata(dswx_s1_metadata)
+
+        # Verify the proper Runtime error message
+        log_file = pge.logger.get_file_name()
+        self.assertTrue(exists(log_file))
+        with open(log_file, 'r', encoding='utf-8') as l_file:
+            log = l_file.read()
+        self.assertIn(f'Could not extract metadata from {dswx_s1_metadata}:', log)
 
     def test_dswx_s1_pge_validate_algorithm_parameters_config(self):
         """Test basic parsing and validation of an algorithm parameters RunConfig file"""
