@@ -166,7 +166,7 @@ RunConfig:
 
         frame_id: 7091
       dynamic_ancillary_file_group:
-        algorithm_parameters_file: /home/mamba/runconfig/opera_pge_disp_s1_r5.1_calval_algorithm_parameters_forward.yaml
+        algorithm_parameters_file: /home/mamba/runconfig/opera_pge_disp_s1_r5.3_calval_algorithm_parameters_historical.yaml
         static_layers_files:
           - /home/mamba/input_dir/dynamic_ancillary_files/static_layers/OPERA_L2_CSLC-S1-STATIC_T027-056725-IW1_20140403_S1A_v1.0.h5
           - /home/mamba/input_dir/dynamic_ancillary_files/static_layers/OPERA_L2_CSLC-S1-STATIC_T027-056726-IW1_20140403_S1A_v1.0.h5
@@ -269,7 +269,7 @@ RunConfig:
         frame_to_burst_json: /home/mamba/input_dir/static_ancillary_files/opera-s1-disp-0.5.0-frame-to-burst.json.zip
         reference_date_database_json:
       primary_executable:
-        product_type: DISP_S1_FORWARD
+        product_type: DISP_S1_HISTORICAL
       product_path_group:
         product_path: /home/mamba/output_dir
         scratch_path: /home/mamba/scratch_dir
