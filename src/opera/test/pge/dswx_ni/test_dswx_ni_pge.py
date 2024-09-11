@@ -515,8 +515,14 @@ class DswxNIPgeTestCase(unittest.TestCase):
         # Initialize the core filename for the catalog metadata generation step
         pge._core_filename()
 
+        # Populate the metadata/filename dictionaries that would normally occur
+        # during output product validation
+        tile_id = 'T11SLS'
+        pge._tile_metadata_cache[tile_id] = dswx_ni_metadata
+        pge._tile_filename_cache[tile_id] = 'OPERA_L3_DSWx-NI_T11SLS_20110226T061749Z_20240329T181033Z_LSAR_30_v0.1'
+
         # Render ISO metadata using the sample metadata
-        iso_metadata = pge._create_iso_metadata(dswx_ni_metadata)
+        iso_metadata = pge._create_iso_metadata(tile_id)
 
         # Rendered template should not have any missing placeholders
         self.assertNotIn('!Not found!', iso_metadata)
@@ -535,6 +541,9 @@ class DswxNIPgeTestCase(unittest.TestCase):
 
         try:
             pge = DSWxNIExecutor(pge_name="DswxNiPgeTest", runconfig_path=test_runconfig_path)
+
+            pge._tile_metadata_cache[tile_id] = dswx_ni_metadata
+            pge._tile_filename_cache[tile_id] = 'OPERA_L3_DSWx-NI_T11SLS_20110226T061749Z_20240329T181033Z_LSAR_30_v0.1'
 
             with self.assertRaises(RuntimeError):
                 pge.run()
