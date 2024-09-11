@@ -412,12 +412,19 @@ class DswxS1PgeTestCase(unittest.TestCase):
             outfile.write('dummy dswx data')
 
         dswx_s1_metadata = pge._collect_dswx_s1_product_metadata(dummy_tif_file)
+        dswx_s1_metadata['SPACECRAFT_NAME'] = 'SENTINEL-1A'
 
         # Initialize the core filename for the catalog metadata generation step
         pge._core_filename()
 
+        # Populate the metadata/filename dictionaries that would normally occur
+        # during output product validation
+        tile_id = 'T18MVA'
+        pge._tile_metadata_cache[tile_id] = dswx_s1_metadata
+        pge._tile_filename_cache[tile_id] = 'OPERA_L3_DSWx-S1_T18MVA_20200702T231843Z_20230317T190549Z_v0.1'
+
         # Render ISO metadata using the sample metadata
-        iso_metadata = pge._create_iso_metadata(dswx_s1_metadata)
+        iso_metadata = pge._create_iso_metadata(tile_id)
 
         # Rendered template should not have any missing placeholders
         self.assertNotIn('!Not found!', iso_metadata)
@@ -436,6 +443,9 @@ class DswxS1PgeTestCase(unittest.TestCase):
 
         try:
             pge = DSWxS1Executor(pge_name="DswxS1PgeTest", runconfig_path=test_runconfig_path)
+
+            pge._tile_metadata_cache[tile_id] = dswx_s1_metadata
+            pge._tile_filename_cache[tile_id] = 'OPERA_L3_DSWx-S1_T18MVA_20200702T231843Z_20230317T190549Z_v0.1'
 
             with self.assertRaises(RuntimeError):
                 pge.run()
