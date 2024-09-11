@@ -180,9 +180,7 @@ class PreProcessorMixin:
                                 'Log file configuration complete')
 
     def _validate_iso_descriptions(self):
-        """
-        If given, check if the run-config description file exists and is valid
-        """
+        """If given, check if the run-config description file exists and is valid"""
         description_file = self.runconfig.iso_measured_parameter_descriptions
 
         if description_file is not None:
