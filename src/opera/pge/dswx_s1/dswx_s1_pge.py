@@ -447,7 +447,7 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
 
         if descriptions_file is not None:
             with open(descriptions_file) as f:
-                descriptions = yaml.safe_load(f)['parameters']
+                descriptions = yaml.safe_load(f)
 
             missing_description_value = '!Not Found!'
         else:

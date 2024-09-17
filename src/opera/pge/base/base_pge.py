@@ -193,7 +193,7 @@ class PreProcessorMixin:
             # Schema maps parameter names to maps which contain descriptions. Using this approach to facilitate adding
             # any new fields as needed, eg attribute type, data type override, etc
             schema = yamale.make_schema(content=dedent("""
-            parameters: map(include('parameter'), key=str())
+            map(include('parameter'), key=str())
             ---
             parameter:
                 description: str()
