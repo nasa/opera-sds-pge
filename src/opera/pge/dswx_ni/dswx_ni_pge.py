@@ -175,7 +175,11 @@ class DSWxNIPostProcessorMixin(DSWxS1PostProcessorMixin):
         # Extract all metadata assigned by the SAS at product creation time
         # TODO: current DSWx-NI GeoTIFF products do not contain any metadata
         #       so just use the mock set for the time being
-        output_product_metadata = MockGdal.MockDSWxNIGdalDataset().GetMetadata()
+        try:
+            output_product_metadata = MockGdal.MockDSWxNIGdalDataset().GetMetadata()
+        except Exception as err:
+            msg = f'Failed to extract metadata from {geotiff_product}, reason: {err}'
+            self.logger.critical(self.name, ErrorCode.ISO_METADATA_COULD_NOT_EXTRACT_METADATA, msg)
 
         # Get the Military Grid Reference System (MGRS) tile code and zone
         # identifier from the intermediate file name

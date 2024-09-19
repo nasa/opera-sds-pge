@@ -427,7 +427,11 @@ class DSWxHLSPostProcessorMixin(PostProcessorMixin):
             self.logger.critical(self.name, ErrorCode.ISO_METADATA_RENDER_FAILED, msg)
 
         # Extract all metadata assigned by the SAS at product creation time
-        output_product_metadata = get_geotiff_metadata(representative_product)
+        try:
+            output_product_metadata = get_geotiff_metadata(representative_product)
+        except Exception as err:
+            msg = f'Failed to extract metadata from {representative_product}, reason: {err}'
+            self.logger.critical(self.name, ErrorCode.ISO_METADATA_COULD_NOT_EXTRACT_METADATA, msg)
 
         # Get the Military Grid Reference System (MGRS) tile code and zone identifier
         # from the name of the input HLS dataset
