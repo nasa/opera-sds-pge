@@ -366,7 +366,7 @@ class CslcS1PgeTestCase(unittest.TestCase):
         self.assertTrue(exists(log_file))
         with open(log_file, 'r', encoding='utf-8') as l_file:
             log = l_file.read()
-        self.assertIn(f'Could not extract metadata from {cslc_metadata_path}:', log)
+        self.assertIn(f'Failed to extract metadata from {cslc_metadata_path}', log)
 
     def test_cslc_s1_pge_input_validation(self):
         """Test the input validation checks."""

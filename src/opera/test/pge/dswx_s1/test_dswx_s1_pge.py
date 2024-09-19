@@ -468,7 +468,7 @@ class DswxS1PgeTestCase(unittest.TestCase):
         self.assertTrue(exists(log_file))
         with open(log_file, 'r', encoding='utf-8') as l_file:
             log = l_file.read()
-        self.assertIn(f'Could not extract metadata from {dswx_s1_metadata}:', log)
+        self.assertIn(f'Failed to extract metadata from {dswx_s1_metadata}', log)
 
     def test_dswx_s1_pge_validate_algorithm_parameters_config(self):
         """Test basic parsing and validation of an algorithm parameters RunConfig file"""

@@ -382,7 +382,7 @@ class DispS1PgeTestCase(unittest.TestCase):
         self.assertTrue(exists(log_file))
         with open(log_file, 'r', encoding='utf-8') as l_file:
             log = l_file.read()
-        self.assertIn(f'Could not extract metadata from {disp_metadata_path}:', log)
+        self.assertIn(f'Failed to extract metadata from {disp_metadata_path}', log)
 
     def test_validate_algorithm_parameters_config(self):
         """Test basic parsing and validation of an algorithm parameters RunConfig file"""

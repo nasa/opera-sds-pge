@@ -623,7 +623,7 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
         try:
             output_product_metadata = get_cslc_s1_product_metadata(cslc_product)
         except Exception as err:
-            msg = f'Could not extract metadata from {cslc_product}: Exception {err}'
+            msg = f'Failed to extract metadata from {cslc_product}, reason: {err}'
             self.logger.critical(self.name, ErrorCode.ISO_METADATA_COULD_NOT_EXTRACT_METADATA, msg)
 
         # Fill in some additional fields expected within the ISO

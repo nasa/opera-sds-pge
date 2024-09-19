@@ -285,7 +285,7 @@ class RtcS1PgeTestCase(unittest.TestCase):
         self.assertTrue(exists(log_file))
         with open(log_file, 'r', encoding='utf-8') as l_file:
             log = l_file.read()
-        self.assertIn(f'Could not extract metadata from {rtc_metadata_file_path}:', log)
+        self.assertIn(f'Failed to extract metadata from {rtc_metadata_file_path}', log)
 
     def test_static_layer_iso_metadata_creation(self):
         """

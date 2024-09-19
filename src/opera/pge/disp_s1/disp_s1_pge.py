@@ -611,7 +611,7 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
         try:
             output_product_metadata = get_disp_s1_product_metadata(disp_product)
         except Exception as err:
-            msg = f'Could not extract metadata from {disp_product}: Exception {err}'
+            msg = f'Failed to extract metadata from {disp_product}, reason: {err}'
             self.logger.critical(self.name, ErrorCode.ISO_METADATA_COULD_NOT_EXTRACT_METADATA, msg)
 
         # Parse the image polygon coordinates to conform with gml

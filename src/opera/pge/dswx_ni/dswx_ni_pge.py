@@ -178,7 +178,7 @@ class DSWxNIPostProcessorMixin(DSWxS1PostProcessorMixin):
         try:
             output_product_metadata = MockGdal.MockDSWxNIGdalDataset().GetMetadata()
         except Exception as err:
-            msg = f'Could not extract metadata from {geotiff_product}: Exception {err}'
+            msg = f'Failed to extract metadata from {geotiff_product}, reason: {err}'
             self.logger.critical(self.name, ErrorCode.ISO_METADATA_COULD_NOT_EXTRACT_METADATA, msg)
 
         # Get the Military Grid Reference System (MGRS) tile code and zone
