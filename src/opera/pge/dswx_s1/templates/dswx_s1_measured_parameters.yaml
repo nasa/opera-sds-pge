@@ -15,19 +15,19 @@ MGRS_COLLECTION_EXPECTED_NUMBER_OF_BURSTS:
 MGRS_COLLECTION_MISSING_NUMBER_OF_BURSTS:
   description: The number of missing RTC-S1 bursts.
 MGRS_POL_MODE:
-  description: "The description for the polarizations of the collected bursts. 'MIX_DUAL_POL': ['HH', 'HV', 'VV', 'VH'], 'MIX_DUAL_H_SINGLE_V_POL': ['HH', 'HV', 'VV'], 'MIX_DUAL_V_SINGLE_H_POL': ['VV', 'VH', 'HH'], 'MIX_SINGLE_POL': ['HH', 'VV'], 'DV_POL': ['VV', 'VH'], 'SV_POL': ['VV'], 'DH_POL': ['HH', 'HV'], 'SH_POL': ['HH'],"
+  description: "The description for the polarizations of the collected bursts. 'MIX_DUAL_POL': ['HH', 'HV', 'VV', 'VH'], 'MIX_DUAL_H_SINGLE_V_POL': ['HH', 'HV', 'VV'], 'MIX_DUAL_V_SINGLE_H_POL': ['VV', 'VH', 'HH'], 'MIX_SINGLE_POL': ['HH', 'VV'], 'DV_POL': ['VV', 'VH'], 'SV_POL': ['VV'], 'DH_POL': ['HH', 'HV'], 'SH_POL': ['HH']."
 INPUT_DEM_SOURCE:
-  description: Description of the input DEM
+  description: Description of the input DEM.
 INPUT_REFERENCE_WATER_SOURCE:
-  description: Description of the input reference water file
+  description: Description of the input reference water file.
 INPUT_WORLDCOVER_SOURCE:
-  description: Description of the input ESA WorldCover 10-m file
+  description: Description of the input ESA WorldCover 10-m file.
 INPUT_HAND_SOURCE:
-  description: Description of the input ASF GLO-30 HAND 30-m file
+  description: Description of the input ASF GLO-30 HAND 30-m file.
 INPUT_GLAD_CLASSIFICATION_SOURCE:
-  description: Description of the input GLAD Annual maps of land cover and land use 30-m file
+  description: Description of the input GLAD Annual maps of land cover and land use 30-m file.
 INPUT_SHORELINE_SOURCE:
-  description: Description of the input shoreline vector file
+  description: Description of the input shoreline vector file.
 POLARIZATION:
   description: Polarizations (e.g. VV, VH).
 PROCESSING_DATETIME:
@@ -125,10 +125,10 @@ RTC_SENSING_START_TIME:
 RTC_TRACK_NUMBER:
   description: Track number. Copied from OPERA RTC-S1.
 SENSOR:
-  description: Name of the sensor instrument. (i.e. IW)
+  description: Name of the sensor instrument (i.e. IW).
 SOFTWARE_VERSION:
   description: The software version used to generate the DSWx-S1 product.
 SPACECRAFT_NAME:
-  description: Name of the sensor platform. (i.e.  Sentinel-1A/B)
+  description: Name of the sensor platform (i.e.  Sentinel-1A/B).
 SPATIAL_COVERAGE:
   description: The area percentage of the tile with data.
