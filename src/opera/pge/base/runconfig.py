@@ -326,11 +326,27 @@ class RunConfig:
     @property
     def iso_template_path(self) -> str:
         """Returns the ISO Template Path for a Primary Executable"""
-        iso_template_path = self._pge_config['PrimaryExecutable']['IsoTemplatePath']
+        iso_template_path = self._pge_config['PrimaryExecutable'].get('IsoTemplatePath', None)
+        if iso_template_path is None:
+            return None
+
         return (
             iso_template_path
             if isabs(iso_template_path)
             else resource_filename('opera', iso_template_path)
+        )
+
+    @property
+    def iso_measured_parameter_descriptions(self) -> str:
+        """Returns the ISO Measured Parameters description file Path for a Primary Executable"""
+        iso_descriptions_path = self._pge_config['PrimaryExecutable'].get('IsoMeasuredParameterDescriptions', None)
+        if iso_descriptions_path is None:
+            return None
+
+        return (
+            iso_descriptions_path
+            if isabs(iso_descriptions_path)
+            else resource_filename('opera', iso_descriptions_path)
         )
 
     @property

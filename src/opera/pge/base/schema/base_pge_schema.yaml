@@ -29,7 +29,8 @@ RunConfig:
         ErrorCodeBase: int(required=True)
         SchemaPath: str(required=True)
         AlgorithmParametersSchemaPath: str(required=False)
-        IsoTemplatePath: str(required=False)
+        IsoTemplatePath: str(required=False)  # TODO: Why is this not required if all the PGEs fail if it doesn't exist/is undefined?
+        IsoMeasuredParameterDescriptions: str(required=False)
         DataValidityStartDate: int(min=20000101, max=21991231, required=False)
 
       QAExecutable:

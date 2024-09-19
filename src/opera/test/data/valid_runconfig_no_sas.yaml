@@ -30,6 +30,7 @@ RunConfig:
         ErrorCodeBase: 100000
         SchemaPath: test/data/sample_sas_schema.yaml
         IsoTemplatePath: sample_iso_template.xml.jinja2
+        IsoMeasuredParameterDescriptions: sample_iso_measured_parameter_descriptions.yaml
         DataValidityStartDate: 20010101
 
       QAExecutable:

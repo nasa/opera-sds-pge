@@ -14,6 +14,8 @@ import re
 from datetime import datetime
 from os.path import abspath, basename, exists, getsize, join, splitext
 
+import yaml
+
 import opera.util.input_validation as input_validation
 from opera.pge.base.base_pge import PgeExecutor
 from opera.pge.base.base_pge import PostProcessorMixin
@@ -441,17 +443,28 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
         """
         augmented_parameters = dict()
 
+        descriptions_file = self.runconfig.iso_measured_parameter_descriptions
+
+        if descriptions_file is not None:
+            with open(descriptions_file) as f:
+                descriptions = yaml.safe_load(f)
+
+            missing_description_value = '!Not Found!'
+        else:
+            descriptions = dict()
+            missing_description_value = 'Not Provided'
+
         for name, value in measured_parameters.items():
             if isinstance(value, list):
                 value = json.dumps(value)
 
             data_type = python_type_to_xml_type(value)
 
-            # TODO: This is hardcoded for now, but we should eventually try to guess this
+            # TODO: This is hardcoded for now, but we should eventually try to guess this or add it to the descriptions
+            #  YAML file
             attr_type = 'processingInformation'
 
-            # TODO: Filling this attribute is also on the back burner for now
-            attr_description = f'TBA: Description for {name}'
+            attr_description = descriptions.setdefault(name, dict(description=missing_description_value))['description']
 
             attr_name = (name.title()
                          .replace('Mgrs', 'MGRS')
@@ -596,7 +609,13 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
             'custom_data': custom_data_dict
         }
 
-        iso_template_path = abspath(self.runconfig.iso_template_path)
+        iso_template_path = self.runconfig.iso_template_path
+
+        if iso_template_path is None:
+            msg = "ISO template path not provided in runconfig"
+            self.logger.critical(self.name, ErrorCode.ISO_METADATA_TEMPLATE_NOT_PROVIDED_WHEN_NEEDED, msg)
+
+        iso_template_path = abspath(iso_template_path)
 
         if not exists(iso_template_path):
             msg = f"Could not load ISO template {iso_template_path}, file does not exist"

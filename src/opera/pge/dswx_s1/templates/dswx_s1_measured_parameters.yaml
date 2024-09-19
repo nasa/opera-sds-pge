@@ -1,0 +1,134 @@
+AREA_OR_POINT:
+  description: Indicates that pixel values are assumed to represent an area rather than points.
+CONTACT_INFORMATION:
+  description: OPERA Project contact email address.
+DSWX_PRODUCT_VERSION:
+  description: The DSWx-S1 product version.
+INSTITUTION:
+  description: Name of the generating Institution.
+LAYOVER_SHADOW_COVERAGE:
+  description: The percentage of layover and shadow in the DSWx-S1 product based on OPERA RTC-S1 product.
+MGRS_COLLECTION_ACTUAL_NUMBER_OF_BURSTS:
+  description: The number of actual RTC-S1 bursts that are collected within the MGRS tile collection ID.
+MGRS_COLLECTION_EXPECTED_NUMBER_OF_BURSTS:
+  description: The number of expected RTC-S1 bursts that are supposed to be collected within the MGRS tile collection ID.
+MGRS_COLLECTION_MISSING_NUMBER_OF_BURSTS:
+  description: The number of missing RTC-S1 bursts.
+MGRS_POL_MODE:
+  description: "The description for the polarizations of the collected bursts. 'MIX_DUAL_POL': ['HH', 'HV', 'VV', 'VH'], 'MIX_DUAL_H_SINGLE_V_POL': ['HH', 'HV', 'VV'], 'MIX_DUAL_V_SINGLE_H_POL': ['VV', 'VH', 'HH'], 'MIX_SINGLE_POL': ['HH', 'VV'], 'DV_POL': ['VV', 'VH'], 'SV_POL': ['VV'], 'DH_POL': ['HH', 'HV'], 'SH_POL': ['HH']."
+INPUT_DEM_SOURCE:
+  description: Description of the input DEM.
+INPUT_REFERENCE_WATER_SOURCE:
+  description: Description of the input reference water file.
+INPUT_WORLDCOVER_SOURCE:
+  description: Description of the input ESA WorldCover 10-m file.
+INPUT_HAND_SOURCE:
+  description: Description of the input ASF GLO-30 HAND 30-m file.
+INPUT_GLAD_CLASSIFICATION_SOURCE:
+  description: Description of the input GLAD Annual maps of land cover and land use 30-m file.
+INPUT_SHORELINE_SOURCE:
+  description: Description of the input shoreline vector file.
+POLARIZATION:
+  description: Polarizations (e.g. VV, VH).
+PROCESSING_DATETIME:
+  description: 'DSWx-S1 product processing date. Format: YYYY-MM-DDTHH:MM:SSZ.'
+PROCESSING_INFORMATION_FILTER:
+  description: RTC intensity filtering method (bregman, lee, guided_filter, anisotropic_diffusion, etc.).
+PROCESSING_INFORMATION_FILTER_ENABLED:
+  description: Indicates if the filter is applied to the input RTC.
+PROCESSING_INFORMATION_FILTER_OPTION:
+  description: Parameters used for the despeckle filter.
+PROCESSING_INFORMATION_FUZZY_VALUE_AREA:
+  description: The foot and shoulder values used to construct an S-shaped function for water body areas.
+PROCESSING_INFORMATION_FUZZY_VALUE_DARK_AREA:
+  description: List of the intensity values to define dark land.
+PROCESSING_INFORMATION_FUZZY_VALUE_HAND:
+  description: Foot and shoulder value to construct a Z-shape function for height above nearest drainage (HAND).
+PROCESSING_INFORMATION_FUZZY_VALUE_HIGH_FREQUENT_AREA:
+  description: The minimum and maximum values representing reference water levels to identify areas with frequent water extent changes.
+PROCESSING_INFORMATION_FUZZY_VALUE_REFERENCE_WATER:
+  description: Foot and shoulder value to construct an S-shape function for reference water.
+PROCESSING_INFORMATION_FUZZY_VALUE_SLOPE:
+  description: Foot and shoulder value to construct a Z-shape function for slope angle.
+PROCESSING_INFORMATION_INUNDATED_VEGETATION:
+  description: Indicates whether inundated vegetation is a factor in the processing.
+PROCESSING_INFORMATION_INUNDATED_VEGETATION_AREA_DATA_TYPE:
+  description: Indicates what sources are used to define the potential wetland areas (e.g. GLAD, WorldCover).
+PROCESSING_INFORMATION_INUNDATED_VEGETATION_CROSS_POL_MIN:
+  description: The cross-polarization backscattering value [dB] used to filter out areas for inundated vegetation mapping. The areas that have this threshold are automatically considered not inundated vegetation.
+PROCESSING_INFORMATION_INUNDATED_VEGETATION_DUAL_POL_RATIO_MAX:
+  description: The maximum threshold for the ratio of co-polarization to cross-polarization in mapping inundated vegetation. It defines the upper limit for this ratio, beyond which vegetation is not considered inundated.
+PROCESSING_INFORMATION_INUNDATED_VEGETATION_DUAL_POL_RATIO_MIN:
+  description: The minimum threshold for the ratio of co-polarization to cross-polarization required to identify inundated vegetation.
+PROCESSING_INFORMATION_INUNDATED_VEGETATION_DUAL_POL_RATIO_THRESHOLD:
+  description: Threshold value for co-pol to cross-pol ratio used to map inundated vegetation areas.
+PROCESSING_INFORMATION_INUNDATED_VEGETATION_FILTER:
+  description: Filtering method used for dual polarization ratio.
+PROCESSING_INFORMATION_INUNDATED_VEGETATION_TARGET_CLASS:
+  description: Land cover classes used to define potential wetland areas.
+PROCESSING_INFORMATION_MASKING_ANCILLARY_CO_POL_THRESHOLD:
+  description: Threshold level [dB] to be used for dark land identification for co-polarization.
+PROCESSING_INFORMATION_MASKING_ANCILLARY_CROSS_POL_THRESHOLD:
+  description: Threshold level [dB] to be used for dark land identification for cross-polarization.
+PROCESSING_INFORMATION_MASKING_ANCILLARY_WATER_THRESHOLD:
+  description: Threshold to be used for dry region identification for reference water data. The fuzzy values computed from cross-polarization are replaced with the one from co-polarization.
+PROCESSING_INFORMATION_REFINE_BIMODALITY_MINIMUM_PIXEL:
+  description: Minimum number of pixels to pass to bimodality test.
+PROCESSING_INFORMATION_REFINE_BIMODALITY_THRESHOLD:
+  description: List of the thresholds to determine if the distribution is close to bimodal distribution.
+PROCESSING_INFORMATION_REGION_GROWING_INITIAL_SEED:
+  description: Seed value for region-growing method.
+PROCESSING_INFORMATION_REGION_GROWING_RELAXED_THRESHOLD:
+  description: Tolerance value for region-growing method.
+PROCESSING_INFORMATION_THRESHOLDING:
+  description: 'Initial thresholding algorithm, either "Kittler-Illingworth" or "OTSU".'
+PROCESSING_INFORMATION_THRESHOLD_BIMODALITY:
+  description: Bimodality threshold for identifying bimodality in data tiles. It is used to select tiles that exhibit bimodal distribution, essential for specific analyses where recognizing two distinct data groups is crucial.
+PROCESSING_INFORMATION_THRESHOLD_BOUNDS:
+  description: Threshold bounds for polarizations (e.g. co-pol and cross-pol).
+PROCESSING_INFORMATION_THRESHOLD_MULTI_THRESHOLD:
+  description: Indicates a Boolean indicator specifying whether a trimodal distribution is assumed in the processing.
+PROCESSING_INFORMATION_THRESHOLD_TILE_AVERAGE:
+  description: Indicates whether averaging of thresholds within a tile is enabled or not.
+PROCESSING_INFORMATION_THRESHOLD_TILE_SELECTION:
+  description: Tile selection method (e.g. Tweles, Chini, Bimodality or combined).
+PROCESSING_INFORMATION_THRESHOLD_TWELE:
+  description: Threshold value for tile selection using the 'twele' method.
+PRODUCT_LEVEL:
+  description: Product level.
+PRODUCT_SOURCE:
+  description: Source data for the product.
+PRODUCT_TYPE:
+  description: Product type.
+PROJECT:
+  description: Name of the project.
+RTC_ABSOLUTE_ORBIT_NUMBER:
+  description: Absolute orbit number. Copied from OPERA RTC-S1 products.
+RTC_BURST_ID:
+  description: 'List of the burst ids used to generate the tile. Format: TrackNumber_BurstID_SwathNumber.'
+RTC_INPUT_L1_SLC_GRANULES:
+  description: List of input L1 SLC granules used.
+RTC_INPUT_LIST:
+  description: List of input RTC-S1 files.
+RTC_ORBIT_PASS_DIRECTION:
+  description: Orbit direction (e.g. Ascending or Descending). Copied from OPERA RTC-S1 products.
+RTC_PRODUCT_VERSION:
+  description: The version of the OPERA RTC-S1 algorithm used for RTC products. Copied directly from OPERA RTC-S1 metadata.
+RTC_QA_RFI_INFO_AVAILABLE:
+  description: A flag to indicate whether RFI information is available in the source data.
+RTC_QA_RFI_NUMBER_OF_BURSTS:
+  description: Number of RTC-S1 bursts affected by RFI.
+RTC_SENSING_END_TIME:
+  description: 'Sensing end time. Latest acquisition time of OPERA burst RTC set. Format: YYYY-MM-DDTHH:MM:SSZ.'
+RTC_SENSING_START_TIME:
+  description: 'Sensing start time. Earliest acquisition time of OPERA burst RTC set. Format: YYYY-MM-DDTHH:MM:SSZ.'
+RTC_TRACK_NUMBER:
+  description: Track number. Copied from OPERA RTC-S1.
+SENSOR:
+  description: Name of the sensor instrument (i.e. IW).
+SOFTWARE_VERSION:
+  description: The software version used to generate the DSWx-S1 product.
+SPACECRAFT_NAME:
+  description: Name of the sensor platform (i.e.  Sentinel-1A/B).
+SPATIAL_COVERAGE:
+  description: The area percentage of the tile with data.
