@@ -729,7 +729,6 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
             'custom_data': custom_data_dict
         }
 
-        iso_template_path = os.path.abspath(self.runconfig.iso_template_path)
         iso_template_path = self.runconfig.iso_template_path
 
         if iso_template_path is None:
