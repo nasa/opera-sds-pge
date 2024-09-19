@@ -815,7 +815,13 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
             'custom_data': custom_data_dict
         }
 
-        iso_template_path = os.path.abspath(self.runconfig.iso_template_path)
+        iso_template_path = self.runconfig.iso_template_path
+
+        if iso_template_path is None:
+            msg = "ISO template path not provided in runconfig"
+            self.logger.critical(self.name, ErrorCode.ISO_METADATA_TEMPLATE_NOT_PROVIDED_WHEN_NEEDED, msg)
+
+        iso_template_path = os.path.abspath(iso_template_path)
 
         if not os.path.exists(iso_template_path):
             msg = f"Could not load ISO template {iso_template_path}, file does not exist"
