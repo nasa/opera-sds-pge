@@ -331,10 +331,10 @@ class RunConfig:
             return None
 
         return (
-            iso_template_path
-            if isabs(iso_template_path)
-            else resource_filename('opera', iso_template_path)
-        )
+                iso_template_path
+                if isabs(iso_template_path)
+                else resource_filename('opera', iso_template_path)
+            )
 
     @property
     def iso_measured_parameter_descriptions(self) -> str:

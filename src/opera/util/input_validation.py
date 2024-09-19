@@ -216,13 +216,6 @@ def check_disp_s1_ancillary_burst_ids(cslc_input_burst_ids: set,
     nl, tab, dtab = '\n', '\t', '\t\t'   # used to format log output in fstrings.
     ancillary_burst_ids: set = get_burst_id_set(ancillary_file_list, logger, name)
 
-    # Test none of the ancillary inputs have the same burst ID
-    if len(ancillary_burst_ids) != len(ancillary_file_list):
-        msg = (f"Duplicate burst ID's in ancillary file list. "
-               f"Length of file list {ancillary_file_list}, "
-               f"Length of file set {ancillary_burst_ids}")
-        logger.critical(name, ErrorCode.INVALID_INPUT, msg)
-
     # Verify that the sets of ancillary input burst ID's match the set of CSLC
     # input burst ID's
     if ancillary_burst_ids != cslc_input_burst_ids:
