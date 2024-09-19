@@ -567,8 +567,11 @@ class RtcS1PgeTestCase(unittest.TestCase):
 
     def test_bad_iso_metadata_template(self):
         """Verify code when the QA application is enabled"""
+
+        # TODO: Roll out these checks for missing & invalid templates to other PGE tests
         runconfig_path = join(self.data_dir, 'test_rtc_s1_config.yaml')
         test_runconfig_path = join(self.data_dir, 'invalid_rtc_s1_config.yaml')
+        test_missing_runconfig_path = join(self.data_dir, 'missing_iso_rtc_s1_config.yaml')
 
         with open(runconfig_path, 'r', encoding='utf-8') as infile:
             runconfig_dict = yaml.safe_load(infile)
@@ -577,6 +580,11 @@ class RtcS1PgeTestCase(unittest.TestCase):
         primary_executable['IsoTemplatePath'] = 'pge/rtc_s1/templates/OPERA_ISO_metadata_L2_RTC_S1_template.xml'
 
         with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+            yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+
+        del primary_executable['IsoTemplatePath']
+
+        with open(test_missing_runconfig_path, 'w', encoding='utf-8') as outfile:
             yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
 
         try:
@@ -595,6 +603,23 @@ class RtcS1PgeTestCase(unittest.TestCase):
         finally:
             if os.path.exists(test_runconfig_path):
                 os.unlink(test_runconfig_path)
+
+        try:
+            pge = RtcS1Executor(pge_name="RtcPgeTest", runconfig_path=test_missing_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+            self.assertIn("ISO template path not provided in runconfig", log_contents)
+
+        finally:
+            if os.path.exists(test_missing_runconfig_path):
+                os.unlink(test_missing_runconfig_path)
 
     def test_qa_enabled(self):
         """Test the staging of the qa.log files."""

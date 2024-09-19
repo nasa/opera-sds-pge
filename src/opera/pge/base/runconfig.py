@@ -326,12 +326,15 @@ class RunConfig:
     @property
     def iso_template_path(self) -> str:
         """Returns the ISO Template Path for a Primary Executable"""
-        iso_template_path = self._pge_config['PrimaryExecutable']['IsoTemplatePath']
+        iso_template_path = self._pge_config['PrimaryExecutable'].get('IsoTemplatePath', None)
+        if iso_template_path is None:
+            return None
+
         return (
-            iso_template_path
-            if isabs(iso_template_path)
-            else resource_filename('opera', iso_template_path)
-        )
+                iso_template_path
+                if isabs(iso_template_path)
+                else resource_filename('opera', iso_template_path)
+            )
 
     @property
     def data_validity_start_date(self) -> str:
