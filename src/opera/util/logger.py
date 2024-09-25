@@ -313,8 +313,6 @@ class PgeLogger:
 
         caller = inspect.currentframe().f_back
 
-        # TODO: Can the number of back frames be determined implicitly?
-        #       i.e. back up until the first non-logging frame is reached?
         for _ in range(additional_back_frames):
             caller = caller.f_back
 
