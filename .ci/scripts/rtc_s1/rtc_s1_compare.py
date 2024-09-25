@@ -612,7 +612,6 @@ def compare_rtc_s1_products(file_1, file_2):
 
     flag_all_ok = [True]
 
-    # TODO: compare projections ds.GetProjection()
     layer_gdal_dataset_1 = gdal.Open(file_1, gdal.GA_ReadOnly)
     geotransform_1 = layer_gdal_dataset_1.GetGeoTransform()
     metadata_1 = layer_gdal_dataset_1.GetMetadata()
