@@ -915,7 +915,8 @@ class DispS1PgeTestCase(unittest.TestCase):
             if exists(test_runconfig_path):
                 os.unlink(test_runconfig_path)
 
-    @pytest.mark.skip  # TODO skip test until NetCDF files are supported by DISP-S1 SAS
+    # DISP-S1 will no longer use GRIB/NetCDF files directly, so this test is permanently disabled
+    @pytest.mark.skip
     @patch.object(opera.pge.disp_s1.disp_s1_pge.subprocess, "run", mock_grib_to_netcdf)
     def test_scratch_sas_runconfig_for_grib_to_netcdf_files(self):
         """
