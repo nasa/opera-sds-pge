@@ -1,0 +1,7 @@
+map(include('parameter'), key=str())
+---
+parameter:
+  description: str()
+  attribute_type: enum('geographicIdentifier', 'qualityInformation', 'instrumentInformation', 'sensorInformation', 'contentInformation', 'platformInformation', 'citation.identifier', 'descriptiveKeyword', 'processingInformation', 'processingParameter', 'commandLineArgument')
+  attribute_name: str(required=False)
+  attribute_data_type: enum('string', 'float', 'int', 'boolean', 'date', 'time', 'dateTime', 'dateString', 'timeString', 'dateTimeString', required=False)

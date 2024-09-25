@@ -15,7 +15,7 @@ from datetime import datetime
 from fnmatch import fnmatch
 from functools import lru_cache
 from os.path import abspath, basename, exists, join, splitext
-from textwrap import dedent
+from pkg_resources import resource_filename
 
 import yamale
 from yamale import YamaleError
@@ -190,15 +190,12 @@ class PreProcessorMixin:
                 msg = f'Could not load description file {description_file}, file does not exist.'
                 self.logger.critical(self.name, ErrorCode.ISO_METADATA_DESCRIPTIONS_CONFIG_NOT_FOUND, msg)
 
-            # Schema maps parameter names to maps which contain descriptions. Using this approach to facilitate adding
-            # any new fields as needed, eg attribute type, data type override, etc
-            schema = yamale.make_schema(content=dedent("""
-            map(include('parameter'), key=str())
-            ---
-            parameter:
-                description: str()
-            """))
+            schema_file = resource_filename(
+                'opera',
+                'pge/base/schema/iso_metadata_measured_parameters_config_schema.yaml'
+            )
 
+            schema = yamale.make_schema(schema_file)
             data = yamale.make_data(description_file)
 
             try:
