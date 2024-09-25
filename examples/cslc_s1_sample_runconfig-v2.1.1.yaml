@@ -113,7 +113,7 @@ RunConfig:
                 ProgramOptions:
 
             DebugLevelGroup:
-                # Set to True to enable Debug mode (TODO this is currently a no-op)
+                # Set to True to enable Debug mode (Note: currently a no-op for this PGE)
                 DebugSwitch: False
 
                 # Set to True to have the PGE invoke the SAS/QA executables via
