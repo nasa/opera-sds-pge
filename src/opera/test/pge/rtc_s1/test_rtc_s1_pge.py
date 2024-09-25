@@ -512,8 +512,7 @@ class RtcS1PgeTestCase(unittest.TestCase):
                 os.unlink(test_runconfig_path)
 
     def test_expected_extension(self):
-        """Code coverage only right now"""
-        # TODO when we get .nc and .h5 files this test will need to be modified
+        """Test validation of output product extension based on RunConfig setting"""
         runconfig_path = join(self.data_dir, 'test_rtc_s1_config.yaml')
         test_runconfig_path = join(self.data_dir, 'invalid_rtc_s1_config.yaml')
 
