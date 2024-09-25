@@ -458,19 +458,17 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
             if isinstance(value, list):
                 value = json.dumps(value)
 
-            data_type = python_type_to_xml_type(value)
-
-            # TODO: This is hardcoded for now, but we should eventually try to guess this or add it to the descriptions
-            #  YAML file
-            attr_type = 'processingInformation'
+            guessed_data_type = python_type_to_xml_type(value)
+            guessed_attr_name = (name.title()
+                                 .replace('Mgrs', 'MGRS')
+                                 .replace('Dswx', 'DSWx')
+                                 .replace('_', '')
+                                 )
 
             attr_description = descriptions.setdefault(name, dict(description=missing_description_value))['description']
-
-            attr_name = (name.title()
-                         .replace('Mgrs', 'MGRS')
-                         .replace('Dswx', 'DSWx')
-                         .replace('_', '')
-                         )
+            data_type = descriptions[name].get('attribute_data_type', guessed_data_type)
+            attr_type = descriptions[name].get('attribute_type', "!Not Found!")
+            attr_name = descriptions[name].get('attribute_name', guessed_attr_name)
 
             augmented_parameters[name] = (dict(name=attr_name, value=value, attr_type=attr_type,
                                                attr_description=attr_description, data_type=data_type))
