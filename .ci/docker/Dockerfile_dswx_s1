@@ -46,7 +46,8 @@ USER 0:0
 SHELL ["conda", "run", "-n", "DSWX-SAR", "/bin/bash", "-c"]
 
 # Install dependencies into existing Conda Env
-# TODO: remove last chmod once permissions are set correctly on /home/dswx_user/scratch for delivered containers
+# Modifications to the destination dir permissions are also required here to ensure
+# we don't run into issues when running as an outside user (via docker run -u)
 RUN set -ex \
     && cd ${PGE_DEST_DIR} \
     && mkdir -p ${CONDA_ROOT}/bin \
@@ -54,7 +55,7 @@ RUN set -ex \
     && chmod +x ${CONDA_ROOT}/bin/*_entrypoint.sh \
     && python -m pip install -r ${PGE_DEST_DIR}/opera/requirements.txt \
     && conda install --yes --channel conda-forge hdf5 \
-    && chmod 777 ${PGE_DEST_DIR}/scratch
+    && chmod 777 $(find ${PGE_DEST_DIR} -type d)
 
 # Set the Docker entrypoint and clear the default command
 ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "DSWX-SAR", "sh", "-c", "exec ${CONDA_ROOT}/bin/pge_docker_entrypoint.sh  \"${@}\"", "--"]
