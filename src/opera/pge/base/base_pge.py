@@ -189,7 +189,6 @@ class PreProcessorMixin:
             Any keyword arguments needed by the pre-processor
 
         """
-        # TODO: better way to handle trace statements before logger has been created?
         print(f'Running preprocessor for {self._pre_mixin_name}')
 
         self._initialize_logger()
