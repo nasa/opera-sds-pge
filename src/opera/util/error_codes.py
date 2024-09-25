@@ -13,6 +13,9 @@ from enum import IntEnum, auto, unique
 CODES_PER_RANGE = 1000
 """Number of error codes allocated to each range"""
 
+ERROR_CODE_PGE_OFFSET = 10000
+"""Base offset used to distinguish error codes by PGE type"""
+
 INFO_RANGE_START = 0
 """Starting value for the Info code range"""
 

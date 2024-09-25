@@ -22,9 +22,15 @@ from os.path import basename, isfile
 import opera.util.time as time_util
 from opera.util import error_codes
 
-from .error_codes import ErrorCode
+from .error_codes import ErrorCode, ERROR_CODE_PGE_OFFSET
 from .time import get_iso_time
 from .usage_metrics import get_os_metrics
+
+INFO = "Info"
+DEBUG = "Debug"
+WARNING = "Warning"
+CRITICAL = "Critical"
+"""Constants for logging levels"""
 
 
 def write(log_stream, severity, workflow, module, error_code, error_location,
@@ -100,19 +106,18 @@ def get_severity_from_error_code(error_code):
         The severity level associated to the provided error code.
 
     """
-    # TODO: constants for max codes and severity strings
-    error_code_offset = error_code % 10000
+    error_code_offset = error_code % ERROR_CODE_PGE_OFFSET
 
     if error_code_offset < error_codes.DEBUG_RANGE_START:
-        return "Info"
+        return INFO
 
     if error_code_offset < error_codes.WARNING_RANGE_START:
-        return "Debug"
+        return DEBUG
 
     if error_code_offset < error_codes.CRITICAL_RANGE_START:
-        return "Warning"
+        return WARNING
 
-    return "Critical"
+    return CRITICAL
 
 
 def standardize_severity_string(severity):
@@ -134,10 +139,10 @@ def standardize_severity_string(severity):
 
     # Convert some potential log level name variations
     if severity == 'Warn':
-        severity = 'Warning'
+        severity = WARNING
 
     if severity == 'Error':
-        severity = 'Critical'
+        severity = CRITICAL
 
     return severity
 
@@ -252,10 +257,10 @@ class PgeLogger:
     @staticmethod
     def _make_blank_log_count_by_severity_dict():
         return {
-            "Debug": 0,
-            "Info": 0,
-            "Warning": 0,
-            "Critical": 0
+            DEBUG: 0,
+            INFO: 0,
+            WARNING: 0,
+            CRITICAL: 0
         }
 
     def get_log_count_by_severity_dict(self):
@@ -334,7 +339,7 @@ class PgeLogger:
             Description message to write to the log.
 
         """
-        self.write("Info", module, error_code_offset, description,
+        self.write(INFO, module, error_code_offset, description,
                    additional_back_frames=1)
 
     def debug(self, module, error_code_offset, description):
@@ -352,7 +357,7 @@ class PgeLogger:
             Description message to write to the log.
 
         """
-        self.write("Debug", module, error_code_offset, description,
+        self.write(DEBUG, module, error_code_offset, description,
                    additional_back_frames=1)
 
     def warning(self, module, error_code_offset, description):
@@ -370,7 +375,7 @@ class PgeLogger:
             Description message to write to the log.
 
         """
-        self.write("Warning", module, error_code_offset, description,
+        self.write(WARNING, module, error_code_offset, description,
                    additional_back_frames=1)
 
     def critical(self, module, error_code_offset, description):
@@ -399,7 +404,7 @@ class PgeLogger:
             parameter is provided as the exception string.
 
         """
-        self.write("Critical", module, error_code_offset, description,
+        self.write(CRITICAL, module, error_code_offset, description,
                    additional_back_frames=1)
 
         self.close_log_stream()
@@ -433,11 +438,11 @@ class PgeLogger:
 
     def get_warning_count(self):
         """Returns the number of messages logged at the warning level."""
-        return self.get_log_count_by_severity('Warning')
+        return self.get_log_count_by_severity(WARNING)
 
     def get_critical_count(self):
         """Returns the number of messages logged at the critical level."""
-        return self.get_log_count_by_severity('Critical')
+        return self.get_log_count_by_severity(CRITICAL)
 
     def move(self, new_filename):
         """
@@ -542,10 +547,10 @@ class PgeLogger:
 
             # Map the error code based on message severity
             error_code = {
-                "Debug": ErrorCode.LOGGED_DEBUG_LINE,
-                "Info": ErrorCode.LOGGED_INFO_LINE,
-                "Warning": ErrorCode.LOGGED_WARNING_LINE,
-                "Critical": ErrorCode.LOGGED_CRITICAL_LINE
+                DEBUG: ErrorCode.LOGGED_DEBUG_LINE,
+                INFO: ErrorCode.LOGGED_INFO_LINE,
+                WARNING: ErrorCode.LOGGED_WARNING_LINE,
+                CRITICAL: ErrorCode.LOGGED_CRITICAL_LINE
             }[severity]
 
             # Add the error code base
