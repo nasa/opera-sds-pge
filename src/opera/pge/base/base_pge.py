@@ -134,7 +134,6 @@ class PreProcessorMixin:
                                  f'Creating output product directory {output_product_path}')
                 os.makedirs(output_product_path, exist_ok=True)
 
-            # TODO: add a cleanup function on the post-processor to remove scratch dir?
             if not exists(scratch_path):
                 self.logger.info(self.name, ErrorCode.CREATING_WORKING_DIRECTORY,
                                  f'Creating scratch directory {scratch_path}')
