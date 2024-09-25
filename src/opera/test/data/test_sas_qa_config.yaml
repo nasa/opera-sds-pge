@@ -27,7 +27,7 @@ RunConfig:
           - hello from primary executable
         ErrorCodeBase: 100000
         SchemaPath: test/data/sample_sas_schema.yaml
-        IsoTemplatePath: sample_iso_template.xml.jinja2
+        IsoTemplatePath: test/data/sample_iso_template.xml.jinja2
 
       QAExecutable:
         Enabled: True

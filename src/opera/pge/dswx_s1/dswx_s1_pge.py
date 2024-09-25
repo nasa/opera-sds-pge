@@ -536,6 +536,9 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
             the sourced metadata dictionaries.
 
         """
+        # Use the base PGE implemenation to validate existence of the template
+        super()._create_iso_metadata()
+
         if tile_id not in self._tile_metadata_cache or tile_id not in self._tile_filename_cache:
             raise RuntimeError(f"No file name or metadata cached for tile ID {tile_id}")
 
@@ -557,17 +560,7 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
             'custom_data': custom_data_dict
         }
 
-        iso_template_path = self.runconfig.iso_template_path
-
-        if iso_template_path is None:
-            msg = "ISO template path not provided in runconfig"
-            self.logger.critical(self.name, ErrorCode.ISO_METADATA_TEMPLATE_NOT_PROVIDED_WHEN_NEEDED, msg)
-
-        iso_template_path = abspath(iso_template_path)
-
-        if not exists(iso_template_path):
-            msg = f"Could not load ISO template {iso_template_path}, file does not exist"
-            self.logger.critical(self.name, ErrorCode.ISO_METADATA_TEMPLATE_NOT_FOUND, msg)
+        iso_template_path = abspath(self.runconfig.iso_template_path)
 
         rendered_template = render_jinja2(iso_template_path, iso_metadata, self.logger)
 
