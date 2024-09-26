@@ -601,7 +601,7 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
         """
         return self._ancillary_filename() + ".qa.log"
 
-    def _collect_cslc_product_metadata(self, metadata_product):
+    def _collect_cslc_product_metadata(self, cslc_product):
         """
         Gathers the available metadata from the HDF5 product created by the
         CSLC-S1 SAS. This metadata is then formatted for use with filling in
@@ -609,8 +609,8 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
 
         Parameters
         ----------
-        metadata_product : str
-            Path the HDF5/NETCDF metadata product to collect metadata from.
+        cslc_product : str
+            Path the HDF5/NETCDF product to collect metadata from.
 
         Returns
         -------
@@ -619,7 +619,12 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
             use with the ISO metadata Jinja2 template.
 
         """
-        output_product_metadata = get_cslc_s1_product_metadata(metadata_product)
+        # Extract all metadata assigned by the SAS at product creation time
+        try:
+            output_product_metadata = get_cslc_s1_product_metadata(cslc_product)
+        except Exception as err:
+            msg = f'Failed to extract metadata from {cslc_product}, reason: {err}'
+            self.logger.critical(self.name, ErrorCode.ISO_METADATA_COULD_NOT_EXTRACT_METADATA, msg)
 
         # Fill in some additional fields expected within the ISO
         output_product_metadata['data']['width'] = len(output_product_metadata['data']['x_coordinates'])

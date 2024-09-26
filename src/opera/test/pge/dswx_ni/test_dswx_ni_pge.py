@@ -24,8 +24,8 @@ import opera.util.tiff_utils
 from opera.pge import RunConfig
 from opera.pge.dswx_ni.dswx_ni_pge import DSWxNIExecutor
 from opera.util import PgeLogger
-from opera.util.mock_utils import MockGdal
 from opera.util.input_validation import validate_algorithm_parameters_config
+from opera.util.mock_utils import MockGdal
 
 
 class DswxNIPgeTestCase(unittest.TestCase):
@@ -555,6 +555,41 @@ class DswxNIPgeTestCase(unittest.TestCase):
                 log_contents = infile.read()
 
             self.assertIn("Could not load ISO template", log_contents)
+        finally:
+            if os.path.exists(test_runconfig_path):
+                os.unlink(test_runconfig_path)
+
+        # Test that a non-existent file path is detected by pre-processor
+        test_runconfig_path = join(self.data_dir, 'invalid_dswx_hls_runconfig.yaml')
+
+        with open(runconfig_path, 'r', encoding='utf-8') as stream:
+            runconfig_dict = yaml.safe_load(stream)
+
+        input_files_group = runconfig_dict['RunConfig']['Groups']['PGE']['InputFilesGroup']
+
+        input_files_group['InputFilePaths'] = ['temp/non_existent_file.h5']
+
+        with open(test_runconfig_path, 'w', encoding='utf-8') as input_path:
+            yaml.safe_dump(runconfig_dict, input_path, sort_keys=False)
+
+        try:
+            pge = DSWxNIExecutor(pge_name="DSWxNIPgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+            # Config validation occurs before the log is fully initialized, but the
+            # initial log file should still exist and contain details of the validation
+            # error
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            # Open the log file, and check that the validation error details were captured
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn(f"Could not locate specified input file/directory "
+                          f"{abspath('temp/non_existent_file.h5')}", log_contents)
+
         finally:
             if os.path.exists(test_runconfig_path):
                 os.unlink(test_runconfig_path)

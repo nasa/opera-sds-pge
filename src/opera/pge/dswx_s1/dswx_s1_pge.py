@@ -493,8 +493,12 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
         output_product_metadata = dict()
 
         # Extract all metadata assigned by the SAS at product creation time
-        measured_parameters = get_geotiff_metadata(geotiff_product)
-        output_product_metadata['MeasuredParameters'] = self._augment_measured_parameters(measured_parameters)
+        try:
+            measured_parameters = get_geotiff_metadata(geotiff_product)
+            output_product_metadata['MeasuredParameters'] = self._augment_measured_parameters(measured_parameters)
+        except Exception as err:
+            msg = f'Failed to extract metadata from {geotiff_product}, reason: {err}'
+            self.logger.critical(self.name, ErrorCode.ISO_METADATA_COULD_NOT_EXTRACT_METADATA, msg)
 
         # Get the Military Grid Reference System (MGRS) tile code and zone
         # identifier from the intermediate file name
