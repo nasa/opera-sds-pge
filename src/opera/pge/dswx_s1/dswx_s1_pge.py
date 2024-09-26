@@ -9,12 +9,9 @@ from Sentinel-1 A/B (S1) PGE.
 
 """
 
-import json
 import re
 from datetime import datetime
 from os.path import abspath, basename, exists, getsize, join, splitext
-
-import yaml
 
 import opera.util.input_validation as input_validation
 from opera.pge.base.base_pge import PgeExecutor
@@ -25,7 +22,7 @@ from opera.util.error_codes import ErrorCode
 from opera.util.geo_utils import get_geographic_boundaries_from_mgrs_tile
 from opera.util.input_validation import validate_algorithm_parameters_config
 from opera.util.input_validation import validate_dswx_inputs
-from opera.util.render_jinja2 import render_jinja2, python_type_to_xml_type, guess_attribute_display_name
+from opera.util.render_jinja2 import render_jinja2
 from opera.util.run_utils import get_checksum
 from opera.util.tiff_utils import get_geotiff_metadata
 from opera.util.time import get_time_for_filename
