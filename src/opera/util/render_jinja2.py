@@ -155,3 +155,7 @@ def python_type_to_xml_type(obj) -> str:
 
     return XML_TYPES[obj]
 
+
+def guess_attribute_display_name(var_name: str) -> str:
+    return var_name.title().replace('_', '')
+

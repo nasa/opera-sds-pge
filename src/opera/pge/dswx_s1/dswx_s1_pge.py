@@ -25,7 +25,7 @@ from opera.util.error_codes import ErrorCode
 from opera.util.geo_utils import get_geographic_boundaries_from_mgrs_tile
 from opera.util.input_validation import validate_algorithm_parameters_config
 from opera.util.input_validation import validate_dswx_inputs
-from opera.util.render_jinja2 import render_jinja2, python_type_to_xml_type
+from opera.util.render_jinja2 import render_jinja2, python_type_to_xml_type, guess_attribute_display_name
 from opera.util.run_utils import get_checksum
 from opera.util.tiff_utils import get_geotiff_metadata
 from opera.util.time import get_time_for_filename
@@ -459,16 +459,14 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
                 value = json.dumps(value)
 
             guessed_data_type = python_type_to_xml_type(value)
-            guessed_attr_name = (name.title()
-                                 .replace('Mgrs', 'MGRS')
-                                 .replace('Dswx', 'DSWx')
-                                 .replace('_', '')
-                                 )
+            guessed_attr_name = guess_attribute_display_name(name)
 
-            attr_description = descriptions.setdefault(name, dict(description=missing_description_value))['description']
+            descriptions.setdefault(name, dict())
+
+            attr_description = descriptions[name].get('description', missing_description_value)
             data_type = descriptions[name].get('attribute_data_type', guessed_data_type)
             attr_type = descriptions[name].get('attribute_type', "!Not Found!")
-            attr_name = descriptions[name].get('attribute_name', guessed_attr_name)
+            attr_name = descriptions[name].get('display_name', guessed_attr_name)
 
             augmented_parameters[name] = (dict(name=attr_name, value=value, attr_type=attr_type,
                                                attr_description=attr_description, data_type=data_type))

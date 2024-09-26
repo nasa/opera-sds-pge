@@ -1,7 +1,22 @@
 map(include('parameter'), key=str())
 ---
 parameter:
+
+  # REQUIRED: Plain-text description of the Measured Parameter as provided in the product spec document
   description: str()
+
+  # REQUIRED: NASA/EOSDIS additional attribute type.
+  # Valid values defined here: https://git.earthdata.nasa.gov/projects/EMFD/repos/iso-schemas/browse/resources/Codelist/eosCodelists.xml?at=606229ea84f207f42b7b477c507eb422f8996115#23
   attribute_type: enum('geographicIdentifier', 'qualityInformation', 'instrumentInformation', 'sensorInformation', 'contentInformation', 'platformInformation', 'citation.identifier', 'descriptiveKeyword', 'processingInformation', 'processingParameter', 'commandLineArgument')
-  attribute_name: str(required=False)
+
+  # OPTIONAL: The data type of the attribute. The PGE will attempt to guess this based on the returned Python datatype
+  # provided by the TIFF metadata util, but this may not always be correct (ie: version strings being interpreted as
+  # a float); use this field to correct errors where needed.
+  # Valid values defined here: https://git.earthdata.nasa.gov/projects/EMFD/repos/iso-schemas/browse/resources/Codelist/eosCodelists.xml?at=606229ea84f207f42b7b477c507eb422f8996115#105
   attribute_data_type: enum('string', 'float', 'int', 'boolean', 'date', 'time', 'dateTime', 'dateString', 'timeString', 'dateTimeString', required=False)
+
+  # OPTIONAL: The display name of the attribute. The PGE will attempt to derive this from the internal metadata variable
+  # name by converting to title case and stripping out underscores. This should provide the proper display name, but may
+  # handle some acronyms improperly (ie, DSWx, MGRS, RTC) and some desired display names retain some underscores. Use
+  # this field to correct these errors where needed.
+  display_name: str(required=False)
