@@ -426,53 +426,6 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
         """
         return self._ancillary_filename() + ".qa.log"
 
-    def _augment_measured_parameters(self, measured_parameters):
-        """
-        Augment the measured parameters dict into a dict of dicts containing the needed fields for the MeasuredParameters
-        section of the ISO XML file.
-
-        Parameters
-        ----------
-        measured_parameters : dict
-            The GeoTIFF metadata from the output product. See get_geotiff_metadata()
-
-        Returns
-        -------
-        augmented_parameters : dict
-            The metadata fields converted to a list with name, value, types, etc
-        """
-        augmented_parameters = dict()
-
-        descriptions_file = self.runconfig.iso_measured_parameter_descriptions
-
-        if descriptions_file is not None:
-            with open(descriptions_file) as f:
-                descriptions = yaml.safe_load(f)
-
-            missing_description_value = '!Not Found!'
-        else:
-            descriptions = dict()
-            missing_description_value = 'Not Provided'
-
-        for name, value in measured_parameters.items():
-            if isinstance(value, list):
-                value = json.dumps(value)
-
-            guessed_data_type = python_type_to_xml_type(value)
-            guessed_attr_name = guess_attribute_display_name(name)
-
-            descriptions.setdefault(name, dict())
-
-            attr_description = descriptions[name].get('description', missing_description_value)
-            data_type = descriptions[name].get('attribute_data_type', guessed_data_type)
-            attr_type = descriptions[name].get('attribute_type', "!Not Found!")
-            attr_name = descriptions[name].get('display_name', guessed_attr_name)
-
-            augmented_parameters[name] = (dict(name=attr_name, value=value, attr_type=attr_type,
-                                               attr_description=attr_description, data_type=data_type))
-
-        return augmented_parameters
-
     def _collect_dswx_s1_product_metadata(self, geotiff_product):
         """
         Gathers the available metadata from an output DSWx-S1 product for
@@ -495,7 +448,7 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
         # Extract all metadata assigned by the SAS at product creation time
         try:
             measured_parameters = get_geotiff_metadata(geotiff_product)
-            output_product_metadata['MeasuredParameters'] = self._augment_measured_parameters(measured_parameters)
+            output_product_metadata['MeasuredParameters'] = self.augment_measured_parameters(measured_parameters)
         except Exception as err:
             msg = f'Failed to extract metadata from {geotiff_product}, reason: {err}'
             self.logger.critical(self.name, ErrorCode.ISO_METADATA_COULD_NOT_EXTRACT_METADATA, msg)

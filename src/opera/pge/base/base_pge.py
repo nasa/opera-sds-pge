@@ -9,6 +9,7 @@ Module defining the Base PGE interfaces from which all other PGEs are derived.
 
 """
 
+import json
 import os
 from collections import OrderedDict
 from datetime import datetime
@@ -27,6 +28,7 @@ from opera.util.error_codes import ErrorCode
 from opera.util.logger import PgeLogger
 from opera.util.logger import default_log_file_name
 from opera.util.metfile import MetFile
+from opera.util.render_jinja2 import python_type_to_xml_type, guess_attribute_display_name
 from opera.util.run_utils import create_qa_command_line
 from opera.util.run_utils import create_sas_command_line
 from opera.util.run_utils import get_checksum
@@ -620,6 +622,53 @@ class PostProcessorMixin:
 
             # Log stream might be closed by this point so raise an Exception instead
             raise RuntimeError(msg)
+
+    def augment_measured_parameters(self, measured_parameters):
+        """
+        Augment the measured parameters dict into a dict of dicts containing the needed fields for the MeasuredParameters
+        section of the ISO XML file.
+
+        Parameters
+        ----------
+        measured_parameters : dict
+            The GeoTIFF metadata from the output product. See get_geotiff_metadata()
+
+        Returns
+        -------
+        augmented_parameters : dict
+            The metadata fields converted to a list with name, value, types, etc
+        """
+        augmented_parameters = dict()
+
+        descriptions_file = self.runconfig.iso_measured_parameter_descriptions
+
+        if descriptions_file is not None:
+            with open(descriptions_file) as f:
+                descriptions = yaml.safe_load(f)
+
+            missing_description_value = '!Not Found!'
+        else:
+            descriptions = dict()
+            missing_description_value = 'Not Provided'
+
+        for name, value in measured_parameters.items():
+            if isinstance(value, list):
+                value = json.dumps(value)
+
+            guessed_data_type = python_type_to_xml_type(value)
+            guessed_attr_name = guess_attribute_display_name(name)
+
+            descriptions.setdefault(name, dict())
+
+            attr_description = descriptions[name].get('description', missing_description_value)
+            data_type = descriptions[name].get('attribute_data_type', guessed_data_type)
+            attr_type = descriptions[name].get('attribute_type', "!Not Found!")
+            attr_name = descriptions[name].get('display_name', guessed_attr_name)
+
+            augmented_parameters[name] = (dict(name=attr_name, value=value, attr_type=attr_type,
+                                               attr_description=attr_description, data_type=data_type))
+
+        return augmented_parameters
 
     def run_postprocessor(self, **kwargs):  # pylint: disable=unused-argument
         """
