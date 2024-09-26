@@ -184,9 +184,8 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
                     dswx_metadata = self._collect_dswx_s1_product_metadata(output_file)
 
                     # TODO: kludge since SAS hardcodes SPACECRAFT_NAME to "Sentinel-1A/B"
-                    dswx_metadata['SPACECRAFT_NAME'] = ("Sentinel-1A"
-                                                        if match_result.groupdict()['sensor'] == "S1A"
-                                                        else "Sentinel-1B")
+                    dswx_metadata['MeasuredParameters']['SPACECRAFT_NAME']['value'] = \
+                        "Sentinel-1A" if match_result.groupdict()['sensor'] == "S1A" else "Sentinel-1B"
 
                     # Cache the metadata for this product for use when generating the ISO XML
                     self._tile_metadata_cache[tile_id] = dswx_metadata
@@ -315,14 +314,14 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
         # Metadata fields we need for ancillary file name should be equivalent
         # across all tiles, so just take the first set of cached metadata as
         # a representative
-        dswx_metadata = list(self._tile_metadata_cache.values())[0]
+        dswx_metadata = list(self._tile_metadata_cache.values())[0]['MeasuredParameters']
 
-        spacecraft_name = dswx_metadata['SPACECRAFT_NAME']
+        spacecraft_name = dswx_metadata['SPACECRAFT_NAME']['value']
         sensor = get_sensor_from_spacecraft_name(spacecraft_name)
         pixel_spacing = "30"  # fixed for tile-based products
 
         processing_time = get_time_for_filename(
-            datetime.strptime(dswx_metadata['PROCESSING_DATETIME'], '%Y-%m-%dT%H:%M:%SZ')
+            datetime.strptime(dswx_metadata['PROCESSING_DATETIME']['value'], '%Y-%m-%dT%H:%M:%SZ')
         )
 
         if not processing_time.endswith('Z'):
@@ -441,9 +440,12 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
             for use with the ISO metadata Jinja2 template.
 
         """
+        output_product_metadata = dict()
+
         # Extract all metadata assigned by the SAS at product creation time
         try:
-            output_product_metadata = get_geotiff_metadata(geotiff_product)
+            measured_parameters = get_geotiff_metadata(geotiff_product)
+            output_product_metadata['MeasuredParameters'] = self.augment_measured_parameters(measured_parameters)
         except Exception as err:
             msg = f'Failed to extract metadata from {geotiff_product}, reason: {err}'
             self.logger.critical(self.name, ErrorCode.ISO_METADATA_COULD_NOT_EXTRACT_METADATA, msg)

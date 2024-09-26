@@ -337,6 +337,19 @@ class RunConfig:
             )
 
     @property
+    def iso_measured_parameter_descriptions(self) -> str:
+        """Returns the ISO Measured Parameters description file Path for a Primary Executable"""
+        iso_descriptions_path = self._pge_config['PrimaryExecutable'].get('IsoMeasuredParameterDescriptions', None)
+        if iso_descriptions_path is None:
+            return None
+
+        return (
+            iso_descriptions_path
+            if isabs(iso_descriptions_path)
+            else resource_filename('opera', iso_descriptions_path)
+        )
+
+    @property
     def data_validity_start_date(self) -> str:
         """Returns the DataValidityStartDate value for the Primary Executable"""
         return self._pge_config['PrimaryExecutable'].get('DataValidityStartDate', None)

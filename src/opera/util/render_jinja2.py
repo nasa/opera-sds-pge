@@ -12,11 +12,22 @@ Adapted by: Jim Hofman
 """
 
 import os
-
+import re
 import jinja2
 
 from opera.util.error_codes import ErrorCode
 from opera.util.logger import PgeLogger
+
+
+XML_TYPES = {
+    str: 'string',
+    int: 'int',
+    float: 'float',
+    bool: 'boolean',
+}
+
+INTEGER_PATTERN = re.compile(r'^[+-]?\d+$')
+FLOATING_POINT_PATTERN = re.compile(r'^[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?$')
 
 
 def _make_undefined_handler_class(logger: PgeLogger):
@@ -128,3 +139,23 @@ def render_jinja2(template_filename: str, input_data: dict, logger: PgeLogger = 
     rendered_text = template.render(input_data)
 
     return rendered_text
+
+
+def python_type_to_xml_type(obj) -> str:
+    if isinstance(obj, str):
+        if obj.lower() in ['true', 'false']:
+            obj = obj == 'true'
+        elif re.match(INTEGER_PATTERN, obj) is not None:
+            obj = int(obj)
+        elif re.match(FLOATING_POINT_PATTERN, obj) is not None:
+            obj = float(obj)
+
+    if not isinstance(obj, type):
+        obj = type(obj)
+
+    return XML_TYPES[obj]
+
+
+def guess_attribute_display_name(var_name: str) -> str:
+    return var_name.title().replace('_', '')
+

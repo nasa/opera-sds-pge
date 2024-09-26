@@ -412,7 +412,7 @@ class DswxS1PgeTestCase(unittest.TestCase):
             outfile.write('dummy dswx data')
 
         dswx_s1_metadata = pge._collect_dswx_s1_product_metadata(dummy_tif_file)
-        dswx_s1_metadata['SPACECRAFT_NAME'] = 'SENTINEL-1A'
+        dswx_s1_metadata['MeasuredParameters']['SPACECRAFT_NAME']['value'] = 'SENTINEL-1A'
 
         # Initialize the core filename for the catalog metadata generation step
         pge._core_filename()
