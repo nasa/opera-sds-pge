@@ -138,7 +138,6 @@ class PreProcessorMixin:
                                  f'Creating output product directory {output_product_path}')
                 os.makedirs(output_product_path, exist_ok=True)
 
-            # TODO: add a cleanup function on the post-processor to remove scratch dir?
             if not exists(scratch_path):
                 self.logger.info(self.name, ErrorCode.CREATING_WORKING_DIRECTORY,
                                  f'Creating scratch directory {scratch_path}')
@@ -222,7 +221,6 @@ class PreProcessorMixin:
             Any keyword arguments needed by the pre-processor
 
         """
-        # TODO: better way to handle trace statements before logger has been created?
         print(f'Running preprocessor for {self._pre_mixin_name}')
 
         self._initialize_logger()
@@ -346,9 +344,23 @@ class PostProcessorMixin:
         Creates the ISO metadata utilized by the DAAC's for indexing output
         products submitted by OPERA. Inheritors of PostProcessorMixin must
         provide their own implementations, as ISO metadata is not applicable
-        to the base PGE.
+        to the base PGE. Rather, this implementation may be optionally invoked
+        by inheritors to perform common validation checks on the ISO template to
+        be used with the PGE.
 
         """
+        iso_template_path = self.runconfig.iso_template_path
+
+        if iso_template_path is None:
+            msg = "ISO template path not provided in runconfig"
+            self.logger.critical(self.name, ErrorCode.ISO_METADATA_TEMPLATE_NOT_PROVIDED_WHEN_NEEDED, msg)
+
+        iso_template_path = os.path.abspath(iso_template_path)
+
+        if not os.path.exists(iso_template_path):
+            msg = f"Could not load ISO template {iso_template_path}, file does not exist"
+            self.logger.critical(self.name, ErrorCode.ISO_METADATA_TEMPLATE_NOT_FOUND, msg)
+
         # Base PGE does not produce ISO metadata.
         return None
 

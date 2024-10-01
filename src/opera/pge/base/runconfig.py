@@ -195,7 +195,6 @@ class RunConfig:
         try:
             return object.__getattribute__(self, item)
         except KeyError as error:
-            # TODO: create exceptions package with more intuitive exception class names
             raise RuntimeError(
                 f'Expected field {str(error)} is missing from RunConfig '
                 f'{abspath(self.filename)}'

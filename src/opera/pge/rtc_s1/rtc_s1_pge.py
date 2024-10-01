@@ -805,6 +805,9 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
             sourced metadata dictionaries.
 
         """
+        # Use the base PGE implemenation to validate existence of the template
+        super()._create_iso_metadata()
+
         runconfig_dict = self.runconfig.asdict()
 
         product_output_dict = burst_metadata
@@ -820,17 +823,7 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
             'custom_data': custom_data_dict
         }
 
-        iso_template_path = self.runconfig.iso_template_path
-
-        if iso_template_path is None:
-            msg = "ISO template path not provided in runconfig"
-            self.logger.critical(self.name, ErrorCode.ISO_METADATA_TEMPLATE_NOT_PROVIDED_WHEN_NEEDED, msg)
-
-        iso_template_path = os.path.abspath(iso_template_path)
-
-        if not os.path.exists(iso_template_path):
-            msg = f"Could not load ISO template {iso_template_path}, file does not exist"
-            self.logger.critical(self.name, ErrorCode.ISO_METADATA_TEMPLATE_NOT_FOUND, msg)
+        iso_template_path = os.path.abspath(self.runconfig.iso_template_path)
 
         rendered_template = render_jinja2(iso_template_path, iso_metadata, self.logger)
 
