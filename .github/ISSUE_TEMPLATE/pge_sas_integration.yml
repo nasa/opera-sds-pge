@@ -1,0 +1,30 @@
+name: PGE/SAS Integration
+description: PGE/SAS Integration Procedure
+title: "<SAS Name> <Delivery> SAS <Version> PGE Integration"
+labels: ["must have"]
+body:
+  - type: textarea
+    id: procedure-steps
+    attributes:
+      label: PGE/SAS Integration Procedure Steps
+      description: Tailor the following task list as-necessary for the PGE Integration to be performed
+      value: |
+          - [ ] Update SAS version number to <container version> in `<pge name>_pge.py`
+          - [ ] Update container build script to user `<docker tag>:<version>` as the base image
+          - [ ] Update baseline SAS Yamale Schema for <SAS Name> to latest from ADT repository
+            - <Include a github repository link to the SAS Yamale schema for the latest version here>
+          - [ ] Update Algorithm Parameters Yamale Schema for <SAS Name> to latest from ADT repository
+            - <Include a github repository link to the Algorithm Parameters Yamale schema for the latest version here>
+          - [ ]  If SAS Yamale schemas have changed, make sure changes are reflected in the sample <SAS Name> RunConfigs bundled with the repository
+            - This should include the RunConfig within the [examples directory](https://github.com/nasa/opera-sds-pge/blob/main/examples), as well as the RunConfigs used with the [Unit](https://github.com/nasa/opera-sds-pge/blob/main/src/opera/test/data) and [Integration](https://github.com/nasa/opera-sds-pge/tree/main/.ci/scripts) tests 
+            - If sample values are needed for new RunConfig fields, consult the examples provided with the "golden" dataset stored in Artifactory-FN
+          - [ ] Update the Measured Parameters Description configuration file (if available) with any changes to the metadata contained within output products
+            - The [opera.util.tiff_utils.get_geotiff_metadata()](https://github.com/nasa/opera-sds-pge/blob/db85e6b073b8fd9aff2d92abc86767a2849dfefb/src/opera/util/tiff_utils.py#L116) can be used to extract all available product metadata from an output product in GeoTIFF format
+            - The [opera.util.h5_utils.get_hd5_group_as_dict()](https://github.com/nasa/opera-sds-pge/blob/db85e6b073b8fd9aff2d92abc86767a2849dfefb/src/opera/util/h5_utils.py#L36) can be used to extract all available product metadata from an output product in HDF5 format
+            - The latest descriptions for each product metadata field should be sourced from the latest Product Specification document for the <SAS Name> SAS
+          - [ ] Create the expected input and output archives used with the Integration test from the samples provided by ADT
+            - This involves splitting out the input data (including ancillaries) and expected outputs from the "golden" data on Artifactory into separate .zip files for each, then uploading the new archives to S3
+          - [ ] Rerun the unit test suite to ensure all tests pass
+          - [ ] Rerun the <SAS Name> Integration Test to ensure it passes using the new expected assets for the latest delivery
+    validations:
+      required: true
