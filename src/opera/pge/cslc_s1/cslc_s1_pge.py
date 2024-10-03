@@ -16,6 +16,8 @@ from os import walk
 from os.path import getsize, join
 from pathlib import Path
 
+import yaml
+
 from opera.pge.base.base_pge import PgeExecutor
 from opera.pge.base.base_pge import PostProcessorMixin
 from opera.pge.base.base_pge import PreProcessorMixin
@@ -601,6 +603,33 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
         """
         return self._ancillary_filename() + ".qa.log"
 
+    def augment_measured_parameters(self, measured_parameters):
+        descriptions_file = self.runconfig.iso_measured_parameter_descriptions
+
+        new_measured_parameters = {}
+
+        if descriptions_file is not None:
+            with open(descriptions_file) as f:
+                descriptions = yaml.safe_load(f)
+        else:
+            msg = ('Measured parameters configuration is needed to extract the measured parameters attributes from the'
+                   'CLSC metadata')
+            self.logger.critical(self.name, ErrorCode.ISO_METADATA_DESCRIPTIONS_CONFIG_NOT_FOUND, msg)
+
+        for parameter_var_name in descriptions:
+            key_path = parameter_var_name.split('/')
+
+            mp = measured_parameters
+
+            while len(key_path) > 0:
+                mp = mp[key_path.pop(0)]
+
+            new_measured_parameters[parameter_var_name] = mp
+
+        augmented_parameters = super().augment_measured_parameters(new_measured_parameters)
+
+        return augmented_parameters
+
     def _collect_cslc_product_metadata(self, cslc_product):
         """
         Gathers the available metadata from the HDF5 product created by the
@@ -622,6 +651,10 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
         # Extract all metadata assigned by the SAS at product creation time
         try:
             output_product_metadata = get_cslc_s1_product_metadata(cslc_product)
+            output_product_metadata['MeasuredParameters'] = self.augment_measured_parameters(
+                # flatten_h5_metadata(output_product_metadata)
+                output_product_metadata
+            )
         except Exception as err:
             msg = f'Failed to extract metadata from {cslc_product}, reason: {err}'
             self.logger.critical(self.name, ErrorCode.ISO_METADATA_COULD_NOT_EXTRACT_METADATA, msg)

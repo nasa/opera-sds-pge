@@ -141,6 +141,24 @@ def render_jinja2(template_filename: str, input_data: dict, logger: PgeLogger = 
     return rendered_text
 
 
+def render_jinja2_string(template: str, input_data: dict, logger: PgeLogger = None):
+    template_loader = jinja2.BaseLoader()
+
+    undefined_handler_class = (_make_undefined_handler_class(logger)
+                               if logger is not None
+                               else jinja2.Undefined)
+
+    template_env = jinja2.Environment(loader=template_loader,
+                                      autoescape=jinja2.select_autoescape(),
+                                      undefined=undefined_handler_class)
+
+    template = template_env.from_string(template)
+
+    rendered_text = template.render(input_data)
+
+    return rendered_text
+
+
 def python_type_to_xml_type(obj) -> str:
     if isinstance(obj, str):
         if obj.lower() in ['true', 'false']:

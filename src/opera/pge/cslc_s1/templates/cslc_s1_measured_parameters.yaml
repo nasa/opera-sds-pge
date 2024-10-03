@@ -1,0 +1,457 @@
+identification/absolute_orbit_number:
+  attribute_data_type: int
+  attribute_type: instrumentInformation
+  description: Absolute Orbit Number
+  display_name: AbsoluteOrbitNumber
+identification/burst_id:
+  attribute_data_type: string
+  attribute_type: instrumentInformation
+  description: Burst identification string
+  display_name: BurstID
+identification/instrument_name:
+  attribute_data_type: string
+  attribute_type: instrumentInformation
+  description: Instrument name
+  display_name: InstrumentName
+identification/is_geocoded:
+  attribute_data_type: boolean
+  attribute_type: instrumentInformation
+  description: Flag to indicate radar geometry or geocoded product
+  display_name: IsGeocoded
+identification/look_direction:
+  attribute_data_type: string
+  attribute_type: instrumentInformation
+  description: Look direction can be left or right
+  display_name: LookDirection
+identification/mission_id:
+  attribute_data_type: string
+  attribute_type: instrumentInformation
+  description: Mission identifier
+  display_name: MissionID
+identification/orbit_pass_direction:
+  attribute_data_type: string
+  attribute_type: instrumentInformation
+  description: Orbit direction can be ascending or descending
+  display_name: OrbitPassDirection
+identification/processing_center:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Processing center
+  display_name: ProcessingCenter
+identification/processing_date_time:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Processing date time
+  display_name: ProcessingDateTime
+identification/product_level:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: 'Product level. L0A: Unprocessed instrument data; L0B: Reformatted,
+    unprocessed instrument data; L1: Processed instrument data in radar coordinates
+    system; and L2: Processed instrument data in geocoded coordinates system'
+  display_name: ProductLevel
+identification/product_specification_version:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Product specification version which represents the schema of this product
+  display_name: ProductSpecificationVersion
+identification/product_type:
+  attribute_data_type: string
+  attribute_type: instrumentInformation
+  description: Product type
+  display_name: ProductType
+identification/product_version:
+  attribute_data_type: string
+  attribute_type: instrumentInformation
+  description: Product version
+  display_name: ProductVersion
+identification/radar_band:
+  attribute_data_type: string
+  attribute_type: instrumentInformation
+  description: Acquired frequency band
+  display_name: RadarBand
+identification/track_number:
+  attribute_data_type: int
+  attribute_type: instrumentInformation
+  description: Track number
+  display_name: TrackNumber
+identification/zero_doppler_end_time:
+  attribute_data_type: string
+  attribute_type: instrumentInformation
+  description: Azimuth stop time of product
+  display_name: ZeroDopplerEndTime
+identification/zero_doppler_start_time:
+  attribute_data_type: string
+  attribute_type: instrumentInformation
+  description: Azimuth start time of product
+  display_name: ZeroDopplerStartTime
+orbit/orbit_direction:
+  attribute_data_type: string
+  attribute_type: platformInformation
+  description: Direction of the sensor orbit ephemerides
+  display_name: OrbitDirection
+orbit/orbit_type:
+  attribute_data_type: string
+  attribute_type: platformInformation
+  description: Restituted (ROE) or Precise (POE) orbit ephemeris
+  display_name: OrbitType
+orbit/position_x:
+  attribute_data_type: string
+  attribute_type: platformInformation
+  description: Platform position along the x-direction
+  display_name: OrbitPositionX
+orbit/position_y:
+  attribute_data_type: string
+  attribute_type: platformInformation
+  description: Platform position along the y-direction
+  display_name: OrbitPositionY
+orbit/position_z:
+  attribute_data_type: string
+  attribute_type: platformInformation
+  description: Platform position along the z-direction
+  display_name: OrbitPositionZ
+orbit/reference_epoch:
+  attribute_data_type: dateTimeString
+  attribute_type: platformInformation
+  description: Reference epoch of the orbit state vectors
+  display_name: OrbitRefEpoch
+orbit/time:
+  attribute_data_type: float
+  attribute_type: platformInformation
+  description: Time vector record. This record contains the time corresponding to
+    position, velocity, acceleration records.
+  display_name: OrbitTime
+orbit/velocity_x:
+  attribute_data_type: string
+  attribute_type: platformInformation
+  description: Platform velocity along the x-direction
+  display_name: OrbitVelocityX
+orbit/velocity_y:
+  attribute_data_type: string
+  attribute_type: platformInformation
+  description: Platform velocity along the y-direction
+  display_name: OrbitVelocityY
+orbit/velocity_z:
+  attribute_data_type: string
+  attribute_type: platformInformation
+  description: Platform velocity along the z-direction
+  display_name: OrbitVelocityZ
+processing_information/algorithms/COMPASS_version:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: CSLC-S1 SAS version used for processing
+  display_name: CompassVersion
+processing_information/algorithms/ISCE3_version:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: ISCE3 version used for processing
+  display_name: IsceVersion
+processing_information/algorithms/complex_data_geocoding_interpolator:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Complex Data Geocoding interpolation algorithm
+  display_name: ComplexDataGeocodingInterpolator
+processing_information/algorithms/dem_interpolation:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: DEM interpolation method
+  display_name: DemInterpolation
+processing_information/algorithms/float_data_geocoding_interpolator:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Floating Point Data Geocoding interpolation algorithm algorithm
+  display_name: FloatDataGeocodingInterpolator
+processing_information/algorithms/s1_reader_version:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: S1-Reader version used for processing
+  display_name: S1ReaderVersion
+processing_information/algorithms/topography_algorithm:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Topography generation algorithm
+  display_name: TopographyAlgorithm
+processing_information/algorithms/uint_data_geocoding_interpolator:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Unsigned int geocoding interpolation method
+  display_name: UintDataGeocodingInterpolator
+processing_information/input_burst_metadata/azimuth_fm_rate/coeffs:
+  attribute_data_type: string
+  attribute_type: instrumentInformation
+  description: Azimuth FM Rate Coefficients
+  display_name: AzimuthFMRateCoeffs
+processing_information/input_burst_metadata/azimuth_fm_rate/mean:
+  attribute_data_type: float
+  attribute_type: instrumentInformation
+  description: Azimuth FM Rate Mean
+  display_name: AzimuthFMRateMean
+processing_information/input_burst_metadata/azimuth_fm_rate/order:
+  attribute_data_type: int
+  attribute_type: instrumentInformation
+  description: Azimuth FM Rate Order
+  display_name: AzimuthFMRateOrder
+processing_information/input_burst_metadata/azimuth_fm_rate/std:
+  attribute_data_type: float
+  attribute_type: instrumentInformation
+  description: Azimuth FM Rate Standard Deviation
+  display_name: AzimuthFMRateStd
+processing_information/input_burst_metadata/azimuth_steering_rate:
+  attribute_data_type: float
+  attribute_type: instrumentInformation
+  description: Azimuth steering rate for IW and EW modes
+  display_name: AzimuthSteerRate
+processing_information/input_burst_metadata/azimuth_time_interval:
+  attribute_data_type: float
+  attribute_type: instrumentInformation
+  description: Time spacing between azimuth lines of the burst
+  display_name: AzimuthTimeInterval
+processing_information/input_burst_metadata/doppler/coeffs:
+  attribute_data_type: string
+  attribute_type: instrumentInformation
+  description: Doppler Coefficients
+  display_name: DopplerCoeffs
+processing_information/input_burst_metadata/doppler/mean:
+  attribute_data_type: float
+  attribute_type: instrumentInformation
+  description: Doppler Mean
+  display_name: DopplerMean
+processing_information/input_burst_metadata/doppler/order:
+  attribute_data_type: int
+  attribute_type: instrumentInformation
+  description: Doppler Order
+  display_name: DopplerOrder
+processing_information/input_burst_metadata/doppler/std:
+  attribute_data_type: float
+  attribute_type: instrumentInformation
+  description: Doppler Standard Deviation
+  display_name: DopplerStd
+processing_information/input_burst_metadata/ipf_version:
+  attribute_data_type: string
+  attribute_type: instrumentInformation
+  description: Instrument Processing Facility (IPF) software version
+  display_name: IPFVersion
+processing_information/input_burst_metadata/iw2_mid_range:
+  attribute_data_type: float
+  attribute_type: instrumentInformation
+  description: Slant range of the middle of the sub-swath IW2
+  display_name: IW2MidRange
+processing_information/input_burst_metadata/platform_id:
+  attribute_data_type: string
+  attribute_type: platformInformation
+  description: Sensor platform identification string
+  display_name: PlatformID
+processing_information/input_burst_metadata/polarization:
+  attribute_data_type: string
+  attribute_type: instrumentInformation
+  description: Polarization of the burst
+  display_name: Polarization
+processing_information/input_burst_metadata/prf_raw_data:
+  attribute_data_type: float
+  attribute_type: instrumentInformation
+  description: Raw data pulse repetition frequency (PRF)
+  display_name: PRFRawData
+processing_information/input_burst_metadata/radar_center_frequency:
+  attribute_data_type: float
+  attribute_type: instrumentInformation
+  description: Radar center frequency
+  display_name: RadarCenterFrequency
+processing_information/input_burst_metadata/range_bandwidth:
+  attribute_data_type: float
+  attribute_type: instrumentInformation
+  description: Slant range bandwidth of the signal
+  display_name: RangeBandwidth
+processing_information/input_burst_metadata/range_chirp_rate:
+  attribute_data_type: float
+  attribute_type: instrumentInformation
+  description: Range chirp rate
+  display_name: RangeChirpRate
+processing_information/input_burst_metadata/range_pixel_spacing:
+  attribute_data_type: float
+  attribute_type: instrumentInformation
+  description: Pixel spacing between slant range samples in the input burst SLC
+  display_name: RangePixelSpacing
+processing_information/input_burst_metadata/range_sampling_rate:
+  attribute_data_type: float
+  attribute_type: instrumentInformation
+  description: Range sampling rate
+  display_name: RangeSamplingRate
+processing_information/input_burst_metadata/range_window_coefficient:
+  attribute_data_type: float
+  attribute_type: processingInformation
+  description: Value of the weighting window coefficient used during processing
+  display_name: RangeWindowCoefficient
+processing_information/input_burst_metadata/range_window_type:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Type of weighting window used during processing
+  display_name: RangeWindowType
+processing_information/input_burst_metadata/rank:
+  attribute_data_type: int
+  attribute_type: processingInformation
+  description: The number of pulse repetition intervals between transmitted pulse
+    and return echo
+  display_name: Rank
+processing_information/input_burst_metadata/sensing_start:
+  attribute_data_type: string
+  attribute_type: instrumentInformation
+  description: Sensing start time
+  display_name: SensingStart
+processing_information/input_burst_metadata/sensing_stop:
+  attribute_data_type: string
+  attribute_type: instrumentInformation
+  description: Sensing stop time
+  display_name: SensingStop
+processing_information/input_burst_metadata/shape:
+  attribute_data_type: string
+  attribute_type: instrumentInformation
+  description: Input burst image shape
+  display_name: Shape
+processing_information/input_burst_metadata/slant_range_time:
+  attribute_data_type: float
+  attribute_type: instrumentInformation
+  description: Slant range time
+  display_name: SlantRangeTime
+processing_information/input_burst_metadata/starting_range:
+  attribute_data_type: float
+  attribute_type: instrumentInformation
+  description: Slant range of the first sample of the input burst
+  display_name: StartingRange
+processing_information/input_burst_metadata/wavelength:
+  attribute_data_type: float
+  attribute_type: instrumentInformation
+  description: Wavelength of the transmitted signal
+  display_name: Wavelength
+processing_information/inputs/burst_location_parameters/burst_index:
+  attribute_data_type: int
+  attribute_type: processingInformation
+  description: Index of the burst within the SLC archive
+  display_name: BurstLocationIndex
+processing_information/inputs/burst_location_parameters/first_valid_line:
+  attribute_data_type: int
+  attribute_type: processingInformation
+  description: First valid line of the input burst
+  display_name: BurstLocationFirstValidLine
+processing_information/inputs/burst_location_parameters/first_valid_sample:
+  attribute_data_type: int
+  attribute_type: processingInformation
+  description: First valid sample of the input burst
+  display_name: BurstLocationFirstValidSample
+processing_information/inputs/burst_location_parameters/last_valid_line:
+  attribute_data_type: int
+  attribute_type: processingInformation
+  description: Last valid line of the input burst
+  display_name: BurstLocationLastValidLine
+processing_information/inputs/burst_location_parameters/last_valid_sample:
+  attribute_data_type: int
+  attribute_type: processingInformation
+  description: Last valid sample of the input burst
+  display_name: BurstLocationLastValidSample
+processing_information/inputs/burst_location_parameters/tiff_path:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Path to the Tiff file for the processed burst
+  display_name: BurstLocationTiffPath
+processing_information/inputs/calibration_files:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: List of input calibration files used
+  display_name: CalibrationFiles
+processing_information/inputs/dem_source:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: DEM source description
+  display_name: DemSource
+processing_information/inputs/l1_slc_files:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: List of used input L1 burst SLC products
+  display_name: L1SlcFiles
+processing_information/inputs/noise_files:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: List of input noise files used
+  display_name: NoiseFiles
+processing_information/inputs/orbit_files:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: List of input orbit files used
+  display_name: OrbitFiles
+processing_information/parameters/azimuth_fm_rate_applied:
+  attribute_data_type: boolean
+  attribute_type: processingInformation
+  description: Flag indicating whether the Azimuth FM Rate was applied
+  display_name: AzimuthFMRateApplied
+processing_information/parameters/azimuth_solid_earth_tides_applied:
+  attribute_data_type: boolean
+  attribute_type: processingInformation
+  description: Flag indicating whether the Azimuth Solid Earth Tides was applied
+  display_name: AzimuthSolidEarthTidesApplied
+processing_information/parameters/bistatic_delay_applied:
+  attribute_data_type: boolean
+  attribute_type: processingInformation
+  description: Flag indicating whether Bistatic Delay was applied
+  display_name: BistaticDelayApplied
+processing_information/parameters/dry_troposphere_weather_model_applied:
+  attribute_data_type: boolean
+  attribute_type: processingInformation
+  description: Flag indicating whether the Dry Troposphere Weather Model was applied
+  display_name: DryTroposphereWeatherModelApplied
+processing_information/parameters/elevation_antenna_pattern_correction_applied:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: The type of elevation antenna pattern correction applied
+  display_name: ElevationAntennaPatternCorrectionApplied
+processing_information/parameters/ellipsoidal_flattening_applied:
+  attribute_data_type: boolean
+  attribute_type: processingInformation
+  description: Flag indicating whether Ellipsoidal Flattening was applied
+  display_name: EllipsoidalFlatteningApplied
+processing_information/parameters/geometry_doppler_applied:
+  attribute_data_type: boolean
+  attribute_type: processingInformation
+  description: Flag indicating whether Geometry Doppler was applied
+  display_name: GeometryDopplerApplied
+processing_information/parameters/ionosphere_tec_applied:
+  attribute_data_type: boolean
+  attribute_type: processingInformation
+  description: Flag indicating whether the Ionosphere TEC was applied
+  display_name: IonosphereTecApplied
+processing_information/parameters/los_solid_earth_tides_applied:
+  attribute_data_type: boolean
+  attribute_type: processingInformation
+  description: Flag indicating whether the LOS Solid Earth Tides correction was applied
+  display_name: LOSSolidEarthTidesApplied
+processing_information/parameters/static_troposphere_applied:
+  attribute_data_type: boolean
+  attribute_type: processingInformation
+  description: Flag indicating whether the Static Troposphere correction was applied
+  display_name: StaticTroposphereApplied
+processing_information/parameters/topographic_flattening_applied:
+  attribute_data_type: boolean
+  attribute_type: processingInformation
+  description: Flag indicating whether Topographic Flattening was applied
+  display_name: TopographicFlatteningApplied
+processing_information/parameters/wet_troposphere_weather_model_applied:
+  attribute_data_type: boolean
+  attribute_type: processingInformation
+  description: Flag indicating whether Wet Troposphere Weather Model was applied
+  display_name: WetTroposphereWeatherModelApplied
+quality_assurance/orbit_information:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: The type of orbit ephemeris (i.e., restituted or precise) used for
+    processing
+  display_name: QualityAssuranceOrbitInformation
+quality_assurance/pixel_classification:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: "{%- if run_config.Groups.SAS.runconfig.groups.primary_executable.product_type == 'CSLC_S1' %}Contains information on the percentage of valid pixels with the complex backscatter layer and the percentage of valid pixels covering land{%- else %}Contains information on the percentage of pixels labeled as affected by layover, shadow, or both{%- endif %}"
+  display_name: QualityAssurancePixelClassification
+  render_description: true
+quality_assurance/statistics:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: "{%- if run_config.Groups.SAS.runconfig.groups.primary_executable.product_type == 'CSLC_S1' %}Includes a series of metrics which statistically characterize the main data layers contained in the /data group and the timing corrections LUTs contained in processing_information/timing_corrections{%- else %}A set of metrics which statistically characterize the floating-point geometry layers contained within the CSLC-S1-Static Layer product{%- endif %}"
+  display_name: QualityAssuranceStatistics
+  render_description: true

@@ -20,3 +20,7 @@ parameter:
   # handle some acronyms improperly (ie, DSWx, MGRS, RTC) and some desired display names retain some underscores. Use
   # this field to correct these errors where needed.
   display_name: str(required=False)
+
+  # OPTIONAL: Set to true if the description has jinja2 rendering logic to be applied. Note: only references to the
+  # PGE RunConfig (key: run_config) may be used currently
+  render_description: bool(required=False)

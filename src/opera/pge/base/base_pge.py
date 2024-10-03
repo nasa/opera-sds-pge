@@ -16,26 +16,25 @@ from datetime import datetime
 from fnmatch import fnmatch
 from functools import lru_cache
 from os.path import abspath, basename, exists, join, splitext
-from pkg_resources import resource_filename
 
+import numpy as np
 import yamale
-from yamale import YamaleError
-
 import yaml
+from pkg_resources import resource_filename
+from yamale import YamaleError
 
 import opera
 from opera.util.error_codes import ErrorCode
 from opera.util.logger import PgeLogger
 from opera.util.logger import default_log_file_name
 from opera.util.metfile import MetFile
-from opera.util.render_jinja2 import python_type_to_xml_type, guess_attribute_display_name
+from opera.util.render_jinja2 import python_type_to_xml_type, guess_attribute_display_name, render_jinja2_string
 from opera.util.run_utils import create_qa_command_line
 from opera.util.run_utils import create_sas_command_line
 from opera.util.run_utils import get_checksum
 from opera.util.run_utils import time_and_execute
 from opera.util.time import get_catalog_metadata_datetime_str
 from opera.util.time import get_time_for_filename
-
 from .runconfig import RunConfig
 
 
@@ -664,7 +663,13 @@ class PostProcessorMixin:
             missing_description_value = 'Not Provided'
 
         for name, value in measured_parameters.items():
-            if isinstance(value, list):
+            if isinstance(value, np.generic):
+                value = value.item()
+
+            if isinstance(value, np.ndarray):
+                value = value.tolist()
+
+            if isinstance(value, (list, dict)):
                 value = json.dumps(value)
 
             guessed_data_type = python_type_to_xml_type(value)
@@ -676,6 +681,9 @@ class PostProcessorMixin:
             data_type = descriptions[name].get('attribute_data_type', guessed_data_type)
             attr_type = descriptions[name].get('attribute_type', "!Not Found!")
             attr_name = descriptions[name].get('display_name', guessed_attr_name)
+
+            if descriptions[name].get('render_description', False):
+                attr_description = render_jinja2_string(attr_description, self.runconfig.asdict(), self.logger)
 
             augmented_parameters[name] = (dict(name=attr_name, value=value, attr_type=attr_type,
                                                attr_description=attr_description, data_type=data_type))
