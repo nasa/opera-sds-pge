@@ -28,7 +28,7 @@ from opera.util.error_codes import ErrorCode
 from opera.util.logger import PgeLogger
 from opera.util.logger import default_log_file_name
 from opera.util.metfile import MetFile
-from opera.util.render_jinja2 import python_type_to_xml_type, guess_attribute_display_name, render_jinja2_string
+from opera.util.render_jinja2 import python_type_to_xml_type, guess_attribute_display_name
 from opera.util.run_utils import create_qa_command_line
 from opera.util.run_utils import create_sas_command_line
 from opera.util.run_utils import get_checksum
@@ -681,13 +681,6 @@ class PostProcessorMixin:
             data_type = descriptions[name].get('attribute_data_type', guessed_data_type)
             attr_type = descriptions[name].get('attribute_type', "!Not Found!")
             attr_name = descriptions[name].get('display_name', guessed_attr_name)
-
-            if descriptions[name].get('render_description', False):
-                attr_description = render_jinja2_string(
-                    attr_description,
-                    {'run_config': self.runconfig.asdict()},
-                    self.logger
-                )
 
             augmented_parameters[name] = (dict(name=attr_name, value=value, attr_type=attr_type,
                                                attr_description=attr_description, data_type=data_type))
