@@ -683,7 +683,11 @@ class PostProcessorMixin:
             attr_name = descriptions[name].get('display_name', guessed_attr_name)
 
             if descriptions[name].get('render_description', False):
-                attr_description = render_jinja2_string(attr_description, self.runconfig.asdict(), self.logger)
+                attr_description = render_jinja2_string(
+                    attr_description,
+                    {'run_config': self.runconfig.asdict()},
+                    self.logger
+                )
 
             augmented_parameters[name] = (dict(name=attr_name, value=value, attr_type=attr_type,
                                                attr_description=attr_description, data_type=data_type))

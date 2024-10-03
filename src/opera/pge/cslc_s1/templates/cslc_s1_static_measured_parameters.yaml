@@ -100,11 +100,16 @@ processing_information/algorithms/dem_interpolation:
   attribute_type: processingInformation
   description: DEM interpolation method
   display_name: DemInterpolation
-processing_information/algorithms/complex_data_geocoding_interpolator:
+processing_information/algorithms/topography_algorithm:  # cut file ln 490
   attribute_data_type: string
   attribute_type: processingInformation
-  description: Complex Data Geocoding interpolation algorithm
-  display_name: ComplexDataGeocodingInterpolator
+  description: Topography generation algorithm
+  display_name: TopographyAlgorithm
+processing_information/algorithms/uint_data_geocoding_interpolator:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Unsigned int geocoding interpolation method
+  display_name: UintDataGeocodingInterpolator
 processing_information/algorithms/float_data_geocoding_interpolator:
   attribute_data_type: string
   attribute_type: processingInformation
@@ -145,66 +150,6 @@ processing_information/inputs/burst_location_parameters/tiff_path:
   attribute_type: processingInformation
   description: Path to the Tiff file for the processed burst
   display_name: BurstLocationTiffPath
-processing_information/parameters/azimuth_fm_rate_applied:
-  attribute_data_type: boolean
-  attribute_type: processingInformation
-  description: Flag indicating whether the Azimuth FM Rate was applied
-  display_name: AzimuthFMRateApplied
-processing_information/parameters/azimuth_solid_earth_tides_applied:
-  attribute_data_type: boolean
-  attribute_type: processingInformation
-  description: Flag indicating whether the Azimuth Solid Earth Tides was applied
-  display_name: AzimuthSolidEarthTidesApplied
-processing_information/parameters/bistatic_delay_applied:
-  attribute_data_type: boolean
-  attribute_type: processingInformation
-  description: Flag indicating whether Bistatic Delay was applied
-  display_name: BistaticDelayApplied
-processing_information/parameters/dry_troposphere_weather_model_applied:
-  attribute_data_type: boolean
-  attribute_type: processingInformation
-  description: Flag indicating whether the Dry Troposphere Weather Model was applied
-  display_name: DryTroposphereWeatherModelApplied
-processing_information/parameters/elevation_antenna_pattern_correction_applied:
-  attribute_data_type: string
-  attribute_type: processingInformation
-  description: The type of elevation antenna pattern correction applied
-  display_name: ElevationAntennaPatternCorrectionApplied
-processing_information/parameters/ellipsoidal_flattening_applied:
-  attribute_data_type: boolean
-  attribute_type: processingInformation
-  description: Flag indicating whether Ellipsoidal Flattening was applied
-  display_name: EllipsoidalFlatteningApplied
-processing_information/parameters/geometry_doppler_applied:
-  attribute_data_type: boolean
-  attribute_type: processingInformation
-  description: Flag indicating whether Geometry Doppler was applied
-  display_name: GeometryDopplerApplied
-processing_information/parameters/ionosphere_tec_applied:
-  attribute_data_type: boolean
-  attribute_type: processingInformation
-  description: Flag indicating whether the Ionosphere TEC was applied
-  display_name: IonosphereTecApplied
-processing_information/parameters/los_solid_earth_tides_applied:
-  attribute_data_type: boolean
-  attribute_type: processingInformation
-  description: Flag indicating whether the LOS Solid Earth Tides correction was applied
-  display_name: LOSSolidEarthTidesApplied
-processing_information/parameters/static_troposphere_applied:
-  attribute_data_type: boolean
-  attribute_type: processingInformation
-  description: Flag indicating whether the Static Troposphere correction was applied
-  display_name: StaticTroposphereApplied
-processing_information/parameters/topographic_flattening_applied:
-  attribute_data_type: boolean
-  attribute_type: processingInformation
-  description: Flag indicating whether Topographic Flattening was applied
-  display_name: TopographicFlatteningApplied
-processing_information/parameters/wet_troposphere_weather_model_applied:
-  attribute_data_type: boolean
-  attribute_type: processingInformation
-  description: Flag indicating whether Wet Troposphere Weather Model was applied
-  display_name: WetTroposphereWeatherModelApplied
 processing_information/inputs/calibration_files:
   attribute_data_type: string
   attribute_type: processingInformation
@@ -436,10 +381,13 @@ quality_assurance/orbit_information:
 quality_assurance/pixel_classification:
   attribute_data_type: string
   attribute_type: processingInformation
-  description: Contains information on the percentage of valid pixels with the complex backscatter layer and the percentage of valid pixels covering land
+  description: Contains information on the percentage of pixels labeled as affected by layover, shadow, or both
   display_name: QualityAssurancePixelClassification
+  render_description: true
 quality_assurance/statistics:
   attribute_data_type: string
   attribute_type: processingInformation
-  description: Includes a series of metrics which statistically characterize the main data layers contained in the /data group and the timing corrections LUTs contained in processing_information/timing_corrections
+  description: A set of metrics which statistically characterize the floating-point geometry layers contained within the CSLC-S1-Static Layer product
   display_name: QualityAssuranceStatistics
+  render_description: true
+
