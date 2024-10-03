@@ -383,11 +383,9 @@ quality_assurance/pixel_classification:
   attribute_type: processingInformation
   description: Contains information on the percentage of pixels labeled as affected by layover, shadow, or both
   display_name: QualityAssurancePixelClassification
-  render_description: true
 quality_assurance/statistics:
   attribute_data_type: string
   attribute_type: processingInformation
   description: A set of metrics which statistically characterize the floating-point geometry layers contained within the CSLC-S1-Static Layer product
   display_name: QualityAssuranceStatistics
-  render_description: true
 
