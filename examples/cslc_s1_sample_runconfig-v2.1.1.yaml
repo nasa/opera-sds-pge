@@ -94,6 +94,14 @@ RunConfig:
                 # Consult the Docker image build scripts for more info
                 IsoTemplatePath: /home/compass_user/opera/pge/cslc_s1/templates/OPERA_ISO_metadata_L2_CSLC_S1_template.xml.jinja2
 
+                # Path to a YAML file mapping Measured Parameter metadata names to descriptions used to supplement the ISO xml
+                # metadata file
+                # Path should correspond to the file system within the Docker
+                # container, and typically should reference a template file bundled
+                # with the opera_pge installation directory within the container
+                # Consult the Docker image build scripts for more info
+                IsoMeasuredParameterDescriptions: /home/compass_user/opera/pge/cslc_s1/templates/cslc_s1_measured_parameters.yaml
+
                 # Date field which designates the point after which the
                 # CSLC static layer product(s) should be considered valid.
                 # This field must be provided for CSLC-S1 jobs when static layer
