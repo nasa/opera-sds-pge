@@ -8,6 +8,8 @@ phase_linking:
     # If there are more ministacks than this, the earliest CCSLCs will be left
     # out of the later stacks.
     max_num_compressed: int(min=1)
+    # Index of input SLC to use for making phase linked interferograms after EVD/EMI.
+    output_reference_idx: int(required=False)
     half_window:
         # Half window size (in pixels) for x direction.
         x: int()
@@ -18,9 +20,13 @@ phase_linking:
     # Beta regularization parameter for correlation matrix inversion. 0 is no regularization.
     beta: num(min=0.0, max=1.0)
     # Method for finding SHPs during phase linking.
-    shp_method: enum('glrt', 'ks', 'kld', 'rect')
+    shp_method: enum('glrt', 'ks', 'rect')
     # Significance level (probability of false alarm) for SHP tests.
     shp_alpha: num(min=0.0, max=1.0)
+    # If True, pixels labeled as PS will get set to NaN during phase linking to
+    # avoid summing their phase. Default of False means that the SHP algorithm
+    # will decide if a pixel should be included, regardless of its PS label.
+    mask_input_ps: bool(required=False)
     # StBAS parameter to include only nearest-N interferograms forphase linking. A
     #   `baseline_lag` of `n` will only include the closest`n` interferograms. `baseline_line`
     #   must be positive.
@@ -86,9 +92,9 @@ unwrap_options:
             max_tiles: int(min=1)
             # Number of points used for determining tiles based on density.
             #   Type: integer.
-            target_points_for_generation: int(min=0)
+            target_points_for_generation: int(required=False, min=1)
             # Target points per tile when generating tiles.
-            target_points_per_tile: int(min=0)
+            target_points_per_tile: int(required=False, min=1)
             # Dilation factor of non-overlapping tiles. 0.05 would lead to 5 percent dilation of the
             #   tile.
             dilation_factor: num(min=0.0)
@@ -101,7 +107,7 @@ unwrap_options:
             s_worker_count: int()
             # Temporal unwrapping operations over spatial links are performed in batches and each batch
             #   is solved in parallel.
-            links_per_batch: int(min=0)
+            links_per_batch: int(required=False, min=1)
             # Temporal unwrapping costs.
             #   Options: ['constant', 'distance', 'centroid'].
             t_cost_type: enum('constant', 'distance', 'centroid')
@@ -112,6 +118,8 @@ unwrap_options:
             s_cost_type: enum('constant', 'distance', 'centroid')
             # Scale factor used to compute edge costs for spatial unwrapping.
             s_cost_scale: num(min=0.0)
+            # Number of tiles to process in parallel. Set to 0 for all tiles.
+            num_parallel_tiles: int(required=False, min=0)
         merger_settings:
             # Minimum number of overlap pixels to be considered valid.
             min_overlap_points: int()
@@ -120,6 +128,9 @@ unwrap_options:
             # Method used to estimate bulk offset between tiles.
             #   Options: ['integer', 'L2'].
             bulk_method: enum('integer', 'L2')
+            # Number of interferograms to merge in one batch. Use zero to merge all
+            # interferograms in a single batch.
+            num_parallel_ifgs: int(required=False, min=0)
 output_options:
     # Output (x, y) resolution (in units of input data).
     output_resolution: any(include('x_y_object'), null())
@@ -146,8 +157,17 @@ output_options:
     add_overviews: bool()
     # List of overview levels to create (if add_overviews=True).
     overview_levels: list(int())
+    # Specify an extra reference datetime in UTC. Adding this lets you
+    # to create and unwrap two single reference networks; the later resets at
+    # the given date (e.g. for a large earthquake event). If passing strings,
+    # formats accepted are YYYY-MM-DD[T]HH:MM[:SS[.ffffff]][Z or [±]HH[:]MM],
+    # or YYYY-MM-DD
+    extra_reference_date: any(str(), null(), required=False)
 # Name of the subdataset to use in the input NetCDF files.
 subdataset: str()
+# Spatial wavelength cutoff (in meters) for the spatial filter. Used to
+# create the short wavelength displacement layer
+spatial_wavelength_cutoff: num(required=False)
 ---
 x_y_object:
     x: int()
