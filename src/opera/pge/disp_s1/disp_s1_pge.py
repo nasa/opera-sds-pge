@@ -282,14 +282,14 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
         # ReferenceDateTime: The acquisition sensing start date and time of
         # the input satellite imagery for the first burst in the frame of the
         # reference product in the format YYYYMMDDTHHMMSSZ
-        reference_date_time = disp_metadata['identification']['reference_datetime']
+        reference_date_time = disp_metadata['identification']['reference_zero_doppler_start_time']
         reference_date_time = datetime.datetime.strptime(reference_date_time, "%Y-%m-%d %H:%M:%S.%f")
         reference_date_time = f"{get_time_for_filename(reference_date_time)}Z"
 
         # SecondaryDateTime: The acquisition sensing start date and time of
         # the input satellite imagery for the first burst in the frame of this
         # secondary product in the format YYYYMMDDTHHMMSSZ
-        secondary_date_time = disp_metadata['identification']['secondary_datetime']
+        secondary_date_time = disp_metadata['identification']['secondary_zero_doppler_start_time']
         secondary_date_time = datetime.datetime.strptime(secondary_date_time, "%Y-%m-%d %H:%M:%S.%f")
         secondary_date_time = f"{get_time_for_filename(secondary_date_time)}Z"
 
