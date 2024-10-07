@@ -62,16 +62,6 @@ RunConfig:
             - /home/mamba/input_dir/jplg3350.22i
             - /home/mamba/input_dir/jplg3470.22i
 
-          # Paths to troposphere weather model files.
-          # One file should be provided for each date covered by the set of input CSLCs
-          # All files should be in GRIB (.grb), NetCDF (.nc) or HDF5 (.h5) format
-          troposphere_files:
-            - /home/mamba/input_dir/ERA5_N36_N41_W124_W118_20221107_14.grb
-            - /home/mamba/input_dir/ERA5_N36_N41_W124_W118_20221119_14.grb
-            - /home/mamba/input_dir/ERA5_N36_N41_W124_W118_20221201_14.grb
-            - /home/mamba/input_dir/ERA5_N36_N41_W124_W118_20221213_14.grb
-            - /home/mamba/input_dir/ERA5_N36_N41_W124_W118_20230506_14.grb
-
       ProductPathGroup:
         # Path to where output products should be stored
         # Must correspond to the file system within the Docker container,
@@ -198,20 +188,14 @@ RunConfig:
           - /home/mamba/input_dir/jplg3230.22i
           - /home/mamba/input_dir/jplg3350.22i
           - /home/mamba/input_dir/jplg3470.22i
-        # List of Paths to troposphere weather model files.
-        #   Type: string.
-        troposphere_files:
-          - /home/mamba/input_dir/ERA5_N36_N41_W124_W118_20221107_14.grb
-          - /home/mamba/input_dir/ERA5_N36_N41_W124_W118_20221119_14.grb
-          - /home/mamba/input_dir/ERA5_N36_N41_W124_W118_20221201_14.grb
-          - /home/mamba/input_dir/ERA5_N36_N41_W124_W118_20221213_14.grb
-          - /home/mamba/input_dir/ERA5_N36_N41_W124_W118_20230506_14.grb
+
       static_ancillary_file_group:
         # JSON file containing the mapping from frame_id to frame/burst information.
         #   Type: string | null.
         frame_to_burst_json: /home/mamba/input_dir/opera-s1-disp-frame-to-burst.json
 
-        # JSON file containing list of reference date changes for each frame
+        # JSON file containing list of reference date changes for each frame.
+        # Should be used only when product_type is set oto DISP_S1_HISTORICAL
         #   Type: string | null.
         reference_date_database_json: /home/mamba/input_dir/opera-s1-disp-reference-date.json
       primary_executable:
