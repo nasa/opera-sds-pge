@@ -77,51 +77,6 @@ RunConfig:
             - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg3480.17i
             - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg3600.17i
           troposphere_files:
-            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1487289600000000000.nc
-            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1488326400000000000.nc
-            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1489363200000000000.nc
-            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1490400000000000000.nc
-            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1491436800000000000.nc
-            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1492473600000000000.nc
-            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1493510400000000000.nc
-            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1494547200000000000.nc
-            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1495584000000000000.nc
-            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1496620800000000000.nc
-            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1498694400000000000.nc
-            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1499731200000000000.nc
-            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1500768000000000000.nc
-            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1501804800000000000.nc
-            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1502841600000000000.nc
-            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1503878400000000000.nc
-            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1504915200000000000.nc
-            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1505952000000000000.nc
-            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1506988800000000000.nc
-            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1508025600000000000.nc
-            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1509062400000000000.nc
-            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1510099200000000000.nc
-            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1511136000000000000.nc
-            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1512172800000000000.nc
-            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1513209600000000000.nc
-            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1514246400000000000.nc
-            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1515283200000000000.nc
-            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1516320000000000000.nc
-            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1517356800000000000.nc
-            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1518393600000000000.nc
-            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1519430400000000000.nc
-            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1520467200000000000.nc
-            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1521504000000000000.nc
-            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1522540800000000000.nc
-            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1523577600000000000.nc
-            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1524614400000000000.nc
-            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1525651200000000000.nc
-            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1526688000000000000.nc
-            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1527724800000000000.nc
-            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1528761600000000000.nc
-            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1529798400000000000.nc
-            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1530835200000000000.nc
-            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1531872000000000000.nc
-            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1532908800000000000.nc
-            - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1542240000000000000.nc
 
       ProductPathGroup:
         OutputProductPath: /home/mamba/output_dir
@@ -166,7 +121,7 @@ RunConfig:
 
         frame_id: 7091
       dynamic_ancillary_file_group:
-        algorithm_parameters_file: /home/mamba/runconfig/opera_pge_disp_s1_r5.3_calval_algorithm_parameters_forward.yaml
+        algorithm_parameters_file: /home/mamba/runconfig/opera_pge_disp_s1_r5.4_calval_algorithm_parameters_forward.yaml
         static_layers_files:
           - /home/mamba/input_dir/dynamic_ancillary_files/static_layers/OPERA_L2_CSLC-S1-STATIC_T027-056725-IW1_20140403_S1A_v1.0.h5
           - /home/mamba/input_dir/dynamic_ancillary_files/static_layers/OPERA_L2_CSLC-S1-STATIC_T027-056726-IW1_20140403_S1A_v1.0.h5
@@ -219,52 +174,6 @@ RunConfig:
           - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg3480.17i
           - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg3600.17i
         troposphere_files:
-          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1487289600000000000.nc
-          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1488326400000000000.nc
-          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1489363200000000000.nc
-          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1490400000000000000.nc
-          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1491436800000000000.nc
-          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1492473600000000000.nc
-          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1493510400000000000.nc
-          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1494547200000000000.nc
-          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1495584000000000000.nc
-          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1496620800000000000.nc
-          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1498694400000000000.nc
-          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1499731200000000000.nc
-          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1500768000000000000.nc
-          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1501804800000000000.nc
-          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1502841600000000000.nc
-          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1503878400000000000.nc
-          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1504915200000000000.nc
-          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1505952000000000000.nc
-          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1506988800000000000.nc
-          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1508025600000000000.nc
-          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1509062400000000000.nc
-          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1510099200000000000.nc
-          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1511136000000000000.nc
-          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1512172800000000000.nc
-          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1513209600000000000.nc
-          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1514246400000000000.nc
-          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1515283200000000000.nc
-          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1516320000000000000.nc
-          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1517356800000000000.nc
-          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1518393600000000000.nc
-          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1519430400000000000.nc
-          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1520467200000000000.nc
-          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1521504000000000000.nc
-          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1522540800000000000.nc
-          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1523577600000000000.nc
-          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1524614400000000000.nc
-          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1525651200000000000.nc
-          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1526688000000000000.nc
-          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1527724800000000000.nc
-          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1528761600000000000.nc
-          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1529798400000000000.nc
-          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1530835200000000000.nc
-          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1531872000000000000.nc
-          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1532908800000000000.nc
-          - /home/mamba/input_dir/dynamic_ancillary_files/troposphere_files/D1542240000000000000.nc
-
       static_ancillary_file_group:
         frame_to_burst_json: /home/mamba/input_dir/static_ancillary_files/opera-s1-disp-0.5.0-frame-to-burst.json.zip
         reference_date_database_json:
