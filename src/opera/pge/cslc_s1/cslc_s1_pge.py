@@ -29,6 +29,9 @@ from opera.util.render_jinja2 import render_jinja2
 from opera.util.time import get_time_for_filename
 
 
+MEASURED_PARAMETER_PATH_SEPARATOR = '/'
+
+
 class CslcS1PreProcessorMixin(PreProcessorMixin):
     """
     Mixin class responsible for handling all pre-processing steps for the CSLC-S1
@@ -613,11 +616,11 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
                 descriptions = yaml.safe_load(f)
         else:
             msg = ('Measured parameters configuration is needed to extract the measured parameters attributes from the'
-                   'CLSC metadata')
+                   'CSLC metadata')
             self.logger.critical(self.name, ErrorCode.ISO_METADATA_DESCRIPTIONS_CONFIG_NOT_FOUND, msg)
 
         for parameter_var_name in descriptions:
-            key_path = parameter_var_name.split('/')
+            key_path = parameter_var_name.split(MEASURED_PARAMETER_PATH_SEPARATOR)
 
             mp = measured_parameters
 
@@ -651,10 +654,7 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
         # Extract all metadata assigned by the SAS at product creation time
         try:
             output_product_metadata = get_cslc_s1_product_metadata(cslc_product)
-            output_product_metadata['MeasuredParameters'] = self.augment_measured_parameters(
-                # flatten_h5_metadata(output_product_metadata)
-                output_product_metadata
-            )
+            output_product_metadata['MeasuredParameters'] = self.augment_measured_parameters(output_product_metadata)
         except Exception as err:
             msg = f'Failed to extract metadata from {cslc_product}, reason: {err}'
             self.logger.critical(self.name, ErrorCode.ISO_METADATA_COULD_NOT_EXTRACT_METADATA, msg)
