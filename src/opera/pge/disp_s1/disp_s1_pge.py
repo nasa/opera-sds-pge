@@ -282,14 +282,14 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
         # ReferenceDateTime: The acquisition sensing start date and time of
         # the input satellite imagery for the first burst in the frame of the
         # reference product in the format YYYYMMDDTHHMMSSZ
-        reference_date_time = disp_metadata['identification']['reference_datetime']
+        reference_date_time = disp_metadata['identification']['reference_zero_doppler_start_time']
         reference_date_time = datetime.datetime.strptime(reference_date_time, "%Y-%m-%d %H:%M:%S.%f")
         reference_date_time = f"{get_time_for_filename(reference_date_time)}Z"
 
         # SecondaryDateTime: The acquisition sensing start date and time of
         # the input satellite imagery for the first burst in the frame of this
         # secondary product in the format YYYYMMDDTHHMMSSZ
-        secondary_date_time = disp_metadata['identification']['secondary_datetime']
+        secondary_date_time = disp_metadata['identification']['secondary_zero_doppler_start_time']
         secondary_date_time = datetime.datetime.strptime(secondary_date_time, "%Y-%m-%d %H:%M:%S.%f")
         secondary_date_time = f"{get_time_for_filename(secondary_date_time)}Z"
 
@@ -635,13 +635,20 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
 
         return output_product_metadata
 
-    def _create_custom_metadata(self):
+    def _create_custom_metadata(self, inter_filename):
         """
         Creates the "custom data" dictionary used with the ISO metadata rendering.
 
         Custom data contains all metadata information needed for the ISO template
         that is not found within any of the other metadata sources (such as the
         RunConfig, output product(s), or catalog metadata).
+
+        Parameters
+        ----------
+        inter_filename : str
+            The intermediate filename of the output product to generate a
+            core filename for. This core filename will be used as the "granule"
+            identifier within the returned metadata dictionary.
 
         Returns
         -------
@@ -652,9 +659,9 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
         """
         custom_metadata = {
             'ISO_OPERA_FilePackageName': self._ancillary_filename(),
-            'ISO_OPERA_ProducerGranuleId': self._ancillary_filename(),
+            'ISO_OPERA_ProducerGranuleId': self._core_filename(inter_filename),
             'MetadataProviderAction': "creation",
-            'GranuleFilename': self._ancillary_filename(),
+            'GranuleFilename': self._core_filename(inter_filename),
             'ISO_OPERA_ProjectKeywords': ['OPERA', 'JPL', 'DISP', 'Displacement', 'Surface', 'Land', 'Global'],
             'ISO_OPERA_PlatformKeywords': ['S1'],
             'ISO_OPERA_InstrumentKeywords': ['Sentinel 1 A/B']
@@ -662,7 +669,7 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
 
         return custom_metadata
 
-    def _create_iso_metadata(self, disp_metadata):
+    def _create_iso_metadata(self, inter_filename, disp_metadata):
         """
         Creates a rendered version of the ISO metadata template for DISP-S1
         output products using metadata sourced from the following locations:
@@ -694,7 +701,7 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
 
         catalog_metadata_dict = self._create_catalog_metadata().asdict()
 
-        custom_data_dict = self._create_custom_metadata()
+        custom_data_dict = self._create_custom_metadata(inter_filename)
 
         iso_metadata = {
             'run_config': runconfig_dict,
@@ -753,7 +760,7 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
         # Generate the ISO metadata for use with product submission to DAAC(s)
         # For CSLC-S1, each burst-based product gets its own ISO xml
         for inter_filename, disp_metadata in self._product_metadata_cache.items():
-            iso_metadata = self._create_iso_metadata(disp_metadata)
+            iso_metadata = self._create_iso_metadata(inter_filename, disp_metadata)
 
             iso_meta_filename = self._iso_metadata_filename(inter_filename)
             iso_meta_filepath = join(self.runconfig.output_product_path, iso_meta_filename)
@@ -826,10 +833,10 @@ class DispS1Executor(DispS1PreProcessorMixin, DispS1PostProcessorMixin, PgeExecu
     LEVEL = "L3"
     """Processing Level for DISP-S1 Products"""
 
-    PGE_VERSION = "3.0.0-rc.4.0"
+    PGE_VERSION = "3.0.0-rc.4.1"
     """Version of the PGE (overrides default from base_pge)"""
 
-    SAS_VERSION = "0.4.3"  # CalVal release https://github.com/opera-adt/disp-s1/releases/tag/v0.4.3
+    SAS_VERSION = "0.4.4"  # CalVal release https://github.com/opera-adt/disp-s1/releases/tag/v0.4.4
 
     def __init__(self, pge_name, runconfig_path, **kwargs):
         super().__init__(pge_name, runconfig_path, **kwargs)

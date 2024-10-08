@@ -1,7 +1,7 @@
 ps_options:
   # Amplitude dispersion threshold to consider a pixel a PS.
   #   Type: number.
-  amp_dispersion_threshold: 0.25
+  amp_dispersion_threshold: 0.20
 phase_linking:
   # Size of the ministack for sequential estimator.
   #   Type: integer.
@@ -9,7 +9,7 @@ phase_linking:
   # Maximum number of compressed images to use in sequential estimator. If there are more
   #   ministacks than this, the earliest CCSLCs will be left out of the later stacks.
   #   Type: integer.
-  max_num_compressed: 5
+  max_num_compressed: 10
   half_window:
     # Half window size (in pixels) for x direction.
     #   Type: integer.
@@ -29,7 +29,7 @@ phase_linking:
   shp_method: glrt
   # Significance level (probability of false alarm) for SHP tests.
   #   Type: number.
-  shp_alpha: 0.005
+  shp_alpha: 0.001
   # StBAS parameter to include only nearest-N interferograms forphase linking. A
   #   `baseline_lag` of `n` will only include the closest`n` interferograms. `baseline_line`
   #   must be positive.
@@ -59,7 +59,7 @@ unwrap_options:
   run_goldstein: false
   # Whether to run interpolation step on wrapped interferogram.
   #   Type: boolean.
-  run_interpolation: false
+  run_interpolation: true
   # Phase unwrapping method.
   #   Type: string.
   #   Options: ['snaphu', 'icu', 'phass', 'spurt', 'whirlwind'].
@@ -90,8 +90,8 @@ unwrap_options:
     # Amount of tile overlap (in pixels) along the (row, col) directions.
     #   Type: array.
     tile_overlap:
-      - 0
-      - 0
+      - 400
+      - 400
     # Number of tiles to unwrap in parallel for each interferogram.
     #   Type: integer.
     n_parallel_tiles: 1
@@ -107,13 +107,13 @@ unwrap_options:
     # Number of tiles to split the inputs into.
     #   Type: array.
     ntiles:
-      - 5
-      - 5
+      - 1
+      - 1
     # Extra multilook factor to use for the coarse unwrap.
     #   Type: array.
     downsample_factor:
-      - 5
-      - 5
+      - 1
+      - 1
     # Initialization method for SNAPHU.
     #   Type: string.
     #   Options: ['mcf', 'mst'].

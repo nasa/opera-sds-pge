@@ -590,10 +590,14 @@ def create_test_disp_metadata_product(file_path):
         frame_id_dset = identification_grp.create_dataset("frame_id", data=123, dtype='int64')
         product_version_dset = identification_grp.create_dataset("product_version",
                                                                  data=np.string_("0.2"))
-        zero_doppler_start_time_dset = identification_grp.create_dataset("zero_doppler_start_time",
-                                                                         data=np.string_("2022-12-13 14:07:50.748411"))
-        zero_doppler_end_time_dset = identification_grp.create_dataset("zero_doppler_end_time",
-                                                                       data=np.string_("2022-12-13 14:07:56.584135"))
+        reference_zero_doppler_start_time_dset = identification_grp.create_dataset("reference_zero_doppler_start_time",
+                                                                                   data=np.string_("2017-02-17 13:27:50.139658"))
+        reference_zero_doppler_end_time_dset = identification_grp.create_dataset("reference_zero_doppler_end_time",
+                                                                                 data=np.string_("2017-02-17 13:27:55.979493"))
+        secondary_zero_doppler_start_time_dset = identification_grp.create_dataset("secondary_zero_doppler_start_time",
+                                                                                   data=np.string_("2017-04-30 13:27:52.049224"))
+        secondary_zero_doppler_end_time_dset = identification_grp.create_dataset("secondary_zero_doppler_end_time",
+                                                                                 data=np.string_("2017-04-30 13:27:57.891116"))
         bounding_polygon_dset = identification_grp.create_dataset("bounding_polygon",
                                                                   data=np.string_("POLYGON ((-119.26 39.15, -119.32 39.16, -119.22 39.32, -119.26 39.15))"))
         radar_wavelength_dset = identification_grp.create_dataset("radar_wavelength",
@@ -602,6 +606,12 @@ def create_test_disp_metadata_product(file_path):
                                                                     data=np.string_("2022-11-07 00:00:00.000000"))
         secondary_datetime_dset = identification_grp.create_dataset("secondary_datetime",
                                                                     data=np.string_("2022-12-13 00:00:00.000000"))
+        average_temporal_coherence_dset = identification_grp.create_dataset("average_temporal_coherence",
+                                                                            data=0.9876175064678105, dtype='float64')
+        mission_id_dset = identification_grp.create_dataset("mission_id", data=np.string_("S1A"))
+        look_direction_dset = identification_grp.create_dataset("look_direction", data=np.string_("Right"))
+        track_number_dset = identification_grp.create_dataset("track_number", data=27, dtype='int64')
+        orbit_pass_direction_dset = identification_grp.create_dataset("orbit_pass_direction", data=np.string_("Descending"))
 
         metadata_grp = outfile.create_group("/metadata")
         disp_s1_software_version_dset = metadata_grp.create_dataset("disp_s1_software_version",
