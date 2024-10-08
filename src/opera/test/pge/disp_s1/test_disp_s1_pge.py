@@ -359,13 +359,13 @@ class DispS1PgeTestCase(unittest.TestCase):
         # Create a sample metadata file within the output directory of the PGE
         output_dir = join(os.curdir, "disp_s1_pge_test/output_dir")
 
-        disp_metadata_path = join(output_dir, '20170217_20170430.nc')
+        disp_metadata_path = abspath(join(output_dir, '20170217_20170430.nc'))
 
         create_test_disp_metadata_product(disp_metadata_path)
 
         disp_metadata = pge._collect_disp_s1_product_metadata(disp_metadata_path)
 
-        iso_metadata = pge._create_iso_metadata(disp_metadata)
+        iso_metadata = pge._create_iso_metadata(disp_metadata_path, disp_metadata)
 
         self.assertNotIn('!Not found!', iso_metadata)
 

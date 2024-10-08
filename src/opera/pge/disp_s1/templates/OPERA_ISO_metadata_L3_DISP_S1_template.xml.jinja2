@@ -689,10 +689,10 @@
                                                 <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
                                             </eos:type>
                                             <eos:name>
-                                                <gco:CharacterString>ZeroDopplerStartTime</gco:CharacterString>
+                                                <gco:CharacterString>ReferenceZeroDopplerStartTime</gco:CharacterString>
                                             </eos:name>
                                             <eos:description>
-                                                <gco:CharacterString>Zero doppler start time of the first burst contained in the frame</gco:CharacterString>
+                                                <gco:CharacterString>Zero doppler start time of the reference burst contained in the frame</gco:CharacterString>
                                             </eos:description>
                                             <eos:dataType>
                                                 <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
@@ -700,7 +700,7 @@
                                         </eos:EOS_AdditionalAttributeDescription>
                                     </eos:reference>
                                     <eos:value>
-                                        <gco:CharacterString>{{ product_output.identification.zero_doppler_start_time }}{# ISO_OPERA_zeroDopplerStartTime #}</gco:CharacterString>
+                                        <gco:CharacterString>{{ product_output.identification.reference_zero_doppler_start_time }}{# ISO_OPERA_referenceZeroDopplerStartTime #}</gco:CharacterString>
                                     </eos:value>
                                 </eos:AdditionalAttribute>
                                 <eos:AdditionalAttribute>
@@ -710,10 +710,10 @@
                                                 <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
                                             </eos:type>
                                             <eos:name>
-                                                <gco:CharacterString>ZeroDopplerEndTime</gco:CharacterString>
+                                                <gco:CharacterString>ReferenceZeroDopplerEndTime</gco:CharacterString>
                                             </eos:name>
                                             <eos:description>
-                                                <gco:CharacterString>Zero doppler end time of the last burst contained in the frame</gco:CharacterString>
+                                                <gco:CharacterString>Zero doppler end time of the reference burst contained in the frame</gco:CharacterString>
                                             </eos:description>
                                             <eos:dataType>
                                                 <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
@@ -721,7 +721,49 @@
                                         </eos:EOS_AdditionalAttributeDescription>
                                     </eos:reference>
                                     <eos:value>
-                                        <gco:CharacterString>{{ product_output.identification.zero_doppler_end_time }}{# ISO_OPERA_zeroDopplerEndTime #}</gco:CharacterString>
+                                        <gco:CharacterString>{{ product_output.identification.reference_zero_doppler_end_time }}{# ISO_OPERA_referenceZeroDopplerEndTime #}</gco:CharacterString>
+                                    </eos:value>
+                                </eos:AdditionalAttribute>
+                                <eos:AdditionalAttribute>
+                                    <eos:reference>
+                                        <eos:EOS_AdditionalAttributeDescription>
+                                            <eos:type>
+                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
+                                            </eos:type>
+                                            <eos:name>
+                                                <gco:CharacterString>SecondaryZeroDopplerStartTime</gco:CharacterString>
+                                            </eos:name>
+                                            <eos:description>
+                                                <gco:CharacterString>Zero doppler start time of the secondary burst contained in the frame</gco:CharacterString>
+                                            </eos:description>
+                                            <eos:dataType>
+                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
+                                            </eos:dataType>
+                                        </eos:EOS_AdditionalAttributeDescription>
+                                    </eos:reference>
+                                    <eos:value>
+                                        <gco:CharacterString>{{ product_output.identification.secondary_zero_doppler_start_time }}{# ISO_OPERA_secondaryZeroDopplerStartTime #}</gco:CharacterString>
+                                    </eos:value>
+                                </eos:AdditionalAttribute>
+                                <eos:AdditionalAttribute>
+                                    <eos:reference>
+                                        <eos:EOS_AdditionalAttributeDescription>
+                                            <eos:type>
+                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
+                                            </eos:type>
+                                            <eos:name>
+                                                <gco:CharacterString>SecondaryZeroDopplerEndTime</gco:CharacterString>
+                                            </eos:name>
+                                            <eos:description>
+                                                <gco:CharacterString>Zero doppler end time of the secondary burst contained in the frame</gco:CharacterString>
+                                            </eos:description>
+                                            <eos:dataType>
+                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
+                                            </eos:dataType>
+                                        </eos:EOS_AdditionalAttributeDescription>
+                                    </eos:reference>
+                                    <eos:value>
+                                        <gco:CharacterString>{{ product_output.identification.secondary_zero_doppler_end_time }}{# ISO_OPERA_secondaryZeroDopplerEndTime #}</gco:CharacterString>
                                     </eos:value>
                                 </eos:AdditionalAttribute>
                                 <eos:AdditionalAttribute>
@@ -806,6 +848,111 @@
                                     </eos:reference>
                                     <eos:value>
                                         <gco:CharacterString>{{ product_output.identification.secondary_datetime }}{# ISO_OPERA_secondaryDateTime #}</gco:CharacterString>
+                                    </eos:value>
+                                </eos:AdditionalAttribute>
+                                <eos:AdditionalAttribute>
+                                    <eos:reference>
+                                        <eos:EOS_AdditionalAttributeDescription>
+                                            <eos:type>
+                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
+                                            </eos:type>
+                                            <eos:name>
+                                                <gco:CharacterString>AverageTemporalCoherence</gco:CharacterString>
+                                            </eos:name>
+                                            <eos:description>
+                                                <gco:CharacterString>Average Temporal Coherence</gco:CharacterString>
+                                            </eos:description>
+                                            <eos:dataType>
+                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="float">float</eos:EOS_AdditionalAttributeDataTypeCode>
+                                            </eos:dataType>
+                                        </eos:EOS_AdditionalAttributeDescription>
+                                    </eos:reference>
+                                    <eos:value>
+                                        <gco:CharacterString>{{ product_output.identification.average_temporal_coherence }}{# ISO_OPERA_averageTemporalCoherence #}</gco:CharacterString>
+                                    </eos:value>
+                                </eos:AdditionalAttribute>
+                                <eos:AdditionalAttribute>
+                                    <eos:reference>
+                                        <eos:EOS_AdditionalAttributeDescription>
+                                            <eos:type>
+                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
+                                            </eos:type>
+                                            <eos:name>
+                                                <gco:CharacterString>MissionId</gco:CharacterString>
+                                            </eos:name>
+                                            <eos:description>
+                                                <gco:CharacterString>Mission ID</gco:CharacterString>
+                                            </eos:description>
+                                            <eos:dataType>
+                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
+                                            </eos:dataType>
+                                        </eos:EOS_AdditionalAttributeDescription>
+                                    </eos:reference>
+                                    <eos:value>
+                                        <gco:CharacterString>{{ product_output.identification.mission_id }}{# ISO_OPERA_missionId #}</gco:CharacterString>
+                                    </eos:value>
+                                </eos:AdditionalAttribute>
+                                <eos:AdditionalAttribute>
+                                    <eos:reference>
+                                        <eos:EOS_AdditionalAttributeDescription>
+                                            <eos:type>
+                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
+                                            </eos:type>
+                                            <eos:name>
+                                                <gco:CharacterString>LookDirection</gco:CharacterString>
+                                            </eos:name>
+                                            <eos:description>
+                                                <gco:CharacterString>Look direction</gco:CharacterString>
+                                            </eos:description>
+                                            <eos:dataType>
+                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
+                                            </eos:dataType>
+                                        </eos:EOS_AdditionalAttributeDescription>
+                                    </eos:reference>
+                                    <eos:value>
+                                        <gco:CharacterString>{{ product_output.identification.look_direction }}{# ISO_OPERA_lookDirection #}</gco:CharacterString>
+                                    </eos:value>
+                                </eos:AdditionalAttribute>
+                                <eos:AdditionalAttribute>
+                                    <eos:reference>
+                                        <eos:EOS_AdditionalAttributeDescription>
+                                            <eos:type>
+                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
+                                            </eos:type>
+                                            <eos:name>
+                                                <gco:CharacterString>TrackNumber</gco:CharacterString>
+                                            </eos:name>
+                                            <eos:description>
+                                                <gco:CharacterString>Track number</gco:CharacterString>
+                                            </eos:description>
+                                            <eos:dataType>
+                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="int">int</eos:EOS_AdditionalAttributeDataTypeCode>
+                                            </eos:dataType>
+                                        </eos:EOS_AdditionalAttributeDescription>
+                                    </eos:reference>
+                                    <eos:value>
+                                        <gco:CharacterString>{{ product_output.identification.track_number }}{# ISO_OPERA_trackNumber #}</gco:CharacterString>
+                                    </eos:value>
+                                </eos:AdditionalAttribute>
+                                <eos:AdditionalAttribute>
+                                    <eos:reference>
+                                        <eos:EOS_AdditionalAttributeDescription>
+                                            <eos:type>
+                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="processingInformation">processingInformation</eos:EOS_AdditionalAttributeTypeCode>
+                                            </eos:type>
+                                            <eos:name>
+                                                <gco:CharacterString>OrbitPassDirection</gco:CharacterString>
+                                            </eos:name>
+                                            <eos:description>
+                                                <gco:CharacterString>Orbit pass direction</gco:CharacterString>
+                                            </eos:description>
+                                            <eos:dataType>
+                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="string">string</eos:EOS_AdditionalAttributeDataTypeCode>
+                                            </eos:dataType>
+                                        </eos:EOS_AdditionalAttributeDescription>
+                                    </eos:reference>
+                                    <eos:value>
+                                        <gco:CharacterString>{{ product_output.identification.orbit_pass_direction }}{# ISO_OPERA_orbitPassDirection #}</gco:CharacterString>
                                     </eos:value>
                                 </eos:AdditionalAttribute>
                                 <eos:AdditionalAttribute>

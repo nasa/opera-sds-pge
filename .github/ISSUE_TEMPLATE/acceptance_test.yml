@@ -1,0 +1,32 @@
+name: SAS Acceptance Test
+description: Acceptance Testing Procedure for SAS Deliveries
+title: "<SAS Name> <Delivery> SAS <Version> Acceptance Test"
+labels: ["must have"]
+body:
+  - type: textarea
+    id: procedure-steps
+    attributes:
+      label: Acceptance Test Procedure Steps
+      description: Tailor the following task list as-necessary for the Acceptance Test to be performed
+      value: |
+          - [ ] Download the delivered SAS Docker image tarball from Artifactory
+             - <Placeholder for Artifactory path to Docker image>
+          - [ ] Download the delivered "golden" test data assets included with SAS delivery from Artifactory
+             - <Placeholder for Artifactory path to test data>
+          - [ ] Optional: Download the delivered documentation for reference
+             - <Placeholder for Artifactory path to documentation>
+          - [ ] If required by the SAS, ensure the instance type of the development machine is set to the correct chip family (Intel vs AMD)
+          - [ ] Load SAS docker image and deploy test data assets on development machine
+          - [ ] Modify provided RunConfig(s) as necessary (see previous AT wiki instructions, if available)
+          - [ ] Execute SAS container using provided sample inputs and RunConfig
+          - [ ] Perform Quality Assurance comparison check of output products with expected products from "golden" test data
+          - [ ] Create/Update Acceptance Testing Procedure wiki page
+             - Be sure to include any changes to test data structure, file permissions, RunConfig changes etc.
+          - [ ] Include the results of Quality Assurance check at the bottom of the wiki page
+             - Include any details on known failures or workarounds, and include a sample of the expected output from the comparison script
+             - If the results of the comparison step are contingent on a particular instance type or chip family, be sure to note that as well
+          - [ ] Optional: Upload results of the Acceptance Test to S3
+             - If the comparison step or the SAS itself is failing, this can be critical for sharing results with ADT
+             - Otherwise, if everything is passing this step can be considered optional
+    validations:
+      required: true
