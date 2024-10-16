@@ -35,7 +35,6 @@ RunConfig:
                 ProgramOptions:
                     - '-p disp_s1_pge_test/output_dir/compressed_slcs;'
                     - 'python3 -c "from opera.util.h5_utils import create_test_disp_metadata_product; create_test_disp_metadata_product(\"disp_s1_pge_test/output_dir/20170217_20170430.nc\")";'
-                    - 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20170217_20170430.displacement.png bs=1M count=1;'
                     - 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20170217_20170430.short_wavelength_displacement.png bs=1M count=1;'
                     - 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/compressed_slcs/compressed_t027_056725_iw1_20170217_20170217_20170430.h5 bs=1M count=1;'
                     - 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/compressed_slcs/compressed_t027_056726_iw1_20170217_20170217_20170430.h5 bs=1M count=1;'
@@ -77,6 +76,8 @@ RunConfig:
 
             static_ancillary_file_group:
                 frame_to_burst_json: disp_s1_pge_test/input_dir/opera-s1-disp-frame-to-burst.json
+                reference_date_database_json: disp_s1_pge_test/input_dir/opera-disp-s1-reference-dates.json
+                algorithm_parameters_overrides_json: disp_s1_pge_test/input_dir/opera-disp-s1-algorithm-parameters-overrides.json
 
             primary_executable:
                 product_type: DISP_S1_FORWARD
