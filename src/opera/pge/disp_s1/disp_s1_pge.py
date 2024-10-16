@@ -18,6 +18,7 @@ from collections import OrderedDict
 from os import listdir
 from os.path import abspath, basename, exists, getsize, join, splitext
 
+import yaml
 from opera.pge.base.base_pge import PgeExecutor
 from opera.pge.base.base_pge import PostProcessorMixin
 from opera.pge.base.base_pge import PreProcessorMixin
@@ -28,6 +29,9 @@ from opera.util.h5_utils import get_disp_s1_product_metadata
 from opera.util.input_validation import validate_algorithm_parameters_config, validate_disp_inputs
 from opera.util.render_jinja2 import render_jinja2
 from opera.util.time import get_time_for_filename
+
+
+MEASURED_PARAMETER_PATH_SEPARATOR = '/'
 
 
 class DispS1PreProcessorMixin(PreProcessorMixin):
@@ -590,6 +594,33 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
         """
         return self._ancillary_filename() + ".qa.log"
 
+    def augment_measured_parameters(self, measured_parameters):
+        descriptions_file = self.runconfig.iso_measured_parameter_descriptions
+
+        new_measured_parameters = {}
+
+        if descriptions_file is not None:
+            with open(descriptions_file) as f:
+                descriptions = yaml.safe_load(f)
+        else:
+            msg = ('Measured parameters configuration is needed to extract the measured parameters attributes from the'
+                   'DISP-S1 metadata')
+            self.logger.critical(self.name, ErrorCode.ISO_METADATA_DESCRIPTIONS_CONFIG_NOT_FOUND, msg)
+
+        for parameter_var_name in descriptions:
+            key_path = parameter_var_name.split(MEASURED_PARAMETER_PATH_SEPARATOR)
+
+            mp = measured_parameters
+
+            while len(key_path) > 0:
+                mp = mp[key_path.pop(0)]
+
+            new_measured_parameters[parameter_var_name] = mp
+
+        augmented_parameters = super().augment_measured_parameters(new_measured_parameters)
+
+        return augmented_parameters
+
     def _collect_disp_s1_product_metadata(self, disp_product):
         """
         Gathers the available metadata from a sample output DISP-S1 product for
@@ -610,6 +641,7 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
         # Extract all metadata assigned by the SAS at product creation time
         try:
             output_product_metadata = get_disp_s1_product_metadata(disp_product)
+            output_product_metadata['MeasuredParameters'] = self.augment_measured_parameters(output_product_metadata)
         except Exception as err:
             msg = f'Failed to extract metadata from {disp_product}, reason: {err}'
             self.logger.critical(self.name, ErrorCode.ISO_METADATA_COULD_NOT_EXTRACT_METADATA, msg)
