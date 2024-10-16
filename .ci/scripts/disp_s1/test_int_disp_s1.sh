@@ -60,13 +60,15 @@ echo "Input data directory: ${input_dir}"
 echo "Expected data directory: ${expected_data_dir}"
 
 # Copy the RunConfig for the historical workflow
-historical_runconfig="opera_pge_disp_s1_r5.4_calval_runconfig_historical.yaml"
+historical_runconfig="opera_pge_disp_s1_r5.5_calval_runconfig_historical.yaml"
 local_historical_runconfig="${SCRIPT_DIR}/${historical_runconfig}"
 echo "Copying runconfig file $local_historical_runconfig to $runconfig_dir"
 cp ${local_historical_runconfig} ${runconfig_dir}
 
 # Run integration tests for DISP-S1 in both "forward" and "historical" modes
-for mode in forward historical
+# TODO for current delivery, only historical mode testing is supported
+#for mode in forward historical
+for mode in historical
 do
     output_dir="${TMP_DIR}/output_disp_s1/${mode}"
 
