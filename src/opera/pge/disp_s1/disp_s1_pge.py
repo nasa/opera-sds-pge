@@ -180,7 +180,6 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
             # Validate .png file(s)
             nc_file_no_ext, ext = splitext(basename(nc_file))
             png_files = [
-                join(output_dir, f'{nc_file_no_ext}.displacement.png'),
                 join(output_dir, f'{nc_file_no_ext}.short_wavelength_displacement.png')
             ]
 
@@ -845,7 +844,7 @@ class DispS1Executor(DispS1PreProcessorMixin, DispS1PostProcessorMixin, PgeExecu
             {
                 # Note: ordering matters here!
                 '*.nc': self._netcdf_filename,
-                '*.displacement.png': self._browse_filename,
+                '*displacement.png': self._browse_filename,
                 'compressed*.h5': self._compressed_cslc_filename
             }
         )
