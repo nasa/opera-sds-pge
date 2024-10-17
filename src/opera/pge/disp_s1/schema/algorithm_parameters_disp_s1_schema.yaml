@@ -131,6 +131,25 @@ unwrap_options:
             # Number of interferograms to merge in one batch. Use zero to merge all
             # interferograms in a single batch.
             num_parallel_ifgs: int(required=False, min=0)
+timeseries_options:
+    # Whether to run the inversion step after unwrapping, if more than a single-reference
+    # network is used.
+    run_inversion: bool()
+    # Norm to use during timeseries inversion.
+    method: enum('L1', 'L2')
+    # Reference point (row, col) used if performing a time series inversion. If not provided, a
+    # point will be selected from a consistent connected component with low amplitude
+    # dispersion.
+    reference_point: any(list(int(), min=2, max=2), null())
+    # Run the velocity estimation from the phase time series.
+    run_velocity: bool()
+    # Pixels with correlation below this value will be masked out.
+    correlation_threshold: num(min=0.0, max=1.0)
+    # Size (rows, columns) of blocks of data to load at a time. 3D dimsion is number of
+    # interferograms (during inversion) and number of SLC dates (during velocity fitting).
+    block_shape: list(int(), min=2, max=2)
+    # Number of parallel blocks to process at once.
+    num_parallel_blocks: int()
 output_options:
     # Output (x, y) resolution (in units of input data).
     output_resolution: any(include('x_y_object'), null())

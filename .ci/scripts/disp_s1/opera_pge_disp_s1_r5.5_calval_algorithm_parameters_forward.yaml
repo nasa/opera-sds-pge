@@ -182,6 +182,35 @@ unwrap_options:
       #   Type: string.
       #   Options: ['integer', 'L2'].
       bulk_method: L2
+timeseries_options:
+  # Whether to run the inversion step after unwrapping, if more than a single-reference
+  #   network is used.
+  #   Type: boolean.
+  run_inversion: false
+  # Norm to use during timeseries inversion.
+  #   Type: string.
+  #   Options: ['L1', 'L2'].
+  method: L1
+  # Reference point (row, col) used if performing a time series inversion. If not provided, a
+  #   point will be selected from a consistent connected component with low amplitude
+  #   dispersion.
+  #   Type: array | null.
+  reference_point:
+  # Run the velocity estimation from the phase time series.
+  #   Type: boolean.
+  run_velocity: false
+  # Pixels with correlation below this value will be masked out.
+  #   Type: number.
+  correlation_threshold: 0.0
+  # Size (rows, columns) of blocks of data to load at a time. 3D dimsion is number of
+  #   interferograms (during inversion) and number of SLC dates (during velocity fitting).
+  #   Type: array.
+  block_shape:
+    - 256
+    - 256
+  # Number of parallel blocks to process at once.
+  #   Type: integer.
+  num_parallel_blocks: 4
 output_options:
   # Output (x, y) resolution (in units of input data).
   #   Type: object | null.
