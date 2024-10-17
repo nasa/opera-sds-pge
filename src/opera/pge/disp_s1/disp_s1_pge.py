@@ -28,7 +28,7 @@ from opera.util.h5_utils import get_cslc_s1_product_metadata
 from opera.util.h5_utils import get_disp_s1_product_metadata
 from opera.util.input_validation import validate_algorithm_parameters_config, validate_disp_inputs
 from opera.util.render_jinja2 import render_jinja2
-from opera.util.time import get_time_for_filename
+from opera.util.time import get_time_for_filename, get_catalog_metadata_datetime_str
 
 
 MEASURED_PARAMETER_PATH_SEPARATOR = '/'
@@ -641,7 +641,22 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
         # Extract all metadata assigned by the SAS at product creation time
         try:
             output_product_metadata = get_disp_s1_product_metadata(disp_product)
+
+            # get_catalog_metadata_datetime_str(self.production_datetime)
+
+            # Add hardcoded values to metadata
+            output_product_metadata['static'] = {
+                'Project': 'OPERA',
+                'ProductLevel': 3,
+                'ProductType': 'DISP-S1',
+                'ProductSource': 'Sentinel-1',
+                'ProcessingDateTime': get_catalog_metadata_datetime_str(self.production_datetime)
+            }
+
             output_product_metadata['MeasuredParameters'] = self.augment_measured_parameters(output_product_metadata)
+
+            # Remove the hardcoded dict from main output product metadata dict once it's served its purpose
+            del output_product_metadata['static']
         except Exception as err:
             msg = f'Failed to extract metadata from {disp_product}, reason: {err}'
             self.logger.critical(self.name, ErrorCode.ISO_METADATA_COULD_NOT_EXTRACT_METADATA, msg)

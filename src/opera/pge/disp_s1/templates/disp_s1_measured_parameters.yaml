@@ -1,36 +1,28 @@
-
-# TODO: These values are currently hardcoded and thus excluded from the jinja loop at this time
-
-#'3':
-#  attribute_data_type: int
-#  attribute_type: processingInformation
-#  description: Product level
-#  display_name: ProductLevel
-#DISP-S1:
-#  attribute_data_type: string
-#  attribute_type: processingInformation
-#  description: Product type
-#  display_name: ProductType
-#OPERA:
-#  attribute_data_type: string
-#  attribute_type: processingInformation
-#  description: Name of the project
-#  display_name: Project
-#Sentinel-1:
-#  attribute_data_type: string
-#  attribute_type: processingInformation
-#  description: Source data for the product
-#  display_name: ProductSource
-
-# TODO: The following value is from catalog metadata and also excluded from the loop
-
-#catalog_metadata/Production_DateTime:
-#  attribute_data_type: string
-#  attribute_type: processingInformation
-#  description: DISP-S1 product processing datetime.
-#  display_name: ProcessingDateTime
-
-
+static/Project:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Name of the project.
+  display_name: Project
+static/ProductLevel:
+  attribute_data_type: int
+  attribute_type: processingInformation
+  description: Product level.
+  display_name: ProductLevel
+static/ProductType:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Product type.
+  display_name: ProductType
+static/ProductSource:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Source data for the product.
+  display_name: ProductSource
+static/ProcessingDateTime:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: DISP-S1 product processing datetime.
+  display_name: ProcessingDateTime
 identification/frame_id:
   attribute_data_type: string
   attribute_type: processingInformation
