@@ -184,7 +184,6 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
             # Validate .png file(s)
             nc_file_no_ext, ext = splitext(basename(nc_file))
             png_files = [
-                join(output_dir, f'{nc_file_no_ext}.displacement.png'),
                 join(output_dir, f'{nc_file_no_ext}.short_wavelength_displacement.png')
             ]
 
@@ -883,7 +882,7 @@ class DispS1Executor(DispS1PreProcessorMixin, DispS1PostProcessorMixin, PgeExecu
     PGE_VERSION = "3.0.0-rc.4.1"
     """Version of the PGE (overrides default from base_pge)"""
 
-    SAS_VERSION = "0.4.4"  # CalVal release https://github.com/opera-adt/disp-s1/releases/tag/v0.4.4
+    SAS_VERSION = "0.4.6"  # CalVal release https://github.com/opera-adt/disp-s1/releases/tag/v0.4.6
 
     def __init__(self, pge_name, runconfig_path, **kwargs):
         super().__init__(pge_name, runconfig_path, **kwargs)
@@ -892,7 +891,7 @@ class DispS1Executor(DispS1PreProcessorMixin, DispS1PostProcessorMixin, PgeExecu
             {
                 # Note: ordering matters here!
                 '*.nc': self._netcdf_filename,
-                '*.displacement.png': self._browse_filename,
+                '*displacement.png': self._browse_filename,
                 'compressed*.h5': self._compressed_cslc_filename
             }
         )
