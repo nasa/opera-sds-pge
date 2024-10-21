@@ -32,6 +32,8 @@ except (ImportError, ModuleNotFoundError):  # pragma: no cover
     osr = MockOsr                           # pragma: no cover
 # pylint: enable=import-error,invalid-name
 
+MEASURED_PARAMETER_PATH_SEPARATOR = '/'
+
 
 def get_hdf5_group_as_dict(file_name, group_path, ignore_keys=None):
     """

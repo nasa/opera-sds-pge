@@ -26,12 +26,10 @@ from opera.util.dataset_utils import parse_bounding_polygon_from_wkt
 from opera.util.error_codes import ErrorCode
 from opera.util.h5_utils import get_cslc_s1_product_metadata
 from opera.util.h5_utils import get_disp_s1_product_metadata
+from opera.util.h5_utils import MEASURED_PARAMETER_PATH_SEPARATOR
 from opera.util.input_validation import validate_algorithm_parameters_config, validate_disp_inputs
 from opera.util.render_jinja2 import render_jinja2
 from opera.util.time import get_time_for_filename, get_catalog_metadata_datetime_str
-
-
-MEASURED_PARAMETER_PATH_SEPARATOR = '/'
 
 
 class DispS1PreProcessorMixin(PreProcessorMixin):
@@ -594,11 +592,33 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
         return self._ancillary_filename() + ".qa.log"
 
     def augment_measured_parameters(self, measured_parameters):
+        """
+        Override of the augment_measured_parameters() method in Base PGE with an added
+        "preprocessing" step to handle the structure of HDF5 metadata. While GeoTIFF
+        metadata is a flat dictionary, HDF5 metadata is a nested dictionary structure,
+        wherein the variable "keys" can be arbitrarily deep into the structure and
+        the values likewise can be nested dictionaries.
+
+        The preprocessing step in this method selectively flattens the metadata
+        dictionary based on the "paths" provided in the variable keys of the configuration
+        YAML file. The result of this preprocessing is then safely passed to the base
+        method to get the correct structure expected by the Jinja template.
+
+        Parameters
+        ----------
+        measured_parameters : dict
+            The HDF5 metadata from the output product. See get_disp_s1_product_metadata()
+
+        Returns
+        -------
+        augmented_parameters : dict
+            The metadata fields converted to a list with name, value, types, etc
+        """
         descriptions_file = self.runconfig.iso_measured_parameter_descriptions
 
         new_measured_parameters = {}
 
-        if descriptions_file is not None:
+        if descriptions_file:
             with open(descriptions_file) as f:
                 descriptions = yaml.safe_load(f)
         else:
@@ -612,7 +632,12 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
             mp = measured_parameters
 
             while len(key_path) > 0:
-                mp = mp[key_path.pop(0)]
+                try:
+                    mp = mp[key_path.pop(0)]
+                except KeyError as e:
+                    msg = (f'Measured parameters configuration contains an invalid path {parameter_var_name}: no such '
+                           f'entry {e}')
+                    self.logger.critical(self.name, ErrorCode.ISO_METADATA_DESCRIPTIONS_CONFIG_INVALID, msg)
 
             new_measured_parameters[parameter_var_name] = mp
 
@@ -653,9 +678,6 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
             }
 
             output_product_metadata['MeasuredParameters'] = self.augment_measured_parameters(output_product_metadata)
-
-            # Remove the hardcoded dict from main output product metadata dict once it's served its purpose
-            del output_product_metadata['static']
         except Exception as err:
             msg = f'Failed to extract metadata from {disp_product}, reason: {err}'
             self.logger.critical(self.name, ErrorCode.ISO_METADATA_COULD_NOT_EXTRACT_METADATA, msg)
