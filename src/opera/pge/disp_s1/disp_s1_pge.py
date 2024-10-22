@@ -18,6 +18,7 @@ from collections import OrderedDict
 from os import listdir
 from os.path import abspath, basename, exists, getsize, join, splitext
 
+import yaml
 from opera.pge.base.base_pge import PgeExecutor
 from opera.pge.base.base_pge import PostProcessorMixin
 from opera.pge.base.base_pge import PreProcessorMixin
@@ -25,9 +26,10 @@ from opera.util.dataset_utils import parse_bounding_polygon_from_wkt
 from opera.util.error_codes import ErrorCode
 from opera.util.h5_utils import get_cslc_s1_product_metadata
 from opera.util.h5_utils import get_disp_s1_product_metadata
+from opera.util.h5_utils import MEASURED_PARAMETER_PATH_SEPARATOR
 from opera.util.input_validation import validate_algorithm_parameters_config, validate_disp_inputs
 from opera.util.render_jinja2 import render_jinja2
-from opera.util.time import get_time_for_filename
+from opera.util.time import get_time_for_filename, get_catalog_metadata_datetime_str
 
 
 class DispS1PreProcessorMixin(PreProcessorMixin):
@@ -589,6 +591,60 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
         """
         return self._ancillary_filename() + ".qa.log"
 
+    def augment_measured_parameters(self, measured_parameters):
+        """
+        Override of the augment_measured_parameters() method in Base PGE with an added
+        "preprocessing" step to handle the structure of HDF5 metadata. While GeoTIFF
+        metadata is a flat dictionary, HDF5 metadata is a nested dictionary structure,
+        wherein the variable "keys" can be arbitrarily deep into the structure and
+        the values likewise can be nested dictionaries.
+
+        The preprocessing step in this method selectively flattens the metadata
+        dictionary based on the "paths" provided in the variable keys of the configuration
+        YAML file. The result of this preprocessing is then safely passed to the base
+        method to get the correct structure expected by the Jinja template.
+
+        Parameters
+        ----------
+        measured_parameters : dict
+            The HDF5 metadata from the output product. See get_disp_s1_product_metadata()
+
+        Returns
+        -------
+        augmented_parameters : dict
+            The metadata fields converted to a list with name, value, types, etc
+        """
+        descriptions_file = self.runconfig.iso_measured_parameter_descriptions
+
+        new_measured_parameters = {}
+
+        if descriptions_file:
+            with open(descriptions_file) as f:
+                descriptions = yaml.safe_load(f)
+        else:
+            msg = ('Measured parameters configuration is needed to extract the measured parameters attributes from the'
+                   'DISP-S1 metadata')
+            self.logger.critical(self.name, ErrorCode.ISO_METADATA_DESCRIPTIONS_CONFIG_NOT_FOUND, msg)
+
+        for parameter_var_name in descriptions:
+            key_path = parameter_var_name.split(MEASURED_PARAMETER_PATH_SEPARATOR)
+
+            mp = measured_parameters
+
+            while len(key_path) > 0:
+                try:
+                    mp = mp[key_path.pop(0)]
+                except KeyError as e:
+                    msg = (f'Measured parameters configuration contains an invalid path {parameter_var_name}: no such '
+                           f'entry {e}')
+                    self.logger.critical(self.name, ErrorCode.ISO_METADATA_DESCRIPTIONS_CONFIG_INVALID, msg)
+
+            new_measured_parameters[parameter_var_name] = mp
+
+        augmented_parameters = super().augment_measured_parameters(new_measured_parameters)
+
+        return augmented_parameters
+
     def _collect_disp_s1_product_metadata(self, disp_product):
         """
         Gathers the available metadata from a sample output DISP-S1 product for
@@ -609,6 +665,19 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
         # Extract all metadata assigned by the SAS at product creation time
         try:
             output_product_metadata = get_disp_s1_product_metadata(disp_product)
+
+            # get_catalog_metadata_datetime_str(self.production_datetime)
+
+            # Add hardcoded values to metadata
+            output_product_metadata['static'] = {
+                'Project': 'OPERA',
+                'ProductLevel': 3,
+                'ProductType': 'DISP-S1',
+                'ProductSource': 'Sentinel-1',
+                'ProcessingDateTime': get_catalog_metadata_datetime_str(self.production_datetime)
+            }
+
+            output_product_metadata['MeasuredParameters'] = self.augment_measured_parameters(output_product_metadata)
         except Exception as err:
             msg = f'Failed to extract metadata from {disp_product}, reason: {err}'
             self.logger.critical(self.name, ErrorCode.ISO_METADATA_COULD_NOT_EXTRACT_METADATA, msg)

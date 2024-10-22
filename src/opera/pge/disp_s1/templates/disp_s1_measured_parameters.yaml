@@ -1,0 +1,112 @@
+static/Project:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Name of the project.
+  display_name: Project
+static/ProductLevel:
+  attribute_data_type: int
+  attribute_type: processingInformation
+  description: Product level.
+  display_name: ProductLevel
+static/ProductType:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Product type.
+  display_name: ProductType
+static/ProductSource:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Source data for the product.
+  display_name: ProductSource
+static/ProcessingDateTime:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: DISP-S1 product processing datetime.
+  display_name: ProcessingDateTime
+identification/frame_id:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: ID number of the processed frame.
+  display_name: FrameId
+identification/product_version:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: The DISP-S1 product version
+  display_name: ProductVersion
+identification/reference_zero_doppler_start_time:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Zero doppler start time of the reference burst contained in the frame
+  display_name: ReferenceZeroDopplerStartTime
+identification/reference_zero_doppler_end_time:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Zero doppler end time of the reference burst contained in the frame
+  display_name: ReferenceZeroDopplerEndTime
+identification/secondary_zero_doppler_start_time:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Zero doppler start time of the secondary burst contained in the frame
+  display_name: SecondaryZeroDopplerStartTime
+identification/secondary_zero_doppler_end_time:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Zero doppler end time of the secondary burst contained in the frame
+  display_name: SecondaryZeroDopplerEndTime
+identification/bounding_polygon:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: WKT representation of bounding polygon of the image
+  display_name: BoundingPolygon
+identification/radar_wavelength:
+  attribute_data_type: float
+  attribute_type: processingInformation
+  description: Wavelength of the transmitted signal
+  display_name: RadarWavelength
+identification/reference_datetime:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: UTC datetime of the acquisition sensing start of the reference epoch
+    to which the unwrapped phase is referenced, in the format YYYY-MM-DD HH:MM:SS.ffffff
+  display_name: ReferenceDatetime
+identification/secondary_datetime:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: UTC datetime of the acquisition sensing start of current acquisition
+    used to create the unwrapped phase, in the format YYYY-MM-DD HH:MM:SS.ffffff
+  display_name: SecondaryDatetime
+identification/average_temporal_coherence:
+  attribute_data_type: float
+  attribute_type: processingInformation
+  description: Average Temporal Coherence
+  display_name: AverageTemporalCoherence
+identification/mission_id:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Mission ID
+  display_name: MissionId
+identification/look_direction:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Look direction
+  display_name: LookDirection
+identification/track_number:
+  attribute_data_type: int
+  attribute_type: processingInformation
+  description: Track number
+  display_name: TrackNumber
+identification/orbit_pass_direction:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Orbit pass direction
+  display_name: OrbitPassDirection
+metadata/disp_s1_software_version:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Version of the disp-s1 software used to generate the product
+  display_name: DispS1SoftwareVersion
+metadata/dolphin_software_version:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Version of the Dolphin software used to generate the product
+  display_name: DolphinSoftwareVersion
