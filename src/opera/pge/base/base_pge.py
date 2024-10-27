@@ -18,23 +18,27 @@ from functools import lru_cache
 from os.path import abspath, basename, exists, join, splitext
 
 import numpy as np
-import yamale
-import yaml
+
 from pkg_resources import resource_filename
+
+import yamale
 from yamale import YamaleError
+
+import yaml
 
 import opera
 from opera.util.error_codes import ErrorCode
 from opera.util.logger import PgeLogger
 from opera.util.logger import default_log_file_name
 from opera.util.metfile import MetFile
-from opera.util.render_jinja2 import python_type_to_xml_type, guess_attribute_display_name
+from opera.util.render_jinja2 import guess_attribute_display_name, python_type_to_xml_type
 from opera.util.run_utils import create_qa_command_line
 from opera.util.run_utils import create_sas_command_line
 from opera.util.run_utils import get_checksum
 from opera.util.run_utils import time_and_execute
 from opera.util.time import get_catalog_metadata_datetime_str
 from opera.util.time import get_time_for_filename
+
 from .runconfig import RunConfig
 
 
@@ -636,8 +640,8 @@ class PostProcessorMixin:
 
     def augment_measured_parameters(self, measured_parameters):
         """
-        Augment the measured parameters dict into a dict of dicts containing the needed fields for the MeasuredParameters
-        section of the ISO XML file.
+        Augment the measured parameters dict into a dict of dicts containing the needed
+        fields for the MeasuredParameters section of the ISO XML file.
 
         Parameters
         ----------

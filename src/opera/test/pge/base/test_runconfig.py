@@ -52,7 +52,8 @@ class RunconfigTestCase(unittest.TestCase):
         self.assertEqual(runconfig.error_code_base, 100000)
         self.assertEqual(runconfig.sas_schema_path, resource_filename("opera", "test/data/sample_sas_schema.yaml"))
         self.assertEqual(runconfig.iso_template_path, resource_filename("opera", "sample_iso_template.xml.jinja2"))
-        self.assertEqual(runconfig.iso_measured_parameter_descriptions, resource_filename("opera", "sample_iso_measured_parameter_descriptions.yaml"))
+        self.assertEqual(runconfig.iso_measured_parameter_descriptions,
+                         resource_filename("opera", "sample_iso_measured_parameter_descriptions.yaml"))
         self.assertEqual(runconfig.qa_enabled, True)
         self.assertEqual(runconfig.qa_program_path, "/opt/QualityAssurance/sample_qa.py")
         self.assertListEqual(runconfig.qa_program_options, ["--debug"])

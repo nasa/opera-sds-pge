@@ -502,6 +502,7 @@ class DSWxHLSPgeTestCase(unittest.TestCase):
         os.system(f'touch {test_file}')
 
         output_product_metadata = pge._collect_dswx_hls_product_metadata()
+        output_product_metadata['MeasuredParameters']['SPACECRAFT_NAME']['value'] = 'SENTINEL-1A'
 
         self.assertIsInstance(output_product_metadata, dict)
 

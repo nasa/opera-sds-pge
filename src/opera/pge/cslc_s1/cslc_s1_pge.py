@@ -607,6 +607,20 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
         return self._ancillary_filename() + ".qa.log"
 
     def augment_measured_parameters(self, measured_parameters):
+        """
+        Augment the measured parameters dict into a dict of dicts containing the needed
+        fields for the MeasuredParameters section of the ISO XML file.
+
+        Parameters
+        ----------
+        measured_parameters : dict
+            The metadata from the output product.
+
+        Returns
+        -------
+        augmented_parameters : dict
+            The metadata fields converted to a list with name, value, types, etc
+        """
         descriptions_file = self.runconfig.iso_measured_parameter_descriptions
 
         new_measured_parameters = {}
