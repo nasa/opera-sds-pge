@@ -1,0 +1,190 @@
+ACCODE:
+  attribute_data_type: string
+  attribute_type: platformInformation
+  description: The version of Land Surface Reflectance Code (LaSRC) used by HLS for the Landsat-8 30m (L30) product or the Sentinel-2 30m (S30) product for atmospheric correction
+  display_name: Accode
+AEROSOL_CLASS_REMAPPING_ENABLED:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Indicates if the aerosol class remapping is enabled (TRUE) or disabled (FALSE)
+  display_name: AerosolClassRemappingEnabled
+AEROSOL_NOT_WATER_TO_HIGH_CONF_WATER_FMASK_VALUES:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: HLS Fmask values to convert not-water to high-confidence water in the presence of high aerosol
+  display_name: AerosolNotWaterToHighConfWaterFMaskValues
+AEROSOL_PARTIAL_SURFACE_AGGRESSIVE_TO_HIGH_CONF_WATER_FMASK_VALUES:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: HLS Fmask values to convert partial surface water aggressive to high-confidence water in the presence of high aerosol
+  display_name: AerosolPartialSurfaceAggressiveToHighConfWaterFMaskValues
+AEROSOL_PARTIAL_SURFACE_WATER_CONSERVATIVE_TO_HIGH_CONF_WATER_FMASK_VALUES:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: HLS Fmask values to convert moderate-confidence water to high-confidence water in the presence of high aerosol
+  display_name: AerosolWaterModerateConfToHighConfWaterFMaskValues
+AREA_OR_POINT:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Indicates that pixel values are assumed to represent an area rather than points
+  display_name: AreaOrPoint
+CLOUD_COVERAGE:
+  attribute_data_type: int
+  attribute_type: qualityInformation
+  description: The percentage of pixels with observational data (as opposed to fill value and ocean masked) that HLS QA mask marks as cloud, cloud shadow, or adjacent-to-cloud (per MASK_ADJACENT_TO_CLOUD setting)
+  display_name: CloudCoverage
+DEM_COVERAGE:
+  attribute_data_type: string
+  attribute_type: qualityInformation
+  description: "Input DEM coverage over the DSWx-HLS product: \u201CFULL\u201D for full coverage, \u201CFULL_WITH_ANTIMERIDIAN_CROSSING\u201D for full coverage with antimeridian crossing, or \u201CNOT_TESTED\u201D if coverage checks are disabled"
+  display_name: DEMCoverage
+FOREST_MASK_LANDCOVER_CLASSES:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Copernicus CGLS Land Cover 100m forest classes used in additional testing that may mask false water detections from the WTR-2 and WTR layers, due to vegetation-related dark reflectance.
+  display_name: ForestMaskLandcoverClasses
+HLS_DATASET:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Name of the input HLS product used to generate the DSWx-HLS product
+  display_name: HlsDataset
+INPUT_HLS_PRODUCT_CLOUD_COVERAGE:
+  attribute_data_type: int
+  attribute_type: qualityInformation
+  description: The percentage of cloud/cloud shadow over observational data (as opposed to fill value) in the input HLS product derived using the HLS Fmask layer
+  display_name: InputHlsProductCloudCoverage
+INPUT_HLS_PRODUCT_SPATIAL_COVERAGE:
+  attribute_data_type: int
+  attribute_type: qualityInformation
+  description: The percentage of the tile area with observational data (as opposed to fill value) in the input HLS product
+  display_name: InputHlsProductSpatialCoverage
+LANDCOVER_COVERAGE:
+  attribute_data_type: string
+  attribute_type: qualityInformation
+  description: "Input CGLS discrete classification map coverage over the DSWx-HLS product: \u201CFULL\u201D for full coverage, \u201CFULL_WITH_ANTIMERIDIAN_CROSSING\u201D for full coverage with antimeridian crossing, \u201CPARTIAL\u201D if DSWx-HLS product coverage exceeds CGLS map limits (i.e., beyond latitudes -60 or +80 degrees), or \u201CNOT_TESTED\u201D if coverage checks are disabled."
+  display_name: LandcoverCoverage
+MASK_ADJACENT_TO_CLOUD_MODE:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: "Define how areas adjacent to cloud/cloud-shadow are handled. Three options are available: \u201Cmask\u201D - mask out these areas marking them as cloud shadow (default); \u201Cignore\u201D - ignore the adjacent to cloud/cloud shadow classification; and \u201Ccover\u201D - cover these areas with a dilation algorithm."
+  display_name: MaskAdjacentToCloudMode
+MAX_SUN_LOCAL_INC_ANGLE:
+  attribute_data_type: int
+  attribute_type: processingInformation
+  description: "Maximum sun local-incidence angle (only applicable for \u201Csun_local_inc_angle\u201D shadow masking algorithm)"
+  display_name: MaxSunLocalIncAngle
+MEAN_SUN_AZIMUTH_ANGLE:
+  attribute_data_type: float
+  attribute_type: geographicIdentifier
+  description: The mean solar azimuth in the tile
+  display_name: MeanSunAzimuthAngle
+MEAN_SUN_ZENITH_ANGLE:
+  attribute_data_type: float
+  attribute_type: geographicIdentifier
+  description: The mean solar zenith in the tile
+  display_name: MeanSunZenithAngle
+MEAN_VIEW_AZIMUTH_ANGLE:
+  attribute_data_type: float
+  attribute_type: geographicIdentifier
+  description: The mean view azimuth angle
+  display_name: MeanViewAzimuthAngle
+MEAN_VIEW_ZENITH_ANGLE:
+  attribute_data_type: float
+  attribute_type: geographicIdentifier
+  description: The mean view zenith angle
+  display_name: MeanViewZenithAngle
+MIN_SLOPE_ANGLE:
+  attribute_data_type: int
+  attribute_type: processingInformation
+  description: "Minimum slope angle (only applicable for \u201Csun_local_inc_angle\u201D shadow masking algorithm)"
+  display_name: MinSlopeAngle
+NBAR_SOLAR_ZENITH:
+  attribute_data_type: float
+  attribute_type: geographicIdentifier
+  description: The solar zenith angle used in Nadir Bidirectional Reflectance Distribution Function Adjusted Reflectance (NBAR) derivation
+  display_name: NBAR_SolarZenith
+OCEAN_MASKING_ENABLED:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Indicates if the ocean masking is enabled (TRUE) or disabled (FALSE)
+  display_name: OceanMaskingEnabled
+OCEAN_MASKING_SHORELINE_DISTANCE_KM:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Ocean masking distance from shoreline in km (only applicable if the ocean masking is enabled)
+  display_name: OceanMaskingShorelineDistanceKM
+PROCESSING_DATETIME:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: DSWx-HLS product processing date
+  display_name: ProcessingDatetime
+PRODUCT_ID:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: The DSWx-HLS product identification
+  display_name: ProductID
+PRODUCT_LEVEL:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: The product level
+  display_name: ProductLevel
+PRODUCT_SOURCE:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: The DSWx-HLS product source for reflectance measurements
+  display_name: ProductSource
+PRODUCT_TYPE:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: The product type
+  display_name: ProductType
+PRODUCT_VERSION:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: The DSWx-HLS product version (same as in the product filename). It increments with changes to the structure and/or metadata contained within the product.
+  display_name: ProductVersion
+PROJECT:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: The project name
+  display_name: Project
+SENSOR:
+  attribute_data_type: string
+  attribute_type: platformInformation
+  description: Name of the sensor instrument
+  display_name: Sensor
+SENSOR_PRODUCT_ID:
+  attribute_data_type: string
+  attribute_type: platformInformation
+  description: Landsat product IDs, copied from the HLS metadata field LANDSAT_PRODUCT_ID, for Landsat-derived HLS products, or Sentinel granule Uniform Resource Identifier (URI), copied from PRODUCT_URI for Sentinel-derived HLS products
+  display_name: SensorProductID
+SHADOW_MASKING_ALGORITHM:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: "Shadow masking algorithm, either \u201Csun_local_inc_angle\u201D (default) or \u201Cotsu\u201D"
+  display_name: ShadowMaskingAlgorithm
+SOFTWARE_VERSION:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: The algorithm software version used to generate the DSWx-HLS product
+  display_name: SoftwareVersion
+SPACECRAFT_NAME:
+  attribute_data_type: string
+  attribute_type: platformInformation
+  description: Name of the sensor platform
+  display_name: SpacecraftName
+SPATIAL_COVERAGE:
+  attribute_data_type: int
+  attribute_type: qualityInformation
+  description: The percentage of the tile area with observational data (as opposed to fill value and ocean masked)
+  display_name: SpatialCoverage
+SPATIAL_COVERAGE_EXCLUDING_MASKED_OCEAN:
+  attribute_data_type: int
+  attribute_type: qualityInformation
+  description: The percentage of the tile area with observational data (as opposed to fill value and ocean masked) excluding masked ocean
+  display_name: SpatialCoverageExcludingMaskedOcean
+WORLDCOVER_COVERAGE:
+  attribute_data_type: string
+  attribute_type: qualityInformation
+  description: "Input ESA WorldCover map coverage over the DSWx-HLS product: \u201CFULL\u201D for full coverage, \u201CFULL_WITH_ANTIMERIDIAN_CROSSING\u201D for full coverage with antimeridian crossing, \u201CPARTIAL\u201D if DSWx-HLS product exceeds the WorldCover map limits (i.e.,beyond  latitudes -60 or +84 degrees), or \u201CNOT_TESTED\u201D if coverage checks are disabled"
+  display_name: WorldcoverCoverage
