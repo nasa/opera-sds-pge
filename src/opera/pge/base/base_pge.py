@@ -28,7 +28,9 @@ from opera.util.error_codes import ErrorCode
 from opera.util.logger import PgeLogger
 from opera.util.logger import default_log_file_name
 from opera.util.metfile import MetFile
-from opera.util.render_jinja2 import python_type_to_xml_type, guess_attribute_display_name
+from opera.util.render_jinja2 import (python_type_to_xml_type,
+                                      guess_attribute_display_name,
+                                      NumpyEncoder)
 from opera.util.run_utils import create_qa_command_line
 from opera.util.run_utils import create_sas_command_line
 from opera.util.run_utils import get_checksum
@@ -670,7 +672,7 @@ class PostProcessorMixin:
                 value = value.tolist()
 
             if isinstance(value, (list, dict)):
-                value = json.dumps(value)
+                value = json.dumps(value, cls=NumpyEncoder)
 
             guessed_data_type = python_type_to_xml_type(value)
             guessed_attr_name = guess_attribute_display_name(name)
