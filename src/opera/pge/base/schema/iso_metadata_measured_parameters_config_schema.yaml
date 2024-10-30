@@ -20,3 +20,7 @@ parameter:
   # handle some acronyms improperly (ie, DSWx, MGRS, RTC) and some desired display names retain some underscores. Use
   # this field to correct these errors where needed.
   display_name: str(required=False)
+
+  # OPTIONAL: Set this flag to true if the value of the attribute should be escaped for HTML characters prior to being
+  # written to the output XML. Applies to string and string-like attributes only.
+  escape_html: bool(required=False)
