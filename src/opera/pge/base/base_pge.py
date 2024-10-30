@@ -9,6 +9,7 @@ Module defining the Base PGE interfaces from which all other PGEs are derived.
 
 """
 
+import html
 import json
 import os
 from collections import OrderedDict
@@ -683,9 +684,15 @@ class PostProcessorMixin:
             data_type = descriptions[name].get('attribute_data_type', guessed_data_type)
             attr_type = descriptions[name].get('attribute_type', "!Not Found!")
             attr_name = descriptions[name].get('display_name', guessed_attr_name)
+            escape_html = descriptions[name].get('escape_html', False)
 
-            augmented_parameters[name] = (dict(name=attr_name, value=value, attr_type=attr_type,
-                                               attr_description=attr_description, data_type=data_type))
+            if escape_html:
+                value = html.escape(value)
+
+            augmented_parameters[name] = (
+                dict(name=attr_name, value=value, attr_type=attr_type,
+                     attr_description=attr_description, data_type=data_type)
+            )
 
         return augmented_parameters
 
