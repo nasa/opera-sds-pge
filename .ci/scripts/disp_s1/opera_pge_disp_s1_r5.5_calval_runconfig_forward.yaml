@@ -77,13 +77,14 @@ RunConfig:
             - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg3480.17i
             - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg3600.17i
           troposphere_files:
+
       ProductPathGroup:
         OutputProductPath: /home/mamba/output_dir
         ScratchPath: /home/mamba/scratch_dir
 
       PrimaryExecutable:
         ProductIdentifier: DISP_S1
-        ProductVersion: "0.4"
+        ProductVersion: "0.7"
         ProgramPath: disp-s1
         ProgramOptions:
           - run
@@ -91,6 +92,7 @@ RunConfig:
         SchemaPath: /home/mamba/opera/pge/disp_s1/schema/disp_s1_sas_schema.yaml
         AlgorithmParametersSchemaPath: /home/mamba/opera/pge/disp_s1/schema/algorithm_parameters_disp_s1_schema.yaml
         IsoTemplatePath: /home/mamba/opera/pge/disp_s1/templates/OPERA_ISO_metadata_L3_DISP_S1_template.xml.jinja2
+        IsoMeasuredParameterDescriptions: /home/mamba/opera/pge/disp_s1/templates/disp_s1_measured_parameters.yaml
 
       QAExecutable:
         Enabled: True
@@ -120,7 +122,7 @@ RunConfig:
 
         frame_id: 7091
       dynamic_ancillary_file_group:
-        algorithm_parameters_file: /home/mamba/runconfig/opera_pge_disp_s1_r5.4_calval_algorithm_parameters_historical.yaml
+        algorithm_parameters_file: /home/mamba/runconfig/opera_pge_disp_s1_r5.5_calval_algorithm_parameters_forward.yaml
         static_layers_files:
           - /home/mamba/input_dir/dynamic_ancillary_files/static_layers/OPERA_L2_CSLC-S1-STATIC_T027-056725-IW1_20140403_S1A_v1.0.h5
           - /home/mamba/input_dir/dynamic_ancillary_files/static_layers/OPERA_L2_CSLC-S1-STATIC_T027-056726-IW1_20140403_S1A_v1.0.h5
@@ -176,13 +178,14 @@ RunConfig:
       static_ancillary_file_group:
         frame_to_burst_json: /home/mamba/input_dir/static_ancillary_files/opera-s1-disp-0.5.0-frame-to-burst.json.zip
         reference_date_database_json: /home/mamba/input_dir/static_ancillary_files/opera-disp-s1-reference-dates-minimal-2024-09-19.json
+        algorithm_parameters_overrides_json: /home/mamba/input_dir/static_ancillary_files/opera-disp-s1-algorithm-parameters-overrides-2024-10-14.json
       primary_executable:
-        product_type: DISP_S1_HISTORICAL
+        product_type: DISP_S1_FORWARD
       product_path_group:
         product_path: /home/mamba/output_dir
         scratch_path: /home/mamba/scratch_dir
         sas_output_path: /home/mamba/output_dir
-        product_version: "0.4"
+        product_version: "0.7"
         save_compressed_slc: true
       worker_settings:
         gpu_enabled: false

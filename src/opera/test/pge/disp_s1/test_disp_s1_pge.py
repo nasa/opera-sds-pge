@@ -103,7 +103,9 @@ class DispS1PgeTestCase(unittest.TestCase):
                              'GMAO_tropo_20180210T000000_ztd.nc',
                              'ERA5_N30_N40_W120_W110_20221119_14.grb',
                              'ERA5_N30_N40_W120_W110_20221201_14.grb',
-                             'opera-s1-disp-frame-to-burst.json']
+                             'opera-s1-disp-frame-to-burst.json',
+                             'opera-disp-s1-reference-dates.json',
+                             'opera-disp-s1-algorithm-parameters-overrides.json']
         for dummy_input_file in dummy_input_files:
             os.system(
                 f"echo \"non-empty file\" > {join(input_dir, dummy_input_file)}"
@@ -805,14 +807,14 @@ class DispS1PgeTestCase(unittest.TestCase):
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
 
-            self.assertIn("SAS output file 20180101_20180330.displacement.png does not exist", log_contents)
+            self.assertIn("SAS output file 20180101_20180330.short_wavelength_displacement.png does not exist", log_contents)
             shutil.rmtree(pge.runconfig.output_product_path)
 
             # PNG is zero sized
             runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']['ProgramOptions'] = \
                 ['-p disp_s1_pge_test/output_dir/compressed_slcs;',
                  'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20180101_20180330.nc bs=1M count=1;',
-                 'touch disp_s1_pge_test/output_dir/20180101_20180330.displacement.png;',
+                 'touch disp_s1_pge_test/output_dir/20180101_20180330.short_wavelength_displacement.png;',
                  '/bin/echo DISP-S1 invoked with RunConfig']
 
             with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
@@ -828,7 +830,7 @@ class DispS1PgeTestCase(unittest.TestCase):
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
 
-            self.assertIn("SAS output file 20180101_20180330.displacement.png exists, but is empty",
+            self.assertIn("SAS output file 20180101_20180330.short_wavelength_displacement.png exists, but is empty",
                           log_contents)
             shutil.rmtree(pge.runconfig.output_product_path)
 

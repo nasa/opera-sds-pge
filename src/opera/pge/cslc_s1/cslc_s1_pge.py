@@ -23,13 +23,10 @@ from opera.pge.base.base_pge import PostProcessorMixin
 from opera.pge.base.base_pge import PreProcessorMixin
 from opera.util.dataset_utils import parse_bounding_polygon_from_wkt
 from opera.util.error_codes import ErrorCode
-from opera.util.h5_utils import get_cslc_s1_product_metadata
+from opera.util.h5_utils import get_cslc_s1_product_metadata, MEASURED_PARAMETER_PATH_SEPARATOR
 from opera.util.input_validation import validate_slc_s1_inputs
 from opera.util.render_jinja2 import render_jinja2
 from opera.util.time import get_time_for_filename
-
-
-MEASURED_PARAMETER_PATH_SEPARATOR = '/'
 
 
 class CslcS1PreProcessorMixin(PreProcessorMixin):
@@ -608,13 +605,21 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
 
     def augment_measured_parameters(self, measured_parameters):
         """
-        Augment the measured parameters dict into a dict of dicts containing the needed
-        fields for the MeasuredParameters section of the ISO XML file.
+        Override of the augment_measured_parameters() method in Base PGE with an added
+        "preprocessing" step to handle the structure of HDF5 metadata. While GeoTIFF
+        metadata is a flat dictionary, HDF5 metadata is a nested dictionary structure,
+        wherein the variable "keys" can be arbitrarily deep into the structure and
+        the values likewise can be nested dictionaries.
+
+        The preprocessing step in this method selectively flattens the metadata
+        dictionary based on the "paths" provided in the variable keys of the configuration
+        YAML file. The result of this preprocessing is then safely passed to the base
+        method to get the correct structure expected by the Jinja template.
 
         Parameters
         ----------
         measured_parameters : dict
-            The metadata from the output product.
+            The HDF5 metadata from the output product. See get_cslc_s1_product_metadata()
 
         Returns
         -------
@@ -625,7 +630,7 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
 
         new_measured_parameters = {}
 
-        if descriptions_file is not None:
+        if descriptions_file:
             with open(descriptions_file) as f:
                 descriptions = yaml.safe_load(f)
         else:
@@ -639,7 +644,12 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
             mp = measured_parameters
 
             while len(key_path) > 0:
-                mp = mp[key_path.pop(0)]
+                try:
+                    mp = mp[key_path.pop(0)]
+                except KeyError as e:
+                    msg = (f'Measured parameters configuration contains an invalid path {parameter_var_name}: no such '
+                           f'entry {e}')
+                    self.logger.critical(self.name, ErrorCode.ISO_METADATA_DESCRIPTIONS_CONFIG_INVALID, msg)
 
             new_measured_parameters[parameter_var_name] = mp
 

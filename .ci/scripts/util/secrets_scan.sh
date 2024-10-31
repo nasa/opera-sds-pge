@@ -36,7 +36,7 @@ detect-secrets -C ${WORKSPACE} scan \
                     --disable-plugin AbsolutePathDetectorExperimental \
                     --all-files \
                     --baseline ${WORKSPACE}/.secrets.new \
-                    --exclude-files '\.secrets..*' \
+                    --exclude-files '\.secrets\..*' \
                     --exclude-files '\.git.*' \
                     --exclude-files 'test_results' \
                     --exclude-files '\.pytest_cache' \
