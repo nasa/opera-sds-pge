@@ -268,7 +268,7 @@ def create_test_rtc_metadata_product(file_path):
         burstID_dset = identification_grp.create_dataset("burstID", data=b't069_147170_iw1')
         contactInformation_dset = identification_grp.create_dataset("contactInformation", data=b'operasds@jpl.nasa.gov')
         ceosAnalysisReadyDataDocumentIdentifier_dset = identification_grp.create_dataset(
-            "ceosAnalysisReadyDataDocumentIdentifier", data=True, dtype='bool')
+            "ceosAnalysisReadyDataDocumentIdentifier", data=b'https://ceos.org/ard/files/PFS/NRB/v5.5/CARD4L-PFS_NRB_v5.5.pdf')
         ceosAnalysisReadyDataProductType_dset = identification_grp.create_dataset("ceosAnalysisReadyDataProductType",
                                                                                   data=b'Normalized Radar Backscatter')
         dataAccess_dset = identification_grp.create_dataset("dataAccess", data=b'(NOT PROVIDED)')
