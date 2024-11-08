@@ -904,7 +904,7 @@ class DispS1Executor(DispS1PreProcessorMixin, DispS1PostProcessorMixin, PgeExecu
     PGE_VERSION = "3.0.0-rc.4.2"
     """Version of the PGE (overrides default from base_pge)"""
 
-    SAS_VERSION = "0.4.6"  # CalVal release https://github.com/opera-adt/disp-s1/releases/tag/v0.4.6
+    SAS_VERSION = "0.5.1"  # Final release https://github.com/opera-adt/disp-s1/releases/tag/v0.5.1
 
     def __init__(self, pge_name, runconfig_path, **kwargs):
         super().__init__(pge_name, runconfig_path, **kwargs)
