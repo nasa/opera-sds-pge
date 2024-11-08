@@ -1,4 +1,4 @@
-# Sample RunConfig for use with the DISP-S1 PGE v3.0.0-rc.4.2
+# Sample RunConfig for use with the DISP-S1 PGE v3.0.0
 # This RunConfig should require minimal changes in order to be used with the
 # OPERA PCM.
 
@@ -83,7 +83,7 @@ RunConfig:
         ProductIdentifier: DISP_S1
 
         # Product version specific to output products
-        ProductVersion: "0.7"
+        ProductVersion: "1.0"
 
         # Path to the executable to run, path must be reachable from
         # within the Docker container (i.e. findable with a "which" command)
@@ -206,11 +206,6 @@ RunConfig:
         # Should be used only when product_type is set oto DISP_S1_HISTORICAL
         #   Type: string | null.
         reference_date_database_json: /home/mamba/input_dir/opera-s1-disp-reference-date.json
-
-        # JSON file containing frame-specific algorithm parameters to override the
-        # defaults passed in the `algorithm_parameters.yaml`.
-        #   Type: string | null.
-        algorithm_parameters_overrides_json: /home/mamba/input_dir/static_ancillary_files/opera-disp-s1-algorithm-parameters-overrides-2024-10-14.json
       primary_executable:
         # Product type of the PGE. Should be one of: DISP_S1_FORWARD or DISP_S1_HISTORICAL
         #   Type: string.
@@ -227,7 +222,7 @@ RunConfig:
         sas_output_path: /home/mamba/output_dir
         # Version of the product.
         #   Type: string.
-        product_version: "0.7"
+        product_version: "1.0"
         # Whether the SAS should output and save the Compressed SLCs in addition to the standard
         #   product output.
         #   Type: boolean.
