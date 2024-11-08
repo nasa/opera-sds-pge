@@ -39,10 +39,6 @@ static_ancillary_file_group:
     # JSON file containing list of reference date changes for each frame
     reference_date_database_json: str(required=False)
 
-    # JSON file containing frame-specific algorithm parameters to override the
-    # defaults passed in the `algorithm_parameters.yaml`.
-    algorithm_parameters_overrides_json: str(required=False)
-
 primary_executable:
     # Product type of the PGE.
     product_type: enum('DISP_S1_FORWARD', 'DISP_S1_HISTORICAL')

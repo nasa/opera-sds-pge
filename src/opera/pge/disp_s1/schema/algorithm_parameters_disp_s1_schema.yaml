@@ -19,9 +19,12 @@ phase_linking:
     use_evd: bool()
     # Beta regularization parameter for correlation matrix inversion. 0 is no regularization.
     beta: num(min=0.0, max=1.0)
+    # Snap correlation values in the coherence matrix below this value to 0.
+    zero_correlation_threshold: num(min=0.0, max=1.0)
     # Method for finding SHPs during phase linking.
     shp_method: enum('glrt', 'ks', 'rect')
-    # Significance level (probability of false alarm) for SHP tests.
+    # Significance level (probability of false alarm) for SHP tests. Lower numbers include more
+    # pixels within the multilook window during covariance estimation.
     shp_alpha: num(min=0.0, max=1.0)
     # If True, pixels labeled as PS will get set to NaN during phase linking to
     # avoid summing their phase. Default of False means that the SHP algorithm
@@ -31,6 +34,8 @@ phase_linking:
     #   `baseline_lag` of `n` will only include the closest`n` interferograms. `baseline_line`
     #   must be positive.
     baseline_lag: any(int(min=0), null())
+    # Plan for creating Compressed SLCs during phase linking.
+    compressed_slc_plan: enum('always_first', 'first_per_ministack', 'last_per_ministack')
 interferogram_network:
     # For single-reference network: Index of the reference image in the network.
     reference_idx: any(int(), null())
@@ -61,9 +66,12 @@ unwrap_options:
         # Threshold on the correlation raster to use for interpolation. Pixels with less than this
         #   value are replaced by a weighted combination of neighboring pixels.
         interpolation_cor_threshold: num(min=0.0, max=1.0)
+        # Threshold on the correlation raster to use for interpolation. Pixels with less than this
+        #   value are replaced by a weighted combination of neighboring pixels.
+        interpolation_similarity_threshold: num(min=0.0, max=1.0)
     snaphu_options:
         # Number of tiles to split the inputs into using SNAPHU's internal tiling.
-        ntiles: list()
+        ntiles: list(int())
         # Amount of tile overlap (in pixels) along the (row, col) directions.
         tile_overlap: list(int(), min=2, max=2)
         # Number of tiles to unwrap in parallel for each interferogram.
@@ -72,11 +80,14 @@ unwrap_options:
         init_method: enum('mcf', 'mst')
         # Statistical cost mode method for SNAPHU.
         cost: enum('defo', 'smooth')
+        # If True, after unwrapping with multiple tiles, an additional post-processing unwrapping
+        #   step is performed to re-optimize the unwrapped phase using a single tile.
+        single_tile_reoptimize: bool()
     tophu_options:
         # Number of tiles to split the inputs into.
-        ntiles: list()
+        ntiles: list(int())
         # Extra multilook factor to use for the coarse unwrap.
-        downsample_factor: any(list(int(), min=2, max=2), null())
+        downsample_factor: list(int())
         # Initialization method for SNAPHU.
         init_method: enum('mcf', 'mst')
         # Statistical cost mode method for SNAPHU.
@@ -84,6 +95,9 @@ unwrap_options:
     spurt_options:
         # Temporal coherence to pick pixels used on an irregular grid.
         temporal_coherence_threshold: num(min=0.0, max=1.0)
+        # Similarity to pick pixels used on an irregular grid. Any pixel with similarity above
+        #   `similarity_threshold` *or* above the temporal coherence threshold is chosen.
+        similarity_threshold: num(min=0.0, max=1.0)
         general_settings:
             # Tile up data spatially.
             use_tiles: bool()
@@ -92,9 +106,9 @@ unwrap_options:
             max_tiles: int(min=1)
             # Number of points used for determining tiles based on density.
             #   Type: integer.
-            target_points_for_generation: int(required=False, min=1)
+            target_points_for_generation: int(min=1)
             # Target points per tile when generating tiles.
-            target_points_per_tile: int(required=False, min=1)
+            target_points_per_tile: int(min=1)
             # Dilation factor of non-overlapping tiles. 0.05 would lead to 5 percent dilation of the
             #   tile.
             dilation_factor: num(min=0.0)
@@ -107,7 +121,7 @@ unwrap_options:
             s_worker_count: int()
             # Temporal unwrapping operations over spatial links are performed in batches and each batch
             #   is solved in parallel.
-            links_per_batch: int(required=False, min=1)
+            links_per_batch: int(min=1)
             # Temporal unwrapping costs.
             #   Options: ['constant', 'distance', 'centroid'].
             t_cost_type: enum('constant', 'distance', 'centroid')
@@ -119,7 +133,7 @@ unwrap_options:
             # Scale factor used to compute edge costs for spatial unwrapping.
             s_cost_scale: num(min=0.0)
             # Number of tiles to process in parallel. Set to 0 for all tiles.
-            num_parallel_tiles: int(required=False, min=0)
+            num_parallel_tiles: int(min=0)
         merger_settings:
             # Minimum number of overlap pixels to be considered valid.
             min_overlap_points: int()
@@ -130,7 +144,7 @@ unwrap_options:
             bulk_method: enum('integer', 'L2')
             # Number of interferograms to merge in one batch. Use zero to merge all
             # interferograms in a single batch.
-            num_parallel_ifgs: int(required=False, min=0)
+            num_parallel_ifgs: int(min=0)
 timeseries_options:
     # Whether to run the inversion step after unwrapping, if more than a single-reference
     # network is used.
@@ -156,10 +170,13 @@ output_options:
     # Alternative to specifying output resolution: Specify the (x, y) strides (decimation
     # factor) to perform while processing input. For example, strides of [4, 2] would turn an
     # input resolution of [5, 10] into an output resolution of [20, 20].
-    strides: any(include('x_y_object'), null())
+    strides: include('x_y_object')
     # Area of interest: (left, bottom, right, top) longitude/latitude e.g.
     # `bbox=(-150.2,65.0,-150.1,65.5)`.
     bounds: any(list(num(), min=4, max=4), null())
+    # Area of interest as a simple Polygon in well-known-text (WKT) format.
+    #  Can pass a string, or a `.wkt` filename containing the Polygon text.
+    bounds_wkt: any(str(), null())
     # EPSG code for the `bounds`, if specified.
     bounds_epsg: int()
     # Options for `create_dataset` with h5py.
@@ -181,12 +198,18 @@ output_options:
     # the given date (e.g. for a large earthquake event). If passing strings,
     # formats accepted are YYYY-MM-DD[T]HH:MM[:SS[.ffffff]][Z or [±]HH[:]MM],
     # or YYYY-MM-DD
-    extra_reference_date: any(str(), null(), required=False)
+    extra_reference_date: any(str(), null())
+
+# JSON file containing frame-specific algorithm parameters to override the
+# defaults passed in the `algorithm_parameters.yaml`.
+algorithm_parameters_overrides_json: any(str(), null())
 # Name of the subdataset to use in the input NetCDF files.
 subdataset: str()
 # Spatial wavelength cutoff (in meters) for the spatial filter. Used to
 # create the short wavelength displacement layer
-spatial_wavelength_cutoff: num(required=False)
+spatial_wavelength_cutoff: num()
+# `vmin, vmax` matplotlib arguments (in meters) passed to browse image creator.
+browse_image_vmin_vmax: list(num(), min=2, max=2)
 ---
 x_y_object:
     x: int()

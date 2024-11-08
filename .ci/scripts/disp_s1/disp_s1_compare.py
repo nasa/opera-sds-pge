@@ -16,6 +16,12 @@ logger = logging.getLogger(__name__)
 
 DSET_DEFAULT = "displacement"
 
+WARN_ONLY_DSETS = [
+    "version",  # /metadata/disp_s1_software_version and dolphin_software_version
+    "dolphin_workflow_config",
+    "pge_runconfig",
+]
+
 # Opera PGE modifications to log errors and continue validation.
 '''
 class ValidationError(Exception):
@@ -135,7 +141,7 @@ def _compare_datasets_attr(
             f"Dataset names do not match: {golden_dataset.name} vs {test_dataset.name}"
         )
     name = golden_dataset.name
-    is_version_dset = "version" in golden_dataset.name
+    ignore_dtype = any(key in golden_dataset.name for key in WARN_ONLY_DSETS)
 
     if golden_dataset.shape != test_dataset.shape:
         # raise ComparisonError(
@@ -145,7 +151,7 @@ def _compare_datasets_attr(
         )
 
     # Skip the dtype check for version datasets (we will just print these)
-    if golden_dataset.dtype != test_dataset.dtype and not is_version_dset:
+    if golden_dataset.dtype != test_dataset.dtype and not ignore_dtype:
         # raise ComparisonError(
         ComparisonError(
             f"{name} dtypes do not match: {golden_dataset.dtype} vs"
@@ -456,7 +462,7 @@ def _validate_dataset(
     golden = golden_dataset[()]
     test = test_dataset[()]
     if golden.dtype.kind == "S":
-        if "version" in golden_dataset.name:
+        if any(key in golden_dataset.name for key in WARN_ONLY_DSETS):
             logger.info(f"{golden_dataset.name}: {golden} vs. {test}")
             return
         if not np.array_equal(golden, test):
