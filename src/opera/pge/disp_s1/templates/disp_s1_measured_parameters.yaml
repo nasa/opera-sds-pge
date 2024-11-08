@@ -80,11 +80,62 @@ identification/average_temporal_coherence:
   attribute_type: processingInformation
   description: Average Temporal Coherence
   display_name: AverageTemporalCoherence
+identification/ceos_analysis_ready_data_document_identifier:
+  attribute_data_type: string
+  attribute_type: contentInformation
+  description: CEOS Analysis Ready Data Document Identifier
+  display_name: CeosAnalysisReadyDataDocumentIdentifier
+  escape_html: true
+identification/source_data_access:
+  attribute_data_type: string
+  attribute_type: contentInformation
+  description: Source data access information
+  display_name: SourceDataAccess
+identification/source_data_x_spacing:
+  attribute_data_type: int
+  attribute_type: contentInformation
+  description: Source data X spacing
+  display_name: SourceDataXSpacing
+identification/source_data_y_spacing:
+  attribute_data_type: int
+  attribute_type: contentInformation
+  description: Source data Y spacing
+  display_name: SourceDataYSpacing
+identification/near_range_incidence_angle:
+  attribute_data_type: float
+  attribute_type: contentInformation
+  description: Near range incidence angle
+  display_name: NearRangeIncidenceAngle
+identification/far_range_incidence_angle:
+  attribute_data_type: float
+  attribute_type: contentInformation
+  description: Far range incidence angle
+  display_name: FarRangeIncidenceAngle
+identification/product_sample_spacing:
+  attribute_data_type: int
+  attribute_type: contentInformation
+  description: Product sample spacing
+  display_name: ProductSampleSpacing
+identification/product_bounding_box:
+  attribute_data_type: string
+  attribute_type: contentInformation
+  description: Product bounding box
+  display_name: ProductBoundingBox
+identification/product_pixel_coordinate_convention:
+  attribute_data_type: string
+  attribute_type: contentInformation
+  description: Product pixel coordinate convention
+  display_name: ProductPixelCoordinateConvention
 identification/mission_id:
   attribute_data_type: string
   attribute_type: processingInformation
   description: Mission ID
   display_name: MissionId
+identification/instrument_name:
+  attribute_data_type: string
+  attribute_type: instrumentInformation
+  description: Instrument name
+  display_name: InstrumentName
 identification/look_direction:
   attribute_data_type: string
   attribute_type: processingInformation
@@ -100,6 +151,11 @@ identification/orbit_pass_direction:
   attribute_type: processingInformation
   description: Orbit pass direction
   display_name: OrbitPassDirection
+identification/absolute_orbit_number:
+  attribute_data_type: int
+  attribute_type: instrumentInformation
+  description: Absolute orbit number
+  display_name: AbsoluteOrbitNumber
 metadata/disp_s1_software_version:
   attribute_data_type: string
   attribute_type: processingInformation
