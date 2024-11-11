@@ -124,7 +124,7 @@ RunConfig:
         # container, and typically should reference a template file bundled
         # with the opera_pge installation directory within the container
         # Consult the Docker image build scripts for more info
-        IsoMeasuredParameterDescriptions: /home/mamba/opera/pge/cslc_s1/templates/disp_s1_measured_parameters.yaml
+        IsoMeasuredParameterDescriptions: /home/mamba/opera/pge/disp_s1/templates/disp_s1_measured_parameters.yaml
 
       QAExecutable:
         # Set to True to enable execution of an additional "Quality Assurance"
