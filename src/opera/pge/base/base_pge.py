@@ -34,7 +34,9 @@ from opera.util.logger import default_log_file_name
 from opera.util.metfile import MetFile
 from opera.util.render_jinja2 import (python_type_to_xml_type,
                                       guess_attribute_display_name,
-                                      NumpyEncoder)
+                                      NumpyEncoder,
+                                      UNDEFINED_ERROR,
+                                      UNDEFINED_WARNING)
 from opera.util.run_utils import create_qa_command_line
 from opera.util.run_utils import create_sas_command_line
 from opera.util.run_utils import get_checksum
@@ -664,10 +666,10 @@ class PostProcessorMixin:
             with open(descriptions_file) as f:
                 descriptions = yaml.safe_load(f)
 
-            missing_description_value = '!Not Found!'
+            missing_description_value = UNDEFINED_ERROR
         else:
             descriptions = dict()
-            missing_description_value = 'Not Provided'
+            missing_description_value = UNDEFINED_WARNING
 
         for name, value in measured_parameters.items():
             if isinstance(value, np.generic):
@@ -686,7 +688,7 @@ class PostProcessorMixin:
 
             attr_description = descriptions[name].get('description', missing_description_value)
             data_type = descriptions[name].get('attribute_data_type', guessed_data_type)
-            attr_type = descriptions[name].get('attribute_type', "!Not Found!")
+            attr_type = descriptions[name].get('attribute_type', UNDEFINED_ERROR)
             attr_name = descriptions[name].get('display_name', guessed_attr_name)
             escape_html = descriptions[name].get('escape_html', False)
 

@@ -31,6 +31,7 @@ from opera.util.h5_utils import create_test_cslc_metadata_product
 from opera.util.h5_utils import create_test_disp_metadata_product
 from opera.util.h5_utils import get_disp_s1_product_metadata
 from opera.util.input_validation import validate_disp_inputs
+from opera.util.render_jinja2 import UNDEFINED_ERROR
 
 
 def mock_grib_to_netcdf(*popenargs, input=None, capture_output=False, timeout=None, check=False, **kwargs):
@@ -383,7 +384,7 @@ class DispS1PgeTestCase(unittest.TestCase):
 
         iso_metadata = pge._create_iso_metadata(disp_metadata_path, disp_metadata)
 
-        self.assertNotIn('!Not found!', iso_metadata)
+        self.assertNotIn(UNDEFINED_ERROR, iso_metadata)
 
         os.unlink(disp_metadata_path)
 
