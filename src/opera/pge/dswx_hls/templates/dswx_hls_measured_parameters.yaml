@@ -188,3 +188,16 @@ WORLDCOVER_COVERAGE:
   attribute_type: qualityInformation
   description: "Input ESA WorldCover map coverage over the DSWx-HLS product: \u201CFULL\u201D for full coverage, \u201CFULL_WITH_ANTIMERIDIAN_CROSSING\u201D for full coverage with antimeridian crossing, \u201CPARTIAL\u201D if DSWx-HLS product exceeds the WorldCover map limits (i.e.,beyond  latitudes -60 or +84 degrees), or \u201CNOT_TESTED\u201D if coverage checks are disabled"
   display_name: WorldcoverCoverage
+DEM_SOURCE:
+  description: Description of the input DEM.
+  attribute_type: processingParameter
+LANDCOVER_SOURCE:
+  description: Description of the input CGLS discrete classification map file used to provide detailed land cover type.
+  attribute_type: processingParameter
+WORLDCOVER_SOURCE:
+  description: Description of the input ESA WorldCover file.
+  attribute_type: processingParameter
+SHORELINE_SOURCE:
+  description: Description of the National Oceanic and Atmospheric Administration (NOAA) Global Self-consistent, Hierarchical, High-resolution Shorelines (GSHHS) shoreline shapefile. The NOAA GSHHS shoreline shapefile is only used for ocean masking, which is disabled in production of the standard DSWx-HLS product v1.0) by default.
+  attribute_type: processingParameter
+
