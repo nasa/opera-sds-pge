@@ -117,6 +117,7 @@ class ErrorCode(IntEnum):
     ISO_METADATA_TEMPLATE_NOT_PROVIDED_WHEN_NEEDED = auto()
     ISO_METADATA_DESCRIPTIONS_CONFIG_INVALID = auto()
     ISO_METADATA_DESCRIPTIONS_CONFIG_NOT_FOUND = auto()
+    ISO_METADATA_NO_ENTRY_FOR_DESCRIPTION = auto()
 
     @classmethod
     def describe(cls):

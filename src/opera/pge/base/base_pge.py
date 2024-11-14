@@ -9,6 +9,7 @@ Module defining the Base PGE interfaces from which all other PGEs are derived.
 
 """
 
+import html
 import json
 import os
 from collections import OrderedDict
@@ -31,7 +32,9 @@ from opera.util.error_codes import ErrorCode
 from opera.util.logger import PgeLogger
 from opera.util.logger import default_log_file_name
 from opera.util.metfile import MetFile
-from opera.util.render_jinja2 import guess_attribute_display_name, python_type_to_xml_type
+from opera.util.render_jinja2 import (python_type_to_xml_type,
+                                      guess_attribute_display_name,
+                                      NumpyEncoder)
 from opera.util.run_utils import create_qa_command_line
 from opera.util.run_utils import create_sas_command_line
 from opera.util.run_utils import get_checksum
@@ -674,7 +677,7 @@ class PostProcessorMixin:
                 value = value.tolist()
 
             if isinstance(value, (list, dict)):
-                value = json.dumps(value)
+                value = json.dumps(value, cls=NumpyEncoder)
 
             guessed_data_type = python_type_to_xml_type(value)
             guessed_attr_name = guess_attribute_display_name(name)
@@ -685,9 +688,15 @@ class PostProcessorMixin:
             data_type = descriptions[name].get('attribute_data_type', guessed_data_type)
             attr_type = descriptions[name].get('attribute_type', "!Not Found!")
             attr_name = descriptions[name].get('display_name', guessed_attr_name)
+            escape_html = descriptions[name].get('escape_html', False)
 
-            augmented_parameters[name] = (dict(name=attr_name, value=value, attr_type=attr_type,
-                                               attr_description=attr_description, data_type=data_type))
+            if escape_html:
+                value = html.escape(value)
+
+            augmented_parameters[name] = (
+                dict(name=attr_name, value=value, attr_type=attr_type,
+                     attr_description=attr_description, data_type=data_type)
+            )
 
         return augmented_parameters
 

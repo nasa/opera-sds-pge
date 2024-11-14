@@ -15,6 +15,8 @@ from datetime import datetime
 from os import walk
 from os.path import basename, getsize, join
 
+import yaml
+
 from opera.pge.base.base_pge import PgeExecutor
 from opera.pge.base.base_pge import PostProcessorMixin
 from opera.pge.base.base_pge import PreProcessorMixin
@@ -23,6 +25,7 @@ from opera.util.dataset_utils import parse_bounding_polygon_from_wkt
 from opera.util.error_codes import ErrorCode
 from opera.util.geo_utils import translate_utm_bbox_to_lat_lon
 from opera.util.h5_utils import get_rtc_s1_product_metadata
+from opera.util.h5_utils import MEASURED_PARAMETER_PATH_SEPARATOR
 from opera.util.input_validation import validate_slc_s1_inputs
 from opera.util.render_jinja2 import render_jinja2
 from opera.util.time import get_time_for_filename
@@ -695,6 +698,59 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
         """
         return self._ancillary_filename() + ".qa.log"
 
+    def augment_measured_parameters(self, measured_parameters):
+        """
+        Override of the augment_measured_parameters() method in Base PGE with an added
+        "preprocessing" step to handle the structure of HDF5 metadata. While GeoTIFF
+        metadata is a flat dictionary, HDF5 metadata is a nested dictionary structure,
+        wherein the variable "keys" can be arbitrarily deep into the structure and
+        the values likewise can be nested dictionaries.
+
+        The preprocessing step in this method selectively flattens the metadata
+        dictionary based on the "paths" provided in the variable keys of the configuration
+        YAML file. The result of this preprocessing is then safely passed to the base
+        method to get the correct structure expected by the Jinja template.
+
+        Parameters
+        ----------
+        measured_parameters : dict
+            The HDF5 metadata from the output product. See get_rtc_s1_product_metadata()
+
+        Returns
+        -------
+        augmented_parameters : dict
+            The metadata fields converted to a list with name, value, types, etc
+        """
+        descriptions_file = self.runconfig.iso_measured_parameter_descriptions
+
+        new_measured_parameters = {}
+
+        if descriptions_file:
+            with open(descriptions_file) as infile:
+                descriptions = yaml.safe_load(infile)
+        else:
+            msg = ('Measured parameters configuration is needed to extract the '
+                   'measured parameters attributes from the RTC-S1 metadata')
+            self.logger.critical(self.name, ErrorCode.ISO_METADATA_DESCRIPTIONS_CONFIG_NOT_FOUND, msg)
+
+        for parameter_var_name in descriptions:
+            key_path = parameter_var_name.split(MEASURED_PARAMETER_PATH_SEPARATOR)
+
+            mp = measured_parameters
+
+            while len(key_path) > 0:
+                try:
+                    mp = mp[key_path.pop(0)]
+                    new_measured_parameters[parameter_var_name] = mp
+                except KeyError as err:
+                    msg = (f'Measured parameters contains no entry for description '
+                           f'key "{err}"')
+                    self.logger.warning(self.name, ErrorCode.ISO_METADATA_NO_ENTRY_FOR_DESCRIPTION, msg)
+
+        augmented_parameters = super().augment_measured_parameters(new_measured_parameters)
+
+        return augmented_parameters
+
     def _collect_rtc_product_metadata(self, metadata_product):
         """
         Gathers the available metadata from an HDF5 product created by
@@ -752,6 +808,9 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
                 output_product_metadata['boundingPolygon'] = bounding_polygon_gml_str
             except ValueError as err:
                 self.logger.critical(self.name, ErrorCode.ISO_METADATA_RENDER_FAILED, str(err))
+
+        # Augment the metadata with descriptions from the measured parameter config for RTC-S1
+        output_product_metadata['MeasuredParameters'] = self.augment_measured_parameters(output_product_metadata)
 
         return output_product_metadata
 

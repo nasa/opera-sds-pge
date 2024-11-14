@@ -78,7 +78,6 @@ RunConfig:
             static_ancillary_file_group:
                 frame_to_burst_json: disp_s1_pge_test/input_dir/opera-s1-disp-frame-to-burst.json
                 reference_date_database_json: disp_s1_pge_test/input_dir/opera-disp-s1-reference-dates.json
-                algorithm_parameters_overrides_json: disp_s1_pge_test/input_dir/opera-disp-s1-algorithm-parameters-overrides.json
 
             primary_executable:
                 product_type: DISP_S1_FORWARD

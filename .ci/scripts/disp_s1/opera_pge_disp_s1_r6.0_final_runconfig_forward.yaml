@@ -26,7 +26,7 @@ RunConfig:
       DynamicAncillaryFilesGroup:
         AncillaryFileMap:
           dem_file: /home/mamba/input_dir/dynamic_ancillary_files/dem.tif
-          mask_file: /home/mamba/input_dir/dynamic_ancillary_files/water_mask.tif
+          mask_file: /home/mamba/input_dir/dynamic_ancillary_files/water_mask.vrt
           static_layers_files:
             - /home/mamba/input_dir/dynamic_ancillary_files/static_layers/OPERA_L2_CSLC-S1-STATIC_T027-056725-IW1_20140403_S1A_v1.0.h5
             - /home/mamba/input_dir/dynamic_ancillary_files/static_layers/OPERA_L2_CSLC-S1-STATIC_T027-056726-IW1_20140403_S1A_v1.0.h5
@@ -122,11 +122,11 @@ RunConfig:
 
         frame_id: 7091
       dynamic_ancillary_file_group:
-        algorithm_parameters_file: /home/mamba/runconfig/opera_pge_disp_s1_r5.5_calval_algorithm_parameters_forward.yaml
+        algorithm_parameters_file: /home/mamba/runconfig/opera_pge_disp_s1_r6.0_final_algorithm_parameters_forward.yaml
         static_layers_files:
           - /home/mamba/input_dir/dynamic_ancillary_files/static_layers/OPERA_L2_CSLC-S1-STATIC_T027-056725-IW1_20140403_S1A_v1.0.h5
           - /home/mamba/input_dir/dynamic_ancillary_files/static_layers/OPERA_L2_CSLC-S1-STATIC_T027-056726-IW1_20140403_S1A_v1.0.h5
-        mask_file: /home/mamba/input_dir/dynamic_ancillary_files/water_mask.tif
+        mask_file: /home/mamba/input_dir/dynamic_ancillary_files/water_mask.vrt
         dem_file: /home/mamba/input_dir/dynamic_ancillary_files/dem.tif
         ionosphere_files:
           - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg0070.18i
@@ -178,7 +178,6 @@ RunConfig:
       static_ancillary_file_group:
         frame_to_burst_json: /home/mamba/input_dir/static_ancillary_files/opera-s1-disp-0.5.0-frame-to-burst.json.zip
         reference_date_database_json: /home/mamba/input_dir/static_ancillary_files/opera-disp-s1-reference-dates-minimal-2024-09-19.json
-        algorithm_parameters_overrides_json: /home/mamba/input_dir/static_ancillary_files/opera-disp-s1-algorithm-parameters-overrides-2024-10-14.json
       primary_executable:
         product_type: DISP_S1_FORWARD
       product_path_group:

@@ -268,7 +268,7 @@ def create_test_rtc_metadata_product(file_path):
         burstID_dset = identification_grp.create_dataset("burstID", data=b't069_147170_iw1')
         contactInformation_dset = identification_grp.create_dataset("contactInformation", data=b'operasds@jpl.nasa.gov')
         ceosAnalysisReadyDataDocumentIdentifier_dset = identification_grp.create_dataset(
-            "ceosAnalysisReadyDataDocumentIdentifier", data=True, dtype='bool')
+            "ceosAnalysisReadyDataDocumentIdentifier", data=b'https://ceos.org/ard/files/PFS/NRB/v5.5/CARD4L-PFS_NRB_v5.5.pdf')
         ceosAnalysisReadyDataProductType_dset = identification_grp.create_dataset("ceosAnalysisReadyDataProductType",
                                                                                   data=b'Normalized Radar Backscatter')
         dataAccess_dset = identification_grp.create_dataset("dataAccess", data=b'(NOT PROVIDED)')
@@ -611,10 +611,24 @@ def create_test_disp_metadata_product(file_path):
                                                                     data=np.string_("2022-12-13 00:00:00.000000"))
         average_temporal_coherence_dset = identification_grp.create_dataset("average_temporal_coherence",
                                                                             data=0.9876175064678105, dtype='float64')
+        ceos_analysis_ready_data_document_identifier_dset = identification_grp.create_dataset("ceos_analysis_ready_data_document_identifier",
+                                                                                              data=np.string_("https://ceos.org/ard/files/PFS/NRB/v5.5/CARD4L-PFS_NRB_v5.5.pdf"))
+        source_data_access_dset = identification_grp.create_dataset("source_data_access",
+                                                                    data=np.string_("OPERA_L2_CSLC-S1_T027-056725-IW1_20170217T132750Z_20240625T060850Z_S1A_VV_v1.1,"
+                                                                                    "OPERA_L2_CSLC-S1_T027-056726-IW1_20170217T132752Z_20240625T060850Z_S1A_VV_v1.1"))
+        source_data_x_spacing_dset = identification_grp.create_dataset("source_data_x_spacing", data=5, dtype='int64')
+        source_data_y_spacing_dset = identification_grp.create_dataset("source_data_y_spacing", data=10, dtype='int64')
+        near_range_incidence_angle_dset = identification_grp.create_dataset("near_range_incidence_angle", data=30.9, dtype='float32')
+        far_range_incidence_angle_dset = identification_grp.create_dataset("far_range_incidence_angle", data=36.8, dtype='float32')
+        product_sample_spacing_dset = identification_grp.create_dataset("product_sample_spacing", data=30, dtype='int64')
+        product_bounding_box_dset = identification_grp.create_dataset("product_bounding_box", data=np.string_("280230.0,3555240.0,572310.0,3767970.0"))
+        product_pixel_coordinate_convention_dset = identification_grp.create_dataset("product_pixel_coordinate_convention", data=np.string_("center"))
         mission_id_dset = identification_grp.create_dataset("mission_id", data=np.string_("S1A"))
+        instrument_name_dset = identification_grp.create_dataset("instrument_name", data=np.string_("C-SAR"))
         look_direction_dset = identification_grp.create_dataset("look_direction", data=np.string_("Right"))
         track_number_dset = identification_grp.create_dataset("track_number", data=27, dtype='int64')
         orbit_pass_direction_dset = identification_grp.create_dataset("orbit_pass_direction", data=np.string_("Descending"))
+        absolute_orbit_number_dset = identification_grp.create_dataset("absolute_orbit_number", data=15324, dtype="int64")
 
         metadata_grp = outfile.create_group("/metadata")
         disp_s1_software_version_dset = metadata_grp.create_dataset("disp_s1_software_version",

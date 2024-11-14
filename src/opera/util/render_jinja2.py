@@ -11,6 +11,8 @@ Original Author: David White
 Adapted by: Jim Hofman
 """
 
+import json
+import numpy as np
 import os
 import re
 import jinja2
@@ -144,7 +146,7 @@ def render_jinja2(template_filename: str, input_data: dict, logger: PgeLogger = 
 def python_type_to_xml_type(obj) -> str:
     if isinstance(obj, str):
         if obj.lower() in ['true', 'false']:
-            obj = obj == 'true'
+            obj = obj.lower() == 'true'
         elif re.match(INTEGER_PATTERN, obj) is not None:
             obj = int(obj)
         elif re.match(FLOATING_POINT_PATTERN, obj) is not None:
@@ -155,6 +157,18 @@ def python_type_to_xml_type(obj) -> str:
 
     return XML_TYPES[obj]
 
+class NumpyEncoder(json.JSONEncoder):
+    """Class to handle serialization of Numpy types during JSON enconding"""
+    def default(self, obj):
+        if isinstance(obj, np.integer):
+            return int(obj)
+        if isinstance(obj, np.floating):
+            return float(obj)
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        if isinstance(obj, np.bool_):
+            return bool(obj)
+        return super(NumpyEncoder, self).default(obj)
 
 def guess_attribute_display_name(var_name: str) -> str:
     return var_name.title().replace('_', '')
