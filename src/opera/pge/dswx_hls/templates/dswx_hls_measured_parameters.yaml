@@ -23,6 +23,11 @@ AEROSOL_PARTIAL_SURFACE_WATER_CONSERVATIVE_TO_HIGH_CONF_WATER_FMASK_VALUES:
   attribute_type: processingInformation
   description: HLS Fmask values to convert moderate-confidence water to high-confidence water in the presence of high aerosol
   display_name: AerosolWaterModerateConfToHighConfWaterFMaskValues
+AEROSOL_WATER_MODERATE_CONF_TO_HIGH_CONF_WATER_FMASK_VALUES:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: HLS Fmask values to convert partial surface water aggressive to high-confidence water in the presence of high aerosol.
+  display_name: AerosolWaterModerateConfToHighConfWaterFMaskValues
 AREA_OR_POINT:
   attribute_data_type: string
   attribute_type: processingInformation
