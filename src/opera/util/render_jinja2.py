@@ -32,7 +32,19 @@ INTEGER_PATTERN = re.compile(r'^[+-]?\d+$')
 FLOATING_POINT_PATTERN = re.compile(r'^[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?$')
 
 UNDEFINED_ERROR = '!Not found!'
+"""
+Placeholder written in for missing fields when rendering a jinja2 template.
+If this value is written to an instantiated template, it indicates an unexpected
+error, either in the template itself or the Measured Parameters config file.
+"""
+
 UNDEFINED_WARNING = 'Not provided'
+"""
+Placeholer written in for undefined fields when rendering a jinja2 template.
+Unlike UNDEFINED_ERROR, existence of this placeholder within a rendered template
+does not indicate a configuration error, rather an incomplete or missing Measured
+Parameters config file.
+"""
 
 
 def _make_undefined_handler_class(logger: PgeLogger):
