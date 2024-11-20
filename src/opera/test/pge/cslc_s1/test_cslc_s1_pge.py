@@ -26,6 +26,7 @@ from opera.pge.cslc_s1.cslc_s1_pge import CslcS1Executor
 from opera.util import PgeLogger
 from opera.util.h5_utils import create_test_cslc_metadata_product
 from opera.util.h5_utils import get_cslc_s1_product_metadata
+from opera.util.render_jinja2 import UNDEFINED_ERROR
 
 
 class CslcS1PgeTestCase(unittest.TestCase):
@@ -289,7 +290,7 @@ class CslcS1PgeTestCase(unittest.TestCase):
         iso_metadata = pge._create_iso_metadata(cslc_metadata)
 
         # Rendered template should not have any missing placeholders
-        self.assertNotIn('!Not found!', iso_metadata)
+        self.assertNotIn(UNDEFINED_ERROR, iso_metadata)
 
         os.unlink(cslc_metadata_path)
 
@@ -351,7 +352,7 @@ class CslcS1PgeTestCase(unittest.TestCase):
         iso_metadata = pge._create_iso_metadata(cslc_metadata)
 
         # Rendered template should not have any missing placeholders
-        self.assertNotIn('!Not found!', iso_metadata)
+        self.assertNotIn(UNDEFINED_ERROR, iso_metadata)
 
         os.unlink(cslc_metadata_path)
 

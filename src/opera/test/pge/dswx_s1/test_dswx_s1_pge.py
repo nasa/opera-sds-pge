@@ -25,6 +25,7 @@ from opera.pge import RunConfig
 from opera.pge.dswx_s1.dswx_s1_pge import DSWxS1Executor
 from opera.util import PgeLogger
 from opera.util.mock_utils import MockGdal
+from opera.util.render_jinja2 import UNDEFINED_ERROR
 
 
 class DswxS1PgeTestCase(unittest.TestCase):
@@ -289,7 +290,7 @@ class DswxS1PgeTestCase(unittest.TestCase):
         with open(expected_iso_metadata_file, 'r', encoding='utf-8') as infile:
             iso_contents = infile.read()
 
-        self.assertNotIn('!Not found!', iso_contents)
+        self.assertNotIn(UNDEFINED_ERROR, iso_contents)
 
         # Check that the log file was created and moved into the output directory
         expected_log_file = pge.logger.get_file_name()
@@ -427,7 +428,7 @@ class DswxS1PgeTestCase(unittest.TestCase):
         iso_metadata = pge._create_iso_metadata(tile_id)
 
         # Rendered template should not have any missing placeholders
-        self.assertNotIn('!Not found!', iso_metadata)
+        self.assertNotIn(UNDEFINED_ERROR, iso_metadata)
 
         # Test bad iso_template_path
         test_runconfig_path = join(self.data_dir, 'invalid_dswx_s1_runconfig.yaml')

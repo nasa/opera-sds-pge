@@ -27,6 +27,7 @@ from opera.util import PgeLogger
 from opera.util.dataset_utils import get_sensor_from_spacecraft_name
 from opera.util.h5_utils import create_test_rtc_metadata_product
 from opera.util.h5_utils import get_rtc_s1_product_metadata
+from opera.util.render_jinja2 import UNDEFINED_ERROR
 
 
 class RtcS1PgeTestCase(unittest.TestCase):
@@ -272,7 +273,7 @@ class RtcS1PgeTestCase(unittest.TestCase):
         iso_metadata = pge._create_iso_metadata(rtc_metadata)
 
         # Rendered template should not have any missing placeholders
-        self.assertNotIn('!Not found!', iso_metadata)
+        self.assertNotIn(UNDEFINED_ERROR, iso_metadata)
 
         # Test no file from which to extract data
         rtc_metadata_file_path = join(os.curdir, 'rtc_s1_test/output_dir/No_file.nc')
@@ -318,7 +319,7 @@ class RtcS1PgeTestCase(unittest.TestCase):
         iso_metadata = pge._create_iso_metadata(rtc_metadata)
 
         # Rendered template should not have any missing placeholders
-        self.assertNotIn('!Not found!', iso_metadata)
+        self.assertNotIn(UNDEFINED_ERROR, iso_metadata)
 
     def test_rtc_s1_pge_input_validation(self):
         """Test the input validation checks."""

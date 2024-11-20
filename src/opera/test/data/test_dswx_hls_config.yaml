@@ -32,6 +32,7 @@ RunConfig:
                 ErrorCodeBase: 100000
                 SchemaPath: pge/dswx_hls/schema/dswx_hls_sas_schema.yaml
                 IsoTemplatePath: pge/dswx_hls/templates/OPERA_ISO_metadata_L3_DSWx_HLS_template.xml.jinja2
+                IsoMeasuredParameterDescriptions: pge/dswx_hls/templates/dswx_hls_measured_parameters.yaml
 
             QAExecutable:
                 Enabled: False

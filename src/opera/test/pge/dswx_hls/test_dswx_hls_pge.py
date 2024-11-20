@@ -27,6 +27,7 @@ from opera.util import PgeLogger
 from opera.util.dataset_utils import get_sensor_from_spacecraft_name
 from opera.util.geo_utils import get_geographic_boundaries_from_mgrs_tile
 from opera.util.mock_utils import MockGdal
+from opera.util.render_jinja2 import UNDEFINED_ERROR
 
 
 class DSWxHLSPgeTestCase(unittest.TestCase):
@@ -138,7 +139,7 @@ class DSWxHLSPgeTestCase(unittest.TestCase):
         with open(expected_iso_metadata_file, 'r', encoding='utf-8') as infile:
             iso_contents = infile.read()
 
-        self.assertNotIn('!Not found!', iso_contents)
+        self.assertNotIn(UNDEFINED_ERROR, iso_contents)
 
         # Check that the log file was created and moved into the output directory
         expected_log_file = pge.logger.get_file_name()
@@ -502,6 +503,7 @@ class DSWxHLSPgeTestCase(unittest.TestCase):
         os.system(f'touch {test_file}')
 
         output_product_metadata = pge._collect_dswx_hls_product_metadata()
+        output_product_metadata['MeasuredParameters']['SPACECRAFT_NAME']['value'] = 'SENTINEL-1A'
 
         self.assertIsInstance(output_product_metadata, dict)
 

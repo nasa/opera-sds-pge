@@ -417,6 +417,8 @@ class DSWxHLSPostProcessorMixin(PostProcessorMixin):
         output_products = self.runconfig.get_output_product_filenames()
         representative_product = None
 
+        output_product_metadata = dict()
+
         for output_product in output_products:
             if basename(output_product) in self.renamed_files.values() and basename(output_product).endswith("tif"):
                 representative_product = output_product
@@ -428,7 +430,8 @@ class DSWxHLSPostProcessorMixin(PostProcessorMixin):
 
         # Extract all metadata assigned by the SAS at product creation time
         try:
-            output_product_metadata = get_geotiff_metadata(representative_product)
+            measured_parameters = get_geotiff_metadata(representative_product)
+            output_product_metadata['MeasuredParameters'] = self.augment_measured_parameters(measured_parameters)
         except Exception as err:
             msg = f'Failed to extract metadata from {representative_product}, reason: {err}'
             self.logger.critical(self.name, ErrorCode.ISO_METADATA_COULD_NOT_EXTRACT_METADATA, msg)
@@ -454,26 +457,31 @@ class DSWxHLSPostProcessorMixin(PostProcessorMixin):
         output_product_metadata['geospatial_lat_min'] = lat_min
         output_product_metadata['geospatial_lat_max'] = lat_max
 
+        # Note: In DSWx-HLS SENSING_TIME represents the Worldwide Reference System (WRS) center sensing time.
+        # The ISO metadata calls for a beginning time and an ending time, so the center time will be written to both
+        # the beginning time slot and the ending time slot.
         # Split the sensing time into the beginning/end portions
-        sensing_time = output_product_metadata.pop('SENSING_TIME')
+        sensing_time_entry = output_product_metadata['MeasuredParameters'].pop('SENSING_TIME')
+        sensing_time_value = sensing_time_entry.get('value')
+        first_sensing_time = sensing_time_value
 
         # Sensing time can contain multiple times delimited by semicolon,
         # just take the first one
-        if ';' in sensing_time:
-            sensing_time = sensing_time.split(';', maxsplit=1)[0]
+        if ';' in sensing_time_value:
+            first_sensing_time = sensing_time_value.split(';', maxsplit=1)[0]
 
         # Certain datasets have been observed with multiple sensing times
         # concatenated by a plus sign, for this case just take the first of the
         # times
-        if '+' in sensing_time:
-            sensing_time = sensing_time.split('+', maxsplit=1)[0]
+        if '+' in first_sensing_time:
+            first_sensing_time = first_sensing_time.split('+', maxsplit=1)[0]
 
-        # Set beginning and end time to single time parsed, since ISO metadata
+        # Set beginning and ending time to the center time, since ISO metadata
         # requires both
-        sensing_time_begin = sensing_time_end = sensing_time
+        sensing_time_begin = sensing_time_end = first_sensing_time.strip()
 
-        output_product_metadata['sensingTimeBegin'] = sensing_time_begin.strip()
-        output_product_metadata['sensingTimeEnd'] = sensing_time_end.strip()
+        output_product_metadata['sensingTimeBegin'] = sensing_time_begin
+        output_product_metadata['sensingTimeEnd'] = sensing_time_end
 
         # Add some fields on the dimensions of the data. These values should
         # be the same for all DSWx-HLS products, and were derived from the
@@ -533,7 +541,7 @@ class DSWxHLSPostProcessorMixin(PostProcessorMixin):
             the sourced metadata dictionaries.
 
         """
-        # Use the base PGE implemenation to validate existence of the template
+        # Use the base PGE implementation to validate existence of the template
         super()._create_iso_metadata()
 
         runconfig_dict = self.runconfig.asdict()

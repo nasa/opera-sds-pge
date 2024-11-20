@@ -16,7 +16,7 @@ from os.path import abspath, join
 from pkg_resources import resource_filename
 
 from opera.util.logger import PgeLogger
-from opera.util.render_jinja2 import render_jinja2
+from opera.util.render_jinja2 import render_jinja2, UNDEFINED_ERROR
 
 
 class RenderJinja2TestCase(unittest.TestCase):
@@ -145,12 +145,12 @@ class RenderJinja2TestCase(unittest.TestCase):
         # Verify that os.getcmd() is used to find the new template.
         render_jinja2('render_jinja_test_template_2.html', data)
 
-        # Remove the title fields and verify the '!Not Found!' is returned
+        # Remove the title fields and verify the UNDEFINED_ERROR constant is returned
         new_data = self.get_data()
         self.remove_key(new_data, 'title')
 
         rendered_text = render_jinja2(template_file, new_data, self.logger)
-        self.assertIn('!Not found!', rendered_text)
+        self.assertIn(UNDEFINED_ERROR, rendered_text)
         # Verify the log has been updated.
         stream = self.logger.get_stream_object()
         self.assertIn('Missing/undefined ISO metadata template variable:', stream.getvalue())

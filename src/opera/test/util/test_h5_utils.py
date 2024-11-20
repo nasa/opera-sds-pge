@@ -51,10 +51,14 @@ class H5UtilsTestCase(unittest.TestCase):
             np.testing.assert_array_equal(product_output['y'], np.zeros(10,))
             self.assertEqual(product_output['identification']['frame_id'], 123)
             self.assertEqual(product_output['identification']['product_version'], "0.2")
-            self.assertEqual(product_output['identification']['reference_zero_doppler_start_time'], "2017-02-17 13:27:50.139658")
-            self.assertEqual(product_output['identification']['reference_zero_doppler_end_time'], "2017-02-17 13:27:55.979493")
-            self.assertEqual(product_output['identification']['secondary_zero_doppler_start_time'],"2017-04-30 13:27:52.049224")
-            self.assertEqual(product_output['identification']['secondary_zero_doppler_end_time'],"2017-04-30 13:27:57.891116")
+            self.assertEqual(product_output['identification']['reference_zero_doppler_start_time'],
+                             "2017-02-17 13:27:50.139658")
+            self.assertEqual(product_output['identification']['reference_zero_doppler_end_time'],
+                             "2017-02-17 13:27:55.979493")
+            self.assertEqual(product_output['identification']['secondary_zero_doppler_start_time'],
+                             "2017-04-30 13:27:52.049224")
+            self.assertEqual(product_output['identification']['secondary_zero_doppler_end_time'],
+                             "2017-04-30 13:27:57.891116")
             self.assertEqual(product_output['identification']['bounding_polygon'],
                              "POLYGON ((-119.26 39.15, -119.32 39.16, -119.22 39.32, -119.26 39.15))")
             self.assertEqual(product_output['identification']['radar_wavelength'], 0.05546576)

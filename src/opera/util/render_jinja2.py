@@ -31,6 +31,21 @@ XML_TYPES = {
 INTEGER_PATTERN = re.compile(r'^[+-]?\d+$')
 FLOATING_POINT_PATTERN = re.compile(r'^[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?$')
 
+UNDEFINED_ERROR = '!Not found!'
+"""
+Placeholder written in for missing fields when rendering a jinja2 template.
+If this value is written to an instantiated template, it indicates an unexpected
+error, either in the template itself or the Measured Parameters config file.
+"""
+
+UNDEFINED_WARNING = 'Not provided'
+"""
+Placeholer written in for undefined fields when rendering a jinja2 template.
+Unlike UNDEFINED_ERROR, existence of this placeholder within a rendered template
+does not indicate a configuration error, rather an incomplete or missing Measured
+Parameters config file.
+"""
+
 
 def _make_undefined_handler_class(logger: PgeLogger):
     """
@@ -40,7 +55,7 @@ def _make_undefined_handler_class(logger: PgeLogger):
     while rendering Jinja2 templates if there is a failure to render a
     template variable. Instead:
         log the error the PGE way (using the PgeLogger class)
-        put "!Not found!" in the rendered text
+        put UNDEFINED_ERROR constant in the rendered text
         let the template rendering continue, try to render the rest of the template.
 
     Parameters
@@ -52,7 +67,7 @@ def _make_undefined_handler_class(logger: PgeLogger):
     -------
     LoggingUndefined : class
         child class of the jinja2.Undefined class, used to avoid exception handling.
-        Allows 'not found' to be added to the rendered text
+        Allows UNDEFINED_ERROR constant to be added to the rendered text
 
 
     """
@@ -77,7 +92,7 @@ def _make_undefined_handler_class(logger: PgeLogger):
 
         def __str__(self):
             _log_message(self)
-            return "!Not found!"
+            return UNDEFINED_ERROR
 
         def __iter__(self):   # pragma no cover
             _log_message(self)
