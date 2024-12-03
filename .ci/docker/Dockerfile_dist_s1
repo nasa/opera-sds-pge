@@ -54,6 +54,9 @@ RUN set -ex \
     && mkdir -p ${CONDA_ROOT}/bin \
     && cp ${PGE_DEST_DIR}/opera/scripts/*_entrypoint.sh ${CONDA_ROOT}/bin \
     && chmod +x ${CONDA_ROOT}/bin/*_entrypoint.sh \
+    && apt-get update \
+    && apt-get install --no-install-recommends -y g++ \
+    && apt-get clean \
     && python -m pip install -r ${PGE_DEST_DIR}/opera/requirements.txt \
     && conda install --yes --channel conda-forge hdf5 \
     && chmod 777 $(find ${PGE_DEST_DIR} -type d)
