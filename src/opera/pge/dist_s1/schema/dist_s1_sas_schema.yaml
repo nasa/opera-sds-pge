@@ -1,0 +1,28 @@
+#
+# Yamale schema for the DIST-S1 SAS Configuration
+#
+run_config:
+
+  # PLACEHOLDER FOR pre_rtc_copol PARAMETER DESCRIPTION
+  pre_rtc_copol: list(str(), required=True)
+
+  # PLACEHOLDER FOR pre_rtc_crosspol PARAMETER DESCRIPTION
+  pre_rtc_crosspol: list(str(), required=True)
+
+  # PLACEHOLDER FOR post_rtc_copol PARAMETER DESCRIPTION
+  post_rtc_copol: list(str(), required=True)
+
+  # PLACEHOLDER FOR post_rtc_crosspol PARAMETER DESCRIPTION
+  post_rtc_crosspol: list(str(), required=True)
+
+  # PLACEHOLDER FOR mgrs_tile_id PARAMETER DESCRIPTION
+  mgrs_tile_id: str(required=True)
+
+  # PLACEHOLDER FOR dist_s1_alert_db_dir PARAMETER DESCRIPTION
+  dist_s1_alert_db_dir: str(required=False)
+
+  # PLACEHOLDER FOR dst_dir PARAMETER DESCRIPTION
+  dst_dir: str(required=False)
+
+  # PLACEHOLDER FOR water_mask PARAMETER DESCRIPTION
+  water_mask: str(required=False)
