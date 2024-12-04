@@ -1,5 +1,5 @@
-# Dockerfile to produce the production DSWx-NI PGE Docker image for OPERA
-# Authors: Scott Collins, Ray Bambery
+# Dockerfile to produce the production DIST-S1 PGE Docker image for OPERA
+# Authors: Riley Kuttruff, Scott Collins, Ray Bambery
 
 # Default SAS image path, must be provided by the docker build call via --build-arg
 ARG SAS_IMAGE
@@ -57,7 +57,7 @@ RUN set -ex \
     && apt-get update \
     && apt-get install --no-install-recommends -y g++ \
     && apt-get clean \
-    && python -m pip install -r ${PGE_DEST_DIR}/opera/requirements.txt \
+    && python -m pip install -r ${PGE_DEST_DIR}/opera/requirements_numpy2.txt \
     && conda install --yes --channel conda-forge hdf5 \
     && chmod 777 $(find ${PGE_DEST_DIR} -type d)
 
