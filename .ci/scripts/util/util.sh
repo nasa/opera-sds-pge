@@ -133,7 +133,7 @@ copy_pge_files() {
   cp ${WORKSPACE}/COPYING \
      ${STAGING_DIR}/opera
 
-  cp ${WORKSPACE}/requirements.txt \
+  cp ${WORKSPACE}/requirements*.txt \
      ${STAGING_DIR}/opera
 
   cp ${WORKSPACE}/.flake8 \
