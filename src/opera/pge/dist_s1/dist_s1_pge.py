@@ -58,7 +58,7 @@ class DistS1PostProcessorMixin(PostProcessorMixin):
 
     def run_postprocessor(self, **kwargs):
         """
-        Executes the post-processing steps for the DSWx-NI PGE.
+        Executes the post-processing steps for the DIST-S1 PGE.
         The DistS1PostProcessorMixin version of this method performs the same
         steps as the base PostProcessorMixin.
 

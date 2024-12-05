@@ -55,7 +55,7 @@ class DistS1PgeTestCase(unittest.TestCase):
         os.makedirs(input_dir, exist_ok=True)
 
         self.input_file = tempfile.NamedTemporaryFile(
-            dir=input_dir, prefix="test_input_", suffix=".tiff"
+            dir=input_dir, prefix="test_input_", suffix=".tif"
         )
 
         os.chdir(self.working_dir.name)
@@ -66,7 +66,7 @@ class DistS1PgeTestCase(unittest.TestCase):
         self.input_file.close()
         self.working_dir.cleanup()
 
-    def test_dswx_ni_pge_execution(self):
+    def test_dist_s1_pge_execution(self):
         """
         Test execution of the DistS1Executor class and its associated mixins
         using a test RunConfig that creates dummy expected output files and logs
@@ -85,7 +85,7 @@ class DistS1PgeTestCase(unittest.TestCase):
         self.assertIsNone(pge.runconfig)
         self.assertIsNone(pge.logger)
 
-        # Kickoff execution of DSWx-NI PGE
+        # Kickoff execution of DIST-S1 PGE
         pge.run()
 
         # Check that the runconfig and logger were instantiated
@@ -109,8 +109,8 @@ class DistS1PgeTestCase(unittest.TestCase):
         self.assertTrue(os.path.exists(expected_log_file))
 
         # Lastly, check that the dummy output products were created
-        slc_files = glob.glob(join(pge.runconfig.output_product_path, "*.tif"))
-        self.assertEqual(len(slc_files), 1)
+        tif_files = glob.glob(join(pge.runconfig.output_product_path, "*.tif"))
+        self.assertEqual(len(tif_files), 1)
 
         # Open and read the log
         with open(expected_log_file, 'r', encoding='utf-8') as infile:

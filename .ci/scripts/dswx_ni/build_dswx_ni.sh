@@ -53,7 +53,7 @@ copy_pge_files $WORKSPACE $STAGING_DIR $PGE_NAME
 mkdir -p ${STAGING_DIR}/opera/pge/dswx_s1; cp -r ${WORKSPACE}/src/opera/pge/dswx_s1/dswx_s1_pge.py ${STAGING_DIR}/opera/pge/dswx_s1/
 
 # Create a VERSION file in the staging area to track version and build time
-printf "pge_version: ${TAG}\pge_build_datetime: ${BUILD_DATE_TIME}\n" \
+printf "pge_version: ${TAG}\npge_build_datetime: ${BUILD_DATE_TIME}\n" \
     > ${STAGING_DIR}/opera/VERSION \
 
 # Remove the old Docker image, if it exists

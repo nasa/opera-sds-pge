@@ -1,5 +1,5 @@
 #!/bin/bash
-# Script to execute unit tests on the OPERA DISP-S1 PGE Docker image
+# Script to execute unit tests on the OPERA DIST-S1 PGE Docker image
 
 set -e
 
@@ -23,7 +23,7 @@ PGE_NAME="dist_s1"
 IMAGE="opera_pge/${PGE_NAME}"
 TEST_RESULTS_REL_DIR="test_results"
 CONTAINER_HOME="/home/ops"
-CONDA_ROOT="/home/ops/miniconda3"
+CONDA_ROOT="/opt/conda"
 
 # defaults
 [ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath $(dirname $(realpath $0))/../../..)

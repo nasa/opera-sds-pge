@@ -5,7 +5,7 @@ h5py
 Jinja2==3.1.4
 jsonschema
 mgrs
-numpy
+numpy>=2
 pandas
 PyYAML
 pylint
