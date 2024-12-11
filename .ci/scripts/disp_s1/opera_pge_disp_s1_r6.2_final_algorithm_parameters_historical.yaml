@@ -1,7 +1,7 @@
 # JSON file containing frame-specific algorithm parameters to override the defaults passed
 #   in the `algorithm_parameters.yaml`.
 #   Type: string | null.
-algorithm_parameters_overrides_json: /home/mamba/input_dir/static_ancillary_files/opera-disp-s1-algorithm-parameters-overrides-2024-10-14.json
+algorithm_parameters_overrides_json: /home/mamba/input_dir/static_ancillary_files/opera-disp-s1-algorithm-parameters-overrides-2024-11-26.json
 ps_options:
   # Amplitude dispersion threshold to consider a pixel a PS.
   #   Type: number.
@@ -58,10 +58,10 @@ phase_linking:
 interferogram_network:
   # For single-reference network: Index of the reference image in the network.
   #   Type: integer | null.
-  reference_idx: 0
+  reference_idx:
   # Max `n` to form the nearest-`n` interferograms by index.
   #   Type: integer | null.
-  max_bandwidth:
+  max_bandwidth: 3
   # Maximum temporal baseline of interferograms.
   #   Type: integer | null.
   max_temporal_baseline:
@@ -128,7 +128,7 @@ unwrap_options:
     # If True, after unwrapping with multiple tiles, an additional post-processing unwrapping
     #   step is performed to re-optimize the unwrapped phase using a single tile.
     #   Type: boolean.
-    single_tile_reoptimize: false
+    single_tile_reoptimize: true
   tophu_options:
     # Number of tiles to split the inputs into.
     #   Type: array.
@@ -169,11 +169,11 @@ unwrap_options:
       target_points_for_generation: 120000
       # Target points per tile when generating tiles.
       #   Type: integer.
-      target_points_per_tile: 750000
+      target_points_per_tile: 700000
       # Dilation factor of non-overlapping tiles. 0.05 would lead to 5 percent dilation of the
       #   tile.
       #   Type: number.
-      dilation_factor: 0.05
+      dilation_factor: 0.03
     solver_settings:
       # Number of workers for temporal unwrapping in parallel. Set value to <=0 to let workflow
       #   use default workers (ncpus - 1).
@@ -182,7 +182,7 @@ unwrap_options:
       # Number of workers for spatial unwrapping in parallel. Set value to <=0 to let workflow use
       #   (ncpus - 1).
       #   Type: integer.
-      s_worker_count: 8
+      s_worker_count: 5
       # Temporal unwrapping operations over spatial links are performed in batches and each batch
       #   is solved in parallel.
       #   Type: integer.
@@ -219,7 +219,7 @@ unwrap_options:
       # Number of interferograms to merge in one batch. Use zero to merge all interferograms in a
       #   single batch.
       #   Type: integer.
-      num_parallel_ifgs: 13
+      num_parallel_ifgs: 39
 timeseries_options:
   # Whether to run the inversion step after unwrapping, if more than a single-reference
   #   network is used.
@@ -228,7 +228,7 @@ timeseries_options:
   # Norm to use during timeseries inversion.
   #   Type: string.
   #   Options: ['L1', 'L2'].
-  method: L2
+  method: L1
   # Reference point (row, col) used if performing a time series inversion. If not provided, a
   #   point will be selected from a consistent connected component with low amplitude
   #   dispersion.

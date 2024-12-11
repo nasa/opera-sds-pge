@@ -83,7 +83,7 @@ RunConfig:
 
       PrimaryExecutable:
         ProductIdentifier: DISP_S1
-        ProductVersion: "0.7"
+        ProductVersion: "0.9"
         ProgramPath: disp-s1
         ProgramOptions:
           - run
@@ -121,7 +121,7 @@ RunConfig:
 
         frame_id: 7091
       dynamic_ancillary_file_group:
-        algorithm_parameters_file: /home/mamba/runconfig/opera_pge_disp_s1_r6.0_final_algorithm_parameters_historical.yaml
+        algorithm_parameters_file: /home/mamba/runconfig/opera_pge_disp_s1_r6.2_final_algorithm_parameters_historical.yaml
         static_layers_files:
           - /home/mamba/input_dir/dynamic_ancillary_files/static_layers/OPERA_L2_CSLC-S1-STATIC_T027-056725-IW1_20140403_S1A_v1.0.h5
           - /home/mamba/input_dir/dynamic_ancillary_files/static_layers/OPERA_L2_CSLC-S1-STATIC_T027-056726-IW1_20140403_S1A_v1.0.h5
@@ -183,7 +183,7 @@ RunConfig:
         product_path: /home/mamba/output_dir
         scratch_path: /home/mamba/scratch_dir
         sas_output_path: /home/mamba/output_dir
-        product_version: "0.7"
+        product_version: "0.9"
         save_compressed_slc: true
       worker_settings:
         gpu_enabled: false
