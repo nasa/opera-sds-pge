@@ -1,22 +1,20 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera.pge.dswx_s1.dswx_s1_pge &mdash; opera-sds-pge 4.0.0-er.3.0 documentation</title>
+  <title>opera.pge.dswx_s1.dswx_s1_pge &mdash; opera-sds-pge 6.0.0-er.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=fa44fd50" />
-      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
 
   
-  <!--[if lt IE 9]>
-    <script src="../../../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=dce9a651"></script>
-        <script src="../../../../_static/doctools.js?v=888ff710"></script>
-        <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=811085ff"></script>
+      <script src="../../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
@@ -33,9 +31,6 @@
           <a href="../../../../index.html" class="icon icon-home">
             opera-sds-pge
           </a>
-              <div class="version">
-                4.0.0-er.3.0
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -264,9 +259,8 @@
                     <span class="n">dswx_metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_collect_dswx_s1_product_metadata</span><span class="p">(</span><span class="n">output_file</span><span class="p">)</span>
 
                     <span class="c1"># TODO: kludge since SAS hardcodes SPACECRAFT_NAME to &quot;Sentinel-1A/B&quot;</span>
-                    <span class="n">dswx_metadata</span><span class="p">[</span><span class="s1">&#39;SPACECRAFT_NAME&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Sentinel-1A&quot;</span>
-                                                        <span class="k">if</span> <span class="n">match_result</span><span class="o">.</span><span class="n">groupdict</span><span class="p">()[</span><span class="s1">&#39;sensor&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;S1A&quot;</span>
-                                                        <span class="k">else</span> <span class="s2">&quot;Sentinel-1B&quot;</span><span class="p">)</span>
+                    <span class="n">dswx_metadata</span><span class="p">[</span><span class="s1">&#39;MeasuredParameters&#39;</span><span class="p">][</span><span class="s1">&#39;SPACECRAFT_NAME&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">=</span> \
+                        <span class="s2">&quot;Sentinel-1A&quot;</span> <span class="k">if</span> <span class="n">match_result</span><span class="o">.</span><span class="n">groupdict</span><span class="p">()[</span><span class="s1">&#39;sensor&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;S1A&quot;</span> <span class="k">else</span> <span class="s2">&quot;Sentinel-1B&quot;</span>
 
                     <span class="c1"># Cache the metadata for this product for use when generating the ISO XML</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_tile_metadata_cache</span><span class="p">[</span><span class="n">tile_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">dswx_metadata</span>
@@ -395,14 +389,14 @@
         <span class="c1"># Metadata fields we need for ancillary file name should be equivalent</span>
         <span class="c1"># across all tiles, so just take the first set of cached metadata as</span>
         <span class="c1"># a representative</span>
-        <span class="n">dswx_metadata</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tile_metadata_cache</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">dswx_metadata</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tile_metadata_cache</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;MeasuredParameters&#39;</span><span class="p">]</span>
 
-        <span class="n">spacecraft_name</span> <span class="o">=</span> <span class="n">dswx_metadata</span><span class="p">[</span><span class="s1">&#39;SPACECRAFT_NAME&#39;</span><span class="p">]</span>
+        <span class="n">spacecraft_name</span> <span class="o">=</span> <span class="n">dswx_metadata</span><span class="p">[</span><span class="s1">&#39;SPACECRAFT_NAME&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
         <span class="n">sensor</span> <span class="o">=</span> <span class="n">get_sensor_from_spacecraft_name</span><span class="p">(</span><span class="n">spacecraft_name</span><span class="p">)</span>
         <span class="n">pixel_spacing</span> <span class="o">=</span> <span class="s2">&quot;30&quot;</span>  <span class="c1"># fixed for tile-based products</span>
 
         <span class="n">processing_time</span> <span class="o">=</span> <span class="n">get_time_for_filename</span><span class="p">(</span>
-            <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">dswx_metadata</span><span class="p">[</span><span class="s1">&#39;PROCESSING_DATETIME&#39;</span><span class="p">],</span> <span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">T%H:%M:%SZ&#39;</span><span class="p">)</span>
+            <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">dswx_metadata</span><span class="p">[</span><span class="s1">&#39;PROCESSING_DATETIME&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">],</span> <span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">T%H:%M:%SZ&#39;</span><span class="p">)</span>
         <span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">processing_time</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;Z&#39;</span><span class="p">):</span>
@@ -521,8 +515,15 @@
 <span class="sd">            for use with the ISO metadata Jinja2 template.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">output_product_metadata</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
         <span class="c1"># Extract all metadata assigned by the SAS at product creation time</span>
-        <span class="n">output_product_metadata</span> <span class="o">=</span> <span class="n">get_geotiff_metadata</span><span class="p">(</span><span class="n">geotiff_product</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">measured_parameters</span> <span class="o">=</span> <span class="n">get_geotiff_metadata</span><span class="p">(</span><span class="n">geotiff_product</span><span class="p">)</span>
+            <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;MeasuredParameters&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">augment_measured_parameters</span><span class="p">(</span><span class="n">measured_parameters</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Failed to extract metadata from </span><span class="si">{</span><span class="n">geotiff_product</span><span class="si">}</span><span class="s1">, reason: </span><span class="si">{</span><span class="n">err</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">ISO_METADATA_COULD_NOT_EXTRACT_METADATA</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
 
         <span class="c1"># Get the Military Grid Reference System (MGRS) tile code and zone</span>
         <span class="c1"># identifier from the intermediate file name</span>
@@ -612,6 +613,9 @@
 <span class="sd">            the sourced metadata dictionaries.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Use the base PGE implemenation to validate existence of the template</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_create_iso_metadata</span><span class="p">()</span>
+
         <span class="k">if</span> <span class="n">tile_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tile_metadata_cache</span> <span class="ow">or</span> <span class="n">tile_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tile_filename_cache</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No file name or metadata cached for tile ID </span><span class="si">{</span><span class="n">tile_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
@@ -634,10 +638,6 @@
         <span class="p">}</span>
 
         <span class="n">iso_template_path</span> <span class="o">=</span> <span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">iso_template_path</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">exists</span><span class="p">(</span><span class="n">iso_template_path</span><span class="p">):</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Could not load ISO template </span><span class="si">{</span><span class="n">iso_template_path</span><span class="si">}</span><span class="s2">, file does not exist&quot;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">ISO_METADATA_TEMPLATE_NOT_FOUND</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
 
         <span class="n">rendered_template</span> <span class="o">=</span> <span class="n">render_jinja2</span><span class="p">(</span><span class="n">iso_template_path</span><span class="p">,</span> <span class="n">iso_metadata</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>
 

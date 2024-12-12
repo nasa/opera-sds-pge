@@ -1,22 +1,20 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera.pge.disp_s1.disp_s1_pge &mdash; opera-sds-pge 4.0.0-er.3.0 documentation</title>
+  <title>opera.pge.disp_s1.disp_s1_pge &mdash; opera-sds-pge 6.0.0-er.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=fa44fd50" />
-      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
 
   
-  <!--[if lt IE 9]>
-    <script src="../../../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=dce9a651"></script>
-        <script src="../../../../_static/doctools.js?v=888ff710"></script>
-        <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=811085ff"></script>
+      <script src="../../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
@@ -33,9 +31,6 @@
           <a href="../../../../index.html" class="icon icon-home">
             opera-sds-pge
           </a>
-              <div class="version">
-                4.0.0-er.3.0
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -98,6 +93,7 @@
 <span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">listdir</span>
 <span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">abspath</span><span class="p">,</span> <span class="n">basename</span><span class="p">,</span> <span class="n">exists</span><span class="p">,</span> <span class="n">getsize</span><span class="p">,</span> <span class="n">join</span><span class="p">,</span> <span class="n">splitext</span>
 
+<span class="kn">import</span> <span class="nn">yaml</span>
 <span class="kn">from</span> <span class="nn">opera.pge.base.base_pge</span> <span class="kn">import</span> <span class="n">PgeExecutor</span>
 <span class="kn">from</span> <span class="nn">opera.pge.base.base_pge</span> <span class="kn">import</span> <span class="n">PostProcessorMixin</span>
 <span class="kn">from</span> <span class="nn">opera.pge.base.base_pge</span> <span class="kn">import</span> <span class="n">PreProcessorMixin</span>
@@ -105,9 +101,10 @@
 <span class="kn">from</span> <span class="nn">opera.util.error_codes</span> <span class="kn">import</span> <span class="n">ErrorCode</span>
 <span class="kn">from</span> <span class="nn">opera.util.h5_utils</span> <span class="kn">import</span> <span class="n">get_cslc_s1_product_metadata</span>
 <span class="kn">from</span> <span class="nn">opera.util.h5_utils</span> <span class="kn">import</span> <span class="n">get_disp_s1_product_metadata</span>
+<span class="kn">from</span> <span class="nn">opera.util.h5_utils</span> <span class="kn">import</span> <span class="n">MEASURED_PARAMETER_PATH_SEPARATOR</span>
 <span class="kn">from</span> <span class="nn">opera.util.input_validation</span> <span class="kn">import</span> <span class="n">validate_algorithm_parameters_config</span><span class="p">,</span> <span class="n">validate_disp_inputs</span>
 <span class="kn">from</span> <span class="nn">opera.util.render_jinja2</span> <span class="kn">import</span> <span class="n">render_jinja2</span>
-<span class="kn">from</span> <span class="nn">opera.util.time</span> <span class="kn">import</span> <span class="n">get_time_for_filename</span>
+<span class="kn">from</span> <span class="nn">opera.util.time</span> <span class="kn">import</span> <span class="n">get_time_for_filename</span><span class="p">,</span> <span class="n">get_catalog_metadata_datetime_str</span>
 
 
 <div class="viewcode-block" id="DispS1PreProcessorMixin"><a class="viewcode-back" href="../../../../opera.pge.disp_s1.html#opera.pge.disp_s1.disp_s1_pge.DispS1PreProcessorMixin">[docs]</a><span class="k">class</span> <span class="nc">DispS1PreProcessorMixin</span><span class="p">(</span><span class="n">PreProcessorMixin</span><span class="p">):</span>
@@ -260,7 +257,6 @@
             <span class="c1"># Validate .png file(s)</span>
             <span class="n">nc_file_no_ext</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">splitext</span><span class="p">(</span><span class="n">basename</span><span class="p">(</span><span class="n">nc_file</span><span class="p">))</span>
             <span class="n">png_files</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">nc_file_no_ext</span><span class="si">}</span><span class="s1">.displacement.png&#39;</span><span class="p">),</span>
                 <span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">nc_file_no_ext</span><span class="si">}</span><span class="s1">.short_wavelength_displacement.png&#39;</span><span class="p">)</span>
             <span class="p">]</span>
 
@@ -362,14 +358,14 @@
         <span class="c1"># ReferenceDateTime: The acquisition sensing start date and time of</span>
         <span class="c1"># the input satellite imagery for the first burst in the frame of the</span>
         <span class="c1"># reference product in the format YYYYMMDDTHHMMSSZ</span>
-        <span class="n">reference_date_time</span> <span class="o">=</span> <span class="n">disp_metadata</span><span class="p">[</span><span class="s1">&#39;identification&#39;</span><span class="p">][</span><span class="s1">&#39;reference_datetime&#39;</span><span class="p">]</span>
+        <span class="n">reference_date_time</span> <span class="o">=</span> <span class="n">disp_metadata</span><span class="p">[</span><span class="s1">&#39;identification&#39;</span><span class="p">][</span><span class="s1">&#39;reference_zero_doppler_start_time&#39;</span><span class="p">]</span>
         <span class="n">reference_date_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">reference_date_time</span><span class="p">,</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S.</span><span class="si">%f</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">reference_date_time</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">get_time_for_filename</span><span class="p">(</span><span class="n">reference_date_time</span><span class="p">)</span><span class="si">}</span><span class="s2">Z&quot;</span>
 
         <span class="c1"># SecondaryDateTime: The acquisition sensing start date and time of</span>
         <span class="c1"># the input satellite imagery for the first burst in the frame of this</span>
         <span class="c1"># secondary product in the format YYYYMMDDTHHMMSSZ</span>
-        <span class="n">secondary_date_time</span> <span class="o">=</span> <span class="n">disp_metadata</span><span class="p">[</span><span class="s1">&#39;identification&#39;</span><span class="p">][</span><span class="s1">&#39;secondary_datetime&#39;</span><span class="p">]</span>
+        <span class="n">secondary_date_time</span> <span class="o">=</span> <span class="n">disp_metadata</span><span class="p">[</span><span class="s1">&#39;identification&#39;</span><span class="p">][</span><span class="s1">&#39;secondary_zero_doppler_start_time&#39;</span><span class="p">]</span>
         <span class="n">secondary_date_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">secondary_date_time</span><span class="p">,</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S.</span><span class="si">%f</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">secondary_date_time</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">get_time_for_filename</span><span class="p">(</span><span class="n">secondary_date_time</span><span class="p">)</span><span class="si">}</span><span class="s2">Z&quot;</span>
 
@@ -670,6 +666,60 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ancillary_filename</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;.qa.log&quot;</span>
 
+<div class="viewcode-block" id="DispS1PostProcessorMixin.augment_measured_parameters"><a class="viewcode-back" href="../../../../opera.pge.disp_s1.html#opera.pge.disp_s1.disp_s1_pge.DispS1PostProcessorMixin.augment_measured_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">augment_measured_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">measured_parameters</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Override of the augment_measured_parameters() method in Base PGE with an added</span>
+<span class="sd">        &quot;preprocessing&quot; step to handle the structure of HDF5 metadata. While GeoTIFF</span>
+<span class="sd">        metadata is a flat dictionary, HDF5 metadata is a nested dictionary structure,</span>
+<span class="sd">        wherein the variable &quot;keys&quot; can be arbitrarily deep into the structure and</span>
+<span class="sd">        the values likewise can be nested dictionaries.</span>
+
+<span class="sd">        The preprocessing step in this method selectively flattens the metadata</span>
+<span class="sd">        dictionary based on the &quot;paths&quot; provided in the variable keys of the configuration</span>
+<span class="sd">        YAML file. The result of this preprocessing is then safely passed to the base</span>
+<span class="sd">        method to get the correct structure expected by the Jinja template.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        measured_parameters : dict</span>
+<span class="sd">            The HDF5 metadata from the output product. See get_disp_s1_product_metadata()</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        augmented_parameters : dict</span>
+<span class="sd">            The metadata fields converted to a list with name, value, types, etc</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">descriptions_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">iso_measured_parameter_descriptions</span>
+
+        <span class="n">new_measured_parameters</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">if</span> <span class="n">descriptions_file</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">descriptions_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">descriptions</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Measured parameters configuration is needed to extract the measured parameters attributes from the&#39;</span>
+                   <span class="s1">&#39;DISP-S1 metadata&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">ISO_METADATA_DESCRIPTIONS_CONFIG_NOT_FOUND</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">parameter_var_name</span> <span class="ow">in</span> <span class="n">descriptions</span><span class="p">:</span>
+            <span class="n">key_path</span> <span class="o">=</span> <span class="n">parameter_var_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">MEASURED_PARAMETER_PATH_SEPARATOR</span><span class="p">)</span>
+
+            <span class="n">mp</span> <span class="o">=</span> <span class="n">measured_parameters</span>
+
+            <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">key_path</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">mp</span> <span class="o">=</span> <span class="n">mp</span><span class="p">[</span><span class="n">key_path</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)]</span>
+                <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Measured parameters configuration contains an invalid path </span><span class="si">{</span><span class="n">parameter_var_name</span><span class="si">}</span><span class="s1">: no such &#39;</span>
+                           <span class="sa">f</span><span class="s1">&#39;entry </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">ISO_METADATA_DESCRIPTIONS_CONFIG_INVALID</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+
+            <span class="n">new_measured_parameters</span><span class="p">[</span><span class="n">parameter_var_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">mp</span>
+
+        <span class="n">augmented_parameters</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">augment_measured_parameters</span><span class="p">(</span><span class="n">new_measured_parameters</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">augmented_parameters</span></div>
+
     <span class="k">def</span> <span class="nf">_collect_disp_s1_product_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">disp_product</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Gathers the available metadata from a sample output DISP-S1 product for</span>
@@ -688,7 +738,24 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Extract all metadata assigned by the SAS at product creation time</span>
-        <span class="n">output_product_metadata</span> <span class="o">=</span> <span class="n">get_disp_s1_product_metadata</span><span class="p">(</span><span class="n">disp_product</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">output_product_metadata</span> <span class="o">=</span> <span class="n">get_disp_s1_product_metadata</span><span class="p">(</span><span class="n">disp_product</span><span class="p">)</span>
+
+            <span class="c1"># get_catalog_metadata_datetime_str(self.production_datetime)</span>
+
+            <span class="c1"># Add hardcoded values to metadata</span>
+            <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;static&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;Project&#39;</span><span class="p">:</span> <span class="s1">&#39;OPERA&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;ProductLevel&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+                <span class="s1">&#39;ProductType&#39;</span><span class="p">:</span> <span class="s1">&#39;DISP-S1&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;ProductSource&#39;</span><span class="p">:</span> <span class="s1">&#39;Sentinel-1&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;ProcessingDateTime&#39;</span><span class="p">:</span> <span class="n">get_catalog_metadata_datetime_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">production_datetime</span><span class="p">)</span>
+            <span class="p">}</span>
+
+            <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;MeasuredParameters&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">augment_measured_parameters</span><span class="p">(</span><span class="n">output_product_metadata</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Failed to extract metadata from </span><span class="si">{</span><span class="n">disp_product</span><span class="si">}</span><span class="s1">, reason: </span><span class="si">{</span><span class="n">err</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">ISO_METADATA_COULD_NOT_EXTRACT_METADATA</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
 
         <span class="c1"># Parse the image polygon coordinates to conform with gml</span>
         <span class="n">bounding_polygon_wkt_str</span> <span class="o">=</span> <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;identification&#39;</span><span class="p">][</span><span class="s1">&#39;bounding_polygon&#39;</span><span class="p">]</span>
@@ -711,13 +778,20 @@
 
         <span class="k">return</span> <span class="n">output_product_metadata</span>
 
-    <span class="k">def</span> <span class="nf">_create_custom_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_create_custom_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inter_filename</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates the &quot;custom data&quot; dictionary used with the ISO metadata rendering.</span>
 
 <span class="sd">        Custom data contains all metadata information needed for the ISO template</span>
 <span class="sd">        that is not found within any of the other metadata sources (such as the</span>
 <span class="sd">        RunConfig, output product(s), or catalog metadata).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        inter_filename : str</span>
+<span class="sd">            The intermediate filename of the output product to generate a</span>
+<span class="sd">            core filename for. This core filename will be used as the &quot;granule&quot;</span>
+<span class="sd">            identifier within the returned metadata dictionary.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -728,9 +802,9 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">custom_metadata</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s1">&#39;ISO_OPERA_FilePackageName&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ancillary_filename</span><span class="p">(),</span>
-            <span class="s1">&#39;ISO_OPERA_ProducerGranuleId&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ancillary_filename</span><span class="p">(),</span>
+            <span class="s1">&#39;ISO_OPERA_ProducerGranuleId&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_core_filename</span><span class="p">(</span><span class="n">inter_filename</span><span class="p">),</span>
             <span class="s1">&#39;MetadataProviderAction&#39;</span><span class="p">:</span> <span class="s2">&quot;creation&quot;</span><span class="p">,</span>
-            <span class="s1">&#39;GranuleFilename&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ancillary_filename</span><span class="p">(),</span>
+            <span class="s1">&#39;GranuleFilename&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_core_filename</span><span class="p">(</span><span class="n">inter_filename</span><span class="p">),</span>
             <span class="s1">&#39;ISO_OPERA_ProjectKeywords&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;OPERA&#39;</span><span class="p">,</span> <span class="s1">&#39;JPL&#39;</span><span class="p">,</span> <span class="s1">&#39;DISP&#39;</span><span class="p">,</span> <span class="s1">&#39;Displacement&#39;</span><span class="p">,</span> <span class="s1">&#39;Surface&#39;</span><span class="p">,</span> <span class="s1">&#39;Land&#39;</span><span class="p">,</span> <span class="s1">&#39;Global&#39;</span><span class="p">],</span>
             <span class="s1">&#39;ISO_OPERA_PlatformKeywords&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;S1&#39;</span><span class="p">],</span>
             <span class="s1">&#39;ISO_OPERA_InstrumentKeywords&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Sentinel 1 A/B&#39;</span><span class="p">]</span>
@@ -738,7 +812,7 @@
 
         <span class="k">return</span> <span class="n">custom_metadata</span>
 
-    <span class="k">def</span> <span class="nf">_create_iso_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">disp_metadata</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_create_iso_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inter_filename</span><span class="p">,</span> <span class="n">disp_metadata</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates a rendered version of the ISO metadata template for DISP-S1</span>
 <span class="sd">        output products using metadata sourced from the following locations:</span>
@@ -761,13 +835,16 @@
 <span class="sd">            the sourced metadata dictionaries.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Use the base PGE implemenation to validate existence of the template</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_create_iso_metadata</span><span class="p">()</span>
+
         <span class="n">runconfig_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">asdict</span><span class="p">()</span>
 
         <span class="n">product_output_dict</span> <span class="o">=</span> <span class="n">disp_metadata</span>
 
         <span class="n">catalog_metadata_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_catalog_metadata</span><span class="p">()</span><span class="o">.</span><span class="n">asdict</span><span class="p">()</span>
 
-        <span class="n">custom_data_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_custom_metadata</span><span class="p">()</span>
+        <span class="n">custom_data_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_custom_metadata</span><span class="p">(</span><span class="n">inter_filename</span><span class="p">)</span>
 
         <span class="n">iso_metadata</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s1">&#39;run_config&#39;</span><span class="p">:</span> <span class="n">runconfig_dict</span><span class="p">,</span>
@@ -777,10 +854,6 @@
         <span class="p">}</span>
 
         <span class="n">iso_template_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">iso_template_path</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">iso_template_path</span><span class="p">):</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Could not load ISO template </span><span class="si">{</span><span class="n">iso_template_path</span><span class="si">}</span><span class="s2">, file does not exist&quot;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">ISO_METADATA_TEMPLATE_NOT_FOUND</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
 
         <span class="n">rendered_template</span> <span class="o">=</span> <span class="n">render_jinja2</span><span class="p">(</span><span class="n">iso_template_path</span><span class="p">,</span> <span class="n">iso_metadata</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>
 
@@ -830,7 +903,7 @@
         <span class="c1"># Generate the ISO metadata for use with product submission to DAAC(s)</span>
         <span class="c1"># For CSLC-S1, each burst-based product gets its own ISO xml</span>
         <span class="k">for</span> <span class="n">inter_filename</span><span class="p">,</span> <span class="n">disp_metadata</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_product_metadata_cache</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="n">iso_metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_iso_metadata</span><span class="p">(</span><span class="n">disp_metadata</span><span class="p">)</span>
+            <span class="n">iso_metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_iso_metadata</span><span class="p">(</span><span class="n">inter_filename</span><span class="p">,</span> <span class="n">disp_metadata</span><span class="p">)</span>
 
             <span class="n">iso_meta_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iso_metadata_filename</span><span class="p">(</span><span class="n">inter_filename</span><span class="p">)</span>
             <span class="n">iso_meta_filepath</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">output_product_path</span><span class="p">,</span> <span class="n">iso_meta_filename</span><span class="p">)</span>
@@ -903,10 +976,10 @@
     <span class="n">LEVEL</span> <span class="o">=</span> <span class="s2">&quot;L3&quot;</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Processing Level for DISP-S1 Products&quot;&quot;&quot;</span>
 
-    <span class="n">PGE_VERSION</span> <span class="o">=</span> <span class="s2">&quot;3.0.0-rc.4.0&quot;</span>
+    <span class="n">PGE_VERSION</span> <span class="o">=</span> <span class="s2">&quot;3.0.1&quot;</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Version of the PGE (overrides default from base_pge)&quot;&quot;&quot;</span>
 
-    <span class="n">SAS_VERSION</span> <span class="o">=</span> <span class="s2">&quot;0.4.3&quot;</span>  <span class="c1"># CalVal release https://github.com/opera-adt/disp-s1/releases/tag/v0.4.3</span>
+    <span class="n">SAS_VERSION</span> <span class="o">=</span> <span class="s2">&quot;0.5.2&quot;</span>  <span class="c1"># Final release https://github.com/opera-adt/disp-s1/releases/tag/v0.5.2</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pge_name</span><span class="p">,</span> <span class="n">runconfig_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">pge_name</span><span class="p">,</span> <span class="n">runconfig_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -915,7 +988,7 @@
             <span class="p">{</span>
                 <span class="c1"># Note: ordering matters here!</span>
                 <span class="s1">&#39;*.nc&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_netcdf_filename</span><span class="p">,</span>
-                <span class="s1">&#39;*.displacement.png&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_browse_filename</span><span class="p">,</span>
+                <span class="s1">&#39;*displacement.png&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_browse_filename</span><span class="p">,</span>
                 <span class="s1">&#39;compressed*.h5&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compressed_cslc_filename</span>
             <span class="p">}</span>
         <span class="p">)</span></div>

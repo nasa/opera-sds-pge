@@ -1,22 +1,20 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera.pge.rtc_s1.rtc_s1_pge &mdash; opera-sds-pge 4.0.0-er.3.0 documentation</title>
+  <title>opera.pge.rtc_s1.rtc_s1_pge &mdash; opera-sds-pge 6.0.0-er.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=fa44fd50" />
-      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
 
   
-  <!--[if lt IE 9]>
-    <script src="../../../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=dce9a651"></script>
-        <script src="../../../../_static/doctools.js?v=888ff710"></script>
-        <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=811085ff"></script>
+      <script src="../../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
@@ -33,9 +31,6 @@
           <a href="../../../../index.html" class="icon icon-home">
             opera-sds-pge
           </a>
-              <div class="version">
-                4.0.0-er.3.0
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -95,6 +90,8 @@
 <span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">walk</span>
 <span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">basename</span><span class="p">,</span> <span class="n">getsize</span><span class="p">,</span> <span class="n">join</span>
 
+<span class="kn">import</span> <span class="nn">yaml</span>
+
 <span class="kn">from</span> <span class="nn">opera.pge.base.base_pge</span> <span class="kn">import</span> <span class="n">PgeExecutor</span>
 <span class="kn">from</span> <span class="nn">opera.pge.base.base_pge</span> <span class="kn">import</span> <span class="n">PostProcessorMixin</span>
 <span class="kn">from</span> <span class="nn">opera.pge.base.base_pge</span> <span class="kn">import</span> <span class="n">PreProcessorMixin</span>
@@ -103,6 +100,7 @@
 <span class="kn">from</span> <span class="nn">opera.util.error_codes</span> <span class="kn">import</span> <span class="n">ErrorCode</span>
 <span class="kn">from</span> <span class="nn">opera.util.geo_utils</span> <span class="kn">import</span> <span class="n">translate_utm_bbox_to_lat_lon</span>
 <span class="kn">from</span> <span class="nn">opera.util.h5_utils</span> <span class="kn">import</span> <span class="n">get_rtc_s1_product_metadata</span>
+<span class="kn">from</span> <span class="nn">opera.util.h5_utils</span> <span class="kn">import</span> <span class="n">MEASURED_PARAMETER_PATH_SEPARATOR</span>
 <span class="kn">from</span> <span class="nn">opera.util.input_validation</span> <span class="kn">import</span> <span class="n">validate_slc_s1_inputs</span>
 <span class="kn">from</span> <span class="nn">opera.util.render_jinja2</span> <span class="kn">import</span> <span class="n">render_jinja2</span>
 <span class="kn">from</span> <span class="nn">opera.util.time</span> <span class="kn">import</span> <span class="n">get_time_for_filename</span>
@@ -775,6 +773,59 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ancillary_filename</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;.qa.log&quot;</span>
 
+<div class="viewcode-block" id="RtcS1PostProcessorMixin.augment_measured_parameters"><a class="viewcode-back" href="../../../../opera.pge.rtc_s1.html#opera.pge.rtc_s1.rtc_s1_pge.RtcS1PostProcessorMixin.augment_measured_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">augment_measured_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">measured_parameters</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Override of the augment_measured_parameters() method in Base PGE with an added</span>
+<span class="sd">        &quot;preprocessing&quot; step to handle the structure of HDF5 metadata. While GeoTIFF</span>
+<span class="sd">        metadata is a flat dictionary, HDF5 metadata is a nested dictionary structure,</span>
+<span class="sd">        wherein the variable &quot;keys&quot; can be arbitrarily deep into the structure and</span>
+<span class="sd">        the values likewise can be nested dictionaries.</span>
+
+<span class="sd">        The preprocessing step in this method selectively flattens the metadata</span>
+<span class="sd">        dictionary based on the &quot;paths&quot; provided in the variable keys of the configuration</span>
+<span class="sd">        YAML file. The result of this preprocessing is then safely passed to the base</span>
+<span class="sd">        method to get the correct structure expected by the Jinja template.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        measured_parameters : dict</span>
+<span class="sd">            The HDF5 metadata from the output product. See get_rtc_s1_product_metadata()</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        augmented_parameters : dict</span>
+<span class="sd">            The metadata fields converted to a list with name, value, types, etc</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">descriptions_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">iso_measured_parameter_descriptions</span>
+
+        <span class="n">new_measured_parameters</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">if</span> <span class="n">descriptions_file</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">descriptions_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">infile</span><span class="p">:</span>
+                <span class="n">descriptions</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">infile</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Measured parameters configuration is needed to extract the &#39;</span>
+                   <span class="s1">&#39;measured parameters attributes from the RTC-S1 metadata&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">ISO_METADATA_DESCRIPTIONS_CONFIG_NOT_FOUND</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">parameter_var_name</span> <span class="ow">in</span> <span class="n">descriptions</span><span class="p">:</span>
+            <span class="n">key_path</span> <span class="o">=</span> <span class="n">parameter_var_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">MEASURED_PARAMETER_PATH_SEPARATOR</span><span class="p">)</span>
+
+            <span class="n">mp</span> <span class="o">=</span> <span class="n">measured_parameters</span>
+
+            <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">key_path</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">mp</span> <span class="o">=</span> <span class="n">mp</span><span class="p">[</span><span class="n">key_path</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)]</span>
+                    <span class="n">new_measured_parameters</span><span class="p">[</span><span class="n">parameter_var_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">mp</span>
+                <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Measured parameters contains no entry for description &#39;</span>
+                           <span class="sa">f</span><span class="s1">&#39;key &quot;</span><span class="si">{</span><span class="n">err</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">ISO_METADATA_NO_ENTRY_FOR_DESCRIPTION</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+
+        <span class="n">augmented_parameters</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">augment_measured_parameters</span><span class="p">(</span><span class="n">new_measured_parameters</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">augmented_parameters</span></div>
+
     <span class="k">def</span> <span class="nf">_collect_rtc_product_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata_product</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Gathers the available metadata from an HDF5 product created by</span>
@@ -793,7 +844,12 @@
 <span class="sd">            use with the ISO metadata Jinja2 template.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">output_product_metadata</span> <span class="o">=</span> <span class="n">get_rtc_s1_product_metadata</span><span class="p">(</span><span class="n">metadata_product</span><span class="p">)</span>
+        <span class="c1"># Extract all metadata assigned by the SAS at product creation time</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">output_product_metadata</span> <span class="o">=</span> <span class="n">get_rtc_s1_product_metadata</span><span class="p">(</span><span class="n">metadata_product</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Failed to extract metadata from </span><span class="si">{</span><span class="n">metadata_product</span><span class="si">}</span><span class="s1">, reason: </span><span class="si">{</span><span class="n">err</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">ISO_METADATA_COULD_NOT_EXTRACT_METADATA</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
 
         <span class="c1"># Fill in some additional fields expected within the ISO</span>
         <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">][</span><span class="s1">&#39;width&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
@@ -827,6 +883,9 @@
                 <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;boundingPolygon&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bounding_polygon_gml_str</span>
             <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">ISO_METADATA_RENDER_FAILED</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">))</span>
+
+        <span class="c1"># Augment the metadata with descriptions from the measured parameter config for RTC-S1</span>
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;MeasuredParameters&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">augment_measured_parameters</span><span class="p">(</span><span class="n">output_product_metadata</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">output_product_metadata</span>
 
@@ -880,6 +939,9 @@
 <span class="sd">            sourced metadata dictionaries.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Use the base PGE implemenation to validate existence of the template</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_create_iso_metadata</span><span class="p">()</span>
+
         <span class="n">runconfig_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">asdict</span><span class="p">()</span>
 
         <span class="n">product_output_dict</span> <span class="o">=</span> <span class="n">burst_metadata</span>
@@ -896,10 +958,6 @@
         <span class="p">}</span>
 
         <span class="n">iso_template_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">iso_template_path</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">iso_template_path</span><span class="p">):</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Could not load ISO template </span><span class="si">{</span><span class="n">iso_template_path</span><span class="si">}</span><span class="s2">, file does not exist&quot;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">ISO_METADATA_TEMPLATE_NOT_FOUND</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
 
         <span class="n">rendered_template</span> <span class="o">=</span> <span class="n">render_jinja2</span><span class="p">(</span><span class="n">iso_template_path</span><span class="p">,</span> <span class="n">iso_metadata</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>
 
