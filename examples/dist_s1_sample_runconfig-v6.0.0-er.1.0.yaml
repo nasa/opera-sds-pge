@@ -18,9 +18,21 @@ RunConfig:
 
       InputFilesGroup:
         # List of input files/directories
-        # Must be a list (containing the directory of input OPERA RTC-S1 GeoTIFF products?)
+        # Must be a list of input GeoTIFF files
         InputFilePaths:
-        - dist_s1_pge_test/input_dir
+        - /home/ops/input_dir/2024-10-22/OPERA_L2_RTC-S1_T137-292324-IW1_20241022T015918Z_20241022T180854Z_S1A_30_v1.0_VV.tif
+        - /home/ops/input_dir/2024-10-22/OPERA_L2_RTC-S1_T137-292324-IW2_20241022T015919Z_20241022T180523Z_S1A_30_v1.0_VV.tif
+        - /home/ops/input_dir/2024-10-22/OPERA_L2_RTC-S1_T137-292325-IW1_20241022T015921Z_20241022T180523Z_S1A_30_v1.0_VV.tif
+        - /home/ops/input_dir/2024-10-22/OPERA_L2_RTC-S1_T137-292324-IW1_20241022T015918Z_20241022T180854Z_S1A_30_v1.0_VH.tif
+        - /home/ops/input_dir/2024-10-22/OPERA_L2_RTC-S1_T137-292324-IW2_20241022T015919Z_20241022T180523Z_S1A_30_v1.0_VH.tif
+        - /home/ops/input_dir/2024-10-22/OPERA_L2_RTC-S1_T137-292325-IW1_20241022T015921Z_20241022T180523Z_S1A_30_v1.0_VH.tif
+        - /home/ops/input_dir/2024-11-03/OPERA_L2_RTC-S1_T137-292324-IW1_20241103T015918Z_20241103T071409Z_S1A_30_v1.0_VV.tif
+        - /home/ops/input_dir/2024-11-03/OPERA_L2_RTC-S1_T137-292324-IW2_20241103T015919Z_20241103T074936Z_S1A_30_v1.0_VV.tif
+        - /home/ops/input_dir/2024-11-03/OPERA_L2_RTC-S1_T137-292325-IW1_20241103T015921Z_20241103T074936Z_S1A_30_v1.0_VV.tif
+        - /home/ops/input_dir/2024-11-03/OPERA_L2_RTC-S1_T137-292324-IW1_20241103T015918Z_20241103T071409Z_S1A_30_v1.0_VH.tif
+        - /home/ops/input_dir/2024-11-03/OPERA_L2_RTC-S1_T137-292324-IW2_20241103T015919Z_20241103T074936Z_S1A_30_v1.0_VH.tif
+        - /home/ops/input_dir/2024-11-03/OPERA_L2_RTC-S1_T137-292325-IW1_20241103T015921Z_20241103T074936Z_S1A_30_v1.0_VH.tif
+
 
       DynamicAncillaryFilesGroup:
         # Map of ancillary file types to paths to the file
@@ -53,12 +65,12 @@ RunConfig:
 
         # Path to the executable to run, path must be reachable from
         # within the Docker container (i.e. findable with a "which" command)
-        ProgramPath: /bin/echo
+        ProgramPath: /opt/conda/envs/dist-s1-env/bin/dist-s1
 
         # List of command-line options to use with ProgramPath
         ProgramOptions:
-        - hello world > dist_s1_pge_test/output_dir/OPERA_L3_DSWx-NI_T18MVA_20200702T231843Z_20230317T190549Z_v0.1_B01_WTR.tif;
-        - /bin/echo DIST-S1 invoked with RunConfig
+        - run_sas
+        - --runconfig_yml_path
 
         # The Error Code base value added to the offset values to make
         # error codes unique per-PGE
@@ -70,12 +82,12 @@ RunConfig:
         # container, and typically should reference a schema file bundled
         # with the opera_pge installation directory within the container
         # Consult the Docker image build scripts for more info
-        SchemaPath: pge/dist_s1/schema/dist_s1_sas_schema.yaml
+        SchemaPath: /home/ops/opera/pge/dist_s1/schema/dist_s1_sas_schema.yaml
 
         # Path to the Yamale schema used specifically to validate the
         # algorithm parameters config, which is stored within a separate
         # yaml file referenced within the SAS portion of this RunConfig
-        AlgorithmParametersSchemaPath: pge/dist_s1/schema/algorithm_parameters_dist_s1_schema.yaml
+        AlgorithmParametersSchemaPath: /home/ops/opera/pge/dist_s1/schema/algorithm_parameters_dist_s1_schema.yaml
 
         # Path to the Jinja2 template used to generate the ISO xml
         # metadata file
@@ -83,7 +95,7 @@ RunConfig:
         # container, and typically should reference a template file bundled
         # with the opera_pge installation directory within the container
         # Consult the Docker image build scripts for more info
-        IsoTemplatePath: pge/dist_s1/templates/OPERA_ISO_metadata_L3_DIST_S1_template.xml.jinja2
+        IsoTemplatePath: /home/ops/opera/pge/dist_s1/templates/OPERA_ISO_metadata_L3_DIST_S1_template.xml.jinja2
 
         # Path to a YAML file mapping Measured Parameter metadata names to descriptions
         # used to supplement the ISO xml metadata file
@@ -91,7 +103,7 @@ RunConfig:
         # container, and typically should reference a template file bundled
         # with the opera_pge installation directory within the container
         # Consult the Docker image build scripts for more info
-        IsoMeasuredParameterDescriptions: pge/dist_s1/templates/dist_s1_measured_parameters.yaml
+        IsoMeasuredParameterDescriptions: /home/ops/opera/pge/dist_s1/templates/dist_s1_measured_parameters.yaml
 
       QAExecutable:
         # Set to True to enable execution of an additional "Quality Assurance"
@@ -121,21 +133,21 @@ RunConfig:
     SAS:
       run_config:
         pre_rtc_copol:
-        - test_data/10SGD_cropped/137/2024-10-22/OPERA_L2_RTC-S1_T137-292324-IW1_20241022T015918Z_20241022T180854Z_S1A_30_v1.0_VV.tif
-        - test_data/10SGD_cropped/137/2024-10-22/OPERA_L2_RTC-S1_T137-292324-IW2_20241022T015919Z_20241022T180523Z_S1A_30_v1.0_VV.tif
-        - test_data/10SGD_cropped/137/2024-10-22/OPERA_L2_RTC-S1_T137-292325-IW1_20241022T015921Z_20241022T180523Z_S1A_30_v1.0_VV.tif
+        - /home/ops/input_dir/2024-10-22/OPERA_L2_RTC-S1_T137-292324-IW1_20241022T015918Z_20241022T180854Z_S1A_30_v1.0_VV.tif
+        - /home/ops/input_dir/2024-10-22/OPERA_L2_RTC-S1_T137-292324-IW2_20241022T015919Z_20241022T180523Z_S1A_30_v1.0_VV.tif
+        - /home/ops/input_dir/2024-10-22/OPERA_L2_RTC-S1_T137-292325-IW1_20241022T015921Z_20241022T180523Z_S1A_30_v1.0_VV.tif
         pre_rtc_crosspol:
-        - test_data/10SGD_cropped/137/2024-10-22/OPERA_L2_RTC-S1_T137-292324-IW1_20241022T015918Z_20241022T180854Z_S1A_30_v1.0_VH.tif
-        - test_data/10SGD_cropped/137/2024-10-22/OPERA_L2_RTC-S1_T137-292324-IW2_20241022T015919Z_20241022T180523Z_S1A_30_v1.0_VH.tif
-        - test_data/10SGD_cropped/137/2024-10-22/OPERA_L2_RTC-S1_T137-292325-IW1_20241022T015921Z_20241022T180523Z_S1A_30_v1.0_VH.tif
+        - /home/ops/input_dir/2024-10-22/OPERA_L2_RTC-S1_T137-292324-IW1_20241022T015918Z_20241022T180854Z_S1A_30_v1.0_VH.tif
+        - /home/ops/input_dir/2024-10-22/OPERA_L2_RTC-S1_T137-292324-IW2_20241022T015919Z_20241022T180523Z_S1A_30_v1.0_VH.tif
+        - /home/ops/input_dir/2024-10-22/OPERA_L2_RTC-S1_T137-292325-IW1_20241022T015921Z_20241022T180523Z_S1A_30_v1.0_VH.tif
         post_rtc_copol:
-        - test_data/10SGD_cropped/137/2024-11-03/OPERA_L2_RTC-S1_T137-292324-IW1_20241103T015918Z_20241103T071409Z_S1A_30_v1.0_VV.tif
-        - test_data/10SGD_cropped/137/2024-11-03/OPERA_L2_RTC-S1_T137-292324-IW2_20241103T015919Z_20241103T074936Z_S1A_30_v1.0_VV.tif
-        - test_data/10SGD_cropped/137/2024-11-03/OPERA_L2_RTC-S1_T137-292325-IW1_20241103T015921Z_20241103T074936Z_S1A_30_v1.0_VV.tif
+        - /home/ops/input_dir/2024-11-03/OPERA_L2_RTC-S1_T137-292324-IW1_20241103T015918Z_20241103T071409Z_S1A_30_v1.0_VV.tif
+        - /home/ops/input_dir/2024-11-03/OPERA_L2_RTC-S1_T137-292324-IW2_20241103T015919Z_20241103T074936Z_S1A_30_v1.0_VV.tif
+        - /home/ops/input_dir/2024-11-03/OPERA_L2_RTC-S1_T137-292325-IW1_20241103T015921Z_20241103T074936Z_S1A_30_v1.0_VV.tif
         post_rtc_crosspol:
-        - test_data/10SGD_cropped/137/2024-11-03/OPERA_L2_RTC-S1_T137-292324-IW1_20241103T015918Z_20241103T071409Z_S1A_30_v1.0_VH.tif
-        - test_data/10SGD_cropped/137/2024-11-03/OPERA_L2_RTC-S1_T137-292324-IW2_20241103T015919Z_20241103T074936Z_S1A_30_v1.0_VH.tif
-        - test_data/10SGD_cropped/137/2024-11-03/OPERA_L2_RTC-S1_T137-292325-IW1_20241103T015921Z_20241103T074936Z_S1A_30_v1.0_VH.tif
+        - /home/ops/input_dir/2024-11-03/OPERA_L2_RTC-S1_T137-292324-IW1_20241103T015918Z_20241103T071409Z_S1A_30_v1.0_VH.tif
+        - /home/ops/input_dir/2024-11-03/OPERA_L2_RTC-S1_T137-292324-IW2_20241103T015919Z_20241103T074936Z_S1A_30_v1.0_VH.tif
+        - /home/ops/input_dir/2024-11-03/OPERA_L2_RTC-S1_T137-292325-IW1_20241103T015921Z_20241103T074936Z_S1A_30_v1.0_VH.tif
         mgrs_tile_id: 10SGD
         dist_s1_alert_db_dir:
         dst_dir:
