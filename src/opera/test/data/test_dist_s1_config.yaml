@@ -19,7 +19,7 @@ RunConfig:
         ProgramOptions:
         - hello world > dist_s1_pge_test/output_dir/OPERA_L3_DSWx-NI_T18MVA_20200702T231843Z_20230317T190549Z_v0.1_B01_WTR.tif;
         - /bin/echo DIST-S1 invoked with RunConfig
-        ErrorCodeBase: 400000
+        ErrorCodeBase: 700000
         SchemaPath: pge/dist_s1/schema/dist_s1_sas_schema.yaml
         AlgorithmParametersSchemaPath: pge/dist_s1/schema/algorithm_parameters_dist_s1_schema.yaml
         IsoTemplatePath: pge/dist_s1/templates/OPERA_ISO_metadata_L3_DIST_S1_template.xml.jinja2

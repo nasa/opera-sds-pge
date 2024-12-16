@@ -74,7 +74,7 @@ RunConfig:
 
         # The Error Code base value added to the offset values to make
         # error codes unique per-PGE
-        ErrorCodeBase: 400000
+        ErrorCodeBase: 700000
 
         # Path to the Yamale schema used to validate the SAS portion
         # of the RunConfig
