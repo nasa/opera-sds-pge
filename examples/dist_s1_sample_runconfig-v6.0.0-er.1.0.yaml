@@ -1,0 +1,154 @@
+# Sample RunConfig for use with the DIST-S1 PGE v6.0.0-er.1.0
+# This RunConfig should require minimal changes in order to be used with the
+# OPERA PCM.
+
+RunConfig:
+  # Name for the RunConfig, may be any string
+  Name: OPERA-DIST-S1-PGE-SAMPLE-CONFIG
+
+  Groups:
+    # PGE-specific RunConfig section
+    # This section is only used by the PGE, however, paths to inputs/outputs
+    # should align with the similar sections of the SAS RunConfig
+    PGE:
+      PGENameGroup:
+        # Name of the PGE for use with this RunConfig, should always be
+        # DIST_S1_PGE when using with the DIST-S1 PGE
+        PGEName: DIST_S1_PGE
+
+      InputFilesGroup:
+        # List of input files/directories
+        # Must be a list of input GeoTIFF files
+        InputFilePaths:
+        - /home/ops/input_dir/2024-10-22/OPERA_L2_RTC-S1_T137-292324-IW1_20241022T015918Z_20241022T180854Z_S1A_30_v1.0_VV.tif
+        - /home/ops/input_dir/2024-10-22/OPERA_L2_RTC-S1_T137-292324-IW2_20241022T015919Z_20241022T180523Z_S1A_30_v1.0_VV.tif
+        - /home/ops/input_dir/2024-10-22/OPERA_L2_RTC-S1_T137-292325-IW1_20241022T015921Z_20241022T180523Z_S1A_30_v1.0_VV.tif
+        - /home/ops/input_dir/2024-10-22/OPERA_L2_RTC-S1_T137-292324-IW1_20241022T015918Z_20241022T180854Z_S1A_30_v1.0_VH.tif
+        - /home/ops/input_dir/2024-10-22/OPERA_L2_RTC-S1_T137-292324-IW2_20241022T015919Z_20241022T180523Z_S1A_30_v1.0_VH.tif
+        - /home/ops/input_dir/2024-10-22/OPERA_L2_RTC-S1_T137-292325-IW1_20241022T015921Z_20241022T180523Z_S1A_30_v1.0_VH.tif
+        - /home/ops/input_dir/2024-11-03/OPERA_L2_RTC-S1_T137-292324-IW1_20241103T015918Z_20241103T071409Z_S1A_30_v1.0_VV.tif
+        - /home/ops/input_dir/2024-11-03/OPERA_L2_RTC-S1_T137-292324-IW2_20241103T015919Z_20241103T074936Z_S1A_30_v1.0_VV.tif
+        - /home/ops/input_dir/2024-11-03/OPERA_L2_RTC-S1_T137-292325-IW1_20241103T015921Z_20241103T074936Z_S1A_30_v1.0_VV.tif
+        - /home/ops/input_dir/2024-11-03/OPERA_L2_RTC-S1_T137-292324-IW1_20241103T015918Z_20241103T071409Z_S1A_30_v1.0_VH.tif
+        - /home/ops/input_dir/2024-11-03/OPERA_L2_RTC-S1_T137-292324-IW2_20241103T015919Z_20241103T074936Z_S1A_30_v1.0_VH.tif
+        - /home/ops/input_dir/2024-11-03/OPERA_L2_RTC-S1_T137-292325-IW1_20241103T015921Z_20241103T074936Z_S1A_30_v1.0_VH.tif
+
+
+      DynamicAncillaryFilesGroup:
+        # Map of ancillary file types to paths to the file
+        # Paths must correspond to the file system within the Docker container
+        # For now, this is empty
+        AncillaryFileMap: {}
+
+      ProductPathGroup:
+        # Path to where output products should be stored
+        # Must correspond to the file system within the Docker container,
+        # and must have write permissions for the User/Group used with
+        # the "Docker run" command
+        OutputProductPath: dist_s1_pge_test/output_dir
+
+        # Path to a scratch directory for the PGE and SAS to store
+        # intermediate files that will not be needed after PGE execution
+        # completes
+        # Must correspond to the file system within the Docker container,
+        # and must have write permissions for the User/Group used with
+        # the "Docker run" command
+        ScratchPath: dist_s1_pge_test/scratch_dir
+
+      PrimaryExecutable:
+        # Identifier for the PGE executable, should always be DIST_S1 for
+        # this PGE
+        ProductIdentifier: DIST_S1
+
+        # Product version specific to output products
+        ProductVersion: "1.0"
+
+        # Path to the executable to run, path must be reachable from
+        # within the Docker container (i.e. findable with a "which" command)
+        ProgramPath: /opt/conda/envs/dist-s1-env/bin/dist-s1
+
+        # List of command-line options to use with ProgramPath
+        ProgramOptions:
+        - run_sas
+        - --runconfig_yml_path
+
+        # The Error Code base value added to the offset values to make
+        # error codes unique per-PGE
+        ErrorCodeBase: 700000
+
+        # Path to the Yamale schema used to validate the SAS portion
+        # of the RunConfig
+        # Path should correspond to the file system within the Docker
+        # container, and typically should reference a schema file bundled
+        # with the opera_pge installation directory within the container
+        # Consult the Docker image build scripts for more info
+        SchemaPath: /home/ops/opera/pge/dist_s1/schema/dist_s1_sas_schema.yaml
+
+        # Path to the Yamale schema used specifically to validate the
+        # algorithm parameters config, which is stored within a separate
+        # yaml file referenced within the SAS portion of this RunConfig
+        AlgorithmParametersSchemaPath: /home/ops/opera/pge/dist_s1/schema/algorithm_parameters_dist_s1_schema.yaml
+
+        # Path to the Jinja2 template used to generate the ISO xml
+        # metadata file
+        # Path should correspond to the file system within the Docker
+        # container, and typically should reference a template file bundled
+        # with the opera_pge installation directory within the container
+        # Consult the Docker image build scripts for more info
+        IsoTemplatePath: /home/ops/opera/pge/dist_s1/templates/OPERA_ISO_metadata_L3_DIST_S1_template.xml.jinja2
+
+        # Path to a YAML file mapping Measured Parameter metadata names to descriptions
+        # used to supplement the ISO xml metadata file
+        # Path should correspond to the file system within the Docker
+        # container, and typically should reference a template file bundled
+        # with the opera_pge installation directory within the container
+        # Consult the Docker image build scripts for more info
+        IsoMeasuredParameterDescriptions: /home/ops/opera/pge/dist_s1/templates/dist_s1_measured_parameters.yaml
+
+      QAExecutable:
+        # Set to True to enable execution of an additional "Quality Assurance"
+        # application after SAS execution has completed
+        Enabled: false
+
+        # Path to the executable to run, path must be reachable from
+        # within the Docker container (i.e. findable with a "which" command)
+        ProgramPath: null
+
+        # List of command-line options to use with ProgramPath
+        ProgramOptions: []
+
+      DebugLevelGroup:
+        # Set to True to enable Debug mode (Note: currently a no-op for this PGE)
+        DebugSwitch: false
+
+        # Set to True to have the PGE invoke the SAS/QA executables via
+        # a shell, rather than a Python subprocess
+        # This allows shell-style syntax to be used in ProgramPath and
+        # ProgramOptions, which can be useful for testing
+        ExecuteViaShell: true
+
+    # SAS-specific RunConfig section
+    # Prior to SAS execution by the PGE, the section below starting at "run_config"
+    # is isolated into its own YAML file for use with the SAS
+    SAS:
+      run_config:
+        pre_rtc_copol:
+        - /home/ops/input_dir/2024-10-22/OPERA_L2_RTC-S1_T137-292324-IW1_20241022T015918Z_20241022T180854Z_S1A_30_v1.0_VV.tif
+        - /home/ops/input_dir/2024-10-22/OPERA_L2_RTC-S1_T137-292324-IW2_20241022T015919Z_20241022T180523Z_S1A_30_v1.0_VV.tif
+        - /home/ops/input_dir/2024-10-22/OPERA_L2_RTC-S1_T137-292325-IW1_20241022T015921Z_20241022T180523Z_S1A_30_v1.0_VV.tif
+        pre_rtc_crosspol:
+        - /home/ops/input_dir/2024-10-22/OPERA_L2_RTC-S1_T137-292324-IW1_20241022T015918Z_20241022T180854Z_S1A_30_v1.0_VH.tif
+        - /home/ops/input_dir/2024-10-22/OPERA_L2_RTC-S1_T137-292324-IW2_20241022T015919Z_20241022T180523Z_S1A_30_v1.0_VH.tif
+        - /home/ops/input_dir/2024-10-22/OPERA_L2_RTC-S1_T137-292325-IW1_20241022T015921Z_20241022T180523Z_S1A_30_v1.0_VH.tif
+        post_rtc_copol:
+        - /home/ops/input_dir/2024-11-03/OPERA_L2_RTC-S1_T137-292324-IW1_20241103T015918Z_20241103T071409Z_S1A_30_v1.0_VV.tif
+        - /home/ops/input_dir/2024-11-03/OPERA_L2_RTC-S1_T137-292324-IW2_20241103T015919Z_20241103T074936Z_S1A_30_v1.0_VV.tif
+        - /home/ops/input_dir/2024-11-03/OPERA_L2_RTC-S1_T137-292325-IW1_20241103T015921Z_20241103T074936Z_S1A_30_v1.0_VV.tif
+        post_rtc_crosspol:
+        - /home/ops/input_dir/2024-11-03/OPERA_L2_RTC-S1_T137-292324-IW1_20241103T015918Z_20241103T071409Z_S1A_30_v1.0_VH.tif
+        - /home/ops/input_dir/2024-11-03/OPERA_L2_RTC-S1_T137-292324-IW2_20241103T015919Z_20241103T074936Z_S1A_30_v1.0_VH.tif
+        - /home/ops/input_dir/2024-11-03/OPERA_L2_RTC-S1_T137-292325-IW1_20241103T015921Z_20241103T074936Z_S1A_30_v1.0_VH.tif
+        mgrs_tile_id: 10SGD
+        dist_s1_alert_db_dir:
+        dst_dir:
+        water_mask:
