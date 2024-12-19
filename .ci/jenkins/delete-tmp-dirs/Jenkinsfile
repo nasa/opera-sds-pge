@@ -16,7 +16,7 @@ pipeline {
                 echo "Cleaning up old Docker data"
                 sh 'docker system prune -f'
                 echo "Removing any orphaned conda environments"
-                sh 'find /var/lib/jenkins/conda_installs/ -maxdepth 1 -type d -mtime +1 -exec rm -rf {} \\;'
+                sh 'find /data/var/lib/jenkins/conda_installs/ -maxdepth 1 -type d -mtime +1 -exec rm -rf {} \\; || true'
             }
         }
     }

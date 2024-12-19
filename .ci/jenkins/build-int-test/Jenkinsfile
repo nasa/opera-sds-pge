@@ -64,10 +64,10 @@ pipeline {
             steps{
                 sh label: 'Download and install',
                    script: """#!/bin/bash
-                     mkdir -p /var/lib/jenkins/conda_installs/${RUN_ID}/miniconda3
-                     wget -q https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O /var/lib/jenkins/conda_installs/${RUN_ID}/miniconda3/miniconda.sh
-                     bash /var/lib/jenkins/conda_installs/${RUN_ID}/miniconda3/miniconda.sh -b -u -p /var/lib/jenkins/conda_installs/${RUN_ID}/miniconda3
-                     rm /var/lib/jenkins/conda_installs/${RUN_ID}/miniconda3/miniconda.sh
+                     mkdir -p /data/var/lib/jenkins/conda_installs/${RUN_ID}/miniconda3
+                     wget -q https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O /data/var/lib/jenkins/conda_installs/${RUN_ID}/miniconda3/miniconda.sh
+                     bash /data/var/lib/jenkins/conda_installs/${RUN_ID}/miniconda3/miniconda.sh -b -u -p /data/var/lib/jenkins/conda_installs/${RUN_ID}/miniconda3
+                     rm /data/var/lib/jenkins/conda_installs/${RUN_ID}/miniconda3/miniconda.sh
                    """
             }
         }
@@ -77,13 +77,13 @@ pipeline {
                     echo "Creating conda env"
                     sh label: 'Installing int test conda environment',
                        script: """#!/bin/bash
-                         /var/lib/jenkins/conda_installs/${RUN_ID}/miniconda3/bin/conda create -n int_test_env python=3.10 pip
-                         /var/lib/jenkins/conda_installs/${RUN_ID}/miniconda3/bin/conda init bash
+                         /data/var/lib/jenkins/conda_installs/${RUN_ID}/miniconda3/bin/conda create -n int_test_env python=3.10 pip
+                         /data/var/lib/jenkins/conda_installs/${RUN_ID}/miniconda3/bin/conda init bash
                     """
 
                     sh label: 'Installing dependencies to int test conda environment',
                        script: '''#!/bin/bash
-                       . /var/lib/jenkins/.bashrc
+                       . /data/var/lib/jenkins/.bashrc
                        conda activate int_test_env
                        conda install -c conda-forge gdal poppler h5py matplotlib
                        pip install -r ./requirements.txt
@@ -102,7 +102,7 @@ pipeline {
 
                         def statusCode = sh label: "Running Integration Test for image ${DOCKER_IMAGE_PREFIX}/${DOCKER_IMAGE_SUFFIX}:${DOCKER_TAG}", returnStatus:true,
                            script: """#!/bin/bash
-                           . /var/lib/jenkins/.bashrc
+                           . /data/var/lib/jenkins/.bashrc
                            conda activate int_test_env
                            .ci/scripts/${DOCKER_IMAGE_SUFFIX}/test_int_${DOCKER_IMAGE_SUFFIX}.sh --tag ${DOCKER_TAG}
                            """
@@ -145,9 +145,10 @@ pipeline {
             echo "Cleaning up Docker images from local host"
             sh ".ci/scripts/util/cleanup.sh ${DOCKER_TAG}"
             echo "Removing int test conda environment"
-            sh "/var/lib/jenkins/conda_installs/${RUN_ID}/miniconda3/bin/conda env remove --yes --name int_test_env"
-            sh "/var/lib/jenkins/conda_installs/${RUN_ID}/miniconda3/bin/conda init --reverse"
-            sh "rm -rf /var/lib/jenkins/conda_installs/${RUN_ID}/"
+            sh "/data/var/lib/jenkins/conda_installs/${RUN_ID}/miniconda3/bin/conda env remove --yes --name int_test_env"
+            sh "/data/var/lib/jenkins/conda_installs/${RUN_ID}/miniconda3/bin/conda clean -ay"
+            sh "/data/var/lib/jenkins/conda_installs/${RUN_ID}/miniconda3/bin/conda init --reverse"
+            sh "rm -rf /data/var/lib/jenkins/conda_installs/${RUN_ID}/"
             deleteDir()
         }
         success {
