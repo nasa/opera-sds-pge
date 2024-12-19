@@ -239,11 +239,11 @@ pipeline {
     post {
         always {
             script {
-                catchError (buildResult: 'FAILURE', stageResult: 'FAILURE') {
+                catchError (buildResult: 'FAILURE', stageResult: 'FAILURE', message: 'Docker image cleanup failed') {
                     echo "Cleaning up Docker images from local host"
                     sh ".ci/scripts/util/cleanup.sh ${DOCKER_TAG}"
                 }
-                catchError (buildResult: 'FAILURE', stageResult: 'FAILURE') {
+                catchError (buildResult: 'FAILURE', stageResult: 'FAILURE', message: 'Conda cleanup failed') {
                     echo "Removing Sphinx build environment"
                     sh "/var/lib/jenkins/conda_installs/${RUN_ID}/miniconda3/bin/conda env remove --yes --name sphinx_env"
                     sh "/var/lib/jenkins/conda_installs/${RUN_ID}/miniconda3/bin/conda clean -ay"
