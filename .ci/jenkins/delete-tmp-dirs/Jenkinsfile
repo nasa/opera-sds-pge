@@ -5,6 +5,10 @@ in order to document the pipeline needed to delete the
 numerous 'tmp<unique_id>' directories that accumulate and consume
 disc space in the add/tmp directory on the opera-pge-ci aws machine.
 Using a Jenkins pipeline was required due to security concerns.
+
+This pipeline will also clean up extraneous docker data and any
+conda installs left over from potential failed executions of the
+int and deploy pipelines
 */
 pipeline {
     agent any
@@ -16,7 +20,7 @@ pipeline {
                 echo "Cleaning up old Docker data"
                 sh 'docker system prune -f'
                 echo "Removing any orphaned conda environments"
-                sh 'find /var/lib/jenkins/conda_installs/ -maxdepth 1 -type d -mtime +1 -exec rm -rf {} \\;'
+                sh 'find /var/lib/jenkins/conda_installs/ -maxdepth 1 -type d -mtime +1 -exec rm -rf {} \\; || true'
             }
         }
     }
