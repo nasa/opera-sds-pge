@@ -510,8 +510,8 @@
                         <gmd:EX_TemporalExtent id="boundingTemporalExtent">
                             <gmd:extent>
                                 <gml:TimePeriod gml:id="DISP_Time_Range">
-                                    <gml:beginPosition>{{ product_output.identification.reference_datetime }}{# ISO_OPERA_refDateTime #}</gml:beginPosition>
-                                    <gml:endPosition>{{ product_output.identification.secondary_datetime }}{# ISO_OPERA_secDateTime #}</gml:endPosition>
+                                    <gml:beginPosition>{{ product_output.identification.secondary_zero_doppler_start_time }}{# ISO_OPERA_refDateTime #}</gml:beginPosition>
+                                    <gml:endPosition>{{ product_output.identification.secondary_zero_doppler_end_time }}{# ISO_OPERA_secDateTime #}</gml:endPosition>
                                 </gml:TimePeriod>
                             </gmd:extent>
                         </gmd:EX_TemporalExtent>
