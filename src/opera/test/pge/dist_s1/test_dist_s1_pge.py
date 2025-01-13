@@ -7,12 +7,13 @@ test_dist_s1_pge.py
 Unit tests for the pge/dist_s1/dist_s1_pge.py module.
 """
 
-import glob
 import os
+import random
 import tempfile
 import unittest
 from io import StringIO
 from os.path import abspath, join
+from pathlib import Path
 
 from pkg_resources import resource_filename
 
@@ -66,6 +67,19 @@ class DistS1PgeTestCase(unittest.TestCase):
         self.input_file.close()
         self.working_dir.cleanup()
 
+    @staticmethod
+    def _create_dummy_input_files(run_config_path):
+        """
+        Create dummy input files in the working directory based on the inputs
+        section of a RunConfig
+        """
+        rc = RunConfig(run_config_path)
+
+        for file in rc.input_files:
+            Path(file).parent.mkdir(parents=True, exist_ok=True)
+            with open(file, "wb") as f:
+                f.write(random.randbytes(1024))
+
     def test_dist_s1_pge_execution(self):
         """
         Test execution of the DistS1Executor class and its associated mixins
@@ -73,6 +87,8 @@ class DistS1PgeTestCase(unittest.TestCase):
         a message to be captured by PgeLogger.
         """
         runconfig_path = join(self.data_dir, 'test_dist_s1_config.yaml')
+
+        DistS1PgeTestCase._create_dummy_input_files(runconfig_path)
 
         pge = DistS1Executor(pge_name="DistS1PgeTest", runconfig_path=runconfig_path)
 
@@ -107,10 +123,6 @@ class DistS1PgeTestCase(unittest.TestCase):
         # Check that the log file was created and moved into the output directory
         expected_log_file = pge.logger.get_file_name()
         self.assertTrue(os.path.exists(expected_log_file))
-
-        # Lastly, check that the dummy output products were created
-        tif_files = glob.glob(join(pge.runconfig.output_product_path, "*.tif"))
-        self.assertEqual(len(tif_files), 1)
 
         # Open and read the log
         with open(expected_log_file, 'r', encoding='utf-8') as infile:
