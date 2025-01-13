@@ -9,12 +9,14 @@ Unit tests for the pge/dist_s1/dist_s1_pge.py module.
 
 import os
 import random
+import shutil
 import tempfile
 import unittest
 from io import StringIO
 from os.path import abspath, join
 from pathlib import Path
 
+import yaml
 from pkg_resources import resource_filename
 
 from opera.pge import RunConfig
@@ -129,6 +131,96 @@ class DistS1PgeTestCase(unittest.TestCase):
             log_contents = infile.read()
 
         self.assertIn(f"DIST-S1 invoked with RunConfig {expected_sas_config_file}", log_contents)
+
+    def test_dist_s1_pge_input_validation(self):
+        """Test the input validation checks made by DistS1PreProcessorMixin."""
+        runconfig_path = join(self.data_dir, 'test_dist_s1_config.yaml')
+        test_runconfig_path = join(self.data_dir, 'invalid_dist_s1_runconfig.yaml')
+
+        with open(runconfig_path, 'r', encoding='utf-8') as stream:
+            runconfig_dict = yaml.safe_load(stream)
+
+        input_files_group = runconfig_dict['RunConfig']['Groups']['PGE']['InputFilesGroup']
+
+        Path('temp').mkdir(parents=True, exist_ok=True)
+
+        # Test that a non-existent file path is detected by pre-processor
+        input_files_group['InputFilePaths'] = ['temp/non_existent_file.tif']
+
+        try:
+            with open(test_runconfig_path, 'w', encoding='utf-8') as input_path:
+                yaml.safe_dump(runconfig_dict, input_path, sort_keys=False)
+
+            pge = DistS1Executor(pge_name="DistS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            # Config validation occurs before the log is fully initialized, but the
+            # initial log file should still exist and contain details of the validation
+            # error
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            # Open the log file, and check that the validation error details were captured
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn(f"Could not locate specified input "
+                          f"{input_files_group['InputFilePaths'][0]}", log_contents)
+
+            # Test that invalid file types are detected by pre-processor
+            input_files_group['InputFilePaths'] = ['temp/wrong_input_type.h5']
+
+            with open(input_files_group['InputFilePaths'][0], 'wb') as fp:
+                fp.write(random.randbytes(1024))
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as input_path:
+                yaml.safe_dump(runconfig_dict, input_path, sort_keys=False)
+
+            pge = DistS1Executor(pge_name="DistS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn(f'Input file {input_files_group["InputFilePaths"][0]} does not have an expected file '
+                          f'extension.', log_contents)
+
+            # Test that empty files are detected by pre-processor
+            input_files_group['InputFilePaths'] = ['temp/empty.tif']
+
+            os.system(
+                f"touch {input_files_group['InputFilePaths'][0]}"
+            )
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as input_path:
+                yaml.safe_dump(runconfig_dict, input_path, sort_keys=False)
+
+            pge = DistS1Executor(pge_name="DistS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn(f'Input file {input_files_group["InputFilePaths"][0]} size is 0. Size must be '
+                          f'greater than 0.', log_contents)
+        finally:
+            if os.path.exists(test_runconfig_path):
+                os.unlink(test_runconfig_path)
+
+            if os.path.exists('temp'):
+                shutil.rmtree('temp')
 
 
 if __name__ == "__main__":
