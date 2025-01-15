@@ -7,6 +7,7 @@ test_dist_s1_pge.py
 Unit tests for the pge/dist_s1/dist_s1_pge.py module.
 """
 
+import glob
 import os
 import random
 import shutil
@@ -65,6 +66,10 @@ class DistS1PgeTestCase(unittest.TestCase):
         self.test_output_dir = abspath(join(self.working_dir.name, "dist_s1_pge_test/output_dir"))
         os.makedirs(self.test_output_dir, exist_ok=True)
         os.chdir(self.working_dir.name)
+
+        # Create dummy input files based on the test run config
+        runconfig_path = join(self.data_dir, 'test_dist_s1_config.yaml')
+        DistS1PgeTestCase._create_dummy_input_files(runconfig_path)
 
     def tearDown(self) -> None:
         """Return to starting directory"""
@@ -130,8 +135,6 @@ class DistS1PgeTestCase(unittest.TestCase):
         """
         runconfig_path = join(self.data_dir, 'test_dist_s1_config.yaml')
 
-        DistS1PgeTestCase._create_dummy_input_files(runconfig_path)
-
         pge = DistS1Executor(pge_name="DistS1PgeTest", runconfig_path=runconfig_path)
 
         # Check that basic attributes were initialized
@@ -165,6 +168,10 @@ class DistS1PgeTestCase(unittest.TestCase):
         # Check that the log file was created and moved into the output directory
         expected_log_file = pge.logger.get_file_name()
         self.assertTrue(os.path.exists(expected_log_file))
+
+        # Lastly, check that the dummy output products were created
+        tif_files = glob.glob(join(pge.runconfig.output_product_path, "*", "*.tif"))
+        self.assertEqual(len(tif_files), 7)
 
         # Open and read the log
         with open(expected_log_file, 'r', encoding='utf-8') as infile:
@@ -267,8 +274,6 @@ class DistS1PgeTestCase(unittest.TestCase):
         runconfig_path = join(self.data_dir, 'test_dist_s1_config.yaml')
         test_runconfig_path = join(self.data_dir, 'invalid_dist_s1_runconfig.yaml')
 
-        DistS1PgeTestCase._create_dummy_input_files(runconfig_path)
-
         with open(runconfig_path, 'r', encoding='utf-8') as stream:
             runconfig_dict = yaml.safe_load(stream)
 
@@ -307,7 +312,7 @@ class DistS1PgeTestCase(unittest.TestCase):
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
 
-            self.assertIn("Incorrect number of output products generated: 0",
+            self.assertIn("Incorrect number of output granules generated: 0",
                           log_contents)
 
             # Test: Extra output products
@@ -328,7 +333,7 @@ class DistS1PgeTestCase(unittest.TestCase):
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
 
-            self.assertIn("Incorrect number of output products generated: 2",
+            self.assertIn("Incorrect number of output granules generated: 2",
                           log_contents)
 
             self.generate_band_data_output(product_id_2, tuple(), clear=True)

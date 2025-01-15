@@ -95,12 +95,12 @@ class DistS1PostProcessorMixin(PostProcessorMixin):
         product_id = re.compile(product_id_pattern + r'$')
         granule_filename = re.compile(granule_filename_pattern)
 
-        oputput_product_path = abspath(self.runconfig.output_product_path)
+        output_product_path = abspath(self.runconfig.output_product_path)
         output_products = []
 
-        for file in os.listdir(oputput_product_path):
-            dir_path = join(oputput_product_path, file)
-            if isdir(dir_path) and product_id.match(file) is not None:
+        for file in os.listdir(output_product_path):
+            dir_path = join(output_product_path, file)
+            if isdir(dir_path) and product_id.match(file):
                 bands = []
                 generated_band_names = []
 
@@ -112,29 +112,25 @@ class DistS1PostProcessorMixin(PostProcessorMixin):
                         if match_result is None:  # or match_result.groupdict()['ext'] != 'tif':
                             error_msg = f'Invalid product filename {granule}'
                             self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
-                        else:
-                            if os.stat(granule_path).st_size == 0:
-                                error_msg = f'Output file {granule_path} is empty.'
-                                self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
-                            elif match_result.groupdict()['layer_name'] not in self._output_layer_names:
-                                error_msg = f'Invalid layer name "{match_result.groupdict()["layer_name"]}" in output.'
-                                self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
-                            else:
-                                bands.append(granule_path)
-                                generated_band_names.append(match_result.groupdict()['layer_name'])
+                        elif os.stat(granule_path).st_size == 0:
+                            error_msg = f'Output file {granule_path} is empty.'
+                            self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
+                        elif match_result.groupdict()['layer_name'] not in self._output_layer_names:
+                            error_msg = f'Invalid layer name "{match_result.groupdict()["layer_name"]}" in output.'
+                            self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
+
+                        bands.append(granule_path)
+                        generated_band_names.append(match_result.groupdict()['layer_name'])
 
                 if len(bands) != len(self._output_layer_names):
                     error_msg = f'Incorrect number of output bands generated: {len(generated_band_names)}'
                     self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
-                else:
-                    output_products.append(dir_path)
+
+                output_products.append(dir_path)
 
         if len(output_products) != 1:
-            error_msg = f'Incorrect number of output products generated: {len(output_products)}'
+            error_msg = f'Incorrect number of output granules generated: {len(output_products)}'
             self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
-
-        #  "(?P<id>(?P<project>OPERA)_(?P<level>L3)_(?P<product_type>DIST)-(?P<source>S1)_(?P<tile_id>T[^\\W_]{5})_(?P<acquisition_ts>(?P<acq_year>\\d{4})(?P<acq_month>\\d{2})(?P<acq_day>\\d{2})T(?P<acq_hour>\\d{2})(?P<acq_minute>\\d{2})(?P<acq_second>\\d{2})Z)_(?P<creation_ts>(?P<cre_year>\\d{4})(?P<cre_month>\\d{2})(?P<cre_day>\\d{2})T(?P<cre_hour>\\d{2})(?P<cre_minute>\\d{2})(?P<cre_second>\\d{2})Z)_(?P<sensor>S1[AC])_(?P<spacing>30)_(?P<product_version>v\\d+[.]\\d+[.]\\d+))$",
-        #  (?P<id>(?P<project>OPERA)_(?P<level>L3)_(?P<product_type>DIST)-(?P<source>S1)_(?P<tile_id>T[^\W_]{5})_(?P<acquisition_ts>(?P<acq_year>\d{4})(?P<acq_month>\d{2})(?P<acq_day>\d{2})T(?P<acq_hour>\d{2})(?P<acq_minute>\d{2})(?P<acq_second>\d{2})Z)_(?P<creation_ts>(?P<cre_year>\d{4})(?P<cre_month>\d{2})(?P<cre_day>\d{2})T(?P<cre_hour>\d{2})(?P<cre_minute>\d{2})(?P<cre_second>\d{2})Z)_(?P<sensor>S1[AC])_(?P<spacing>30)_(?P<product_version>v\d+[.]\d+[.]\d+))((_(?P<layer_name>DIST-GEN-STATUS|DIST-GEN-STATUS-ACQ|GEN-METRIC|DATE-FIRST|DATE-LATEST|N-DIST|N-OBS))|_BROWSE)?[.](?P<ext>tif|tiff|png|iso\.xml)$
 
     def run_postprocessor(self, **kwargs):
         """
