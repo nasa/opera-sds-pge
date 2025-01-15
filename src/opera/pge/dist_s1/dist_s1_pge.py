@@ -144,7 +144,7 @@ class DistS1PostProcessorMixin(PostProcessorMixin):
         **kwargs: dict
             Any keyword arguments needed by the post-processor
         """
-        # super().run_postprocessor(**kwargs)
+
         print(f'Running postprocessor for {self._post_mixin_name}')
 
         self._validate_outputs()
