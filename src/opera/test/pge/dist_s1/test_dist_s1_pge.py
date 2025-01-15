@@ -31,7 +31,6 @@ class DistS1PgeTestCase(unittest.TestCase):
     starting_dir = None
     working_dir = None
     test_dir = None
-    input_file = None
 
     @classmethod
     def setUpClass(cls) -> None:
@@ -58,27 +57,21 @@ class DistS1PgeTestCase(unittest.TestCase):
         input_dir = join(self.working_dir.name, "dist_s1_pge_test/input_dir")
         os.makedirs(input_dir, exist_ok=True)
 
-        self.input_file = tempfile.NamedTemporaryFile(
-            dir=input_dir, prefix="test_input_", suffix=".tif"
-        )
+        # Create dummy input files based on the test run config
+        runconfig_path = join(self.data_dir, 'test_dist_s1_config.yaml')
+        self._create_dummy_input_files(runconfig_path)
 
         # Create the output directories expected by the test Runconfig file
         self.test_output_dir = abspath(join(self.working_dir.name, "dist_s1_pge_test/output_dir"))
         os.makedirs(self.test_output_dir, exist_ok=True)
         os.chdir(self.working_dir.name)
 
-        # Create dummy input files based on the test run config
-        runconfig_path = join(self.data_dir, 'test_dist_s1_config.yaml')
-        DistS1PgeTestCase._create_dummy_input_files(runconfig_path)
-
     def tearDown(self) -> None:
         """Return to starting directory"""
         os.chdir(self.test_dir)
-        self.input_file.close()
         self.working_dir.cleanup()
 
-    @staticmethod
-    def _create_dummy_input_files(run_config_path):
+    def _create_dummy_input_files(self, run_config_path):
         """
         Create dummy input files in the working directory based on the inputs
         section of a RunConfig
@@ -86,8 +79,10 @@ class DistS1PgeTestCase(unittest.TestCase):
         rc = RunConfig(run_config_path)
 
         for file in rc.input_files:
-            Path(file).parent.mkdir(parents=True, exist_ok=True)
-            with open(file, "wb") as f:
+            dummy_file_path = join(self.working_dir.name, file)
+
+            Path(dummy_file_path).parent.mkdir(parents=True, exist_ok=True)
+            with open(dummy_file_path, "wb") as f:
                 f.write(random.randbytes(1024))
 
     def generate_band_data_output(self, product_id, band_data, empty_file=False, clear=True):
