@@ -176,7 +176,7 @@ RunConfig:
         troposphere_files:
       static_ancillary_file_group:
         frame_to_burst_json: /home/mamba/input_dir/static_ancillary_files/opera-s1-disp-0.7.0-frame-to-burst.json.zip
-        reference_date_database_json: /home/mamba/input_dir/static_ancillary_files/opera-disp-s1-reference-dates-minimal-2025-01-15.json
+        reference_date_database_json: /home/mamba/input_dir/static_ancillary_files/opera-disp-s1-reference-dates-2025-01-15-minimal.json
       primary_executable:
         product_type: DISP_S1_HISTORICAL
       product_path_group:
