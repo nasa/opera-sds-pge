@@ -28,8 +28,8 @@ SAMPLE_TIME=15
 # RUNCONFIG should be the name of the runconfig in s3://operasds-dev-pge/disp_s1/
 [ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath "$(dirname "$(realpath "$0")")"/../../..)
 [ -z "${PGE_TAG}" ] && PGE_TAG="${USER}-dev"
-[ -z "${INPUT_DATA}" ] && INPUT_DATA="disp_s1_r6.2_final_expected_input.zip"
-[ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="disp_s1_r6.2_final_expected_output.zip"
+[ -z "${INPUT_DATA}" ] && INPUT_DATA="disp_s1_r6.3_final_expected_input.zip"
+[ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="disp_s1_r6.3_final_expected_output.zip"
 [ -z "${RUNCONFIG}" ] && RUNCONFIG="opera_pge_disp_s1_r6.0_final_runconfig_forward.yaml"
 [ -z "${TMP_ROOT}" ] && TMP_ROOT="$DEFAULT_TMP_ROOT"
 
@@ -60,7 +60,7 @@ echo "Input data directory: ${input_dir}"
 echo "Expected data directory: ${expected_data_dir}"
 
 # Copy the RunConfig for the historical workflow
-historical_runconfig="opera_pge_disp_s1_r6.2_final_runconfig_historical.yaml"
+historical_runconfig="opera_pge_disp_s1_r6.3_final_runconfig_historical.yaml"
 local_historical_runconfig="${SCRIPT_DIR}/${historical_runconfig}"
 echo "Copying runconfig file $local_historical_runconfig to $runconfig_dir"
 cp ${local_historical_runconfig} ${runconfig_dir}
