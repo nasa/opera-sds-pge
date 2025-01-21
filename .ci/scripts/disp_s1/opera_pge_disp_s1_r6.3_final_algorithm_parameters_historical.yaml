@@ -1,7 +1,7 @@
 # JSON file containing frame-specific algorithm parameters to override the defaults passed
 #   in the `algorithm_parameters.yaml`.
 #   Type: string | null.
-algorithm_parameters_overrides_json: /home/mamba/input_dir/static_ancillary_files/opera-disp-s1-algorithm-parameters-overrides-2024-01-09.json
+algorithm_parameters_overrides_json: /home/mamba/input_dir/static_ancillary_files/opera-disp-s1-algorithm-parameters-overrides-2025-01-09.json
 ps_options:
   # Amplitude dispersion threshold to consider a pixel a PS.
   #   Type: number.

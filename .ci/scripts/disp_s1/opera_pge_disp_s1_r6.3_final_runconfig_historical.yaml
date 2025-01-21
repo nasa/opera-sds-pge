@@ -175,8 +175,8 @@ RunConfig:
           - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg3600.17i
         troposphere_files:
       static_ancillary_file_group:
-        frame_to_burst_json: /home/mamba/input_dir/static_ancillary_files/opera-s1-disp-0.5.0-frame-to-burst.json.zip
-        reference_date_database_json: /home/mamba/input_dir/static_ancillary_files/opera-disp-s1-reference-dates-minimal-2024-09-19.json
+        frame_to_burst_json: /home/mamba/input_dir/static_ancillary_files/opera-s1-disp-0.7.0-frame-to-burst.json.zip
+        reference_date_database_json: /home/mamba/input_dir/static_ancillary_files/opera-disp-s1-reference-dates-minimal-2025-01-15.json
       primary_executable:
         product_type: DISP_S1_HISTORICAL
       product_path_group:
