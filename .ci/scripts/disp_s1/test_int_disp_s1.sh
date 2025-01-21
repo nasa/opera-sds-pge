@@ -92,7 +92,7 @@ do
     mkdir -p --mode=777 "$scratch_dir"
 
     # Copy the Algorithm Parameters RunConfigs
-    algo_runconfig="opera_pge_disp_s1_r6.2_final_algorithm_parameters_${mode}.yaml"
+    algo_runconfig="opera_pge_disp_s1_r6.3_final_algorithm_parameters_${mode}.yaml"
     local_algo_runconfig="${SCRIPT_DIR}/${algo_runconfig}"
     echo "Copying runconfig file $local_algo_runconfig to $runconfig_dir"
     cp ${local_algo_runconfig} ${runconfig_dir}
@@ -110,7 +110,7 @@ do
                -v ${output_dir}:/home/mamba/output_dir \
                -v ${scratch_dir}:/home/mamba/scratch_dir \
                -v ${expected_data_dir}/${mode}:/home/mamba/expected_output_dir \
-               ${PGE_IMAGE}:"${PGE_TAG}" --file /home/mamba/runconfig/opera_pge_disp_s1_r6.2_final_runconfig_${mode}.yaml
+               ${PGE_IMAGE}:"${PGE_TAG}" --file /home/mamba/runconfig/opera_pge_disp_s1_r6.3_final_runconfig_${mode}.yaml
 
     docker_exit_status=$?
 
