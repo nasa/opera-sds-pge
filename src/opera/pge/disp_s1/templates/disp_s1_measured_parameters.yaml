@@ -121,16 +121,18 @@ identification/product_bounding_box:
   attribute_type: contentInformation
   description: Product bounding box
   display_name: ProductBoundingBox
-identification/product_pixel_coordinate_convention:
-  attribute_data_type: string
-  attribute_type: contentInformation
-  description: Product pixel coordinate convention
-  display_name: ProductPixelCoordinateConvention
-identification/mission_id:
-  attribute_data_type: string
-  attribute_type: processingInformation
-  description: Mission ID
-  display_name: MissionId
+#
+# TODO: These appear to have been removed in 0.5.3
+#identification/product_pixel_coordinate_convention:
+#  attribute_data_type: string
+#  attribute_type: contentInformation
+#  description: Product pixel coordinate convention
+#  display_name: ProductPixelCoordinateConvention
+#identification/mission_id:
+#  attribute_data_type: string
+#  attribute_type: processingInformation
+#  description: Mission ID
+#  display_name: MissionId
 identification/instrument_name:
   attribute_data_type: string
   attribute_type: instrumentInformation
@@ -156,6 +158,123 @@ identification/absolute_orbit_number:
   attribute_type: instrumentInformation
   description: Absolute orbit number
   display_name: AbsoluteOrbitNumber
+identification/static_layers_data_access:
+  attribute_data_type: processingInformation
+  attribute_type: string
+  description: Location of the static layers product associated with this product (URL or DOI).
+  display_name: StaticLayersDataAccess
+identification/radar_band:
+  attribute_data_type: instrumentInformation
+  attribute_type: string
+  description: Acquired radar frequency band.
+  display_name: RadarBand
+
+# TODO: These are new but undocumented (so far) in 0.5.3
+#identification/acquisition_mode:
+#  attribute_data_type:
+#  attribute_type:
+#  description:
+#  display_name:
+#identification/ceos_analysis_ready_data_product_type:
+#  attribute_data_type:
+#  attribute_type:
+#  description:
+#  display_name:
+#identification/ceos_number_of_input_granules:
+#  attribute_data_type:
+#  attribute_type:
+#  description:
+#  display_name:
+#identification/processing_facility:
+#  attribute_data_type:
+#  attribute_type:
+#  description:
+#  display_name:
+#identification/processing_start_datetime:
+#  attribute_data_type:
+#  attribute_type:
+#  description:
+#  display_name:
+#identification/product_data_access:
+#  attribute_data_type:
+#  attribute_type:
+#  description:
+#  display_name:
+#identification/radar_center_frequency:
+#  attribute_data_type:
+#  attribute_type:
+#  description:
+#  display_name:
+#identification/source_data_azimuth_resolutions:
+#  attribute_data_type:
+#  attribute_type:
+#  description:
+#  display_name:
+#identification/source_data_dem_name:
+#  attribute_data_type:
+#  attribute_type:
+#  description:
+#  display_name:
+#identification/source_data_earliest_acquisition:
+#  attribute_data_type:
+#  attribute_type:
+#  description:
+#  display_name:
+#identification/source_data_earliest_processing_datetime:
+#  attribute_data_type:
+#  attribute_type:
+#  description:
+#  display_name:
+#identification/source_data_file_list:
+#  attribute_data_type:
+#  attribute_type:
+#  description:
+#  display_name:
+#identification/source_data_latest_acquisition:
+#  attribute_data_type:
+#  attribute_type:
+#  description:
+#  display_name:
+#identification/source_data_latest_processing_datetime:
+#  attribute_data_type:
+#  attribute_type:
+#  description:
+#  display_name:
+#identification/source_data_max_noise_equivalent_sigma_zero:
+#  attribute_data_type:
+#  attribute_type:
+#  description:
+#  display_name:
+#identification/source_data_original_institution:
+#  attribute_data_type:
+#  attribute_type:
+#  description:
+#  display_name:
+#identification/source_data_polarization:
+#  attribute_data_type:
+#  attribute_type:
+#  description:
+#  display_name:
+#identification/source_data_range_resolutions:
+#  attribute_data_type:
+#  attribute_type:
+#  description:
+#  display_name:
+#identification/source_data_reference_orbit_type:
+#  attribute_data_type:
+#  attribute_type:
+#  description:
+#  display_name:
+#identification/source_data_satellite_names:
+#  attribute_data_type:
+#  attribute_type:
+#  description:
+#  display_name:
+#identification/source_data_secondary_orbit_type:
+#  attribute_data_type:
+#  attribute_type:
+#  description:
+#  display_name:
 metadata/disp_s1_software_version:
   attribute_data_type: string
   attribute_type: processingInformation
@@ -166,3 +285,147 @@ metadata/dolphin_software_version:
   attribute_type: processingInformation
   description: Version of the Dolphin software used to generate the product
   display_name: DolphinSoftwareVersion
+
+metadata/pge_runconfig:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: The full PGE runconfig YAML file used to generate the product.
+  display_name: PGERunConfig
+metadata/algorithm_parameters_yaml:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: The full PGE runconfig YAML file used to generate the product.
+  display_name: AlgorithmParametersYAML
+metadata/dolphin_workflow_config:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: The configuration parameters used by `dolphin` during the processing.
+  display_name: DolphinWorkflowConfig
+metadata/reference_orbit/orbit_direction:
+  attribute_data_type: string
+  attribute_type: platformInformation
+  description: Direction of sensor orbit ephemeris (e.g., ascending, descending).
+  display_name: ReferenceOrbitDirection
+metadata/reference_orbit/orbit_type:
+  attribute_data_type: string
+  attribute_type: platformInformation
+  description: "Type of orbit file used for processing. RESORB: restituted orbit ephemeris or POEORB: precise orbit ephemeris."
+  display_name: ReferenceOrbitType
+metadata/reference_orbit/reference_epoch:
+  attribute_data_type: string
+  attribute_type: platformInformation
+  description: "Reference epoch of the state vectors with the format of YYYY-MM-DD HH:MM:SS.6f."
+  display_name: ReferenceReferenceEpoch
+metadata/secondary_orbit/orbit_direction:
+  attribute_data_type: string
+  attribute_type: platformInformation
+  description: Direction of sensor orbit ephemeris (e.g., ascending, descending).
+  display_name: SecondaryOrbitDirection
+metadata/secondary_orbit/orbit_type:
+  attribute_data_type: string
+  attribute_type: platformInformation
+  description: "Type of orbit file used for processing. RESORB: restituted orbit ephemeris or POEORB: precise orbit ephemeris."
+  display_name: SecondaryOrbitType
+metadata/secondary_orbit/reference_epoch:
+  attribute_data_type: string
+  attribute_type: platformInformation
+  description: "Reference epoch of the state vectors with the format of YYYY-MM-DD HH:MM:SS.6f."
+  display_name: SecondaryReferenceEpoch
+
+
+# TODO: These are new but undocumented (so far) in 0.5.3
+#metadata/algorithm_theoretical_basis_document_id:
+#  attribute_data_type:
+#  attribute_type:
+#  description:
+#  display_name:
+#metadata/ceos_atmospheric_phase_correction:
+#  attribute_data_type:
+#  attribute_type:
+#  description:
+#  display_name:
+#metadata/ceos_gridding_convention:
+#  attribute_data_type:
+#  attribute_type:
+#  description:
+#  display_name:
+#metadata/ceos_insar_pair_baseline_criteria_information:
+#  attribute_data_type:
+#  attribute_type:
+#  description:
+#  display_name:
+#metadata/ceos_ionospheric_phase_correction:
+#  attribute_data_type:
+#  attribute_type:
+#  description:
+#  display_name:
+#metadata/ceos_noise_removal:
+#  attribute_data_type:
+#  attribute_type:
+#  description:
+#  display_name:
+#metadata/ceos_persistent_scatterer_amplitude_dispersion_threshold:
+#  attribute_data_type:
+#  attribute_type:
+#  description:
+#  display_name:
+#metadata/ceos_persistent_scatterer_selection_criteria:
+#  attribute_data_type:
+#  attribute_type:
+#  description:
+#  display_name:
+#metadata/ceos_persistent_scatterer_selection_criteria_doi:
+#  attribute_data_type:
+#  attribute_type:
+#  description:
+#  display_name:
+#metadata/ceos_phase_similarity_metric_doi:
+#  attribute_data_type:
+#  attribute_type:
+#  description:
+#  display_name:
+#metadata/ceos_phase_unwrapping_method:
+#  attribute_data_type:
+#  attribute_type:
+#  description:
+#  display_name:
+#metadata/ceos_phase_unwrapping_snaphu_doi:
+#  attribute_data_type:
+#  attribute_type:
+#  description:
+#  display_name:
+#metadata/platform_id:
+#  attribute_data_type:
+#  attribute_type:
+#  description:
+#  display_name:
+#metadata/product_pixel_coordinate_convention:
+#  attribute_data_type:
+#  attribute_type:
+#  description:
+#  display_name:
+#metadata/product_specification_document_id:
+#  attribute_data_type:
+#  attribute_type:
+#  description:
+#  display_name:
+#metadata/slant_range_mid_swath:
+#  attribute_data_type:
+#  attribute_type:
+#  description:
+#  display_name:
+#metadata/source_data_software_COMPASS_version:
+#  attribute_data_type:
+#  attribute_type:
+#  description:
+#  display_name:
+#metadata/source_data_software_ISCE3_version:
+#  attribute_data_type:
+#  attribute_type:
+#  description:
+#  display_name:
+#metadata/source_data_software_s1_reader_version:
+#  attribute_data_type:
+#  attribute_type:
+#  description:
+#  display_name:
