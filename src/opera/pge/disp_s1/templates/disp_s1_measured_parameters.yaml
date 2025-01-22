@@ -147,13 +147,13 @@ identification/absolute_orbit_number:
   description: Absolute orbit number
   display_name: AbsoluteOrbitNumber
 identification/static_layers_data_access:
-  attribute_data_type: processingInformation
-  attribute_type: string
+  attribute_data_type: string
+  attribute_type: processingInformation
   description: Location of the static layers product associated with this product (URL or DOI).
   display_name: StaticLayersDataAccess
 identification/radar_band:
-  attribute_data_type: instrumentInformation
-  attribute_type: string
+  attribute_data_type: string
+  attribute_type: instrumentInformation
   description: Acquired radar frequency band.
   display_name: RadarBand
 
