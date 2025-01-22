@@ -294,36 +294,6 @@ metadata/dolphin_workflow_config:
   attribute_type: processingInformation
   description: The configuration parameters used by `dolphin` during the processing.
   display_name: DolphinWorkflowConfig
-metadata/reference_orbit/orbit_direction:
-  attribute_data_type: string
-  attribute_type: platformInformation
-  description: Direction of sensor orbit ephemeris (e.g., ascending, descending).
-  display_name: ReferenceOrbitDirection
-metadata/reference_orbit/orbit_type:
-  attribute_data_type: string
-  attribute_type: platformInformation
-  description: "Type of orbit file used for processing. RESORB: restituted orbit ephemeris or POEORB: precise orbit ephemeris."
-  display_name: ReferenceOrbitType
-metadata/reference_orbit/reference_epoch:
-  attribute_data_type: string
-  attribute_type: platformInformation
-  description: "Reference epoch of the state vectors with the format of YYYY-MM-DD HH:MM:SS.6f."
-  display_name: ReferenceReferenceEpoch
-metadata/secondary_orbit/orbit_direction:
-  attribute_data_type: string
-  attribute_type: platformInformation
-  description: Direction of sensor orbit ephemeris (e.g., ascending, descending).
-  display_name: SecondaryOrbitDirection
-metadata/secondary_orbit/orbit_type:
-  attribute_data_type: string
-  attribute_type: platformInformation
-  description: "Type of orbit file used for processing. RESORB: restituted orbit ephemeris or POEORB: precise orbit ephemeris."
-  display_name: SecondaryOrbitType
-metadata/secondary_orbit/reference_epoch:
-  attribute_data_type: string
-  attribute_type: platformInformation
-  description: "Reference epoch of the state vectors with the format of YYYY-MM-DD HH:MM:SS.6f."
-  display_name: SecondaryReferenceEpoch
 
 
 # TODO: These are new in SAS v0.5.3 - Descriptions sourced from code, not spec. attribute_data_type fields are guessed.

@@ -158,6 +158,7 @@ unwrap_options:
     #   `similarity_threshold` *or* above the temporal coherence threshold is chosen.
     #   Type: number.
     similarity_threshold: 0.5
+    run_ambiguity_interpolation: true
     general_settings:
       # Tile up data spatially.
       #   Type: boolean.
