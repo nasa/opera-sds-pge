@@ -183,12 +183,12 @@ RunConfig:
         product_path: /home/mamba/output_dir
         scratch_path: /home/mamba/scratch_dir
         sas_output_path: /home/mamba/output_dir
-        product_version: "0.9"
+        product_version: "1.0"
         save_compressed_slc: true
       worker_settings:
         gpu_enabled: false
-        threads_per_worker: 4
-        n_parallel_bursts: 2
+        threads_per_worker: 2
+        n_parallel_bursts: 9
         block_shape:
           - 512
           - 512
