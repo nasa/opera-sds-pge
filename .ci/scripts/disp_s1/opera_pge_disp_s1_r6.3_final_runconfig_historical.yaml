@@ -83,7 +83,7 @@ RunConfig:
 
       PrimaryExecutable:
         ProductIdentifier: DISP_S1
-        ProductVersion: "0.9"
+        ProductVersion: "1.0"
         ProgramPath: disp-s1
         ProgramOptions:
           - run
