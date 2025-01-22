@@ -70,7 +70,7 @@ do
         else
             compare_out=$(${SCRIPT_DIR}/disp_s1_compare.py \
                 --golden "${expected_file}" --test "${OUTPUT_DIR}/${output_file}" \
-                --exclude_groups pge_runconfig dolphin_workflow_config dolphin_workflow_config algorithm_parameters_yaml ) || compare_exit_status=$?
+                --exclude_groups pge_runconfig dolphin_workflow_config dolphin_workflow_config algorithm_parameters_yaml processing_start_datetime ) || compare_exit_status=$?
 
             if [[ $compare_exit_status -ne 0 ]]; then
                 echo "File comparison failed. Output and expected files differ for ${output_file}"
