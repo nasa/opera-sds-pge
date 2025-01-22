@@ -5,7 +5,7 @@ algorithm_parameters_overrides_json: /home/mamba/input_dir/static_ancillary_file
 ps_options:
   # Amplitude dispersion threshold to consider a pixel a PS.
   #   Type: number.
-  amp_dispersion_threshold: 0.20
+  amp_dispersion_threshold: 0.2
 phase_linking:
   # Size of the ministack for sequential estimator.
   #   Type: integer.
@@ -116,7 +116,7 @@ unwrap_options:
       - 400
     # Number of tiles to unwrap in parallel for each interferogram.
     #   Type: integer.
-    n_parallel_tiles: 2
+    n_parallel_tiles: 7
     # Initialization method for SNAPHU.
     #   Type: string.
     #   Options: ['mcf', 'mst'].
@@ -156,6 +156,10 @@ unwrap_options:
     #   `similarity_threshold` *or* above the temporal coherence threshold is chosen.
     #   Type: number.
     similarity_threshold: 0.5
+    # After running spurt, interpolate the values that were masked during unwrapping (which are
+    #   otherwise left as nan).
+    #   Type: boolean.
+    run_ambiguity_interpolation: true
     general_settings:
       # Tile up data spatially.
       #   Type: boolean.
