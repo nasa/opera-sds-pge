@@ -156,10 +156,6 @@ identification/radar_band:
   attribute_type: instrumentInformation
   description: Acquired radar frequency band.
   display_name: RadarBand
-
-# TODO: These are new in SAS v0.5.3 - Descriptions sourced from code, not spec. attribute_data_type fields are guessed.
-#  Need to double check
-
 identification/acquisition_mode:
   attribute_data_type: string
   attribute_type: instrumentInformation
@@ -278,27 +274,6 @@ metadata/dolphin_software_version:
   attribute_type: processingInformation
   description: Version of the Dolphin software used to generate the product
   display_name: DolphinSoftwareVersion
-
-metadata/pge_runconfig:
-  attribute_data_type: string
-  attribute_type: processingInformation
-  description: The full PGE runconfig YAML file used to generate the product.
-  display_name: PGERunConfig
-metadata/algorithm_parameters_yaml:
-  attribute_data_type: string
-  attribute_type: processingInformation
-  description: The full algorithm parameters YAML file used to generate the product.
-  display_name: AlgorithmParametersYAML
-metadata/dolphin_workflow_config:
-  attribute_data_type: string
-  attribute_type: processingInformation
-  description: The configuration parameters used by `dolphin` during the processing.
-  display_name: DolphinWorkflowConfig
-
-
-# TODO: These are new in SAS v0.5.3 - Descriptions sourced from code, not spec. attribute_data_type fields are guessed.
-#  Need to double check
-
 metadata/algorithm_theoretical_basis_document_id:
   attribute_data_type: string
   attribute_type: processingInformation
@@ -327,12 +302,12 @@ metadata/ceos_ionospheric_phase_correction:
 metadata/ceos_noise_removal:
   attribute_data_type: string
   attribute_type: processingInformation
-  description: Flag if noise removal* has been applied (Y/N). Metadata should include the noise removal algorithm and reference to the algorithm as URL or DOI.
+  description: Flag if noise removal has been applied (Y/N). Metadata should include the noise removal algorithm and reference to the algorithm as URL or DOI.
   display_name: CEOSNoiseRemoval
 metadata/ceos_persistent_scatterer_amplitude_dispersion_threshold:
   attribute_data_type: float
   attribute_type: processingInformation
-  description: "TBA"  #TODO: ask Scott S - this is a duplicate description in code
+  description: CEOS persistent scatterer amplitude dispersion threshold
   display_name: CEOSPersistentScattererAmplitudeDispersionThreshold
 metadata/ceos_persistent_scatterer_selection_criteria:
   attribute_data_type: string
