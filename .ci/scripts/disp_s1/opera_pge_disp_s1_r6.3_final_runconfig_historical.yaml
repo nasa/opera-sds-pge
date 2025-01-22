@@ -83,7 +83,7 @@ RunConfig:
 
       PrimaryExecutable:
         ProductIdentifier: DISP_S1
-        ProductVersion: "0.9"
+        ProductVersion: "1.0"
         ProgramPath: disp-s1
         ProgramOptions:
           - run
@@ -121,7 +121,7 @@ RunConfig:
 
         frame_id: 7091
       dynamic_ancillary_file_group:
-        algorithm_parameters_file: /home/mamba/runconfig/opera_pge_disp_s1_r6.2_final_algorithm_parameters_historical.yaml
+        algorithm_parameters_file: /home/mamba/runconfig/opera_pge_disp_s1_r6.3_final_algorithm_parameters_historical.yaml
         static_layers_files:
           - /home/mamba/input_dir/dynamic_ancillary_files/static_layers/OPERA_L2_CSLC-S1-STATIC_T027-056725-IW1_20140403_S1A_v1.0.h5
           - /home/mamba/input_dir/dynamic_ancillary_files/static_layers/OPERA_L2_CSLC-S1-STATIC_T027-056726-IW1_20140403_S1A_v1.0.h5
@@ -175,20 +175,20 @@ RunConfig:
           - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg3600.17i
         troposphere_files:
       static_ancillary_file_group:
-        frame_to_burst_json: /home/mamba/input_dir/static_ancillary_files/opera-s1-disp-0.5.0-frame-to-burst.json.zip
-        reference_date_database_json: /home/mamba/input_dir/static_ancillary_files/opera-disp-s1-reference-dates-minimal-2024-09-19.json
+        frame_to_burst_json: /home/mamba/input_dir/static_ancillary_files/opera-s1-disp-0.7.0-frame-to-burst.json.zip
+        reference_date_database_json: /home/mamba/input_dir/static_ancillary_files/opera-disp-s1-reference-dates-2025-01-15-minimal.json
       primary_executable:
         product_type: DISP_S1_HISTORICAL
       product_path_group:
         product_path: /home/mamba/output_dir
         scratch_path: /home/mamba/scratch_dir
         sas_output_path: /home/mamba/output_dir
-        product_version: "0.9"
+        product_version: "1.0"
         save_compressed_slc: true
       worker_settings:
         gpu_enabled: false
-        threads_per_worker: 4
-        n_parallel_bursts: 2
+        threads_per_worker: 2
+        n_parallel_bursts: 9
         block_shape:
           - 512
           - 512

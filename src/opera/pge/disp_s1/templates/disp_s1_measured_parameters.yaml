@@ -121,16 +121,6 @@ identification/product_bounding_box:
   attribute_type: contentInformation
   description: Product bounding box
   display_name: ProductBoundingBox
-identification/product_pixel_coordinate_convention:
-  attribute_data_type: string
-  attribute_type: contentInformation
-  description: Product pixel coordinate convention
-  display_name: ProductPixelCoordinateConvention
-identification/mission_id:
-  attribute_data_type: string
-  attribute_type: processingInformation
-  description: Mission ID
-  display_name: MissionId
 identification/instrument_name:
   attribute_data_type: string
   attribute_type: instrumentInformation
@@ -156,6 +146,124 @@ identification/absolute_orbit_number:
   attribute_type: instrumentInformation
   description: Absolute orbit number
   display_name: AbsoluteOrbitNumber
+identification/static_layers_data_access:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Location of the static layers product associated with this product (URL or DOI).
+  display_name: StaticLayersDataAccess
+identification/radar_band:
+  attribute_data_type: string
+  attribute_type: instrumentInformation
+  description: Acquired radar frequency band.
+  display_name: RadarBand
+identification/acquisition_mode:
+  attribute_data_type: string
+  attribute_type: instrumentInformation
+  description: Radar acquisition mode for input products.
+  display_name: AcquisitionMode
+identification/ceos_analysis_ready_data_product_type:
+  attribute_data_type: string
+  attribute_type: contentInformation
+  description: CEOS Analysis Ready Data (CARD) document identifier
+  display_name: CEOSAnalysisReadyDataProductType
+identification/ceos_number_of_input_granules:
+  attribute_data_type: int
+  attribute_type: processingInformation
+  description: Number of input data granule used during processing.
+  display_name: CEOSNumberOfInputGranules
+identification/processing_facility:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Product processing facility.
+  display_name: ProcessingFacility
+identification/processing_start_datetime:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: UTC datetime of the start of processing for this product.
+  display_name: ProcessingStartDatetime
+identification/product_data_access:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: The metadata identifies the location from where the source data can be retrieved, expressed as a URL or DOI.
+  display_name: ProductDataAccess
+identification/radar_center_frequency:
+  attribute_data_type: float
+  attribute_type: instrumentInformation
+  description: Radar center frequency of input products.
+  display_name: RadarCenterFrequency
+identification/source_data_azimuth_resolutions:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: List of [IW1, IW2, IW3] azimuth resolutions from L1 Sentinel-1 SLCs.
+  display_name: SourceDataAzimuthResolutions
+identification/source_data_dem_name:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Name of Digital Elevation Model used during input data processing.
+  display_name: SourceDataDEMName
+identification/source_data_earliest_acquisition:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Datetime of earliest input granule used during processing.
+  display_name: SourceDataEarliestAcquisition
+identification/source_data_earliest_processing_datetime:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Earliest processing datetime of input granules.
+  display_name: SourceDataEarliestProcessingDatetime
+identification/source_data_file_list:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: List of input coregistered SLC granules used to create displacement frame.
+  display_name: SourceDataFileList
+identification/source_data_latest_acquisition:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Datetime of latest input granule used during processing.
+  display_name: SourceDataLatestAcquisition
+identification/source_data_latest_processing_datetime:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Latest processing datetime of input granules.
+  display_name: SourceDataLatestProcessingDatetime
+identification/source_data_max_noise_equivalent_sigma_zero:
+  attribute_data_type: float
+  attribute_type: processingInformation
+  description: Maximum Noise equivalent sigma0 in dB.
+  display_name: SourceDataMaxNoiseEquivalentSigmaZero
+identification/source_data_original_institution:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Original processing institution of Sentinel-1 SLC data.
+  display_name: SourceDataOriginalInstitution
+identification/source_data_polarization:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Radar polarization of input products.
+  display_name: SourceDataPolarization
+identification/source_data_range_resolutions:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: List of [IW1, IW2, IW3] range resolutions from source L1 Sentinel-1 SLCs.
+  display_name: SourceDataRangeResolution
+identification/source_data_reference_orbit_type:
+  attribute_data_type: string
+  attribute_type: platformInformation
+  description: Type of orbit (precise, restituted) used during input data processing for the reference acquisition.
+  display_name: SourceDataReferenceOrbitType
+identification/source_data_satellite_names:
+  attribute_data_type: string
+  attribute_type: platformInformation
+  description: Names of satellites included in input granules.
+  display_name: SourceDataSatelliteNames
+identification/source_data_secondary_orbit_type:
+  attribute_data_type: string
+  attribute_type: platformInformation
+  description: Type of orbit (precise, restituted) used during input data processing for the secondary acquisition
+  display_name: SourceDataSecondaryOrbitType
+
+#####
+
 metadata/disp_s1_software_version:
   attribute_data_type: string
   attribute_type: processingInformation
@@ -166,3 +274,98 @@ metadata/dolphin_software_version:
   attribute_type: processingInformation
   description: Version of the Dolphin software used to generate the product
   display_name: DolphinSoftwareVersion
+metadata/algorithm_theoretical_basis_document_id:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Document identifier for Algorithm Theoretical Basis Document (ATBD).
+  display_name: AlgorithmTheoreticalBasisDocumentID
+metadata/ceos_atmospheric_phase_correction:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Method used to correct for atmosphere phase noise.
+  display_name: CEOSAtmosphericPhaseCorrection
+metadata/ceos_gridding_convention:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Whether a consistent gridding/sampling frame is used for ascending/descending frames.
+  display_name: CEOSGriddingConvention
+metadata/ceos_insar_pair_baseline_criteria_information:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: InSAR pair baseline selection criteria.
+  display_name: CEOSInSARPairBaselineCriteriaInformation
+metadata/ceos_ionospheric_phase_correction:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Method used to correct for ionospheric phase noise.
+  display_name: CEOSIonosphericPhaseCorrection
+metadata/ceos_noise_removal:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Flag if noise removal has been applied (Y/N). Metadata should include the noise removal algorithm and reference to the algorithm as URL or DOI.
+  display_name: CEOSNoiseRemoval
+metadata/ceos_persistent_scatterer_amplitude_dispersion_threshold:
+  attribute_data_type: float
+  attribute_type: processingInformation
+  description: CEOS persistent scatterer amplitude dispersion threshold
+  display_name: CEOSPersistentScattererAmplitudeDispersionThreshold
+metadata/ceos_persistent_scatterer_selection_criteria:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Name of persistent scatterer selection criteria.
+  display_name: CEOSPersistentScattererSelectionCriteria
+metadata/ceos_persistent_scatterer_selection_criteria_doi:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: DOI of reference describing persistent scatterer selection criteria.
+  display_name: CEOSPersistentScattererSelectionCriteriaDOI
+metadata/ceos_phase_similarity_metric_doi:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: DOI of reference describing phase cosine similarity metric.
+  display_name: CEOSPhaseSimilarityMetricDOI
+metadata/ceos_phase_unwrapping_method:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Name of phase unwrapping method.
+  display_name: CEOSPhaseUnwrappingMethod
+metadata/ceos_phase_unwrapping_snaphu_doi:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: DOI to reference describing SNAPHU phase unwrapping algorithm.
+  display_name: CEOSPhaseUnwrappingSnaphuDOI
+metadata/platform_id:  # Description copied from CSLC processing_information/input_burst_metadata/platform_id
+  attribute_data_type: string
+  attribute_type: platformInformation
+  description: Sensor platform identification string.
+  display_name: PlatformID
+metadata/product_pixel_coordinate_convention:
+  attribute_data_type: string
+  attribute_type: contentInformation
+  description: x/y coordinate convention referring to pixel center or corner.
+  display_name: ProductPixelCoordinateConvention
+metadata/product_specification_document_id:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Document identifier for Product Specification.
+  display_name: ProductSpecificationDocumentID
+metadata/slant_range_mid_swath:  # Description copied from CSLC processing_information/input_burst_metadata/iw2_mid_range
+  attribute_data_type: float
+  attribute_type: instrumentInformation
+  description: Slant range of the middle of the sub-swath IW2.
+  display_name: SlantRangeMidSwath
+metadata/source_data_software_COMPASS_version:  # Description copied from CSLC processing_information/algorithms/COMPASS_version
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: CSLC-S1 SAS version used for processing.
+  display_name: SourceDataSoftwareCOMPASSVersion
+metadata/source_data_software_ISCE3_version:  # Description copied from CSLC processing_information/algorithms/ISCE3_version
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: ISCE3 version used for processing
+  display_name: SourceDataSoftwareISCE3Version
+metadata/source_data_software_s1_reader_version:  # Description copied from CSLC processing_information/algorithms/s1_reader_version
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: S1-Reader version used for processing
+  display_name: SourceDataSoftwareS1ReaderVersion

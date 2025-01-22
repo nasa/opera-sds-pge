@@ -127,7 +127,7 @@ class DispS1PgeTestCase(unittest.TestCase):
         Helper method to check the properties of a parsed algorithm parameters runconfig against the
         expected values as defined by the "valid" sample algorithm parameters runconfig files.
         """
-        self.assertEqual(runconfig['algorithm_parameters_overrides_json'], "opera-disp-s1-algorithm-parameters-overrides-2024-10-14.json")
+        self.assertEqual(runconfig['algorithm_parameters_overrides_json'], "opera-disp-s1-algorithm-parameters-overrides-2025-01-09.json")
         self.assertEqual(runconfig['ps_options']['amp_dispersion_threshold'], 0.25)
         self.assertEqual(runconfig['phase_linking']['ministack_size'], 1000)
         self.assertEqual(runconfig['phase_linking']['max_num_compressed'], 5)

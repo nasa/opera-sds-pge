@@ -1,7 +1,7 @@
 # JSON file containing frame-specific algorithm parameters to override the defaults passed
 #   in the `algorithm_parameters.yaml`.
 #   Type: string | null.
-algorithm_parameters_overrides_json: opera-disp-s1-algorithm-parameters-overrides-2024-10-14.json
+algorithm_parameters_overrides_json: opera-disp-s1-algorithm-parameters-overrides-2025-01-09.json
 ps_options:
   # Amplitude dispersion threshold to consider a pixel a PS.
   #   Type: number.
@@ -158,6 +158,7 @@ unwrap_options:
     #   `similarity_threshold` *or* above the temporal coherence threshold is chosen.
     #   Type: number.
     similarity_threshold: 0.5
+    run_ambiguity_interpolation: true
     general_settings:
       # Tile up data spatially.
       #   Type: boolean.
@@ -323,3 +324,11 @@ spatial_wavelength_cutoff: 25000.0
 browse_image_vmin_vmax:
   - -0.1
   - 0.1
+# When creating `recommended_mask`, pixels with temporal coherence below this threshold and with similarity below
+# `recommended_similarity_threshold` are masked.
+recommended_temporal_coherence_threshold: 0.6
+# When creating `recommended_mask`, pixels with similarity below this threshold and with temporal coherence below
+# `recommended_temporal_coherence_threshold` are masked.
+recommended_similarity_threshold: 0.5
+# Number of output products to create in parallel.
+num_parallel_products: 3
