@@ -563,7 +563,10 @@ def get_disp_s1_product_metadata(file_name):
     return disp_metadata
 
 
-def create_test_disp_metadata_product(file_path):
+def create_test_disp_metadata_product(
+        file_path,
+        omit_cslc_measured_parameters=False
+):
     # pylint: disable=unused-variable,invalid-name,too-many-locals,too-many-statements,too-many-boolean-expressions
     """
     Creates a dummy DISP-S1 h5 metadata file with expected groups and datasets.
@@ -574,6 +577,9 @@ def create_test_disp_metadata_product(file_path):
     ----------
     file_path : str
         Full path to write the dummy DISP H5 metadata file to.
+    omit_cslc_measured_parameters : bool
+        If true, do not create dummy datasets for datasets copied from the input CSLC
+        (https://github.com/opera-adt/disp-s1/blob/fa562e194f26ebdadfdbe6f0defe80b55f212b4a/src/disp_s1/product.py#L1614-L1647)
 
     """
     pge_runconfig_contents = """
@@ -594,23 +600,30 @@ def create_test_disp_metadata_product(file_path):
     """
 
     with h5py.File(file_path, 'w') as outfile:
-        x_dset = outfile.create_dataset("x", data=np.zeros(10,), dtype='float64')
-        y_dset = outfile.create_dataset("y", data=np.zeros(10,), dtype='float64')
+        x_dset = outfile.create_dataset("x", data=np.zeros(10, ), dtype='float64')
+        y_dset = outfile.create_dataset("y", data=np.zeros(10, ), dtype='float64')
 
         identification_grp = outfile.create_group("/identification")
         frame_id_dset = identification_grp.create_dataset("frame_id", data=123, dtype='int64')
         product_version_dset = identification_grp.create_dataset("product_version",
                                                                  data=np.bytes_("0.2"))
         reference_zero_doppler_start_time_dset = identification_grp.create_dataset("reference_zero_doppler_start_time",
-                                                                                   data=np.bytes_("2017-02-17 13:27:50.139658"))
+                                                                                   data=np.bytes_(
+                                                                                       "2017-02-17 13:27:50.139658"))
         reference_zero_doppler_end_time_dset = identification_grp.create_dataset("reference_zero_doppler_end_time",
-                                                                                 data=np.bytes_("2017-02-17 13:27:55.979493"))
+                                                                                 data=np.bytes_(
+                                                                                     "2017-02-17 13:27:55.979493"))
         secondary_zero_doppler_start_time_dset = identification_grp.create_dataset("secondary_zero_doppler_start_time",
-                                                                                   data=np.bytes_("2017-04-30 13:27:52.049224"))
+                                                                                   data=np.bytes_(
+                                                                                       "2017-04-30 13:27:52.049224"))
         secondary_zero_doppler_end_time_dset = identification_grp.create_dataset("secondary_zero_doppler_end_time",
-                                                                                 data=np.bytes_("2017-04-30 13:27:57.891116"))
-        bounding_polygon_dset = identification_grp.create_dataset("bounding_polygon",
-                                                                  data=np.bytes_("POLYGON ((-119.26 39.15, -119.32 39.16, -119.22 39.32, -119.26 39.15))"))
+                                                                                 data=np.bytes_(
+                                                                                     "2017-04-30 13:27:57.891116"))
+        bounding_polygon_dset = identification_grp.create_dataset(
+              "bounding_polygon",
+              data=np.bytes_(
+                  "POLYGON ((-119.26 39.15, -119.32 39.16, -119.22 39.32, -119.26 39.15))")
+        )
         radar_wavelength_dset = identification_grp.create_dataset("radar_wavelength",
                                                                   data=0.05546576, dtype='float64')
         reference_datetime_dset = identification_grp.create_dataset("reference_datetime",
@@ -619,24 +632,36 @@ def create_test_disp_metadata_product(file_path):
                                                                     data=np.bytes_("2022-12-13 00:00:00.000000"))
         average_temporal_coherence_dset = identification_grp.create_dataset("average_temporal_coherence",
                                                                             data=0.9876175064678105, dtype='float64')
-        ceos_analysis_ready_data_document_identifier_dset = identification_grp.create_dataset("ceos_analysis_ready_data_document_identifier",
-                                                                                              data=np.bytes_("https://ceos.org/ard/files/PFS/NRB/v5.5/CARD4L-PFS_NRB_v5.5.pdf"))
-        source_data_access_dset = identification_grp.create_dataset("source_data_access",
-                                                                    data=np.bytes_("OPERA_L2_CSLC-S1_T027-056725-IW1_20170217T132750Z_20240625T060850Z_S1A_VV_v1.1,"
-                                                                                    "OPERA_L2_CSLC-S1_T027-056726-IW1_20170217T132752Z_20240625T060850Z_S1A_VV_v1.1"))
+        ceos_analysis_ready_data_document_identifier_dset = identification_grp.create_dataset(
+            "ceos_analysis_ready_data_document_identifier",
+            data=np.bytes_("https://ceos.org/ard/files/PFS/NRB/v5.5/CARD4L-PFS_NRB_v5.5.pdf"))
+        source_data_access_dset = identification_grp.create_dataset(
+            "source_data_access",
+            data=np.bytes_(
+                "OPERA_L2_CSLC-S1_T027-056725-IW1_20170217T132750Z_20240625T060850Z_S1A_VV_v1.1,"
+                "OPERA_L2_CSLC-S1_T027-056726-IW1_20170217T132752Z_20240625T060850Z_S1A_VV_v1.1")
+        )
         source_data_x_spacing_dset = identification_grp.create_dataset("source_data_x_spacing", data=5, dtype='int64')
         source_data_y_spacing_dset = identification_grp.create_dataset("source_data_y_spacing", data=10, dtype='int64')
-        near_range_incidence_angle_dset = identification_grp.create_dataset("near_range_incidence_angle", data=30.9, dtype='float32')
-        far_range_incidence_angle_dset = identification_grp.create_dataset("far_range_incidence_angle", data=36.8, dtype='float32')
-        product_sample_spacing_dset = identification_grp.create_dataset("product_sample_spacing", data=30, dtype='int64')
-        product_bounding_box_dset = identification_grp.create_dataset("product_bounding_box", data=np.bytes_("280230.0,3555240.0,572310.0,3767970.0"))
-        product_pixel_coordinate_convention_dset = identification_grp.create_dataset("product_pixel_coordinate_convention", data=np.bytes_("center"))
+        near_range_incidence_angle_dset = identification_grp.create_dataset("near_range_incidence_angle", data=30.9,
+                                                                            dtype='float32')
+        far_range_incidence_angle_dset = identification_grp.create_dataset("far_range_incidence_angle", data=36.8,
+                                                                           dtype='float32')
+        product_sample_spacing_dset = identification_grp.create_dataset("product_sample_spacing", data=30,
+                                                                        dtype='int64')
+        product_bounding_box_dset = identification_grp.create_dataset("product_bounding_box", data=np.bytes_(
+            "280230.0,3555240.0,572310.0,3767970.0"))
+        product_pixel_coordinate_convention_dset = identification_grp.create_dataset(
+            "product_pixel_coordinate_convention", data=np.bytes_("center"))
         mission_id_dset = identification_grp.create_dataset("mission_id", data=np.bytes_("S1A"))
-        instrument_name_dset = identification_grp.create_dataset("instrument_name", data=np.bytes_("C-SAR"))
-        look_direction_dset = identification_grp.create_dataset("look_direction", data=np.bytes_("Right"))
-        track_number_dset = identification_grp.create_dataset("track_number", data=27, dtype='int64')
-        orbit_pass_direction_dset = identification_grp.create_dataset("orbit_pass_direction", data=np.bytes_("Descending"))
-        absolute_orbit_number_dset = identification_grp.create_dataset("absolute_orbit_number", data=15324, dtype="int64")
+        if not omit_cslc_measured_parameters:
+            instrument_name_dset = identification_grp.create_dataset("instrument_name", data=np.bytes_("C-SAR"))
+            look_direction_dset = identification_grp.create_dataset("look_direction", data=np.bytes_("Right"))
+            track_number_dset = identification_grp.create_dataset("track_number", data=27, dtype='int64')
+            orbit_pass_direction_dset = identification_grp.create_dataset("orbit_pass_direction",
+                                                                          data=np.bytes_("Descending"))
+            absolute_orbit_number_dset = identification_grp.create_dataset("absolute_orbit_number", data=15324,
+                                                                           dtype="int64")
 
         acquisition_mode_dset = identification_grp.create_dataset("acquisition_mode", data=np.bytes_("IW"))
         ceos_analysis_ready_data_product_type_dset = identification_grp.create_dataset(
@@ -649,7 +674,8 @@ def create_test_disp_metadata_product(file_path):
                                                                            data=np.bytes_("2025-01-17 22:47:38"))
         product_data_access_dset = identification_grp.create_dataset("product_data_access", data=np.bytes_(
             "https://search.asf.alaska.edu/#/?dataset=OPERA-S1&productTypes=DISP-S1"))
-        radar_center_frequency_dset = identification_grp.create_dataset("radar_center_frequency", data=5405000454.33435, dtype="float64")
+        radar_center_frequency_dset = identification_grp.create_dataset("radar_center_frequency", data=5405000454.33435,
+                                                                        dtype="float64")
         source_data_azimuth_resolutions_dset = identification_grp.create_dataset("source_data_azimuth_resolutions",
                                                                                  data=np.bytes_("[22.5, 22.7, 22.6]"))
         source_data_dem_name_dset = identification_grp.create_dataset("source_data_dem_name",
@@ -659,7 +685,20 @@ def create_test_disp_metadata_product(file_path):
         source_data_earliest_processing_datetime_dset = identification_grp.create_dataset(
             "source_data_earliest_processing_datetime", data=np.bytes_("2024-06-25T00:00:00"))
         source_data_file_list_dset = identification_grp.create_dataset("source_data_file_list", data=np.bytes_(
-            "OPERA_L2_CSLC-S1_T027-056725-IW1_20170217T132750Z_20240625T060850Z_S1A_VV_v1.1,OPERA_L2_CSLC-S1_T027-056726-IW1_20170217T132752Z_20240625T060850Z_S1A_VV_v1.1,OPERA_L2_CSLC-S1_T027-056725-IW1_20170301T132749Z_20240625T090210Z_S1A_VV_v1.1,OPERA_L2_CSLC-S1_T027-056726-IW1_20170301T132752Z_20240625T090210Z_S1A_VV_v1.1,OPERA_L2_CSLC-S1_T027-056725-IW1_20170313T132750Z_20240625T121542Z_S1A_VV_v1.1,OPERA_L2_CSLC-S1_T027-056726-IW1_20170313T132753Z_20240625T121542Z_S1A_VV_v1.1,OPERA_L2_CSLC-S1_T027-056725-IW1_20170325T132750Z_20240625T163704Z_S1A_VV_v1.1,OPERA_L2_CSLC-S1_T027-056726-IW1_20170325T132753Z_20240625T163704Z_S1A_VV_v1.1,OPERA_L2_CSLC-S1_T027-056725-IW1_20170406T132750Z_20240625T225442Z_S1A_VV_v1.1,OPERA_L2_CSLC-S1_T027-056726-IW1_20170406T132753Z_20240625T225442Z_S1A_VV_v1.1,OPERA_L2_CSLC-S1_T027-056725-IW1_20170418T132751Z_20240626T003055Z_S1A_VV_v1.1,OPERA_L2_CSLC-S1_T027-056726-IW1_20170418T132754Z_20240626T003055Z_S1A_VV_v1.1,OPERA_L2_CSLC-S1_T027-056725-IW1_20170430T132752Z_20240626T015700Z_S1A_VV_v1.1,OPERA_L2_CSLC-S1_T027-056726-IW1_20170430T132754Z_20240626T015700Z_S1A_VV_v1.1"))
+            "OPERA_L2_CSLC-S1_T027-056725-IW1_20170217T132750Z_20240625T060850Z_S1A_VV_v1.1,"
+            "OPERA_L2_CSLC-S1_T027-056726-IW1_20170217T132752Z_20240625T060850Z_S1A_VV_v1.1,"
+            "OPERA_L2_CSLC-S1_T027-056725-IW1_20170301T132749Z_20240625T090210Z_S1A_VV_v1.1,"
+            "OPERA_L2_CSLC-S1_T027-056726-IW1_20170301T132752Z_20240625T090210Z_S1A_VV_v1.1,"
+            "OPERA_L2_CSLC-S1_T027-056725-IW1_20170313T132750Z_20240625T121542Z_S1A_VV_v1.1,"
+            "OPERA_L2_CSLC-S1_T027-056726-IW1_20170313T132753Z_20240625T121542Z_S1A_VV_v1.1,"
+            "OPERA_L2_CSLC-S1_T027-056725-IW1_20170325T132750Z_20240625T163704Z_S1A_VV_v1.1,"
+            "OPERA_L2_CSLC-S1_T027-056726-IW1_20170325T132753Z_20240625T163704Z_S1A_VV_v1.1,"
+            "OPERA_L2_CSLC-S1_T027-056725-IW1_20170406T132750Z_20240625T225442Z_S1A_VV_v1.1,"
+            "OPERA_L2_CSLC-S1_T027-056726-IW1_20170406T132753Z_20240625T225442Z_S1A_VV_v1.1,"
+            "OPERA_L2_CSLC-S1_T027-056725-IW1_20170418T132751Z_20240626T003055Z_S1A_VV_v1.1,"
+            "OPERA_L2_CSLC-S1_T027-056726-IW1_20170418T132754Z_20240626T003055Z_S1A_VV_v1.1,"
+            "OPERA_L2_CSLC-S1_T027-056725-IW1_20170430T132752Z_20240626T015700Z_S1A_VV_v1.1,"
+            "OPERA_L2_CSLC-S1_T027-056726-IW1_20170430T132754Z_20240626T015700Z_S1A_VV_v1.1"))
         source_data_latest_acquisition_dset = identification_grp.create_dataset("source_data_latest_acquisition",
                                                                                 data=np.bytes_("2017-04-30T00:00:00"))
         source_data_latest_processing_datetime_dset = identification_grp.create_dataset(
@@ -679,19 +718,24 @@ def create_test_disp_metadata_product(file_path):
                                                                              data=np.bytes_("S1A"))
         source_data_secondary_orbit_type_dset = identification_grp.create_dataset("source_data_secondary_orbit_type",
                                                                                   data=np.bytes_("precise orbit file"))
-        static_layers_data_access_dset = identification_grp.create_dataset("static_layers_data_access",
-                                                                           data=np.bytes_("https://search.asf.alaska.edu/#/?dataset=OPERA-S1&productTypes=DISP-S1-STATIC&frame=7091"))
+        static_layers_data_access_dset = identification_grp.create_dataset(
+           "static_layers_data_access",
+           data=np.bytes_(
+               "https://search.asf.alaska.edu/#/?dataset=OPERA-S1&productTypes=DISP-S1-STATIC&frame=7091")
+        )
         radar_band_dset = identification_grp.create_dataset("radar_band", data=np.bytes_("C"))
 
         metadata_grp = outfile.create_group("/metadata")
         disp_s1_software_version_dset = metadata_grp.create_dataset("disp_s1_software_version",
-                                                                          data=np.bytes_("0.2.7"))
+                                                                    data=np.bytes_("0.2.7"))
         dolphin_software_version_dset = metadata_grp.create_dataset("dolphin_software_version",
-                                                                          data=np.bytes_("0.15.3"))
+                                                                    data=np.bytes_("0.15.3"))
         pge_runconfig_dset = metadata_grp.create_dataset("pge_runconfig",
                                                          data=np.bytes_(pge_runconfig_contents))
-        algorithm_parameters_yaml_dset = metadata_grp.create_dataset("algorithm_parameters_yaml", data=np.bytes_(algorithm_parameters_contents))
-        dolphin_workflow_config_dset = metadata_grp.create_dataset("dolphin_workflow_config", data=np.bytes_(dolphin_workflow_config_contents))
+        algorithm_parameters_yaml_dset = metadata_grp.create_dataset("algorithm_parameters_yaml",
+                                                                     data=np.bytes_(algorithm_parameters_contents))
+        dolphin_workflow_config_dset = metadata_grp.create_dataset("dolphin_workflow_config",
+                                                                   data=np.bytes_(dolphin_workflow_config_contents))
 
         algorithm_theoretical_basis_document_id_dset = metadata_grp.create_dataset(
             "algorithm_theoretical_basis_document_id", data=np.bytes_("JPL D-108765"))
@@ -709,23 +753,32 @@ def create_test_disp_metadata_product(file_path):
             "ceos_persistent_scatterer_selection_criteria", data=np.bytes_("Amplitude Dispersion"))
         ceos_persistent_scatterer_selection_criteria_doi_dset = metadata_grp.create_dataset(
             "ceos_persistent_scatterer_selection_criteria_doi", data=np.bytes_("https://doi.org/10.1109/36.898661"))
-        ceos_phase_similarity_metric_doi_dset = metadata_grp.create_dataset("ceos_phase_similarity_metric_doi",
-                                                                            data=np.bytes_(
-                                                                                "https://doi.org/10.1109/TGRS.2022.3210868"))
+        ceos_phase_similarity_metric_doi_dset = metadata_grp.create_dataset(
+            "ceos_phase_similarity_metric_doi",
+            data=np.bytes_(
+                "https://doi.org/10.1109/TGRS.2022.3210868")
+        )
         ceos_phase_unwrapping_method_dset = metadata_grp.create_dataset("ceos_phase_unwrapping_method",
                                                                         data=np.bytes_("UnwrapMethod.SNAPHU"))
-        ceos_phase_unwrapping_snaphu_doi_dset = metadata_grp.create_dataset("ceos_phase_unwrapping_snaphu_doi",
-                                                                            data=np.bytes_(
-                                                                                "https://doi.org/10.1364/JOSAA.18.000338"))
-        platform_id_dset = metadata_grp.create_dataset("platform_id", data=np.bytes_("S1A"))
+        ceos_phase_unwrapping_snaphu_doi_dset = metadata_grp.create_dataset(
+            "ceos_phase_unwrapping_snaphu_doi",
+            data=np.bytes_(
+                "https://doi.org/10.1364/JOSAA.18.000338")
+        )
         product_pixel_coordinate_convention_dset = metadata_grp.create_dataset("product_pixel_coordinate_convention",
                                                                                data=np.bytes_("center"))
         product_specification_document_id_dset = metadata_grp.create_dataset("product_specification_document_id",
                                                                              data=np.bytes_("JPL D-108278"))
-        slant_range_mid_swath_dset = metadata_grp.create_dataset("slant_range_mid_swath", data=875720.2393261964, dtype="float64")
-        source_data_software_COMPASS_version_dset = metadata_grp.create_dataset("source_data_software_COMPASS_version",
-                                                                                data=np.bytes_("0.5.5"))
-        source_data_software_ISCE3_version_dset = metadata_grp.create_dataset("source_data_software_ISCE3_version",
-                                                                              data=np.bytes_("0.15.1"))
-        source_data_software_s1_reader_version_dset = metadata_grp.create_dataset(
-            "source_data_software_s1_reader_version", data=np.bytes_("0.2.4"))
+
+        if not omit_cslc_measured_parameters:
+            platform_id_dset = metadata_grp.create_dataset("platform_id", data=np.bytes_("S1A"))
+            slant_range_mid_swath_dset = metadata_grp.create_dataset("slant_range_mid_swath", data=875720.2393261964,
+                                                                     dtype="float64")
+            source_data_software_COMPASS_version_dset = metadata_grp.create_dataset(
+                "source_data_software_COMPASS_version",
+                data=np.bytes_("0.5.5")
+            )
+            source_data_software_ISCE3_version_dset = metadata_grp.create_dataset("source_data_software_ISCE3_version",
+                                                                                  data=np.bytes_("0.15.1"))
+            source_data_software_s1_reader_version_dset = metadata_grp.create_dataset(
+                "source_data_software_s1_reader_version", data=np.bytes_("0.2.4"))

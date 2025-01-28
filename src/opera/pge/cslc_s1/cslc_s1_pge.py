@@ -647,7 +647,7 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
                 try:
                     mp = mp[key_path.pop(0)]
                 except KeyError as e:
-                    msg = (f'Measured parameters configuration contains an path {parameter_var_name} that is missing '
+                    msg = (f'Measured parameters configuration contains a path {parameter_var_name} that is missing '
                            f'from the output product')
                     if descriptions[parameter_var_name].get('optional', False):
                         self.logger.warning(self.name, ErrorCode.ISO_METADATA_NO_ENTRY_FOR_DESCRIPTION, msg)
