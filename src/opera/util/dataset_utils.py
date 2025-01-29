@@ -100,7 +100,9 @@ def get_sensor_from_spacecraft_name(spacecraft_name):
             'SENTINEL-1A': 'S1A',
             'SENTINEL-1B': 'S1B',
             'SENTINEL-2A': 'S2A',
-            'SENTINEL-2B': 'S2B'
+            'SENTINEL-2B': 'S2B',
+            'SENTINEL-2C': 'S2C',
+            'SENTINEL-2D': 'S2D'
         }[spacecraft_name.upper()]
     except KeyError:
         raise RuntimeError(f"Unknown spacecraft name '{spacecraft_name}'")
