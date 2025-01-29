@@ -401,6 +401,63 @@ class DispS1PgeTestCase(unittest.TestCase):
             log = l_file.read()
         self.assertIn(f'Failed to extract metadata from {disp_metadata_path}', log)
 
+    @patch.object(opera.pge.disp_s1.disp_s1_pge.subprocess, "run", mock_grib_to_netcdf)
+    def test_iso_metadata_creation_missing_optional(self):
+        """
+        Test that the ISO metadata template is fully filled out when realistic
+        DISP-S1 product metadata is available.
+        """
+        runconfig_path = join(self.data_dir, 'test_disp_s1_config.yaml')
+
+        pge = DispS1Executor(pge_name="DispS1PgeTest", runconfig_path=runconfig_path)
+
+        # Run only the pre-processor steps to ingest the runconfig and set
+        # up directories
+        pge.run_preprocessor()
+
+        # Create a sample metadata file within the output directory of the PGE with the copied CSLC datasets omitted
+        output_dir = join(os.curdir, "disp_s1_pge_test/output_dir")
+
+        disp_metadata_path = abspath(join(output_dir, '20170217_20170430.nc'))
+
+        create_test_disp_metadata_product(disp_metadata_path, omit_cslc_measured_parameters=True)
+
+        disp_metadata = pge._collect_disp_s1_product_metadata(disp_metadata_path)
+
+        iso_metadata = pge._create_iso_metadata(disp_metadata_path, disp_metadata)
+
+        self.assertNotIn(UNDEFINED_ERROR, iso_metadata)
+
+        # Verify the proper Runtime Warning messages for each expected missing field
+
+        expected_missing_paths = [
+            'identification/instrument_name',
+            'identification/look_direction',
+            'identification/track_number',
+            'identification/orbit_pass_direction',
+            'identification/absolute_orbit_number',
+            'metadata/platform_id',
+            'metadata/slant_range_mid_swath',
+            'metadata/source_data_software_COMPASS_version',
+            'metadata/source_data_software_ISCE3_version',
+            'metadata/source_data_software_s1_reader_version',
+        ]
+
+        pge.logger.close_log_stream()
+        log_file = pge.logger.get_file_name()
+        self.assertTrue(exists(log_file))
+        with open(log_file, 'r', encoding='utf-8') as l_file:
+            log = l_file.read()
+
+        for expected_missing_path in expected_missing_paths:
+            expected_log_msg = (f'Measured parameters configuration contains a path {expected_missing_path} that is '
+                                f'missing from the output product')
+
+            self.assertIn(expected_log_msg, log)
+
+        os.unlink(disp_metadata_path)
+
+
     def test_validate_algorithm_parameters_config(self):
         """Test basic parsing and validation of an algorithm parameters RunConfig file"""
         runconfig_path = join(self.data_dir, 'test_disp_s1_config.yaml')

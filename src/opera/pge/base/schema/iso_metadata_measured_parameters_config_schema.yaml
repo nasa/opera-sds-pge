@@ -24,3 +24,7 @@ parameter:
   # OPTIONAL: Set this flag to true if the value of the attribute should be escaped for HTML characters prior to being
   # written to the output XML. Applies to string and string-like attributes only.
   escape_html: bool(required=False)
+
+  # OPTIONAL: If true, this parameter will log a warning if not present in the output product. Otherwise, it will raise
+  # an error. Defaults to false. Only applicable for CSLC-S1, RTC-S1 and DISP-S1
+  optional: bool(required=False)
