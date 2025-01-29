@@ -112,6 +112,7 @@ class DSWxHLSPreProcessorMixin(PreProcessorMixin):
 
         # Get a list of input files to check for invalid platform metadata
         list_of_input_tifs = []
+
         for input_file in self.runconfig.input_files:
             input_file_path = abspath(input_file)
             if isdir(input_file_path):
@@ -120,7 +121,6 @@ class DSWxHLSPreProcessorMixin(PreProcessorMixin):
                 list_of_input_tifs.append(input_file_path)
 
         for input_tif in list_of_input_tifs:
-
             if re.match(r"^HLS\.L30.*", os.path.basename(input_tif)):
                 input_tif_metadata = get_geotiff_metadata(input_tif)
                 if 'LANDSAT_PRODUCT_ID' in input_tif_metadata:
@@ -133,10 +133,12 @@ class DSWxHLSPreProcessorMixin(PreProcessorMixin):
             if re.match(r"^HLS\.S30.*", os.path.basename(input_tif)):
                 input_tif_metadata = get_geotiff_metadata(input_tif)
                 if 'PRODUCT_URI' in input_tif_metadata:
-                    data_is_S2A = re.match(r"S2A.*", input_tif_metadata['PRODUCT_URI'])
-                    data_is_S2B = re.match(r"S2B.*", input_tif_metadata['PRODUCT_URI'])
-                    if not data_is_S2A and not data_is_S2B:
-                        error_msg = (f"Input file {input_tif} appears to not be Sentinel 2 A/B data, "
+                    # For DSWx-HLS, we only want inputs from Sentinel 2-A/B/C/D
+                    valid_s30_product_types = ("S2A", "S2B", "S2C", "S2D")
+
+                    if not any(re.match(rf"{valid_s30_product_type}.*", input_tif_metadata['PRODUCT_URI'])
+                               for valid_s30_product_type in valid_s30_product_types):
+                        error_msg = (f"Input file {input_tif} appears to not be a supported Sentinel 2 data type, "
                                      f"metadata PRODUCT_URI is {input_tif_metadata['PRODUCT_URI']}.")
                         self.logger.critical(self.name, ErrorCode.INVALID_INPUT, error_msg)
 
