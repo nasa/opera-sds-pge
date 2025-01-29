@@ -91,6 +91,7 @@ identification/source_data_access:
   attribute_type: contentInformation
   description: Source data access information
   display_name: SourceDataAccess
+  escape_html: true
 identification/source_data_x_spacing:
   attribute_data_type: int
   attribute_type: contentInformation
@@ -156,6 +157,7 @@ identification/static_layers_data_access:
   attribute_type: processingInformation
   description: Location of the static layers product associated with this product (URL or DOI).
   display_name: StaticLayersDataAccess
+  escape_html: true
 identification/radar_band:
   attribute_data_type: string
   attribute_type: instrumentInformation
@@ -191,6 +193,7 @@ identification/product_data_access:
   attribute_type: processingInformation
   description: The metadata identifies the location from where the source data can be retrieved, expressed as a URL or DOI.
   display_name: ProductDataAccess
+  escape_html: true
 identification/radar_center_frequency:
   attribute_data_type: float
   attribute_type: instrumentInformation

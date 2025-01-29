@@ -646,6 +646,7 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
             while len(key_path) > 0:
                 try:
                     mp = mp[key_path.pop(0)]
+                    new_measured_parameters[parameter_var_name] = mp
                 except KeyError as e:
                     msg = (f'Measured parameters configuration contains a path {parameter_var_name} that is missing '
                            f'from the output product')
@@ -653,8 +654,6 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
                         self.logger.warning(self.name, ErrorCode.ISO_METADATA_NO_ENTRY_FOR_DESCRIPTION, msg)
                     else:
                         self.logger.critical(self.name, ErrorCode.ISO_METADATA_DESCRIPTIONS_CONFIG_INVALID, msg)
-
-            new_measured_parameters[parameter_var_name] = mp
 
         augmented_parameters = super().augment_measured_parameters(new_measured_parameters)
 

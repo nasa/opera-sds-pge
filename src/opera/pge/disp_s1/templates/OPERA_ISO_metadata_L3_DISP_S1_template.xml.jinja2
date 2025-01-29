@@ -706,17 +706,6 @@
                     </gmd:source>
                     {%- endfor %}
                     {%- endif %}
-                    {%- if run_config.Groups.PGE.DynamicAncillaryFilesGroup.AncillaryFileMap.troposphere_files is not none %}
-                    {%- for troposphere_file in run_config.Groups.PGE.DynamicAncillaryFilesGroup.AncillaryFileMap.troposphere_files %}
-                    <gmd:source>
-                        <gmd:LI_Source>
-                            <gmd:description>
-                                <gco:CharacterString>Troposphere Model - {{ troposphere_file }}{# ISO_OPERA_troposphereFile #}</gco:CharacterString>
-                            </gmd:description>
-                        </gmd:LI_Source>
-                    </gmd:source>
-                    {%- endfor %}
-                    {%- endif %}
                 </gmd:LI_Lineage>
             </gmd:lineage>
         </gmd:DQ_DataQuality>
