@@ -449,8 +449,8 @@ class DSWxHLSPgeTestCase(unittest.TestCase):
             """Custom Open method for Sentinel testing"""
             gdal_dataset = MockGdal.MockDSWxHLSGdalDataset()
 
-            # S2C is invalid
-            gdal_dataset.dummy_metadata['PRODUCT_URI'] = "S2C_MSIL1C_20210907T163901_N0301_" \
+            # S1C is invalid
+            gdal_dataset.dummy_metadata['PRODUCT_URI'] = "S1C_MSIL1C_20210907T163901_N0301_" \
                                                          "R126_T15SXR_20210907T202434.SAFE"
             return gdal_dataset
 
@@ -561,7 +561,7 @@ class DSWxHLSPgeTestCase(unittest.TestCase):
 
     @patch.object(opera.util.tiff_utils, "gdal", CustomMockGdal_InvalidSentinel)
     def test_dswx_hls_validate_expected_input_platforms_sentinel(self):
-        """Test exceptions raised for non-Sentinel S2A/B input data"""
+        """Test exceptions raised for non-Sentinel S2 A/B/C/D input data"""
         # Create a filename that will trigger a metadata check
         input_file = os.path.join(self.input_dir, "HLS.S30.T15SXR.2021250T163901.v2.0.SAA.tif")
         os.system(f"touch {input_file}")
@@ -581,8 +581,8 @@ class DSWxHLSPgeTestCase(unittest.TestCase):
 
         # Look for the expected exception message in the log to verify the correct exception was raised.
         # There is a temporary file name in the path, so we only look for the static part.
-        expected_msg = (f"_temp/{input_file} appears to not be Sentinel 2 A/B data, "
-                        f"metadata PRODUCT_URI is S2C_MSIL1C_20210907T163901_N0301_R126_T15SXR_20210907T202434.SAFE.")
+        expected_msg = (f"_temp/{input_file} appears to not be a supported Sentinel 2 data type, "
+                        f"metadata PRODUCT_URI is S1C_MSIL1C_20210907T163901_N0301_R126_T15SXR_20210907T202434.SAFE.")
         self.assertIn(expected_msg, log_contents)
 
     @patch.object(opera.util.tiff_utils, "gdal", CustomMockGdal)
