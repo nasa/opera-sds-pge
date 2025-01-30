@@ -15,10 +15,8 @@ from os.path import abspath, join
 
 from pkg_resources import resource_filename
 
-import pytest
-
 from opera.util.logger import PgeLogger
-from opera.util.render_jinja2 import render_jinja2, UNDEFINED_ERROR, XML_VALIDATOR, JSON_VALIDATOR, YAML_VALIDATOR
+from opera.util.render_jinja2 import JSON_VALIDATOR, render_jinja2, UNDEFINED_ERROR, XML_VALIDATOR, YAML_VALIDATOR
 
 
 class RenderJinja2TestCase(unittest.TestCase):
