@@ -15,8 +15,10 @@ from os.path import abspath, join
 
 from pkg_resources import resource_filename
 
+import pytest
+
 from opera.util.logger import PgeLogger
-from opera.util.render_jinja2 import render_jinja2, UNDEFINED_ERROR
+from opera.util.render_jinja2 import render_jinja2, UNDEFINED_ERROR, XML_VALIDATOR, JSON_VALIDATOR, YAML_VALIDATOR
 
 
 class RenderJinja2TestCase(unittest.TestCase):
@@ -160,3 +162,41 @@ class RenderJinja2TestCase(unittest.TestCase):
         self.remove_key(new_data, 'title')
         render_jinja2(template_file, new_data)
         self.assertRaises(KeyError)
+
+    def testRenderJinja2ValidateJSON(self):
+        template_file = join(self.data_dir, 'render_jinja_json_test_template.json.jinja2')
+
+        # Test for valid JSON
+        rendered_text = render_jinja2(template_file, {'foo': {'bar': '"bar"'}}, validator=JSON_VALIDATOR)
+
+        # Test for invalid JSON
+        with self.assertRaises(RuntimeError):
+            rendered_text = render_jinja2(template_file, {'foo': {'bar': '"bar'}}, validator=JSON_VALIDATOR)
+
+    def testRenderJinja2ValidateYAML(self):
+        template_file = join(self.data_dir, 'render_jinja_yaml_test_template.yaml.jinja2')
+
+        # Test for valid JSON
+        rendered_text = render_jinja2(template_file, {'foo': {'bar': 'bar'}}, validator=YAML_VALIDATOR)
+
+        # Test for invalid JSON
+        with self.assertRaises(RuntimeError):
+            rendered_text = render_jinja2(template_file, {'foo': {'bar': ' : bar'}}, validator=YAML_VALIDATOR)
+
+    def testRenderJinja2ValidateXML(self):
+        template_file = join(self.data_dir, 'render_jinja_xml_test_template.xml.jinja2')
+
+        # Test for valid JSON
+        rendered_text = render_jinja2(
+            template_file,
+            {'foo': {'bar': 'http://example.com?foo=foo&amp;bar=bar'}},
+            validator=XML_VALIDATOR
+        )
+
+        # Test for invalid JSON
+        with self.assertRaises(RuntimeError):
+            rendered_text = render_jinja2(
+                template_file,
+                {'foo': {'bar': 'http://example.com?foo=foo&bar=bar'}},
+                validator=XML_VALIDATOR
+            )
