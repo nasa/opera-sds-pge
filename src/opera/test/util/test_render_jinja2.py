@@ -174,24 +174,24 @@ class RenderJinja2TestCase(unittest.TestCase):
     def testRenderJinja2ValidateYAML(self):
         template_file = join(self.data_dir, 'render_jinja_yaml_test_template.yaml.jinja2')
 
-        # Test for valid JSON
+        # Test for valid YAML
         rendered_text = render_jinja2(template_file, {'foo': {'bar': 'bar'}}, validator=YAML_VALIDATOR)
 
-        # Test for invalid JSON
+        # Test for invalid YAML
         with self.assertRaises(RuntimeError):
             rendered_text = render_jinja2(template_file, {'foo': {'bar': ' : bar'}}, validator=YAML_VALIDATOR)
 
     def testRenderJinja2ValidateXML(self):
         template_file = join(self.data_dir, 'render_jinja_xml_test_template.xml.jinja2')
 
-        # Test for valid JSON
+        # Test for valid XML
         rendered_text = render_jinja2(
             template_file,
             {'foo': {'bar': 'http://example.com?foo=foo&amp;bar=bar'}},
             validator=XML_VALIDATOR
         )
 
-        # Test for invalid JSON
+        # Test for invalid XML
         with self.assertRaises(RuntimeError):
             rendered_text = render_jinja2(
                 template_file,
