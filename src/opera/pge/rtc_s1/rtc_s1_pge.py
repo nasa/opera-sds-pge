@@ -27,7 +27,7 @@ from opera.util.geo_utils import translate_utm_bbox_to_lat_lon
 from opera.util.h5_utils import get_rtc_s1_product_metadata
 from opera.util.h5_utils import MEASURED_PARAMETER_PATH_SEPARATOR
 from opera.util.input_validation import validate_slc_s1_inputs
-from opera.util.render_jinja2 import render_jinja2
+from opera.util.render_jinja2 import render_jinja2, XML_VALIDATOR
 from opera.util.time import get_time_for_filename
 
 
@@ -891,7 +891,7 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
 
         iso_template_path = os.path.abspath(self.runconfig.iso_template_path)
 
-        rendered_template = render_jinja2(iso_template_path, iso_metadata, self.logger)
+        rendered_template = render_jinja2(iso_template_path, iso_metadata, self.logger, validator=XML_VALIDATOR)
 
         return rendered_template
 
