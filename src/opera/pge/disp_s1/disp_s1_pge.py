@@ -630,6 +630,7 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
             key_path = parameter_var_name.split(MEASURED_PARAMETER_PATH_SEPARATOR)
 
             mp = measured_parameters
+            missing = False
 
             while len(key_path) > 0:
                 try:
@@ -639,10 +640,12 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
                            f'from the output product')
                     if descriptions[parameter_var_name].get('optional', False):
                         self.logger.warning(self.name, ErrorCode.ISO_METADATA_NO_ENTRY_FOR_DESCRIPTION, msg)
+                        missing = True
                     else:
                         self.logger.critical(self.name, ErrorCode.ISO_METADATA_DESCRIPTIONS_CONFIG_INVALID, msg)
 
-            new_measured_parameters[parameter_var_name] = mp
+            if not missing:
+                new_measured_parameters[parameter_var_name] = mp
 
         augmented_parameters = super().augment_measured_parameters(new_measured_parameters)
 
