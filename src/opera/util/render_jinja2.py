@@ -127,7 +127,7 @@ def render_jinja2(
         template_filename: str,
         input_data: dict,
         logger: PgeLogger = None,
-        validator=None
+        validator=XML_VALIDATOR
 ):
     """
     Renders from a jinja2 template using the specified input data.
