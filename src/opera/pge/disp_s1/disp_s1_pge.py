@@ -28,7 +28,7 @@ from opera.util.h5_utils import get_cslc_s1_product_metadata
 from opera.util.h5_utils import get_disp_s1_product_metadata
 from opera.util.h5_utils import MEASURED_PARAMETER_PATH_SEPARATOR
 from opera.util.input_validation import validate_algorithm_parameters_config, validate_disp_inputs
-from opera.util.render_jinja2 import render_jinja2, XML_VALIDATOR
+from opera.util.render_jinja2 import render_jinja2
 from opera.util.time import get_time_for_filename, get_catalog_metadata_datetime_str
 
 
@@ -786,7 +786,7 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
 
         iso_template_path = os.path.abspath(self.runconfig.iso_template_path)
 
-        rendered_template = render_jinja2(iso_template_path, iso_metadata, self.logger, validator=XML_VALIDATOR)
+        rendered_template = render_jinja2(iso_template_path, iso_metadata, self.logger)
 
         return rendered_template
 

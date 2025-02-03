@@ -22,7 +22,7 @@ from opera.util.error_codes import ErrorCode
 from opera.util.geo_utils import get_geographic_boundaries_from_mgrs_tile
 from opera.util.input_validation import validate_algorithm_parameters_config
 from opera.util.input_validation import validate_dswx_inputs
-from opera.util.render_jinja2 import render_jinja2, XML_VALIDATOR
+from opera.util.render_jinja2 import render_jinja2
 from opera.util.run_utils import get_checksum
 from opera.util.tiff_utils import get_geotiff_metadata
 from opera.util.time import get_time_for_filename
@@ -564,7 +564,7 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
 
         iso_template_path = abspath(self.runconfig.iso_template_path)
 
-        rendered_template = render_jinja2(iso_template_path, iso_metadata, self.logger, validator=XML_VALIDATOR)
+        rendered_template = render_jinja2(iso_template_path, iso_metadata, self.logger)
 
         return rendered_template
 

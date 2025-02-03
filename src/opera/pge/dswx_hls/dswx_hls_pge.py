@@ -25,7 +25,7 @@ from opera.util.dataset_utils import get_sensor_from_spacecraft_name
 from opera.util.error_codes import ErrorCode
 from opera.util.geo_utils import get_geographic_boundaries_from_mgrs_tile
 from opera.util.input_validation import validate_dswx_inputs
-from opera.util.render_jinja2 import render_jinja2, XML_VALIDATOR
+from opera.util.render_jinja2 import render_jinja2
 from opera.util.tiff_utils import get_geotiff_hls_dataset
 from opera.util.tiff_utils import get_geotiff_hls_sensor_product_id
 from opera.util.tiff_utils import get_geotiff_metadata
@@ -563,7 +563,7 @@ class DSWxHLSPostProcessorMixin(PostProcessorMixin):
 
         iso_template_path = os.path.abspath(self.runconfig.iso_template_path)
 
-        rendered_template = render_jinja2(iso_template_path, iso_metadata, self.logger, validator=XML_VALIDATOR)
+        rendered_template = render_jinja2(iso_template_path, iso_metadata, self.logger)
 
         return rendered_template
 

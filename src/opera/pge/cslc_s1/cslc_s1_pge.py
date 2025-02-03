@@ -25,7 +25,7 @@ from opera.util.dataset_utils import parse_bounding_polygon_from_wkt
 from opera.util.error_codes import ErrorCode
 from opera.util.h5_utils import get_cslc_s1_product_metadata, MEASURED_PARAMETER_PATH_SEPARATOR
 from opera.util.input_validation import validate_slc_s1_inputs
-from opera.util.render_jinja2 import render_jinja2, XML_VALIDATOR
+from opera.util.render_jinja2 import render_jinja2
 from opera.util.time import get_time_for_filename
 
 
@@ -802,7 +802,7 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
 
         iso_template_path = os.path.abspath(self.runconfig.iso_template_path)
 
-        rendered_template = render_jinja2(iso_template_path, iso_metadata, self.logger, validator=XML_VALIDATOR)
+        rendered_template = render_jinja2(iso_template_path, iso_metadata, self.logger)
 
         return rendered_template
 
