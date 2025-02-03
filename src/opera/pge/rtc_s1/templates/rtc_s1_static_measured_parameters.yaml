@@ -1,0 +1,291 @@
+identification/absoluteOrbitNumber:
+  attribute_data_type: int
+  attribute_type: instrumentInformation
+  description: Absolute orbit number
+  display_name: AbsoluteOrbitNumber
+identification/acquisitionMode:
+  attribute_data_type: string
+  attribute_type: instrumentInformation
+  description: Acquisition Mode
+  display_name: AcquisitionMode
+identification/boundingBox:
+  attribute_data_type: string
+  attribute_type: instrumentInformation
+  description: Bounding box of the product, in order of xmin, ymin, xmax, ymax
+  display_name: BoundingBox
+identification/burstID:
+  attribute_data_type: string
+  attribute_type: instrumentInformation
+  description: Burst identification (burst ID)
+  display_name: BurstID
+identification/ceosAnalysisReadyDataDocumentIdentifier:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: CEOS Analysis Ready Data Document Identifier
+  display_name: CEOSAnalysisReadyDataDocumentIdentifier
+  escape_html: true
+identification/ceosAnalysisReadyDataProductType:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: CEOS Analysis Ready Data Product Type
+  display_name: CEOSAnalysisReadyDataProductType
+identification/contactInformation:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Contact email address
+  display_name: ContactInformation
+identification/dataAccess:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Data Access URL
+  display_name: DataAccess
+  escape_html: true
+identification/trackNumber:
+  attribute_data_type: int
+  attribute_type: instrumentInformation
+  description: Track number
+  display_name: TrackNumber
+identification/productType:
+  attribute_data_type: string
+  attribute_type: contentInformation
+  description: Product type
+  display_name: ProductType
+identification/project:
+  attribute_data_type: string
+  attribute_type: contentInformation
+  description: Project name
+  display_name: Project
+identification/radarBand:
+  attribute_data_type: string
+  attribute_type: instrumentInformation
+  description: Acquired frequency band
+  display_name: RadarBand
+identification/subSwathID:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Sub Swath ID
+  display_name: SubSwathID
+identification/productVersion:
+  attribute_data_type: string
+  attribute_type: contentInformation
+  description: Product version
+  display_name: ProductVersion
+identification/lookDirection:
+  attribute_data_type: string
+  attribute_type: instrumentInformation
+  description: Look direction can be left or right
+  display_name: LookDirection
+identification/orbitPassDirection:
+  attribute_data_type: string
+  attribute_type: instrumentInformation
+  description: Orbit direction can be ascending or descending
+  display_name: OrbitPassDirection
+identification/platform:
+  attribute_data_type: string
+  attribute_type: instrumentInformation
+  description: Platform name
+  display_name: Platform
+identification/zeroDopplerStartTime:
+  attribute_data_type: dateTimeString
+  attribute_type: instrumentInformation
+  description: Azimuth start time of the product
+  display_name: ZeroDopplerStartTime
+identification/zeroDopplerEndTime:
+  attribute_data_type: dateTimeString
+  attribute_type: instrumentInformation
+  description: Azimuth stop time of the product
+  display_name: ZeroDopplerEndTime
+identification/institution:
+  attribute_data_type: string
+  attribute_type: contentInformation
+  description: Institution name
+  display_name: Institution
+identification/instrumentName:
+  attribute_data_type: string
+  attribute_type: instrumentInformation
+  description: Name of the instrument used to collect the remote sensing data provided in this product
+  display_name: InstrumentName
+identification/isGeocoded:
+  attribute_data_type: boolean
+  attribute_type: contentInformation
+  description: Flag to indicate radar geometry or geocoded product
+  display_name: IsGeocoded
+identification/processingDateTime:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Processing date and time
+  display_name: ProcessingDateTime
+identification/processingType:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: NOMINAL (or) URGENT (or) CUSTOM (or) UNDEFINED
+  display_name: ProcessingType
+identification/productLevel:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: 'Product level. L0A: Unprocessed instrument data; L0B: Reformatted, 
+    unprocessed instrument data; L1: Processed instrument data in radar coordinates 
+    system; and L2: Processed instrument data in geocoded coordinates system'
+  display_name: ProductLevel
+identification/productSpecificationVersion:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Product specification version which represents the schema of this product
+  display_name: ProductSpecificationVersion
+data/listOfPolarizations:
+  attribute_data_type: string
+  attribute_type: contentInformation
+  description: List of processed polarization layers
+  display_name: ListOfPolarizations
+data/yCoordinateSpacing:
+  attribute_data_type: float
+  attribute_type: contentInformation
+  description: Nominal spacing in meters between consecutive lines
+  display_name: YCoordinateSpacing
+data/xCoordinateSpacing:
+  attribute_data_type: float
+  attribute_type: contentInformation
+  description: Nominal spacing in meters between consecutive pixels
+  display_name: XCoordinateSpacing
+data/projection:
+  attribute_data_type: int
+  attribute_type: processingInformation
+  description: EPSG Projection Value
+  display_name: Projection
+processingInformation/parameters/bistaticDelayCorrectionApplied:
+  attribute_data_type: boolean
+  attribute_type: processingParameter
+  description: Flag to indicate if Bi-static Delay correction was applied
+  display_name: BistaticDelayCorrectedApplied
+processingInformation/parameters/staticTroposphericGeolocationCorrectionApplied:
+  attribute_data_type: boolean
+  attribute_type: processingParameter
+  description: Flag to indicate if the Static Tropospheric Geolocation correction was applied
+  display_name: StaticTroposphericGeolocationCorrectedApplied
+processingInformation/parameters/filteringApplied:
+  attribute_data_type: boolean
+  attribute_type: processingParameter
+  description: Flag to indicate if filtering was applied
+  display_name: FilteringApplied
+processingInformation/parameters/geocoding/burstGeogridSnapX:
+  attribute_data_type: int
+  attribute_type: processingParameter
+  description: Burst Geogrid Snap X value
+  display_name: BurstGeogridSnapX
+processingInformation/parameters/geocoding/burstGeogridSnapY:
+  attribute_data_type: int
+  attribute_type: processingParameter
+  description: Burst Geogrid Snap Y value
+  display_name: BurstGeogridSnapY
+processingInformation/parameters/inputBackscatterNormalizationConvention:
+  attribute_data_type: string
+  attribute_type: processingParameter
+  description: Normalization convention for input backscatter
+  display_name: InputBackscatterNormalizationConvention
+processingInformation/parameters/outputBackscatterDecibelConversionEquation:
+  attribute_data_type: string
+  attribute_type: processingParameter
+  description: Output Backscatter Decibel Conversion Equation
+  display_name: OutputBackscatterDecibelConversionEquation
+processingInformation/parameters/outputBackscatterExpressionConvention:
+  attribute_data_type: string
+  attribute_type: processingParameter
+  description: Output Backscatter Expression Convention
+  display_name: OutputBackscatterExpressionConvention
+processingInformation/parameters/outputBackscatterNormalizationConvention:
+  attribute_data_type: string
+  attribute_type: processingParameter
+  description: Output Backscatter Normalization Convention
+  display_name: OutputBackscatterNormalizationConvention
+processingInformation/parameters/preprocessingMultilookingApplied:
+  attribute_data_type: boolean
+  attribute_type: processingParameter
+  description: Flag to indicate if Pre Processing Multilooking was applied
+  display_name: PreprocessingMultilookingApplied
+processingInformation/parameters/wetTroposphericGeolocationCorrectionApplied:
+  attribute_data_type: boolean
+  attribute_type: processingParameter
+  description: Flag to indicate if the Wet Tropospheric Geolocation Correction was applied
+  display_name: WetTroposphericGeolocationCorrectionApplied
+processingInformation/algorithms/demEgmModel:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: DEM Earth Gravitational Model
+  display_name: DemEgmModel
+processingInformation/algorithms/demInterpolation:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: DEM interpolation method
+  display_name: DemInterpolation
+processingInformation/algorithms/geocoding:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Geocoding algorithm
+  display_name: Geocoding
+processingInformation/algorithms/geocodingAlgorithmReference:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Geocoding algorithm reference document
+  display_name: GeocodingAlgorithmReference
+processingInformation/algorithms/radiometricTerrainCorrection:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Radiometric terrain correction (RTC) algorithm
+  display_name: RadiometricTerrainCorrection
+processingInformation/algorithms/radiometricTerrainCorrectionAlgorithmReference:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Radiometric terrain correction algorithm reference document
+  display_name: RadiometricTerrainCorrectionAlgorithmReference
+  escape_html: true
+processingInformation/algorithms/s1ReaderVersion:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: S1-Reader version used for processing
+  display_name: S1ReaderVersion
+processingInformation/algorithms/isce3Version:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: ISCE version used for processing
+  display_name: ISCEVersion
+processingInformation/algorithms/softwareVersion:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Software version used for processing
+  display_name: SoftwareVersion
+processingInformation/inputs/l1SlcGranules:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: List of input L1 SLC products used
+  display_name: L1SlcGranules
+processingInformation/inputs/orbitFiles:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: List of input orbit files used
+  display_name: OrbitFiles
+processingInformation/inputs/annotationFiles:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: List of input annotation files used
+  display_name: AnnotationFiles
+processingInformation/inputs/demSource:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Source description for the utilized DEM file
+  display_name: DemSource
+  escape_html: true
+orbit/interpMethod:
+  attribute_data_type: string
+  attribute_type: instrumentInformation
+  description: Orbit Interpolation Method
+  display_name: OrbitInterpolationMethod
+orbit/referenceEpoch:
+  attribute_data_type: string
+  attribute_type: instrumentInformation
+  description: Reference epoch in the format YYYY-MM-DDTHH:MM:SS.SSS
+  display_name: OrbitReferenceEpoch
+orbit/orbitType:
+  attribute_data_type: string
+  attribute_type: instrumentInformation
+  description: PrOE (or) NOE (or) MOE (or) POE (or) Custom
+  display_name: OrbitType
