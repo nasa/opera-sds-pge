@@ -181,7 +181,7 @@ def render_jinja2(
         try:
             validator(rendered_text)
         except Exception as err:
-            raise RuntimeError(f"Error parsing ISO XML: {err}") from err
+            raise RuntimeError(f"Error parsing rendered ISO XML: {err}") from err
 
     return rendered_text
 
