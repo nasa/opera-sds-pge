@@ -11,6 +11,7 @@ Original Author: David White
 Adapted by: Jim Hofman
 """
 
+import html
 import json
 import os
 import re
@@ -24,6 +25,7 @@ import numpy as np
 
 from lxml import etree
 from opera.util.error_codes import ErrorCode
+from opera.util.h5_utils import MEASURED_PARAMETER_PATH_SEPARATOR
 from opera.util.logger import PgeLogger
 
 XML_TYPES = {
@@ -202,6 +204,134 @@ def python_type_to_xml_type(obj) -> str:
     return XML_TYPES[obj]
 
 
+def augment_measured_parameters(measured_parameters: dict, mpc_path: str, logger: PgeLogger) -> dict:
+    """
+    Augment the measured parameters dict of GeoTIFF metadata into a dict of dicts
+    containing the needed fields for the MeasuredParameters section of the ISO XML
+    file.
+
+    For HDF5 or NetCDF metadata, use augment_hd5_measured_parameters()
+
+    Parameters
+    ----------
+    measured_parameters : dict
+       The GeoTIFF metadata from the output product. See get_geotiff_metadata()
+    mpc_path: str
+        Path to the Measured Parameters Descriptions YAML file
+    logger: PgeLogger
+        PgeLogger instance
+
+    Returns
+    -------
+    augmented_parameters : dict
+       The metadata fields converted to a list with name, value, types, etc
+    """
+    augmented_parameters = dict()
+
+    if mpc_path is not None:
+        with open(mpc_path) as f:
+            descriptions = yaml.safe_load(f)
+
+        missing_description_value = UNDEFINED_ERROR
+    else:
+        descriptions = dict()
+        missing_description_value = UNDEFINED_WARNING
+
+    for name, value in measured_parameters.items():
+        if isinstance(value, np.generic):
+            value = value.item()
+
+        if isinstance(value, np.ndarray):
+            value = value.tolist()
+
+        if isinstance(value, (list, dict)):
+            value = json.dumps(value, cls=NumpyEncoder)
+
+        guessed_data_type = python_type_to_xml_type(value)
+        guessed_attr_name = guess_attribute_display_name(name)
+
+        descriptions.setdefault(name, dict())
+
+        attr_description = descriptions[name].get('description', missing_description_value)
+        data_type = descriptions[name].get('attribute_data_type', guessed_data_type)
+        attr_type = descriptions[name].get('attribute_type', UNDEFINED_ERROR)
+        attr_name = descriptions[name].get('display_name', guessed_attr_name)
+        escape_html = descriptions[name].get('escape_html', False)
+
+        if escape_html:
+            value = html.escape(value)
+
+        augmented_parameters[name] = (
+            dict(name=attr_name, value=value, attr_type=attr_type,
+                 attr_description=attr_description, data_type=data_type)
+        )
+
+    return augmented_parameters
+
+
+def augment_hd5_measured_parameters(measured_parameters: dict, mpc_path: str, logger: PgeLogger) -> dict:
+    """
+    The augment_measured_parameters() function wrapped in a "preprocessing" step to
+    handle the structure of HDF5 metadata. While GeoTIFF metadata is a flat
+    dictionary, HDF5 metadata is a nested dictionary structure, wherein the variable
+    "keys" can be arbitrarily deep into the structure and the values likewise can be
+    nested dictionaries.
+
+    The preprocessing step in this method selectively flattens the metadata
+    dictionary based on the "paths" provided in the variable keys of the configuration
+    YAML file. The result of this preprocessing is then safely passed to the base
+    method to get the correct structure expected by the Jinja template.
+
+    Parameters
+    ----------
+    measured_parameters : dict
+        The HDF5 metadata from the output product. See get_cslc_s1_product_metadata()
+    mpc_path: str
+        Path to the Measured Parameters Descriptions YAML file
+    logger: PgeLogger
+        PgeLogger instance
+
+    Returns
+    -------
+    augmented_parameters : dict
+        The metadata fields converted to a list with name, value, types, etc
+    """
+    new_measured_parameters = {}
+
+    if mpc_path:
+        with open(mpc_path) as f:
+            descriptions = yaml.safe_load(f)
+    else:
+        msg = ('Measured parameters configuration is needed to extract the measured parameters attributes from the '
+               'metadata')
+        logger.critical("render_jinja2", ErrorCode.ISO_METADATA_DESCRIPTIONS_CONFIG_NOT_FOUND, msg)
+
+    for parameter_var_name in descriptions:
+        key_path = parameter_var_name.split(MEASURED_PARAMETER_PATH_SEPARATOR)
+
+        mp = measured_parameters
+        missing = False
+
+        while len(key_path) > 0:
+            try:
+                mp = mp[key_path.pop(0)]
+            except KeyError:
+                msg = (f'Measured parameters configuration contains a path {parameter_var_name} that is missing '
+                       f'from the output product')
+                if descriptions[parameter_var_name].get('optional', False):
+                    logger.warning("render_jinja2", ErrorCode.ISO_METADATA_NO_ENTRY_FOR_DESCRIPTION, msg)
+                    missing = True
+                else:
+                    logger.critical("render_jinja2", ErrorCode.ISO_METADATA_DESCRIPTIONS_CONFIG_INVALID, msg)
+
+        if not missing:
+            new_measured_parameters[parameter_var_name] = mp
+
+    augmented_parameters = augment_measured_parameters(new_measured_parameters, mpc_path, logger)
+
+    return augmented_parameters
+
+
 class NumpyEncoder(json.JSONEncoder):
     """Class to handle serialization of Numpy types during JSON enconding"""
     def default(self, obj):
@@ -214,6 +344,7 @@ class NumpyEncoder(json.JSONEncoder):
         if isinstance(obj, np.bool_):
             return bool(obj)
         return super(NumpyEncoder, self).default(obj)
+
 
 def guess_attribute_display_name(var_name: str) -> str:
     """
