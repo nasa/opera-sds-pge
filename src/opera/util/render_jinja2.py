@@ -12,14 +12,19 @@ Adapted by: Jim Hofman
 """
 
 import json
-import numpy as np
 import os
 import re
-import jinja2
 
+from functools import partial
+
+import jinja2
+import yaml
+
+import numpy as np
+
+from lxml import etree
 from opera.util.error_codes import ErrorCode
 from opera.util.logger import PgeLogger
-
 
 XML_TYPES = {
     str: 'string',
@@ -87,18 +92,18 @@ def _make_undefined_handler_class(logger: PgeLogger):
     class LoggingUndefined(jinja2.Undefined):
         """Override the default behavior which can raise an exception"""
 
-        def _fail_with_undefined_error(self, *args, **kwargs):   # pragma no cover
+        def _fail_with_undefined_error(self, *args, **kwargs):  # pragma no cover
             _log_message(self)
 
         def __str__(self):
             _log_message(self)
             return UNDEFINED_ERROR
 
-        def __iter__(self):   # pragma no cover
+        def __iter__(self):  # pragma no cover
             _log_message(self)
             return super().__iter__()
 
-        def __bool__(self):   # pragma no cover
+        def __bool__(self):  # pragma no cover
             _log_message(self)
             return super().__bool__()
 
@@ -109,7 +114,21 @@ def _make_undefined_handler_class(logger: PgeLogger):
     return LoggingUndefined
 
 
-def render_jinja2(template_filename: str, input_data: dict, logger: PgeLogger = None):
+def _try_parse_xml_string(s: str):
+    _ = etree.fromstring(s.encode('utf-8'))
+
+
+JSON_VALIDATOR = json.loads
+YAML_VALIDATOR = partial(yaml.load, Loader=yaml.SafeLoader)
+XML_VALIDATOR = _try_parse_xml_string
+
+
+def render_jinja2(
+        template_filename: str,
+        input_data: dict,
+        logger: PgeLogger = None,
+        validator=XML_VALIDATOR
+):
     """
     Renders from a jinja2 template using the specified input data.
     Writes the rendered output to the specified output file.
@@ -126,6 +145,9 @@ def render_jinja2(template_filename: str, input_data: dict, logger: PgeLogger = 
         will not raise exceptions or abort rendering. If not provided,
         the default Jinja2 error handling will apply for such errors,
         possibly including raised exceptions.
+    validator:
+        Callable which, if provided, takes the rendered text as an input and
+        attempts to parse it. Must raise an exception if given invalid input.
 
     Returns
     -------
@@ -155,10 +177,17 @@ def render_jinja2(template_filename: str, input_data: dict, logger: PgeLogger = 
 
     rendered_text = template.render(input_data)
 
+    if validator is not None:
+        try:
+            validator(rendered_text)
+        except Exception as err:
+            raise RuntimeError(f"Error parsing rendered ISO XML: {err}") from err
+
     return rendered_text
 
 
 def python_type_to_xml_type(obj) -> str:
+    """Returns a guess for the XML type of a Python object."""
     if isinstance(obj, str):
         if obj.lower() in ['true', 'false']:
             obj = obj.lower() == 'true'
@@ -171,6 +200,7 @@ def python_type_to_xml_type(obj) -> str:
         obj = type(obj)
 
     return XML_TYPES[obj]
+
 
 class NumpyEncoder(json.JSONEncoder):
     """Class to handle serialization of Numpy types during JSON enconding"""
@@ -186,5 +216,9 @@ class NumpyEncoder(json.JSONEncoder):
         return super(NumpyEncoder, self).default(obj)
 
 def guess_attribute_display_name(var_name: str) -> str:
+    """
+    Returns an approximation of an Additional Attribute's display name from its attribute name by converting snake_case
+    to PascalCase.
+    Ex. sample_attribute_name -> SampleAttributeName
+    """
     return var_name.title().replace('_', '')
-
