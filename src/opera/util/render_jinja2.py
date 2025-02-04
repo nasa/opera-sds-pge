@@ -327,9 +327,7 @@ def augment_hd5_measured_parameters(measured_parameters: dict, mpc_path: str, lo
         if not missing:
             new_measured_parameters[parameter_var_name] = mp
 
-    augmented_parameters = augment_measured_parameters(new_measured_parameters, mpc_path, logger)
-
-    return augmented_parameters
+    return augment_measured_parameters(new_measured_parameters, mpc_path, logger)
 
 
 class NumpyEncoder(json.JSONEncoder):

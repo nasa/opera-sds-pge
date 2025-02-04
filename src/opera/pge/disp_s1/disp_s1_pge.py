@@ -28,7 +28,7 @@ from opera.util.h5_utils import get_cslc_s1_product_metadata
 from opera.util.h5_utils import get_disp_s1_product_metadata
 from opera.util.h5_utils import MEASURED_PARAMETER_PATH_SEPARATOR
 from opera.util.input_validation import validate_algorithm_parameters_config, validate_disp_inputs
-from opera.util.render_jinja2 import render_jinja2
+from opera.util.render_jinja2 import augment_hd5_measured_parameters, render_jinja2
 from opera.util.time import get_time_for_filename, get_catalog_metadata_datetime_str
 
 
@@ -591,66 +591,6 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
         """
         return self._ancillary_filename() + ".qa.log"
 
-    def augment_measured_parameters(self, measured_parameters):
-        """
-        Override of the augment_measured_parameters() method in Base PGE with an added
-        "preprocessing" step to handle the structure of HDF5 metadata. While GeoTIFF
-        metadata is a flat dictionary, HDF5 metadata is a nested dictionary structure,
-        wherein the variable "keys" can be arbitrarily deep into the structure and
-        the values likewise can be nested dictionaries.
-
-        The preprocessing step in this method selectively flattens the metadata
-        dictionary based on the "paths" provided in the variable keys of the configuration
-        YAML file. The result of this preprocessing is then safely passed to the base
-        method to get the correct structure expected by the Jinja template.
-
-        Parameters
-        ----------
-        measured_parameters : dict
-            The HDF5 metadata from the output product. See get_disp_s1_product_metadata()
-
-        Returns
-        -------
-        augmented_parameters : dict
-            The metadata fields converted to a list with name, value, types, etc
-        """
-        descriptions_file = self.runconfig.iso_measured_parameter_descriptions
-
-        new_measured_parameters = {}
-
-        if descriptions_file:
-            with open(descriptions_file) as f:
-                descriptions = yaml.safe_load(f)
-        else:
-            msg = ('Measured parameters configuration is needed to extract the measured parameters attributes from the'
-                   'DISP-S1 metadata')
-            self.logger.critical(self.name, ErrorCode.ISO_METADATA_DESCRIPTIONS_CONFIG_NOT_FOUND, msg)
-
-        for parameter_var_name in descriptions:
-            key_path = parameter_var_name.split(MEASURED_PARAMETER_PATH_SEPARATOR)
-
-            mp = measured_parameters
-            missing = False
-
-            while len(key_path) > 0:
-                try:
-                    mp = mp[key_path.pop(0)]
-                except KeyError:
-                    msg = (f'Measured parameters configuration contains a path {parameter_var_name} that is missing '
-                           f'from the output product')
-                    if descriptions[parameter_var_name].get('optional', False):
-                        self.logger.warning(self.name, ErrorCode.ISO_METADATA_NO_ENTRY_FOR_DESCRIPTION, msg)
-                        missing = True
-                    else:
-                        self.logger.critical(self.name, ErrorCode.ISO_METADATA_DESCRIPTIONS_CONFIG_INVALID, msg)
-
-            if not missing:
-                new_measured_parameters[parameter_var_name] = mp
-
-        augmented_parameters = super().augment_measured_parameters(new_measured_parameters)
-
-        return augmented_parameters
-
     def _collect_disp_s1_product_metadata(self, disp_product):
         """
         Gathers the available metadata from a sample output DISP-S1 product for
@@ -683,7 +623,11 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
                 'ProcessingDateTime': get_catalog_metadata_datetime_str(self.production_datetime)
             }
 
-            output_product_metadata['MeasuredParameters'] = self.augment_measured_parameters(output_product_metadata)
+            output_product_metadata['MeasuredParameters'] = augment_hd5_measured_parameters(
+                output_product_metadata,
+                self.runconfig.iso_measured_parameter_descriptions,
+                self.logger
+            )
         except Exception as err:
             msg = f'Failed to extract metadata from {disp_product}, reason: {err}'
             self.logger.critical(self.name, ErrorCode.ISO_METADATA_COULD_NOT_EXTRACT_METADATA, msg)
