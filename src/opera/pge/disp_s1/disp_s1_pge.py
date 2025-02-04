@@ -18,7 +18,6 @@ from collections import OrderedDict
 from os import listdir
 from os.path import abspath, basename, exists, getsize, join, splitext
 
-import yaml
 from opera.pge.base.base_pge import PgeExecutor
 from opera.pge.base.base_pge import PostProcessorMixin
 from opera.pge.base.base_pge import PreProcessorMixin
@@ -26,7 +25,6 @@ from opera.util.dataset_utils import parse_bounding_polygon_from_wkt
 from opera.util.error_codes import ErrorCode
 from opera.util.h5_utils import get_cslc_s1_product_metadata
 from opera.util.h5_utils import get_disp_s1_product_metadata
-from opera.util.h5_utils import MEASURED_PARAMETER_PATH_SEPARATOR
 from opera.util.input_validation import validate_algorithm_parameters_config, validate_disp_inputs
 from opera.util.render_jinja2 import augment_hd5_measured_parameters, render_jinja2
 from opera.util.time import get_time_for_filename, get_catalog_metadata_datetime_str

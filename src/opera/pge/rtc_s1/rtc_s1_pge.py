@@ -15,8 +15,6 @@ from datetime import datetime
 from os import walk
 from os.path import basename, getsize, join
 
-import yaml
-
 from opera.pge.base.base_pge import PgeExecutor
 from opera.pge.base.base_pge import PostProcessorMixin
 from opera.pge.base.base_pge import PreProcessorMixin
@@ -25,7 +23,6 @@ from opera.util.dataset_utils import parse_bounding_polygon_from_wkt
 from opera.util.error_codes import ErrorCode
 from opera.util.geo_utils import translate_utm_bbox_to_lat_lon
 from opera.util.h5_utils import get_rtc_s1_product_metadata
-from opera.util.h5_utils import MEASURED_PARAMETER_PATH_SEPARATOR
 from opera.util.input_validation import validate_slc_s1_inputs
 from opera.util.render_jinja2 import augment_hd5_measured_parameters, render_jinja2
 from opera.util.time import get_time_for_filename

@@ -9,16 +9,12 @@ Module defining the Base PGE interfaces from which all other PGEs are derived.
 
 """
 
-import html
-import json
 import os
 from collections import OrderedDict
 from datetime import datetime
 from fnmatch import fnmatch
 from functools import lru_cache
 from os.path import abspath, basename, exists, join, splitext
-
-import numpy as np
 
 from pkg_resources import resource_filename
 
@@ -32,11 +28,6 @@ from opera.util.error_codes import ErrorCode
 from opera.util.logger import PgeLogger
 from opera.util.logger import default_log_file_name
 from opera.util.metfile import MetFile
-from opera.util.render_jinja2 import (python_type_to_xml_type,
-                                      guess_attribute_display_name,
-                                      NumpyEncoder,
-                                      UNDEFINED_ERROR,
-                                      UNDEFINED_WARNING)
 from opera.util.run_utils import create_qa_command_line
 from opera.util.run_utils import create_sas_command_line
 from opera.util.run_utils import get_checksum
