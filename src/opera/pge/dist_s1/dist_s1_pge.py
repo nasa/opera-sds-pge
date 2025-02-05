@@ -10,11 +10,14 @@ Module defining the implementation for the Surface Disturbance (DIST) from Senti
 
 import os
 import re
+from datetime import datetime
 from os.path import join, isdir, isfile, abspath
 
 from opera.pge.base.base_pge import PreProcessorMixin, PgeExecutor, PostProcessorMixin
+from opera.util.dataset_utils import get_sensor_from_spacecraft_name
 from opera.util.error_codes import ErrorCode
 from opera.util.input_validation import check_input_list
+from opera.util.time import get_time_for_filename
 
 
 class DistS1PreProcessorMixin(PreProcessorMixin):
@@ -131,6 +134,108 @@ class DistS1PostProcessorMixin(PostProcessorMixin):
         if len(output_products) != 1:
             error_msg = f'Incorrect number of output granules generated: {len(output_products)}'
             self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
+
+    def _ancillary_filename(self):
+        """
+        Helper method to derive the core component of the file names for the
+        ancillary products associated to a PGE job (catalog metadata, log file,
+        etc...).
+
+        The core file name component for DSWx-S1 ancillary products consists of:
+
+        <PROJECT>_<LEVEL>_<PGE NAME>_<PROD TIMETAG>_<SENSOR>_<SPACING>_<PRODUCT VERSION>
+
+        Since these files are not specific to any particular tile processed for
+        a DIST-S1 job, fields such as tile ID and acquisition time are omitted from
+        this file pattern.
+
+        Also note that this does not include a file extension, which should be
+        added to the return value of this method by any callers to distinguish
+        the different formats of ancillary outputs produced by this PGE.
+
+        Returns
+        -------
+        ancillary_filename : str
+            The file name component to assign to ancillary products created by this PGE.
+        """
+
+        #TODO: Get this from metadata
+        spacecraft_name = "SENTINEL-1A"
+        sensor = get_sensor_from_spacecraft_name(spacecraft_name)
+        pixel_spacing = "30"
+
+        #TODO: See above
+        processing_time = get_time_for_filename(
+            datetime.utcnow()
+        )
+
+        if not processing_time.endswith('Z'):
+            processing_time = f'{processing_time}Z'
+
+        product_version = str(self.runconfig.product_version)
+
+        if not product_version.startswith('v'):
+            product_version = f'v{product_version}'
+
+        ancillary_filename = (f"{self.PROJECT}_{self.LEVEL}_{self.NAME}_{processing_time}_"
+                              f"{sensor}_{pixel_spacing}_{product_version}")
+
+        return ancillary_filename
+
+    def _catalog_metadata_filename(self):
+        """
+        Returns the file name to use for Catalog Metadata produced by the DSWx-S1 PGE.
+
+        The Catalog Metadata file name for the DSWx-S1 PGE consists of:
+
+            <Ancillary filename>.catalog.json
+
+        Where <Ancillary filename> is returned by DistS1PostProcessorMixin._ancillary_filename()
+
+        Returns
+        -------
+        <catalog metadata filename> : str
+            The file name to assign to the Catalog Metadata product created by this PGE.
+
+        """
+        return self._ancillary_filename() + ".catalog.json"
+
+    def _log_filename(self):
+        """
+        Returns the file name to use for the PGE/SAS log file produced by the DSWx-S1 PGE.
+
+        The log file name for the DSWx-S1 PGE consists of:
+
+            <Ancillary filename>.log
+
+        Where <Ancillary filename> is returned by DistS1PostProcessorMixin._ancillary_filename()
+
+        Returns
+        -------
+        log_filename : str
+            The file name to assign to the PGE/SAS log created by this PGE.
+
+        """
+        return self._ancillary_filename() + ".log"
+
+    def _qa_log_filename(self):
+        """
+        Returns the file name to use for the Quality Assurance application log
+        file produced by the DSWx-S1 PGE.
+
+        The log file name for the DSWx-S1 PGE consists of:
+
+            <Ancillary filename>.qa.log
+
+        Where <Ancillary filename> is returned by DistS1PostProcessorMixin._ancillary_filename()
+
+        Returns
+        -------
+        log_filename : str
+            The file name to assign to the QA log created by this PGE.
+
+        """
+        return self._ancillary_filename() + ".qa.log"
 
     def run_postprocessor(self, **kwargs):
         """
