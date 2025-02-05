@@ -141,7 +141,7 @@ class DistS1PostProcessorMixin(PostProcessorMixin):
         ancillary products associated to a PGE job (catalog metadata, log file,
         etc...).
 
-        The core file name component for DSWx-S1 ancillary products consists of:
+        The core file name component for DIST-S1 ancillary products consists of:
 
         <PROJECT>_<LEVEL>_<PGE NAME>_<PROD TIMETAG>_<SENSOR>_<SPACING>_<PRODUCT VERSION>
 
@@ -184,9 +184,9 @@ class DistS1PostProcessorMixin(PostProcessorMixin):
 
     def _catalog_metadata_filename(self):
         """
-        Returns the file name to use for Catalog Metadata produced by the DSWx-S1 PGE.
+        Returns the file name to use for Catalog Metadata produced by the DIST-S1 PGE.
 
-        The Catalog Metadata file name for the DSWx-S1 PGE consists of:
+        The Catalog Metadata file name for the DIST-S1 PGE consists of:
 
             <Ancillary filename>.catalog.json
 
@@ -202,9 +202,9 @@ class DistS1PostProcessorMixin(PostProcessorMixin):
 
     def _log_filename(self):
         """
-        Returns the file name to use for the PGE/SAS log file produced by the DSWx-S1 PGE.
+        Returns the file name to use for the PGE/SAS log file produced by the DIST-S1 PGE.
 
-        The log file name for the DSWx-S1 PGE consists of:
+        The log file name for the DIST-S1 PGE consists of:
 
             <Ancillary filename>.log
 
@@ -221,9 +221,9 @@ class DistS1PostProcessorMixin(PostProcessorMixin):
     def _qa_log_filename(self):
         """
         Returns the file name to use for the Quality Assurance application log
-        file produced by the DSWx-S1 PGE.
+        file produced by the DIST-S1 PGE.
 
-        The log file name for the DSWx-S1 PGE consists of:
+        The log file name for the DIST-S1 PGE consists of:
 
             <Ancillary filename>.qa.log
 
