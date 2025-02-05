@@ -159,14 +159,16 @@ class DistS1PostProcessorMixin(PostProcessorMixin):
             The file name component to assign to ancillary products created by this PGE.
         """
 
-        #TODO: Get this from metadata
+        # TODO: Get this from metadata
         spacecraft_name = "SENTINEL-1A"
         sensor = get_sensor_from_spacecraft_name(spacecraft_name)
         pixel_spacing = "30"
 
-        #TODO: See above
+        # TODO - for now, use the PGE production time, but ideally this should
+        #        eventually match the production time assigned by the SAS, which
+        #        should be present in the product metadata
         processing_time = get_time_for_filename(
-            datetime.utcnow()
+            self.production_datetime
         )
 
         if not processing_time.endswith('Z'):
@@ -236,6 +238,36 @@ class DistS1PostProcessorMixin(PostProcessorMixin):
 
         """
         return self._ancillary_filename() + ".qa.log"
+
+    # TODO: Figure out how we want to approach this
+    # def _iso_metadata_filename(self, tile_id):
+    #     """
+    #     Returns the file name to use for ISO Metadata produced by the DIST-S1 PGE.
+    #
+    #     The ISO Metadata file name for the DIST-S1 PGE consists of:
+    #
+    #         <DIST-S1 filename>.iso.xml
+    #
+    #     Where <DIST-S1 filename> is returned by DistS1PostProcessorMixin. [TODO: put proper method here]
+    #
+    #     Parameters
+    #     ----------
+    #     tile_id : str
+    #         The MGRS tile identifier used to look up the corresponding cached
+    #         DIST-S1 file name.
+    #
+    #     Returns
+    #     -------
+    #     <iso metadata filename> : str
+    #         The file name to assign to the ISO Metadata product created by this PGE.
+    #
+    #     """
+    #     if tile_id not in self._tile_filename_cache:
+    #         raise RuntimeError(f"No file name cached for tile ID {tile_id}")
+    #
+    #     iso_metadata_filename = self._tile_filename_cache[tile_id]
+    #
+    #     return iso_metadata_filename + ".iso.xml"
 
     def run_postprocessor(self, **kwargs):
         """
