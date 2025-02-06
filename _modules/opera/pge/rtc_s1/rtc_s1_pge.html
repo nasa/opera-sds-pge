@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>opera.pge.rtc_s1.rtc_s1_pge &mdash; opera-sds-pge 6.0.0-er.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
 
   
@@ -85,28 +85,28 @@
 
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">os.path</span>
-<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
-<span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">walk</span>
-<span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">basename</span><span class="p">,</span> <span class="n">getsize</span><span class="p">,</span> <span class="n">join</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os.path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">os</span><span class="w"> </span><span class="kn">import</span> <span class="n">walk</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">os.path</span><span class="w"> </span><span class="kn">import</span> <span class="n">basename</span><span class="p">,</span> <span class="n">getsize</span><span class="p">,</span> <span class="n">join</span>
 
-<span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">yaml</span>
 
-<span class="kn">from</span> <span class="nn">opera.pge.base.base_pge</span> <span class="kn">import</span> <span class="n">PgeExecutor</span>
-<span class="kn">from</span> <span class="nn">opera.pge.base.base_pge</span> <span class="kn">import</span> <span class="n">PostProcessorMixin</span>
-<span class="kn">from</span> <span class="nn">opera.pge.base.base_pge</span> <span class="kn">import</span> <span class="n">PreProcessorMixin</span>
-<span class="kn">from</span> <span class="nn">opera.util.dataset_utils</span> <span class="kn">import</span> <span class="n">get_sensor_from_spacecraft_name</span>
-<span class="kn">from</span> <span class="nn">opera.util.dataset_utils</span> <span class="kn">import</span> <span class="n">parse_bounding_polygon_from_wkt</span>
-<span class="kn">from</span> <span class="nn">opera.util.error_codes</span> <span class="kn">import</span> <span class="n">ErrorCode</span>
-<span class="kn">from</span> <span class="nn">opera.util.geo_utils</span> <span class="kn">import</span> <span class="n">translate_utm_bbox_to_lat_lon</span>
-<span class="kn">from</span> <span class="nn">opera.util.h5_utils</span> <span class="kn">import</span> <span class="n">get_rtc_s1_product_metadata</span>
-<span class="kn">from</span> <span class="nn">opera.util.h5_utils</span> <span class="kn">import</span> <span class="n">MEASURED_PARAMETER_PATH_SEPARATOR</span>
-<span class="kn">from</span> <span class="nn">opera.util.input_validation</span> <span class="kn">import</span> <span class="n">validate_slc_s1_inputs</span>
-<span class="kn">from</span> <span class="nn">opera.util.render_jinja2</span> <span class="kn">import</span> <span class="n">render_jinja2</span>
-<span class="kn">from</span> <span class="nn">opera.util.time</span> <span class="kn">import</span> <span class="n">get_time_for_filename</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.pge.base.base_pge</span><span class="w"> </span><span class="kn">import</span> <span class="n">PgeExecutor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.pge.base.base_pge</span><span class="w"> </span><span class="kn">import</span> <span class="n">PostProcessorMixin</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.pge.base.base_pge</span><span class="w"> </span><span class="kn">import</span> <span class="n">PreProcessorMixin</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.dataset_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_sensor_from_spacecraft_name</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.dataset_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">parse_bounding_polygon_from_wkt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.error_codes</span><span class="w"> </span><span class="kn">import</span> <span class="n">ErrorCode</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.geo_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">translate_utm_bbox_to_lat_lon</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.h5_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_rtc_s1_product_metadata</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.h5_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">MEASURED_PARAMETER_PATH_SEPARATOR</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.input_validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate_slc_s1_inputs</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.render_jinja2</span><span class="w"> </span><span class="kn">import</span> <span class="n">render_jinja2</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.time</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_time_for_filename</span>
 
 
-<div class="viewcode-block" id="RtcS1PreProcessorMixin"><a class="viewcode-back" href="../../../../opera.pge.rtc_s1.html#opera.pge.rtc_s1.rtc_s1_pge.RtcS1PreProcessorMixin">[docs]</a><span class="k">class</span> <span class="nc">RtcS1PreProcessorMixin</span><span class="p">(</span><span class="n">PreProcessorMixin</span><span class="p">):</span>
+<div class="viewcode-block" id="RtcS1PreProcessorMixin"><a class="viewcode-back" href="../../../../opera.pge.rtc_s1.html#opera.pge.rtc_s1.rtc_s1_pge.RtcS1PreProcessorMixin">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">RtcS1PreProcessorMixin</span><span class="p">(</span><span class="n">PreProcessorMixin</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Mixin class responsible for handling all pre-processing steps for the RTC-S1</span>
 <span class="sd">    PGE. The pre-processing phase is defined as all steps necessary prior to</span>
@@ -120,7 +120,7 @@
 
     <span class="n">_pre_mixin_name</span> <span class="o">=</span> <span class="s2">&quot;RtcS1PreProcessorMixin&quot;</span>
 
-<div class="viewcode-block" id="RtcS1PreProcessorMixin.run_preprocessor"><a class="viewcode-back" href="../../../../opera.pge.rtc_s1.html#opera.pge.rtc_s1.rtc_s1_pge.RtcS1PreProcessorMixin.run_preprocessor">[docs]</a>    <span class="k">def</span> <span class="nf">run_preprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="RtcS1PreProcessorMixin.run_preprocessor"><a class="viewcode-back" href="../../../../opera.pge.rtc_s1.html#opera.pge.rtc_s1.rtc_s1_pge.RtcS1PreProcessorMixin.run_preprocessor">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">run_preprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Executes the pre-processing steps for RTC-S1 PGE initialization.</span>
 
@@ -139,7 +139,7 @@
         <span class="n">validate_slc_s1_inputs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="RtcS1PostProcessorMixin"><a class="viewcode-back" href="../../../../opera.pge.rtc_s1.html#opera.pge.rtc_s1.rtc_s1_pge.RtcS1PostProcessorMixin">[docs]</a><span class="k">class</span> <span class="nc">RtcS1PostProcessorMixin</span><span class="p">(</span><span class="n">PostProcessorMixin</span><span class="p">):</span>
+<div class="viewcode-block" id="RtcS1PostProcessorMixin"><a class="viewcode-back" href="../../../../opera.pge.rtc_s1.html#opera.pge.rtc_s1.rtc_s1_pge.RtcS1PostProcessorMixin">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">RtcS1PostProcessorMixin</span><span class="p">(</span><span class="n">PostProcessorMixin</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Mixin class responsible for handling all post-processing steps for the RTC-S1</span>
 <span class="sd">    PGE. The post-processing phase is defined as all steps required after SAS</span>
@@ -156,7 +156,7 @@
     <span class="n">_burst_metadata_cache</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">_burst_filename_cache</span> <span class="o">=</span> <span class="p">{}</span>
 
-    <span class="k">def</span> <span class="nf">_validate_output</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_output</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Evaluates the output file(s) generated from SAS execution to ensure</span>
 <span class="sd">        the existence of a directory for each burst containing a single output</span>
@@ -208,7 +208,7 @@
 
                     <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INVALID_OUTPUT</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_core_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inter_filename</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_core_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inter_filename</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the core file name component for products produced by the</span>
 <span class="sd">        RTC-S1 PGE.</span>
@@ -251,7 +251,7 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cached_core_filename</span>
 
-    <span class="k">def</span> <span class="nf">_core_static_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inter_filename</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_core_static_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inter_filename</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the core file name component for static layer products produced</span>
 <span class="sd">        by the RTC-S1 PGE.</span>
@@ -282,7 +282,7 @@
 
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">core_filename</span><span class="si">}</span><span class="s2">-STATIC&quot;</span>
 
-    <span class="k">def</span> <span class="nf">_rtc_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inter_filename</span><span class="p">,</span> <span class="n">static_layer_product</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_rtc_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inter_filename</span><span class="p">,</span> <span class="n">static_layer_product</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the base file name to use for RTC products produced by this PGE.</span>
 
@@ -409,7 +409,7 @@
 
         <span class="k">return</span> <span class="n">rtc_filename</span>
 
-    <span class="k">def</span> <span class="nf">_static_layer_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inter_filename</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_static_layer_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inter_filename</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the final file name for the static layer RTC product which</span>
 <span class="sd">        may be optionally produced by this PGE. There are currently 5 static layer</span>
@@ -458,7 +458,7 @@
 
         <span class="k">return</span> <span class="n">static_layer_filename</span>
 
-    <span class="k">def</span> <span class="nf">_rtc_geotiff_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inter_filename</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_rtc_geotiff_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inter_filename</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the file name to use for GeoTIFF format RTC products produced</span>
 <span class="sd">        by this PGE.</span>
@@ -494,7 +494,7 @@
 
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">rtc_filename</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">polarization</span><span class="si">}</span><span class="s2">.tif&quot;</span>
 
-    <span class="k">def</span> <span class="nf">_mask_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inter_filename</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_mask_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inter_filename</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the file name to use for RTC mask products produced by this PGE.</span>
 
@@ -521,7 +521,7 @@
 
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">rtc_filename</span><span class="si">}</span><span class="s2">_mask.tif&quot;</span>
 
-    <span class="k">def</span> <span class="nf">_browse_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inter_filename</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_browse_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inter_filename</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the final file name of the PNG browse image product which may</span>
 <span class="sd">        be optionally produced by this PGE.</span>
@@ -551,7 +551,7 @@
 
         <span class="k">return</span> <span class="n">browse_filename</span>
 
-    <span class="k">def</span> <span class="nf">_static_browse_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inter_filename</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_static_browse_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inter_filename</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the final file name of the static layer PNG browse image product</span>
 <span class="sd">        which may be optionally produced by this PGE.</span>
@@ -582,7 +582,7 @@
 
         <span class="k">return</span> <span class="n">browse_filename</span>
 
-    <span class="k">def</span> <span class="nf">_rtc_metadata_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inter_filename</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_rtc_metadata_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inter_filename</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the file name to use for RTC metadata products produced by this PGE.</span>
 
@@ -613,7 +613,7 @@
 
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">rtc_filename</span><span class="si">}{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
 
-    <span class="k">def</span> <span class="nf">_static_metadata_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inter_filename</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_static_metadata_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inter_filename</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the file name to use for RTC metadata products produced by this PGE.</span>
 
@@ -645,7 +645,7 @@
 
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">rtc_filename</span><span class="si">}{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
 
-    <span class="k">def</span> <span class="nf">_ancillary_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_ancillary_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Helper method to derive the core component of the file names for</span>
 <span class="sd">        the ancillary products associated to a PGE job (catalog metadata, log</span>
@@ -689,7 +689,7 @@
 
         <span class="k">return</span> <span class="n">ancillary_filename</span>
 
-    <span class="k">def</span> <span class="nf">_catalog_metadata_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_catalog_metadata_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the file name to use for Catalog Metadata produced by the RTC-S1 PGE.</span>
 
@@ -707,7 +707,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ancillary_filename</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;.catalog.json&quot;</span>
 
-    <span class="k">def</span> <span class="nf">_iso_metadata_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">burst_id</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_iso_metadata_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">burst_id</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the file name to use for ISO Metadata produced by the RTC-S1 PGE.</span>
 
@@ -736,7 +736,7 @@
 
         <span class="k">return</span> <span class="n">iso_metadata_filename</span> <span class="o">+</span> <span class="s2">&quot;.iso.xml&quot;</span>
 
-    <span class="k">def</span> <span class="nf">_log_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_log_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the file name to use for the PGE/SAS log file produced by the RTC-S1 PGE.</span>
 
@@ -754,7 +754,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ancillary_filename</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;.log&quot;</span>
 
-    <span class="k">def</span> <span class="nf">_qa_log_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_qa_log_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the file name to use for the Quality Assurance application log</span>
 <span class="sd">        file produced by the RTC-S1 PGE.</span>
@@ -773,7 +773,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ancillary_filename</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;.qa.log&quot;</span>
 
-<div class="viewcode-block" id="RtcS1PostProcessorMixin.augment_measured_parameters"><a class="viewcode-back" href="../../../../opera.pge.rtc_s1.html#opera.pge.rtc_s1.rtc_s1_pge.RtcS1PostProcessorMixin.augment_measured_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">augment_measured_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">measured_parameters</span><span class="p">):</span>
+<div class="viewcode-block" id="RtcS1PostProcessorMixin.augment_measured_parameters"><a class="viewcode-back" href="../../../../opera.pge.rtc_s1.html#opera.pge.rtc_s1.rtc_s1_pge.RtcS1PostProcessorMixin.augment_measured_parameters">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">augment_measured_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">measured_parameters</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Override of the augment_measured_parameters() method in Base PGE with an added</span>
 <span class="sd">        &quot;preprocessing&quot; step to handle the structure of HDF5 metadata. While GeoTIFF</span>
@@ -812,21 +812,28 @@
             <span class="n">key_path</span> <span class="o">=</span> <span class="n">parameter_var_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">MEASURED_PARAMETER_PATH_SEPARATOR</span><span class="p">)</span>
 
             <span class="n">mp</span> <span class="o">=</span> <span class="n">measured_parameters</span>
+            <span class="n">missing</span> <span class="o">=</span> <span class="kc">False</span>
 
             <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">key_path</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="n">mp</span> <span class="o">=</span> <span class="n">mp</span><span class="p">[</span><span class="n">key_path</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)]</span>
-                    <span class="n">new_measured_parameters</span><span class="p">[</span><span class="n">parameter_var_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">mp</span>
-                <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
-                    <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Measured parameters contains no entry for description &#39;</span>
-                           <span class="sa">f</span><span class="s1">&#39;key &quot;</span><span class="si">{</span><span class="n">err</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">ISO_METADATA_NO_ENTRY_FOR_DESCRIPTION</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Measured parameters configuration contains a path </span><span class="si">{</span><span class="n">parameter_var_name</span><span class="si">}</span><span class="s1"> that is missing &#39;</span>
+                           <span class="sa">f</span><span class="s1">&#39;from the output product&#39;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">descriptions</span><span class="p">[</span><span class="n">parameter_var_name</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;optional&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">ISO_METADATA_NO_ENTRY_FOR_DESCRIPTION</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+                        <span class="n">missing</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">ISO_METADATA_DESCRIPTIONS_CONFIG_INVALID</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">missing</span><span class="p">:</span>
+                <span class="n">new_measured_parameters</span><span class="p">[</span><span class="n">parameter_var_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">mp</span>
 
         <span class="n">augmented_parameters</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">augment_measured_parameters</span><span class="p">(</span><span class="n">new_measured_parameters</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">augmented_parameters</span></div>
 
-    <span class="k">def</span> <span class="nf">_collect_rtc_product_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata_product</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_collect_rtc_product_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata_product</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Gathers the available metadata from an HDF5 product created by</span>
 <span class="sd">        the RTC-S1 SAS. This metadata is then formatted for use with filling in</span>
@@ -889,7 +896,7 @@
 
         <span class="k">return</span> <span class="n">output_product_metadata</span>
 
-    <span class="k">def</span> <span class="nf">_create_custom_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_custom_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates the &quot;custom data&quot; dictionary used with the ISO metadata rendering.</span>
 
@@ -916,7 +923,7 @@
 
         <span class="k">return</span> <span class="n">custom_metadata</span>
 
-    <span class="k">def</span> <span class="nf">_create_iso_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">burst_metadata</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_iso_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">burst_metadata</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates a rendered version of the ISO metadata template for RTC-S1</span>
 <span class="sd">        output products using metadata from the following locations:</span>
@@ -963,7 +970,7 @@
 
         <span class="k">return</span> <span class="n">rendered_template</span>
 
-    <span class="k">def</span> <span class="nf">_stage_output_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_stage_output_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Ensures that all output products produced by both the SAS and this PGE</span>
 <span class="sd">        are staged to the output location defined by the RunConfig. This includes</span>
@@ -1043,7 +1050,7 @@
             <span class="c1"># Log stream might be closed by this point so raise an Exception instead</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
-<div class="viewcode-block" id="RtcS1PostProcessorMixin.run_postprocessor"><a class="viewcode-back" href="../../../../opera.pge.rtc_s1.html#opera.pge.rtc_s1.rtc_s1_pge.RtcS1PostProcessorMixin.run_postprocessor">[docs]</a>    <span class="k">def</span> <span class="nf">run_postprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="RtcS1PostProcessorMixin.run_postprocessor"><a class="viewcode-back" href="../../../../opera.pge.rtc_s1.html#opera.pge.rtc_s1.rtc_s1_pge.RtcS1PostProcessorMixin.run_postprocessor">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">run_postprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Executes the post-processing steps for the RTC-S1 PGE.</span>
 
@@ -1065,7 +1072,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_stage_output_files</span><span class="p">()</span></div></div>
 
 
-<div class="viewcode-block" id="RtcS1Executor"><a class="viewcode-back" href="../../../../opera.pge.rtc_s1.html#opera.pge.rtc_s1.rtc_s1_pge.RtcS1Executor">[docs]</a><span class="k">class</span> <span class="nc">RtcS1Executor</span><span class="p">(</span><span class="n">RtcS1PreProcessorMixin</span><span class="p">,</span> <span class="n">RtcS1PostProcessorMixin</span><span class="p">,</span> <span class="n">PgeExecutor</span><span class="p">):</span>
+<div class="viewcode-block" id="RtcS1Executor"><a class="viewcode-back" href="../../../../opera.pge.rtc_s1.html#opera.pge.rtc_s1.rtc_s1_pge.RtcS1Executor">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">RtcS1Executor</span><span class="p">(</span><span class="n">RtcS1PreProcessorMixin</span><span class="p">,</span> <span class="n">RtcS1PostProcessorMixin</span><span class="p">,</span> <span class="n">PgeExecutor</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Main class for execution of the RTC-S1 PGE, including the SAS layer.</span>
 
@@ -1089,7 +1096,7 @@
 
     <span class="n">SOURCE</span> <span class="o">=</span> <span class="s2">&quot;S1&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pge_name</span><span class="p">,</span> <span class="n">runconfig_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pge_name</span><span class="p">,</span> <span class="n">runconfig_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">pge_name</span><span class="p">,</span> <span class="n">runconfig_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="c1"># Used in base_pge.py to rename and keep track of files</span>

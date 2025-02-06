@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>opera.util.usage_metrics &mdash; opera-sds-pge 6.0.0-er.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
 
   
@@ -88,12 +88,12 @@
 
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">resource</span>
-<span class="kn">from</span> <span class="nn">sys</span> <span class="kn">import</span> <span class="n">platform</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">resource</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sys</span><span class="w"> </span><span class="kn">import</span> <span class="n">platform</span>
 
 
-<div class="viewcode-block" id="get_os_metrics"><a class="viewcode-back" href="../../../opera.util.html#opera.util.usage_metrics.get_os_metrics">[docs]</a><span class="k">def</span> <span class="nf">get_os_metrics</span><span class="p">():</span>
+<div class="viewcode-block" id="get_os_metrics"><a class="viewcode-back" href="../../../opera.util.html#opera.util.usage_metrics.get_os_metrics">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">get_os_metrics</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Gets metrics related to machine resource usage, by the current process</span>
 <span class="sd">    and by all of its children processes.</span>
@@ -145,7 +145,7 @@
     <span class="k">return</span> <span class="n">metrics</span></div>
 
 
-<div class="viewcode-block" id="get_self_peak_vmm_kb"><a class="viewcode-back" href="../../../opera.util.html#opera.util.usage_metrics.get_self_peak_vmm_kb">[docs]</a><span class="k">def</span> <span class="nf">get_self_peak_vmm_kb</span><span class="p">():</span>  <span class="c1"># pylint: disable=missing-raises-doc</span>
+<div class="viewcode-block" id="get_self_peak_vmm_kb"><a class="viewcode-back" href="../../../opera.util.html#opera.util.usage_metrics.get_self_peak_vmm_kb">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">get_self_peak_vmm_kb</span><span class="p">():</span>  <span class="c1"># pylint: disable=missing-raises-doc</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Attempt to get the peak virtual memory by looking into the /proc/self/status</span>
 

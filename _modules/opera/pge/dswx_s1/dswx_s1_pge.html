@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>opera.pge.dswx_s1.dswx_s1_pge &mdash; opera-sds-pge 6.0.0-er.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
 
   
@@ -84,26 +84,26 @@
 
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
-<span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">abspath</span><span class="p">,</span> <span class="n">basename</span><span class="p">,</span> <span class="n">exists</span><span class="p">,</span> <span class="n">getsize</span><span class="p">,</span> <span class="n">join</span><span class="p">,</span> <span class="n">splitext</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">os.path</span><span class="w"> </span><span class="kn">import</span> <span class="n">abspath</span><span class="p">,</span> <span class="n">basename</span><span class="p">,</span> <span class="n">exists</span><span class="p">,</span> <span class="n">getsize</span><span class="p">,</span> <span class="n">join</span><span class="p">,</span> <span class="n">splitext</span>
 
-<span class="kn">import</span> <span class="nn">opera.util.input_validation</span> <span class="k">as</span> <span class="nn">input_validation</span>
-<span class="kn">from</span> <span class="nn">opera.pge.base.base_pge</span> <span class="kn">import</span> <span class="n">PgeExecutor</span>
-<span class="kn">from</span> <span class="nn">opera.pge.base.base_pge</span> <span class="kn">import</span> <span class="n">PostProcessorMixin</span>
-<span class="kn">from</span> <span class="nn">opera.pge.base.base_pge</span> <span class="kn">import</span> <span class="n">PreProcessorMixin</span>
-<span class="kn">from</span> <span class="nn">opera.util.dataset_utils</span> <span class="kn">import</span> <span class="n">get_sensor_from_spacecraft_name</span>
-<span class="kn">from</span> <span class="nn">opera.util.error_codes</span> <span class="kn">import</span> <span class="n">ErrorCode</span>
-<span class="kn">from</span> <span class="nn">opera.util.geo_utils</span> <span class="kn">import</span> <span class="n">get_geographic_boundaries_from_mgrs_tile</span>
-<span class="kn">from</span> <span class="nn">opera.util.input_validation</span> <span class="kn">import</span> <span class="n">validate_algorithm_parameters_config</span>
-<span class="kn">from</span> <span class="nn">opera.util.input_validation</span> <span class="kn">import</span> <span class="n">validate_dswx_inputs</span>
-<span class="kn">from</span> <span class="nn">opera.util.render_jinja2</span> <span class="kn">import</span> <span class="n">render_jinja2</span>
-<span class="kn">from</span> <span class="nn">opera.util.run_utils</span> <span class="kn">import</span> <span class="n">get_checksum</span>
-<span class="kn">from</span> <span class="nn">opera.util.tiff_utils</span> <span class="kn">import</span> <span class="n">get_geotiff_metadata</span>
-<span class="kn">from</span> <span class="nn">opera.util.time</span> <span class="kn">import</span> <span class="n">get_time_for_filename</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">opera.util.input_validation</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">input_validation</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.pge.base.base_pge</span><span class="w"> </span><span class="kn">import</span> <span class="n">PgeExecutor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.pge.base.base_pge</span><span class="w"> </span><span class="kn">import</span> <span class="n">PostProcessorMixin</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.pge.base.base_pge</span><span class="w"> </span><span class="kn">import</span> <span class="n">PreProcessorMixin</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.dataset_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_sensor_from_spacecraft_name</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.error_codes</span><span class="w"> </span><span class="kn">import</span> <span class="n">ErrorCode</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.geo_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_geographic_boundaries_from_mgrs_tile</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.input_validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate_algorithm_parameters_config</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.input_validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate_dswx_inputs</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.render_jinja2</span><span class="w"> </span><span class="kn">import</span> <span class="n">render_jinja2</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.run_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_checksum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.tiff_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_geotiff_metadata</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.time</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_time_for_filename</span>
 
 
-<div class="viewcode-block" id="DSWxS1PreProcessorMixin"><a class="viewcode-back" href="../../../../opera.pge.dswx_s1.html#opera.pge.dswx_s1.dswx_s1_pge.DSWxS1PreProcessorMixin">[docs]</a><span class="k">class</span> <span class="nc">DSWxS1PreProcessorMixin</span><span class="p">(</span><span class="n">PreProcessorMixin</span><span class="p">):</span>
+<div class="viewcode-block" id="DSWxS1PreProcessorMixin"><a class="viewcode-back" href="../../../../opera.pge.dswx_s1.html#opera.pge.dswx_s1.dswx_s1_pge.DSWxS1PreProcessorMixin">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">DSWxS1PreProcessorMixin</span><span class="p">(</span><span class="n">PreProcessorMixin</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Mixin class responsible for handling all pre-processing steps for the DSWx-S1</span>
 <span class="sd">    PGE. The pre-processing phase is defined as all steps necessary prior</span>
@@ -118,7 +118,7 @@
     <span class="n">_pre_mixin_name</span> <span class="o">=</span> <span class="s2">&quot;DSWxS1PreProcessorMixin&quot;</span>
     <span class="n">_valid_input_extensions</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;.tif&quot;</span><span class="p">,</span> <span class="s2">&quot;.h5&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_validate_dynamic_ancillary_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_dynamic_ancillary_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Evaluates the list of dynamic ancillary inputs from the RunConfig to</span>
 <span class="sd">        ensure they exist and have an expected file extension.</span>
@@ -160,7 +160,7 @@
                     <span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">valid_extensions</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;.yaml&#39;</span><span class="p">,</span> <span class="p">)</span>
                 <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_validate_static_ancillary_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_static_ancillary_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Evaluates the list of static ancillary inputs from the RunConfig to</span>
 <span class="sd">        ensure they exist and have an expected file extension.</span>
@@ -179,7 +179,7 @@
                 <span class="c1"># actually file paths, so skip them</span>
                 <span class="k">continue</span>
 
-<div class="viewcode-block" id="DSWxS1PreProcessorMixin.run_preprocessor"><a class="viewcode-back" href="../../../../opera.pge.dswx_s1.html#opera.pge.dswx_s1.dswx_s1_pge.DSWxS1PreProcessorMixin.run_preprocessor">[docs]</a>    <span class="k">def</span> <span class="nf">run_preprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="DSWxS1PreProcessorMixin.run_preprocessor"><a class="viewcode-back" href="../../../../opera.pge.dswx_s1.html#opera.pge.dswx_s1.dswx_s1_pge.DSWxS1PreProcessorMixin.run_preprocessor">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">run_preprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Executes the pre-processing steps for DSWx-S1 PGE initialization.</span>
 <span class="sd">        The DswxS1PreProcessorMixin version of this class performs all actions</span>
@@ -206,7 +206,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_static_ancillary_inputs</span><span class="p">()</span></div></div>
 
 
-<div class="viewcode-block" id="DSWxS1PostProcessorMixin"><a class="viewcode-back" href="../../../../opera.pge.dswx_s1.html#opera.pge.dswx_s1.dswx_s1_pge.DSWxS1PostProcessorMixin">[docs]</a><span class="k">class</span> <span class="nc">DSWxS1PostProcessorMixin</span><span class="p">(</span><span class="n">PostProcessorMixin</span><span class="p">):</span>
+<div class="viewcode-block" id="DSWxS1PostProcessorMixin"><a class="viewcode-back" href="../../../../opera.pge.dswx_s1.html#opera.pge.dswx_s1.dswx_s1_pge.DSWxS1PostProcessorMixin">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">DSWxS1PostProcessorMixin</span><span class="p">(</span><span class="n">PostProcessorMixin</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Mixin class responsible for handling all post-processing steps for the DSWx-S1</span>
 <span class="sd">    PGE. The post-processing phase is defined as all steps required after SAS</span>
@@ -223,7 +223,7 @@
     <span class="n">_tile_metadata_cache</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">_tile_filename_cache</span> <span class="o">=</span> <span class="p">{}</span>
 
-    <span class="k">def</span> <span class="nf">_validate_output_product_filenames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_output_product_filenames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method validates output product file names assigned by the SAS</span>
 <span class="sd">        via a regular expression. The output product file names should follow</span>
@@ -269,7 +269,7 @@
                     <span class="c1"># Cache the core filename for use when naming the ISO XML file</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_tile_filename_cache</span><span class="p">[</span><span class="n">tile_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">file_id</span>
 
-    <span class="k">def</span> <span class="nf">_validate_output</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_output</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Evaluates the output file(s) generated from SAS execution to ensure:</span>
 <span class="sd">            - That the file(s) contains some content (size is greater than 0).</span>
@@ -328,7 +328,7 @@
 
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INVALID_OUTPUT</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_checksum_output_products</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_checksum_output_products</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generates a dictionary mapping output product file names to the</span>
 <span class="sd">        corresponding MD5 checksum digest of the file&#39;s contents.</span>
@@ -362,7 +362,7 @@
 
         <span class="k">return</span> <span class="n">checksums</span>
 
-    <span class="k">def</span> <span class="nf">_ancillary_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_ancillary_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Helper method to derive the core component of the file names for the</span>
 <span class="sd">        ancillary products associated to a PGE job (catalog metadata, log file,</span>
@@ -414,7 +414,7 @@
 
         <span class="k">return</span> <span class="n">ancillary_filename</span>
 
-    <span class="k">def</span> <span class="nf">_catalog_metadata_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_catalog_metadata_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the file name to use for Catalog Metadata produced by the DSWx-S1 PGE.</span>
 
@@ -432,7 +432,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ancillary_filename</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;.catalog.json&quot;</span>
 
-    <span class="k">def</span> <span class="nf">_iso_metadata_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tile_id</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_iso_metadata_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tile_id</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the file name to use for ISO Metadata produced by the DSWX-S1 PGE.</span>
 
@@ -461,7 +461,7 @@
 
         <span class="k">return</span> <span class="n">iso_metadata_filename</span> <span class="o">+</span> <span class="s2">&quot;.iso.xml&quot;</span>
 
-    <span class="k">def</span> <span class="nf">_log_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_log_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the file name to use for the PGE/SAS log file produced by the DSWx-S1 PGE.</span>
 
@@ -479,7 +479,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ancillary_filename</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;.log&quot;</span>
 
-    <span class="k">def</span> <span class="nf">_qa_log_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_qa_log_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the file name to use for the Quality Assurance application log</span>
 <span class="sd">        file produced by the DSWx-S1 PGE.</span>
@@ -498,7 +498,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ancillary_filename</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;.qa.log&quot;</span>
 
-    <span class="k">def</span> <span class="nf">_collect_dswx_s1_product_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">geotiff_product</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_collect_dswx_s1_product_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">geotiff_product</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Gathers the available metadata from an output DSWx-S1 product for</span>
 <span class="sd">        use in filling out the ISO metadata template for the DSWx-S1 PGE.</span>
@@ -557,7 +557,7 @@
 
         <span class="k">return</span> <span class="n">output_product_metadata</span>
 
-    <span class="k">def</span> <span class="nf">_create_custom_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tile_filename</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_custom_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tile_filename</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates the &quot;custom data&quot; dictionary used with the ISO metadata rendering.</span>
 
@@ -590,7 +590,7 @@
 
         <span class="k">return</span> <span class="n">custom_metadata</span>
 
-    <span class="k">def</span> <span class="nf">_create_iso_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tile_id</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_iso_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tile_id</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates a rendered version of the ISO metadata template for DSWX-S1</span>
 <span class="sd">        output products using metadata from the following locations:</span>
@@ -643,7 +643,7 @@
 
         <span class="k">return</span> <span class="n">rendered_template</span>
 
-    <span class="k">def</span> <span class="nf">_stage_output_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_stage_output_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Ensures that all output products produced by both the SAS and this PGE</span>
 <span class="sd">        are staged to the output location defined by the RunConfig.</span>
@@ -712,7 +712,7 @@
             <span class="c1"># Log stream might be closed by this point so raise an Exception instead</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
-<div class="viewcode-block" id="DSWxS1PostProcessorMixin.run_postprocessor"><a class="viewcode-back" href="../../../../opera.pge.dswx_s1.html#opera.pge.dswx_s1.dswx_s1_pge.DSWxS1PostProcessorMixin.run_postprocessor">[docs]</a>    <span class="k">def</span> <span class="nf">run_postprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="DSWxS1PostProcessorMixin.run_postprocessor"><a class="viewcode-back" href="../../../../opera.pge.dswx_s1.html#opera.pge.dswx_s1.dswx_s1_pge.DSWxS1PostProcessorMixin.run_postprocessor">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">run_postprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Executes the post-processing steps for the DSWx-S1 PGE.</span>
 <span class="sd">        The DSWxS1PostProcessorMixin version of this method performs the same</span>
@@ -732,7 +732,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_stage_output_files</span><span class="p">()</span></div></div>
 
 
-<div class="viewcode-block" id="DSWxS1Executor"><a class="viewcode-back" href="../../../../opera.pge.dswx_s1.html#opera.pge.dswx_s1.dswx_s1_pge.DSWxS1Executor">[docs]</a><span class="k">class</span> <span class="nc">DSWxS1Executor</span><span class="p">(</span><span class="n">DSWxS1PreProcessorMixin</span><span class="p">,</span> <span class="n">DSWxS1PostProcessorMixin</span><span class="p">,</span> <span class="n">PgeExecutor</span><span class="p">):</span>
+<div class="viewcode-block" id="DSWxS1Executor"><a class="viewcode-back" href="../../../../opera.pge.dswx_s1.html#opera.pge.dswx_s1.dswx_s1_pge.DSWxS1Executor">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">DSWxS1Executor</span><span class="p">(</span><span class="n">DSWxS1PreProcessorMixin</span><span class="p">,</span> <span class="n">DSWxS1PostProcessorMixin</span><span class="p">,</span> <span class="n">PgeExecutor</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Main class for execution of the DSWx-S1 PGE, including the SAS layer.</span>
 <span class="sd">    This class essentially rolls up the DSWx-specific pre- and post-processor</span>
@@ -753,7 +753,7 @@
     <span class="n">SAS_VERSION</span> <span class="o">=</span> <span class="s2">&quot;1.1&quot;</span>  <span class="c1"># Final release https://github.com/opera-adt/DSWX-SAR/releases/tag/v1.1</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Version of the SAS wrapped by this PGE, should be updated as needed&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pge_name</span><span class="p">,</span> <span class="n">runconfig_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pge_name</span><span class="p">,</span> <span class="n">runconfig_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">pge_name</span><span class="p">,</span> <span class="n">runconfig_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="c1"># Used in base_pge.py to rename and keep track of files</span>

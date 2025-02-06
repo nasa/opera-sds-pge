@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>opera.pge.base.runconfig &mdash; opera-sds-pge 6.0.0-er.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
 
   
@@ -88,21 +88,21 @@
 <span class="sd">Adapted By: Scott Collins</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">abspath</span><span class="p">,</span> <span class="n">basename</span><span class="p">,</span> <span class="n">isabs</span><span class="p">,</span> <span class="n">isdir</span><span class="p">,</span> <span class="n">isfile</span><span class="p">,</span> <span class="n">join</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">os.path</span><span class="w"> </span><span class="kn">import</span> <span class="n">abspath</span><span class="p">,</span> <span class="n">basename</span><span class="p">,</span> <span class="n">isabs</span><span class="p">,</span> <span class="n">isdir</span><span class="p">,</span> <span class="n">isfile</span><span class="p">,</span> <span class="n">join</span>
 
-<span class="kn">from</span> <span class="nn">pkg_resources</span> <span class="kn">import</span> <span class="n">resource_filename</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pkg_resources</span><span class="w"> </span><span class="kn">import</span> <span class="n">resource_filename</span>
 
-<span class="kn">import</span> <span class="nn">yamale</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">yamale</span>
 
-<span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">yaml</span>
 
 
 <span class="n">BASE_PGE_SCHEMA</span> <span class="o">=</span> <span class="n">resource_filename</span><span class="p">(</span><span class="s1">&#39;opera&#39;</span><span class="p">,</span> <span class="s1">&#39;pge/base/schema/base_pge_schema.yaml&#39;</span><span class="p">)</span>
 <span class="sd">&quot;&quot;&quot;Path to the Yamale schema applicable to the PGE portion of each RunConfig&quot;&quot;&quot;</span>
 
 
-<div class="viewcode-block" id="RunConfig"><a class="viewcode-back" href="../../../../opera.pge.base.html#opera.pge.base.runconfig.RunConfig">[docs]</a><span class="k">class</span> <span class="nc">RunConfig</span><span class="p">:</span>
+<div class="viewcode-block" id="RunConfig"><a class="viewcode-back" href="../../../../opera.pge.base.html#opera.pge.base.runconfig.RunConfig">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">RunConfig</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class used to parse and validate run configuration files for OPERA PGEs.</span>
 
@@ -123,7 +123,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_filename</span> <span class="o">=</span> <span class="n">filename</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_run_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_run_config_file</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
@@ -133,7 +133,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_sas_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_config</span><span class="p">[</span><span class="s1">&#39;Groups&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;SAS&#39;</span><span class="p">)</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_parse_run_config_file</span><span class="p">(</span><span class="n">yaml_filename</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_parse_run_config_file</span><span class="p">(</span><span class="n">yaml_filename</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Loads a run configuration YAML file.</span>
 <span class="sd">        Returns the loaded data as a Python object.</span>
@@ -158,10 +158,10 @@
         <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">key_error</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s1">&#39;Unable to parse </span><span class="si">{</span><span class="n">yaml_filename</span><span class="si">}</span><span class="s1">, expected top-level RunConfig entry&#39;</span>
-            <span class="p">)</span> <span class="kn">from</span> <span class="nn">key_error</span>
+            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">key_error</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_parse_algorithm_parameters_run_config_file</span><span class="p">(</span><span class="n">yaml_filename</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_parse_algorithm_parameters_run_config_file</span><span class="p">(</span><span class="n">yaml_filename</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Loads an algorithm parameter run configuration YAML file.</span>
 <span class="sd">        Returns the loaded data as a Python object.</span>
@@ -189,7 +189,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unable to parse </span><span class="si">{</span><span class="n">yaml_filename</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="RunConfig.validate"><a class="viewcode-back" href="../../../../opera.pge.base.html#opera.pge.base.runconfig.RunConfig.validate">[docs]</a>    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pge_schema_file</span><span class="o">=</span><span class="n">BASE_PGE_SCHEMA</span><span class="p">,</span> <span class="n">strict_mode</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="RunConfig.validate"><a class="viewcode-back" href="../../../../opera.pge.base.html#opera.pge.base.runconfig.RunConfig.validate">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pge_schema_file</span><span class="o">=</span><span class="n">BASE_PGE_SCHEMA</span><span class="p">,</span> <span class="n">strict_mode</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Validates the RunConfig using a combination of the base PGE schema,</span>
 <span class="sd">        and the specific SAS schema defined by the RunConfig itself.</span>
@@ -245,7 +245,7 @@
         <span class="c1"># Finally, validate the RunConfig against the combined PGE/SAS schema</span>
         <span class="n">yamale</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">pge_schema</span><span class="p">,</span> <span class="n">runconfig_data</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="n">strict_mode</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Wrapper function for all attribute access attempts on instances of</span>
 <span class="sd">        RunConfig. Used to provide consistent error handling for when an</span>
@@ -273,80 +273,80 @@
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s1">&#39;Expected field </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">error</span><span class="p">)</span><span class="si">}</span><span class="s1"> is missing from RunConfig &#39;</span>
                 <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
-            <span class="p">)</span> <span class="kn">from</span> <span class="nn">error</span>
+            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">error</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">filename</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">filename</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the of the file parsed to create the RunConfig&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filename</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the name of the RunConfig file&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_config</span><span class="p">[</span><span class="s1">&#39;Name&#39;</span><span class="p">]</span>
 
     <span class="c1"># PGENameGroup</span>
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">pge_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pge_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the PGE Name from the PGE Name Group&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pge_config</span><span class="p">[</span><span class="s1">&#39;PGENameGroup&#39;</span><span class="p">][</span><span class="s1">&#39;PGEName&#39;</span><span class="p">]</span>
 
     <span class="c1"># InputFilesGroup</span>
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">input_files</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">input_files</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the path from the Input Files Group&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pge_config</span><span class="p">[</span><span class="s1">&#39;InputFilesGroup&#39;</span><span class="p">][</span><span class="s1">&#39;InputFilePaths&#39;</span><span class="p">]</span>
 
     <span class="c1"># DynamicAncillaryFilesGroup</span>
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">ancillary_file_map</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ancillary_file_map</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the Ancillary File Map from the Dynamic Ancillary Files Group&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pge_config</span><span class="p">[</span><span class="s1">&#39;DynamicAncillaryFilesGroup&#39;</span><span class="p">][</span><span class="s1">&#39;AncillaryFileMap&#39;</span><span class="p">]</span>
 
     <span class="c1"># ProductPathGroup</span>
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">output_product_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">output_product_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the Output Product Path from the Product Path Group&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pge_config</span><span class="p">[</span><span class="s1">&#39;ProductPathGroup&#39;</span><span class="p">][</span><span class="s1">&#39;OutputProductPath&#39;</span><span class="p">]</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">scratch_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">scratch_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the Scratch Path from the Product Path Group&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pge_config</span><span class="p">[</span><span class="s1">&#39;ProductPathGroup&#39;</span><span class="p">][</span><span class="s1">&#39;ScratchPath&#39;</span><span class="p">]</span>
 
     <span class="c1"># PrimaryExecutable</span>
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">product_identifier</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">product_identifier</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the Product Identifier from the Primary Executable Category&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pge_config</span><span class="p">[</span><span class="s1">&#39;PrimaryExecutable&#39;</span><span class="p">][</span><span class="s1">&#39;ProductIdentifier&#39;</span><span class="p">]</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">product_version</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">product_version</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the Product Version from the Primary Executable Category&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pge_config</span><span class="p">[</span><span class="s1">&#39;PrimaryExecutable&#39;</span><span class="p">][</span><span class="s1">&#39;ProductVersion&#39;</span><span class="p">]</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">composite_release_id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">composite_release_id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the Composite Release ID (CRID) from the Primary Executable Category&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pge_config</span><span class="p">[</span><span class="s1">&#39;PrimaryExecutable&#39;</span><span class="p">][</span><span class="s1">&#39;CompositeReleaseID&#39;</span><span class="p">]</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">sas_program_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sas_program_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the Program Path from a Primary Executable Category&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pge_config</span><span class="p">[</span><span class="s1">&#39;PrimaryExecutable&#39;</span><span class="p">][</span><span class="s1">&#39;ProgramPath&#39;</span><span class="p">]</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">sas_program_options</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sas_program_options</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the Program Options (arguments) to a Primary Executable&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pge_config</span><span class="p">[</span><span class="s1">&#39;PrimaryExecutable&#39;</span><span class="p">][</span><span class="s1">&#39;ProgramOptions&#39;</span><span class="p">]</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">error_code_base</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">error_code_base</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the Error Code Base for a particular Primary Executable&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pge_config</span><span class="p">[</span><span class="s1">&#39;PrimaryExecutable&#39;</span><span class="p">][</span><span class="s1">&#39;ErrorCodeBase&#39;</span><span class="p">]</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">sas_schema_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sas_schema_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the path to the Schema file for a Primary Executable&quot;&quot;&quot;</span>
         <span class="n">sas_schema_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pge_config</span><span class="p">[</span><span class="s1">&#39;PrimaryExecutable&#39;</span><span class="p">][</span><span class="s1">&#39;SchemaPath&#39;</span><span class="p">]</span>
         <span class="k">return</span> <span class="p">(</span>
@@ -356,7 +356,7 @@
         <span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">algorithm_parameters_schema_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">algorithm_parameters_schema_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the path to the optional algorithm parameter Schema file for DSWX-S1&quot;&quot;&quot;</span>
         <span class="n">algorithm_parameters_schema_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pge_config</span><span class="p">[</span><span class="s1">&#39;PrimaryExecutable&#39;</span><span class="p">][</span><span class="s1">&#39;AlgorithmParametersSchemaPath&#39;</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">algorithm_parameters_schema_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -369,7 +369,7 @@
             <span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">algorithm_parameters_file_config_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">algorithm_parameters_file_config_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the path to the algorithm parameters run configuration file&quot;&quot;&quot;</span>
         <span class="c1"># ADT is inconsistent with how they define this location across different SAS,</span>
         <span class="c1"># so check all known permutations</span>
@@ -398,7 +398,7 @@
         <span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">iso_template_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">iso_template_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the ISO Template Path for a Primary Executable&quot;&quot;&quot;</span>
         <span class="n">iso_template_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pge_config</span><span class="p">[</span><span class="s1">&#39;PrimaryExecutable&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;IsoTemplatePath&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">iso_template_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -411,7 +411,7 @@
         <span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">iso_measured_parameter_descriptions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">iso_measured_parameter_descriptions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the ISO Measured Parameters description file Path for a Primary Executable&quot;&quot;&quot;</span>
         <span class="n">iso_descriptions_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pge_config</span><span class="p">[</span><span class="s1">&#39;PrimaryExecutable&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;IsoMeasuredParameterDescriptions&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">iso_descriptions_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -424,51 +424,51 @@
         <span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">data_validity_start_date</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">data_validity_start_date</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the DataValidityStartDate value for the Primary Executable&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pge_config</span><span class="p">[</span><span class="s1">&#39;PrimaryExecutable&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;DataValidityStartDate&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
     <span class="c1"># QAExecutable</span>
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">qa_enabled</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">qa_enabled</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a boolean indicating the state of QAExecutable: enabled/disabled&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pge_config</span><span class="p">[</span><span class="s1">&#39;QAExecutable&#39;</span><span class="p">][</span><span class="s1">&#39;Enabled&#39;</span><span class="p">])</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">qa_program_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">qa_program_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the path to a QA Executable&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pge_config</span><span class="p">[</span><span class="s1">&#39;QAExecutable&#39;</span><span class="p">][</span><span class="s1">&#39;ProgramPath&#39;</span><span class="p">]</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">qa_program_options</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">qa_program_options</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return program options (arguments) for an executable command&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pge_config</span><span class="p">[</span><span class="s1">&#39;QAExecutable&#39;</span><span class="p">][</span><span class="s1">&#39;ProgramOptions&#39;</span><span class="p">]</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">debug_switch</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">debug_switch</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a boolean indicating the debugging state: enabled/disabled.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pge_config</span><span class="p">[</span><span class="s1">&#39;DebugLevelGroup&#39;</span><span class="p">][</span><span class="s1">&#39;DebugSwitch&#39;</span><span class="p">])</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">execute_via_shell</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">execute_via_shell</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a boolean indicating the state of ExecuteViaShell: enabled/disabled&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pge_config</span><span class="p">[</span><span class="s1">&#39;DebugLevelGroup&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;ExecuteViaShell&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">product_type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">product_type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the product type as defined in the SAS portion of the RunConfig&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sas_config</span><span class="p">[</span><span class="s1">&#39;runconfig&#39;</span><span class="p">][</span><span class="s1">&#39;groups&#39;</span><span class="p">][</span><span class="s1">&#39;primary_executable&#39;</span><span class="p">][</span><span class="s1">&#39;product_type&#39;</span><span class="p">]</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">sas_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sas_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the short-cut to the SAS-specific section of the parsed RunConfig&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sas_config</span>
 
-<div class="viewcode-block" id="RunConfig.asdict"><a class="viewcode-back" href="../../../../opera.pge.base.html#opera.pge.base.runconfig.RunConfig.asdict">[docs]</a>    <span class="k">def</span> <span class="nf">asdict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<div class="viewcode-block" id="RunConfig.asdict"><a class="viewcode-back" href="../../../../opera.pge.base.html#opera.pge.base.runconfig.RunConfig.asdict">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">asdict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the entire parsed RunConfig in its dictionary representation&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_config</span></div>
 
-<div class="viewcode-block" id="RunConfig.get_input_filenames"><a class="viewcode-back" href="../../../../opera.pge.base.html#opera.pge.base.runconfig.RunConfig.get_input_filenames">[docs]</a>    <span class="k">def</span> <span class="nf">get_input_filenames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="RunConfig.get_input_filenames"><a class="viewcode-back" href="../../../../opera.pge.base.html#opera.pge.base.runconfig.RunConfig.get_input_filenames">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_input_filenames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Iterates over the input_file list from the runconfig and returns a list</span>
 <span class="sd">        of all files.</span>
@@ -495,7 +495,7 @@
 
         <span class="n">input_files</span> <span class="o">=</span> <span class="p">[]</span>
 
-        <span class="k">def</span> <span class="nf">__is_input_file</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">__is_input_file</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
 <span class="w">            </span><span class="sd">&quot;&quot;&quot;Helper function for filtering out directories and hidden files&quot;&quot;&quot;</span>
             <span class="k">return</span> <span class="n">isfile</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">basename</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
 
@@ -514,7 +514,7 @@
 
         <span class="k">return</span> <span class="n">input_files</span></div>
 
-<div class="viewcode-block" id="RunConfig.get_ancillary_filenames"><a class="viewcode-back" href="../../../../opera.pge.base.html#opera.pge.base.runconfig.RunConfig.get_ancillary_filenames">[docs]</a>    <span class="k">def</span> <span class="nf">get_ancillary_filenames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="RunConfig.get_ancillary_filenames"><a class="viewcode-back" href="../../../../opera.pge.base.html#opera.pge.base.runconfig.RunConfig.get_ancillary_filenames">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_ancillary_filenames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a list of all ancillary filenames listed in the</span>
 <span class="sd">        DynamicAncillaryFilesGroup section of the run config file.</span>
@@ -537,7 +537,7 @@
 
         <span class="k">return</span> <span class="n">result</span></div>
 
-<div class="viewcode-block" id="RunConfig.get_output_product_filenames"><a class="viewcode-back" href="../../../../opera.pge.base.html#opera.pge.base.runconfig.RunConfig.get_output_product_filenames">[docs]</a>    <span class="k">def</span> <span class="nf">get_output_product_filenames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="RunConfig.get_output_product_filenames"><a class="viewcode-back" href="../../../../opera.pge.base.html#opera.pge.base.runconfig.RunConfig.get_output_product_filenames">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_output_product_filenames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a sorted list of all product file paths currently written to the</span>
 <span class="sd">        output location specified by the RunConfig.</span>

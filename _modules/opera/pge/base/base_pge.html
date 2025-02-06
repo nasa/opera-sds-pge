@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>opera.pge.base.base_pge &mdash; opera-sds-pge 6.0.0-er.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
 
   
@@ -84,45 +84,45 @@
 
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">html</span>
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
-<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
-<span class="kn">from</span> <span class="nn">fnmatch</span> <span class="kn">import</span> <span class="n">fnmatch</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">lru_cache</span>
-<span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">abspath</span><span class="p">,</span> <span class="n">basename</span><span class="p">,</span> <span class="n">exists</span><span class="p">,</span> <span class="n">join</span><span class="p">,</span> <span class="n">splitext</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">html</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fnmatch</span><span class="w"> </span><span class="kn">import</span> <span class="n">fnmatch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">lru_cache</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">os.path</span><span class="w"> </span><span class="kn">import</span> <span class="n">abspath</span><span class="p">,</span> <span class="n">basename</span><span class="p">,</span> <span class="n">exists</span><span class="p">,</span> <span class="n">join</span><span class="p">,</span> <span class="n">splitext</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">pkg_resources</span> <span class="kn">import</span> <span class="n">resource_filename</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pkg_resources</span><span class="w"> </span><span class="kn">import</span> <span class="n">resource_filename</span>
 
-<span class="kn">import</span> <span class="nn">yamale</span>
-<span class="kn">from</span> <span class="nn">yamale</span> <span class="kn">import</span> <span class="n">YamaleError</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">yamale</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">yamale</span><span class="w"> </span><span class="kn">import</span> <span class="n">YamaleError</span>
 
-<span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">yaml</span>
 
-<span class="kn">import</span> <span class="nn">opera</span>
-<span class="kn">from</span> <span class="nn">opera.util.error_codes</span> <span class="kn">import</span> <span class="n">ErrorCode</span>
-<span class="kn">from</span> <span class="nn">opera.util.logger</span> <span class="kn">import</span> <span class="n">PgeLogger</span>
-<span class="kn">from</span> <span class="nn">opera.util.logger</span> <span class="kn">import</span> <span class="n">default_log_file_name</span>
-<span class="kn">from</span> <span class="nn">opera.util.metfile</span> <span class="kn">import</span> <span class="n">MetFile</span>
-<span class="kn">from</span> <span class="nn">opera.util.render_jinja2</span> <span class="kn">import</span> <span class="p">(</span><span class="n">python_type_to_xml_type</span><span class="p">,</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">opera</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.error_codes</span><span class="w"> </span><span class="kn">import</span> <span class="n">ErrorCode</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">PgeLogger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">default_log_file_name</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.metfile</span><span class="w"> </span><span class="kn">import</span> <span class="n">MetFile</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.render_jinja2</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">python_type_to_xml_type</span><span class="p">,</span>
                                       <span class="n">guess_attribute_display_name</span><span class="p">,</span>
                                       <span class="n">NumpyEncoder</span><span class="p">,</span>
                                       <span class="n">UNDEFINED_ERROR</span><span class="p">,</span>
                                       <span class="n">UNDEFINED_WARNING</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">opera.util.run_utils</span> <span class="kn">import</span> <span class="n">create_qa_command_line</span>
-<span class="kn">from</span> <span class="nn">opera.util.run_utils</span> <span class="kn">import</span> <span class="n">create_sas_command_line</span>
-<span class="kn">from</span> <span class="nn">opera.util.run_utils</span> <span class="kn">import</span> <span class="n">get_checksum</span>
-<span class="kn">from</span> <span class="nn">opera.util.run_utils</span> <span class="kn">import</span> <span class="n">time_and_execute</span>
-<span class="kn">from</span> <span class="nn">opera.util.time</span> <span class="kn">import</span> <span class="n">get_catalog_metadata_datetime_str</span>
-<span class="kn">from</span> <span class="nn">opera.util.time</span> <span class="kn">import</span> <span class="n">get_time_for_filename</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.run_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_qa_command_line</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.run_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_sas_command_line</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.run_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_checksum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.run_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">time_and_execute</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.time</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_catalog_metadata_datetime_str</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.time</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_time_for_filename</span>
 
-<span class="kn">from</span> <span class="nn">.runconfig</span> <span class="kn">import</span> <span class="n">RunConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.runconfig</span><span class="w"> </span><span class="kn">import</span> <span class="n">RunConfig</span>
 
 
-<div class="viewcode-block" id="PreProcessorMixin"><a class="viewcode-back" href="../../../../opera.pge.base.html#opera.pge.base.base_pge.PreProcessorMixin">[docs]</a><span class="k">class</span> <span class="nc">PreProcessorMixin</span><span class="p">:</span>
+<div class="viewcode-block" id="PreProcessorMixin"><a class="viewcode-back" href="../../../../opera.pge.base.html#opera.pge.base.base_pge.PreProcessorMixin">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">PreProcessorMixin</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Mixin class which is responsible for handling all pre-processing steps for</span>
 <span class="sd">    the PGE. The pre-processing phase is defined as all steps necessary prior</span>
@@ -140,7 +140,7 @@
 
     <span class="n">_pre_mixin_name</span> <span class="o">=</span> <span class="s2">&quot;PreProcessorMixin&quot;</span>
 
-    <span class="k">def</span> <span class="nf">_initialize_logger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_initialize_logger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates the logger object used by the PGE.</span>
 
@@ -156,7 +156,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">LOG_FILE_CREATED</span><span class="p">,</span>
                              <span class="sa">f</span><span class="s1">&#39;Log file passed from pge_main: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">get_file_name</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_initialize_qa_logger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_initialize_qa_logger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates the qa logger object used by the PGE when QA is enabled.</span>
 
@@ -169,7 +169,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">LOG_FILE_CREATED</span><span class="p">,</span>
                              <span class="sa">f</span><span class="s1">&#39;New QA Log file initialized to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">qa_logger</span><span class="o">.</span><span class="n">get_file_name</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_load_runconfig</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_runconfig</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Loads the RunConfig file provided to the PGE into an in-memory</span>
 <span class="sd">        representation.</span>
@@ -179,7 +179,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span> <span class="o">=</span> <span class="n">RunConfig</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig_path</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_validate_runconfig</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_runconfig</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Validates the parsed RunConfig against the appropriate schema(s).</span>
 
@@ -206,7 +206,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">RUN_CONFIG_VALIDATION_FAILED</span><span class="p">,</span> <span class="n">error_msg</span>
             <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_setup_directories</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_setup_directories</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates the output/scratch directory locations referenced by the</span>
 <span class="sd">        RunConfig if they don&#39;t exist already.</span>
@@ -240,7 +240,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">DIRECTORY_CREATION_FAILED</span><span class="p">,</span> <span class="n">error_msg</span>
             <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_configure_logger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_configure_logger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Configures the logger used by the PGE using information from the</span>
 <span class="sd">        parsed and validated RunConfig.</span>
@@ -263,7 +263,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">qa_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">LOG_FILE_INIT_COMPLETE</span><span class="p">,</span>
                                 <span class="s1">&#39;Log file configuration complete&#39;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_validate_iso_descriptions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_iso_descriptions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;If given, check if the run-config description file exists and is valid&quot;&quot;&quot;</span>
         <span class="n">description_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">iso_measured_parameter_descriptions</span>
 
@@ -291,7 +291,7 @@
             <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Measured parameters descriptions were not provided&#39;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">ISO_METADATA_NO_DESCRIPTIONS</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
 
-<div class="viewcode-block" id="PreProcessorMixin.run_preprocessor"><a class="viewcode-back" href="../../../../opera.pge.base.html#opera.pge.base.base_pge.PreProcessorMixin.run_preprocessor">[docs]</a>    <span class="k">def</span> <span class="nf">run_preprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>  <span class="c1"># pylint: disable=unused-argument</span>
+<div class="viewcode-block" id="PreProcessorMixin.run_preprocessor"><a class="viewcode-back" href="../../../../opera.pge.base.html#opera.pge.base.base_pge.PreProcessorMixin.run_preprocessor">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">run_preprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>  <span class="c1"># pylint: disable=unused-argument</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Executes the pre-processing steps for PGE initialization.</span>
 
@@ -315,7 +315,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_configure_logger</span><span class="p">()</span></div></div>
 
 
-<div class="viewcode-block" id="PostProcessorMixin"><a class="viewcode-back" href="../../../../opera.pge.base.html#opera.pge.base.base_pge.PostProcessorMixin">[docs]</a><span class="k">class</span> <span class="nc">PostProcessorMixin</span><span class="p">:</span>
+<div class="viewcode-block" id="PostProcessorMixin"><a class="viewcode-back" href="../../../../opera.pge.base.html#opera.pge.base.base_pge.PostProcessorMixin">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">PostProcessorMixin</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Mixin class which is responsible for handling all post-processing steps for</span>
 <span class="sd">    the PGE. The post-processing phase is defined as all steps necessary after</span>
@@ -333,7 +333,7 @@
 
     <span class="n">_post_mixin_name</span> <span class="o">=</span> <span class="s2">&quot;PostProcessorMixin&quot;</span>
 
-    <span class="k">def</span> <span class="nf">_run_sas_qa_executable</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_run_sas_qa_executable</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Executes an optional Quality Assurance (QA) application which may be bundled</span>
 <span class="sd">        with a SAS delivery. QA execution is controlled by settings within the</span>
@@ -371,7 +371,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">QA_SAS_PROGRAM_DISABLED</span><span class="p">,</span>
                              <span class="s1">&#39;SAS QA is disabled, skipping&#39;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_checksum_output_products</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_checksum_output_products</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generates a dictionary mapping output product file names to the</span>
 <span class="sd">        corresponding MD5 checksum digest of the file&#39;s contents.</span>
@@ -405,7 +405,7 @@
         <span class="k">return</span> <span class="n">checksums</span>
 
     <span class="nd">@lru_cache</span>
-    <span class="k">def</span> <span class="nf">_create_catalog_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_catalog_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the catalog metadata as a MetFile instance. Once generated, the</span>
 <span class="sd">        catalog metadata is cached for the life of the PGE instance.</span>
@@ -422,7 +422,7 @@
 
         <span class="k">return</span> <span class="n">MetFile</span><span class="p">(</span><span class="n">catalog_metadata</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_create_iso_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pylint: disable=no-self-use</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_iso_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pylint: disable=no-self-use</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates the ISO metadata utilized by the DAAC&#39;s for indexing output</span>
 <span class="sd">        products submitted by OPERA. Inheritors of PostProcessorMixin must</span>
@@ -447,7 +447,7 @@
         <span class="c1"># Base PGE does not produce ISO metadata.</span>
         <span class="k">return</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">_finalize_log</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_finalize_log</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Finalizes the provided logger such that the execution summary is logged before</span>
 <span class="sd">        the log file is closed. This should typically be one of the last functions</span>
@@ -464,7 +464,7 @@
                     <span class="sa">f</span><span class="s2">&quot;Closing log file </span><span class="si">{</span><span class="n">logger</span><span class="o">.</span><span class="n">get_file_name</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">close_log_stream</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">_core_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inter_filename</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>  <span class="c1"># pylint: disable=unused-argument</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_core_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inter_filename</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>  <span class="c1"># pylint: disable=unused-argument</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the core file name component for products produced by the</span>
 <span class="sd">        Base PGE. This function should typically be overridden by inheritors</span>
@@ -496,7 +496,7 @@
 
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">PROJECT</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">LEVEL</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">NAME</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">time_tag</span><span class="si">}</span><span class="s2">&quot;</span>
 
-    <span class="k">def</span> <span class="nf">_geotiff_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inter_filename</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_geotiff_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inter_filename</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the file name to use for GeoTIFF&#39;s produced by the Base PGE.</span>
 
@@ -522,7 +522,7 @@
         <span class="n">base_filename</span> <span class="o">=</span> <span class="n">splitext</span><span class="p">(</span><span class="n">basename</span><span class="p">(</span><span class="n">inter_filename</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_core_filename</span><span class="p">()</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">base_filename</span><span class="si">}</span><span class="s2">.tif&quot;</span>
 
-    <span class="k">def</span> <span class="nf">_catalog_metadata_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_catalog_metadata_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the file name to use for Catalog Metadata produced by the Base PGE.</span>
 
@@ -540,7 +540,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_core_filename</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;.catalog.json&quot;</span>
 
-    <span class="k">def</span> <span class="nf">_iso_metadata_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_iso_metadata_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the file name to use for ISO Metadata produced by the Base PGE.</span>
 
@@ -558,7 +558,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_core_filename</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;.iso.xml&quot;</span>
 
-    <span class="k">def</span> <span class="nf">_log_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_log_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the file name to use for the PGE/SAS log file produced by the Base PGE.</span>
 
@@ -576,7 +576,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_core_filename</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;.log&quot;</span>
 
-    <span class="k">def</span> <span class="nf">_qa_log_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_qa_log_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the file name to use for the Quality Assurance application log</span>
 <span class="sd">        file produced by the Base PGE.</span>
@@ -595,7 +595,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_core_filename</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;.qa.log&quot;</span>
 
-    <span class="k">def</span> <span class="nf">_assign_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_filepath</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_assign_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_filepath</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Assigns the appropriate file name which meets the file-naming conventions</span>
 <span class="sd">        for the PGE to the provided input file on disk.</span>
@@ -640,7 +640,7 @@
             <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Failed to rename output file </span><span class="si">{</span><span class="n">basename</span><span class="p">(</span><span class="n">input_filepath</span><span class="p">)</span><span class="si">}</span><span class="s2">, reason: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">FILE_MOVE_FAILED</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_stage_output_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_stage_output_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Ensures that all output products produced by both the SAS and this PGE</span>
 <span class="sd">        are staged to the output location defined by the RunConfig. This includes</span>
@@ -718,7 +718,7 @@
             <span class="c1"># Log stream might be closed by this point so raise an Exception instead</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
-<div class="viewcode-block" id="PostProcessorMixin.augment_measured_parameters"><a class="viewcode-back" href="../../../../opera.pge.base.html#opera.pge.base.base_pge.PostProcessorMixin.augment_measured_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">augment_measured_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">measured_parameters</span><span class="p">):</span>
+<div class="viewcode-block" id="PostProcessorMixin.augment_measured_parameters"><a class="viewcode-back" href="../../../../opera.pge.base.html#opera.pge.base.base_pge.PostProcessorMixin.augment_measured_parameters">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">augment_measured_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">measured_parameters</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Augment the measured parameters dict into a dict of dicts containing the needed</span>
 <span class="sd">        fields for the MeasuredParameters section of the ISO XML file.</span>
@@ -777,7 +777,7 @@
 
         <span class="k">return</span> <span class="n">augmented_parameters</span></div>
 
-<div class="viewcode-block" id="PostProcessorMixin.run_postprocessor"><a class="viewcode-back" href="../../../../opera.pge.base.html#opera.pge.base.base_pge.PostProcessorMixin.run_postprocessor">[docs]</a>    <span class="k">def</span> <span class="nf">run_postprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>  <span class="c1"># pylint: disable=unused-argument</span>
+<div class="viewcode-block" id="PostProcessorMixin.run_postprocessor"><a class="viewcode-back" href="../../../../opera.pge.base.html#opera.pge.base.base_pge.PostProcessorMixin.run_postprocessor">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">run_postprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>  <span class="c1"># pylint: disable=unused-argument</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Executes the post-processing steps for PGE job completion.</span>
 
@@ -796,7 +796,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_stage_output_files</span><span class="p">()</span></div></div>
 
 
-<div class="viewcode-block" id="PgeExecutor"><a class="viewcode-back" href="../../../../opera.pge.base.html#opera.pge.base.base_pge.PgeExecutor">[docs]</a><span class="k">class</span> <span class="nc">PgeExecutor</span><span class="p">(</span><span class="n">PreProcessorMixin</span><span class="p">,</span> <span class="n">PostProcessorMixin</span><span class="p">):</span>
+<div class="viewcode-block" id="PgeExecutor"><a class="viewcode-back" href="../../../../opera.pge.base.html#opera.pge.base.base_pge.PgeExecutor">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">PgeExecutor</span><span class="p">(</span><span class="n">PreProcessorMixin</span><span class="p">,</span> <span class="n">PostProcessorMixin</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Main class for execution of a PGE, including the SAS layer.</span>
 
@@ -829,7 +829,7 @@
     <span class="n">SAS_VERSION</span> <span class="o">=</span> <span class="s2">&quot;0.1&quot;</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Version of the SAS wrapped by this PGE (dummy value)&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pge_name</span><span class="p">,</span> <span class="n">runconfig_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pge_name</span><span class="p">,</span> <span class="n">runconfig_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates a new instance of PgeExecutor</span>
 
@@ -864,7 +864,7 @@
         <span class="c1"># Keeps track of the files that were renamed by the PGE</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">renamed_files</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">_isolate_sas_runconfig</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_isolate_sas_runconfig</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Isolates the SAS-specific portion of the RunConfig into its own</span>
 <span class="sd">        YAML file, so it may be fed into the SAS executable without unneeded</span>
@@ -892,7 +892,7 @@
 
         <span class="k">return</span> <span class="n">sas_runconfig_filepath</span>
 
-<div class="viewcode-block" id="PgeExecutor.run_sas_executable"><a class="viewcode-back" href="../../../../opera.pge.base.html#opera.pge.base.base_pge.PgeExecutor.run_sas_executable">[docs]</a>    <span class="k">def</span> <span class="nf">run_sas_executable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>  <span class="c1"># pylint: disable=unused-argument</span>
+<div class="viewcode-block" id="PgeExecutor.run_sas_executable"><a class="viewcode-back" href="../../../../opera.pge.base.html#opera.pge.base.base_pge.PgeExecutor.run_sas_executable">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">run_sas_executable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>  <span class="c1"># pylint: disable=unused-argument</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Kicks off a SAS executable as defined by the RunConfig provided to</span>
 <span class="sd">        the PGE.</span>
@@ -932,7 +932,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">log_one_metric</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;sas.elapsed_seconds&#39;</span><span class="p">,</span> <span class="n">elapsed_time</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="PgeExecutor.run"><a class="viewcode-back" href="../../../../opera.pge.base.html#opera.pge.base.base_pge.PgeExecutor.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="PgeExecutor.run"><a class="viewcode-back" href="../../../../opera.pge.base.html#opera.pge.base.base_pge.PgeExecutor.run">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Main entry point for PGE execution.</span>
 

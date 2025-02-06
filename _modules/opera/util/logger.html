@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>opera.util.logger &mdash; opera-sds-pge 6.0.0-er.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
 
   
@@ -87,19 +87,19 @@
 <span class="sd">Adapted By: Scott Collins, Jim Hofman</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">import</span> <span class="nn">datetime</span>
-<span class="kn">import</span> <span class="nn">inspect</span>
-<span class="kn">import</span> <span class="nn">shutil</span>
-<span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="n">StringIO</span>
-<span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">basename</span><span class="p">,</span> <span class="n">isfile</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">io</span><span class="w"> </span><span class="kn">import</span> <span class="n">StringIO</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">os.path</span><span class="w"> </span><span class="kn">import</span> <span class="n">basename</span><span class="p">,</span> <span class="n">isfile</span>
 
-<span class="kn">import</span> <span class="nn">opera.util.time</span> <span class="k">as</span> <span class="nn">time_util</span>
-<span class="kn">from</span> <span class="nn">opera.util</span> <span class="kn">import</span> <span class="n">error_codes</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">opera.util.time</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">time_util</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">error_codes</span>
 
-<span class="kn">from</span> <span class="nn">.error_codes</span> <span class="kn">import</span> <span class="n">ErrorCode</span><span class="p">,</span> <span class="n">ERROR_CODE_PGE_OFFSET</span>
-<span class="kn">from</span> <span class="nn">.time</span> <span class="kn">import</span> <span class="n">get_iso_time</span>
-<span class="kn">from</span> <span class="nn">.usage_metrics</span> <span class="kn">import</span> <span class="n">get_os_metrics</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.error_codes</span><span class="w"> </span><span class="kn">import</span> <span class="n">ErrorCode</span><span class="p">,</span> <span class="n">ERROR_CODE_PGE_OFFSET</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.time</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_iso_time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.usage_metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_os_metrics</span>
 
 <span class="n">INFO</span> <span class="o">=</span> <span class="s2">&quot;Info&quot;</span>
 <span class="n">DEBUG</span> <span class="o">=</span> <span class="s2">&quot;Debug&quot;</span>
@@ -108,7 +108,7 @@
 <span class="sd">&quot;&quot;&quot;Constants for logging levels&quot;&quot;&quot;</span>
 
 
-<div class="viewcode-block" id="write"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.write">[docs]</a><span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="n">log_stream</span><span class="p">,</span> <span class="n">severity</span><span class="p">,</span> <span class="n">workflow</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">error_code</span><span class="p">,</span> <span class="n">error_location</span><span class="p">,</span>
+<div class="viewcode-block" id="write"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.write">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">write</span><span class="p">(</span><span class="n">log_stream</span><span class="p">,</span> <span class="n">severity</span><span class="p">,</span> <span class="n">workflow</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">error_code</span><span class="p">,</span> <span class="n">error_location</span><span class="p">,</span>
           <span class="n">description</span><span class="p">,</span> <span class="n">time_tag</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Low-level logging function. May be called directly in lieu of PgeLogger class.</span>
@@ -143,7 +143,7 @@
     <span class="n">log_stream</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">message_str</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="default_log_file_name"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.default_log_file_name">[docs]</a><span class="k">def</span> <span class="nf">default_log_file_name</span><span class="p">():</span>
+<div class="viewcode-block" id="default_log_file_name"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.default_log_file_name">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">default_log_file_name</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns a path + filename that can be used for the log file right away.</span>
 
@@ -165,7 +165,7 @@
     <span class="k">return</span> <span class="n">file_path</span></div>
 
 
-<div class="viewcode-block" id="get_severity_from_error_code"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.get_severity_from_error_code">[docs]</a><span class="k">def</span> <span class="nf">get_severity_from_error_code</span><span class="p">(</span><span class="n">error_code</span><span class="p">):</span>
+<div class="viewcode-block" id="get_severity_from_error_code"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.get_severity_from_error_code">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">get_severity_from_error_code</span><span class="p">(</span><span class="n">error_code</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Determines the log level (Critical, Warning, Info, or Debug) based on the</span>
 <span class="sd">    provided error code.</span>
@@ -195,7 +195,7 @@
     <span class="k">return</span> <span class="n">CRITICAL</span></div>
 
 
-<div class="viewcode-block" id="standardize_severity_string"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.standardize_severity_string">[docs]</a><span class="k">def</span> <span class="nf">standardize_severity_string</span><span class="p">(</span><span class="n">severity</span><span class="p">):</span>
+<div class="viewcode-block" id="standardize_severity_string"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.standardize_severity_string">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">standardize_severity_string</span><span class="p">(</span><span class="n">severity</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the severity string in a consistent way.</span>
 
@@ -222,7 +222,7 @@
     <span class="k">return</span> <span class="n">severity</span></div>
 
 
-<div class="viewcode-block" id="PgeLogger"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.PgeLogger">[docs]</a><span class="k">class</span> <span class="nc">PgeLogger</span><span class="p">:</span>
+<div class="viewcode-block" id="PgeLogger"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.PgeLogger">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">PgeLogger</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class to help with the PGE logging.</span>
 
@@ -235,7 +235,7 @@
     <span class="n">LOGGER_CODE_BASE</span> <span class="o">=</span> <span class="mi">900000</span>
     <span class="n">QA_LOGGER_CODE_BASE</span> <span class="o">=</span> <span class="mi">800000</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workflow</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">error_code_base</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">log_filename</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workflow</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">error_code_base</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">log_filename</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructor opens the log file as a stream</span>
 
@@ -270,24 +270,24 @@
                                  <span class="k">if</span> <span class="n">error_code_base</span> <span class="k">else</span> <span class="n">PgeLogger</span><span class="o">.</span><span class="n">LOGGER_CODE_BASE</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">workflow</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">workflow</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return specific workflow&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_workflow</span>
 
     <span class="nd">@workflow</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">workflow</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workflow</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">workflow</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workflow</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_workflow</span> <span class="o">=</span> <span class="n">workflow</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">error_code_base</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">error_code_base</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the error code base from error_codes.py&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_code_base</span>
 
     <span class="nd">@error_code_base</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">error_code_base</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error_code_base</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">error_code_base</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error_code_base</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_error_code_base</span> <span class="o">=</span> <span class="n">error_code_base</span>
 
-<div class="viewcode-block" id="PgeLogger.close_log_stream"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.PgeLogger.close_log_stream">[docs]</a>    <span class="k">def</span> <span class="nf">close_log_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="PgeLogger.close_log_stream"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.PgeLogger.close_log_stream">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">close_log_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Writes the log summary to the log stream</span>
 <span class="sd">        Writes the log stream to a log file and saves the file to disk</span>
@@ -304,7 +304,7 @@
 
             <span class="bp">self</span><span class="o">.</span><span class="n">log_stream</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="PgeLogger.get_log_count_by_severity"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.PgeLogger.get_log_count_by_severity">[docs]</a>    <span class="k">def</span> <span class="nf">get_log_count_by_severity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">severity</span><span class="p">):</span>
+<div class="viewcode-block" id="PgeLogger.get_log_count_by_severity"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.PgeLogger.get_log_count_by_severity">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_log_count_by_severity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">severity</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Gets the number of messages logged for the specified severity</span>
 
@@ -330,7 +330,7 @@
             <span class="k">return</span> <span class="mi">0</span></div>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_make_blank_log_count_by_severity_dict</span><span class="p">():</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_make_blank_log_count_by_severity_dict</span><span class="p">():</span>
         <span class="k">return</span> <span class="p">{</span>
             <span class="n">DEBUG</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
             <span class="n">INFO</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
@@ -338,11 +338,11 @@
             <span class="n">CRITICAL</span><span class="p">:</span> <span class="mi">0</span>
         <span class="p">}</span>
 
-<div class="viewcode-block" id="PgeLogger.get_log_count_by_severity_dict"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.PgeLogger.get_log_count_by_severity_dict">[docs]</a>    <span class="k">def</span> <span class="nf">get_log_count_by_severity_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="PgeLogger.get_log_count_by_severity_dict"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.PgeLogger.get_log_count_by_severity_dict">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_log_count_by_severity_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a copy of the dictionary of log counts by severity.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">log_count_by_severity</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="PgeLogger.increment_log_count_by_severity"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.PgeLogger.increment_log_count_by_severity">[docs]</a>    <span class="k">def</span> <span class="nf">increment_log_count_by_severity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">severity</span><span class="p">):</span>
+<div class="viewcode-block" id="PgeLogger.increment_log_count_by_severity"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.PgeLogger.increment_log_count_by_severity">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">increment_log_count_by_severity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">severity</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Increments the logged message count of the provided severity level.</span>
 
@@ -361,7 +361,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;PgeLogger&quot;</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">LOGGING_COULD_NOT_INCREMENT_SEVERITY</span><span class="p">,</span>
                          <span class="sa">f</span><span class="s2">&quot;Could not increment severity level: &#39;</span><span class="si">{</span><span class="n">severity</span><span class="si">}</span><span class="s2">&#39; &quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="PgeLogger.write"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.PgeLogger.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">severity</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">error_code_offset</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span>
+<div class="viewcode-block" id="PgeLogger.write"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.PgeLogger.write">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">severity</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">error_code_offset</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span>
               <span class="n">additional_back_frames</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Write a message to the log.</span>
@@ -397,7 +397,7 @@
               <span class="bp">self</span><span class="o">.</span><span class="n">error_code_base</span> <span class="o">+</span> <span class="n">error_code_offset</span><span class="p">,</span>
               <span class="n">location</span><span class="p">,</span> <span class="n">description</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="PgeLogger.info"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.PgeLogger.info">[docs]</a>    <span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">error_code_offset</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
+<div class="viewcode-block" id="PgeLogger.info"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.PgeLogger.info">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">error_code_offset</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Write an info-level message to the log.</span>
 
@@ -415,7 +415,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">INFO</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">error_code_offset</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span>
                    <span class="n">additional_back_frames</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="PgeLogger.debug"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.PgeLogger.debug">[docs]</a>    <span class="k">def</span> <span class="nf">debug</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">error_code_offset</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
+<div class="viewcode-block" id="PgeLogger.debug"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.PgeLogger.debug">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">debug</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">error_code_offset</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Write a debug-level message to the log.</span>
 
@@ -433,7 +433,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">DEBUG</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">error_code_offset</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span>
                    <span class="n">additional_back_frames</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="PgeLogger.warning"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.PgeLogger.warning">[docs]</a>    <span class="k">def</span> <span class="nf">warning</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">error_code_offset</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
+<div class="viewcode-block" id="PgeLogger.warning"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.PgeLogger.warning">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">warning</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">error_code_offset</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Write a warning-level message to the log.</span>
 
@@ -451,7 +451,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">WARNING</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">error_code_offset</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span>
                    <span class="n">additional_back_frames</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="PgeLogger.critical"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.PgeLogger.critical">[docs]</a>    <span class="k">def</span> <span class="nf">critical</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">error_code_offset</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
+<div class="viewcode-block" id="PgeLogger.critical"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.PgeLogger.critical">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">critical</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">error_code_offset</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Write a critical-level message to the log.</span>
 
@@ -484,7 +484,7 @@
 
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">description</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="PgeLogger.log"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.PgeLogger.log">[docs]</a>    <span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">error_code_offset</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">additional_back_frames</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<div class="viewcode-block" id="PgeLogger.log"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.PgeLogger.log">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">log</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">error_code_offset</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">additional_back_frames</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Logs any kind of message.</span>
 
@@ -509,15 +509,15 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">severity</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">error_code_offset</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span>
                    <span class="n">additional_back_frames</span><span class="o">=</span><span class="n">additional_back_frames</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="PgeLogger.get_warning_count"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.PgeLogger.get_warning_count">[docs]</a>    <span class="k">def</span> <span class="nf">get_warning_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="PgeLogger.get_warning_count"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.PgeLogger.get_warning_count">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_warning_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the number of messages logged at the warning level.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_log_count_by_severity</span><span class="p">(</span><span class="n">WARNING</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="PgeLogger.get_critical_count"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.PgeLogger.get_critical_count">[docs]</a>    <span class="k">def</span> <span class="nf">get_critical_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="PgeLogger.get_critical_count"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.PgeLogger.get_critical_count">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_critical_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the number of messages logged at the critical level.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_log_count_by_severity</span><span class="p">(</span><span class="n">CRITICAL</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="PgeLogger.move"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.PgeLogger.move">[docs]</a>    <span class="k">def</span> <span class="nf">move</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_filename</span><span class="p">):</span>
+<div class="viewcode-block" id="PgeLogger.move"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.PgeLogger.move">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">move</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_filename</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This function is useful when the log file has been given a default name,</span>
 <span class="sd">        and needs to be assigned a name that meets the PGE file naming conventions.</span>
@@ -530,15 +530,15 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">log_filename</span> <span class="o">=</span> <span class="n">new_filename</span></div>
 
-<div class="viewcode-block" id="PgeLogger.get_stream_object"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.PgeLogger.get_stream_object">[docs]</a>    <span class="k">def</span> <span class="nf">get_stream_object</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="PgeLogger.get_stream_object"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.PgeLogger.get_stream_object">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_stream_object</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the stingIO object for the current log.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">log_stream</span></div>
 
-<div class="viewcode-block" id="PgeLogger.get_file_name"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.PgeLogger.get_file_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_file_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="PgeLogger.get_file_name"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.PgeLogger.get_file_name">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_file_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the file name for the current log.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">log_filename</span></div>
 
-<div class="viewcode-block" id="PgeLogger.append"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.PgeLogger.append">[docs]</a>    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">):</span>
+<div class="viewcode-block" id="PgeLogger.append"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.PgeLogger.append">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Appends text from another file to this log file.</span>
 
@@ -568,7 +568,7 @@
             <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">log_stream</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">log_line</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="PgeLogger.parse_line"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.PgeLogger.parse_line">[docs]</a>    <span class="k">def</span> <span class="nf">parse_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
+<div class="viewcode-block" id="PgeLogger.parse_line"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.PgeLogger.parse_line">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">parse_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parses the provided formatted log line into its component parts according</span>
 <span class="sd">        to the log formatting style for OPERA.</span>
@@ -636,7 +636,7 @@
                 <span class="sa">f</span><span class="s1">&#39;Failed to parse log line &quot;</span><span class="si">{</span><span class="n">line</span><span class="si">}</span><span class="s1">&quot; reason: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
             <span class="p">)</span></div>
 
-<div class="viewcode-block" id="PgeLogger.log_one_metric"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.PgeLogger.log_one_metric">[docs]</a>    <span class="k">def</span> <span class="nf">log_one_metric</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">metric_name</span><span class="p">,</span> <span class="n">metric_value</span><span class="p">,</span>
+<div class="viewcode-block" id="PgeLogger.log_one_metric"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.PgeLogger.log_one_metric">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">log_one_metric</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">metric_name</span><span class="p">,</span> <span class="n">metric_value</span><span class="p">,</span>
                        <span class="n">additional_back_frames</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Writes one metric value to the log file.</span>
@@ -659,7 +659,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">SUMMARY_STATS_MESSAGE</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span>
                  <span class="n">additional_back_frames</span><span class="o">=</span><span class="n">additional_back_frames</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="PgeLogger.write_log_summary"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.PgeLogger.write_log_summary">[docs]</a>    <span class="k">def</span> <span class="nf">write_log_summary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="PgeLogger.write_log_summary"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.PgeLogger.write_log_summary">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">write_log_summary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Writes a summary at the end of the log file, which includes totals</span>
 <span class="sd">        of each message logged for each severity level, OS-level metrics,</span>
