@@ -17,6 +17,7 @@ import os
 import re
 
 from functools import partial
+from typing import Optional
 
 import jinja2
 import yaml
@@ -204,11 +205,19 @@ def python_type_to_xml_type(obj) -> str:
     return XML_TYPES[obj]
 
 
-def augment_measured_parameters(measured_parameters: dict, mpc_path: str, logger: PgeLogger) -> dict:
+def augment_measured_parameters(measured_parameters: dict, mpc_path: Optional[str], logger: PgeLogger) -> dict:
     """
     Augment the measured parameters dict of GeoTIFF metadata into a dict of dicts
     containing the needed fields for the MeasuredParameters section of the ISO XML
     file.
+
+    The configuration for how this is done is provided by the mpc_path parameter
+    (see src/opera/pge/base/schema/iso_metadata_measured_parameters_config_schema.yaml).
+    This configuration file is optional. If not provided (mpc_path=None), then the
+    ISO XML's AdditionalAttribute descriptions will be fixed as "Not Provided", and
+    the data type and display names will be guessed. If it is provided, any AdditionalAttributes
+    present in the metadata that are missing corresponding entries in the MPC will
+    be rendered as "!Not Found!" which is indicative of a configuration error.
 
     For HDF5 or NetCDF metadata, use augment_hd5_measured_parameters()
 
@@ -216,8 +225,8 @@ def augment_measured_parameters(measured_parameters: dict, mpc_path: str, logger
     ----------
     measured_parameters : dict
        The GeoTIFF metadata from the output product. See get_geotiff_metadata()
-    mpc_path: str
-        Path to the Measured Parameters Descriptions YAML file
+    mpc_path: str | None
+        Path to the Measured Parameters Descriptions YAML file (OPTIONAL)
     logger: PgeLogger
         PgeLogger instance
 
@@ -279,15 +288,25 @@ def augment_hdf5_measured_parameters(measured_parameters: dict, mpc_path: str, l
 
     The preprocessing step in this method selectively flattens the metadata
     dictionary based on the "paths" provided in the variable keys of the configuration
-    YAML file. The result of this preprocessing is then safely passed to the base
-    method to get the correct structure expected by the Jinja template.
+    YAML file. The result of this preprocessing is then safely passed to
+    augment_measured_parameters()  to get the correct structure expected by the Jinja
+    template.
+
+    Unlike in augment_measured_parameters() the mpc_path parameter is REQUIRED. Since
+    the measured_parameters metadata dictionary is not flat (vs a flat name: value
+    structure expected by augment_measured_parameters()) there needs to be a way to
+    determine which values are desired metadata values (which can be dictionaries).
+
+    Metadata paths specified in the MPC but absent from the measured parameters
+    dictionary are raised as a critical error by default, unless that entry in the
+    MPC is marked optional, in which case a warning is logged.
 
     Parameters
     ----------
     measured_parameters : dict
-        The HDF5 metadata from the output product. See get_cslc_s1_product_metadata()
+        The HDF5 metadata from the output product. Ex: see get_cslc_s1_product_metadata()
     mpc_path: str
-        Path to the Measured Parameters Descriptions YAML file
+        Path to the Measured Parameters Descriptions YAML file (REQUIRED)
     logger: PgeLogger
         PgeLogger instance
 
