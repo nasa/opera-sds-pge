@@ -269,7 +269,7 @@ def augment_measured_parameters(measured_parameters: dict, mpc_path: str, logger
     return augmented_parameters
 
 
-def augment_hd5_measured_parameters(measured_parameters: dict, mpc_path: str, logger: PgeLogger) -> dict:
+def augment_hdf5_measured_parameters(measured_parameters: dict, mpc_path: str, logger: PgeLogger) -> dict:
     """
     The augment_measured_parameters() function wrapped in a "preprocessing" step to
     handle the structure of HDF5 metadata. While GeoTIFF metadata is a flat

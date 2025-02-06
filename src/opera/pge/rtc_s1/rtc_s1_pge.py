@@ -24,7 +24,7 @@ from opera.util.error_codes import ErrorCode
 from opera.util.geo_utils import translate_utm_bbox_to_lat_lon
 from opera.util.h5_utils import get_rtc_s1_product_metadata
 from opera.util.input_validation import validate_slc_s1_inputs
-from opera.util.render_jinja2 import augment_hd5_measured_parameters, render_jinja2
+from opera.util.render_jinja2 import augment_hdf5_measured_parameters, render_jinja2
 from opera.util.time import get_time_for_filename
 
 
@@ -754,7 +754,7 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
                 self.logger.critical(self.name, ErrorCode.ISO_METADATA_RENDER_FAILED, str(err))
 
         # Augment the metadata with descriptions from the measured parameter config for RTC-S1
-        output_product_metadata['MeasuredParameters'] = augment_hd5_measured_parameters(
+        output_product_metadata['MeasuredParameters'] = augment_hdf5_measured_parameters(
             output_product_metadata,
             self.runconfig.iso_measured_parameter_descriptions,
             self.logger

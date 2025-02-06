@@ -26,7 +26,7 @@ from opera.util.error_codes import ErrorCode
 from opera.util.h5_utils import get_cslc_s1_product_metadata
 from opera.util.h5_utils import get_disp_s1_product_metadata
 from opera.util.input_validation import validate_algorithm_parameters_config, validate_disp_inputs
-from opera.util.render_jinja2 import augment_hd5_measured_parameters, render_jinja2
+from opera.util.render_jinja2 import augment_hdf5_measured_parameters, render_jinja2
 from opera.util.time import get_time_for_filename, get_catalog_metadata_datetime_str
 
 
@@ -621,7 +621,7 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
                 'ProcessingDateTime': get_catalog_metadata_datetime_str(self.production_datetime)
             }
 
-            output_product_metadata['MeasuredParameters'] = augment_hd5_measured_parameters(
+            output_product_metadata['MeasuredParameters'] = augment_hdf5_measured_parameters(
                 output_product_metadata,
                 self.runconfig.iso_measured_parameter_descriptions,
                 self.logger

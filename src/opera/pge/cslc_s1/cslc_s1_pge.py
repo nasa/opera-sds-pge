@@ -23,7 +23,7 @@ from opera.util.dataset_utils import parse_bounding_polygon_from_wkt
 from opera.util.error_codes import ErrorCode
 from opera.util.h5_utils import get_cslc_s1_product_metadata
 from opera.util.input_validation import validate_slc_s1_inputs
-from opera.util.render_jinja2 import augment_hd5_measured_parameters, render_jinja2
+from opera.util.render_jinja2 import augment_hdf5_measured_parameters, render_jinja2
 from opera.util.time import get_time_for_filename
 
 
@@ -622,7 +622,7 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
         # Extract all metadata assigned by the SAS at product creation time
         try:
             output_product_metadata = get_cslc_s1_product_metadata(cslc_product)
-            output_product_metadata['MeasuredParameters'] = augment_hd5_measured_parameters(
+            output_product_metadata['MeasuredParameters'] = augment_hdf5_measured_parameters(
                 output_product_metadata,
                 self.runconfig.iso_measured_parameter_descriptions,
                 self.logger
