@@ -25,7 +25,7 @@ from opera.util.dataset_utils import get_sensor_from_spacecraft_name
 from opera.util.error_codes import ErrorCode
 from opera.util.geo_utils import get_geographic_boundaries_from_mgrs_tile
 from opera.util.input_validation import validate_dswx_inputs
-from opera.util.render_jinja2 import render_jinja2
+from opera.util.render_jinja2 import augment_measured_parameters, render_jinja2
 from opera.util.tiff_utils import get_geotiff_hls_dataset
 from opera.util.tiff_utils import get_geotiff_hls_sensor_product_id
 from opera.util.tiff_utils import get_geotiff_metadata
@@ -433,7 +433,11 @@ class DSWxHLSPostProcessorMixin(PostProcessorMixin):
         # Extract all metadata assigned by the SAS at product creation time
         try:
             measured_parameters = get_geotiff_metadata(representative_product)
-            output_product_metadata['MeasuredParameters'] = self.augment_measured_parameters(measured_parameters)
+            output_product_metadata['MeasuredParameters'] = augment_measured_parameters(
+                measured_parameters,
+                self.runconfig.iso_measured_parameter_descriptions,
+                self.logger
+            )
         except Exception as err:
             msg = f'Failed to extract metadata from {representative_product}, reason: {err}'
             self.logger.critical(self.name, ErrorCode.ISO_METADATA_COULD_NOT_EXTRACT_METADATA, msg)
