@@ -129,7 +129,11 @@ do
         overall_status=1
     else
         # Retrieve the return code written to disk by the comparison script
-        overall_status=$(cat "$output_dir/compare_disp_s1_products.rc")
+        test_status=$(cat "$output_dir/compare_dswx_hls_products.rc")
+
+        if [ $test_status -ne 0 ]; then
+          overall_status=$test_status
+        fi
     fi
 done
 
