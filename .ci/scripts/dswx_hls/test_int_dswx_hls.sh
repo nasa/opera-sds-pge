@@ -45,6 +45,12 @@ test_int_setup_test_data
 # Setup cleanup on exit
 trap test_int_trap_cleanup EXIT
 
+# overall_status values and their meaning
+# 0 - pass
+# 1 - failure to execute some part of this script
+# 2 - product validation failure
+overall_status=0
+
 # For each <data_set> directory, run the Docker image to produce a <data_set>/output_dir
 # directory and then compare the contents of the output and expected directories
 for data_set in l30_greenland s30_louisiana
@@ -113,7 +119,11 @@ do
         overall_status=1
     else
         # Retrieve the return code written to disk by the comparison script
-        overall_status=$(cat "$output_dir/compare_dswx_hls_products.rc")
+        test_status=$(cat "$output_dir/compare_dswx_hls_products.rc")
+
+        if [ $test_status -ne 0 ]; then
+          overall_status=$test_status
+        fi
     fi
 done
 
