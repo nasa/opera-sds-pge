@@ -72,8 +72,10 @@ class DistS1PostProcessorMixin(PostProcessorMixin):
     _cached_core_filename = None
     _tile_metadata_cache = {}
     _tile_filename_cache = {}
-    _output_layer_names = ['DATE-FIRST', 'DATE-LATEST', 'DIST-STATUS-ACQ',
-                           'DIST-STATUS', 'GEN-METRIC', 'N-DIST', 'N-OBS']
+
+    _main_output_layer_names = ['DIST-GEN-STATUS-ACQ', 'DIST-GEN-STATUS', 'GEN-METRIC', 'BROWSE']
+    _alert_db_output_layer_names = ['DATE-FIRST', 'DATE-LATEST', 'N-DIST', 'N-OBS']
+    _valid_layer_names = _main_output_layer_names + _alert_db_output_layer_names
 
     def _validate_outputs(self):
         # TODO: Below is a pattern better aligned with the product spec. The uncommented pattern aligns with the current
@@ -90,9 +92,9 @@ class DistS1PostProcessorMixin(PostProcessorMixin):
                               r'(?P<acq_day>\d{2})T(?P<acq_hour>\d{2})(?P<acq_minute>\d{2})(?P<acq_second>\d{2})Z)_'
                               r'(?P<creation_ts>(?P<cre_year>\d{4})(?P<cre_month>\d{2})(?P<cre_day>\d{2})T'
                               r'(?P<cre_hour>\d{2})(?P<cre_minute>\d{2})(?P<cre_second>\d{2})Z)_(?P<sensor>S1)_'
-                              r'(?P<spacing>30)_(?P<product_version>v\d+[.]\d+[.]\d+))')
+                              r'(?P<spacing>30)_(?P<product_version>v\d+[.]\d+))')
 
-        granule_filename_pattern = (product_id_pattern + rf'((_(?P<layer_name>{"|".join(self._output_layer_names)}))|'
+        granule_filename_pattern = (product_id_pattern + rf'((_(?P<layer_name>{"|".join(self._valid_layer_names)}))|'
                                                          r'_BROWSE)?[.](?P<ext>tif|tiff|png)$')
 
         product_id = re.compile(product_id_pattern + r'$')
@@ -115,18 +117,29 @@ class DistS1PostProcessorMixin(PostProcessorMixin):
                         if match_result is None:  # or match_result.groupdict()['ext'] != 'tif':
                             error_msg = f'Invalid product filename {granule}'
                             self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
-                        elif os.stat(granule_path).st_size == 0:
+
+                        match_dict = match_result.groupdict()
+
+                        if match_dict['layer_name'] is None and match_dict['ext'] == 'png':
+                            match_dict['layer_name'] = 'BROWSE'
+
+                        if os.stat(granule_path).st_size == 0:
                             error_msg = f'Output file {granule_path} is empty.'
                             self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
-                        elif match_result.groupdict()['layer_name'] not in self._output_layer_names:
-                            error_msg = f'Invalid layer name "{match_result.groupdict()["layer_name"]}" in output.'
+                        elif match_dict['layer_name'] not in self._valid_layer_names:
+                            error_msg = f'Invalid layer name "{match_dict["layer_name"]}" in output.'
                             self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
 
                         bands.append(granule_path)
-                        generated_band_names.append(match_result.groupdict()['layer_name'])
+                        generated_band_names.append(match_dict['layer_name'])
 
-                if len(bands) != len(self._output_layer_names):
-                    error_msg = f'Incorrect number of output bands generated: {len(generated_band_names)}'
+                # Not sure how I should do this validation... The bands in self._alert_db_output_layer_names
+                # are only created if the confirmation db is available (& might still be missing on initial runs
+                # with it available?)
+                missing_main_output_bands = set(self._main_output_layer_names).difference(set(generated_band_names))
+
+                if len(missing_main_output_bands) > 0:
+                    error_msg = f'Some required output bands are missing: {list(missing_main_output_bands)}'
                     self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
 
                 output_products.append(dir_path)
@@ -302,7 +315,7 @@ class DistS1Executor(DistS1PreProcessorMixin, DistS1PostProcessorMixin, PgeExecu
     LEVEL = "L3"
     """Processing Level for DIST-S1 Products"""
 
-    SAS_VERSION = "0.0.3"  # Beta release https://github.com/opera-adt/dist-s1/releases/tag/v0.0.3
+    SAS_VERSION = "0.0.6"  # Beta release https://github.com/opera-adt/dist-s1/releases/tag/v0.0.3
     """Version of the SAS wrapped by this PGE, should be updated as needed"""
 
     def __init__(self, pge_name, runconfig_path, **kwargs):

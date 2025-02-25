@@ -293,17 +293,21 @@ class DistS1PgeTestCase(unittest.TestCase):
         primary_executable_group['ProgramPath'] = 'echo'
         primary_executable_group['ProgramOptions'] = ['hello world']
 
-        product_id_1 = 'OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.0.1'
-        product_id_2 = 'OPERA_L3_DIST-ALERT-S1_T10SGD_20241105T015902Z_20241204T175000Z_S1_30_v0.0.1'
+        product_id_1 = 'OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.1'
+        product_id_2 = 'OPERA_L3_DIST-ALERT-S1_T10SGD_20241105T015902Z_20241204T175000Z_S1_30_v0.1'
 
         sample_bands = [
-            'OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.0.1_DATE-FIRST.tif',
-            'OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.0.1_GEN-METRIC.tif',
-            'OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.0.1_DATE-LATEST.tif',
-            'OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.0.1_N-DIST.tif',
-            'OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.0.1_DIST-STATUS-ACQ.tif',
-            'OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.0.1_N-OBS.tif',
-            'OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.0.1_DIST-STATUS.tif'
+            # These bands are always created
+            'OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.1_DIST-GEN-STATUS-ACQ.tif',
+            'OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.1_DIST-GEN-STATUS.tif',
+            'OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.1_GEN-METRIC.tif',
+            'OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.1.png',
+
+            # These bands depend on the conf db
+            'OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.1_DATE-FIRST.tif',
+            'OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.1_DATE-LATEST.tif',
+            'OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.1_N-DIST.tif',
+            'OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.1_N-OBS.tif',
         ]
 
         with open(test_runconfig_path, 'w', encoding='utf-8') as config_fh:
@@ -350,7 +354,7 @@ class DistS1PgeTestCase(unittest.TestCase):
 
             # Test: Not enough bands
 
-            band_data = tuple(sample_bands[:3])
+            band_data = tuple(sample_bands[1:])
 
             self.generate_band_data_output(product_id_1, band_data)
 
@@ -365,7 +369,7 @@ class DistS1PgeTestCase(unittest.TestCase):
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
 
-            self.assertIn("Incorrect number of output bands generated: 3", log_contents)
+            self.assertIn("Some required output bands are missing: [\'DIST-GEN-STATUS-ACQ\']", log_contents)
 
             # Test: Invalid band name
 
