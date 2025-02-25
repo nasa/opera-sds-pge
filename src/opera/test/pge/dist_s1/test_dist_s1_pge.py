@@ -23,6 +23,7 @@ from pkg_resources import resource_filename
 from opera.pge import RunConfig
 from opera.pge.dist_s1.dist_s1_pge import DistS1Executor
 from opera.util import PgeLogger
+from opera.util.render_jinja2 import UNDEFINED_ERROR
 
 
 class DistS1PgeTestCase(unittest.TestCase):
@@ -166,14 +167,14 @@ class DistS1PgeTestCase(unittest.TestCase):
         self.assertTrue(os.path.exists(expected_catalog_metadata_file))
 
         # # Check that the ISO metadata file was created and filled in as expected
-        # expected_iso_metadata_file = join(
-        #     pge.runconfig.output_product_path, pge._iso_metadata_filename(tile_id='T10SGD'))
-        # self.assertTrue(os.path.exists(expected_iso_metadata_file))
-        #
-        # with open(expected_iso_metadata_file, 'r', encoding='utf-8') as infile:
-        #     iso_contents = infile.read()
-        #
-        # self.assertNotIn(UNDEFINED_ERROR, iso_contents)
+        expected_iso_metadata_file = join(
+            pge.runconfig.output_product_path, pge._iso_metadata_filename())
+        self.assertTrue(os.path.exists(expected_iso_metadata_file))
+
+        with open(expected_iso_metadata_file, 'r', encoding='utf-8') as infile:
+            iso_contents = infile.read()
+
+        self.assertNotIn(UNDEFINED_ERROR, iso_contents)
 
         # Check that the log file was created and moved into the output directory
         expected_log_file = pge.logger.get_file_name()

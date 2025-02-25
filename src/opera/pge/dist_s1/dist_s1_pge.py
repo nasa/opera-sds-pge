@@ -10,13 +10,15 @@ Module defining the implementation for the Surface Disturbance (DIST) from Senti
 
 import os
 import re
-from datetime import datetime
-from os.path import join, isdir, isfile, abspath
+from os.path import join, isdir, isfile, abspath, basename
 
 from opera.pge.base.base_pge import PreProcessorMixin, PgeExecutor, PostProcessorMixin
 from opera.util.dataset_utils import get_sensor_from_spacecraft_name
 from opera.util.error_codes import ErrorCode
+from opera.util.geo_utils import get_geographic_boundaries_from_mgrs_tile
 from opera.util.input_validation import check_input_list
+from opera.util.render_jinja2 import augment_measured_parameters, render_jinja2
+from opera.util.tiff_utils import get_geotiff_metadata
 from opera.util.time import get_time_for_filename
 
 
@@ -70,6 +72,8 @@ class DistS1PostProcessorMixin(PostProcessorMixin):
 
     _post_mixin_name = "DistS1PostProcessorMixin"
     _cached_core_filename = None
+
+    # May not need these since PGE produces 1 tile / execution
     _tile_metadata_cache = {}
     _tile_filename_cache = {}
 
@@ -132,6 +136,16 @@ class DistS1PostProcessorMixin(PostProcessorMixin):
 
                         bands.append(granule_path)
                         generated_band_names.append(match_dict['layer_name'])
+
+                        tile_id = match_dict['tile_id']
+                        file_id = match_dict['id']
+
+                        if tile_id not in self._tile_metadata_cache:
+                            dist_metadata = self._collect_dist_s1_product_metadata(granule_path)
+                            self._tile_metadata_cache[tile_id] = dist_metadata
+
+                        if file_id not in self._tile_filename_cache:
+                            self._tile_filename_cache[tile_id] = file_id
 
                 # Not sure how I should do this validation... The bands in self._alert_db_output_layer_names
                 # are only created if the confirmation db is available (& might still be missing on initial runs
@@ -252,35 +266,177 @@ class DistS1PostProcessorMixin(PostProcessorMixin):
         """
         return self._ancillary_filename() + ".qa.log"
 
-    # TODO: Figure out how we want to approach this
-    # def _iso_metadata_filename(self, tile_id):
-    #     """
-    #     Returns the file name to use for ISO Metadata produced by the DIST-S1 PGE.
-    #
-    #     The ISO Metadata file name for the DIST-S1 PGE consists of:
-    #
-    #         <DIST-S1 filename>.iso.xml
-    #
-    #     Where <DIST-S1 filename> is returned by DistS1PostProcessorMixin. [TODO: put proper method here]
-    #
-    #     Parameters
-    #     ----------
-    #     tile_id : str
-    #         The MGRS tile identifier used to look up the corresponding cached
-    #         DIST-S1 file name.
-    #
-    #     Returns
-    #     -------
-    #     <iso metadata filename> : str
-    #         The file name to assign to the ISO Metadata product created by this PGE.
-    #
-    #     """
-    #     if tile_id not in self._tile_filename_cache:
-    #         raise RuntimeError(f"No file name cached for tile ID {tile_id}")
-    #
-    #     iso_metadata_filename = self._tile_filename_cache[tile_id]
-    #
-    #     return iso_metadata_filename + ".iso.xml"
+    def _iso_metadata_filename(self):
+        """
+        Returns the file name to use for ISO Metadata produced by the DIST-S1 PGE.
+
+        The ISO Metadata file name for the DIST-S1 PGE consists of:
+
+            <DIST-S1 filename>.iso.xml
+
+        Where <DIST-S1 filename> is returned by DistS1PostProcessorMixin. [TODO: put proper method here]
+
+        Returns
+        -------
+        <iso metadata filename> : str
+            The file name to assign to the ISO Metadata product created by this PGE.
+
+        """
+        # Since we only produce 1 tile each execution, we only have one tile ID in here
+        tile_id = list(self._tile_filename_cache.keys())[0]
+
+        iso_metadata_filename = self._tile_filename_cache[tile_id]
+
+        return iso_metadata_filename + ".iso.xml"
+
+    def _collect_dist_s1_product_metadata(self, geotiff_product):
+        """
+        Gathers the available metadata from an output DIST-S1 product for
+        use in filling out the ISO metadata template for the DIST-S1 PGE.
+
+        Parameters
+        ----------
+        geotiff_product : str
+            Path the GeoTIFF product to collect metadata from.
+
+        Returns
+        -------
+        output_product_metadata : dict
+            Dictionary containing DIST-S1 output product metadata, formatted
+            for use with the ISO metadata Jinja2 template.
+        """
+        output_product_metadata = dict()
+
+        try:
+            measured_parameters = get_geotiff_metadata(geotiff_product)
+            output_product_metadata['MeasuredParameters'] = augment_measured_parameters(
+                measured_parameters,
+                self.runconfig.iso_measured_parameter_descriptions,
+                self.logger
+            )
+        except Exception as err:
+            msg = f'Failed to extract metadata from {geotiff_product}, reason: {err}'
+            self.logger.critical(self.name, ErrorCode.ISO_METADATA_COULD_NOT_EXTRACT_METADATA, msg)
+
+        # Get the Military Grid Reference System (MGRS) tile code and zone
+        # identifier from the intermediate file name
+        mgrs_tile_id = basename(geotiff_product).split('_')[3]
+
+        output_product_metadata['tileCode'] = mgrs_tile_id
+        output_product_metadata['zoneIdentifier'] = mgrs_tile_id[:2]
+
+        # Translate the MGRS tile ID to a lat/lon bounding box
+        (lat_min,
+         lat_max,
+         lon_min,
+         lon_max) = get_geographic_boundaries_from_mgrs_tile(mgrs_tile_id)
+
+        output_product_metadata['geospatial_lon_min'] = lon_min
+        output_product_metadata['geospatial_lon_max'] = lon_max
+        output_product_metadata['geospatial_lat_min'] = lat_min
+        output_product_metadata['geospatial_lat_max'] = lat_max
+
+        # Add some fields on the dimensions of the data. These values should
+        # be the same for all DSWx-S1 products, and were derived from the
+        # ADT product spec
+        output_product_metadata['xCoordinates'] = {
+            'size': 3600,  # pixels
+            'spacing': 30  # meters/pixel
+        }
+        output_product_metadata['yCoordinates'] = {
+            'size': 3600,  # pixels
+            'spacing': 30  # meters/pixel
+        }
+
+        return output_product_metadata
+
+    def _create_custom_metadata(self, tile_filename):
+        """
+        Creates the "custom data" dictionary used with the ISO metadata rendering.
+
+        Custom data contains all metadata information needed for the ISO template
+        that is not found within any of the other metadata sources (such as the
+        RunConfig, output product(s), or catalog metadata).
+
+        Parameters
+        ----------
+        tile_filename : str
+            Tile filename to be used as the granule identifier within the
+            custom metadata.
+
+        Returns
+        -------
+        custom_metadata : dict
+            Dictionary containing the custom metadata as expected by the ISO
+            metadata Jinja2 template.
+
+        """
+        custom_metadata = {
+            'ISO_OPERA_FilePackageName': tile_filename,
+            'ISO_OPERA_ProducerGranuleId': tile_filename,
+            'MetadataProviderAction': "creation",
+            'GranuleFilename': tile_filename,
+            'ISO_OPERA_ProjectKeywords': ['OPERA', 'JPL', 'DIST', 'Surface', 'Disturbance'],
+            'ISO_OPERA_PlatformKeywords': ['S1'],
+            'ISO_OPERA_InstrumentKeywords': ['Sentinel 1 A/C']
+        }
+
+        return custom_metadata
+
+    def _create_iso_metadata(self):
+        """
+        Creates a rendered version of the ISO metadata template for DIST-S1
+        output products using metadata from the following locations:
+
+            * RunConfig (in dictionary form)
+            * Output product (dictionary extracted from HDF5 product, per-tile)
+            * Catalog metadata
+            * "Custom" metadata (all metadata not found anywhere else)
+
+        Returns
+        -------
+        rendered_template : str
+            The ISO metadata template for DSWX-S1 filled in with values from
+            the sourced metadata dictionaries.
+
+        """
+        # Use the base PGE implemenation to validate existence of the template
+        super()._create_iso_metadata()
+
+        # Since we only produce 1 tile each execution, we only have one tile ID in here
+        tile_id = list(self._tile_metadata_cache.keys())[0]
+
+        if tile_id not in self._tile_metadata_cache or tile_id not in self._tile_filename_cache:
+            raise RuntimeError(f"No file name or metadata cached for tile ID {tile_id}")
+
+        tile_metadata = self._tile_metadata_cache[tile_id]
+        tile_filename = self._tile_filename_cache[tile_id]
+
+        runconfig_dict = self.runconfig.asdict()
+
+        product_output_dict = tile_metadata
+
+        catalog_metadata_dict = self._create_catalog_metadata().asdict()
+
+        custom_data_dict = self._create_custom_metadata(tile_filename)
+
+        iso_metadata = {
+            'run_config': runconfig_dict,
+            'product_output': product_output_dict,
+            'catalog_metadata': catalog_metadata_dict,
+            'custom_data': custom_data_dict
+        }
+
+        iso_template_path = abspath(self.runconfig.iso_template_path)
+
+        rendered_template = render_jinja2(iso_template_path, iso_metadata, self.logger)
+
+        print('made iso')
+
+        with open('/tmp/test.xml', 'w') as f:
+            f.write(rendered_template)
+
+        return rendered_template
 
     def run_postprocessor(self, **kwargs):
         """
