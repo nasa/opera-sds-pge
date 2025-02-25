@@ -1,220 +1,75 @@
-ACCODE:
-  attribute_data_type: string
-  attribute_type: processingInformation
-  description: 'TBA'
-  display_name: Accode
-AEROSOL_CLASS_REMAPPING_ENABLED:
-  attribute_data_type: boolean
-  attribute_type: processingInformation
-  description: 'TBA'
-  display_name: AerosolClassRemappingEnabled
-AEROSOL_NOT_WATER_TO_HIGH_CONF_WATER_FMASK_VALUES:
-  attribute_data_type: string
-  attribute_type: processingInformation
-  description: 'TBA'
-  display_name: AerosolNotWaterToHighConfWaterFmaskValues
-AEROSOL_PARTIAL_SURFACE_AGGRESSIVE_TO_HIGH_CONF_WATER_FMASK_VALUES:
-  attribute_data_type: string
-  attribute_type: processingInformation
-  description: 'TBA'
-  display_name: AerosolPartialSurfaceAggressiveToHighConfWaterFmaskValues
-AEROSOL_PARTIAL_SURFACE_WATER_CONSERVATIVE_TO_HIGH_CONF_WATER_FMASK_VALUES:
-  attribute_data_type: string
-  attribute_type: processingInformation
-  description: 'TBA'
-  display_name: AerosolPartialSurfaceWaterConservativeToHighConfWaterFmaskValues
-AEROSOL_WATER_MODERATE_CONF_TO_HIGH_CONF_WATER_FMASK_VALUES:
-  attribute_data_type: string
-  attribute_type: processingInformation
-  description: 'TBA'
-  display_name: AerosolWaterModerateConfToHighConfWaterFmaskValues
-AREA_OR_POINT:
-  attribute_data_type: string
-  attribute_type: processingInformation
-  description: 'TBA'
-  display_name: AreaOrPoint
-CLOUD_COVERAGE:
-  attribute_data_type: int
-  attribute_type: processingInformation
-  description: 'TBA'
-  display_name: CloudCoverage
-DEM_COVERAGE:
-  attribute_data_type: string
-  attribute_type: processingInformation
-  description: 'TBA'
-  display_name: DemCoverage
-DEM_SOURCE:
-  attribute_data_type: string
-  attribute_type: processingParameter
-  description: 'TBA'
-  display_name: DemSource
-FOREST_MASK_LANDCOVER_CLASSES:
-  attribute_data_type: string
-  attribute_type: processingInformation
-  description: 'TBA'
-  display_name: ForestMaskLandcoverClasses
-HLS_DATASET:
-  attribute_data_type: string
-  attribute_type: processingInformation
-  description: 'TBA'
-  display_name: HlsDataset
-INPUT_HLS_PRODUCT_CLOUD_COVERAGE:
-  attribute_data_type: int
-  attribute_type: processingInformation
-  description: 'TBA'
-  display_name: InputHlsProductCloudCoverage
-INPUT_HLS_PRODUCT_SPATIAL_COVERAGE:
-  attribute_data_type: int
-  attribute_type: processingInformation
-  description: 'TBA'
-  display_name: InputHlsProductSpatialCoverage
-LANDCOVER_COVERAGE:
-  attribute_data_type: string
-  attribute_type: processingInformation
-  description: 'TBA'
-  display_name: LandcoverCoverage
-LANDCOVER_SOURCE:
-  attribute_data_type: string
-  attribute_type: processingParameter
-  description: 'TBA'
-  display_name: LandcoverSource
-MASK_ADJACENT_TO_CLOUD_MODE:
-  attribute_data_type: string
-  attribute_type: processingParameter
-  description: 'TBA'
-  display_name: MaskAdjacentToCloudMode
-MAX_SUN_LOCAL_INC_ANGLE:
-  attribute_data_type: int
-  attribute_type: processingInformation
-  description: 'TBA'
-  display_name: MaxSunLocalIncAngle
-MEAN_SUN_AZIMUTH_ANGLE:
-  attribute_data_type: float
-  attribute_type: processingInformation
-  description: 'TBA'
-  display_name: MeanSunAzimuthAngle
-MEAN_SUN_ZENITH_ANGLE:
-  attribute_data_type: float
-  attribute_type: processingInformation
-  description: 'TBA'
-  display_name: MeanSunZenithAngle
-MEAN_VIEW_AZIMUTH_ANGLE:
-  attribute_data_type: float
-  attribute_type: processingInformation
-  description: 'TBA'
-  display_name: MeanViewAzimuthAngle
-MEAN_VIEW_ZENITH_ANGLE:
-  attribute_data_type: float
-  attribute_type: processingInformation
-  description: 'TBA'
-  display_name: MeanViewZenithAngle
-MIN_SLOPE_ANGLE:
-  attribute_data_type: int
-  attribute_type: processingInformation
-  description: 'TBA'
-  display_name: MinSlopeAngle
-NBAR_SOLAR_ZENITH:
-  attribute_data_type: float
-  attribute_type: processingInformation
-  description: 'TBA'
-  display_name: NbarSolarZenith
-OCEAN_MASKING_ENABLED:
+apply_water_mask:
   attribute_data_type: boolean
   attribute_type: processingParameter
   description: 'TBA'
-  display_name: OceanMaskingEnabled
-OCEAN_MASKING_SHORELINE_DISTANCE_KM:
-  attribute_data_type: string
-  attribute_type: processingInformation
-  description: 'TBA'
-  display_name: OceanMaskingShorelineDistanceKm
-PROCESSING_DATETIME:
-  attribute_data_type: string
-  attribute_type: processingInformation
-  description: 'TBA'
-  display_name: ProcessingDatetime
-PRODUCT_ID:
-  attribute_data_type: string
-  attribute_type: processingInformation
-  description: 'TBA'
-  display_name: ProductId
-PRODUCT_LEVEL:
-  attribute_data_type: int
-  attribute_type: processingInformation
-  description: 'TBA'
-  display_name: ProductLevel
-PRODUCT_SOURCE:
-  attribute_data_type: string
-  attribute_type: processingInformation
-  description: 'TBA'
-  display_name: ProductSource
-PRODUCT_TYPE:
-  attribute_data_type: string
-  attribute_type: processingInformation
-  description: 'TBA'
-  display_name: ProductType
-PRODUCT_VERSION:
-  attribute_data_type: float
-  attribute_type: processingInformation
-  description: 'TBA'
-  display_name: ProductVersion
-PROJECT:
-  attribute_data_type: string
-  attribute_type: processingInformation
-  description: 'TBA'
-  display_name: Project
-SENSING_TIME:
-  attribute_data_type: string
-  attribute_type: platformInformation
-  description: 'TBA'
-  display_name: SensingTime
-SENSOR:
-  attribute_data_type: string
-  attribute_type: sensorInformation
-  description: 'TBA'
-  display_name: Sensor
-SENSOR_PRODUCT_ID:
-  attribute_data_type: string
-  attribute_type: sensorInformation
-  description: 'TBA'
-  display_name: SensorProductId
-SHADOW_MASKING_ALGORITHM:
-  attribute_data_type: string
-  attribute_type: processingInformation
-  description: 'TBA'
-  display_name: ShadowMaskingAlgorithm
-SHORELINE_SOURCE:
+  display_name: ApplyWaterMask
+bucket:
   attribute_data_type: string
   attribute_type: processingParameter
   description: 'TBA'
-  display_name: ShorelineSource
-SOFTWARE_VERSION:
-  attribute_data_type: float
-  attribute_type: processingInformation
-  description: 'TBA'
-  display_name: SoftwareVersion
-SPACECRAFT_NAME:
-  attribute_data_type: string
-  attribute_type: platformInformation
-  description: 'TBA'
-  display_name: SpacecraftName
-SPATIAL_COVERAGE:
-  attribute_data_type: int
-  attribute_type: processingInformation
-  description: 'TBA'
-  display_name: SpatialCoverage
-SPATIAL_COVERAGE_EXCLUDING_MASKED_OCEAN:
-  attribute_data_type: int
-  attribute_type: processingInformation
-  description: 'TBA'
-  display_name: SpatialCoverageExcludingMaskedOcean
-WORLDCOVER_COVERAGE:
-  attribute_data_type: string
-  attribute_type: processingInformation
-  description: 'TBA'
-  display_name: WorldcoverCoverage
-WORLDCOVER_SOURCE:
+  display_name: Bucket
+dst_dir:
   attribute_data_type: string
   attribute_type: processingParameter
   description: 'TBA'
-  display_name: WorldcoverSource
+  display_name: DstDir
+high_confidence_threshold:
+  attribute_data_type: float
+  attribute_type: processingParameter
+  description: 'TBA'
+  display_name: HighConfidenceThreshold
+memory_strategy:
+  attribute_data_type: string
+  attribute_type: processingParameter
+  description: 'TBA'
+  display_name: MemoryStrategy
+mgrs_tile_id:
+  attribute_data_type: string
+  attribute_type: processingParameter
+  description: 'TBA'
+  display_name: MGRSTileID
+moderate_confidence_threshold:
+  attribute_data_type: float
+  attribute_type: processingParameter
+  description: 'TBA'
+  display_name: ModerateConfidenceThreshold
+n_lookbacks:
+  attribute_data_type: int
+  attribute_type: processingParameter
+  description: 'TBA'
+  display_name: NLookbacks
+n_workers_for_despeckling:
+  attribute_data_type: int
+  attribute_type: processingParameter
+  description: 'TBA'
+  display_name: NWorkersForDespeckling
+post_rtc_opera_ids:
+  attribute_data_type: string
+  attribute_type: processingParameter
+  description: 'TBA'
+  display_name: PostRtcOperaIDs
+pre_rtc_opera_ids:
+  attribute_data_type: string
+  attribute_type: processingParameter
+  description: 'TBA'
+  display_name: PreRtcOperaIDs
+product_dst_dir:
+  attribute_data_type: string
+  attribute_type: processingParameter
+  description: 'TBA'
+  display_name: ProductDstDir
+tqdm_enabled:
+  attribute_data_type: boolean
+  attribute_type: processingParameter
+  description: 'TBA'
+  display_name: TqdmEnabled
+version:
+  attribute_data_type: string
+  attribute_type: processingParameter
+  description: 'TBA'
+  display_name: Version
+water_mask_path:
+  attribute_data_type: string
+  attribute_type: processingParameter
+  description: 'TBA'
+  display_name: WaterMaskPath

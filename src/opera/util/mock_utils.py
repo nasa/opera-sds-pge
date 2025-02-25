@@ -232,6 +232,91 @@ class MockGdal:  # pragma: no cover
             """
             return deepcopy(self.dummy_metadata)
 
+    class MockDistS1GdalDataset:
+        """
+        Mock class for gdal.Dataset objects, as returned from an Open call.
+        For use when mocking metadata from DIST-S1 GeoTIFF products
+        """
+
+        def __init__(self):
+            self.dummy_metadata = {
+                'apply_water_mask': 'False',
+                'bucket': 'None',
+                'dst_dir': '/home/ops/scratch_dir',
+                'high_confidence_threshold': '5.5',
+                'memory_strategy': 'high',
+                'mgrs_tile_id': '10SGD',
+                'moderate_confidence_threshold': '3.5',
+                'n_lookbacks': '3',
+                'n_workers_for_despeckling': '5',
+                'post_rtc_opera_ids': 'OPERA_L2_RTC-S1_T137-292318-IW1_20250102T015857Z_20250102T190143Z_S1A_30_v1.0,'
+                                      'OPERA_L2_RTC-S1_T137-292318-IW2_20250102T015858Z_20250102T190143Z_S1A_30_v1.0,'
+                                      'OPERA_L2_RTC-S1_T137-292319-IW1_20250102T015900Z_20250102T190143Z_S1A_30_v1.0,'
+                                      'OPERA_L2_RTC-S1_T137-292319-IW2_20250102T015901Z_20250102T190143Z_S1A_30_v1.0,'
+                                      'OPERA_L2_RTC-S1_T137-292320-IW1_20250102T015903Z_20250102T190143Z_S1A_30_v1.0,'
+                                      'OPERA_L2_RTC-S1_T137-292320-IW2_20250102T015903Z_20250102T190143Z_S1A_30_v1.0,'
+                                      'OPERA_L2_RTC-S1_T137-292321-IW1_20250102T015905Z_20250102T190143Z_S1A_30_v1.0,'
+                                      'OPERA_L2_RTC-S1_T137-292321-IW2_20250102T015906Z_20250102T190143Z_S1A_30_v1.0,'
+                                      'OPERA_L2_RTC-S1_T137-292322-IW1_20250102T015908Z_20250102T190143Z_S1A_30_v1.0,'
+                                      'OPERA_L2_RTC-S1_T137-292322-IW2_20250102T015909Z_20250102T190143Z_S1A_30_v1.0,'
+                                      'OPERA_L2_RTC-S1_T137-292323-IW1_20250102T015911Z_20250102T190143Z_S1A_30_v1.0,'
+                                      'OPERA_L2_RTC-S1_T137-292323-IW2_20250102T015912Z_20250102T190143Z_S1A_30_v1.0,'
+                                      'OPERA_L2_RTC-S1_T137-292324-IW1_20250102T015914Z_20250102T190143Z_S1A_30_v1.0,'
+                                      'OPERA_L2_RTC-S1_T137-292324-IW2_20250102T015914Z_20250102T100414Z_S1A_30_v1.0,'
+                                      'OPERA_L2_RTC-S1_T137-292325-IW1_20250102T015916Z_20250102T100414Z_S1A_30_v1.0',
+                'pre_rtc_opera_ids': 'OPERA_L2_RTC-S1_T137-292318-IW1_20240904T015900Z_20240904T150822Z_S1A_30_v1.0,'
+                                     'OPERA_L2_RTC-S1_T137-292318-IW1_20240916T015901Z_20240916T114330Z_S1A_30_v1.0,'
+                                     'OPERA_L2_RTC-S1_T137-292318-IW1_20240928T015901Z_20240929T005548Z_S1A_30_v1.0,'
+                                     'OPERA_L2_RTC-S1_T137-292318-IW1_20241010T015902Z_20241010T101259Z_S1A_30_v1.0,'
+                                     'OPERA_L2_RTC-S1_T137-292318-IW1_20241022T015902Z_20241022T180854Z_S1A_30_v1.0,'
+                                     'OPERA_L2_RTC-S1_T137-292318-IW1_20241103T015902Z_20241103T071409Z_S1A_30_v1.0,'
+                                     'OPERA_L2_RTC-S1_T137-292318-IW1_20241115T015901Z_20241115T104237Z_S1A_30_v1.0,'
+                                     'OPERA_L2_RTC-S1_T137-292318-IW1_20241127T015900Z_20241205T232915Z_S1A_30_v1.0,'
+                                     'OPERA_L2_RTC-S1_T137-292318-IW1_20241209T015859Z_20241212T032725Z_S1A_30_v1.0,'
+                                     'OPERA_L2_RTC-S1_T137-292318-IW1_20241221T015858Z_20241221T080422Z_S1A_30_v1.0,'
+                                     'OPERA_L2_RTC-S1_T137-292318-IW2_20240904T015901Z_20240904T150822Z_S1A_30_v1.0,'
+                                     'OPERA_L2_RTC-S1_T137-292318-IW2_20240916T015902Z_20240916T114330Z_S1A_30_v1.0,'
+                                     'OPERA_L2_RTC-S1_T137-292318-IW2_20240928T015902Z_20240929T005548Z_S1A_30_v1.0,'
+                                     'OPERA_L2_RTC-S1_T137-292318-IW2_20241010T015903Z_20241010T101259Z_S1A_30_v1.0,'
+                                     'OPERA_L2_RTC-S1_T137-292318-IW2_20241022T015902Z_20241022T180854Z_S1A_30_v1.0,'
+                                     'OPERA_L2_RTC-S1_T137-292318-IW2_20241103T015902Z_20241103T071409Z_S1A_30_v1.0,'
+                                     'OPERA_L2_RTC-S1_T137-292318-IW2_20241115T015902Z_20241115T104237Z_S1A_30_v1.0,'
+                                     'OPERA_L2_RTC-S1_T137-292318-IW2_20241127T015901Z_20241205T232915Z_S1A_30_v1.0,'
+                                     'OPERA_L2_RTC-S1_T137-292318-IW2_20241209T015900Z_20241212T032725Z_S1A_30_v1.0,'
+                                     'OPERA_L2_RTC-S1_T137-292318-IW2_20241221T015859Z_20241221T080422Z_S1A_30_v1.0,'
+                                     'OPERA_L2_RTC-S1_T137-292319-IW1_20240904T015903Z_20240904T150822Z_S1A_30_v1.0,'
+                                     'OPERA_L2_RTC-S1_T137-292319-IW1_20240916T015904Z_20240916T114330Z_S1A_30_v1.0,'
+                                     'OPERA_L2_RTC-S1_T137-292319-IW1_20240928T015904Z_20240929T005548Z_S1A_30_v1.0,'
+                                     'OPERA_L2_RTC-S1_T137-292319-IW1_20241010T015905Z_20241010T101259Z_S1A_30_v1.0,'
+                                     'OPERA_L2_RTC-S1_T137-292319-IW1_20241022T015904Z_20241022T180854Z_S1A_30_v1.0,'
+                                     'OPERA_L2_RTC-S1_T137-292319-IW1_20241103T015904Z_20241103T071409Z_S1A_30_v1.0,'
+                                     'OPERA_L2_RTC-S1_T137-292319-IW1_20241115T015904Z_20241115T104237Z_S1A_30_v1.0,'
+                                     'OPERA_L2_RTC-S1_T137-292319-IW1_20241127T015903Z_20241205T232915Z_S1A_30_v1.0,'
+                                     'OPERA_L2_RTC-S1_T137-292319-IW1_20241209T015902Z_20241212T032725Z_S1A_30_v1.0,'
+                                     'OPERA_L2_RTC-S1_T137-292319-IW1_20241221T015901Z_20241221T080422Z_S1A_30_v1.0,'
+                                     'OPERA_L2_RTC-S1_T137-292319-IW2_20240904T015904Z_20240904T150822Z_S1A_30_v1.0,'
+                                     'OPERA_L2_RTC-S1_T137-292319-IW2_20240916T015905Z_20240916T114330Z_S1A_30_v1.0,'
+                                     'OPERA_L2_RTC-S1_T137-292319-IW2_20240928T015905Z_20240929T005548Z_S1A_30_v1.0,'
+                                     'OPERA_L2_RTC-S1_T137-292319-IW2_20241010T015906Z_20241010T101259Z_S1A_30_v1.0,'
+                                     'OPERA_L2_RTC-S1_T137-292319-IW2_20241022T015905Z_20241022T180854Z_S1A_30_v1.0,'
+                                     'OPERA_L2_RTC-S1_T137-292319-IW2_20241103T015905Z_20241103T071409Z_S1A_30_v1.0,'
+                                     'OPERA_L2_RTC-S1_T137-292319-IW2_20241115T015905Z_20241115T104237Z_S1A_30_v1.0,'
+                                     'OPERA_L2_RTC-S1_T137-292319-IW2_20241127T015904Z_20241205T232915Z_S1A_30_v1.0,'
+                                     'OPERA_L2_RTC-S1_T137-292319-IW2_20241209T015903Z_20241212T032725Z_S1A_30_v1.0,'
+                                     'OPERA_L2_RTC-S1_T137-292319-IW2_20241221T015902Z_20241221T080422Z_S1A_30_v1.0',
+                'product_dst_dir': '/home/ops/output_dir',
+                'tqdm_enabled': 'True',
+                'version': '0.0.6',
+                'water_mask_path': 'None'
+            }
+
+        def GetMetadata(self):
+            """
+            Returns a subset of dummy metadata expected by the PGE.
+            This function should be updated as needed for requisite metadata fields.
+            """
+            return deepcopy(self.dummy_metadata)
+
     @staticmethod
     def Open(filename):
         """Mock implementation for gdal.Open. Returns an instance of the mock Dataset."""
@@ -248,6 +333,8 @@ class MockGdal:  # pragma: no cover
             return MockGdal.MockDSWxNIGdalDataset()
         elif 'rtc_s1' in file_name or 'rtc-s1' in file_name:
             return MockGdal.MockRtcS1GdalDataset()
+        elif 'dist_alert_s1' in file_name or 'dist-alert-s1' in file_name:
+            return MockGdal.MockDistS1GdalDataset()
         else:
             return MockGdal.MockDSWxHLSGdalDataset()
 
