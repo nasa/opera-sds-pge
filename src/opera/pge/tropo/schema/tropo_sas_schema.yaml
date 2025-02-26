@@ -1,0 +1,64 @@
+#
+# Yamale schema for the TROPO SAS Configuration
+#
+
+runconfig:
+  input_file_group:
+    # Path to HRES model file.
+    input_file_path: str(required=True)
+
+  primary_executable:
+    # Product type of the PGE.
+    product_type: str(required=True)
+
+  product_path_group:
+    # Directory where PGE will place results.
+    product_path: str(required=True)
+
+    # Path to the scratch directory.
+    scratch_path: str(required=False)
+
+    # Path to the SAS output directory.
+    sas_output_path: str(required=False)
+
+    # Version of the product, in ‘<major>.<minor>’ format.
+    product_version: str(required=False)
+
+  worker_settings:
+    # Number of workers to run in parallel 
+    n_workers: int(required=True, min=1)
+
+    # Number of threads to use per worker. This sets the OMP_NUM_THREADS 
+    # environment variable in each python process.
+    threads_per_worker: int(required=True, min=1)
+
+    # Max memory to use per worker in GB. 
+    max_memory: int(required=False, min=2)
+    
+    # Dask local spill directory 
+    dask_temp_dir: str(required=False)
+
+    # Size (rows, columns) of blocks of data to load at a time.
+    block_shape:
+      required: false
+      default: [128, 128]
+      type: list
+      len: 2
+      items:
+        type: int
+
+  output_options:
+    # Output height levels for ZTD, if empty use default HRES 145 levels.
+    output_heights: list(required=False)
+
+    # Level of compression applied to netcdf
+    compression_kwargs: include('compression_kwargs_options', required=False)
+    
+  compression_kwargs_options:
+    compression_flag: bool(required=False)
+    zlib: bool(required=False)
+    complevel: int(required=False, min=0, max=9)
+    shuffle: bool(required=False)
+
+  # Path to the output log file in addition to logging to stderr.
+  log_file: str(required=False)
