@@ -14,7 +14,7 @@ from opera.pge.base.base_pge import PreProcessorMixin
 
 class TROPOPreProcessorMixin(PreProcessorMixin):
     """
-    Mixin class responsible for handling all pre-processing steps for the DSWX-NI
+    Mixin class responsible for handling all pre-processing steps for the TROPO
     PGE. The pre-processing phase is defined as all steps necessary prior
     to SAS execution.
     In addition to the base functionality inherited from PreProcessorMixin, this

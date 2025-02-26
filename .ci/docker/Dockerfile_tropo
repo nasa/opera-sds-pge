@@ -1,5 +1,5 @@
 # Dockerfile to produce the production TROPO PGE Docker image for OPERA
-# Authors: Kevin Marlis, Scott Collins, Ray Bambery
+# Authors: Kevin Marlis, Scott Collins
 
 # Default SAS image path, must be provided by the docker build call via --build-arg
 ARG SAS_IMAGE
