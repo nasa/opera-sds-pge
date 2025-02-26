@@ -274,7 +274,9 @@ class DistS1PostProcessorMixin(PostProcessorMixin):
 
             <DIST-S1 filename>.iso.xml
 
-        Where <DIST-S1 filename> is returned by DistS1PostProcessorMixin. [TODO: put proper method here]
+        Where <DIST-S1 filename> is:
+
+        <PROJECT>_<LEVEL>_<PGE NAME>_<TILE ID>_<ACQ TIMESTAMP>_<PROD TIMETAG>_<SENSOR>_<SPACING>_<PRODUCT VERSION>
 
         Returns
         -------
