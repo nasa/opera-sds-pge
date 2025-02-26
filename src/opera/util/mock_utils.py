@@ -335,8 +335,10 @@ class MockGdal:  # pragma: no cover
             return MockGdal.MockRtcS1GdalDataset()
         elif 'dist_alert_s1' in file_name or 'dist-alert-s1' in file_name:
             return MockGdal.MockDistS1GdalDataset()
-        else:
+        elif 'dswx_hls' in file_name or 'dswx-hls' in file_name:
             return MockGdal.MockDSWxHLSGdalDataset()
+        else:
+            raise ValueError(f'Filename does not appear to match existing mock GDAL datasets')
 
 
 def mock_gdal_edit(args):
