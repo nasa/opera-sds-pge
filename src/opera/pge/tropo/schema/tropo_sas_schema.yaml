@@ -2,7 +2,7 @@
 # Yamale schema for the TROPO SAS Configuration
 #
 
-runconfig:
+run_config:
   input_file_group:
     # Path to HRES model file.
     input_file_path: str(required=True)
@@ -39,13 +39,7 @@ runconfig:
     dask_temp_dir: str(required=False)
 
     # Size (rows, columns) of blocks of data to load at a time.
-    block_shape:
-      required: false
-      default: [128, 128]
-      type: list
-      len: 2
-      items:
-        type: int
+    block_shape: list(int, required=False, min=2, max=2)
 
   output_options:
     # Output height levels for ZTD, if empty use default HRES 145 levels.
@@ -53,12 +47,13 @@ runconfig:
 
     # Level of compression applied to netcdf
     compression_kwargs: include('compression_kwargs_options', required=False)
-    
-  compression_kwargs_options:
-    compression_flag: bool(required=False)
-    zlib: bool(required=False)
-    complevel: int(required=False, min=0, max=9)
-    shuffle: bool(required=False)
 
   # Path to the output log file in addition to logging to stderr.
   log_file: str(required=False)
+
+---
+compression_kwargs_options:
+  compression_flag: bool(required=False)
+  zlib: bool(required=False)
+  complevel: int(required=False, min=0, max=9)
+  shuffle: bool(required=False)
