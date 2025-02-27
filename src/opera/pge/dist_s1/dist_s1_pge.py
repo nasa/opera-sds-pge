@@ -77,9 +77,13 @@ class DistS1PostProcessorMixin(PostProcessorMixin):
     _tile_metadata_cache = {}
     _tile_filename_cache = {}
 
+    # These layers are always produced and therefore must be present
     _main_output_layer_names = ['DIST-GEN-STATUS-ACQ', 'DIST-GEN-STATUS', 'GEN-METRIC', 'BROWSE']
-    _alert_db_output_layer_names = ['DATE-FIRST', 'DATE-LATEST', 'N-DIST', 'N-OBS']
-    _valid_layer_names = _main_output_layer_names + _alert_db_output_layer_names
+
+    # The production of these layers depends on the confirmation DB and may be absent
+    _confirmation_db_output_layer_names = ['DATE-FIRST', 'DATE-LATEST', 'N-DIST', 'N-OBS']
+
+    _valid_layer_names = _main_output_layer_names + _confirmation_db_output_layer_names
 
     def _validate_outputs(self):
         # TODO: Below is a pattern better aligned with the product spec. The uncommented pattern aligns with the current
@@ -147,7 +151,7 @@ class DistS1PostProcessorMixin(PostProcessorMixin):
                         if file_id not in self._tile_filename_cache:
                             self._tile_filename_cache[tile_id] = file_id
 
-                # Not sure how I should do this validation... The bands in self._alert_db_output_layer_names
+                # Not sure how I should do this validation... The bands in self._confirmation_db_output_layer_names
                 # are only created if the confirmation db is available (& might still be missing on initial runs
                 # with it available?)
                 missing_main_output_bands = set(self._main_output_layer_names).difference(set(generated_band_names))
@@ -432,11 +436,6 @@ class DistS1PostProcessorMixin(PostProcessorMixin):
         iso_template_path = abspath(self.runconfig.iso_template_path)
 
         rendered_template = render_jinja2(iso_template_path, iso_metadata, self.logger)
-
-        print('made iso')
-
-        with open('/tmp/test.xml', 'w') as f:
-            f.write(rendered_template)
 
         return rendered_template
 
