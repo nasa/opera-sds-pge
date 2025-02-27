@@ -7,7 +7,7 @@ FROM $SAS_IMAGE
 
 ARG PGE_SOURCE_DIR
 ARG PGE_DEST_DIR=/home/ops
-ARG CONDA_ROOT=/home/tropo_user/miniconda3
+ARG CONDA_ROOT=/opt/conda
 
 ENV PGE_DEST_DIR=$PGE_DEST_DIR
 ENV CONDA_ROOT=$CONDA_ROOT
@@ -43,8 +43,8 @@ COPY --chown=tropo_user:tropo_user ${PGE_SOURCE_DIR} ${PGE_DEST_DIR}
 # Switch to root for installing into Conda Env
 USER 0:0
 
-# Set the default shell to run commands within the Conda environment named "tropo-env" using bash
-SHELL ["conda", "run", "-n", "tropo-env", "/bin/bash", "-c"]
+# Set the default shell to run commands within the Conda environment named "opera_tropo" using bash
+SHELL ["conda", "run", "-n", "opera_tropo", "/bin/bash", "-c"]
 
 # Install dependencies into existing Conda Env
 # Modifications to the destination dir permissions are also required here to ensure
@@ -59,7 +59,7 @@ RUN set -ex \
     && chmod 777 $(find ${PGE_DEST_DIR} -type d)
 
 # Set the Docker entrypoint and clear the default command
-ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "tropo-env", "sh", "-c", "exec ${CONDA_ROOT}/bin/pge_docker_entrypoint.sh  \"${@}\"", "--"]
+ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "opera_tropo", "sh", "-c", "exec ${CONDA_ROOT}/bin/pge_docker_entrypoint.sh  \"${@}\"", "--"]
 CMD []
 
 # Set the user/group back to the default

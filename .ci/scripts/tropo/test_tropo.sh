@@ -6,7 +6,7 @@ set -e
 # Source the build script utility functions
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
-. "${SCRIPT_DIR}"/util.sh
+. "${SCRIPT_DIR}"/../util/util.sh
 
 # Parse args
 parse_build_args "$@"
@@ -26,7 +26,7 @@ CONTAINER_HOME="/home/ops"
 CONDA_ROOT="/opt/conda"
 
 # defaults
-[ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath $(dirname $(realpath $0))/../..)
+[ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath $(dirname $(realpath $0))/../../..)
 [ -z "${TAG}" ] && TAG="${USER}-dev"
 
 TEST_RESULTS_DIR="${WORKSPACE}/${TEST_RESULTS_REL_DIR}/${PGE_NAME}"
@@ -44,24 +44,26 @@ DOCKER_RUN="docker run --rm \
     -v ${WORKSPACE}/src/opera/test/data:${CONTAINER_HOME}/opera/test/data \
     -w /workspace/${TEST_RESULTS_REL_DIR} \
     -u ${UID}:$(id -g) \
-    --entrypoint ${CONDA_ROOT}/bin/pge_tests_entrypoint.sh \
+    --entrypoint conda \
     ${IMAGE}:${TAG}"
+
+ENTRYPOINT="run --no-capture-output -n opera_tropo ${CONDA_ROOT}/bin/pge_tests_entrypoint.sh"
 
 # Configure a trap to set permissions on exit regardless of whether the testing succeeds
 function set_perms {
     # Open up permissions on all test results so we can be sure the CI system can
     # delete them after results are archived within Jenkins
-    ${DOCKER_RUN} bash -c "find \
+    ${DOCKER_RUN} ${ENTRYPOINT} bash -c "find \
         /workspace/${TEST_RESULTS_REL_DIR} -type d -exec chmod 775 {} +"
 
-    ${DOCKER_RUN} bash -c "find \
+    ${DOCKER_RUN} ${ENTRYPOINT} bash -c "find \
         /workspace/${TEST_RESULTS_REL_DIR} -type f -exec chmod 664 {} +"
 }
 
 trap set_perms EXIT
 
 # linting and pep8 style check (configured by .flake8 and .pylintrc)
-${DOCKER_RUN} bash -c "source /usr/local/bin/_activate_current_env.sh; flake8 \
+${DOCKER_RUN} ${ENTRYPOINT} bash -c "flake8 \
     --config ${CONTAINER_HOME}/opera/.flake8 \
     --jobs auto \
     --exit-zero \
@@ -69,7 +71,7 @@ ${DOCKER_RUN} bash -c "source /usr/local/bin/_activate_current_env.sh; flake8 \
     --output-file /workspace/${TEST_RESULTS_REL_DIR}/${PGE_NAME}/flake8.log \
     ${CONTAINER_HOME}/opera"
 
-${DOCKER_RUN} bash -c "export HOME=/home/mamba/opera; source /usr/local/bin/_activate_current_env.sh; pylint \
+${DOCKER_RUN} ${ENTRYPOINT} bash -c "pylint \
     --rcfile=${CONTAINER_HOME}/opera/.pylintrc \
     --jobs 0 \
     --exit-zero \
@@ -78,7 +80,7 @@ ${DOCKER_RUN} bash -c "export HOME=/home/mamba/opera; source /usr/local/bin/_act
     ${CONTAINER_HOME}/opera"
 
 # pytest (including code coverage)
-${DOCKER_RUN} bash -c "source /usr/local/bin/_activate_current_env.sh; pytest \
+${DOCKER_RUN} ${ENTRYPOINT} bash -c "pytest \
     --junit-xml=/workspace/${TEST_RESULTS_REL_DIR}/${PGE_NAME}/pytest-junit.xml \
     --cov=${CONTAINER_HOME}/opera/pge/base \
     --cov=${CONTAINER_HOME}/opera/pge/${PGE_NAME} \
