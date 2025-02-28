@@ -1,0 +1,90 @@
+RunConfig:
+  Name: OPERA-TROPO-PGE-TEST-CONFIG
+  Groups:
+    PGE:
+      PGENameGroup:
+        PGEName: TROPO_PGE
+      InputFilesGroup:
+        InputFilePaths:
+        - tropo_pge_test/input_dir
+      DynamicAncillaryFilesGroup:
+        AncillaryFileMap: {}
+      ProductPathGroup:
+        OutputProductPath: tropo_pge_test/output_dir
+        ScratchPath: tropo_pge_test/scratch_dir
+      PrimaryExecutable:
+        ProductIdentifier: TROPO
+        ProductVersion: "1.0"
+        ProgramPath: /bin/echo
+        ProgramOptions:
+        - 'hello world > tropo_pge_test/output_dir/tropo_test.nc;'
+        - '/bin/echo TROPO invoked with RunConfig'
+        ErrorCodeBase: 400000
+        SchemaPath: pge/tropo/schema/tropo_sas_schema.yaml
+        AlgorithmParametersSchemaPath: 
+        IsoMeasuredParameterDescriptions:
+        DataValidityStartDate:
+        IsoTemplatePath: ""
+      QAExecutable:
+        Enabled: false
+        ProgramPath: null
+        ProgramOptions: []
+      DebugLevelGroup:
+        DebugSwitch: false
+        ExecuteViaShell: true
+    SAS:
+      run_config:
+        input_file_group:
+          # REQUIRED: path to HRES model file.
+          #   Type: string | Path.
+          input_file_path: input_data/D01010000010100001.zz.nc
+        primary_executable:
+          # Product type of the PGE.
+          #   Type: string.
+          product_type: OPERA_TROPO
+        product_path_group:
+          # REQUIRED: Directory where PGE will place results.
+          #   Type: string.
+          product_path: tropo_pge_test/output_dir
+          # Path to the scratch directory.
+          #   Type: string.
+          scratch_path: tropo_pge_test/scratch_dir
+          # Path to the SAS output directory.
+          #   Type: string.
+          sas_output_path: tropo_pge_test/output_dir
+          # Version of the product, in <major>.<minor> format.
+          #   Type: string.
+          product_version: '0.1'
+        worker_settings:
+          # Number of workers to run in parallel 
+          #   Type: integer.
+          n_workers: 4
+          # Number of threads to use per worker. This sets the OMP_NUM_THREADS environment variable in
+          #   each python process.
+          #   Type: integer.
+          threads_per_worker: 2
+          # Max memory to use per worker in GB. 
+          #   Type: integer.
+          max_memory: 8
+          # Dask local spill directory 
+          #   Type: string.
+          dask_temp_dir: tmp
+          # Size (rows, columns) of blocks of data to load at a time.
+          #   Type: array.
+          block_shape:
+            - 128
+            - 128
+        output_options:
+          # Output height levels for ZTD, if empty use default HRES 145 levels.
+          #   Type: list.
+          output_heights: []
+          # Level of compression applied to netcdf
+          #   Type: dict.
+          compression_kwargs:
+            compression_flag: true
+            zlib: true
+            complevel: 5
+            shuffle: true
+        # Path to the output log file in addition to logging to stderr.
+        #   Type: string | null.
+        log_file: output_dir/test_log.log

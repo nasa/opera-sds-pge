@@ -31,6 +31,7 @@ PGE_NAME_MAP = {
     'DSWX_NI_PGE': ('opera.pge.dswx_ni.dswx_ni_pge', 'DSWxNIExecutor'),
     'DSWX_S1_PGE': ('opera.pge.dswx_s1.dswx_s1_pge', 'DSWxS1Executor'),
     'RTC_S1_PGE': ('opera.pge.rtc_s1.rtc_s1_pge', 'RtcS1Executor'),
+    'TROPO_PGE': ('opera.pge.tropo.tropo_pge', 'TROPOExectuor')
 }
 """Mapping of PGE names specified by a RunConfig to the PGE module and class type to instantiate"""
 
