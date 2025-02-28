@@ -1,1 +1,75 @@
-{}
+apply_water_mask:
+  attribute_data_type: boolean
+  attribute_type: processingParameter
+  description: 'TBA'
+  display_name: ApplyWaterMask
+bucket:
+  attribute_data_type: string
+  attribute_type: processingParameter
+  description: 'TBA'
+  display_name: Bucket
+dst_dir:
+  attribute_data_type: string
+  attribute_type: processingParameter
+  description: 'TBA'
+  display_name: DstDir
+high_confidence_threshold:
+  attribute_data_type: float
+  attribute_type: processingParameter
+  description: 'TBA'
+  display_name: HighConfidenceThreshold
+memory_strategy:
+  attribute_data_type: string
+  attribute_type: processingParameter
+  description: 'TBA'
+  display_name: MemoryStrategy
+mgrs_tile_id:
+  attribute_data_type: string
+  attribute_type: processingParameter
+  description: 'TBA'
+  display_name: MGRSTileID
+moderate_confidence_threshold:
+  attribute_data_type: float
+  attribute_type: processingParameter
+  description: 'TBA'
+  display_name: ModerateConfidenceThreshold
+n_lookbacks:
+  attribute_data_type: int
+  attribute_type: processingParameter
+  description: 'TBA'
+  display_name: NLookbacks
+n_workers_for_despeckling:
+  attribute_data_type: int
+  attribute_type: processingParameter
+  description: 'TBA'
+  display_name: NWorkersForDespeckling
+post_rtc_opera_ids:
+  attribute_data_type: string
+  attribute_type: processingParameter
+  description: 'TBA'
+  display_name: PostRtcOperaIDs
+pre_rtc_opera_ids:
+  attribute_data_type: string
+  attribute_type: processingParameter
+  description: 'TBA'
+  display_name: PreRtcOperaIDs
+product_dst_dir:
+  attribute_data_type: string
+  attribute_type: processingParameter
+  description: 'TBA'
+  display_name: ProductDstDir
+tqdm_enabled:
+  attribute_data_type: boolean
+  attribute_type: processingParameter
+  description: 'TBA'
+  display_name: TqdmEnabled
+version:
+  attribute_data_type: string
+  attribute_type: processingParameter
+  description: 'TBA'
+  display_name: Version
+water_mask_path:
+  attribute_data_type: string
+  attribute_type: processingParameter
+  description: 'TBA'
+  display_name: WaterMaskPath

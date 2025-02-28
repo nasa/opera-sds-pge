@@ -28,20 +28,24 @@ RunConfig:
         ProductVersion: "1.0"
         ProgramPath: /bin/mkdir
         ProgramOptions:
-        - -p dist_s1_pge_test/output_dir/OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.0.1;
-        - dd if=/dev/urandom of=dist_s1_pge_test/output_dir/OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.0.1/OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.0.1_DATE-FIRST.tif
+        - -p dist_s1_pge_test/output_dir/OPERA_L3_DIST-ALERT-S1_T10SGD_20250102T015857Z_20250224T152115Z_S1_30_v0.1;
+        - dd if=/dev/urandom of=dist_s1_pge_test/output_dir/OPERA_L3_DIST-ALERT-S1_T10SGD_20250102T015857Z_20250224T152115Z_S1_30_v0.1/OPERA_L3_DIST-ALERT-S1_T10SGD_20250102T015857Z_20250224T152115Z_S1_30_v0.1_DIST-GEN-STATUS-ACQ.tif
           bs=1M count=1;
-        - dd if=/dev/urandom of=dist_s1_pge_test/output_dir/OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.0.1/OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.0.1_DATE-LATEST.tif
+        - dd if=/dev/urandom of=dist_s1_pge_test/output_dir/OPERA_L3_DIST-ALERT-S1_T10SGD_20250102T015857Z_20250224T152115Z_S1_30_v0.1/OPERA_L3_DIST-ALERT-S1_T10SGD_20250102T015857Z_20250224T152115Z_S1_30_v0.1_DIST-GEN-STATUS.tif
           bs=1M count=1;
-        - dd if=/dev/urandom of=dist_s1_pge_test/output_dir/OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.0.1/OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.0.1_DIST-STATUS-ACQ.tif
+        - dd if=/dev/urandom of=dist_s1_pge_test/output_dir/OPERA_L3_DIST-ALERT-S1_T10SGD_20250102T015857Z_20250224T152115Z_S1_30_v0.1/OPERA_L3_DIST-ALERT-S1_T10SGD_20250102T015857Z_20250224T152115Z_S1_30_v0.1_GEN-METRIC.tif
           bs=1M count=1;
-        - dd if=/dev/urandom of=dist_s1_pge_test/output_dir/OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.0.1/OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.0.1_DIST-STATUS.tif
+        - dd if=/dev/urandom of=dist_s1_pge_test/output_dir/OPERA_L3_DIST-ALERT-S1_T10SGD_20250102T015857Z_20250224T152115Z_S1_30_v0.1/OPERA_L3_DIST-ALERT-S1_T10SGD_20250102T015857Z_20250224T152115Z_S1_30_v0.1.png
           bs=1M count=1;
-        - dd if=/dev/urandom of=dist_s1_pge_test/output_dir/OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.0.1/OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.0.1_GEN-METRIC.tif
+
+        # TODO: Should I include these in the unit tests? We can't generate them without the confirmation db
+        - dd if=/dev/urandom of=dist_s1_pge_test/output_dir/OPERA_L3_DIST-ALERT-S1_T10SGD_20250102T015857Z_20250224T152115Z_S1_30_v0.1/OPERA_L3_DIST-ALERT-S1_T10SGD_20250102T015857Z_20250224T152115Z_S1_30_v0.1_DATE-FIRST.tif
           bs=1M count=1;
-        - dd if=/dev/urandom of=dist_s1_pge_test/output_dir/OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.0.1/OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.0.1_N-DIST.tif
+        - dd if=/dev/urandom of=dist_s1_pge_test/output_dir/OPERA_L3_DIST-ALERT-S1_T10SGD_20250102T015857Z_20250224T152115Z_S1_30_v0.1/OPERA_L3_DIST-ALERT-S1_T10SGD_20250102T015857Z_20250224T152115Z_S1_30_v0.1_DATE-LATEST.tif
           bs=1M count=1;
-        - dd if=/dev/urandom of=dist_s1_pge_test/output_dir/OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.0.1/OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.0.1_N-OBS.tif
+        - dd if=/dev/urandom of=dist_s1_pge_test/output_dir/OPERA_L3_DIST-ALERT-S1_T10SGD_20250102T015857Z_20250224T152115Z_S1_30_v0.1/OPERA_L3_DIST-ALERT-S1_T10SGD_20250102T015857Z_20250224T152115Z_S1_30_v0.1_N-DIST.tif
+          bs=1M count=1;
+        - dd if=/dev/urandom of=dist_s1_pge_test/output_dir/OPERA_L3_DIST-ALERT-S1_T10SGD_20250102T015857Z_20250224T152115Z_S1_30_v0.1/OPERA_L3_DIST-ALERT-S1_T10SGD_20250102T015857Z_20250224T152115Z_S1_30_v0.1_N-OBS.tif
           bs=1M count=1;
         - /bin/echo DIST-S1 invoked with RunConfig
         ErrorCodeBase: 700000
@@ -75,6 +79,14 @@ RunConfig:
         - test_data/10SGD_cropped/137/2024-11-03/OPERA_L2_RTC-S1_T137-292324-IW2_20241103T015919Z_20241103T074936Z_S1A_30_v1.0_VH.tif
         - test_data/10SGD_cropped/137/2024-11-03/OPERA_L2_RTC-S1_T137-292325-IW1_20241103T015921Z_20241103T074936Z_S1A_30_v1.0_VH.tif
         mgrs_tile_id: 10SGD
-        dist_s1_alert_db_dir:
-        dst_dir:
-        water_mask:
+        dst_dir: dist_s1_pge_test/scratch_dir
+        product_dst_dir: dist_s1_pge_test/output_dir
+        water_mask_path:
+        apply_water_mask: false
+        memory_strategy: high
+        tqdm_enabled: true
+        n_lookbacks: 3
+        moderate_confidence_threshold: 3.5
+        high_confidence_threshold: 5.5
+        bucket:
+        bucket_prefix: ''
