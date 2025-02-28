@@ -86,20 +86,11 @@ class DistS1PostProcessorMixin(PostProcessorMixin):
     _valid_layer_names = _main_output_layer_names + _confirmation_db_output_layer_names
 
     def _validate_outputs(self):
-        # TODO: Below is a pattern better aligned with the product spec. The uncommented pattern aligns with the current
-        #  SAS output
-        # product_id_pattern = (r'(?P<id>(?P<project>OPERA)_(?P<level>L3)_(?P<product_type>DIST)-(?P<source>S1)_'
-        #                       r'(?P<tile_id>T[^\W_]{5})_(?P<acquisition_ts>(?P<acq_year>\d{4})(?P<acq_month>\d{2})'
-        #                       r'(?P<acq_day>\d{2})T(?P<acq_hour>\d{2})(?P<acq_minute>\d{2})(?P<acq_second>\d{2})Z)_'
-        #                       r'(?P<creation_ts>(?P<cre_year>\d{4})(?P<cre_month>\d{2})(?P<cre_day>\d{2})T'
-        #                       r'(?P<cre_hour>\d{2})(?P<cre_minute>\d{2})(?P<cre_second>\d{2})Z)_(?P<sensor>S1[AC])_'
-        #                       r'(?P<spacing>30)_(?P<product_version>v\d+[.]\d+[.]\d+))')
-
-        product_id_pattern = (r'(?P<id>(?P<project>OPERA)_(?P<level>L3)_(?P<product_type>DIST-ALERT)-(?P<source>S1)_'
+        product_id_pattern = (r'(?P<id>(?P<project>OPERA)_(?P<level>L3)_(?P<product_type>DIST(-ALERT)?)-(?P<source>S1)_'
                               r'(?P<tile_id>T[^\W_]{5})_(?P<acquisition_ts>(?P<acq_year>\d{4})(?P<acq_month>\d{2})'
                               r'(?P<acq_day>\d{2})T(?P<acq_hour>\d{2})(?P<acq_minute>\d{2})(?P<acq_second>\d{2})Z)_'
                               r'(?P<creation_ts>(?P<cre_year>\d{4})(?P<cre_month>\d{2})(?P<cre_day>\d{2})T'
-                              r'(?P<cre_hour>\d{2})(?P<cre_minute>\d{2})(?P<cre_second>\d{2})Z)_(?P<sensor>S1)_'
+                              r'(?P<cre_hour>\d{2})(?P<cre_minute>\d{2})(?P<cre_second>\d{2})Z)_(?P<sensor>S1[AC]?)_'
                               r'(?P<spacing>30)_(?P<product_version>v\d+[.]\d+))')
 
         granule_filename_pattern = (product_id_pattern + rf'((_(?P<layer_name>{"|".join(self._valid_layer_names)}))|'
@@ -343,7 +334,7 @@ class DistS1PostProcessorMixin(PostProcessorMixin):
         output_product_metadata['geospatial_lat_max'] = lat_max
 
         # Add some fields on the dimensions of the data. These values should
-        # be the same for all DSWx-S1 products, and were derived from the
+        # be the same for all DIST-S1 products, and were derived from the
         # ADT product spec
         output_product_metadata['xCoordinates'] = {
             'size': 3600,  # pixels

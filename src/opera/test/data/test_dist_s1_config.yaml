@@ -37,8 +37,6 @@ RunConfig:
           bs=1M count=1;
         - dd if=/dev/urandom of=dist_s1_pge_test/output_dir/OPERA_L3_DIST-ALERT-S1_T10SGD_20250102T015857Z_20250224T152115Z_S1_30_v0.1/OPERA_L3_DIST-ALERT-S1_T10SGD_20250102T015857Z_20250224T152115Z_S1_30_v0.1.png
           bs=1M count=1;
-
-        # TODO: Should I include these in the unit tests? We can't generate them without the confirmation db
         - dd if=/dev/urandom of=dist_s1_pge_test/output_dir/OPERA_L3_DIST-ALERT-S1_T10SGD_20250102T015857Z_20250224T152115Z_S1_30_v0.1/OPERA_L3_DIST-ALERT-S1_T10SGD_20250102T015857Z_20250224T152115Z_S1_30_v0.1_DATE-FIRST.tif
           bs=1M count=1;
         - dd if=/dev/urandom of=dist_s1_pge_test/output_dir/OPERA_L3_DIST-ALERT-S1_T10SGD_20250102T015857Z_20250224T152115Z_S1_30_v0.1/OPERA_L3_DIST-ALERT-S1_T10SGD_20250102T015857Z_20250224T152115Z_S1_30_v0.1_DATE-LATEST.tif
