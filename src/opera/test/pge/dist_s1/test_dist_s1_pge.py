@@ -23,6 +23,7 @@ from pkg_resources import resource_filename
 from opera.pge import RunConfig
 from opera.pge.dist_s1.dist_s1_pge import DistS1Executor
 from opera.util import PgeLogger
+from opera.util.render_jinja2 import UNDEFINED_ERROR
 
 
 class DistS1PgeTestCase(unittest.TestCase):
@@ -166,14 +167,14 @@ class DistS1PgeTestCase(unittest.TestCase):
         self.assertTrue(os.path.exists(expected_catalog_metadata_file))
 
         # # Check that the ISO metadata file was created and filled in as expected
-        # expected_iso_metadata_file = join(
-        #     pge.runconfig.output_product_path, pge._iso_metadata_filename(tile_id='T10SGD'))
-        # self.assertTrue(os.path.exists(expected_iso_metadata_file))
-        #
-        # with open(expected_iso_metadata_file, 'r', encoding='utf-8') as infile:
-        #     iso_contents = infile.read()
-        #
-        # self.assertNotIn(UNDEFINED_ERROR, iso_contents)
+        expected_iso_metadata_file = join(
+            pge.runconfig.output_product_path, pge._iso_metadata_filename())
+        self.assertTrue(os.path.exists(expected_iso_metadata_file))
+
+        with open(expected_iso_metadata_file, 'r', encoding='utf-8') as infile:
+            iso_contents = infile.read()
+
+        self.assertNotIn(UNDEFINED_ERROR, iso_contents)
 
         # Check that the log file was created and moved into the output directory
         expected_log_file = pge.logger.get_file_name()
@@ -293,17 +294,21 @@ class DistS1PgeTestCase(unittest.TestCase):
         primary_executable_group['ProgramPath'] = 'echo'
         primary_executable_group['ProgramOptions'] = ['hello world']
 
-        product_id_1 = 'OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.0.1'
-        product_id_2 = 'OPERA_L3_DIST-ALERT-S1_T10SGD_20241105T015902Z_20241204T175000Z_S1_30_v0.0.1'
+        product_id_1 = 'OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.1'
+        product_id_2 = 'OPERA_L3_DIST-ALERT-S1_T10SGD_20241105T015902Z_20241204T175000Z_S1_30_v0.1'
 
         sample_bands = [
-            'OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.0.1_DATE-FIRST.tif',
-            'OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.0.1_GEN-METRIC.tif',
-            'OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.0.1_DATE-LATEST.tif',
-            'OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.0.1_N-DIST.tif',
-            'OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.0.1_DIST-STATUS-ACQ.tif',
-            'OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.0.1_N-OBS.tif',
-            'OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.0.1_DIST-STATUS.tif'
+            # These bands are always created
+            'OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.1_DIST-GEN-STATUS-ACQ.tif',
+            'OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.1_DIST-GEN-STATUS.tif',
+            'OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.1_GEN-METRIC.tif',
+            'OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.1.png',
+
+            # These bands depend on the conf db
+            'OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.1_DATE-FIRST.tif',
+            'OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.1_DATE-LATEST.tif',
+            'OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.1_N-DIST.tif',
+            'OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.1_N-OBS.tif',
         ]
 
         with open(test_runconfig_path, 'w', encoding='utf-8') as config_fh:
@@ -350,7 +355,7 @@ class DistS1PgeTestCase(unittest.TestCase):
 
             # Test: Not enough bands
 
-            band_data = tuple(sample_bands[:3])
+            band_data = tuple(sample_bands[1:])
 
             self.generate_band_data_output(product_id_1, band_data)
 
@@ -365,7 +370,7 @@ class DistS1PgeTestCase(unittest.TestCase):
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
 
-            self.assertIn("Incorrect number of output bands generated: 3", log_contents)
+            self.assertIn("Some required output bands are missing: [\'DIST-GEN-STATUS-ACQ\']", log_contents)
 
             # Test: Invalid band name
 

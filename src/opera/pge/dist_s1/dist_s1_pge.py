@@ -10,13 +10,15 @@ Module defining the implementation for the Surface Disturbance (DIST) from Senti
 
 import os
 import re
-from datetime import datetime
-from os.path import join, isdir, isfile, abspath
+from os.path import join, isdir, isfile, abspath, basename
 
 from opera.pge.base.base_pge import PreProcessorMixin, PgeExecutor, PostProcessorMixin
 from opera.util.dataset_utils import get_sensor_from_spacecraft_name
 from opera.util.error_codes import ErrorCode
+from opera.util.geo_utils import get_geographic_boundaries_from_mgrs_tile
 from opera.util.input_validation import check_input_list
+from opera.util.render_jinja2 import augment_measured_parameters, render_jinja2
+from opera.util.tiff_utils import get_geotiff_metadata
 from opera.util.time import get_time_for_filename
 
 
@@ -70,29 +72,28 @@ class DistS1PostProcessorMixin(PostProcessorMixin):
 
     _post_mixin_name = "DistS1PostProcessorMixin"
     _cached_core_filename = None
+
+    # May not need these since PGE produces 1 tile / execution
     _tile_metadata_cache = {}
     _tile_filename_cache = {}
-    _output_layer_names = ['DATE-FIRST', 'DATE-LATEST', 'DIST-STATUS-ACQ',
-                           'DIST-STATUS', 'GEN-METRIC', 'N-DIST', 'N-OBS']
+
+    # These layers are always produced and therefore must be present
+    _main_output_layer_names = ['DIST-GEN-STATUS-ACQ', 'DIST-GEN-STATUS', 'GEN-METRIC', 'BROWSE']
+
+    # The production of these layers depends on the confirmation DB and may be absent
+    _confirmation_db_output_layer_names = ['DATE-FIRST', 'DATE-LATEST', 'N-DIST', 'N-OBS']
+
+    _valid_layer_names = _main_output_layer_names + _confirmation_db_output_layer_names
 
     def _validate_outputs(self):
-        # TODO: Below is a pattern better aligned with the product spec. The uncommented pattern aligns with the current
-        #  SAS output
-        # product_id_pattern = (r'(?P<id>(?P<project>OPERA)_(?P<level>L3)_(?P<product_type>DIST)-(?P<source>S1)_'
-        #                       r'(?P<tile_id>T[^\W_]{5})_(?P<acquisition_ts>(?P<acq_year>\d{4})(?P<acq_month>\d{2})'
-        #                       r'(?P<acq_day>\d{2})T(?P<acq_hour>\d{2})(?P<acq_minute>\d{2})(?P<acq_second>\d{2})Z)_'
-        #                       r'(?P<creation_ts>(?P<cre_year>\d{4})(?P<cre_month>\d{2})(?P<cre_day>\d{2})T'
-        #                       r'(?P<cre_hour>\d{2})(?P<cre_minute>\d{2})(?P<cre_second>\d{2})Z)_(?P<sensor>S1[AC])_'
-        #                       r'(?P<spacing>30)_(?P<product_version>v\d+[.]\d+[.]\d+))')
-
-        product_id_pattern = (r'(?P<id>(?P<project>OPERA)_(?P<level>L3)_(?P<product_type>DIST-ALERT)-(?P<source>S1)_'
+        product_id_pattern = (r'(?P<id>(?P<project>OPERA)_(?P<level>L3)_(?P<product_type>DIST(-ALERT)?)-(?P<source>S1)_'
                               r'(?P<tile_id>T[^\W_]{5})_(?P<acquisition_ts>(?P<acq_year>\d{4})(?P<acq_month>\d{2})'
                               r'(?P<acq_day>\d{2})T(?P<acq_hour>\d{2})(?P<acq_minute>\d{2})(?P<acq_second>\d{2})Z)_'
                               r'(?P<creation_ts>(?P<cre_year>\d{4})(?P<cre_month>\d{2})(?P<cre_day>\d{2})T'
-                              r'(?P<cre_hour>\d{2})(?P<cre_minute>\d{2})(?P<cre_second>\d{2})Z)_(?P<sensor>S1)_'
-                              r'(?P<spacing>30)_(?P<product_version>v\d+[.]\d+[.]\d+))')
+                              r'(?P<cre_hour>\d{2})(?P<cre_minute>\d{2})(?P<cre_second>\d{2})Z)_(?P<sensor>S1[AC]?)_'
+                              r'(?P<spacing>30)_(?P<product_version>v\d+[.]\d+))')
 
-        granule_filename_pattern = (product_id_pattern + rf'((_(?P<layer_name>{"|".join(self._output_layer_names)}))|'
+        granule_filename_pattern = (product_id_pattern + rf'((_(?P<layer_name>{"|".join(self._valid_layer_names)}))|'
                                                          r'_BROWSE)?[.](?P<ext>tif|tiff|png)$')
 
         product_id = re.compile(product_id_pattern + r'$')
@@ -115,18 +116,39 @@ class DistS1PostProcessorMixin(PostProcessorMixin):
                         if match_result is None:  # or match_result.groupdict()['ext'] != 'tif':
                             error_msg = f'Invalid product filename {granule}'
                             self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
-                        elif os.stat(granule_path).st_size == 0:
+
+                        match_dict = match_result.groupdict()
+
+                        if match_dict['layer_name'] is None and match_dict['ext'] == 'png':
+                            match_dict['layer_name'] = 'BROWSE'
+
+                        if os.stat(granule_path).st_size == 0:
                             error_msg = f'Output file {granule_path} is empty.'
                             self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
-                        elif match_result.groupdict()['layer_name'] not in self._output_layer_names:
-                            error_msg = f'Invalid layer name "{match_result.groupdict()["layer_name"]}" in output.'
+                        elif match_dict['layer_name'] not in self._valid_layer_names:
+                            error_msg = f'Invalid layer name "{match_dict["layer_name"]}" in output.'
                             self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
 
                         bands.append(granule_path)
-                        generated_band_names.append(match_result.groupdict()['layer_name'])
+                        generated_band_names.append(match_dict['layer_name'])
 
-                if len(bands) != len(self._output_layer_names):
-                    error_msg = f'Incorrect number of output bands generated: {len(generated_band_names)}'
+                        tile_id = match_dict['tile_id']
+                        file_id = match_dict['id']
+
+                        if tile_id not in self._tile_metadata_cache:
+                            dist_metadata = self._collect_dist_s1_product_metadata(granule_path)
+                            self._tile_metadata_cache[tile_id] = dist_metadata
+
+                        if file_id not in self._tile_filename_cache:
+                            self._tile_filename_cache[tile_id] = file_id
+
+                # Not sure how I should do this validation... The bands in self._confirmation_db_output_layer_names
+                # are only created if the confirmation db is available (& might still be missing on initial runs
+                # with it available?)
+                missing_main_output_bands = set(self._main_output_layer_names).difference(set(generated_band_names))
+
+                if len(missing_main_output_bands) > 0:
+                    error_msg = f'Some required output bands are missing: {list(missing_main_output_bands)}'
                     self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
 
                 output_products.append(dir_path)
@@ -239,35 +261,174 @@ class DistS1PostProcessorMixin(PostProcessorMixin):
         """
         return self._ancillary_filename() + ".qa.log"
 
-    # TODO: Figure out how we want to approach this
-    # def _iso_metadata_filename(self, tile_id):
-    #     """
-    #     Returns the file name to use for ISO Metadata produced by the DIST-S1 PGE.
-    #
-    #     The ISO Metadata file name for the DIST-S1 PGE consists of:
-    #
-    #         <DIST-S1 filename>.iso.xml
-    #
-    #     Where <DIST-S1 filename> is returned by DistS1PostProcessorMixin. [TODO: put proper method here]
-    #
-    #     Parameters
-    #     ----------
-    #     tile_id : str
-    #         The MGRS tile identifier used to look up the corresponding cached
-    #         DIST-S1 file name.
-    #
-    #     Returns
-    #     -------
-    #     <iso metadata filename> : str
-    #         The file name to assign to the ISO Metadata product created by this PGE.
-    #
-    #     """
-    #     if tile_id not in self._tile_filename_cache:
-    #         raise RuntimeError(f"No file name cached for tile ID {tile_id}")
-    #
-    #     iso_metadata_filename = self._tile_filename_cache[tile_id]
-    #
-    #     return iso_metadata_filename + ".iso.xml"
+    def _iso_metadata_filename(self):
+        """
+        Returns the file name to use for ISO Metadata produced by the DIST-S1 PGE.
+
+        The ISO Metadata file name for the DIST-S1 PGE consists of:
+
+            <DIST-S1 filename>.iso.xml
+
+        Where <DIST-S1 filename> is:
+
+        <PROJECT>_<LEVEL>_<PGE NAME>_<TILE ID>_<ACQ TIMESTAMP>_<PROD TIMETAG>_<SENSOR>_<SPACING>_<PRODUCT VERSION>
+
+        Returns
+        -------
+        <iso metadata filename> : str
+            The file name to assign to the ISO Metadata product created by this PGE.
+
+        """
+        # Since we only produce 1 tile each execution, we only have one tile ID in here
+        tile_id = list(self._tile_filename_cache.keys())[0]
+
+        iso_metadata_filename = self._tile_filename_cache[tile_id]
+
+        return iso_metadata_filename + ".iso.xml"
+
+    def _collect_dist_s1_product_metadata(self, geotiff_product):
+        """
+        Gathers the available metadata from an output DIST-S1 product for
+        use in filling out the ISO metadata template for the DIST-S1 PGE.
+
+        Parameters
+        ----------
+        geotiff_product : str
+            Path the GeoTIFF product to collect metadata from.
+
+        Returns
+        -------
+        output_product_metadata : dict
+            Dictionary containing DIST-S1 output product metadata, formatted
+            for use with the ISO metadata Jinja2 template.
+        """
+        output_product_metadata = dict()
+
+        try:
+            measured_parameters = get_geotiff_metadata(geotiff_product)
+            output_product_metadata['MeasuredParameters'] = augment_measured_parameters(
+                measured_parameters,
+                self.runconfig.iso_measured_parameter_descriptions,
+                self.logger
+            )
+        except Exception as err:
+            msg = f'Failed to extract metadata from {geotiff_product}, reason: {err}'
+            self.logger.critical(self.name, ErrorCode.ISO_METADATA_COULD_NOT_EXTRACT_METADATA, msg)
+
+        # Get the Military Grid Reference System (MGRS) tile code and zone
+        # identifier from the intermediate file name
+        mgrs_tile_id = basename(geotiff_product).split('_')[3]
+
+        output_product_metadata['tileCode'] = mgrs_tile_id
+        output_product_metadata['zoneIdentifier'] = mgrs_tile_id[:2]
+
+        # Translate the MGRS tile ID to a lat/lon bounding box
+        (lat_min,
+         lat_max,
+         lon_min,
+         lon_max) = get_geographic_boundaries_from_mgrs_tile(mgrs_tile_id)
+
+        output_product_metadata['geospatial_lon_min'] = lon_min
+        output_product_metadata['geospatial_lon_max'] = lon_max
+        output_product_metadata['geospatial_lat_min'] = lat_min
+        output_product_metadata['geospatial_lat_max'] = lat_max
+
+        # Add some fields on the dimensions of the data. These values should
+        # be the same for all DIST-S1 products, and were derived from the
+        # ADT product spec
+        output_product_metadata['xCoordinates'] = {
+            'size': 3600,  # pixels
+            'spacing': 30  # meters/pixel
+        }
+        output_product_metadata['yCoordinates'] = {
+            'size': 3600,  # pixels
+            'spacing': 30  # meters/pixel
+        }
+
+        return output_product_metadata
+
+    def _create_custom_metadata(self, tile_filename):
+        """
+        Creates the "custom data" dictionary used with the ISO metadata rendering.
+
+        Custom data contains all metadata information needed for the ISO template
+        that is not found within any of the other metadata sources (such as the
+        RunConfig, output product(s), or catalog metadata).
+
+        Parameters
+        ----------
+        tile_filename : str
+            Tile filename to be used as the granule identifier within the
+            custom metadata.
+
+        Returns
+        -------
+        custom_metadata : dict
+            Dictionary containing the custom metadata as expected by the ISO
+            metadata Jinja2 template.
+
+        """
+        custom_metadata = {
+            'ISO_OPERA_FilePackageName': tile_filename,
+            'ISO_OPERA_ProducerGranuleId': tile_filename,
+            'MetadataProviderAction': "creation",
+            'GranuleFilename': tile_filename,
+            'ISO_OPERA_ProjectKeywords': ['OPERA', 'JPL', 'DIST', 'Surface', 'Disturbance'],
+            'ISO_OPERA_PlatformKeywords': ['S1'],
+            'ISO_OPERA_InstrumentKeywords': ['Sentinel 1 A/C']
+        }
+
+        return custom_metadata
+
+    def _create_iso_metadata(self):
+        """
+        Creates a rendered version of the ISO metadata template for DIST-S1
+        output products using metadata from the following locations:
+
+            * RunConfig (in dictionary form)
+            * Output product (dictionary extracted from HDF5 product, per-tile)
+            * Catalog metadata
+            * "Custom" metadata (all metadata not found anywhere else)
+
+        Returns
+        -------
+        rendered_template : str
+            The ISO metadata template for DSWX-S1 filled in with values from
+            the sourced metadata dictionaries.
+
+        """
+        # Use the base PGE implemenation to validate existence of the template
+        super()._create_iso_metadata()
+
+        # Since we only produce 1 tile each execution, we only have one tile ID in here
+        tile_id = list(self._tile_metadata_cache.keys())[0]
+
+        if tile_id not in self._tile_metadata_cache or tile_id not in self._tile_filename_cache:
+            raise RuntimeError(f"No file name or metadata cached for tile ID {tile_id}")
+
+        tile_metadata = self._tile_metadata_cache[tile_id]
+        tile_filename = self._tile_filename_cache[tile_id]
+
+        runconfig_dict = self.runconfig.asdict()
+
+        product_output_dict = tile_metadata
+
+        catalog_metadata_dict = self._create_catalog_metadata().asdict()
+
+        custom_data_dict = self._create_custom_metadata(tile_filename)
+
+        iso_metadata = {
+            'run_config': runconfig_dict,
+            'product_output': product_output_dict,
+            'catalog_metadata': catalog_metadata_dict,
+            'custom_data': custom_data_dict
+        }
+
+        iso_template_path = abspath(self.runconfig.iso_template_path)
+
+        rendered_template = render_jinja2(iso_template_path, iso_metadata, self.logger)
+
+        return rendered_template
 
     def run_postprocessor(self, **kwargs):
         """
@@ -302,7 +463,7 @@ class DistS1Executor(DistS1PreProcessorMixin, DistS1PostProcessorMixin, PgeExecu
     LEVEL = "L3"
     """Processing Level for DIST-S1 Products"""
 
-    SAS_VERSION = "0.0.3"  # Beta release https://github.com/opera-adt/dist-s1/releases/tag/v0.0.3
+    SAS_VERSION = "0.0.6"  # Beta release https://github.com/opera-adt/dist-s1/releases/tag/v0.0.3
     """Version of the SAS wrapped by this PGE, should be updated as needed"""
 
     def __init__(self, pge_name, runconfig_path, **kwargs):

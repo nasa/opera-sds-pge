@@ -232,6 +232,46 @@ class MockGdal:  # pragma: no cover
             """
             return deepcopy(self.dummy_metadata)
 
+    class MockDistS1GdalDataset:
+        """
+        Mock class for gdal.Dataset objects, as returned from an Open call.
+        For use when mocking metadata from DIST-S1 GeoTIFF products
+        """
+
+        def __init__(self):
+            self.dummy_metadata = {
+                'apply_water_mask': 'False',
+                'bucket': 'None',
+                'dst_dir': '/home/ops/scratch_dir',
+                'high_confidence_threshold': '5.5',
+                'memory_strategy': 'high',
+                'mgrs_tile_id': '10SGD',
+                'moderate_confidence_threshold': '3.5',
+                'n_lookbacks': '3',
+                'n_workers_for_despeckling': '5',
+                'post_rtc_opera_ids': 'OPERA_L2_RTC-S1_T137-292318-IW1_20250102T015857Z_20250102T190143Z_S1A_30_v1.0,'
+                                      'OPERA_L2_RTC-S1_T137-292318-IW2_20250102T015858Z_20250102T190143Z_S1A_30_v1.0,'
+                                      'OPERA_L2_RTC-S1_T137-292319-IW1_20250102T015900Z_20250102T190143Z_S1A_30_v1.0,'
+                                      'OPERA_L2_RTC-S1_T137-292319-IW2_20250102T015901Z_20250102T190143Z_S1A_30_v1.0,'
+                                      'OPERA_L2_RTC-S1_T137-292320-IW1_20250102T015903Z_20250102T190143Z_S1A_30_v1.0',
+                'pre_rtc_opera_ids': 'OPERA_L2_RTC-S1_T137-292318-IW1_20240904T015900Z_20240904T150822Z_S1A_30_v1.0,'
+                                     'OPERA_L2_RTC-S1_T137-292318-IW1_20240916T015901Z_20240916T114330Z_S1A_30_v1.0,'
+                                     'OPERA_L2_RTC-S1_T137-292318-IW1_20240928T015901Z_20240929T005548Z_S1A_30_v1.0,'
+                                     'OPERA_L2_RTC-S1_T137-292318-IW1_20241010T015902Z_20241010T101259Z_S1A_30_v1.0,'
+                                     'OPERA_L2_RTC-S1_T137-292318-IW1_20241022T015902Z_20241022T180854Z_S1A_30_v1.0',
+                'product_dst_dir': '/home/ops/output_dir',
+                'tqdm_enabled': 'True',
+                'version': '0.0.6',
+                'water_mask_path': 'None'
+            }
+
+        def GetMetadata(self):
+            """
+            Returns a subset of dummy metadata expected by the PGE.
+            This function should be updated as needed for requisite metadata fields.
+            """
+            return deepcopy(self.dummy_metadata)
+
     @staticmethod
     def Open(filename):
         """Mock implementation for gdal.Open. Returns an instance of the mock Dataset."""
@@ -248,8 +288,12 @@ class MockGdal:  # pragma: no cover
             return MockGdal.MockDSWxNIGdalDataset()
         elif 'rtc_s1' in file_name or 'rtc-s1' in file_name:
             return MockGdal.MockRtcS1GdalDataset()
-        else:
+        elif 'dist_alert_s1' in file_name or 'dist-alert-s1' in file_name:
+            return MockGdal.MockDistS1GdalDataset()
+        elif 'dswx_hls' in file_name or 'dswx-hls' in file_name:
             return MockGdal.MockDSWxHLSGdalDataset()
+        else:
+            raise ValueError(f'Filename does not appear to match existing mock GDAL datasets')
 
 
 def mock_gdal_edit(args):
