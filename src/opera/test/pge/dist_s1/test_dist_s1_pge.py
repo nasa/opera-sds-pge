@@ -16,13 +16,16 @@ import unittest
 from io import StringIO
 from os.path import abspath, join
 from pathlib import Path
+from unittest.mock import patch
 
 import yaml
 from pkg_resources import resource_filename
 
+import opera.util.tiff_utils
 from opera.pge import RunConfig
 from opera.pge.dist_s1.dist_s1_pge import DistS1Executor
 from opera.util import PgeLogger
+from opera.util.mock_utils import MockGdal
 from opera.util.render_jinja2 import UNDEFINED_ERROR
 
 
@@ -123,6 +126,7 @@ class DistS1PgeTestCase(unittest.TestCase):
             else:
                 os.system(f"touch {join(dir_path, band_output_file)}")
 
+    @patch.object(opera.util.tiff_utils, "gdal", MockGdal)
     def test_dist_s1_pge_execution(self):
         """
         Test execution of the DistS1Executor class and its associated mixins
@@ -280,6 +284,7 @@ class DistS1PgeTestCase(unittest.TestCase):
             if os.path.exists('temp'):
                 shutil.rmtree('temp')
 
+    @patch.object(opera.util.tiff_utils, "gdal", MockGdal)
     def test_dist_s1_pge_output_validation(self):
         """Test the output validation checks made by DistS1PreProcessorMixin."""
         runconfig_path = join(self.data_dir, 'test_dist_s1_config.yaml')
