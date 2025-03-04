@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 """Compare DIST products"""
 import argparse
-import os
 
-import numpy as np
+from dist_s1.data_models.output_models import ProductDirectoryData
 
 
 def _get_parser():
@@ -34,9 +33,13 @@ def main():
 
     args = parser.parse_args()
 
-    print(f'Placeholder comparison between {args.expected_product} and {args.test_product}')
+    expected_product = ProductDirectoryData.from_product_path(args.expected_product)
+    test_product = ProductDirectoryData.from_product_path(args.test_product)
 
-    print('[FAIL] Simulating comp failure')
+    if expected_product == test_product:
+        print('[OK] Products are equal')
+    else:
+        print('[FAIL] Products are not equal')
 
 
 if __name__ == '__main__':
