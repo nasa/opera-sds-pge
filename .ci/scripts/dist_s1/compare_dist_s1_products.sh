@@ -121,7 +121,7 @@ do
   output_product=$(basename -- "$output_product")
 
   # Parse the tile code from the filename
-  IFS='_' read -ra ARR <<< "$output_file"
+  IFS='_' read -ra ARR <<< "$output_product"
   tile_code=${ARR[3]}
 
   for potential_product in $(find $EXPECTED_DIR -maxdepth 1 -mindepth 1 -type d)
@@ -146,10 +146,10 @@ do
   fi
 
   if [[ "$compare_output" != *"FAIL"* ]]; then
-      echo "Product validation was successful for $output_file"
+      echo "Product validation was successful for $output_product"
       compare_result="PASS"
   else
-      echo "Failure: Some comparisons failed for $output_file"
+      echo "Failure: Some comparisons failed for $output_product"
       compare_result="FAIL"
       overall_status=2
   fi
@@ -157,7 +157,7 @@ do
   # add html breaks to newlines
   compare_output=${compare_output//$'\n'/<br>$'\n'}
 
-  update_html_results_file "${compare_result}" "${output_file}" "${expected_file}" "${compare_output}"
+  update_html_results_file "${compare_result}" "${$output_product}" "${expected_file}" "${compare_output}"
 done
 
 finalize_html_results_file
