@@ -361,7 +361,7 @@ RunConfig:
 
       QAExecutable:
         Enabled: True
-        ProgramPath: /home/dswx_user/opera/.ci/scripts/dist_s1/compare_dist_s1_products.sh
+        ProgramPath: /home/ops/opera/.ci/scripts/dist_s1/compare_dist_s1_products.sh
         ProgramOptions: []
 
       DebugLevelGroup:
