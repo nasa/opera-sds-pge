@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compare DSWX products"""
+"""Compare DIST products"""
 import argparse
 import os
 

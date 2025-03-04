@@ -1,5 +1,5 @@
 #!/bin/bash
-# Script to execute integration tests on OPERA DSWx-S1 PGE Docker image
+# Script to execute integration tests on OPERA DIST-S1 PGE Docker image
 #
 set -e
 umask 002
@@ -24,8 +24,8 @@ SAMPLE_TIME=1
 
 # defaults, test data and runconfig files should be updated as-needed to use
 # the latest available as defaults for use with the Jenkins pipeline call
-# INPUT/OUTPUT_DATA should be the name of the corresponding archives in s3://operasds-dev-pge/dswx_s1/
-# RUNCONFIG should be the name of the runconfig in s3://operasds-dev-pge/dswx_s1/
+# INPUT/OUTPUT_DATA should be the name of the corresponding archives in s3://operasds-dev-pge/dist_s1/
+# RUNCONFIG should be the name of the runconfig file  in <repo_root>/.ci/scripts/dist-s1/
 [ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath "$(dirname "$(realpath "$0")")"/../../..)
 [ -z "${PGE_TAG}" ] && PGE_TAG="${USER}-dev"
 [ -z "${INPUT_DATA}" ] && INPUT_DATA="dist_s1_beta_0.0.6_expected_input.zip "
@@ -108,7 +108,7 @@ metrics_collection_end "$PGE_NAME" "$container_name" "$docker_exit_status" "$TES
 # by Jenkins with the other results
 cp "${output_dir}"/*.log "${TEST_RESULTS_DIR}"
 # Copy the results.html file to the same directory
-cp "${output_dir}"/test_int_dswx_s1_results.html "${TEST_RESULTS_DIR}"/test_int_dist_s1_results.html
+cp "${output_dir}"/test_int_dist_s1_results.html "${TEST_RESULTS_DIR}"/test_int_dist_s1_results.html
 
 if [ $docker_exit_status -ne 0 ]; then
     echo "docker exit indicates failure: ${docker_exit_status}"

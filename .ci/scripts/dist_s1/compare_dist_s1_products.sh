@@ -78,7 +78,7 @@ initialize_html_results_file "$OUTPUT_DIR" "$PGE_NAME"
 #      else
 #         # compare output and expected files
 #         echo "python3 dist_s1_compare.py $(basename -- ${expected_file}) ${output_file}"
-#         compare_output=$(python3 $SCRIPT_DIR/dswx_comparison.py ${expected_file} $OUTPUT_DIR/${output_file})
+#         compare_output=$(python3 $SCRIPT_DIR/dist_comparison.py ${expected_file} $OUTPUT_DIR/${output_file})
 #         echo "$compare_output"
 #      fi
 #
@@ -134,7 +134,7 @@ do
   else
      # compare output and expected files
      echo "python3 dist_s1_compare.py $(basename -- ${expected_product}) ${output_product}"
-     compare_output=$(python3 $SCRIPT_DIR/dswx_comparison.py ${expected_product} $OUTPUT_DIR/${output_product})
+     compare_output=$(python3 $SCRIPT_DIR/dist_s1_compare.py ${expected_product} $OUTPUT_DIR/${output_product})
      echo "$compare_output"
   fi
 
