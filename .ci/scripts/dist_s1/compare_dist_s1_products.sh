@@ -27,6 +27,13 @@ fi
 
 initialize_html_results_file "$OUTPUT_DIR" "$PGE_NAME"
 
+# overall_status values and their meaning
+# 0 - pass
+# 1 - failure to execute some part of this script
+# 2 - product validation failure
+overall_status=0
+
+
 # TODO: Should the PGE flatten the output?
 
 # TODO: Just realized the below loop doesn't really work with the current compare script (but should be kept since
