@@ -35,11 +35,6 @@ RunConfig:
         # Map of ancillary file types to paths to the file
         # Paths must correspond to the file system within the Docker container
         AncillaryFileMap:
-          # Path to the Digital Elevation Model
-          # Must be either a single .tif, or a .vrt that points to one
-          # or more .tif files
-          dem_file: /home/mamba/input_dir/dem.tif
-
           # Path to the reference water mask file
           # Must be either a single .tif, .flg, or a .vrt that points to one
           # or more .tif files
@@ -184,9 +179,6 @@ RunConfig:
         #   data.
         #   Type: array.
         mask_file: /home/mamba/input_dir/watermask.tif
-        # Path to the DEM file covering full frame.
-        #   Type: string.
-        dem_file: /home/mamba/input_dir/dem.tif
         # List of Paths to TEC files in IONEX format for ionosphere correction.
         #   Type: string.
         ionosphere_files:
