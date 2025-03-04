@@ -635,6 +635,18 @@ def create_test_disp_metadata_product(
         ceos_analysis_ready_data_document_identifier_dset = identification_grp.create_dataset(
             "ceos_analysis_ready_data_document_identifier",
             data=np.bytes_("https://ceos.org/ard/files/PFS/NRB/v5.5/CARD4L-PFS_NRB_v5.5.pdf"))
+        source_data_processing_facility_dset = identification_grp.create_dataset(
+            "source_data_processing_facility",
+            data=np.bytes_("NASA Jet Propulsion Laboratory on AWS")
+        )
+        source_data_imaging_geometry_dset = identification_grp.create_dataset(
+            "source_data_imaging_geometry",
+            data=np.bytes_("Geocoded")
+        )
+        source_data_acquisition_polarization_dset = identification_grp.create_dataset(
+            "source_data_acquisition_polarization",
+            data=np.bytes_("VV/VH")
+        )
         source_data_access_dset = identification_grp.create_dataset(
             "source_data_access",
             data=np.bytes_(
@@ -649,6 +661,8 @@ def create_test_disp_metadata_product(
                                                                            dtype='float32')
         product_sample_spacing_dset = identification_grp.create_dataset("product_sample_spacing", data=30,
                                                                         dtype='int64')
+        nodata_pixel_count_dset = identification_grp.create_dataset("nodata_pixel_count", data=65399573,
+                                                                    dtype='int64')
         product_bounding_box_dset = identification_grp.create_dataset("product_bounding_box", data=np.bytes_(
             "280230.0,3555240.0,572310.0,3767970.0"))
         product_pixel_coordinate_convention_dset = identification_grp.create_dataset(
@@ -672,6 +686,7 @@ def create_test_disp_metadata_product(
             "NASA Jet Propulsion Laboratory on AWS"))
         processing_start_datetime_dset = identification_grp.create_dataset("processing_start_datetime",
                                                                            data=np.bytes_("2025-01-17 22:47:38"))
+        product_data_polarization_dset = identification_grp.create_dataset("product_data_polarization", data=np.bytes_("VV"))
         product_data_access_dset = identification_grp.create_dataset("product_data_access", data=np.bytes_(
             "https://search.asf.alaska.edu/#/?dataset=OPERA-S1&productTypes=DISP-S1"))
         radar_center_frequency_dset = identification_grp.create_dataset("radar_center_frequency", data=5405000454.33435,
@@ -726,6 +741,10 @@ def create_test_disp_metadata_product(
         radar_band_dset = identification_grp.create_dataset("radar_band", data=np.bytes_("C"))
 
         metadata_grp = outfile.create_group("/metadata")
+        product_landing_page_doi_dset = metadata_grp.create_dataset(
+            "product_landing_page_doi",
+            data=np.bytes_("https://doi.org/10.5067/SNWG/OPL3DISPS1-V1")
+        )
         disp_s1_software_version_dset = metadata_grp.create_dataset("disp_s1_software_version",
                                                                     data=np.bytes_("0.2.7"))
         dolphin_software_version_dset = metadata_grp.create_dataset("dolphin_software_version",
@@ -736,17 +755,38 @@ def create_test_disp_metadata_product(
                                                                      data=np.bytes_(algorithm_parameters_contents))
         dolphin_workflow_config_dset = metadata_grp.create_dataset("dolphin_workflow_config",
                                                                    data=np.bytes_(dolphin_workflow_config_contents))
-
-        algorithm_theoretical_basis_document_id_dset = metadata_grp.create_dataset(
-            "algorithm_theoretical_basis_document_id", data=np.bytes_("JPL D-108765"))
+        algorithm_theoretical_basis_document_doi_dset = metadata_grp.create_dataset(
+            "algorithm_theoretical_basis_document_doi", data=np.bytes_("https://doi.org/10.5067/SNWG/OPL3DISPS1-V1"))
+        ceos_product_measurement_projection_dset = metadata_grp.create_dataset(
+            "ceos_product_measurement_projection", data=np.bytes_("line of sight"))
         ceos_atmospheric_phase_correction_dset = metadata_grp.create_dataset("ceos_atmospheric_phase_correction",
                                                                              data=np.bytes_("None"))
         ceos_gridding_convention_dset = metadata_grp.create_dataset("ceos_gridding_convention", data=np.bytes_("Yes"))
         ceos_insar_pair_baseline_criteria_information_dset = metadata_grp.create_dataset(
             "ceos_insar_pair_baseline_criteria_information", data=np.bytes_("All"))
+        ceos_insar_azimuth_common_band_filtering_dset = metadata_grp.create_dataset(
+            "ceos_insar_azimuth_common_band_filtering", data=np.bytes_("False"))
+        ceos_insar_range_spectral_shift_filtering_dset = metadata_grp.create_dataset(
+            "ceos_insar_range_spectral_shift_filtering", data=np.bytes_("False"))
+        ceos_insar_orbital_baseline_refinement_dset = metadata_grp.create_dataset(
+            "ceos_insar_orbital_baseline_refinement", data=np.bytes_("False"))
+        ceos_shp_selection_selection_criteria_dset = metadata_grp.create_dataset(
+            "ceos_shp_selection_selection_criteria", data=np.bytes_("glrt"))
+        ceos_shp_selection_window_size = metadata_grp.create_dataset(
+            "ceos_shp_selection_window_size", data=np.bytes_("11x23"))
+        ceos_shp_selection_selection_threshold = metadata_grp.create_dataset(
+            "ceos_shp_selection_selection_threshold", data=0.001, dtype="float64")
         ceos_ionospheric_phase_correction_dset = metadata_grp.create_dataset("ceos_ionospheric_phase_correction",
                                                                              data=np.bytes_("None"))
         ceos_noise_removal_dset = metadata_grp.create_dataset("ceos_noise_removal", data=np.bytes_("No"))
+        ceos_absolute_geolocation_ground_range_bias_dset = metadata_grp.create_dataset(
+            "ceos_absolute_geolocation_ground_range_bias", data=-0.06, dtype="float64")
+        ceos_absolute_geolocation_ground_range_stddev_dset = metadata_grp.create_dataset(
+            "ceos_absolute_geolocation_ground_range_stddev", data=0.38, dtype="float64")
+        ceos_absolute_geolocation_azimuth_bias_dset = metadata_grp.create_dataset(
+            "ceos_absolute_geolocation_azimuth_bias", data=-0.04, dtype="float64")
+        ceos_absolute_geolocation_azimuth_stddev_dset = metadata_grp.create_dataset(
+            "ceos_absolute_geolocation_azimuth_stddev", data=0.46, dtype="float64")
         ceos_persistent_scatterer_amplitude_dispersion_threshold_dset = metadata_grp.create_dataset(
             "ceos_persistent_scatterer_amplitude_dispersion_threshold", data=0.15, dtype="float64")
         ceos_persistent_scatterer_selection_criteria_dset = metadata_grp.create_dataset(
@@ -758,13 +798,16 @@ def create_test_disp_metadata_product(
             data=np.bytes_(
                 "https://doi.org/10.1109/TGRS.2022.3210868")
         )
+        ceos_estimated_phase_quality_metric_algorithm_dset = metadata_grp.create_dataset(
+            "ceos_estimated_phase_quality_metric_algorithm", data=np.bytes_("Gaussian filtering"))
         ceos_phase_unwrapping_method_dset = metadata_grp.create_dataset("ceos_phase_unwrapping_method",
                                                                         data=np.bytes_("UnwrapMethod.SNAPHU"))
         ceos_phase_unwrapping_snaphu_doi_dset = metadata_grp.create_dataset(
-            "ceos_phase_unwrapping_snaphu_doi",
-            data=np.bytes_(
-                "https://doi.org/10.1364/JOSAA.18.000338")
-        )
+            "ceos_phase_unwrapping_snaphu_doi",data=np.bytes_("https://doi.org/10.1364/JOSAA.18.000338"))
+        ceos_phase_unwrapping_spurt_doi_dset = metadata_grp.create_dataset(
+            "ceos_phase_unwrapping_spurt_doi", data=np.bytes_("'https://doi.org/10.1016/j.rse.2023.113456'"))
+        ceos_phase_unwrapping_similarity_threshold_dset = metadata_grp.create_dataset(
+            "ceos_phase_unwrapping_similarity_threshold", data=0.4, dtype="float64")
         product_pixel_coordinate_convention_dset = metadata_grp.create_dataset("product_pixel_coordinate_convention",
                                                                                data=np.bytes_("center"))
         product_specification_document_id_dset = metadata_grp.create_dataset("product_specification_document_id",
