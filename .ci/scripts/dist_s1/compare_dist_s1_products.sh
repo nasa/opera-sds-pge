@@ -126,7 +126,7 @@ do
     fi
   done
 
-  if [ ! -f "$expected_product" ]; then
+  if [ ! -d "$expected_product" ]; then
     echo "No matching product found in expected directory $EXPECTED_DIR"
     overall_status=1
     compare_result="FAIL"
