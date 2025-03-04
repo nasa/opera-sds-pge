@@ -36,6 +36,8 @@ def main():
 
     print(f'Placeholder comparison between {args.expected_product} and {args.test_product}')
 
+    print('[FAIL] Simulating comp failure')
+
 
 if __name__ == '__main__':
     main()

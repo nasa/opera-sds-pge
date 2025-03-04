@@ -111,8 +111,15 @@ cp "${output_dir}"/*.log "${TEST_RESULTS_DIR}"
 cp "${output_dir}"/test_int_dist_s1_results.html "${TEST_RESULTS_DIR}"/test_int_dist_s1_results.html
 
 if [ $docker_exit_status -ne 0 ]; then
-    echo "docker exit indicates failure: ${docker_exit_status}"
-    overall_status=1
+  echo "docker exit indicates failure: ${docker_exit_status}"
+  overall_status=1
+else
+  # Retrieve the return code written to disk by the comparison script
+  test_status=$(cat "$output_dir/compare_dist_s1_products.rc")
+
+  if [ $test_status -ne 0 ]; then
+    overall_status=$test_status
+  fi
 fi
 
 echo " "
