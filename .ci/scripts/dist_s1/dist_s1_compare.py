@@ -5,6 +5,7 @@ import os
 
 import numpy as np
 
+
 def _get_parser():
     parser = argparse.ArgumentParser(
         description="Compare two DIST-S1 products",
