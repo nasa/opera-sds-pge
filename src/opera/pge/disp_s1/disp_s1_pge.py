@@ -618,7 +618,9 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
                 'ProductLevel': 3,
                 'ProductType': 'DISP-S1',
                 'ProductSource': 'Sentinel-1',
-                'ProcessingDateTime': get_catalog_metadata_datetime_str(self.production_datetime)
+                'ProcessingDateTime': get_catalog_metadata_datetime_str(self.production_datetime),
+                'StartTime': output_product_metadata['identification']['secondary_zero_doppler_start_time'],
+                'EndTime': output_product_metadata['identification']['secondary_zero_doppler_end_time']
             }
 
             output_product_metadata['MeasuredParameters'] = augment_hdf5_measured_parameters(
