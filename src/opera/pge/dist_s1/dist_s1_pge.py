@@ -446,6 +446,7 @@ class DistS1PostProcessorMixin(PostProcessorMixin):
         print(f'Running postprocessor for {self._post_mixin_name}')
 
         self._validate_outputs()
+        self._run_sas_qa_executable()
         self._stage_output_files()
 
 
