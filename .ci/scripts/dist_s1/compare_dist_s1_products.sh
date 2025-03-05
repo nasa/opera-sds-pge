@@ -37,7 +37,7 @@ for output_product in $(find $OUTPUT_DIR -maxdepth 1 -mindepth 1 -type d)
 do
   compare_output="N/A"
   compare_result="N/A"
-  expected_file="N/A"
+  expected_product="N/A"
 
   echo "output_product $output_product"
   output_product=$(basename -- "$output_product")
