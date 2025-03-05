@@ -353,7 +353,6 @@ RunConfig:
         ProgramOptions:
           - run_sas
           - --runconfig_yml_path
-#          - /home/ops/runconfig_dir/runconfig.yaml
         ErrorCodeBase: 700000
         SchemaPath: /home/ops/opera/pge/dist_s1/schema/dist_s1_sas_schema.yaml
         IsoTemplatePath: /home/ops/opera/pge/dist_s1/templates/OPERA_ISO_metadata_L3_DIST_S1_template.xml.jinja2
@@ -713,6 +712,6 @@ RunConfig:
         n_lookbacks: 3
         moderate_confidence_threshold: 3.5
         high_confidence_threshold: 5.5
-        product_dst_dir: /home/ops/output_dir  # want to check this is separate directory
+        product_dst_dir: /home/ops/output_dir
         bucket:
         bucket_prefix: ''
