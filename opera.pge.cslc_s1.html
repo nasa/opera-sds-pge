@@ -146,31 +146,6 @@ execution has completed, prior to handover of output products to PCM.</p>
 mixin adds an output validation step to ensure that the output file(s) defined
 by the RunConfig exist and are valid.</p>
 <dl class="py method">
-<dt class="sig sig-object py" id="opera.pge.cslc_s1.cslc_s1_pge.CslcS1PostProcessorMixin.augment_measured_parameters">
-<span class="sig-name descname"><span class="pre">augment_measured_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">measured_parameters</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/opera/pge/cslc_s1/cslc_s1_pge.html#CslcS1PostProcessorMixin.augment_measured_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opera.pge.cslc_s1.cslc_s1_pge.CslcS1PostProcessorMixin.augment_measured_parameters" title="Permalink to this definition"></a></dt>
-<dd><p>Override of the augment_measured_parameters() method in Base PGE with an added
-“preprocessing” step to handle the structure of HDF5 metadata. While GeoTIFF
-metadata is a flat dictionary, HDF5 metadata is a nested dictionary structure,
-wherein the variable “keys” can be arbitrarily deep into the structure and
-the values likewise can be nested dictionaries.</p>
-<p>The preprocessing step in this method selectively flattens the metadata
-dictionary based on the “paths” provided in the variable keys of the configuration
-YAML file. The result of this preprocessing is then safely passed to the base
-method to get the correct structure expected by the Jinja template.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>measured_parameters</strong> (<em>dict</em>) – The HDF5 metadata from the output product. See get_cslc_s1_product_metadata()</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>augmented_parameters</strong> – The metadata fields converted to a list with name, value, types, etc</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dict</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="opera.pge.cslc_s1.cslc_s1_pge.CslcS1PostProcessorMixin.run_postprocessor">
 <span class="sig-name descname"><span class="pre">run_postprocessor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/opera/pge/cslc_s1/cslc_s1_pge.html#CslcS1PostProcessorMixin.run_postprocessor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opera.pge.cslc_s1.cslc_s1_pge.CslcS1PostProcessorMixin.run_postprocessor" title="Permalink to this definition"></a></dt>
 <dd><p>Executes the post-processing steps for the CSLC-S1 PGE.</p>

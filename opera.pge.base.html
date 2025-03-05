@@ -183,24 +183,6 @@ instance attributes defined by PgeExecutor.</p>
 for any of the exiting pre-processing steps, and even provide additional
 steps as necessary.</p>
 <dl class="py method">
-<dt class="sig sig-object py" id="opera.pge.base.base_pge.PostProcessorMixin.augment_measured_parameters">
-<span class="sig-name descname"><span class="pre">augment_measured_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">measured_parameters</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/opera/pge/base/base_pge.html#PostProcessorMixin.augment_measured_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opera.pge.base.base_pge.PostProcessorMixin.augment_measured_parameters" title="Permalink to this definition"></a></dt>
-<dd><p>Augment the measured parameters dict into a dict of dicts containing the needed
-fields for the MeasuredParameters section of the ISO XML file.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>measured_parameters</strong> (<em>dict</em>) – The GeoTIFF metadata from the output product. See get_geotiff_metadata()</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>augmented_parameters</strong> – The metadata fields converted to a list with name, value, types, etc</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dict</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="opera.pge.base.base_pge.PostProcessorMixin.run_postprocessor">
 <span class="sig-name descname"><span class="pre">run_postprocessor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/opera/pge/base/base_pge.html#PostProcessorMixin.run_postprocessor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opera.pge.base.base_pge.PostProcessorMixin.run_postprocessor" title="Permalink to this definition"></a></dt>
 <dd><p>Executes the post-processing steps for PGE job completion.</p>
@@ -255,7 +237,7 @@ Adapted By: Scott Collins</p>
 </section>
 <dl class="py data">
 <dt class="sig sig-object py" id="opera.pge.base.runconfig.BASE_PGE_SCHEMA">
-<span class="sig-prename descclassname"><span class="pre">opera.pge.base.runconfig.</span></span><span class="sig-name descname"><span class="pre">BASE_PGE_SCHEMA</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'/data/var/lib/jenkins/workspace/e-release-pipeline_release_3.0.2/src/opera/pge/base/schema/base_pge_schema.yaml'</span></em><a class="headerlink" href="#opera.pge.base.runconfig.BASE_PGE_SCHEMA" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">opera.pge.base.runconfig.</span></span><span class="sig-name descname"><span class="pre">BASE_PGE_SCHEMA</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'/data/var/lib/jenkins/workspace/e-release-pipeline_release_3.0.3/src/opera/pge/base/schema/base_pge_schema.yaml'</span></em><a class="headerlink" href="#opera.pge.base.runconfig.BASE_PGE_SCHEMA" title="Permalink to this definition"></a></dt>
 <dd><p>Path to the Yamale schema applicable to the PGE portion of each RunConfig</p>
 </dd></dl>
 
@@ -540,7 +522,7 @@ the output product directory).</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="opera.pge.base.runconfig.RunConfig.validate">
-<span class="sig-name descname"><span class="pre">validate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pge_schema_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'/data/var/lib/jenkins/workspace/e-release-pipeline_release_3.0.2/src/opera/pge/base/schema/base_pge_schema.yaml'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strict_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/opera/pge/base/runconfig.html#RunConfig.validate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opera.pge.base.runconfig.RunConfig.validate" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">validate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pge_schema_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'/data/var/lib/jenkins/workspace/e-release-pipeline_release_3.0.3/src/opera/pge/base/schema/base_pge_schema.yaml'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strict_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/opera/pge/base/runconfig.html#RunConfig.validate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opera.pge.base.runconfig.RunConfig.validate" title="Permalink to this definition"></a></dt>
 <dd><p>Validates the RunConfig using a combination of the base PGE schema,
 and the specific SAS schema defined by the RunConfig itself.</p>
 <dl class="field-list simple">

@@ -100,7 +100,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.error_codes</span><span class="w"> </span><span class="kn">import</span> <span class="n">ErrorCode</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.geo_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_geographic_boundaries_from_mgrs_tile</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.input_validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate_dswx_inputs</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.render_jinja2</span><span class="w"> </span><span class="kn">import</span> <span class="n">render_jinja2</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.render_jinja2</span><span class="w"> </span><span class="kn">import</span> <span class="n">augment_measured_parameters</span><span class="p">,</span> <span class="n">render_jinja2</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.tiff_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_geotiff_hls_dataset</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.tiff_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_geotiff_hls_sensor_product_id</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.tiff_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_geotiff_metadata</span>
@@ -508,7 +508,11 @@
         <span class="c1"># Extract all metadata assigned by the SAS at product creation time</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">measured_parameters</span> <span class="o">=</span> <span class="n">get_geotiff_metadata</span><span class="p">(</span><span class="n">representative_product</span><span class="p">)</span>
-            <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;MeasuredParameters&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">augment_measured_parameters</span><span class="p">(</span><span class="n">measured_parameters</span><span class="p">)</span>
+            <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;MeasuredParameters&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">augment_measured_parameters</span><span class="p">(</span>
+                <span class="n">measured_parameters</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">iso_measured_parameter_descriptions</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
+            <span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Failed to extract metadata from </span><span class="si">{</span><span class="n">representative_product</span><span class="si">}</span><span class="s1">, reason: </span><span class="si">{</span><span class="n">err</span><span class="si">}</span><span class="s1">&#39;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">ISO_METADATA_COULD_NOT_EXTRACT_METADATA</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>

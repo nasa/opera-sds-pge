@@ -90,8 +90,6 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">os</span><span class="w"> </span><span class="kn">import</span> <span class="n">walk</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">os.path</span><span class="w"> </span><span class="kn">import</span> <span class="n">basename</span><span class="p">,</span> <span class="n">getsize</span><span class="p">,</span> <span class="n">join</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">yaml</span>
-
 <span class="kn">from</span><span class="w"> </span><span class="nn">opera.pge.base.base_pge</span><span class="w"> </span><span class="kn">import</span> <span class="n">PgeExecutor</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">opera.pge.base.base_pge</span><span class="w"> </span><span class="kn">import</span> <span class="n">PostProcessorMixin</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">opera.pge.base.base_pge</span><span class="w"> </span><span class="kn">import</span> <span class="n">PreProcessorMixin</span>
@@ -100,9 +98,8 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.error_codes</span><span class="w"> </span><span class="kn">import</span> <span class="n">ErrorCode</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.geo_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">translate_utm_bbox_to_lat_lon</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.h5_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_rtc_s1_product_metadata</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.h5_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">MEASURED_PARAMETER_PATH_SEPARATOR</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.input_validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate_slc_s1_inputs</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.render_jinja2</span><span class="w"> </span><span class="kn">import</span> <span class="n">render_jinja2</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.render_jinja2</span><span class="w"> </span><span class="kn">import</span> <span class="n">augment_hdf5_measured_parameters</span><span class="p">,</span> <span class="n">render_jinja2</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.time</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_time_for_filename</span>
 
 
@@ -773,66 +770,6 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ancillary_filename</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;.qa.log&quot;</span>
 
-<div class="viewcode-block" id="RtcS1PostProcessorMixin.augment_measured_parameters"><a class="viewcode-back" href="../../../../opera.pge.rtc_s1.html#opera.pge.rtc_s1.rtc_s1_pge.RtcS1PostProcessorMixin.augment_measured_parameters">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">augment_measured_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">measured_parameters</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Override of the augment_measured_parameters() method in Base PGE with an added</span>
-<span class="sd">        &quot;preprocessing&quot; step to handle the structure of HDF5 metadata. While GeoTIFF</span>
-<span class="sd">        metadata is a flat dictionary, HDF5 metadata is a nested dictionary structure,</span>
-<span class="sd">        wherein the variable &quot;keys&quot; can be arbitrarily deep into the structure and</span>
-<span class="sd">        the values likewise can be nested dictionaries.</span>
-
-<span class="sd">        The preprocessing step in this method selectively flattens the metadata</span>
-<span class="sd">        dictionary based on the &quot;paths&quot; provided in the variable keys of the configuration</span>
-<span class="sd">        YAML file. The result of this preprocessing is then safely passed to the base</span>
-<span class="sd">        method to get the correct structure expected by the Jinja template.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        measured_parameters : dict</span>
-<span class="sd">            The HDF5 metadata from the output product. See get_rtc_s1_product_metadata()</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        augmented_parameters : dict</span>
-<span class="sd">            The metadata fields converted to a list with name, value, types, etc</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">descriptions_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">iso_measured_parameter_descriptions</span>
-
-        <span class="n">new_measured_parameters</span> <span class="o">=</span> <span class="p">{}</span>
-
-        <span class="k">if</span> <span class="n">descriptions_file</span><span class="p">:</span>
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">descriptions_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">infile</span><span class="p">:</span>
-                <span class="n">descriptions</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">infile</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Measured parameters configuration is needed to extract the &#39;</span>
-                   <span class="s1">&#39;measured parameters attributes from the RTC-S1 metadata&#39;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">ISO_METADATA_DESCRIPTIONS_CONFIG_NOT_FOUND</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
-
-        <span class="k">for</span> <span class="n">parameter_var_name</span> <span class="ow">in</span> <span class="n">descriptions</span><span class="p">:</span>
-            <span class="n">key_path</span> <span class="o">=</span> <span class="n">parameter_var_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">MEASURED_PARAMETER_PATH_SEPARATOR</span><span class="p">)</span>
-
-            <span class="n">mp</span> <span class="o">=</span> <span class="n">measured_parameters</span>
-            <span class="n">missing</span> <span class="o">=</span> <span class="kc">False</span>
-
-            <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">key_path</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="k">try</span><span class="p">:</span>
-                    <span class="n">mp</span> <span class="o">=</span> <span class="n">mp</span><span class="p">[</span><span class="n">key_path</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)]</span>
-                <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-                    <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Measured parameters configuration contains a path </span><span class="si">{</span><span class="n">parameter_var_name</span><span class="si">}</span><span class="s1"> that is missing &#39;</span>
-                           <span class="sa">f</span><span class="s1">&#39;from the output product&#39;</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="n">descriptions</span><span class="p">[</span><span class="n">parameter_var_name</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;optional&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">ISO_METADATA_NO_ENTRY_FOR_DESCRIPTION</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
-                        <span class="n">missing</span> <span class="o">=</span> <span class="kc">True</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">ISO_METADATA_DESCRIPTIONS_CONFIG_INVALID</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
-
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">missing</span><span class="p">:</span>
-                <span class="n">new_measured_parameters</span><span class="p">[</span><span class="n">parameter_var_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">mp</span>
-
-        <span class="n">augmented_parameters</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">augment_measured_parameters</span><span class="p">(</span><span class="n">new_measured_parameters</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">augmented_parameters</span></div>
-
     <span class="k">def</span><span class="w"> </span><span class="nf">_collect_rtc_product_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata_product</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Gathers the available metadata from an HDF5 product created by</span>
@@ -892,7 +829,11 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">ISO_METADATA_RENDER_FAILED</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">))</span>
 
         <span class="c1"># Augment the metadata with descriptions from the measured parameter config for RTC-S1</span>
-        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;MeasuredParameters&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">augment_measured_parameters</span><span class="p">(</span><span class="n">output_product_metadata</span><span class="p">)</span>
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;MeasuredParameters&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">augment_hdf5_measured_parameters</span><span class="p">(</span>
+            <span class="n">output_product_metadata</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">iso_measured_parameter_descriptions</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
+        <span class="p">)</span>
 
         <span class="k">return</span> <span class="n">output_product_metadata</span>
 
