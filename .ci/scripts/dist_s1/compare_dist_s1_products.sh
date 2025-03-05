@@ -79,7 +79,7 @@ do
   # add html breaks to newlines
   compare_output=${compare_output//$'\n'/<br>$'\n'}
 
-  update_html_results_file "${compare_result}" "${output_product}" "${expected_product}" "${compare_output}"
+  update_html_results_file "${compare_result}" "${output_product}" "$(basename -- "$expected_product")" "${compare_output}"
 done
 
 finalize_html_results_file
