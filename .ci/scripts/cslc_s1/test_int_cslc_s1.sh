@@ -113,6 +113,13 @@ metrics_collection_end "$PGE_NAME" "$container_name" "$docker_exit_status" "$TES
 if [ $docker_exit_status -ne 0 ]; then
     echo "docker exit indicates failure: ${docker_exit_status}"
     overall_status=1
+else
+  # Retrieve the return code written to disk by the comparison script
+  test_status=$(cat "$output_dir/compare_cslc_s1_products.rc")
+
+  if [ $test_status -ne 0 ]; then
+    overall_status=$test_status
+  fi
 fi
 
 # Run the static layer workflow
@@ -140,6 +147,13 @@ metrics_collection_end "${PGE_NAME}_static" "$container_name" "$docker_exit_stat
 if [ $docker_exit_status -ne 0 ]; then
     echo "docker exit indicates failure: ${docker_exit_status}"
     overall_status=1
+else
+  # Retrieve the return code written to disk by the comparison script
+  test_status=$(cat "$output_dir/compare_cslc_s1_products.rc")
+
+  if [ $test_status -ne 0 ]; then
+    overall_status=$test_status
+  fi
 fi
 
 # Copy the PGE/SAS log file(s) to the test results directory so it can be archived
