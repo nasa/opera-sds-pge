@@ -87,11 +87,9 @@ class DistS1PostProcessorMixin(PostProcessorMixin):
     _valid_layer_names = _main_output_layer_names + _confirmation_db_output_layer_names
 
     _product_id_pattern = (r'(?P<id>(?P<project>OPERA)_(?P<level>L3)_(?P<product_type>DIST(-ALERT)?)-(?P<source>S1)_'
-                           r'(?P<tile_id>T[^\W_]{5})_(?P<acquisition_ts>(?P<acq_year>\d{4})(?P<acq_month>\d{2})'
-                           r'(?P<acq_day>\d{2})T(?P<acq_hour>\d{2})(?P<acq_minute>\d{2})(?P<acq_second>\d{2})Z)_'
-                           r'(?P<creation_ts>(?P<cre_year>\d{4})(?P<cre_month>\d{2})(?P<cre_day>\d{2})T'
-                           r'(?P<cre_hour>\d{2})(?P<cre_minute>\d{2})(?P<cre_second>\d{2})Z)_(?P<sensor>S1[AC]?)_'
-                           r'(?P<spacing>30)_(?P<product_version>v\d+[.]\d+))')
+                           r'(?P<tile_id>T[^\W_]{5})_(?P<acquisition_ts>\d{4}\d{2}\d{2}T\d{2}\d{2}\d{2}Z)_'
+                           r'(?P<creation_ts>\d{4}\d{2}\d{2}T\d{2}\d{2}\d{2}Z)_(?P<sensor>S1[AC]?)_(?P<spacing>30)_'
+                           r'(?P<product_version>v\d+[.]\d+))')
 
     _granule_filename_pattern = (_product_id_pattern + rf'((_(?P<layer_name>{"|".join(_valid_layer_names)}))|'
                                                        r'_BROWSE)?[.](?P<ext>tif|tiff|png)$')
@@ -352,7 +350,7 @@ class DistS1PostProcessorMixin(PostProcessorMixin):
         match_result = self._granule_filename_re.match(basename(geotiff_product))
 
         if match_result is None:
-            # This really should not happen due to bassing the _validate_outputs function but check anyway
+            # This really should not happen due to passing the _validate_outputs function but check anyway
             msg = f'Failed to parse DIST-S1 filename {basename(geotiff_product)}'
             self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, msg)
 
