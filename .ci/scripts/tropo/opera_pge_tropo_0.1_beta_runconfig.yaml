@@ -6,7 +6,7 @@ RunConfig:
         PGEName: TROPO_PGE
       InputFilesGroup:
         InputFilePaths:
-        - /home/ops/input_dir/20190603/D06130600061306001.zz.nc
+        - /home/ops/input_dir/20190613/D06130600061306001.zz.nc
       DynamicAncillaryFilesGroup:
         AncillaryFileMap: {}
       ProductPathGroup:
@@ -35,7 +35,7 @@ RunConfig:
       input_file:
         # REQUIRED: path to HRES model file.
         #   Type: string | Path.
-        input_file_path: /home/ops/input_dir/20190603/D06130600061306001.zz.nc
+        input_file_path: /home/ops/input_dir/20190613/D06130600061306001.zz.nc
       primary_executable:
         # Product type of the PGE.
         #   Type: string.
