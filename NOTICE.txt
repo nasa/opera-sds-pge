@@ -1,6 +1,6 @@
 OPERA SDS PGE Subsystem
 
-Copyright 2021-2024, California Institute of Technology ("Caltech").
+Copyright 2021-2025, California Institute of Technology ("Caltech").
 U.S. Government sponsorship acknowledged.
 
 All rights reserved.
