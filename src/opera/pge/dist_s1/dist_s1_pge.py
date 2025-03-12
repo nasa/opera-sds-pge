@@ -12,7 +12,7 @@ import os
 import re
 import shutil
 from datetime import datetime
-from os.path import join, isdir, isfile, abspath, basename
+from os.path import join, isdir, isfile, abspath, basename, splitext
 
 from opera.pge.base.base_pge import PreProcessorMixin, PgeExecutor, PostProcessorMixin
 from opera.util.dataset_utils import get_sensor_from_spacecraft_name
@@ -20,6 +20,7 @@ from opera.util.error_codes import ErrorCode
 from opera.util.geo_utils import get_geographic_boundaries_from_mgrs_tile
 from opera.util.input_validation import check_input_list
 from opera.util.render_jinja2 import augment_measured_parameters, render_jinja2
+from opera.util.run_utils import get_checksum
 from opera.util.tiff_utils import get_geotiff_metadata
 from opera.util.time import get_time_for_filename, get_iso_time
 
@@ -463,6 +464,39 @@ class DistS1PostProcessorMixin(PostProcessorMixin):
                 if scratch_path not in src and src != dst:
                     shutil.move(str(src), dst)
 
+    def _checksum_output_products(self):
+        """
+        Generates a dictionary mapping output product file names to the
+        corresponding MD5 checksum digest of the file's contents.
+
+        The products to generate checksums for are determined by scanning
+        the output product location specified by the RunConfig. Any files
+        within the directory that have the expected file extensions for output
+        products are then picked up for checksum generation.
+
+        Returns
+        -------
+        checksums : dict
+            Mapping of output product file names to MD5 checksums of said
+            products.
+
+        """
+        output_products = self.runconfig.get_output_product_filenames()
+
+        # Filter out any files that do not end with the expected extensions
+        expected_extensions = ('.tif', '.png')
+        filtered_output_products = filter(
+            lambda product: splitext(product)[-1] in expected_extensions,
+            output_products
+        )
+
+        # Generate checksums on the filtered product list
+        checksums = {
+            basename(output_product): get_checksum(output_product)
+            for output_product in filtered_output_products
+        }
+
+        return checksums
 
     def run_postprocessor(self, **kwargs):
         """
