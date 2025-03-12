@@ -16,7 +16,6 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 OUTPUT_DIR="/home/ops/output_dir"
 EXPECTED_DIR="/home/ops/expected_output_dir"
 PGE_NAME="tropo"
-PGE_IMAGE="opera_pge/${PGE_NAME}"
 
 # Validate that OUTPUT_DIR and EXPECTED_DIR exist within the container
 if [ ! -d "$OUTPUT_DIR" ]; then
@@ -56,9 +55,9 @@ do
         # OPERA_L4_TROPO_20190613T060000Z_20250208T180402Z_HRES_0.1_v0.1.nc -> golden_output_20190613T06.nc\
         output_file=$(basename ${output_file})
         # Extract %Y%m%dT%H portion of filename
-        output_file_date=$(echo "${output_file}" | grep -oP '\d{8}T\d{2}')
+        output_file_date=$(echo "$output_file" | cut -d'_' -f4 | cut -c1-11)
 
-        echo "Output product is ${output_file}"
+        echo "Output product is ${output_file} with file date ${output_file_date}"
 
         # Find the matching expected output product based on date range
         for potential_file in "$EXPECTED_DIR"/*.nc
@@ -75,7 +74,7 @@ do
             overall_status=1
         else
             echo "Running validation script on golden_output/$(basename $expected_file) and output/${output_file}"
-            opera_tropo validate golden_output/$(basename $expected_file) output/${output_file}
+            opera_tropo validate $expected_file ${OUTPUT_DIR}/${output_file}
             
             compare_exit_status=$?
 
