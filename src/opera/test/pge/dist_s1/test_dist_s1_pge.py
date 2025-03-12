@@ -185,7 +185,7 @@ class DistS1PgeTestCase(unittest.TestCase):
         self.assertTrue(os.path.exists(expected_log_file))
 
         # Lastly, check that the dummy output products were created
-        tif_files = glob.glob(join(pge.runconfig.output_product_path, "*", "*.tif"))
+        tif_files = glob.glob(join(pge.runconfig.output_product_path, "*.tif"))
         self.assertEqual(len(tif_files), 7)
 
         # Open and read the log

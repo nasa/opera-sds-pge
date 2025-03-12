@@ -10,6 +10,7 @@ Module defining the implementation for the Surface Disturbance (DIST) from Senti
 
 import os
 import re
+import shutil
 from datetime import datetime
 from os.path import join, isdir, isfile, abspath, basename
 
@@ -446,6 +447,23 @@ class DistS1PostProcessorMixin(PostProcessorMixin):
 
         return rendered_template
 
+    def _flatten_output_dir(self):
+        """
+        Flattens the output directory since PCM expects all output files
+        to be in the output root.
+        """
+        output_product_path = abspath(self.runconfig.output_product_path)
+        scratch_path = abspath(self.runconfig.scratch_path)
+
+        for dirpath, dirnames, filenames in os.walk(output_product_path):
+            for filename in filenames:
+                src = os.path.join(dirpath, filename)
+                dst = os.path.join(output_product_path, basename(filename))
+
+                if scratch_path not in src and src != dst:
+                    shutil.move(str(src), dst)
+
+
     def run_postprocessor(self, **kwargs):
         """
         Executes the post-processing steps for the DIST-S1 PGE.
@@ -462,6 +480,7 @@ class DistS1PostProcessorMixin(PostProcessorMixin):
         print(f'Running postprocessor for {self._post_mixin_name}')
 
         self._validate_outputs()
+        self._flatten_output_dir()
         self._run_sas_qa_executable()
         self._stage_output_files()
 
