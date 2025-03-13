@@ -30,7 +30,7 @@ fi
 
 initialize_html_results_file "$OUTPUT_DIR" "$PGE_NAME"
 
-echo "<tr><th>Compare Result</th><th><ul><li>Expected file</li><li>Output file</li></ul></th><th>disp_s1_compare.py output</th></tr>" >> "$RESULTS_FILE"
+echo "<tr><th>Compare Result</th><th><ul><li>Expected file</li><li>Output file</li></ul></th><th>opera_tropo validate output</th></tr>" >> "$RESULTS_FILE"
 
 # overall_status values and their meaning
 # 0 - pass
@@ -73,8 +73,8 @@ do
             echo "No expected file found for product $output_file in expected directory $EXPECTED_DIR"
             overall_status=1
         else
-            echo "Running validation script on golden_output/$(basename $expected_file) and output/${output_file}"
-            opera_tropo validate $expected_file ${OUTPUT_DIR}/${output_file}
+            echo "Running validation script on $expected_file and ${OUTPUT_DIR}/${output_file}"
+            compare_out=$(opera_tropo validate $expected_file ${OUTPUT_DIR}/${output_file})
             
             compare_exit_status=$?
 
@@ -94,7 +94,7 @@ do
 
     # add html breaks to newlines
     compare_out="${compare_out//$'\n'/<br>}"
-    update_html_results_file "${compare_result}" "${output_file}" "${expected_file}" "${compare_out}"
+    update_html_results_file "${compare_result}" "${expected_file}" "${output_file}" "${compare_out}"
 done
 
 finalize_html_results_file
