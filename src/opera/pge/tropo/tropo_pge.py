@@ -101,11 +101,7 @@ class TROPOPostProcessorMixin(PostProcessorMixin):
         **kwargs: dict
             Any keyword arguments needed by the post-processor
         """
-        self._validate_output()
-        self._validate_output_product_filenames()
-        self._run_sas_qa_executable()
-        self._stage_output_files()
-        # super().run_postprocessor(**kwargs)
+        super().run_postprocessor(**kwargs)
 
 
 class TROPOExecutor(TROPOPreProcessorMixin, TROPOPostProcessorMixin, PgeExecutor):
