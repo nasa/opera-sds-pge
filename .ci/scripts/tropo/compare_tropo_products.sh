@@ -2,7 +2,7 @@
 
 # Script used to orchestrate the pairwise comparison of output and expected
 # TROPO products. Each individual pair of products is compared using the
-# tropo_comparison.py script
+# opera_tropo validate workflow
 
 set -e
 umask 002
@@ -12,7 +12,6 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 # Set up the expected directory paths within the container
 # These are determined by the docker volume mounting that occurs in test_int_tropo.sh
-# TODO: set actual values
 OUTPUT_DIR="/home/ops/output_dir"
 EXPECTED_DIR="/home/ops/expected_output_dir"
 PGE_NAME="tropo"
@@ -74,7 +73,7 @@ do
             overall_status=1
         else
             echo "Running validation script on $expected_file and ${OUTPUT_DIR}/${output_file}"
-            compare_out=$(opera_tropo validate $expected_file ${OUTPUT_DIR}/${output_file})
+            compare_log=$(opera_tropo validate "$expected_file" "${OUTPUT_DIR}/${output_file}" 2>&1)
             
             compare_exit_status=$?
 
