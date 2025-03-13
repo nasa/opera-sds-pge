@@ -470,7 +470,7 @@ class DistS1PgeTestCase(unittest.TestCase):
             pre_rtc_copol = runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['pre_rtc_copol']
             pre_rtc_crosspol = runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['pre_rtc_crosspol']
 
-            pge_input_index = len(pre_rtc_crosspol) + len(pre_rtc_crosspol)
+            pge_input_index = len(pre_rtc_copol) + len(pre_rtc_crosspol)
 
             runconfig_dict['RunConfig']['Groups']['PGE']['InputFilesGroup']['InputFilePaths'][pge_input_index] = s1_file
             runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['post_rtc_copol'][0] = s1_file
@@ -495,14 +495,63 @@ class DistS1PgeTestCase(unittest.TestCase):
 
             self.assertIn(f"Date or burst ID mismatch in post_rtc copol and crosspol lists", log_contents)
 
+            # Test 6a: crosspol in copol
 
+            runconfig_dict = deepcopy(backup_runconfig)
+
+            pre_rtc_copol = runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['pre_rtc_copol']
+            pre_rtc_crosspol = runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['pre_rtc_crosspol']
+
+            pre_rtc_copol[0] = pre_rtc_crosspol[0]
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as input_path:
+                yaml.safe_dump(runconfig_dict, input_path, sort_keys=False)
+
+            pge = DistS1Executor(pge_name="DistS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            # Open the log file, and check that the validation error details were captured
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn(f"Found non-copol RTC in copol input list", log_contents)
+
+            # Test 6b: copol in crosspol
+
+            runconfig_dict = deepcopy(backup_runconfig)
+
+            pre_rtc_copol = runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['pre_rtc_copol']
+            pre_rtc_crosspol = runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['pre_rtc_crosspol']
+
+            pre_rtc_crosspol[0] = pre_rtc_copol[0]
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as input_path:
+                yaml.safe_dump(runconfig_dict, input_path, sort_keys=False)
+
+            pge = DistS1Executor(pge_name="DistS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            # Open the log file, and check that the validation error details were captured
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn(f"Found non-crosspol RTC in crosspol input list", log_contents)
         finally:
             if os.path.exists(test_runconfig_path):
                 os.unlink(test_runconfig_path)
 
             if os.path.exists('temp'):
                 shutil.rmtree('temp')
-
 
     @patch.object(opera.util.tiff_utils, "gdal", MockGdal)
     def test_dist_s1_pge_output_validation(self):

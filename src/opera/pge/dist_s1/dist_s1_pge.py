@@ -49,6 +49,7 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
         4. Ensures input RTCs are not from a mixture of Sentinel-1A and Sentinel-1C
         5. Validates that the co- and cross-pol RTCs are in the same order (burst-ID &
            acquisition time)
+        6. Validates no cross-pol RTCs are in copol input lists and vice-versa
         """
 
         sas_config = self.runconfig.sas_config
@@ -156,6 +157,24 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
                 ErrorCode.INVALID_INPUT,
                 msg
             )
+
+        for rtc in pre_rtc_copol + post_rtc_copol:
+            if rtc_pattern.match(os.path.basename(rtc)).groupdict()['pol'] not in ['VV', 'HH']:
+                msg = 'Found non-copol RTC in copol input list'
+                self.logger.critical(
+                    self.name,
+                    ErrorCode.INVALID_INPUT,
+                    msg
+                )
+
+        for rtc in pre_rtc_crosspol + post_rtc_crosspol:
+            if rtc_pattern.match(os.path.basename(rtc)).groupdict()['pol'] not in ['VH', 'HV']:
+                msg = 'Found non-crosspol RTC in crosspol input list'
+                self.logger.critical(
+                    self.name,
+                    ErrorCode.INVALID_INPUT,
+                    msg
+                )
 
     def run_preprocessor(self, **kwargs):
         """
