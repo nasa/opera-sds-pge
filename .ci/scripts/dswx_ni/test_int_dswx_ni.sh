@@ -115,6 +115,13 @@ cp "${output_dir}"/test_int_dswx_ni_results.html "${TEST_RESULTS_DIR}"/test_int_
 if [ $docker_exit_status -ne 0 ]; then
     echo "docker exit indicates failure: ${docker_exit_status}"
     overall_status=1
+else
+  # Retrieve the return code written to disk by the comparison script
+  test_status=$(cat "$output_dir/compare_dswx_ni_products.rc")
+
+  if [ $test_status -ne 0 ]; then
+    overall_status=$test_status
+  fi
 fi
 
 echo " "

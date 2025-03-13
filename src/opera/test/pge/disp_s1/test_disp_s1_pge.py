@@ -206,6 +206,9 @@ class DispS1PgeTestCase(unittest.TestCase):
         self.assertEqual(runconfig['subdataset'], '/data/VV')
         self.assertEqual(runconfig['spatial_wavelength_cutoff'], 25000.0)
         self.assertListEqual(runconfig['browse_image_vmin_vmax'], [-0.1, 0.1])
+        self.assertEqual(runconfig['recommended_temporal_coherence_threshold'], 0.6)
+        self.assertEqual(runconfig['recommended_similarity_threshold'], 0.5)
+        self.assertEqual(runconfig['num_parallel_products'], 3)
 
     @patch.object(opera.pge.disp_s1.disp_s1_pge.subprocess, "run", mock_grib_to_netcdf)
     def test_disp_s1_pge_execution(self):

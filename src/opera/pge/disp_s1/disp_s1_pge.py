@@ -849,10 +849,10 @@ class DispS1Executor(DispS1PreProcessorMixin, DispS1PostProcessorMixin, PgeExecu
     LEVEL = "L3"
     """Processing Level for DISP-S1 Products"""
 
-    PGE_VERSION = "3.0.2"
+    PGE_VERSION = "3.0.4"
     """Version of the PGE (overrides default from base_pge)"""
 
-    SAS_VERSION = "0.5.3"  # Final release https://github.com/opera-adt/disp-s1/releases/tag/v0.5.3
+    SAS_VERSION = "0.5.5"  # Final release https://github.com/opera-adt/disp-s1/releases/tag/v0.5.5
 
     def __init__(self, pge_name, runconfig_path, **kwargs):
         super().__init__(pge_name, runconfig_path, **kwargs)

@@ -10,6 +10,7 @@ Module defining the implementation for the Surface Disturbance (DIST) from Senti
 
 import os
 import re
+from datetime import datetime
 from os.path import join, isdir, isfile, abspath, basename
 
 from opera.pge.base.base_pge import PreProcessorMixin, PgeExecutor, PostProcessorMixin
@@ -19,7 +20,7 @@ from opera.util.geo_utils import get_geographic_boundaries_from_mgrs_tile
 from opera.util.input_validation import check_input_list
 from opera.util.render_jinja2 import augment_measured_parameters, render_jinja2
 from opera.util.tiff_utils import get_geotiff_metadata
-from opera.util.time import get_time_for_filename
+from opera.util.time import get_time_for_filename, get_iso_time
 
 
 class DistS1PreProcessorMixin(PreProcessorMixin):
@@ -85,33 +86,31 @@ class DistS1PostProcessorMixin(PostProcessorMixin):
 
     _valid_layer_names = _main_output_layer_names + _confirmation_db_output_layer_names
 
+    _product_id_pattern = (r'(?P<id>(?P<project>OPERA)_(?P<level>L3)_(?P<product_type>DIST(-ALERT)?)-(?P<source>S1)_'
+                           r'(?P<tile_id>T[^\W_]{5})_(?P<acquisition_ts>\d{4}\d{2}\d{2}T\d{2}\d{2}\d{2}Z)_'
+                           r'(?P<creation_ts>\d{4}\d{2}\d{2}T\d{2}\d{2}\d{2}Z)_(?P<sensor>S1[AC]?)_(?P<spacing>30)_'
+                           r'(?P<product_version>v\d+[.]\d+))')
+
+    _granule_filename_pattern = (_product_id_pattern + rf'((_(?P<layer_name>{"|".join(_valid_layer_names)}))|'
+                                                       r'_BROWSE)?[.](?P<ext>tif|tiff|png)$')
+
+    _product_id_re = re.compile(_product_id_pattern + r'$')
+    _granule_filename_re = re.compile(_granule_filename_pattern)
+
     def _validate_outputs(self):
-        product_id_pattern = (r'(?P<id>(?P<project>OPERA)_(?P<level>L3)_(?P<product_type>DIST(-ALERT)?)-(?P<source>S1)_'
-                              r'(?P<tile_id>T[^\W_]{5})_(?P<acquisition_ts>(?P<acq_year>\d{4})(?P<acq_month>\d{2})'
-                              r'(?P<acq_day>\d{2})T(?P<acq_hour>\d{2})(?P<acq_minute>\d{2})(?P<acq_second>\d{2})Z)_'
-                              r'(?P<creation_ts>(?P<cre_year>\d{4})(?P<cre_month>\d{2})(?P<cre_day>\d{2})T'
-                              r'(?P<cre_hour>\d{2})(?P<cre_minute>\d{2})(?P<cre_second>\d{2})Z)_(?P<sensor>S1[AC]?)_'
-                              r'(?P<spacing>30)_(?P<product_version>v\d+[.]\d+))')
-
-        granule_filename_pattern = (product_id_pattern + rf'((_(?P<layer_name>{"|".join(self._valid_layer_names)}))|'
-                                                         r'_BROWSE)?[.](?P<ext>tif|tiff|png)$')
-
-        product_id = re.compile(product_id_pattern + r'$')
-        granule_filename = re.compile(granule_filename_pattern)
-
         output_product_path = abspath(self.runconfig.output_product_path)
         output_products = []
 
         for file in os.listdir(output_product_path):
             dir_path = join(output_product_path, file)
-            if isdir(dir_path) and product_id.match(file):
+            if isdir(dir_path) and self._product_id_re.match(file):
                 bands = []
                 generated_band_names = []
 
                 for granule in os.listdir(dir_path):
                     granule_path = join(dir_path, granule)
                     if isfile(granule_path):
-                        match_result = granule_filename.match(granule)
+                        match_result = self._granule_filename_re.match(granule)
 
                         if match_result is None:  # or match_result.groupdict()['ext'] != 'tif':
                             error_msg = f'Invalid product filename {granule}'
@@ -345,6 +344,23 @@ class DistS1PostProcessorMixin(PostProcessorMixin):
             'spacing': 30  # meters/pixel
         }
 
+        # TODO: Replace these with metadata values sourced from the granule when available
+        #  (Or remove entirely if possible to refer to them straight through the MP dict)
+
+        match_result = self._granule_filename_re.match(basename(geotiff_product))
+
+        if match_result is None:
+            # This really should not happen due to passing the _validate_outputs function but check anyway
+            msg = f'Failed to parse DIST-S1 filename {basename(geotiff_product)}'
+            self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, msg)
+
+        match_result = match_result.groupdict()
+        acq_time = match_result['acquisition_ts']
+        acq_time = datetime.strptime(acq_time, '%Y%m%dT%H%M%SZ')
+
+        output_product_metadata['acquisition_start_time'] = get_iso_time(acq_time)
+        output_product_metadata['acquisition_end_time'] = get_iso_time(acq_time)
+
         return output_product_metadata
 
     def _create_custom_metadata(self, tile_filename):
@@ -446,6 +462,7 @@ class DistS1PostProcessorMixin(PostProcessorMixin):
         print(f'Running postprocessor for {self._post_mixin_name}')
 
         self._validate_outputs()
+        self._run_sas_qa_executable()
         self._stage_output_files()
 
 
