@@ -39,6 +39,124 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
     _pre_mixin_name = "DistS1PreProcessorMixin"
     _valid_input_extensions = (".tif",)
 
+    def _validate_rtcs(self):
+        """
+        Performs the following validations on the input RTCs:
+
+        1. Verifies the co- and cross-pol RTC input lists are the same length
+        2. Verifies the combined SAS RTC input lists are a subset of the PGE input list
+        3. Verifies the input RTCs have standard filenames (important for later checks)
+        4. Ensures input RTCs are not from a mixture of Sentinel-1A and Sentinel-1C
+        5. Validates that the co- and cross-pol RTCs are in the same order (burst-ID &
+           acquisition time)
+        """
+
+        sas_config = self.runconfig.sas_config
+
+        pre_rtc_copol = sas_config["run_config"]["pre_rtc_copol"]
+        pre_rtc_crosspol = sas_config["run_config"]["pre_rtc_crosspol"]
+        post_rtc_copol = sas_config["run_config"]["post_rtc_copol"]
+        post_rtc_crosspol = sas_config["run_config"]["post_rtc_crosspol"]
+
+        if len(pre_rtc_copol) != len(pre_rtc_crosspol) or len(post_rtc_copol) != len(post_rtc_crosspol):
+            msg = (f'Lengths of input pre/post co/cross pol input RTC lists differ: pre {len(pre_rtc_copol)} '
+                   f'{len(pre_rtc_crosspol)} post {len(post_rtc_copol)} {len(post_rtc_crosspol)}')
+            self.logger.critical(
+                self.name,
+                ErrorCode.INVALID_INPUT,
+                msg
+            )
+
+        all_rtcs = pre_rtc_copol + pre_rtc_crosspol + post_rtc_copol + post_rtc_crosspol
+
+        if not set([basename(rtc) for rtc in all_rtcs]).issubset([basename(rtc) for rtc in self.runconfig.input_files]):
+            msg = 'SAS RTC file groups do not make a subset of PGE Input Files'
+            self.logger.critical(
+                self.name,
+                ErrorCode.INVALID_INPUT,
+                msg
+            )
+
+        rtc_pattern = re.compile(r'(?P<id>(?P<project>OPERA)_(?P<level>L2)_(?P<product_type>RTC)-(?P<source>S1)_'
+                                 r'(?P<burst_id>\w{4}-\w{6}-\w{3})_(?P<acquisition_ts>(?P<acq_year>\d{4})(?P<acq_month>'
+                                 r'\d{2})(?P<acq_day>\d{2})T(?P<acq_hour>\d{2})(?P<acq_minute>\d{2})(?P<acq_second>'
+                                 r'\d{2})Z)_(?P<creation_ts>(?P<cre_year>\d{4})(?P<cre_month>\d{2})(?P<cre_day>\d{2})T'
+                                 r'(?P<cre_hour>\d{2})(?P<cre_minute>\d{2})(?P<cre_second>\d{2})Z)_'
+                                 r'(?P<sensor>S1A|S1B|S1C)_(?P<spacing>30)_(?P<product_version>v\d+[.]\d+))'
+                                 r'(_(?P<pol>VV|VH|HH|HV|VV\+VH|HH\+HV)|_BROWSE|_mask)?[.]'
+                                 r'(?P<ext>tif|tiff|h5|png|iso\.xml)$')
+
+        rtc_matches = [rtc_pattern.match(basename(rtc)) for rtc in all_rtcs]
+
+        if any([match is None for match in rtc_matches]):
+            msg = 'Invalid RTC filenames in SAS input'
+            self.logger.critical(
+                self.name,
+                ErrorCode.INVALID_INPUT,
+                msg
+            )
+
+        if len(set([match.groupdict()['sensor'] for match in rtc_matches])) > 1:
+            msg = 'SAS input contains a RTCs from more than one S1 Sensor. Inputs should be all from S1A or S1C'
+            self.logger.critical(
+                self.name,
+                ErrorCode.INVALID_INPUT,
+                msg
+            )
+
+        def is_sorted(iterable, key=lambda x: x) -> bool:
+            for i, e in enumerate(iterable[1:]):
+                if key(e) < key(iterable[i]):
+                    return False
+            return True
+
+        def sort_fn(path):
+            match = rtc_pattern.match(os.path.basename(path))
+            match_dict = match.groupdict()
+
+            return match_dict['burst_id'], match_dict['acquisition_ts']
+
+        if not all([is_sorted(rtc_list, key=sort_fn) for rtc_list in (pre_rtc_copol, pre_rtc_crosspol,
+                                                                      post_rtc_copol, post_rtc_crosspol)]):
+            msg = 'One or more of the SAS RTC lists is badly ordered. Attempting to sort them'
+            self.logger.warning(
+                self.name,
+                ErrorCode.LOGGED_WARNING_LINE,
+                msg
+            )
+
+            pre_rtc_copol.sort(key=sort_fn)
+            pre_rtc_crosspol.sort(key=sort_fn)
+            post_rtc_copol.sort(key=sort_fn)
+            post_rtc_crosspol.sort(key=sort_fn)
+
+        def compare_rtc_dates_and_bursts(copol, crosspol):
+            for copol_rtc, crosspol_rtc in zip(copol, crosspol):
+                copol_rtc = rtc_pattern.match(os.path.basename(copol_rtc))
+                crosspol_rtc = rtc_pattern.match(os.path.basename(crosspol_rtc))
+
+                if copol_rtc.groupdict()['acquisition_ts'] != crosspol_rtc.groupdict()['acquisition_ts']:
+                    return False
+                if copol_rtc.groupdict()['burst_id'] != crosspol_rtc.groupdict()['burst_id']:
+                    return False
+            return True
+
+        if not compare_rtc_dates_and_bursts(pre_rtc_copol, pre_rtc_crosspol):
+            msg = 'Date or burst ID mismatch in pre_rtc copol and crosspol lists'
+            self.logger.critical(
+                self.name,
+                ErrorCode.INVALID_INPUT,
+                msg
+            )
+
+        if not compare_rtc_dates_and_bursts(post_rtc_copol, post_rtc_crosspol):
+            msg = 'Date or burst ID mismatch in post_rtc copol and crosspol lists'
+            self.logger.critical(
+                self.name,
+                ErrorCode.INVALID_INPUT,
+                msg
+            )
+
     def run_preprocessor(self, **kwargs):
         """
         Executes the pre-processing steps for DIST-S1 PGE initialization.
@@ -60,6 +178,7 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
             valid_extensions=self._valid_input_extensions,
             check_zero_size=True
         )
+        self._validate_rtcs()
 
 
 class DistS1PostProcessorMixin(PostProcessorMixin):

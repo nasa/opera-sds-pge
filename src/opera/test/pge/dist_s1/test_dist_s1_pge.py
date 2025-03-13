@@ -13,6 +13,7 @@ import random
 import shutil
 import tempfile
 import unittest
+from copy import deepcopy
 from io import StringIO
 from os.path import abspath, join
 from pathlib import Path
@@ -283,6 +284,225 @@ class DistS1PgeTestCase(unittest.TestCase):
 
             if os.path.exists('temp'):
                 shutil.rmtree('temp')
+
+    def test_dist_s1_pge_input_rtc_validations(self):
+        """Test the input RTC validation checks made by DistS1PreProcessorMixin."""
+        runconfig_path = join(self.data_dir, 'test_dist_s1_config.yaml')
+        test_runconfig_path = join(self.data_dir, 'invalid_dist_s1_runconfig.yaml')
+
+        with open(runconfig_path, 'r', encoding='utf-8') as stream:
+            runconfig_dict = yaml.safe_load(stream)
+
+        backup_runconfig = deepcopy(runconfig_dict)
+
+        try:
+            Path('temp').mkdir(parents=True, exist_ok=True)
+
+            # Test 1: Detect co/crosspol length mismatch
+
+            s1_file = 'temp/OPERA_L2_RTC-S1_T137-292325-IW1_20241022T015921Z_20241022T180523Z_S1A_30_v1.0_VV.tif'
+
+            runconfig_dict['RunConfig']['Groups']['PGE']['InputFilesGroup']['InputFilePaths'].append(s1_file)
+            runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['pre_rtc_copol'].append(s1_file)
+
+            with open(s1_file, 'wb') as fp:
+                fp.write(random.randbytes(1024))
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as input_path:
+                yaml.safe_dump(runconfig_dict, input_path, sort_keys=False)
+
+            pge = DistS1Executor(pge_name="DistS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            # Open the log file, and check that the validation error details were captured
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn(f"Lengths of input pre/post co/cross pol input RTC lists differ", log_contents)
+
+            # Test 2: Detect SAS RTCs not subset of PGE RTCs
+
+            runconfig_dict = deepcopy(backup_runconfig)
+
+            runconfig_dict['RunConfig']['Groups']['PGE']['InputFilesGroup']['InputFilePaths'] = (
+                runconfig_dict['RunConfig']['Groups']['PGE']['InputFilesGroup']['InputFilePaths'])[1:]
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as input_path:
+                yaml.safe_dump(runconfig_dict, input_path, sort_keys=False)
+
+            pge = DistS1Executor(pge_name="DistS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            # Config validation occurs before the log is fully initialized, but the
+            # initial log file should still exist and contain details of the validation
+            # error
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            # Open the log file, and check that the validation error details were captured
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn(f"SAS RTC file groups do not make a subset of PGE Input Files", log_contents)
+
+            # Test 3: Detect if input RTC sensors are heterogeneous
+
+            runconfig_dict = deepcopy(backup_runconfig)
+
+            s1c_file = 'temp/OPERA_L2_RTC-S1_T137-292325-IW1_20241022T015921Z_20241022T180523Z_S1C_30_v1.0_VV.tif'
+
+            runconfig_dict['RunConfig']['Groups']['PGE']['InputFilesGroup']['InputFilePaths'][0] = s1c_file
+            runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['pre_rtc_copol'][0] = s1c_file
+
+            with open(s1c_file, 'wb') as fp:
+                fp.write(random.randbytes(1024))
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as input_path:
+                yaml.safe_dump(runconfig_dict, input_path, sort_keys=False)
+
+            pge = DistS1Executor(pge_name="DistS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            # Open the log file, and check that the validation error details were captured
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn(f"SAS input contains a RTCs from more than one S1 Sensor", log_contents)
+
+            # Test 4: Incorrect RTC file names
+
+            runconfig_dict = deepcopy(backup_runconfig)
+
+            s1c_file = 'temp/non_standard_rtc_name.tif'
+
+            runconfig_dict['RunConfig']['Groups']['PGE']['InputFilesGroup']['InputFilePaths'][0] = s1c_file
+            runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['pre_rtc_copol'][0] = s1c_file
+
+            with open(s1c_file, 'wb') as fp:
+                fp.write(random.randbytes(1024))
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as input_path:
+                yaml.safe_dump(runconfig_dict, input_path, sort_keys=False)
+
+            pge = DistS1Executor(pge_name="DistS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            # Open the log file, and check that the validation error details were captured
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn(f"Invalid RTC filenames in SAS input", log_contents)
+
+            # Test 5a: Badly ordered RTCs - Fixable
+
+            runconfig_dict = deepcopy(backup_runconfig)
+
+            pre_rtc_copol = runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['pre_rtc_copol']
+            pre_rtc_copol[0], pre_rtc_copol[1] = pre_rtc_copol[1], pre_rtc_copol[0]
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as input_path:
+                yaml.safe_dump(runconfig_dict, input_path, sort_keys=False)
+
+            pge = DistS1Executor(pge_name="DistS1PgeTest", runconfig_path=test_runconfig_path)
+            pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            # Open the log file, and check that the validation error details were captured
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn("One or more of the SAS RTC lists is badly ordered. Attempting to sort them", log_contents)
+
+            # Test 5b: Badly ordered RTCs - Unfixable - Date mismatch
+
+            runconfig_dict = deepcopy(backup_runconfig)
+
+            s1_file = 'temp/OPERA_L2_RTC-S1_T137-292318-IW1_20240904T015859Z_20240904T150822Z_S1A_30_v1.0_VV.tif'
+
+            runconfig_dict['RunConfig']['Groups']['PGE']['InputFilesGroup']['InputFilePaths'][0] = s1_file
+            runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['pre_rtc_copol'][0] = s1_file
+
+            with open(s1_file, 'wb') as fp:
+                fp.write(random.randbytes(1024))
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as input_path:
+                yaml.safe_dump(runconfig_dict, input_path, sort_keys=False)
+
+            pge = DistS1Executor(pge_name="DistS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            # Open the log file, and check that the validation error details were captured
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn(f"Date or burst ID mismatch in pre_rtc copol and crosspol lists", log_contents)
+
+            # Test 5c: Badly ordered RTCs - Unfixable - Burst mismatch
+
+            runconfig_dict = deepcopy(backup_runconfig)
+
+            s1_file = 'temp/OPERA_L2_RTC-S1_T137-292317-IW1_20250102T015857Z_20250102T190143Z_S1A_30_v1.0_VV.tif'
+
+            pre_rtc_copol = runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['pre_rtc_copol']
+            pre_rtc_crosspol = runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['pre_rtc_crosspol']
+
+            pge_input_index = len(pre_rtc_crosspol) + len(pre_rtc_crosspol)
+
+            runconfig_dict['RunConfig']['Groups']['PGE']['InputFilesGroup']['InputFilePaths'][pge_input_index] = s1_file
+            runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['post_rtc_copol'][0] = s1_file
+
+            with open(s1_file, 'wb') as fp:
+                fp.write(random.randbytes(1024))
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as input_path:
+                yaml.safe_dump(runconfig_dict, input_path, sort_keys=False)
+
+            pge = DistS1Executor(pge_name="DistS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            # Open the log file, and check that the validation error details were captured
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn(f"Date or burst ID mismatch in post_rtc copol and crosspol lists", log_contents)
+
+
+        finally:
+            if os.path.exists(test_runconfig_path):
+                os.unlink(test_runconfig_path)
+
+            if os.path.exists('temp'):
+                shutil.rmtree('temp')
+
 
     @patch.object(opera.util.tiff_utils, "gdal", MockGdal)
     def test_dist_s1_pge_output_validation(self):
