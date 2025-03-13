@@ -581,7 +581,9 @@ class DistS1PostProcessorMixin(PostProcessorMixin):
                 dst = os.path.join(output_product_path, basename(filename))
 
                 if scratch_path not in src and src != dst:
-                    shutil.move(str(src), dst)
+                    # TODO: Change this to shutil.move() with the next SAS delivery. We need the output directory
+                    #  structure intact for the comparison script since it works on the whole directory
+                    shutil.copy(str(src), dst)
 
     def _checksum_output_products(self):
         """
