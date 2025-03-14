@@ -33,25 +33,22 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
 
     This particular pre-processor is currently a stub implementation, inheriting from the base pre-processor mixin
     and adding nothing at this time. New functionalities will be added as new versions of the DIST-S1 SAS are released.
-
     """
 
     _pre_mixin_name = "DistS1PreProcessorMixin"
     _valid_input_extensions = (".tif",)
 
-    def _validate_rtcs(self):
-        """
-        Performs the following validations on the input RTCs:
+    _rtc_pattern = re.compile(r'(?P<id>(?P<project>OPERA)_(?P<level>L2)_(?P<product_type>RTC)-(?P<source>S1)_'
+                              r'(?P<burst_id>\w{4}-\w{6}-\w{3})_(?P<acquisition_ts>\d{4}\d{2}\d{2}T\d{2}\d{2}\d{2}Z)'
+                              r'_(?P<creation_ts>\d{4}\d{2}\d{2}T\d{2}\d{2}\d{2}Z)_(?P<sensor>S1A|S1B|S1C)_'
+                              r'(?P<spacing>30)_(?P<product_version>v\d+[.]\d+))'
+                              r'(_(?P<pol>VV|VH|HH|HV|VV\+VH|HH\+HV))?[.](?P<ext>tif|tiff)$')
 
-        1. Verifies the co- and cross-pol RTC input lists are the same length
-        2. Verifies the combined SAS RTC input lists are a subset of the PGE input list
-        3. Verifies the input RTCs have standard filenames (important for later checks)
-        4. Ensures input RTCs are not from a mixture of Sentinel-1A and Sentinel-1C
-        5. Validates that the co- and cross-pol RTCs are in the same order (burst-ID &
-           acquisition time)
-        6. Validates no cross-pol RTCs are in copol input lists and vice-versa
+    def __validate_rtc_list_lengths(self):
         """
-
+        Validate that the pre_rtc_copol & pre_rtc_crosspol / post_rtc_copol &
+        post_rtc_crosspol are the same lengths
+        """
         sas_config = self.runconfig.sas_config
 
         pre_rtc_copol = sas_config["run_config"]["pre_rtc_copol"]
@@ -68,6 +65,15 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
                 msg
             )
 
+    def __validate_rtc_lists_are_pge_subset(self):
+        """Ensures all RTCs in the SAS group are also in the PGE group"""
+        sas_config = self.runconfig.sas_config
+
+        pre_rtc_copol = sas_config["run_config"]["pre_rtc_copol"]
+        pre_rtc_crosspol = sas_config["run_config"]["pre_rtc_crosspol"]
+        post_rtc_copol = sas_config["run_config"]["post_rtc_copol"]
+        post_rtc_crosspol = sas_config["run_config"]["post_rtc_crosspol"]
+
         all_rtcs = pre_rtc_copol + pre_rtc_crosspol + post_rtc_copol + post_rtc_crosspol
 
         if not set([basename(rtc) for rtc in all_rtcs]).issubset([basename(rtc) for rtc in self.runconfig.input_files]):
@@ -78,13 +84,28 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
                 msg
             )
 
-        rtc_pattern = re.compile(r'(?P<id>(?P<project>OPERA)_(?P<level>L2)_(?P<product_type>RTC)-(?P<source>S1)_'
-                                 r'(?P<burst_id>\w{4}-\w{6}-\w{3})_(?P<acquisition_ts>\d{4}\d{2}\d{2}T\d{2}\d{2}\d{2}Z)'
-                                 r'_(?P<creation_ts>\d{4}\d{2}\d{2}T\d{2}\d{2}\d{2}Z)_(?P<sensor>S1A|S1B|S1C)_'
-                                 r'(?P<spacing>30)_(?P<product_version>v\d+[.]\d+))'
-                                 r'(_(?P<pol>VV|VH|HH|HV|VV\+VH|HH\+HV))?[.](?P<ext>tif|tiff)$')
+    def __validate_rtc_filenames(self):
+        """
+        Validates that all input RTCs have the standard filename defined in the RTC product specification.
 
-        rtc_matches = [rtc_pattern.match(basename(rtc)) for rtc in all_rtcs]
+        See: https://www.jpl.nasa.gov/go/opera/products/rtc-product/
+
+        Returns
+        -------
+        <rtc_matches>: List of re.Match objects
+            List of RTC filenames matched by a regular expression. Used in later validation. Only returns
+            if this validation is passing.
+        """
+        sas_config = self.runconfig.sas_config
+
+        pre_rtc_copol = sas_config["run_config"]["pre_rtc_copol"]
+        pre_rtc_crosspol = sas_config["run_config"]["pre_rtc_crosspol"]
+        post_rtc_copol = sas_config["run_config"]["post_rtc_copol"]
+        post_rtc_crosspol = sas_config["run_config"]["post_rtc_crosspol"]
+
+        all_rtcs = pre_rtc_copol + pre_rtc_crosspol + post_rtc_copol + post_rtc_crosspol
+
+        rtc_matches = [self._rtc_pattern.match(basename(rtc)) for rtc in all_rtcs]
         mismatches = [rtc for match, rtc in zip(rtc_matches, all_rtcs) if match is None]
 
         if len(mismatches) > 0:
@@ -95,6 +116,17 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
                 msg
             )
 
+        return rtc_matches
+
+    def __validate_rtc_homogeneity(self, rtc_matches):
+        """
+        Validates all RTCs are from either Sentinel-1A or Sentinel-1C.
+
+        Parameters
+        ----------
+        <rtc_matches>: List of re.Match objects
+            List of RTC filenames matched by a regular expression.
+        """
         if len(set([match.groupdict()['sensor'] for match in rtc_matches])) > 1:
             msg = 'RunConfig contains RTCs from more than one S1 Sensor. Inputs should be all from S1A or S1C'
             self.logger.critical(
@@ -103,6 +135,14 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
                 msg
             )
 
+    def __validate_rtc_ordering(self):
+        """
+        Verifies the pre and post co- and cross-pol RTC lists are well-ordered.
+
+        First, the lists are sorted by burst ID, then acquisition time. They are then
+        checked so that each RTC in the copol lists have the same burst ID and acquisition
+        time as the RTC in the same position in the corresponding crosspol list.
+        """
         def is_sorted(iterable, key=lambda x: x) -> bool:
             for i, e in enumerate(iterable[1:]):
                 if key(e) < key(iterable[i]):
@@ -110,10 +150,28 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
             return True
 
         def sort_fn(path):
-            match = rtc_pattern.match(os.path.basename(path))
+            match = self._rtc_pattern.match(os.path.basename(path))
             match_dict = match.groupdict()
 
             return match_dict['burst_id'], match_dict['acquisition_ts']
+
+        def compare_rtc_dates_and_bursts(copol, crosspol):
+            for copol_rtc, crosspol_rtc in zip(copol, crosspol):
+                copol_rtc = self._rtc_pattern.match(os.path.basename(copol_rtc))
+                crosspol_rtc = self._rtc_pattern.match(os.path.basename(crosspol_rtc))
+
+                if copol_rtc.groupdict()['acquisition_ts'] != crosspol_rtc.groupdict()['acquisition_ts']:
+                    return False
+                if copol_rtc.groupdict()['burst_id'] != crosspol_rtc.groupdict()['burst_id']:
+                    return False
+            return True
+
+        sas_config = self.runconfig.sas_config
+
+        pre_rtc_copol = sas_config["run_config"]["pre_rtc_copol"]
+        pre_rtc_crosspol = sas_config["run_config"]["pre_rtc_crosspol"]
+        post_rtc_copol = sas_config["run_config"]["post_rtc_copol"]
+        post_rtc_crosspol = sas_config["run_config"]["post_rtc_crosspol"]
 
         if not all([is_sorted(rtc_list, key=sort_fn) for rtc_list in (pre_rtc_copol, pre_rtc_crosspol,
                                                                       post_rtc_copol, post_rtc_crosspol)]):
@@ -128,17 +186,6 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
             pre_rtc_crosspol.sort(key=sort_fn)
             post_rtc_copol.sort(key=sort_fn)
             post_rtc_crosspol.sort(key=sort_fn)
-
-        def compare_rtc_dates_and_bursts(copol, crosspol):
-            for copol_rtc, crosspol_rtc in zip(copol, crosspol):
-                copol_rtc = rtc_pattern.match(os.path.basename(copol_rtc))
-                crosspol_rtc = rtc_pattern.match(os.path.basename(crosspol_rtc))
-
-                if copol_rtc.groupdict()['acquisition_ts'] != crosspol_rtc.groupdict()['acquisition_ts']:
-                    return False
-                if copol_rtc.groupdict()['burst_id'] != crosspol_rtc.groupdict()['burst_id']:
-                    return False
-            return True
 
         if not compare_rtc_dates_and_bursts(pre_rtc_copol, pre_rtc_crosspol):
             msg = 'Date or burst ID mismatch in pre_rtc copol and crosspol lists'
@@ -156,8 +203,20 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
                 msg
             )
 
+    def __validate_co_and_cross_polarizations(self):
+        """
+        Ensures the RTCs in the copol lists are co-polarized (VV or HH). Likewise,
+        ensures the RTCs in the crosspol lists are cross-polarized (VH or HV).
+        """
+        sas_config = self.runconfig.sas_config
+
+        pre_rtc_copol = sas_config["run_config"]["pre_rtc_copol"]
+        pre_rtc_crosspol = sas_config["run_config"]["pre_rtc_crosspol"]
+        post_rtc_copol = sas_config["run_config"]["post_rtc_copol"]
+        post_rtc_crosspol = sas_config["run_config"]["post_rtc_crosspol"]
+
         for rtc in pre_rtc_copol + post_rtc_copol:
-            if rtc_pattern.match(os.path.basename(rtc)).groupdict()['pol'] not in ['VV', 'HH']:
+            if self._rtc_pattern.match(os.path.basename(rtc)).groupdict()['pol'] not in ['VV', 'HH']:
                 msg = f'Found non-copol RTC in copol input list: {os.path.basename(rtc)}'
                 self.logger.critical(
                     self.name,
@@ -166,13 +225,33 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
                 )
 
         for rtc in pre_rtc_crosspol + post_rtc_crosspol:
-            if rtc_pattern.match(os.path.basename(rtc)).groupdict()['pol'] not in ['VH', 'HV']:
+            if self._rtc_pattern.match(os.path.basename(rtc)).groupdict()['pol'] not in ['VH', 'HV']:
                 msg = f'Found non-crosspol RTC in crosspol input list: {os.path.basename(rtc)}'
                 self.logger.critical(
                     self.name,
                     ErrorCode.INVALID_INPUT,
                     msg
                 )
+
+    def _validate_rtcs(self):
+        """
+        Performs the following validations on the input RTCs:
+
+        1. Verifies the co- and cross-pol RTC input lists are the same length
+        2. Verifies the combined SAS RTC input lists are a subset of the PGE input list
+        3. Verifies the input RTCs have standard filenames (important for later checks)
+        4. Ensures input RTCs are not from a mixture of Sentinel-1A and Sentinel-1C
+        5. Validates that the co- and cross-pol RTCs are in the same order (burst-ID &
+           acquisition time)
+        6. Validates no cross-pol RTCs are in copol input lists and vice-versa
+        """
+
+        self.__validate_rtc_list_lengths()
+        self.__validate_rtc_lists_are_pge_subset()
+        matches = self.__validate_rtc_filenames()
+        self.__validate_rtc_homogeneity(matches)
+        self.__validate_rtc_ordering()
+        self.__validate_co_and_cross_polarizations()
 
     def run_preprocessor(self, **kwargs):
         """
@@ -206,7 +285,6 @@ class DistS1PostProcessorMixin(PostProcessorMixin):
 
     This particular pre-processor is currently a stub implementation, inheriting from the base pre-processor mixin
     and adding nothing at this time. New functionalities will be added as new versions of the DIST-S1 SAS are released.
-
     """
 
     _post_mixin_name = "DistS1PostProcessorMixin"
