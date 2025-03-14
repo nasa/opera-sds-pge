@@ -59,8 +59,8 @@ class DistS1PgeTestCase(unittest.TestCase):
 
         # Create the input dir expected by the test RunConfig and add a
         # dummy input file
-        input_dir = join(self.working_dir.name, "dist_s1_pge_test/input_dir")
-        os.makedirs(input_dir, exist_ok=True)
+        self.input_dir = abspath(join(self.working_dir.name, "dist_s1_pge_test/input_dir"))
+        os.makedirs(self.input_dir, exist_ok=True)
 
         # Create dummy input files based on the test run config
         runconfig_path = join(self.data_dir, 'test_dist_s1_config.yaml')
@@ -205,10 +205,8 @@ class DistS1PgeTestCase(unittest.TestCase):
 
         input_files_group = runconfig_dict['RunConfig']['Groups']['PGE']['InputFilesGroup']
 
-        Path('temp').mkdir(parents=True, exist_ok=True)
-
         # Test that a non-existent file path is detected by pre-processor
-        input_files_group['InputFilePaths'] = ['temp/non_existent_file.tif']
+        input_files_group['InputFilePaths'] = [os.path.join(self.input_dir, 'non_existent_file.tif')]
 
         try:
             with open(test_runconfig_path, 'w', encoding='utf-8') as input_path:
@@ -233,7 +231,7 @@ class DistS1PgeTestCase(unittest.TestCase):
                           f"{input_files_group['InputFilePaths'][0]}", log_contents)
 
             # Test that invalid file types are detected by pre-processor
-            input_files_group['InputFilePaths'] = ['temp/wrong_input_type.h5']
+            input_files_group['InputFilePaths'] = [os.path.join(self.input_dir, 'wrong_input_type.h5')]
 
             with open(input_files_group['InputFilePaths'][0], 'wb') as fp:
                 fp.write(random.randbytes(1024))
@@ -256,7 +254,7 @@ class DistS1PgeTestCase(unittest.TestCase):
                           f'extension.', log_contents)
 
             # Test that empty files are detected by pre-processor
-            input_files_group['InputFilePaths'] = ['temp/empty.tif']
+            input_files_group['InputFilePaths'] = [os.path.join(self.input_dir, 'empty.tif')]
 
             os.system(
                 f"touch {input_files_group['InputFilePaths'][0]}"
@@ -282,9 +280,6 @@ class DistS1PgeTestCase(unittest.TestCase):
             if os.path.exists(test_runconfig_path):
                 os.unlink(test_runconfig_path)
 
-            if os.path.exists('temp'):
-                shutil.rmtree('temp')
-
     def test_dist_s1_pge_input_rtc_validations(self):
         """Test the input RTC validation checks made by DistS1PreProcessorMixin."""
         runconfig_path = join(self.data_dir, 'test_dist_s1_config.yaml')
@@ -296,11 +291,9 @@ class DistS1PgeTestCase(unittest.TestCase):
         backup_runconfig = deepcopy(runconfig_dict)
 
         try:
-            Path('temp').mkdir(parents=True, exist_ok=True)
-
             # Test 1: Detect co/crosspol length mismatch
 
-            s1_file = 'temp/OPERA_L2_RTC-S1_T137-292325-IW1_20241022T015921Z_20241022T180523Z_S1A_30_v1.0_VV.tif'
+            s1_file = os.path.join(self.input_dir, 'OPERA_L2_RTC-S1_T137-292325-IW1_20241022T015921Z_20241022T180523Z_S1A_30_v1.0_VV.tif')
 
             runconfig_dict['RunConfig']['Groups']['PGE']['InputFilesGroup']['InputFilePaths'].append(s1_file)
             runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['pre_rtc_copol'].append(s1_file)
@@ -356,7 +349,7 @@ class DistS1PgeTestCase(unittest.TestCase):
 
             runconfig_dict = deepcopy(backup_runconfig)
 
-            s1c_file = 'temp/OPERA_L2_RTC-S1_T137-292325-IW1_20241022T015921Z_20241022T180523Z_S1C_30_v1.0_VV.tif'
+            s1c_file = os.path.join(self.input_dir, 'OPERA_L2_RTC-S1_T137-292325-IW1_20241022T015921Z_20241022T180523Z_S1C_30_v1.0_VV.tif')
 
             runconfig_dict['RunConfig']['Groups']['PGE']['InputFilesGroup']['InputFilePaths'][0] = s1c_file
             runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['pre_rtc_copol'][0] = s1c_file
@@ -385,7 +378,7 @@ class DistS1PgeTestCase(unittest.TestCase):
 
             runconfig_dict = deepcopy(backup_runconfig)
 
-            s1c_file = 'temp/non_standard_rtc_name.tif'
+            s1c_file = os.path.join(self.input_dir, 'non_standard_rtc_name.tif')
 
             runconfig_dict['RunConfig']['Groups']['PGE']['InputFilesGroup']['InputFilePaths'][0] = s1c_file
             runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['pre_rtc_copol'][0] = s1c_file
@@ -436,7 +429,7 @@ class DistS1PgeTestCase(unittest.TestCase):
 
             runconfig_dict = deepcopy(backup_runconfig)
 
-            s1_file = 'temp/OPERA_L2_RTC-S1_T137-292318-IW1_20240904T015859Z_20240904T150822Z_S1A_30_v1.0_VV.tif'
+            s1_file = os.path.join(self.input_dir, 'OPERA_L2_RTC-S1_T137-292318-IW1_20240904T015859Z_20240904T150822Z_S1A_30_v1.0_VV.tif')
 
             runconfig_dict['RunConfig']['Groups']['PGE']['InputFilesGroup']['InputFilePaths'][0] = s1_file
             runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['pre_rtc_copol'][0] = s1_file
@@ -465,7 +458,7 @@ class DistS1PgeTestCase(unittest.TestCase):
 
             runconfig_dict = deepcopy(backup_runconfig)
 
-            s1_file = 'temp/OPERA_L2_RTC-S1_T137-292317-IW1_20250102T015857Z_20250102T190143Z_S1A_30_v1.0_VV.tif'
+            s1_file = os.path.join(self.input_dir, 'OPERA_L2_RTC-S1_T137-292317-IW1_20250102T015857Z_20250102T190143Z_S1A_30_v1.0_VV.tif')
 
             pre_rtc_copol = runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['pre_rtc_copol']
             pre_rtc_crosspol = runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['pre_rtc_crosspol']
@@ -549,9 +542,6 @@ class DistS1PgeTestCase(unittest.TestCase):
         finally:
             if os.path.exists(test_runconfig_path):
                 os.unlink(test_runconfig_path)
-
-            if os.path.exists('temp'):
-                shutil.rmtree('temp')
 
     @patch.object(opera.util.tiff_utils, "gdal", MockGdal)
     def test_dist_s1_pge_output_validation(self):
