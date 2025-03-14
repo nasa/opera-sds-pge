@@ -1,33 +1,32 @@
 RunConfig:
-  Name: OPERA-TROPO-PGE-TEST-CONFIG
+  Name: OPERA-TROPO-PGE-INT-TEST-RUNCONFIG
   Groups:
     PGE:
       PGENameGroup:
         PGEName: TROPO_PGE
       InputFilesGroup:
         InputFilePaths:
-        - tropo_pge_test/input_dir
+        - /home/ops/input_dir/20190613/D06130600061306001.zz.nc
       DynamicAncillaryFilesGroup:
         AncillaryFileMap: {}
       ProductPathGroup:
-        OutputProductPath: tropo_pge_test/output_dir
-        ScratchPath: tropo_pge_test/scratch_dir
+        OutputProductPath: /home/ops/output_dir 
+        ScratchPath: /home/ops/scratch_dir
       PrimaryExecutable:
         ProductIdentifier: TROPO
-        ProductVersion: "1.0"
-        ProgramPath: /bin/echo
+        ProductVersion: "0.1"
+        ProgramPath: opera_tropo
         ProgramOptions:
-        - 'hello world > tropo_pge_test/output_dir/tropo_test.nc;'
-        - '/bin/echo TROPO invoked with RunConfig'
-        ErrorCodeBase: 400000
-        SchemaPath: pge/tropo/schema/tropo_sas_schema.yaml
+        - run
+        ErrorCodeBase: 800000
+        SchemaPath: /home/ops/opera/pge/tropo/schema/tropo_sas_schema.yaml
         AlgorithmParametersSchemaPath: 
         IsoMeasuredParameterDescriptions:
         DataValidityStartDate:
         IsoTemplatePath: ""
       QAExecutable:
-        Enabled: false
-        ProgramPath: null
+        Enabled: true
+        ProgramPath: /home/ops/opera/.ci/scripts/tropo/compare_tropo_products.sh
         ProgramOptions: []
       DebugLevelGroup:
         DebugSwitch: false
@@ -36,7 +35,7 @@ RunConfig:
       input_file:
         # REQUIRED: path to HRES model file.
         #   Type: string | Path.
-        input_file_path: input_data/D01010000010100001.zz.nc
+        input_file_path: /home/ops/input_dir/20190613/D06130600061306001.zz.nc
       primary_executable:
         # Product type of the PGE.
         #   Type: string.
@@ -44,13 +43,13 @@ RunConfig:
       product_path_group:
         # REQUIRED: Directory where PGE will place results.
         #   Type: string.
-        product_path: tropo_pge_test/output_dir
+        product_path: /home/ops/output_dir
         # Path to the scratch directory.
         #   Type: string.
-        scratch_path: tropo_pge_test/scratch_dir
+        scratch_path: /home/ops/scratch_dir
         # Path to the SAS output directory.
         #   Type: string.
-        sas_output_path: tropo_pge_test/output_dir
+        sas_output_path: /home/ops/output_dir
         # Version of the product, in <major>.<minor> format.
         #   Type: string.
         product_version: '0.1'
