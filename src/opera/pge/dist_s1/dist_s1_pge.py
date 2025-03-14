@@ -12,7 +12,7 @@ import os
 import re
 import shutil
 from datetime import datetime
-from itertools import chain, cycle
+from itertools import chain
 from os.path import join, isdir, isfile, abspath, basename, splitext
 
 from opera.pge.base.base_pge import PreProcessorMixin, PgeExecutor, PostProcessorMixin
