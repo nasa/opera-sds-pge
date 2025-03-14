@@ -343,7 +343,10 @@ class DistS1PgeTestCase(unittest.TestCase):
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
 
-            self.assertIn(f"SAS RTC file groups do not make a subset of PGE Input Files", log_contents)
+            self.assertIn(
+                f"RunConfig SAS group RTC file lists do not make a subset of PGE group Input File list",
+                log_contents
+            )
 
             # Test 3: Detect if input RTC sensors are heterogeneous
 
@@ -401,7 +404,7 @@ class DistS1PgeTestCase(unittest.TestCase):
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
 
-            self.assertIn(f"Invalid RTC filenames in SAS input", log_contents)
+            self.assertIn(f"Invalid RTC filenames in RunConfig", log_contents)
 
             # Test 5a: Badly ordered RTCs - Fixable
 
@@ -423,7 +426,7 @@ class DistS1PgeTestCase(unittest.TestCase):
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
 
-            self.assertIn("One or more of the SAS RTC lists is badly ordered. Attempting to sort them", log_contents)
+            self.assertIn("One or more of the RunConfig SAS group RTC lists is badly ordered. Attempting to sort them", log_contents)
 
             # Test 5b: Badly ordered RTCs - Unfixable - Date mismatch
 
