@@ -65,7 +65,7 @@ pipeline {
                 sh label: 'Download and install',
                    script: """#!/bin/bash
                      mkdir -p /var/lib/jenkins/conda_installs/${RUN_ID}/miniforge
-                     wget -q https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh -O /var/lib/jenkins/conda_installs/${RUN_ID}/miniforge/miniforge.sh
+                     wget -q https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh -O /var/lib/jenkins/conda_installs/${RUN_ID}/miniforge/miniforge.sh
                      bash /var/lib/jenkins/conda_installs/${RUN_ID}/miniforge/miniforge.sh -b -u -p /var/lib/jenkins/conda_installs/${RUN_ID}/miniforge
                      rm /var/lib/jenkins/conda_installs/${RUN_ID}/miniforge/miniforge.sh
                    """
