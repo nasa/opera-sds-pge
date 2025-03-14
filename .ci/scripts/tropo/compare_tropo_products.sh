@@ -73,7 +73,7 @@ do
             overall_status=1
         else
             echo "Running validation script on $expected_file and ${OUTPUT_DIR}/${output_file}"
-            compare_log=$(opera_tropo validate "$expected_file" "${OUTPUT_DIR}/${output_file}" 2>&1)
+            compare_out=$(opera_tropo validate "$expected_file" "${OUTPUT_DIR}/${output_file}" 2>&1)
             
             compare_exit_status=$?
 
