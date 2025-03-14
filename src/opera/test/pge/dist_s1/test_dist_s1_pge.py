@@ -379,7 +379,7 @@ class DistS1PgeTestCase(unittest.TestCase):
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
 
-            self.assertIn(f"SAS input contains a RTCs from more than one S1 Sensor", log_contents)
+            self.assertIn(f"RunConfig contains RTCs from more than one S1 Sensor", log_contents)
 
             # Test 4: Incorrect RTC file names
 

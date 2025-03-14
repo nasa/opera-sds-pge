@@ -79,18 +79,16 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
             )
 
         rtc_pattern = re.compile(r'(?P<id>(?P<project>OPERA)_(?P<level>L2)_(?P<product_type>RTC)-(?P<source>S1)_'
-                                 r'(?P<burst_id>\w{4}-\w{6}-\w{3})_(?P<acquisition_ts>(?P<acq_year>\d{4})(?P<acq_month>'
-                                 r'\d{2})(?P<acq_day>\d{2})T(?P<acq_hour>\d{2})(?P<acq_minute>\d{2})(?P<acq_second>'
-                                 r'\d{2})Z)_(?P<creation_ts>(?P<cre_year>\d{4})(?P<cre_month>\d{2})(?P<cre_day>\d{2})T'
-                                 r'(?P<cre_hour>\d{2})(?P<cre_minute>\d{2})(?P<cre_second>\d{2})Z)_'
-                                 r'(?P<sensor>S1A|S1B|S1C)_(?P<spacing>30)_(?P<product_version>v\d+[.]\d+))'
-                                 r'(_(?P<pol>VV|VH|HH|HV|VV\+VH|HH\+HV)|_BROWSE|_mask)?[.]'
-                                 r'(?P<ext>tif|tiff|h5|png|iso\.xml)$')
+                                 r'(?P<burst_id>\w{4}-\w{6}-\w{3})_(?P<acquisition_ts>\d{4}\d{2}\d{2}T\d{2}\d{2}\d{2}Z)'
+                                 r'_(?P<creation_ts>\d{4}\d{2}\d{2}T\d{2}\d{2}\d{2}Z)_(?P<sensor>S1A|S1B|S1C)_'
+                                 r'(?P<spacing>30)_(?P<product_version>v\d+[.]\d+))'
+                                 r'(_(?P<pol>VV|VH|HH|HV|VV\+VH|HH\+HV))?[.](?P<ext>tif|tiff)$')
 
         rtc_matches = [rtc_pattern.match(basename(rtc)) for rtc in all_rtcs]
+        mismatches = [rtc for match, rtc in zip(rtc_matches, all_rtcs) if match is None]
 
-        if any([match is None for match in rtc_matches]):
-            msg = 'Invalid RTC filenames in SAS input'
+        if len(mismatches) > 0:
+            msg = f'Invalid RTC filenames in SAS input: {mismatches}'
             self.logger.critical(
                 self.name,
                 ErrorCode.INVALID_INPUT,
@@ -98,7 +96,7 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
             )
 
         if len(set([match.groupdict()['sensor'] for match in rtc_matches])) > 1:
-            msg = 'SAS input contains a RTCs from more than one S1 Sensor. Inputs should be all from S1A or S1C'
+            msg = 'RunConfig contains RTCs from more than one S1 Sensor. Inputs should be all from S1A or S1C'
             self.logger.critical(
                 self.name,
                 ErrorCode.INVALID_INPUT,
@@ -160,7 +158,7 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
 
         for rtc in pre_rtc_copol + post_rtc_copol:
             if rtc_pattern.match(os.path.basename(rtc)).groupdict()['pol'] not in ['VV', 'HH']:
-                msg = 'Found non-copol RTC in copol input list'
+                msg = f'Found non-copol RTC in copol input list: {os.path.basename(rtc)}'
                 self.logger.critical(
                     self.name,
                     ErrorCode.INVALID_INPUT,
@@ -169,7 +167,7 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
 
         for rtc in pre_rtc_crosspol + post_rtc_crosspol:
             if rtc_pattern.match(os.path.basename(rtc)).groupdict()['pol'] not in ['VH', 'HV']:
-                msg = 'Found non-crosspol RTC in crosspol input list'
+                msg = f'Found non-crosspol RTC in crosspol input list: {os.path.basename(rtc)}'
                 self.logger.critical(
                     self.name,
                     ErrorCode.INVALID_INPUT,
