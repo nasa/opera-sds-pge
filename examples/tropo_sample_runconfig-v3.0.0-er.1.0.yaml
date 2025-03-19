@@ -1,0 +1,177 @@
+# Sample RunConfig for use with the TROPO PGE v3.0.0-er.1.0
+# This RunConfig should require minimal changes in order to be used with the
+# OPERA PCM.
+
+RunConfig:
+  # Name for the RunCOnfig, may be any string
+  Name: OPERA-TROPO-PGE-SAMPLE-CONFIG
+  
+  Groups:
+    # PGE-specific RunConfig section
+    # This section is only used by the PGE, however, paths to inputs/outputs
+    # should align with the similar sections of the SAS RunConfig
+    PGE:
+      PGENameGroup:
+        # Name of the PGE for use with this RunConfig, should always be
+        # TROPO_PGE when using with the TROPO PGE
+        PGEName: TROPO_PGE
+
+      InputFilesGroup:
+        # List of input files/directories
+        # Must be a list of input netCDF files
+        InputFilePaths:
+        - /home/ops/input_dir/20190613/D06130600061306001.zz.nc
+
+      DynamicAncillaryFilesGroup:
+        # Map of ancillary file types to paths to the file
+        # Paths must correspond to the file system within the Docker container
+        # For now, this is empty
+        AncillaryFileMap: {}
+
+      ProductPathGroup:
+        # Path to where output products should be stored
+        # Must correspond to the file system within the Docker container,
+        # and must have write permissions for the User/Group used with
+        # the "Docker run" command
+        OutputProductPath: /home/ops/output_dir 
+
+        # Path to a scratch directory for the PGE and SAS to store
+        # intermediate files that will not be needed after PGE execution
+        # completes
+        # Must correspond to the file system within the Docker container,
+        # and must have write permissions for the User/Group used with
+        # the "Docker run" command
+        ScratchPath: /home/ops/scratch_dir
+
+      PrimaryExecutable:
+        # Identifier for the PGE executable, should always be TROPO for
+        # this PGE
+        ProductIdentifier: TROPO
+
+        # Product version specific to output products
+        ProductVersion: "0.1"
+
+        # Path to the executable to run, path must be reachable from
+        # within the Docker container (i.e. findable with a "which" command)
+        ProgramPath: opera_tropo
+
+        # List of command-line options to use with ProgramPath
+        ProgramOptions:
+        - run
+
+        # The Error Code base value added to the offset values to make
+        # error codes unique per-PGE
+        ErrorCodeBase: 800000
+
+        # Path to the Yamale schema used to validate the SAS portion
+        # of the RunConfig
+        # Path should correspond to the file system within the Docker
+        # container, and typically should reference a schema file bundled
+        # with the opera_pge installation directory within the container
+        # Consult the Docker image build scripts for more info
+        SchemaPath: /home/ops/opera/pge/tropo/schema/tropo_sas_schema.yaml
+
+        # Path to the Yamale schema used specifically to validate the
+        # algorithm parameters config, which is stored within a separate
+        # yaml file referenced within the SAS portion of this RunConfig
+        # Currently unused by TROPO
+        AlgorithmParametersSchemaPath: ""
+
+        # Path to a YAML file mapping Measured Parameter metadata names to descriptions
+        # used to supplement the ISO xml metadata file
+        # Path should correspond to the file system within the Docker
+        # container, and typically should reference a template file bundled
+        # with the opera_pge installation directory within the container
+        # Consult the Docker image build scripts for more info
+        # TBD for TROPO
+        IsoMeasuredParameterDescriptions: ""
+
+        # Path to the Jinja2 template used to generate the ISO xml
+        # metadata file
+        # Path should correspond to the file system within the Docker
+        # container, and typically should reference a template file bundled
+        # with the opera_pge installation directory within the container
+        # Consult the Docker image build scripts for more info
+        # TBD for TROPO
+        IsoTemplatePath: ""
+
+      QAExecutable:
+        # Set to True to enable execution of an additional "Quality Assurance"
+        # application after SAS execution has completed
+        Enabled: false
+
+        # Path to the executable to run, path must be reachable from
+        # within the Docker container (i.e. findable with a "which" command)
+        ProgramPath: null
+
+        # List of command-line options to use with ProgramPath
+        ProgramOptions: []
+        
+      DebugLevelGroup:
+        # Set to True to enable Debug mode (Note: currently a no-op for this PGE)
+        DebugSwitch: false
+
+        # Set to True to have the PGE invoke the SAS/QA executables via
+        # a shell, rather than a Python subprocess
+        # This allows shell-style syntax to be used in ProgramPath and
+        # ProgramOptions, which can be useful for testing
+        ExecuteViaShell: true
+
+    # SAS-specific RunConfig section
+    # Prior to SAS execution by the PGE, the section below starting at "SAS"
+    # is isolated into its own YAML file for use with the SAS 
+    SAS:
+      input_file:
+        # REQUIRED: path to HRES model file.
+        #   Type: string | Path.
+        input_file_path: /home/ops/input_dir/20190613/D06130600061306001.zz.nc
+      primary_executable:
+        # Product type of the PGE.
+        #   Type: string.
+        product_type: OPERA_TROPO
+      product_path_group:
+        # REQUIRED: Directory where PGE will place results.
+        #   Type: string.
+        product_path: /home/ops/output_dir
+        # Path to the scratch directory.
+        #   Type: string.
+        scratch_path: /home/ops/scratch_dir
+        # Path to the SAS output directory.
+        #   Type: string.
+        sas_output_path: /home/ops/output_dir
+        # Version of the product, in <major>.<minor> format.
+        #   Type: string.
+        product_version: '0.1'
+      worker_settings:
+        # Number of workers to run in parallel 
+        #   Type: integer.
+        n_workers: 4
+        # Number of threads to use per worker. This sets the OMP_NUM_THREADS environment variable in
+        #   each python process.
+        #   Type: integer.
+        threads_per_worker: 2
+        # Max memory to use per worker in GB. 
+        #   Type: integer.
+        max_memory: 8
+        # Dask local spill directory 
+        #   Type: string.
+        dask_temp_dir: tmp
+        # Size (rows, columns) of blocks of data to load at a time.
+        #   Type: array.
+        block_shape:
+          - 128
+          - 128
+      output_options:
+        # Output height levels for ZTD, if empty use default HRES 145 levels.
+        #   Type: list.
+        output_heights: []
+        # Level of compression applied to netcdf
+        #   Type: dict.
+        compression_kwargs:
+          compression_flag: true
+          zlib: true
+          complevel: 5
+          shuffle: true
+      # Path to the output log file in addition to logging to stderr.
+      #   Type: string | null.
+      log_file: output_dir/sas_logfile.log
