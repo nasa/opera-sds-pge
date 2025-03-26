@@ -25,7 +25,9 @@ from opera.util.dataset_utils import parse_bounding_polygon_from_wkt
 from opera.util.error_codes import ErrorCode
 from opera.util.h5_utils import get_cslc_s1_product_metadata
 from opera.util.h5_utils import get_disp_s1_product_metadata
-from opera.util.input_validation import validate_algorithm_parameters_config, validate_disp_inputs
+from opera.util.input_validation import (validate_algorithm_parameters_config,
+                                         validate_disp_inputs,
+                                         validate_disp_static_inputs)
 from opera.util.render_jinja2 import augment_hdf5_measured_parameters, render_jinja2
 from opera.util.time import get_time_for_filename, get_catalog_metadata_datetime_str
 
@@ -44,6 +46,25 @@ class DispS1PreProcessorMixin(PreProcessorMixin):
 
     _pre_mixin_name = "DispS1PreProcessorMixin"
 
+    def _baseline_preprocessor(self):
+        """Preprocessor steps for baseline workflow"""
+
+        # If debug mode is enabled, skip the input validation, since we might
+        # be working with only a partial set of inputs/ancillaries
+        if not self.runconfig.debug_switch:
+            validate_disp_inputs(self.runconfig, self.logger, self.name)
+
+        validate_algorithm_parameters_config(self.name,
+                                             self.runconfig.algorithm_parameters_schema_path,
+                                             self.runconfig.algorithm_parameters_file_config_path,
+                                             self.logger)
+
+    def _static_preprocessor(self):
+        """Preprocessor steps for static workflow"""
+
+        if not self.runconfig.debug_switch:
+            validate_disp_static_inputs(self.runconfig, self.logger, self.name)
+
     def run_preprocessor(self, **kwargs):
         """
         Executes the pre-processing steps for DISP-S1 PGE initialization.
@@ -59,15 +80,12 @@ class DispS1PreProcessorMixin(PreProcessorMixin):
         """
         super().run_preprocessor(**kwargs)
 
-        # If debug mode is enabled, skip the input validation, since we might
-        # be working with only a partial set of inputs/ancillaries
-        if not self.runconfig.debug_switch:
-            validate_disp_inputs(self.runconfig, self.logger, self.name)
+        static_layers = self.runconfig.sas_config['primary_executable']['product_type'] == 'DISP_S1_STATIC'
 
-        validate_algorithm_parameters_config(self.name,
-                                             self.runconfig.algorithm_parameters_schema_path,
-                                             self.runconfig.algorithm_parameters_file_config_path,
-                                             self.logger)
+        if static_layers:
+            self._static_preprocessor()
+        else:
+            self._baseline_preprocessor()
 
     def convert_troposphere_model_files(self):
         """
