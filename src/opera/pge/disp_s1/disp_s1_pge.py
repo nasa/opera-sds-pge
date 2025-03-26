@@ -28,7 +28,8 @@ from opera.util.h5_utils import get_disp_s1_product_metadata
 from opera.util.input_validation import (validate_algorithm_parameters_config,
                                          validate_disp_inputs,
                                          validate_disp_static_inputs)
-from opera.util.render_jinja2 import augment_hdf5_measured_parameters, render_jinja2
+from opera.util.render_jinja2 import augment_hdf5_measured_parameters, render_jinja2, augment_measured_parameters
+from opera.util.tiff_utils import get_geotiff_metadata
 from opera.util.time import get_time_for_filename, get_catalog_metadata_datetime_str
 
 
@@ -881,5 +882,264 @@ class DispS1Executor(DispS1PreProcessorMixin, DispS1PostProcessorMixin, PgeExecu
                 '*.nc': self._netcdf_filename,
                 '*displacement.png': self._browse_filename,
                 'compressed*.h5': self._compressed_cslc_filename
+            }
+        )
+
+
+class DispS1StaticPreProcessorMixin(DispS1PreProcessorMixin):
+    """
+    Alias for DispS1PreProcessorMixin to avoid errors with inheritance in Executor.
+    Makes no changes to base class
+    """
+    ...
+
+
+class DispS1StaticPostProcessorMixin(DispS1PostProcessorMixin):
+    """
+    Mixin class responsible for handling all post-processing steps for the DISP-S1
+    PGE. The post-processing phase is defined as all steps required after SAS
+    execution has completed, prior to handover of output products to PCM.
+
+    In addition to the base functionality inherited from PostProcessorMixin, this
+    mixin adds an output validation step to ensure that the output file(s) defined
+    by the RunConfig exist and are valid.
+
+    """
+
+    _post_mixin_name = "DispS1StaticPostProcessorMixin"
+    _product_metadata_cache = {}
+    _product_filename_cache = {}
+
+    def _validate_output(self):
+        """
+        Evaluates the output files generated from SAS execution to ensure:
+            - That three expected .tif files exist in the output directory designated
+              by the RunConfig and are non-zero in size
+            - .png file corresponding to the expected output los_enu.tif product exists
+              alongside and is non-zero in size
+
+        """
+
+        output_dir = abspath(self.runconfig.output_product_path)
+
+        # Validate .nc product file
+        tiff_files = glob.glob(join(output_dir, '*.tif'))
+        png_files = glob.glob(join(output_dir, '*.png'))
+
+        if set([basename(f) for f in tiff_files]) != {'dem_warped_utm.tif', 'layover_shadow_mask.tif', 'los_enu.tif'}:
+            error_msg = ("The SAS did not create the expected output products: 'dem_warped_utm.tif', "
+                         "'layover_shadow_mask.tif', and 'los_enu.tif'")
+            self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
+
+        if 'los_enu.browse.png' not in [basename(f) for f in png_files]:
+            error_msg = "The SAS did not create the expected output browse image: 'los_enu.browse.png'"
+            self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
+
+        for f in tiff_files + png_files:
+            if os.stat(f).st_size == 0:
+                error_msg = f"SAS produced an output file {basename(f)} that is empty"
+                self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
+
+    def _core_filename(self, inter_filename=None):
+        """
+        Returns the core file name component for products produced by the
+        DISP-S1 PGE.
+
+        The core file name component of the DISP-S1 PGE consists of:
+
+        <PROJECT>_<LEVEL>_<PGE NAME>_<FrameID>_<ValidityStartDate>_<Sensor>_<ProductVersion>
+
+        Callers of this function are responsible for assignment of any other
+        product-specific fields, such as the file extension.
+
+        Parameters
+        ----------
+        inter_filename : str, optional
+            The intermediate filename of the output product to generate the
+            core filename for. This parameter may be used to inspect the file
+            in order to derive any necessary components of the returned filename.
+            Once the core filename is cached upon first call to this function,
+            this parameter may be omitted.
+
+        Returns
+        -------
+        core_filename : str
+            The filename component to assign to frame-based products created by
+            this PGE.
+        """
+        core_filename = (
+            f"{self.PROJECT}_{self.LEVEL}_{self.NAME}"
+        )
+
+        # FrameID: Unique frame identification number as a 5-digit string in
+        # the format FXXXXX
+        frame_id = f"F{self.runconfig.sas_config['input_file_group']['frame_id']:05d}"
+
+        #TODO: Later deliveries will probably have a better way to derive sensor & valid time
+
+        input_file_sample = self.runconfig.sas_config['dynamic_ancillary_file_group']['static_layers_files'][0]
+
+        input_file_fields = basename(input_file_sample).split('_')
+
+        sensor = input_file_fields[5]
+        validity_start_date = input_file_fields[4]
+
+        inter_disp_product_filename = '.'.join(inter_filename.split('.')[:1] + ["tif"])
+
+        # Check if we've already cached the product metadata corresponding to
+        # this set of intermediate products (there can be multiple sets of
+        # .nc and .png output files when running in historical mode)
+        if inter_disp_product_filename in self._product_metadata_cache:
+            disp_metadata = self._product_metadata_cache[inter_disp_product_filename]
+        else:
+            disp_metadata = self._collect_disp_s1_static_product_metadata(inter_disp_product_filename)
+            self._product_metadata_cache[inter_disp_product_filename] = disp_metadata
+
+        # ProductVersion: OPERA DISP-S1-STATIC product version number with four
+        # characters, including the letter “v” and two digits indicating the
+        # major and minor versions, which are delimited by a period
+        product_version = f"v{disp_metadata['identification']['product_version']}"
+
+        disp_s1_static_product_filename = f"{core_filename}_{frame_id}_{validity_start_date}_{sensor}_{product_version}"
+
+        # Cache the file name for this set of DISP products, so it can be used
+        # with the ISO metadata later.
+        self._product_filename_cache[inter_disp_product_filename] = disp_s1_static_product_filename
+
+        return disp_s1_static_product_filename
+
+    def _geotiff_filename(self, inter_filename):
+        """
+        Returns the file name to use for GeoTIFF's produced by the DIST-S1-STATIC PGE.
+
+        The GeoTIFF filename for the Base PGE consists of:
+
+            <Core filename>.tif
+
+        Where <Core filename> is returned by DispS1StaticPostProcessorMixin._core_filename()
+
+        Parameters
+        ----------
+        inter_filename : str
+            The intermediate filename of the output GeoTIFF to generate
+            a filename for. This parameter may be used to inspect the file
+            in order to derive any necessary components of the returned filename.
+
+        Returns
+        -------
+        geotiff_filename : str
+            The file name to assign to GeoTIFF product(s) created by this PGE.
+        """
+        base_filename = splitext(basename(inter_filename))[0]
+
+        return f"{self._core_filename(inter_filename)}_{base_filename}.tif"
+
+    def _ancillary_filename(self):
+        """
+        Helper method to derive the core component of the file names for the
+        ancillary products associated to a PGE job (catalog metadata, log file,
+        etc...).
+
+        The core file name component DISP-S1-STATIC ancillary products consists of:
+
+        <PROJECT>_<LEVEL>_<PGE NAME>_<FrameID>_<ProductVersion>_<ProductGenerationDateTime>
+
+        Since these files are note specific to any particular DISP-S1-STATIC output
+        product, fields such as valid datetime and sensor are omitted from
+        this file pattern.
+
+        Also note that this file name does not include a file extension, which
+        should be added to the return value of this method by any callers to
+        distinguish the different formats of ancillary outputs produced by this
+        PGE.
+
+        Returns
+        -------
+        ancillary_filename : str
+            The file name component to assign to ancillary products created by
+            this PGE.
+
+        """
+        core_filename = (
+            f"{self.PROJECT}_{self.LEVEL}_{self.NAME}"
+        )
+
+        frame_id = f"F{self.runconfig.sas_config['input_file_group']['frame_id']:05d}"
+
+        product_version = self.runconfig.sas_config['product_path_group']['product_version']
+
+        if not product_version.startswith('v'):
+            product_version = f'v{product_version}'
+
+        product_generation_date_time = f"{get_time_for_filename(self.production_datetime)}Z"
+
+        ancillary_filename = f"{core_filename}_{frame_id}_{product_version}_{product_generation_date_time}"
+
+        return ancillary_filename
+
+    def _collect_disp_s1_static_product_metadata(self, disp_product):
+        """
+        Gathers the available metadata from a sample output DISP-S1-STATIC product for
+        use in filling out the ISO metadata template for the DISP-S1-STATIC PGE.
+
+        Parameters
+        ----------
+        disp_product : str
+            Path to the DISP-S1-STATIC GeoTIFF product to collect metadata from.
+
+        Returns
+        -------
+        output_product_metadata : dict
+            Dictionary containing DISP-S1 output product metadata, formatted
+            for use with the ISO metadata Jinja2 template.
+
+        """
+
+        output_product_metadata = dict()
+
+        try:
+            measured_parameters = get_geotiff_metadata(disp_product)
+            output_product_metadata['MeasuredParameters'] = augment_measured_parameters(
+                measured_parameters,
+                self.runconfig.iso_measured_parameter_descriptions,
+                self.logger
+            )
+        except Exception as err:
+            msg = f'Failed to extract metadata from {disp_product}, reason: {err}'
+            self.logger.critical(self.name, ErrorCode.ISO_METADATA_COULD_NOT_EXTRACT_METADATA, msg)
+
+        # Add some fields on the dimensions of the data.
+        output_product_metadata['xCoordinates'] = {
+            'size': len(output_product_metadata['x']),  # pixels
+            'spacing': 30  # meters/pixel
+        }
+        output_product_metadata['yCoordinates'] = {
+            'size': len(output_product_metadata['y']),  # pixels
+            'spacing': 30  # meters/pixel
+        }
+
+        return output_product_metadata
+
+
+class DispS1StaticExecutor(DispS1StaticPreProcessorMixin, DispS1StaticPostProcessorMixin, DispS1Executor):
+    """
+    Main class for execution of the DISP-S1 PGE static layers workflow, including the SAS layer.
+    This class essentially rolls up the DISP-specific pre- and post-processor
+    functionality, while inheriting all other functionality for setup and execution
+    of the SAS from the base PgeExecutor class.
+
+    """
+
+    NAME = "DISP-S1-STATIC"
+    """Short name for the DISP-S1 PGE"""
+
+    def __init__(self, pge_name, runconfig_path, **kwargs):
+        super().__init__(pge_name, runconfig_path, **kwargs)
+
+        self.rename_by_pattern_map = OrderedDict(
+            {
+                # Note: ordering matters here!
+                '*.tif': self._geotiff_filename,
+                '*.png': self._browse_filename,
             }
         )

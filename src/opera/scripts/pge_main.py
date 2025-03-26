@@ -26,6 +26,7 @@ PGE_NAME_MAP = {
     'BASE_PGE': ('opera.pge.base.base_pge', 'PgeExecutor'),
     'CSLC_S1_PGE': ('opera.pge.cslc_s1.cslc_s1_pge', 'CslcS1Executor'),
     'DISP_S1_PGE': ('opera.pge.disp_s1.disp_s1_pge', 'DispS1Executor'),
+    'DISP_S1_STATIC_PGE': ('opera.pge.disp_s1.disp_s1_pge', 'DispS1StaticExecutor'),
     'DIST_S1_PGE': ('opera.pge.dist_s1.dist_s1_pge', 'DistS1Executor'),
     'DSWX_HLS_PGE': ('opera.pge.dswx_hls.dswx_hls_pge', 'DSWxHLSExecutor'),
     'DSWX_NI_PGE': ('opera.pge.dswx_ni.dswx_ni_pge', 'DSWxNIExecutor'),
