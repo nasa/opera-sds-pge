@@ -44,7 +44,7 @@ static_ancillary_file_group:
 
 primary_executable:
     # Product type of the PGE.
-    product_type: enum('DISP_S1_FORWARD', 'DISP_S1_HISTORICAL', 'DISP-S1-STATIC')
+    product_type: enum('DISP_S1_FORWARD', 'DISP_S1_HISTORICAL', 'DISP_S1_STATIC')
 
 product_path_group:
     # Directory where PGE will place results.

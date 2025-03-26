@@ -355,7 +355,7 @@ RunConfig:
           - --runconfig_yml_path
         ErrorCodeBase: 700000
         SchemaPath: /home/ops/opera/pge/dist_s1/schema/dist_s1_sas_schema.yaml
-        IsoTemplatePath: /home/ops/opera/pge/dist_s1/templates/OPERA_ISO_metadata_L3_DIST_S1_template.xml.jinja2
+        IsoTemplatePath: /home/ops/opera/pge/dist_s1/templates/OPERA_ISO_metadata_L3_DIST_S1_STATIC_template.xml.jinja2
         IsoMeasuredParameterDescriptions: /home/ops/opera/pge/dist_s1/templates/dist_s1_measured_parameters.yaml
 
       QAExecutable:

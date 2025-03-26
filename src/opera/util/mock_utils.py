@@ -265,6 +265,19 @@ class MockGdal:  # pragma: no cover
                 'water_mask_path': 'None'
             }
 
+    class MockDispS1StaticGdalDataset:
+        """
+        Mock class for gdal.Dataset objects, as returned from an Open call.
+        For use when mocking metadata from DISP-S1-STATIC GeoTIFF products
+        """
+
+        def __init__(self):
+            self.dummy_metadata = {
+                'AreaOrPoint': 'Area',
+                'x': 3600,
+                'y': 3600
+            }
+
         def GetMetadata(self):
             """
             Returns a subset of dummy metadata expected by the PGE.
@@ -292,6 +305,8 @@ class MockGdal:  # pragma: no cover
             return MockGdal.MockDistS1GdalDataset()
         elif 'dswx_hls' in file_name or 'dswx-hls' in file_name:
             return MockGdal.MockDSWxHLSGdalDataset()
+        elif 'disp_s1_static' in file_name or 'disp-s1-static' in file_name:
+            return MockGdal.MockDispS1StaticGdalDataset()
         else:
             raise ValueError(f'Filename does not appear to match existing mock GDAL datasets')
 

@@ -25,12 +25,13 @@ import yaml
 
 import opera.pge.disp_s1.disp_s1_pge
 from opera.pge import RunConfig
-from opera.pge.disp_s1.disp_s1_pge import DispS1Executor
+from opera.pge.disp_s1.disp_s1_pge import DispS1Executor, DispS1StaticExecutor
 from opera.util import PgeLogger
 from opera.util.h5_utils import create_test_cslc_metadata_product
 from opera.util.h5_utils import create_test_disp_metadata_product
 from opera.util.h5_utils import get_disp_s1_product_metadata
 from opera.util.input_validation import validate_disp_inputs
+from opera.util.mock_utils import MockGdal
 from opera.util.render_jinja2 import UNDEFINED_ERROR
 
 
@@ -106,7 +107,10 @@ class DispS1PgeTestCase(unittest.TestCase):
                              'ERA5_N30_N40_W120_W110_20221201_14.grb',
                              'opera-s1-disp-frame-to-burst.json',
                              'opera-disp-s1-reference-dates.json',
-                             'opera-disp-s1-algorithm-parameters-overrides.json']
+                             'opera-disp-s1-algorithm-parameters-overrides.json',
+                             'OPERA_L2_CSLC-S1-STATIC_T042-088913-IW1_20140403_S1A_v1.0.h5',
+                             'OPERA_L2_RTC-S1-STATIC_T042-088913-IW1_20140403_S1A_30_v1.0_mask.tif',
+                             'dem.vrt']
         for dummy_input_file in dummy_input_files:
             os.system(
                 f"echo \"non-empty file\" > {join(input_dir, dummy_input_file)}"
@@ -1043,6 +1047,86 @@ class DispS1PgeTestCase(unittest.TestCase):
                 ending_grb_file_names.append(ending_file_name)
 
         self.assertEqual(starting_grb_file_names, ending_grb_file_names)
+
+    @patch.object(opera.util.tiff_utils, "gdal", MockGdal)
+    def test_disp_s1_static_pge_execution(self):
+        """
+        Test execution of the DispS1StaticExecutor class and its associated mixins
+        using a test RunConfig that creates dummy expected output files and logs
+        a message to be captured by PgeLogger.
+        """
+        runconfig_path = join(self.data_dir, 'test_disp_s1_static_config.yaml')
+
+        pge = DispS1StaticExecutor(pge_name="DispS1StaticPgeTest", runconfig_path=runconfig_path)
+
+        # Check that basic attributes were initialized
+        self.assertEqual(pge.name, "DISP-S1-STATIC")
+        self.assertEqual(pge.pge_name, "DispS1StaticPgeTest")
+        self.assertEqual(pge.runconfig_path, runconfig_path)
+
+        # Check that other objects have not been instantiated yet
+        self.assertIsNone(pge.runconfig)
+        self.assertIsNone(pge.logger)
+
+        # Kickoff execution of DISP-S1 PGE
+        pge.run()
+
+        # Check that the runconfig and logger were instantiated
+        self.assertIsInstance(pge.runconfig, RunConfig)
+        self.assertIsInstance(pge.logger, PgeLogger)
+
+        # Check that directories were created according to RunConfig
+        self.assertTrue(os.path.isdir(pge.runconfig.output_product_path))
+        self.assertTrue(os.path.isdir(pge.runconfig.scratch_path))
+
+        # Check that an in-memory log was created
+        stream = pge.logger.get_stream_object()
+        self.assertIsInstance(stream, StringIO)
+
+        # Check that a RunConfig for the SAS was isolated within the scratch directory
+        expected_sas_config_file = join(pge.runconfig.scratch_path, 'test_disp_s1_static_config_sas.yaml')
+        self.assertTrue(os.path.exists(expected_sas_config_file))
+
+        # Check that the catalog metadata file was created in the output directory
+        expected_catalog_metadata_file = join(
+            pge.runconfig.output_product_path, pge._catalog_metadata_filename())
+        self.assertTrue(os.path.exists(expected_catalog_metadata_file))
+
+        expected_inter_filename = abspath("disp_s1_pge_test/output_dir/OPERA_L3_DISP-S1-STATIC_F11115_20140403_S1A_v1.0_los_enu.tif")
+        expected_browse_filename = abspath("disp_s1_pge_test/output_dir/OPERA_L3_DISP-S1-STATIC_F11115_20140403_S1A_v1.0_los_enu.browse.png")
+
+        # Check that the ISO metadata file was created and all placeholders were
+        # filled in
+        expected_iso_metadata_file = join(
+            pge.runconfig.output_product_path, pge._iso_metadata_filename(expected_inter_filename))
+        self.assertTrue(os.path.exists(expected_iso_metadata_file))
+
+        # Check that the log file was created and moved into the output directory
+        expected_log_file = pge.logger.get_file_name()
+        self.assertTrue(os.path.exists(expected_log_file))
+
+        # Lastly, check that the dummy output products were created and renamed
+        expected_disp_product = join(
+            pge.runconfig.output_product_path,
+            pge._geotiff_filename(
+                inter_filename=expected_inter_filename
+            )
+        )
+        self.assertTrue(os.path.exists(expected_disp_product))
+
+        expected_browse_product = join(
+            pge.runconfig.output_product_path,
+            pge._browse_filename(
+                inter_filename=expected_browse_filename
+            )
+        )
+        self.assertTrue(os.path.exists(expected_browse_product))
+
+        # Open and read the log
+        with open(expected_log_file, 'r', encoding='utf-8') as infile:
+            log_contents = infile.read()
+
+        self.assertIn(f"DISP-S1-STATIC invoked with RunConfig {expected_sas_config_file}", log_contents)
 
 
 class MockRunConfig:

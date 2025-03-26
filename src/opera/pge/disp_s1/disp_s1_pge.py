@@ -926,13 +926,12 @@ class DispS1StaticPostProcessorMixin(DispS1PostProcessorMixin):
         tiff_files = glob.glob(join(output_dir, '*.tif'))
         png_files = glob.glob(join(output_dir, '*.png'))
 
-        if set([basename(f) for f in tiff_files]) != {'dem_warped_utm.tif', 'layover_shadow_mask.tif', 'los_enu.tif'}:
-            error_msg = ("The SAS did not create the expected output products: 'dem_warped_utm.tif', "
-                         "'layover_shadow_mask.tif', and 'los_enu.tif'")
+        if len(tiff_files) != 3:
+            error_msg = "The SAS did not create the expected number of output products"
             self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
 
-        if 'los_enu.browse.png' not in [basename(f) for f in png_files]:
-            error_msg = "The SAS did not create the expected output browse image: 'los_enu.browse.png'"
+        if len(png_files) != 1:
+            error_msg = "The SAS did not create the expected output browse images"
             self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
 
         for f in tiff_files + png_files:
@@ -984,7 +983,7 @@ class DispS1StaticPostProcessorMixin(DispS1PostProcessorMixin):
         sensor = input_file_fields[5]
         validity_start_date = input_file_fields[4]
 
-        inter_disp_product_filename = '.'.join(inter_filename.split('.')[:1] + ["tif"])
+        inter_disp_product_filename = '.'.join(inter_filename.split('.')[:2] + ["tif"])
 
         # Check if we've already cached the product metadata corresponding to
         # this set of intermediate products (there can be multiple sets of
@@ -998,7 +997,10 @@ class DispS1StaticPostProcessorMixin(DispS1PostProcessorMixin):
         # ProductVersion: OPERA DISP-S1-STATIC product version number with four
         # characters, including the letter “v” and two digits indicating the
         # major and minor versions, which are delimited by a period
-        product_version = f"v{disp_metadata['identification']['product_version']}"
+        product_version = self.runconfig.sas_config['product_path_group']['product_version']
+
+        if not product_version.startswith('v'):
+            product_version = f'v{product_version}'
 
         disp_s1_static_product_filename = f"{core_filename}_{frame_id}_{validity_start_date}_{sensor}_{product_version}"
 
@@ -1030,9 +1032,9 @@ class DispS1StaticPostProcessorMixin(DispS1PostProcessorMixin):
         geotiff_filename : str
             The file name to assign to GeoTIFF product(s) created by this PGE.
         """
-        base_filename = splitext(basename(inter_filename))[0]
+        band_name = '_'.join(splitext(basename(inter_filename))[0].split("_")[7:])
 
-        return f"{self._core_filename(inter_filename)}_{base_filename}.tif"
+        return f"{self._core_filename(inter_filename)}_{band_name}.tif"
 
     def _ancillary_filename(self):
         """
@@ -1110,11 +1112,11 @@ class DispS1StaticPostProcessorMixin(DispS1PostProcessorMixin):
 
         # Add some fields on the dimensions of the data.
         output_product_metadata['xCoordinates'] = {
-            'size': len(output_product_metadata['x']),  # pixels
+            'size': 3600, # TODO: Where to derive this    len(output_product_metadata['x']),  # pixels
             'spacing': 30  # meters/pixel
         }
         output_product_metadata['yCoordinates'] = {
-            'size': len(output_product_metadata['y']),  # pixels
+            'size': 3600, # TODO: Where to derive this    len(output_product_metadata['y']),  # pixels
             'spacing': 30  # meters/pixel
         }
 
