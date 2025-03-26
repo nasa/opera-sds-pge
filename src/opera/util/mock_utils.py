@@ -265,6 +265,13 @@ class MockGdal:  # pragma: no cover
                 'water_mask_path': 'None'
             }
 
+        def GetMetadata(self):
+            """
+            Returns a subset of dummy metadata expected by the PGE.
+            This function should be updated as needed for requisite metadata fields.
+            """
+            return deepcopy(self.dummy_metadata)
+
     class MockDispS1StaticGdalDataset:
         """
         Mock class for gdal.Dataset objects, as returned from an Open call.
