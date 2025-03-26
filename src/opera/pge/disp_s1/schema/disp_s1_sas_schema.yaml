@@ -44,7 +44,7 @@ static_ancillary_file_group:
 
 primary_executable:
     # Product type of the PGE.
-    product_type: enum('DISP_S1_FORWARD', 'DISP_S1_HISTORICAL')
+    product_type: enum('DISP_S1_FORWARD', 'DISP_S1_HISTORICAL', 'DISP-S1-STATIC')
 
 product_path_group:
     # Directory where PGE will place results.
@@ -61,11 +61,11 @@ product_path_group:
 
     # Whether the SAS should output and save the Compressed SLCs in addition to
     # the standard product output.
-    save_compressed_slc: bool(required=True)
+    save_compressed_slc: bool(required=False)
 
 worker_settings:
     # Whether to use GPU for processing (if available).
-    gpu_enabled: bool(required=True)
+    gpu_enabled: bool(required=False)
 
     # Number of threads to use per worker. This sets the OMP_NUM_THREADS
     # environment variable in each python process.
