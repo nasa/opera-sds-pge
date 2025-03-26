@@ -28,8 +28,8 @@ SAMPLE_TIME=15
 # RUNCONFIG should be the name of the runconfig in s3://operasds-dev-pge/disp_s1/
 [ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath "$(dirname "$(realpath "$0")")"/../../..)
 [ -z "${PGE_TAG}" ] && PGE_TAG="${USER}-dev"
-[ -z "${INPUT_DATA}" ] && INPUT_DATA="disp_s1_r6.5_final_expected_input.zip"
-[ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="disp_s1_r6.5_final_expected_output.zip"
+[ -z "${INPUT_DATA}" ] && INPUT_DATA="disp_s1_r6.6_final_expected_input.zip"
+[ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="disp_s1_r6.6_final_expected_output.zip"
 [ -z "${RUNCONFIG}" ] && RUNCONFIG="opera_pge_disp_s1_r6.0_final_runconfig_forward.yaml"
 [ -z "${TMP_ROOT}" ] && TMP_ROOT="$DEFAULT_TMP_ROOT"
 
@@ -60,7 +60,7 @@ echo "Input data directory: ${input_dir}"
 echo "Expected data directory: ${expected_data_dir}"
 
 # Copy the RunConfig for the historical workflow
-historical_runconfig="opera_pge_disp_s1_r6.5_final_runconfig_historical.yaml"
+historical_runconfig="opera_pge_disp_s1_r6.6_final_runconfig_historical.yaml"
 local_historical_runconfig="${SCRIPT_DIR}/${historical_runconfig}"
 echo "Copying runconfig file $local_historical_runconfig to $runconfig_dir"
 cp ${local_historical_runconfig} ${runconfig_dir}
@@ -92,7 +92,7 @@ do
     mkdir -p --mode=777 "$scratch_dir"
 
     # Copy the Algorithm Parameters RunConfigs
-    algo_runconfig="opera_pge_disp_s1_r6.5_final_algorithm_parameters_${mode}.yaml"
+    algo_runconfig="opera_pge_disp_s1_r6.6_final_algorithm_parameters_${mode}.yaml"
     local_algo_runconfig="${SCRIPT_DIR}/${algo_runconfig}"
     echo "Copying runconfig file $local_algo_runconfig to $runconfig_dir"
     cp ${local_algo_runconfig} ${runconfig_dir}
@@ -136,6 +136,82 @@ do
         fi
     fi
 done
+
+# Run static layers workflow
+
+echo "Testing DISP-S1 Static Layers Workflow"
+
+expected_data_dir="${TMP_DIR}/${EXPECTED_DATA%.*}/golden_output_static"
+
+echo "Input data directory: ${input_dir}"
+echo "Expected data directory: ${expected_data_dir}"
+
+# Copy the RunConfig for the static workflow
+static_runconfig="opera_pge_disp_s1_r6.6_calval_runconfig.yaml"
+local_static_runconfig="${SCRIPT_DIR}/${static_runconfig}"
+echo "Copying runconfig file $local_static_runconfig to $runconfig_dir"
+cp ${local_static_runconfig} ${runconfig_dir}
+
+output_dir="${TMP_DIR}/output_disp_s1/static"
+
+# make sure no output directory already exists
+if [ -d "$output_dir" ]; then
+    echo "Output directory $output_dir already exists (and should not). Removing directory."
+    rm -rf "${output_dir}"
+fi
+
+echo "Creating output directory $output_dir."
+mkdir -p "$output_dir"
+
+scratch_dir="${TMP_DIR}/scratch_disp_s1/static"
+
+# make sure no scratch directory already exists
+if [ -d "$scratch_dir" ]; then
+    echo "Scratch directory $scratch_dir already exists (and should not). Removing directory."
+    rm -rf "${scratch_dir}"
+fi
+echo "Creating scratch directory $scratch_dir."
+mkdir -p --mode=777 "$scratch_dir"
+
+container_name="${PGE_NAME}-static-PID$$"
+
+# Start metrics collection
+metrics_collection_start "${PGE_NAME}_static" "$container_name" "$TEST_RESULTS_DIR" "$SAMPLE_TIME"
+
+echo "Running Docker image ${PGE_IMAGE}:${PGE_TAG} for ${mode} mode"
+docker run --rm -u $UID:"$(id -g)" --name $container_name \
+           -w /home/mamba \
+           -v ${runconfig_dir}:/home/mamba/runconfig \
+           -v ${input_dir}:/home/mamba/input_dir \
+           -v ${output_dir}:/home/mamba/output_dir \
+           -v ${scratch_dir}:/home/mamba/scratch_dir \
+           -v ${expected_data_dir}/${mode}:/home/mamba/expected_output_dir \
+           ${PGE_IMAGE}:"${PGE_TAG}" --file /home/mamba/runconfig/opera_pge_disp_s1_r6.6_calval_runconfig.yaml
+
+docker_exit_status=$?
+
+# End metrics collection
+metrics_collection_end "${PGE_NAME}_static" "$container_name" "$docker_exit_status" "$TEST_RESULTS_DIR"
+
+# Copy the PGE/SAS log file(s) to the test results directory so it can be archived
+# by Jenkins with the other results
+cp "${output_dir}"/*.log "${TEST_RESULTS_DIR}"
+
+# Copy the results.html file to the same directory
+cp "${output_dir}"/test_int_disp_s1_results.html "${TEST_RESULTS_DIR}"/test_int_disp_s1_${mode}_results.html
+
+if [ $docker_exit_status -ne 0 ]; then
+    echo "docker exit indicates failure: ${docker_exit_status}"
+    overall_status=1
+else
+    # Retrieve the return code written to disk by the comparison script
+    test_status=$(cat "$output_dir/compare_disp_s1_static_products.rc")
+
+    if [ $test_status -ne 0 ]; then
+      overall_status=$test_status
+    fi
+fi
+
 
 if [ $overall_status -ne 0 ]; then
     echo "Test FAILED."
