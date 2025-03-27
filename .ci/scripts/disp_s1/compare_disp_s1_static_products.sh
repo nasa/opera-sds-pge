@@ -46,7 +46,7 @@ compare_exit_status=0
 
 echo "Evaluating output directory $output_file"
 
-compare_out=$(disp-s1 validate-static-layers $expected_file $output_file)
+compare_out=$(disp-s1 validate-static-layers $expected_file $output_file 2>&1)
 compare_exit_status=$?
 
 if [[ $compare_exit_status -ne 0 ]]; then
