@@ -1034,7 +1034,16 @@ class DispS1StaticPostProcessorMixin(DispS1PostProcessorMixin):
         geotiff_filename : str
             The file name to assign to GeoTIFF product(s) created by this PGE.
         """
-        band_name = '_'.join(splitext(basename(inter_filename))[0].split("_")[7:])
+
+        # I think there should be a better way to do this. The SAS outputs just the band names
+        # (ie, dem_warped_utm.tif) But I need 'dist-s1-static' in the mock filenames to match
+        # the mock GDAL dataset, so I need this code to handle both filenames. I can't split on
+        # '_' and mock the final OPERA naming convention since the layers have a varying number
+        # of underscores, so I settled to mocking "dist-s1-static-<layer>" and splitting by "-"
+        # to get the last field which is the band name. The SAS outputs don't contain any "-"s
+        # so this split has no effect.
+
+        band_name = splitext(basename(inter_filename))[0].split('-')[-1]
 
         return f"{self._core_filename(inter_filename)}_{band_name}.tif"
 

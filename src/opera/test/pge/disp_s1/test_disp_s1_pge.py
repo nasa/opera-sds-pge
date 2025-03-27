@@ -1092,8 +1092,8 @@ class DispS1PgeTestCase(unittest.TestCase):
             pge.runconfig.output_product_path, pge._catalog_metadata_filename())
         self.assertTrue(os.path.exists(expected_catalog_metadata_file))
 
-        expected_inter_filename = abspath("disp_s1_pge_test/output_dir/OPERA_L3_DISP-S1-STATIC_F11115_20140403_S1A_v1.0_los_enu.tif")
-        expected_browse_filename = abspath("disp_s1_pge_test/output_dir/OPERA_L3_DISP-S1-STATIC_F11115_20140403_S1A_v1.0_los_enu.browse.png")
+        expected_inter_filename = abspath("disp_s1_pge_test/output_dir/disp-s1-static-los_enu.tif")
+        expected_browse_filename = abspath("disp_s1_pge_test/output_dir/disp-s1-static-los_enu.browse.png")
 
         # Check that the ISO metadata file was created and all placeholders were
         # filled in

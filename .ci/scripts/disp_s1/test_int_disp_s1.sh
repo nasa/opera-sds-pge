@@ -178,7 +178,7 @@ container_name="${PGE_NAME}-static-PID$$"
 # Start metrics collection
 metrics_collection_start "${PGE_NAME}_static" "$container_name" "$TEST_RESULTS_DIR" "$SAMPLE_TIME"
 
-echo "Running Docker image ${PGE_IMAGE}:${PGE_TAG} for ${mode} mode"
+echo "Running Docker image ${PGE_IMAGE}:${PGE_TAG} for static layers workflow"
 docker run --rm -u $UID:"$(id -g)" --name $container_name \
            -w /home/mamba \
            -v ${runconfig_dir}:/home/mamba/runconfig \

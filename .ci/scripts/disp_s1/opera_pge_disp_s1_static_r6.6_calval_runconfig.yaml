@@ -87,7 +87,7 @@ RunConfig:
 
       QAExecutable:
         Enabled: True
-        ProgramPath: /home/mamba/opera/.ci/scripts/disp_s1/compare_disp_s1_products.sh
+        ProgramPath: /home/mamba/opera/.ci/scripts/disp_s1/compare_disp_s1_static_products.sh
         ProgramOptions: []
 
       DebugLevelGroup:
