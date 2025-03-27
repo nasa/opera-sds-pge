@@ -983,7 +983,9 @@ class DispS1StaticPostProcessorMixin(DispS1PostProcessorMixin):
         sensor = input_file_fields[5]
         validity_start_date = input_file_fields[4]
 
-        inter_disp_product_filename = '.'.join(inter_filename.split('.')[:2] + ["tif"])
+        inter_filename_parts = list(splitext(inter_filename))
+        inter_filename_parts[0] = inter_filename_parts[0].removesuffix('.browse')
+        inter_disp_product_filename = '.'.join(inter_filename_parts[:1] + ["tif"])
 
         # Check if we've already cached the product metadata corresponding to
         # this set of intermediate products (there can be multiple sets of
