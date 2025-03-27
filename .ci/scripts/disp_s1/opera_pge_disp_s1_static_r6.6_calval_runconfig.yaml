@@ -82,8 +82,8 @@ RunConfig:
           - run
         ErrorCodeBase: 500000
         SchemaPath: /home/mamba/opera/pge/disp_s1/schema/disp_s1_sas_schema.yaml
-        IsoTemplatePath: /home/mamba/opera/pge/disp_s1/templates/OPERA_ISO_metadata_L3_DISP_S1_template.xml.jinja2
-        IsoMeasuredParameterDescriptions: /home/mamba/opera/pge/disp_s1/templates/disp_s1_measured_parameters.yaml
+        IsoTemplatePath: /home/mamba/opera/pge/disp_s1/templates/OPERA_ISO_metadata_L3_DISP_S1_STATIC_template.xml.jinja2
+        IsoMeasuredParameterDescriptions: /home/mamba/opera/pge/disp_s1/templates/disp_s1_static_measured_parameters.yaml
 
       QAExecutable:
         Enabled: True
