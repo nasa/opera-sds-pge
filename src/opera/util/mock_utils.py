@@ -281,8 +281,6 @@ class MockGdal:  # pragma: no cover
         def __init__(self):
             self.dummy_metadata = {
                 'AreaOrPoint': 'Area',
-                'x': 3600,
-                'y': 3600
             }
 
         def GetMetadata(self):
@@ -291,6 +289,17 @@ class MockGdal:  # pragma: no cover
             This function should be updated as needed for requisite metadata fields.
             """
             return deepcopy(self.dummy_metadata)
+
+        @property
+        def RasterXSize(self):
+            """Return the width of the mock raster"""
+            return 9600
+
+        @property
+        def RasterYSize(self):
+            """Return the width of the mock raster"""
+            return 6867
+
 
     @staticmethod
     def Open(filename):

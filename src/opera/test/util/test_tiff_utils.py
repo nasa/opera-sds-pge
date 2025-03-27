@@ -17,6 +17,7 @@ from unittest import skipIf
 
 from pkg_resources import resource_filename
 
+from opera.util.tiff_utils import get_geotiff_dimensions
 from opera.util.tiff_utils import get_geotiff_hls_dataset
 from opera.util.tiff_utils import get_geotiff_hls_product_version
 from opera.util.tiff_utils import get_geotiff_metadata
@@ -100,6 +101,15 @@ class TiffUtilsTestCase(unittest.TestCase):
         # Try with an invalid file type
         with self.assertRaises(RuntimeError):
             get_geotiff_metadata(join(self.data_dir, "valid_runconfig_full.yaml"))
+
+    @skipIf(not gdal_is_available(), reason="GDAL is not installed on the local instance")
+    def test_get_geotiff_dimensions(self):
+        input_tiff = join(self.data_dir, "sample_s30_dswx_hls.tif")
+
+        raster_width, raster_height = get_geotiff_dimensions(input_tiff)
+
+        self.assertEqual(raster_width, 3660)
+        self.assertEqual(raster_height, 3660)
 
 
 if __name__ == "__main__":

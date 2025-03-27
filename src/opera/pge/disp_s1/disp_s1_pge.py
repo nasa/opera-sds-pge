@@ -29,7 +29,7 @@ from opera.util.input_validation import (validate_algorithm_parameters_config,
                                          validate_disp_inputs,
                                          validate_disp_static_inputs)
 from opera.util.render_jinja2 import augment_hdf5_measured_parameters, render_jinja2, augment_measured_parameters
-from opera.util.tiff_utils import get_geotiff_metadata
+from opera.util.tiff_utils import get_geotiff_metadata, get_geotiff_dimensions
 from opera.util.time import get_time_for_filename, get_catalog_metadata_datetime_str
 
 
@@ -1110,13 +1110,15 @@ class DispS1StaticPostProcessorMixin(DispS1PostProcessorMixin):
             msg = f'Failed to extract metadata from {disp_product}, reason: {err}'
             self.logger.critical(self.name, ErrorCode.ISO_METADATA_COULD_NOT_EXTRACT_METADATA, msg)
 
+        output_raster_width, output_raster_height = get_geotiff_dimensions(disp_product)
+
         # Add some fields on the dimensions of the data.
         output_product_metadata['xCoordinates'] = {
-            'size': 3600, # TODO: Where to derive this    len(output_product_metadata['x']),  # pixels
+            'size': output_raster_width,
             'spacing': 30  # meters/pixel
         }
         output_product_metadata['yCoordinates'] = {
-            'size': 3600, # TODO: Where to derive this    len(output_product_metadata['y']),  # pixels
+            'size': output_raster_height,
             'spacing': 30  # meters/pixel
         }
 
