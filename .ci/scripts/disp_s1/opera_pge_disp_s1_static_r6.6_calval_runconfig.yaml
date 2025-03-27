@@ -7,39 +7,40 @@ RunConfig:
         PGEName: DISP_S1_STATIC_PGE
 
       InputFilesGroup:
+
+        # The SAS marks the CSLC-STATIC inputs as ancillaries, but we're treating them here as the primary
+        # input for the purpose of catalog metadata & lineage
         InputFilePaths:
-          - /home/mamba/input_dir/
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088913-IW1_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088913-IW2_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088913-IW3_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088914-IW1_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088914-IW2_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088914-IW3_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088915-IW1_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088915-IW2_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088915-IW3_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088916-IW1_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088916-IW2_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088916-IW3_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088917-IW1_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088917-IW2_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088917-IW3_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088918-IW1_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088918-IW2_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088918-IW3_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088919-IW1_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088919-IW2_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088919-IW3_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088920-IW1_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088920-IW2_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088920-IW3_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088921-IW1_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088921-IW2_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088921-IW3_20140403_S1A_v1.0.h5
 
       DynamicAncillaryFilesGroup:
         AncillaryFileMap:
-          static_layers_files:
-            - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088913-IW1_20140403_S1A_v1.0.h5
-            - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088913-IW2_20140403_S1A_v1.0.h5
-            - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088913-IW3_20140403_S1A_v1.0.h5
-            - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088914-IW1_20140403_S1A_v1.0.h5
-            - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088914-IW2_20140403_S1A_v1.0.h5
-            - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088914-IW3_20140403_S1A_v1.0.h5
-            - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088915-IW1_20140403_S1A_v1.0.h5
-            - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088915-IW2_20140403_S1A_v1.0.h5
-            - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088915-IW3_20140403_S1A_v1.0.h5
-            - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088916-IW1_20140403_S1A_v1.0.h5
-            - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088916-IW2_20140403_S1A_v1.0.h5
-            - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088916-IW3_20140403_S1A_v1.0.h5
-            - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088917-IW1_20140403_S1A_v1.0.h5
-            - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088917-IW2_20140403_S1A_v1.0.h5
-            - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088917-IW3_20140403_S1A_v1.0.h5
-            - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088918-IW1_20140403_S1A_v1.0.h5
-            - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088918-IW2_20140403_S1A_v1.0.h5
-            - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088918-IW3_20140403_S1A_v1.0.h5
-            - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088919-IW1_20140403_S1A_v1.0.h5
-            - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088919-IW2_20140403_S1A_v1.0.h5
-            - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088919-IW3_20140403_S1A_v1.0.h5
-            - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088920-IW1_20140403_S1A_v1.0.h5
-            - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088920-IW2_20140403_S1A_v1.0.h5
-            - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088920-IW3_20140403_S1A_v1.0.h5
-            - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088921-IW1_20140403_S1A_v1.0.h5
-            - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088921-IW2_20140403_S1A_v1.0.h5
-            - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088921-IW3_20140403_S1A_v1.0.h5
           dem_file: /home/mamba/input_dir/dem.vrt
           rtc_static_layers_files:
             - /home/mamba/input_dir/rtc_static/OPERA_L2_RTC-S1-STATIC_T042-088913-IW1_20140403_S1A_30_v1.0_mask.tif

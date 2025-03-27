@@ -8,13 +8,10 @@ RunConfig:
 
             InputFilesGroup:
                 InputFilePaths:
-                    - disp_s1_pge_test/input_dir/
+                  - disp_s1_pge_test/input_dir/OPERA_L2_CSLC-S1-STATIC_T042-088913-IW1_20140403_S1A_v1.0.h5
 
             DynamicAncillaryFilesGroup:
                 AncillaryFileMap:
-                    static_layers_files:
-                        - disp_s1_pge_test/input_dir/OPERA_L2_CSLC-S1-STATIC_T042-088913-IW1_20140403_S1A_v1.0.h5
-
                     dem_file: disp_s1_pge_test/input_dir/dem.vrt
                     rtc_static_layers_files:
                         - disp_s1_pge_test/input_dir/OPERA_L2_RTC-S1-STATIC_T042-088913-IW1_20140403_S1A_30_v1.0_mask.tif

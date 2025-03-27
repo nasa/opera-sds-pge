@@ -510,8 +510,8 @@
                         <gmd:EX_TemporalExtent id="boundingTemporalExtent">
                             <gmd:extent>
                                 <gml:TimePeriod gml:id="DISP_Time_Range">
-                                    <gml:beginPosition>{{ product_output.identification.secondary_zero_doppler_start_time }}{# ISO_OPERA_refDateTime #}</gml:beginPosition>
-                                    <gml:endPosition>{{ product_output.identification.secondary_zero_doppler_end_time }}{# ISO_OPERA_secDateTime #}</gml:endPosition>
+                                    <gml:beginPosition>{{ product_output.acquisitionDate }}{# ISO_OPERA_refDateTime #}</gml:beginPosition>
+                                    <gml:endPosition>{{ product_output.acquisitionDate }}{# ISO_OPERA_secDateTime #}</gml:endPosition>
                                 </gml:TimePeriod>
                             </gmd:extent>
                         </gmd:EX_TemporalExtent>
@@ -677,30 +677,12 @@
                             </gmd:description>
                         </gmd:LI_Source>
                     </gmd:source>
-                    <gmd:source>
-                        <gmd:LI_Source>
-                            <gmd:description>
-                                <gco:CharacterString>Reference Water File - {{ run_config.Groups.PGE.DynamicAncillaryFilesGroup.AncillaryFileMap.mask_file }}{# ISO_OPERA_waterMaskFile #}</gco:CharacterString>
-                            </gmd:description>
-                        </gmd:LI_Source>
-                    </gmd:source>
                     {%- if run_config.Groups.PGE.DynamicAncillaryFilesGroup.AncillaryFileMap.static_layers_files is not none %}
-                    {%- for static_layers_file in run_config.Groups.PGE.DynamicAncillaryFilesGroup.AncillaryFileMap.static_layers_files %}
+                    {%- for rtc_static_layers_file in run_config.Groups.PGE.DynamicAncillaryFilesGroup.AncillaryFileMap.rtc_static_layers_files %}
                     <gmd:source>
                         <gmd:LI_Source>
                             <gmd:description>
-                                <gco:CharacterString>CSLC Static Layer File - {{ static_layers_file }}{# ISO_OPERA_staticLayerFile #}</gco:CharacterString>
-                            </gmd:description>
-                        </gmd:LI_Source>
-                    </gmd:source>
-                    {%- endfor %}
-                    {%- endif %}
-                    {%- if run_config.Groups.PGE.DynamicAncillaryFilesGroup.AncillaryFileMap.ionosphere_files is not none %}
-                    {%- for ionosphere_file in run_config.Groups.PGE.DynamicAncillaryFilesGroup.AncillaryFileMap.ionosphere_files %}
-                    <gmd:source>
-                        <gmd:LI_Source>
-                            <gmd:description>
-                                <gco:CharacterString>Ionosphere Correction - {{ ionosphere_file }}{# ISO_OPERA_ionosphereFile #}</gco:CharacterString>
+                                <gco:CharacterString>RTC Static Layer File - {{ rtc_static_layers_file }}{# ISO_OPERA_staticLayerFile #}</gco:CharacterString>
                             </gmd:description>
                         </gmd:LI_Source>
                     </gmd:source>

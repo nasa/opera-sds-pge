@@ -280,7 +280,7 @@ class MockGdal:  # pragma: no cover
 
         def __init__(self):
             self.dummy_metadata = {
-                'AreaOrPoint': 'Area',
+                'AREA_OR_POINT': 'Area',
             }
 
         def GetMetadata(self):

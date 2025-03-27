@@ -1122,6 +1122,14 @@ class DispS1StaticPostProcessorMixin(DispS1PostProcessorMixin):
             'spacing': 30  # meters/pixel
         }
 
+        # TODO: Start/stop times will eventually be derived from product metadata
+        input_file_sample = self.runconfig.sas_config['dynamic_ancillary_file_group']['static_layers_files'][0]
+        input_file_fields = basename(input_file_sample).split('_')
+        validity_start_date = input_file_fields[4]
+        validity_start_date = f'{validity_start_date[:4]}-{validity_start_date[4:6]}-{validity_start_date[6:8]}'
+
+        output_product_metadata['acquisitionDate'] = validity_start_date
+
         return output_product_metadata
 
 
