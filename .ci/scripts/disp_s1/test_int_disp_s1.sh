@@ -198,7 +198,7 @@ metrics_collection_end "${PGE_NAME}_static" "$container_name" "$docker_exit_stat
 cp "${output_dir}"/*.log "${TEST_RESULTS_DIR}"
 
 # Copy the results.html file to the same directory
-cp "${output_dir}"/test_int_disp_s1_results.html "${TEST_RESULTS_DIR}"/test_int_disp_s1_${mode}_results.html
+cp "${output_dir}"/test_int_disp_s1_static_results.html "${TEST_RESULTS_DIR}"/test_int_disp_s1_static_results.html
 
 if [ $docker_exit_status -ne 0 ]; then
     echo "docker exit indicates failure: ${docker_exit_status}"

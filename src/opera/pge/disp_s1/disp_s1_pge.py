@@ -1090,6 +1090,40 @@ class DispS1StaticPostProcessorMixin(DispS1PostProcessorMixin):
 
         return ancillary_filename
 
+    def _create_custom_metadata(self, inter_filename):
+        """
+        Creates the "custom data" dictionary used with the ISO metadata rendering.
+
+        Custom data contains all metadata information needed for the ISO template
+        that is not found within any of the other metadata sources (such as the
+        RunConfig, output product(s), or catalog metadata).
+
+        Parameters
+        ----------
+        inter_filename : str
+            The intermediate filename of the output product to generate a
+            core filename for. This core filename will be used as the "granule"
+            identifier within the returned metadata dictionary.
+
+        Returns
+        -------
+        custom_metadata : dict
+            Dictionary containing the custom metadata as expected by the ISO
+            metadata Jinja2 template.
+
+        """
+        custom_metadata = {
+            'ISO_OPERA_FilePackageName': self._core_filename(inter_filename),
+            'ISO_OPERA_ProducerGranuleId': self._core_filename(inter_filename),
+            'MetadataProviderAction': "creation",
+            'GranuleFilename': self._core_filename(inter_filename),
+            'ISO_OPERA_ProjectKeywords': ['OPERA', 'JPL', 'DISP', 'Displacement', 'Surface', 'Land', 'Global'],
+            'ISO_OPERA_PlatformKeywords': ['S1'],
+            'ISO_OPERA_InstrumentKeywords': ['Sentinel 1 A/B']
+        }
+
+        return custom_metadata
+
     def _collect_disp_s1_static_product_metadata(self, disp_product):
         """
         Gathers the available metadata from a sample output DISP-S1-STATIC product for

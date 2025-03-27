@@ -46,7 +46,8 @@ compare_exit_status=0
 
 echo "Evaluating output directory $output_file"
 
-compare_out=$(disp-s1 validate-static-layers $expected_file $output_file) || compare_exit_status=$?
+compare_out=$(disp-s1 validate-static-layers $expected_file $output_file)
+compare_exit_status=$?
 
 if [[ $compare_exit_status -ne 0 ]]; then
     echo "Output comparison failed. Output and expected files differ for ${output_file}"
