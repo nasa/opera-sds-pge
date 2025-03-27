@@ -1175,6 +1175,13 @@ class DispS1StaticPostProcessorMixin(DispS1PostProcessorMixin):
 
         output_product_metadata['acquisitionDate'] = validity_start_date
 
+        # TODO: BBOX will be derived from product metadata
+
+        output_product_metadata['geospatial_lon_min'] = 0
+        output_product_metadata['geospatial_lon_max'] = 0
+        output_product_metadata['geospatial_lat_min'] = 0
+        output_product_metadata['geospatial_lat_max'] = 0
+
         return output_product_metadata
 
 
