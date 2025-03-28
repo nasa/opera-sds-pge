@@ -47,25 +47,6 @@ class DispS1PreProcessorMixin(PreProcessorMixin):
 
     _pre_mixin_name = "DispS1PreProcessorMixin"
 
-    def _baseline_preprocessor(self):
-        """Preprocessor steps for baseline workflow"""
-
-        # If debug mode is enabled, skip the input validation, since we might
-        # be working with only a partial set of inputs/ancillaries
-        if not self.runconfig.debug_switch:
-            validate_disp_inputs(self.runconfig, self.logger, self.name)
-
-        validate_algorithm_parameters_config(self.name,
-                                             self.runconfig.algorithm_parameters_schema_path,
-                                             self.runconfig.algorithm_parameters_file_config_path,
-                                             self.logger)
-
-    def _static_preprocessor(self):
-        """Preprocessor steps for static workflow"""
-
-        if not self.runconfig.debug_switch:
-            validate_disp_static_inputs(self.runconfig, self.logger, self.name)
-
     def run_preprocessor(self, **kwargs):
         """
         Executes the pre-processing steps for DISP-S1 PGE initialization.
@@ -81,12 +62,15 @@ class DispS1PreProcessorMixin(PreProcessorMixin):
         """
         super().run_preprocessor(**kwargs)
 
-        static_layers = self.runconfig.sas_config['primary_executable']['product_type'] == 'DISP_S1_STATIC'
+        # If debug mode is enabled, skip the input validation, since we might
+        # be working with only a partial set of inputs/ancillaries
+        if not self.runconfig.debug_switch:
+            validate_disp_inputs(self.runconfig, self.logger, self.name)
 
-        if static_layers:
-            self._static_preprocessor()
-        else:
-            self._baseline_preprocessor()
+        validate_algorithm_parameters_config(self.name,
+                                             self.runconfig.algorithm_parameters_schema_path,
+                                             self.runconfig.algorithm_parameters_file_config_path,
+                                             self.logger)
 
     def convert_troposphere_model_files(self):
         """
@@ -888,10 +872,36 @@ class DispS1Executor(DispS1PreProcessorMixin, DispS1PostProcessorMixin, PgeExecu
 
 class DispS1StaticPreProcessorMixin(DispS1PreProcessorMixin):
     """
-    Alias for DispS1PreProcessorMixin to avoid errors with inheritance in Executor.
-    Makes no changes to base class
+    Mixin class responsible for handling all pre-processing steps for the DISP-S1-STATIC
+    PGE. The pre-processing phase is defined as all steps necessary prior
+    to SAS execution.
+
+    In addition to the base functionality inherited from PreProcessorMixin, this
+    mixin adds an input validation step to ensure that input(s) defined by the
+    RunConfig exist and are valid.
+
     """
-    ...
+
+    _pre_mixin_name = "DispS1PreProcessorMixin"
+
+    def run_preprocessor(self, **kwargs):
+        """
+        Executes the pre-processing steps for DISP-S1 PGE initialization.
+        The DispS1PreProcessorMixin version of this class performs all actions
+        of the base PreProcessorMixin class, and adds an input validation step
+        for the inputs defined within the RunConfig.
+
+        Parameters
+        ----------
+        **kwargs: dict
+            Any keyword arguments needed by the pre-processor
+
+        """
+
+        PreProcessorMixin.run_preprocessor(self, **kwargs)
+
+        if not self.runconfig.debug_switch:
+            validate_disp_static_inputs(self.runconfig, self.logger, self.name)
 
 
 class DispS1StaticPostProcessorMixin(DispS1PostProcessorMixin):
