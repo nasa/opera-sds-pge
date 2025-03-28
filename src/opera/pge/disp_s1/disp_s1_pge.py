@@ -99,6 +99,8 @@ class DispS1PreProcessorMixin(PreProcessorMixin):
         """
         super().run_preprocessor(**kwargs)
 
+        self._validate_runconfig_needed_options()
+
         # If debug mode is enabled, skip the input validation, since we might
         # be working with only a partial set of inputs/ancillaries
         if not self.runconfig.debug_switch:
@@ -973,6 +975,8 @@ class DispS1StaticPreProcessorMixin(DispS1PreProcessorMixin):
         """
 
         PreProcessorMixin.run_preprocessor(self, **kwargs)
+
+        self._validate_runconfig_needed_options()
 
         if not self.runconfig.debug_switch:
             validate_disp_static_inputs(self.runconfig, self.logger, self.name)
