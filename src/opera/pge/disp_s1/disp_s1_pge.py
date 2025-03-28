@@ -896,7 +896,7 @@ class DispS1StaticPreProcessorMixin(DispS1PreProcessorMixin):
 
 class DispS1StaticPostProcessorMixin(DispS1PostProcessorMixin):
     """
-    Mixin class responsible for handling all post-processing steps for the DISP-S1
+    Mixin class responsible for handling all post-processing steps for the DISP-S1-STATIC
     PGE. The post-processing phase is defined as all steps required after SAS
     execution has completed, prior to handover of output products to PCM.
 
@@ -942,9 +942,9 @@ class DispS1StaticPostProcessorMixin(DispS1PostProcessorMixin):
     def _core_filename(self, inter_filename=None):
         """
         Returns the core file name component for products produced by the
-        DISP-S1 PGE.
+        DISP-S1-STATIC PGE.
 
-        The core file name component of the DISP-S1 PGE consists of:
+        The core file name component of the DISP-S1-STATIC PGE consists of:
 
         <PROJECT>_<LEVEL>_<PGE NAME>_<FrameID>_<ValidityStartDate>_<Sensor>_<ProductVersion>
 
@@ -1137,7 +1137,7 @@ class DispS1StaticPostProcessorMixin(DispS1PostProcessorMixin):
         Returns
         -------
         output_product_metadata : dict
-            Dictionary containing DISP-S1 output product metadata, formatted
+            Dictionary containing DISP-S1-STATIC output product metadata, formatted
             for use with the ISO metadata Jinja2 template.
 
         """
@@ -1187,15 +1187,18 @@ class DispS1StaticPostProcessorMixin(DispS1PostProcessorMixin):
 
 class DispS1StaticExecutor(DispS1StaticPreProcessorMixin, DispS1StaticPostProcessorMixin, DispS1Executor):
     """
-    Main class for execution of the DISP-S1 PGE static layers workflow, including the SAS layer.
-    This class essentially rolls up the DISP-specific pre- and post-processor
+    Main class for execution of the DISP-S1-STATIC PGE, including the SAS layer.
+    This class essentially rolls up the DISP-STATIC-specific pre- and post-processor
     functionality, while inheriting all other functionality for setup and execution
-    of the SAS from the base PgeExecutor class.
+    of the SAS from the baseline DISP-S1 Executor class.
 
     """
 
     NAME = "DISP-S1-STATIC"
     """Short name for the DISP-S1 PGE"""
+
+    # SAS_VERSION is inherited from parent DISP-S1 PGE, but is considered a CalVal release for the
+    # DISP-S1-STATIC workflow
 
     def __init__(self, pge_name, runconfig_path, **kwargs):
         super().__init__(pge_name, runconfig_path, **kwargs)

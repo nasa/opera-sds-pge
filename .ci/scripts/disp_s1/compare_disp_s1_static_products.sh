@@ -1,8 +1,9 @@
 #!/bin/bash
 
 # Script used to orchestrate the pairwise comparison of output and expected
-# DISP-S1 products. Each individual pair of products is compared using the
-# disp_s1_compare.py script
+# DISP-S1-STATIC products. The output and golden product directories are
+# directly compared using the validate-static-layers workflow bundled with
+# the SAS
 
 set -e
 umask 002
