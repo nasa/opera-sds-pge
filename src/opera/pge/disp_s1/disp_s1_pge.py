@@ -88,8 +88,8 @@ class DispS1PreProcessorMixin(PreProcessorMixin):
         """
         Executes the pre-processing steps for DISP-S1 PGE initialization.
         The DispS1PreProcessorMixin version of this class performs all actions
-        of the base PreProcessorMixin class, and adds an input validation step
-        for the inputs defined within the RunConfig.
+        of the base PreProcessorMixin class, and adds input validation steps
+        for the RunConfig and the inputs defined within it.
 
         Parameters
         ----------
@@ -962,10 +962,10 @@ class DispS1StaticPreProcessorMixin(DispS1PreProcessorMixin):
 
     def run_preprocessor(self, **kwargs):
         """
-        Executes the pre-processing steps for DISP-S1 PGE initialization.
-        The DispS1PreProcessorMixin version of this class performs all actions
-        of the base PreProcessorMixin class, and adds an input validation step
-        for the inputs defined within the RunConfig.
+        Executes the pre-processing steps for DISP-S1-STATIC PGE initialization.
+        The DispS1StaticPreProcessorMixin version of this class performs all actions
+        of the base PreProcessorMixin class, and adds input validation steps
+        for the RunConfig and the inputs defined within it.
 
         Parameters
         ----------
