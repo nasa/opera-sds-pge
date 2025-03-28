@@ -47,6 +47,43 @@ class DispS1PreProcessorMixin(PreProcessorMixin):
 
     _pre_mixin_name = "DispS1PreProcessorMixin"
 
+    def _validate_runconfig_needed_options(self):
+        """
+        The SAS schema for the DISP-S1 PGEs validates for both baseline and static workflows.
+        This could lead to missing required options and/or unexpected options falling through
+        the cracks during yamale validation due to the workflows having distinct sets of options.
+        This function does a final check on the schema to ensure the SAS gets all needed and no
+        extra options for the configured workflow.
+        """
+
+        sas_config = self.runconfig.sas_config
+
+        extra_keys = []
+        missing_required_keys = []
+
+        if 'cslc_file_list' not in sas_config['input_file_group']:
+            missing_required_keys.append('input_file_list.cslc_file_list')
+
+        if 'algorithm_parameters_file' not in sas_config['dynamic_ancillary_file_group']:
+            missing_required_keys.append('dynamic_ancillary_file_group.algorithm_parameters_file')
+
+        if 'save_compressed_slc' not in sas_config['product_path_group']:
+            missing_required_keys.append('product_path_group.save_compressed_slc')
+
+        if 'gpu_enabled' not in sas_config['worker_settings']:
+            missing_required_keys.append('worker_settings.gpu_enabled')
+
+        if 'rtc_static_layers_files' in sas_config['dynamic_ancillary_file_group']:
+            extra_keys.append('dynamic_ancillary_file_group.rtc_static_layers_files')
+
+        if len(missing_required_keys) > 0:
+            msg = f'Missing required options in RunConfig: {missing_required_keys}'
+            self.logger.critical(self.name, ErrorCode.RUN_CONFIG_VALIDATION_FAILED, msg)
+
+        if len(extra_keys) > 0:
+            msg = f'Unexpected options found in RunConfig: {extra_keys}'
+            self.logger.critical(self.name, ErrorCode.RUN_CONFIG_VALIDATION_FAILED, msg)
+
     def run_preprocessor(self, **kwargs):
         """
         Executes the pre-processing steps for DISP-S1 PGE initialization.
@@ -883,6 +920,43 @@ class DispS1StaticPreProcessorMixin(DispS1PreProcessorMixin):
     """
 
     _pre_mixin_name = "DispS1PreProcessorMixin"
+
+    def _validate_runconfig_needed_options(self):
+        """
+        The SAS schema for the DISP-S1 PGEs validates for both baseline and static workflows.
+        This could lead to missing required options and/or unexpected options falling through
+        the cracks during yamale validation due to the workflows having distinct sets of options.
+        This function does a final check on the schema to ensure the SAS gets all needed and no
+        extra options for the configured workflow.
+        """
+
+        sas_config = self.runconfig.sas_config
+
+        extra_keys = []
+        missing_required_keys = []
+
+        if 'cslc_file_list' in sas_config['input_file_group']:
+            extra_keys.append('input_file_list.cslc_file_list')
+
+        if 'algorithm_parameters_file' in sas_config['dynamic_ancillary_file_group']:
+            extra_keys.append('dynamic_ancillary_file_group.algorithm_parameters_file')
+
+        if 'save_compressed_slc' in sas_config['product_path_group']:
+            extra_keys.append('product_path_group.save_compressed_slc')
+
+        if 'gpu_enabled' in sas_config['worker_settings']:
+            extra_keys.append('worker_settings.gpu_enabled')
+
+        if 'rtc_static_layers_files' not in sas_config['dynamic_ancillary_file_group']:
+            missing_required_keys.append('dynamic_ancillary_file_group.rtc_static_layers_files')
+
+        if len(missing_required_keys) > 0:
+            msg = f'Missing required options in RunConfig: {missing_required_keys}'
+            self.logger.critical(self.name, ErrorCode.RUN_CONFIG_VALIDATION_FAILED, msg)
+
+        if len(extra_keys) > 0:
+            msg = f'Unexpected options found in RunConfig: {extra_keys}'
+            self.logger.critical(self.name, ErrorCode.RUN_CONFIG_VALIDATION_FAILED, msg)
 
     def run_preprocessor(self, **kwargs):
         """
