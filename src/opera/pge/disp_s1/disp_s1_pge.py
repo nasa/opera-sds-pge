@@ -926,11 +926,14 @@ class DispS1StaticPostProcessorMixin(DispS1PostProcessorMixin):
         tiff_files = glob.glob(join(output_dir, '*.tif'))
         png_files = glob.glob(join(output_dir, '*.png'))
 
-        if len(tiff_files) != 3:
+        expected_num_outputs = 3
+        expected_num_png_outputs = 1
+
+        if len(tiff_files) != expected_num_outputs:
             error_msg = "The SAS did not create the expected number of output products"
             self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
 
-        if len(png_files) != 1:
+        if len(png_files) != expected_num_png_outputs:
             error_msg = "The SAS did not create the expected output browse images"
             self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
 
