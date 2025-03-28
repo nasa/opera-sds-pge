@@ -272,6 +272,35 @@ class MockGdal:  # pragma: no cover
             """
             return deepcopy(self.dummy_metadata)
 
+    class MockDispS1StaticGdalDataset:
+        """
+        Mock class for gdal.Dataset objects, as returned from an Open call.
+        For use when mocking metadata from DISP-S1-STATIC GeoTIFF products
+        """
+
+        def __init__(self):
+            self.dummy_metadata = {
+                'AREA_OR_POINT': 'Area',
+            }
+
+        def GetMetadata(self):
+            """
+            Returns a subset of dummy metadata expected by the PGE.
+            This function should be updated as needed for requisite metadata fields.
+            """
+            return deepcopy(self.dummy_metadata)
+
+        @property
+        def RasterXSize(self):
+            """Return the width of the mock raster"""
+            return 9600
+
+        @property
+        def RasterYSize(self):
+            """Return the width of the mock raster"""
+            return 6867
+
+
     @staticmethod
     def Open(filename):
         """Mock implementation for gdal.Open. Returns an instance of the mock Dataset."""
@@ -292,6 +321,8 @@ class MockGdal:  # pragma: no cover
             return MockGdal.MockDistS1GdalDataset()
         elif 'dswx_hls' in file_name or 'dswx-hls' in file_name:
             return MockGdal.MockDSWxHLSGdalDataset()
+        elif 'disp_s1_static' in file_name or 'disp-s1-static' in file_name:
+            return MockGdal.MockDispS1StaticGdalDataset()
         else:
             raise ValueError(f'Filename does not appear to match existing mock GDAL datasets')
 

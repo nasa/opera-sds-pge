@@ -146,6 +146,42 @@ def get_geotiff_metadata(filename):
     return gdal_data.GetMetadata()
 
 
+@lru_cache
+def get_geotiff_dimensions(filename):
+    """
+    Returns the width and height in pixels of the provided GeoTIFF
+    file name. The dimensions returned are cached for future lookups on the same
+    file name.
+
+    Parameters
+    ----------
+    filename : str
+        Path to the GeoTIFF file to get dimensions for.
+
+    Returns
+    -------
+    x, y : tuple(int, int)
+        Tuple of pixel lengths if the GeoTIFF width and height.
+
+    Raises
+    ------
+    RuntimeError
+        If the provided file name does not exist, or cannot be read by GDAL.
+    """
+    gdal_data = gdal.Open(filename)
+
+    if not gdal_data:
+        raise RuntimeError(
+            f'Failed to read GeoTIFF file "{filename}"\n'
+            f'Please ensure the file exists and is a GDAL-compatible GeoTIFF file.'
+        )
+
+    raster_width = gdal_data.RasterXSize
+    raster_height = gdal_data.RasterYSize
+
+    return raster_width, raster_height
+
+
 def get_geotiff_hls_dataset(filename):
     """Returns the HLS_DATASET value from the provided file, if it exists. None otherwise."""
     metadata = get_geotiff_metadata(filename)

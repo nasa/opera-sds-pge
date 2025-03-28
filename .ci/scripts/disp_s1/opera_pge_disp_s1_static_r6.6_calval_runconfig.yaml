@@ -1,0 +1,172 @@
+RunConfig:
+  Name: OPERA-DISP-S1-PGE-STATIC-INT-TEST-CONFIG
+
+  Groups:
+    PGE:
+      PGENameGroup:
+        PGEName: DISP_S1_STATIC_PGE
+
+      InputFilesGroup:
+
+        # The SAS marks the CSLC-STATIC inputs as ancillaries, but we're treating them here as the primary
+        # input for the purpose of catalog metadata & lineage
+        InputFilePaths:
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088913-IW1_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088913-IW2_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088913-IW3_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088914-IW1_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088914-IW2_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088914-IW3_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088915-IW1_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088915-IW2_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088915-IW3_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088916-IW1_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088916-IW2_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088916-IW3_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088917-IW1_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088917-IW2_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088917-IW3_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088918-IW1_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088918-IW2_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088918-IW3_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088919-IW1_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088919-IW2_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088919-IW3_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088920-IW1_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088920-IW2_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088920-IW3_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088921-IW1_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088921-IW2_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088921-IW3_20140403_S1A_v1.0.h5
+
+      DynamicAncillaryFilesGroup:
+        AncillaryFileMap:
+          dem_file: /home/mamba/input_dir/dem.vrt
+          rtc_static_layers_files:
+            - /home/mamba/input_dir/rtc_static/OPERA_L2_RTC-S1-STATIC_T042-088913-IW1_20140403_S1A_30_v1.0_mask.tif
+            - /home/mamba/input_dir/rtc_static/OPERA_L2_RTC-S1-STATIC_T042-088913-IW2_20140403_S1A_30_v1.0_mask.tif
+            - /home/mamba/input_dir/rtc_static/OPERA_L2_RTC-S1-STATIC_T042-088913-IW3_20140403_S1A_30_v1.0_mask.tif
+            - /home/mamba/input_dir/rtc_static/OPERA_L2_RTC-S1-STATIC_T042-088914-IW1_20140403_S1A_30_v1.0_mask.tif
+            - /home/mamba/input_dir/rtc_static/OPERA_L2_RTC-S1-STATIC_T042-088914-IW2_20140403_S1A_30_v1.0_mask.tif
+            - /home/mamba/input_dir/rtc_static/OPERA_L2_RTC-S1-STATIC_T042-088914-IW3_20140403_S1A_30_v1.0_mask.tif
+            - /home/mamba/input_dir/rtc_static/OPERA_L2_RTC-S1-STATIC_T042-088915-IW1_20140403_S1A_30_v1.0_mask.tif
+            - /home/mamba/input_dir/rtc_static/OPERA_L2_RTC-S1-STATIC_T042-088915-IW2_20140403_S1A_30_v1.0_mask.tif
+            - /home/mamba/input_dir/rtc_static/OPERA_L2_RTC-S1-STATIC_T042-088915-IW3_20140403_S1A_30_v1.0_mask.tif
+            - /home/mamba/input_dir/rtc_static/OPERA_L2_RTC-S1-STATIC_T042-088916-IW1_20140403_S1A_30_v1.0_mask.tif
+            - /home/mamba/input_dir/rtc_static/OPERA_L2_RTC-S1-STATIC_T042-088916-IW2_20140403_S1A_30_v1.0_mask.tif
+            - /home/mamba/input_dir/rtc_static/OPERA_L2_RTC-S1-STATIC_T042-088916-IW3_20140403_S1A_30_v1.0_mask.tif
+            - /home/mamba/input_dir/rtc_static/OPERA_L2_RTC-S1-STATIC_T042-088917-IW1_20140403_S1A_30_v1.0_mask.tif
+            - /home/mamba/input_dir/rtc_static/OPERA_L2_RTC-S1-STATIC_T042-088917-IW2_20140403_S1A_30_v1.0_mask.tif
+            - /home/mamba/input_dir/rtc_static/OPERA_L2_RTC-S1-STATIC_T042-088917-IW3_20140403_S1A_30_v1.0_mask.tif
+            - /home/mamba/input_dir/rtc_static/OPERA_L2_RTC-S1-STATIC_T042-088918-IW1_20140403_S1A_30_v1.0_mask.tif
+            - /home/mamba/input_dir/rtc_static/OPERA_L2_RTC-S1-STATIC_T042-088918-IW2_20140403_S1A_30_v1.0_mask.tif
+            - /home/mamba/input_dir/rtc_static/OPERA_L2_RTC-S1-STATIC_T042-088918-IW3_20140403_S1A_30_v1.0_mask.tif
+            - /home/mamba/input_dir/rtc_static/OPERA_L2_RTC-S1-STATIC_T042-088919-IW1_20140403_S1A_30_v1.0_mask.tif
+            - /home/mamba/input_dir/rtc_static/OPERA_L2_RTC-S1-STATIC_T042-088919-IW2_20140403_S1A_30_v1.0_mask.tif
+            - /home/mamba/input_dir/rtc_static/OPERA_L2_RTC-S1-STATIC_T042-088919-IW3_20140403_S1A_30_v1.0_mask.tif
+            - /home/mamba/input_dir/rtc_static/OPERA_L2_RTC-S1-STATIC_T042-088920-IW1_20140403_S1A_30_v1.0_mask.tif
+            - /home/mamba/input_dir/rtc_static/OPERA_L2_RTC-S1-STATIC_T042-088920-IW2_20140403_S1A_30_v1.0_mask.tif
+            - /home/mamba/input_dir/rtc_static/OPERA_L2_RTC-S1-STATIC_T042-088920-IW3_20140403_S1A_30_v1.0_mask.tif
+            - /home/mamba/input_dir/rtc_static/OPERA_L2_RTC-S1-STATIC_T042-088921-IW1_20140403_S1A_30_v1.0_mask.tif
+            - /home/mamba/input_dir/rtc_static/OPERA_L2_RTC-S1-STATIC_T042-088921-IW2_20140403_S1A_30_v1.0_mask.tif
+            - /home/mamba/input_dir/rtc_static/OPERA_L2_RTC-S1-STATIC_T042-088921-IW3_20140403_S1A_30_v1.0_mask.tif
+      ProductPathGroup:
+        OutputProductPath: /home/mamba/output_dir
+        ScratchPath: /home/mamba/scratch_dir
+
+      PrimaryExecutable:
+        ProductIdentifier: DISP_S1_STATIC
+        ProductVersion: "1.0"
+        ProgramPath: disp-s1
+        ProgramOptions:
+          - run
+        ErrorCodeBase: 500000
+        SchemaPath: /home/mamba/opera/pge/disp_s1/schema/disp_s1_sas_schema.yaml
+        IsoTemplatePath: /home/mamba/opera/pge/disp_s1/templates/OPERA_ISO_metadata_L3_DISP_S1_STATIC_template.xml.jinja2
+        IsoMeasuredParameterDescriptions: /home/mamba/opera/pge/disp_s1/templates/disp_s1_static_measured_parameters.yaml
+
+      QAExecutable:
+        Enabled: True
+        ProgramPath: /home/mamba/opera/.ci/scripts/disp_s1/compare_disp_s1_static_products.sh
+        ProgramOptions: []
+
+      DebugLevelGroup:
+        DebugSwitch: False
+        ExecuteViaShell: False
+    SAS:
+      input_file_group:
+        frame_id: 11115
+      dynamic_ancillary_file_group:
+        static_layers_files:
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088913-IW1_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088913-IW2_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088913-IW3_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088914-IW1_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088914-IW2_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088914-IW3_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088915-IW1_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088915-IW2_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088915-IW3_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088916-IW1_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088916-IW2_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088916-IW3_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088917-IW1_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088917-IW2_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088917-IW3_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088918-IW1_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088918-IW2_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088918-IW3_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088919-IW1_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088919-IW2_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088919-IW3_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088920-IW1_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088920-IW2_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088920-IW3_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088921-IW1_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088921-IW2_20140403_S1A_v1.0.h5
+          - /home/mamba/input_dir/cslc_static/OPERA_L2_CSLC-S1-STATIC_T042-088921-IW3_20140403_S1A_v1.0.h5
+        dem_file: /home/mamba/input_dir/dem.vrt
+        rtc_static_layers_files:
+          - /home/mamba/input_dir/rtc_static/OPERA_L2_RTC-S1-STATIC_T042-088913-IW1_20140403_S1A_30_v1.0_mask.tif
+          - /home/mamba/input_dir/rtc_static/OPERA_L2_RTC-S1-STATIC_T042-088913-IW2_20140403_S1A_30_v1.0_mask.tif
+          - /home/mamba/input_dir/rtc_static/OPERA_L2_RTC-S1-STATIC_T042-088913-IW3_20140403_S1A_30_v1.0_mask.tif
+          - /home/mamba/input_dir/rtc_static/OPERA_L2_RTC-S1-STATIC_T042-088914-IW1_20140403_S1A_30_v1.0_mask.tif
+          - /home/mamba/input_dir/rtc_static/OPERA_L2_RTC-S1-STATIC_T042-088914-IW2_20140403_S1A_30_v1.0_mask.tif
+          - /home/mamba/input_dir/rtc_static/OPERA_L2_RTC-S1-STATIC_T042-088914-IW3_20140403_S1A_30_v1.0_mask.tif
+          - /home/mamba/input_dir/rtc_static/OPERA_L2_RTC-S1-STATIC_T042-088915-IW1_20140403_S1A_30_v1.0_mask.tif
+          - /home/mamba/input_dir/rtc_static/OPERA_L2_RTC-S1-STATIC_T042-088915-IW2_20140403_S1A_30_v1.0_mask.tif
+          - /home/mamba/input_dir/rtc_static/OPERA_L2_RTC-S1-STATIC_T042-088915-IW3_20140403_S1A_30_v1.0_mask.tif
+          - /home/mamba/input_dir/rtc_static/OPERA_L2_RTC-S1-STATIC_T042-088916-IW1_20140403_S1A_30_v1.0_mask.tif
+          - /home/mamba/input_dir/rtc_static/OPERA_L2_RTC-S1-STATIC_T042-088916-IW2_20140403_S1A_30_v1.0_mask.tif
+          - /home/mamba/input_dir/rtc_static/OPERA_L2_RTC-S1-STATIC_T042-088916-IW3_20140403_S1A_30_v1.0_mask.tif
+          - /home/mamba/input_dir/rtc_static/OPERA_L2_RTC-S1-STATIC_T042-088917-IW1_20140403_S1A_30_v1.0_mask.tif
+          - /home/mamba/input_dir/rtc_static/OPERA_L2_RTC-S1-STATIC_T042-088917-IW2_20140403_S1A_30_v1.0_mask.tif
+          - /home/mamba/input_dir/rtc_static/OPERA_L2_RTC-S1-STATIC_T042-088917-IW3_20140403_S1A_30_v1.0_mask.tif
+          - /home/mamba/input_dir/rtc_static/OPERA_L2_RTC-S1-STATIC_T042-088918-IW1_20140403_S1A_30_v1.0_mask.tif
+          - /home/mamba/input_dir/rtc_static/OPERA_L2_RTC-S1-STATIC_T042-088918-IW2_20140403_S1A_30_v1.0_mask.tif
+          - /home/mamba/input_dir/rtc_static/OPERA_L2_RTC-S1-STATIC_T042-088918-IW3_20140403_S1A_30_v1.0_mask.tif
+          - /home/mamba/input_dir/rtc_static/OPERA_L2_RTC-S1-STATIC_T042-088919-IW1_20140403_S1A_30_v1.0_mask.tif
+          - /home/mamba/input_dir/rtc_static/OPERA_L2_RTC-S1-STATIC_T042-088919-IW2_20140403_S1A_30_v1.0_mask.tif
+          - /home/mamba/input_dir/rtc_static/OPERA_L2_RTC-S1-STATIC_T042-088919-IW3_20140403_S1A_30_v1.0_mask.tif
+          - /home/mamba/input_dir/rtc_static/OPERA_L2_RTC-S1-STATIC_T042-088920-IW1_20140403_S1A_30_v1.0_mask.tif
+          - /home/mamba/input_dir/rtc_static/OPERA_L2_RTC-S1-STATIC_T042-088920-IW2_20140403_S1A_30_v1.0_mask.tif
+          - /home/mamba/input_dir/rtc_static/OPERA_L2_RTC-S1-STATIC_T042-088920-IW3_20140403_S1A_30_v1.0_mask.tif
+          - /home/mamba/input_dir/rtc_static/OPERA_L2_RTC-S1-STATIC_T042-088921-IW1_20140403_S1A_30_v1.0_mask.tif
+          - /home/mamba/input_dir/rtc_static/OPERA_L2_RTC-S1-STATIC_T042-088921-IW2_20140403_S1A_30_v1.0_mask.tif
+          - /home/mamba/input_dir/rtc_static/OPERA_L2_RTC-S1-STATIC_T042-088921-IW3_20140403_S1A_30_v1.0_mask.tif
+      static_ancillary_file_group:
+        frame_to_burst_json: "/home/mamba/input_dir/opera-s1-disp-0.9.0-frame-to-burst.json.zip"
+      primary_executable:
+        product_type: DISP_S1_STATIC
+      product_path_group:
+        product_path: /home/mamba/output_dir
+        scratch_path: /home/mamba/scratch_dir
+        sas_output_path: /home/mamba/output_dir
+        product_version: '1.0'
+      worker_settings:
+        threads_per_worker: 2
+        n_parallel_bursts: 9
+        block_shape:
+          - 512
+          - 512
+      log_file: /home/mamba/output_dir/sas_logfile.log

@@ -357,6 +357,52 @@ def validate_disp_inputs(runconfig, logger, name):
                     name, valid_extensions=('.json',), check_zero_size=True)
 
 
+def validate_disp_static_inputs(runconfig, logger, name):
+    """
+        Evaluates the list of inputs from the RunConfig to ensure they are valid for the static layers
+        workflow.
+
+        The input products for DISP-S1 can be classified into two groups:
+            1) the main input products (the CSLC-STATIC burst products) and
+            2) the ancillary input products (DEM, RTC STATIC masks, etc).
+
+        Parameters
+        ----------
+        runconfig: file
+            Runconfig file passed by the calling PGE
+        logger: PgeLogger
+            Logger passed by the calling PGE
+        name:  str
+            pge name
+
+        """
+    dyn_anc_file_group = runconfig.sas_config['dynamic_ancillary_file_group']
+    static_anc_file_group = runconfig.sas_config['static_ancillary_file_group']
+
+    check_input_list(dyn_anc_file_group['static_layers_files'], logger, name,
+                     valid_extensions=('.h5',), check_zero_size=True)
+
+    cslc_burst_id_set = get_cslc_input_burst_id_set(dyn_anc_file_group['static_layers_files'], logger, name)
+
+    if ('rtc_static_layers_files' in dyn_anc_file_group and
+            isinstance(dyn_anc_file_group['rtc_static_layers_files'], list) and
+            len(dyn_anc_file_group['rtc_static_layers_files']) > 0):
+        check_input_list(dyn_anc_file_group['rtc_static_layers_files'], logger, name,
+                         valid_extensions=('.tif',), check_zero_size=True)
+        check_disp_s1_ancillary_burst_ids(cslc_burst_id_set,
+                                          dyn_anc_file_group['rtc_static_layers_files'],
+                                          logger, name)
+
+    if 'dem_file' in dyn_anc_file_group and dyn_anc_file_group['dem_file']:
+        check_input(dyn_anc_file_group['dem_file'], logger, name,
+                    valid_extensions=('.vrt',), check_zero_size=True)
+
+    if ('frame_to_burst_json' in static_anc_file_group and
+            static_anc_file_group['frame_to_burst_json'] is not None):
+        check_input(static_anc_file_group['frame_to_burst_json'], logger, name,
+                    valid_extensions=('.json', '.zip'), check_zero_size=True)
+
+
 def validate_dswx_inputs(runconfig, logger, name, valid_extensions=None):
     """
     This function is shared by the DSWX-HLS and DSWX-S1 PGEs:

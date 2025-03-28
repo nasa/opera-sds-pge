@@ -1,0 +1,74 @@
+RunConfig:
+    Name: OPERA-DISP-S1-STATIC-PGE-TEST-CONFIG
+
+    Groups:
+        PGE:
+            PGENameGroup:
+                PGEName: DISP_S1_STATIC_PGE
+
+            InputFilesGroup:
+                InputFilePaths:
+                  - disp_s1_pge_test/input_dir/OPERA_L2_CSLC-S1-STATIC_T042-088913-IW1_20140403_S1A_v1.0.h5
+
+            DynamicAncillaryFilesGroup:
+                AncillaryFileMap:
+                    dem_file: disp_s1_pge_test/input_dir/dem.vrt
+                    rtc_static_layers_files:
+                        - disp_s1_pge_test/input_dir/OPERA_L2_RTC-S1-STATIC_T042-088913-IW1_20140403_S1A_30_v1.0_mask.tif
+
+            ProductPathGroup:
+                OutputProductPath: disp_s1_pge_test/output_dir
+                ScratchPath: disp_s1_pge_test/scratch_dir
+
+            PrimaryExecutable:
+                ProductIdentifier: DISP_S1_STATIC
+                ProductVersion: "1.0"
+                ProgramPath: mkdir
+                ProgramOptions:
+                    - '-p disp_s1_pge_test/output_dir;'
+                    - 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/disp-s1-static-dem_warped_utm.tif bs=1M count=1;'
+                    - 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/disp-s1-static-layover_shadow_mask.tif bs=1M count=1;'
+                    - 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/disp-s1-static-los_enu.browse.png bs=1M count=1;'
+                    - 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/disp-s1-static-los_enu.tif bs=1M count=1;'
+                    - '/bin/echo DISP-S1-STATIC invoked with RunConfig'
+                ErrorCodeBase: 500000
+                SchemaPath: pge/disp_s1/schema/disp_s1_sas_schema.yaml
+                AlgorithmParametersSchemaPath: pge/disp_s1/schema/algorithm_parameters_disp_s1_schema.yaml
+                IsoTemplatePath: pge/disp_s1/templates/OPERA_ISO_metadata_L3_DISP_S1_STATIC_template.xml.jinja2
+                IsoMeasuredParameterDescriptions: pge/disp_s1/templates/disp_s1_static_measured_parameters.yaml
+
+            QAExecutable:
+                Enabled: False
+                ProgramPath:
+                ProgramOptions: []
+
+            DebugLevelGroup:
+                DebugSwitch: False
+                ExecuteViaShell: True  # Must be set to True for test to work
+
+        SAS:
+          input_file_group:
+            frame_id: 11115
+          dynamic_ancillary_file_group:
+            static_layers_files:
+              - disp_s1_pge_test/input_dir/OPERA_L2_CSLC-S1-STATIC_T042-088913-IW1_20140403_S1A_v1.0.h5
+            dem_file: disp_s1_pge_test/input_dir/dem.vrt
+            rtc_static_layers_files:
+              - disp_s1_pge_test/input_dir/OPERA_L2_RTC-S1-STATIC_T042-088913-IW1_20140403_S1A_30_v1.0_mask.tif
+          static_ancillary_file_group:
+            frame_to_burst_json: "disp_s1_pge_test/input_dir/opera-s1-disp-frame-to-burst.json"
+          primary_executable:
+            product_type: DISP_S1_STATIC
+          product_path_group:
+            product_path: /home/mamba/output_dir
+            scratch_path: /home/mamba/scratch_dir
+            sas_output_path: /home/mamba/output_dir
+            product_version: '1.0'
+          worker_settings:
+            threads_per_worker: 2
+            n_parallel_bursts: 9
+            block_shape:
+              - 512
+              - 512
+
+          log_file: disp_s1_pge_test/output_dir/sas_logfile.log

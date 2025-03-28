@@ -1,0 +1,704 @@
+<?xml version='1.0' encoding='utf-8'?>
+<gmi:MI_Metadata xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xmlns:gmd="http://www.isotc211.org/2005/gmd"
+                 xmlns:gco="http://www.isotc211.org/2005/gco"
+                 xmlns:eos="http://earthdata.nasa.gov/schema/eos"
+                 xmlns:xlink="http://www.w3.org/1999/xlink"
+                 xmlns:gml="http://www.opengis.net/gml/3.2"
+                 xmlns:gmi="http://www.isotc211.org/2005/gmi"
+                 xmlns:gmx="http://www.isotc211.org/2005/gmx">
+    <!-- The granule file name. Should map to core filename used with the PGE -->
+    <gmd:fileIdentifier>
+        <gco:CharacterString>{{ custom_data.ISO_OPERA_FilePackageName }}{# ISO_OPERA_FilePackageName #}</gco:CharacterString>
+    </gmd:fileIdentifier>
+    <!-- The language used as the content of this metadata record. -->
+    <gmd:language>
+        <gco:CharacterString>eng</gco:CharacterString>
+    </gmd:language>
+    <!-- The character set used in this metadata record.-->
+    <gmd:characterSet>
+        <gmd:MD_CharacterSetCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/gmxCodelists.xml#MD_CharacterSetCode" codeListValue="utf8">utf8</gmd:MD_CharacterSetCode>
+    </gmd:characterSet>
+    <!-- What is represented by this metadata record - currently series means collection and dataset means granule.-->
+    <gmd:hierarchyLevel>
+        <gmd:MD_ScopeCode codeList="http://www.ngdc.noaa.gov/metadata/published/xsd/schema/resources/Codelist/gmxCodelists.xml#MD_ScopeCode" codeListValue="dataset">dataset</gmd:MD_ScopeCode>
+    </gmd:hierarchyLevel>
+    <!-- Contact information for JPL -->
+    <gmd:contact>
+        <gmd:CI_ResponsibleParty>
+            <gmd:organisationName>
+                <gco:CharacterString>Jet Propulsion Laboratory</gco:CharacterString>
+            </gmd:organisationName>
+            <gmd:contactInfo>
+                <gmd:CI_Contact gml:id="JPLcontactInfo">
+                    <gmd:address>
+                        <gmd:CI_Address>
+                            <gmd:deliveryPoint>
+                                <gco:CharacterString>4800 Oak Grove Drive</gco:CharacterString>
+                            </gmd:deliveryPoint>
+                            <gmd:city>
+                                <gco:CharacterString>Pasadena</gco:CharacterString>
+                            </gmd:city>
+                            <gmd:administrativeArea>
+                                <gco:CharacterString>CA</gco:CharacterString>
+                            </gmd:administrativeArea>
+                            <gmd:postalCode>
+                                <gco:CharacterString>91109</gco:CharacterString>
+                            </gmd:postalCode>
+                            <gmd:country>
+                                <gco:CharacterString>USA</gco:CharacterString>
+                            </gmd:country>
+                            <gmd:electronicMailAddress>
+                                <gco:CharacterString>ops@jpl.nasa.gov</gco:CharacterString>
+                            </gmd:electronicMailAddress>
+                        </gmd:CI_Address>
+                    </gmd:address>
+                </gmd:CI_Contact>
+            </gmd:contactInfo>
+            <gmd:role>
+                <gmd:CI_RoleCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/gmxCodelists.xml#CI_RoleCode" codeListValue="pointOfContact">pointOfContact</gmd:CI_RoleCode>
+            </gmd:role>
+        </gmd:CI_ResponsibleParty>
+    </gmd:contact>
+    <!-- The catalog metadata creation date for the granule -->
+    <gmd:dateStamp>
+        <gco:DateTime>{{ catalog_metadata.Production_DateTime }}{# ISO_OPERA_CreationDateTime_Product #}</gco:DateTime>
+    </gmd:dateStamp>
+    <!-- This section just documents the ISO schema and version used for this record. -->
+    <gmd:metadataStandardName>
+        <gco:CharacterString>ISO 19115-2 Geographic Information - Metadata Part 2 Extensions for imagery and gridded data</gco:CharacterString>
+    </gmd:metadataStandardName>
+    <gmd:metadataStandardVersion>
+        <gco:CharacterString>ISO 19115-2:2019(E)</gco:CharacterString>
+    </gmd:metadataStandardVersion>
+    <gmd:spatialRepresentationInfo>
+        <gmd:MD_GridSpatialRepresentation>
+            <gmd:numberOfDimensions>
+                <gco:Integer>2</gco:Integer>
+            </gmd:numberOfDimensions>
+            <gmd:axisDimensionProperties>
+                <gmd:MD_Dimension>
+                    <gmd:dimensionName>
+                        <gmd:MD_DimensionNameTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/gmxCodelists.xml#MD_DimensionNameTypeCode" codeListValue="row">row</gmd:MD_DimensionNameTypeCode>
+                    </gmd:dimensionName>
+                    <gmd:dimensionSize>
+                        <gco:Integer>{{ product_output.xCoordinates.size }}{# ISO_OPERA_rangeCount #}</gco:Integer>
+                    </gmd:dimensionSize>
+                    <gmd:resolution>
+                        <gco:Length uom="meter">{{ product_output.xCoordinates.spacing }}{# ISO_OPERA_rangePixelSize #}</gco:Length>
+                    </gmd:resolution>
+                </gmd:MD_Dimension>
+            </gmd:axisDimensionProperties>
+            <gmd:axisDimensionProperties>
+                <gmd:MD_Dimension>
+                    <gmd:dimensionName>
+                        <gmd:MD_DimensionNameTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/gmxCodelists.xml#MD_DimensionNameTypeCode" codeListValue="column">column</gmd:MD_DimensionNameTypeCode>
+                    </gmd:dimensionName>
+                    <gmd:dimensionSize>
+                        <gco:Integer>{{ product_output.yCoordinates.size }}{# ISO_OPERA_azimuthCount #}</gco:Integer>
+                    </gmd:dimensionSize>
+                    <gmd:resolution>
+                        <gco:Length uom="meter">{{ product_output.yCoordinates.spacing }}{# ISO_OPERA_azimuthPixelSize #}</gco:Length>
+                    </gmd:resolution>
+                </gmd:MD_Dimension>
+            </gmd:axisDimensionProperties>
+            <gmd:cellGeometry>
+                <gmd:MD_CellGeometryCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/gmxCodelists.xml#MD_CellGeometryCode" codeListValue="area">area</gmd:MD_CellGeometryCode>
+            </gmd:cellGeometry>
+            <gmd:transformationParameterAvailability>
+                <gco:Boolean>false</gco:Boolean>
+            </gmd:transformationParameterAvailability>
+        </gmd:MD_GridSpatialRepresentation>
+    </gmd:spatialRepresentationInfo>
+    <gmd:referenceSystemInfo>
+        <gmd:MD_ReferenceSystem>
+            <gmd:referenceSystemIdentifier>
+                <gmd:MD_Identifier>
+                    <gmd:authority>
+                        <gmd:CI_Citation>
+                            <gmd:title>
+                                <gco:CharacterString>Universal Transverse Mercator (UTM)</gco:CharacterString>
+                            </gmd:title>
+                        </gmd:CI_Citation>
+                    </gmd:authority>
+                </gmd:MD_Identifier>
+            </gmd:referenceSystemIdentifier>
+        </gmd:MD_ReferenceSystem>
+    </gmd:referenceSystemInfo>
+    <!-- This section documents granule data in this metadata record. -->
+    <gmd:identificationInfo>
+        <gmd:MD_DataIdentification>
+            <!-- This section holds the granule MetadataProviderDates, and the granule identifiers -->
+            <gmd:citation>
+                <gmd:CI_Citation>
+                    <gmd:title>
+                        <gmx:FileName>{{ custom_data.ISO_OPERA_ProducerGranuleId }}{# ISO_OPERA_ProducerGranuleId #}</gmx:FileName>
+                    </gmd:title>
+                    <gmd:alternateTitle>
+                        <gco:CharacterString>Surface Displacement Static Layers from Sentinel-1 A/B Product</gco:CharacterString>
+                    </gmd:alternateTitle>
+                    <!-- The date/time that data provider created or updated the granule info on data provider's database.-->
+                    <gmd:date>
+                        <gmd:CI_Date>
+                            <gmd:date>
+                                <gco:DateTime>{{ catalog_metadata.Production_DateTime }}{# ISO_OPERA_MetadataProvider_Action_DateTime #}</gco:DateTime>
+                            </gmd:date>
+                            <gmd:dateType>
+                                <gmd:CI_DateTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/gmxCodelists.xml#CI_DateTypeCode" codeListValue="{{ custom_data.MetadataProviderAction }}{# ISO_OPERA_MetadataProvider_Action #}">{{ custom_data.MetadataProviderAction }}{# ISO_OPERA_MetadataProvider_Action #}</gmd:CI_DateTypeCode>
+                            </gmd:dateType>
+                        </gmd:CI_Date>
+                    </gmd:date>
+                    <gmd:edition>
+                        <gco:CharacterString>{{ run_config.Groups.PGE.PrimaryExecutable.ProductVersion }}{# ISO_OPERA_ProductVersion #}</gco:CharacterString>
+                    </gmd:edition>
+                    <!-- This is the producer granule id -->
+                    <gmd:identifier>
+                        <gmd:MD_Identifier>
+                            <gmd:code>
+                                <gco:CharacterString>{{ custom_data.GranuleFilename }}{# ISO_OPERA_ProducerGranuleId #}</gco:CharacterString>
+                            </gmd:code>
+                            <gmd:codeSpace>
+                                <gco:CharacterString>gov.nasa.esdis.umm.producergranuleid</gco:CharacterString>
+                            </gmd:codeSpace>
+                            <gmd:description>
+                                <gco:CharacterString>ProducerGranuleId</gco:CharacterString>
+                            </gmd:description>
+                        </gmd:MD_Identifier>
+                    </gmd:identifier>
+                    <!-- PGE Version -->
+                    <gmd:identifier>
+                        <gmd:MD_Identifier>
+                            <gmd:code>
+                                <gco:CharacterString>{{ catalog_metadata.PGE_Version|truncate(10, True, '', 0) }}{# ISO_OPERA_PGEVersionId #}</gco:CharacterString>
+                            </gmd:code>
+                            <gmd:codeSpace>
+                                <gco:CharacterString>gov.nasa.esdis.umm.otherid</gco:CharacterString>
+                            </gmd:codeSpace>
+                            <gmd:description>
+                                <gco:CharacterString>OtherId: PGEVersionId</gco:CharacterString>
+                            </gmd:description>
+                        </gmd:MD_Identifier>
+                    </gmd:identifier>
+                    <!-- SAS Version -->
+                    <gmd:identifier>
+                        <gmd:MD_Identifier>
+                            <gmd:code>
+                                <gco:CharacterString>{{ catalog_metadata.SAS_Version }}{# ISO_OPERA_SASVersionId #}</gco:CharacterString>
+                            </gmd:code>
+                            <gmd:codeSpace>
+                                <gco:CharacterString>gov.nasa.esdis.umm.otherid</gco:CharacterString>
+                            </gmd:codeSpace>
+                            <gmd:description>
+                                <gco:CharacterString>OtherId: SASVersionId</gco:CharacterString>
+                            </gmd:description>
+                        </gmd:MD_Identifier>
+                    </gmd:identifier>
+                    <gmd:citedResponsibleParty>
+                        <gmd:CI_ResponsibleParty>
+                            <gmd:organisationName>
+                                <gco:CharacterString>Jet Propulsion Laboratory</gco:CharacterString>
+                            </gmd:organisationName>
+                            <gmd:contactInfo>
+                                <gmd:CI_Contact xlink:href="#JPLcontactInfo"/>
+                            </gmd:contactInfo>
+                            <gmd:role>
+                                <gmd:CI_RoleCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/gmxCodelists.xml#CI_RoleCode" codeListValue="originator">originator</gmd:CI_RoleCode>
+                            </gmd:role>
+                        </gmd:CI_ResponsibleParty>
+                    </gmd:citedResponsibleParty>
+                    <gmd:presentationForm>
+                        <gmd:CI_PresentationFormCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/gmxCodelists.xml#CI_PresentationFormCode" codeListValue="documentDigital">documentDigital</gmd:CI_PresentationFormCode>
+                    </gmd:presentationForm>
+                </gmd:CI_Citation>
+            </gmd:citation>
+            <gmd:abstract>
+                <gco:CharacterString>The Surface Displacement Static Layers (DISP-STATIC) from Sentinel-1 (S1) product provides information on anthropogenic and natural changes of Earth's surface, such as subsidence, tectonics, and landslides.</gco:CharacterString>
+            </gmd:abstract>
+            <gmd:status>
+                <gmd:MD_ProgressCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/gmxCodelists.xml#MD_ProgressCode" codeListValue="completed">completed</gmd:MD_ProgressCode>
+            </gmd:status>
+            <!-- This section holds the ReprocessingPlanned value -->
+            <gmd:resourceMaintenance>
+                <gmd:MD_MaintenanceInformation>
+                    <gmd:maintenanceAndUpdateFrequency>
+                        <gmd:MD_MaintenanceFrequencyCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/gmxCodelists.xml#MD_MaintenanceFrequencyCode" codeListValue="asNeeded">asNeeded</gmd:MD_MaintenanceFrequencyCode>
+                    </gmd:maintenanceAndUpdateFrequency>
+                </gmd:MD_MaintenanceInformation>
+            </gmd:resourceMaintenance>
+            <!-- This section describes projects as keywords. The CMR does not read this section.-->
+            <gmd:descriptiveKeywords>
+                <gmd:MD_Keywords>
+                    {%- for project_kw in custom_data.ISO_OPERA_ProjectKeywords %}
+                    <gmd:keyword>
+                        <gco:CharacterString>{{ project_kw }}</gco:CharacterString>
+                    </gmd:keyword>
+                    {%- endfor %}
+                    <gmd:type>
+                        <gmd:MD_KeywordTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/gmxCodelists.xml#MD_KeywordTypeCode" codeListValue="project">project</gmd:MD_KeywordTypeCode>
+                    </gmd:type>
+                    <gmd:thesaurusName>
+                        <gmd:CI_Citation>
+                            <gmd:title>
+                                <gco:CharacterString>NASA Project Keywords</gco:CharacterString>
+                            </gmd:title>
+                            <gmd:date gco:nilReason="unknown"/>
+                            <gmd:citedResponsibleParty>
+                                <gmd:CI_ResponsibleParty>
+                                    <gmd:organisationName>
+                                        <gco:CharacterString>NASA</gco:CharacterString>
+                                    </gmd:organisationName>
+                                    <gmd:positionName>
+                                        <gco:CharacterString>User Support Office</gco:CharacterString>
+                                    </gmd:positionName>
+                                    <gmd:contactInfo>
+                                        <gmd:CI_Contact>
+                                            <gmd:onlineResource>
+                                                <gmd:CI_OnlineResource>
+                                                    <gmd:linkage>
+                                                        <gmd:URL>https://support.earthdata.nasa.gov/</gmd:URL>
+                                                    </gmd:linkage>
+                                                    <gmd:name>
+                                                        <gco:CharacterString>Earthdata Support</gco:CharacterString>
+                                                    </gmd:name>
+                                                    <gmd:description>
+                                                        <gco:CharacterString>File an issue or provide feedback</gco:CharacterString>
+                                                    </gmd:description>
+                                                    <gmd:function>
+                                                        <gmd:CI_OnLineFunctionCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/gmxCodelists.xml#CI_OnLineFunctionCode" codeListValue="information">information</gmd:CI_OnLineFunctionCode>
+                                                    </gmd:function>
+                                                </gmd:CI_OnlineResource>
+                                            </gmd:onlineResource>
+                                        </gmd:CI_Contact>
+                                    </gmd:contactInfo>
+                                    <gmd:role>
+                                        <gmd:CI_RoleCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/gmxCodelists.xml#CI_RoleCode" codeListValue="custodian">custodian</gmd:CI_RoleCode>
+                                    </gmd:role>
+                                </gmd:CI_ResponsibleParty>
+                            </gmd:citedResponsibleParty>
+                        </gmd:CI_Citation>
+                    </gmd:thesaurusName>
+                </gmd:MD_Keywords>
+            </gmd:descriptiveKeywords>
+            <!-- This section describes platform keywords -->
+            <gmd:descriptiveKeywords>
+                <gmd:MD_Keywords>
+                    {%- for platform_kw in custom_data.ISO_OPERA_PlatformKeywords %}
+                    <gmd:keyword>
+                        <gco:CharacterString>{{ platform_kw }}</gco:CharacterString>
+                    </gmd:keyword>
+                    {%- endfor %}
+                    <gmd:type>
+                        <gmd:MD_KeywordTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/gmxCodelists.xml#MD_KeywordTypeCode" codeListValue="platform">platform</gmd:MD_KeywordTypeCode>
+                    </gmd:type>
+                    <gmd:thesaurusName>
+                        <gmd:CI_Citation>
+                            <gmd:title>
+                                <gco:CharacterString>NASA Platform Keywords</gco:CharacterString>
+                            </gmd:title>
+                            <gmd:date gco:nilReason="unknown"/>
+                            <gmd:citedResponsibleParty>
+                                <gmd:CI_ResponsibleParty>
+                                    <gmd:organisationName>
+                                        <gco:CharacterString>NASA</gco:CharacterString>
+                                    </gmd:organisationName>
+                                    <gmd:positionName>
+                                        <gco:CharacterString>User Support Office</gco:CharacterString>
+                                    </gmd:positionName>
+                                    <gmd:contactInfo>
+                                        <gmd:CI_Contact>
+                                            <gmd:onlineResource>
+                                                <gmd:CI_OnlineResource>
+                                                    <gmd:linkage>
+                                                        <gmd:URL>https://support.earthdata.nasa.gov/</gmd:URL>
+                                                    </gmd:linkage>
+                                                    <gmd:name>
+                                                        <gco:CharacterString>Earthdata Support</gco:CharacterString>
+                                                    </gmd:name>
+                                                    <gmd:description>
+                                                        <gco:CharacterString>File an issue or provide feedback</gco:CharacterString>
+                                                    </gmd:description>
+                                                    <gmd:function>
+                                                        <gmd:CI_OnLineFunctionCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/gmxCodelists.xml#CI_OnLineFunctionCode" codeListValue="information">information</gmd:CI_OnLineFunctionCode>
+                                                    </gmd:function>
+                                                </gmd:CI_OnlineResource>
+                                            </gmd:onlineResource>
+                                        </gmd:CI_Contact>
+                                    </gmd:contactInfo>
+                                    <gmd:role>
+                                        <gmd:CI_RoleCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/gmxCodelists.xml#CI_RoleCode" codeListValue="custodian">custodian</gmd:CI_RoleCode>
+                                    </gmd:role>
+                                </gmd:CI_ResponsibleParty>
+                            </gmd:citedResponsibleParty>
+                        </gmd:CI_Citation>
+                    </gmd:thesaurusName>
+                </gmd:MD_Keywords>
+            </gmd:descriptiveKeywords>
+            <!-- This section describes instrument keywords -->
+            <gmd:descriptiveKeywords>
+                <gmd:MD_Keywords>
+                    {%- for instr_kw in custom_data.ISO_OPERA_InstrumentKeywords %}
+                    <gmd:keyword>
+                        <gco:CharacterString>{{ instr_kw }}</gco:CharacterString>
+                    </gmd:keyword>
+                    {%- endfor %}
+                    <gmd:type><gmd:MD_KeywordTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/gmxCodelists.xml#MD_KeywordTypeCode" codeListValue="instrument">instrument</gmd:MD_KeywordTypeCode>
+                    </gmd:type>
+                    <gmd:thesaurusName>
+                        <gmd:CI_Citation>
+                            <gmd:title>
+                                <gco:CharacterString>NASA Instrument Keywords</gco:CharacterString>
+                            </gmd:title>
+                            <gmd:date gco:nilReason="unknown"/>
+                            <gmd:citedResponsibleParty>
+                                <gmd:CI_ResponsibleParty>
+                                    <gmd:organisationName>
+                                        <gco:CharacterString>NASA</gco:CharacterString>
+                                    </gmd:organisationName>
+                                    <gmd:positionName>
+                                        <gco:CharacterString>User Support Office</gco:CharacterString>
+                                    </gmd:positionName>
+                                    <gmd:contactInfo>
+                                        <gmd:CI_Contact>
+                                            <gmd:onlineResource>
+                                                <gmd:CI_OnlineResource>
+                                                    <gmd:linkage>
+                                                        <gmd:URL>https://support.earthdata.nasa.gov/</gmd:URL>
+                                                    </gmd:linkage>
+                                                    <gmd:name>
+                                                        <gco:CharacterString>Earthdata Support</gco:CharacterString>
+                                                    </gmd:name>
+                                                    <gmd:description>
+                                                        <gco:CharacterString>File an issue or provide feedback</gco:CharacterString>
+                                                    </gmd:description>
+                                                    <gmd:function>
+                                                        <gmd:CI_OnLineFunctionCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/gmxCodelists.xml#CI_OnLineFunctionCode" codeListValue="information">information</gmd:CI_OnLineFunctionCode>
+                                                    </gmd:function>
+                                                </gmd:CI_OnlineResource>
+                                            </gmd:onlineResource>
+                                        </gmd:CI_Contact>
+                                    </gmd:contactInfo>
+                                    <gmd:role>
+                                        <gmd:CI_RoleCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/gmxCodelists.xml#CI_RoleCode" codeListValue="custodian">custodian</gmd:CI_RoleCode>
+                                    </gmd:role>
+                                </gmd:CI_ResponsibleParty>
+                            </gmd:citedResponsibleParty>
+                        </gmd:CI_Citation>
+                    </gmd:thesaurusName>
+                </gmd:MD_Keywords>
+            </gmd:descriptiveKeywords>
+            <!-- This is the granule collection short name. If this is used then the Collection Version must also exist.  Only this and Collection Version or or Collection Entry Id are required. -->
+            <gmd:aggregationInfo>
+                <gmd:MD_AggregateInformation>
+                    <gmd:aggregateDataSetIdentifier>
+                        <gmd:MD_Identifier>
+                            <gmd:code>
+                                <gco:CharacterString>{{ catalog_metadata.PGE_Name }}{# ISO_OPERA_CollectionShortName #}</gco:CharacterString>
+                            </gmd:code>
+                            <gmd:codeSpace>
+                                <gco:CharacterString>gov.nasa.esdis.umm.collectionshortname</gco:CharacterString>
+                            </gmd:codeSpace>
+                            <gmd:description>
+                                <gco:CharacterString>CollectionShortName</gco:CharacterString>
+                            </gmd:description>
+                        </gmd:MD_Identifier>
+                    </gmd:aggregateDataSetIdentifier>
+                    <gmd:associationType>
+                        <gmd:DS_AssociationTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/gmxCodelists.xml#DS_AssociationTypeCode" codeListValue="LargerWorkCitation">LargerWorkCitation</gmd:DS_AssociationTypeCode>
+                    </gmd:associationType>
+                </gmd:MD_AggregateInformation>
+            </gmd:aggregationInfo>
+            <!-- This is the granule collection version. If this is used then the Collection Short Name must also exist. Only this and Collection Short Name or Collection Entry Id are required. -->
+            <gmd:aggregationInfo>
+                <gmd:MD_AggregateInformation>
+                    <gmd:aggregateDataSetIdentifier>
+                        <gmd:MD_Identifier>
+                            <gmd:code>
+                                <gco:CharacterString>{{ catalog_metadata.PGE_Version|truncate(10, True, '', 0) }}{# ISO_OPERA_CollectionVersion #}</gco:CharacterString>
+                            </gmd:code>
+                            <gmd:codeSpace>
+                                <gco:CharacterString>gov.nasa.esdis.umm.collectionversion</gco:CharacterString>
+                            </gmd:codeSpace>
+                            <gmd:description>
+                                <gco:CharacterString>CollectionVersion</gco:CharacterString>
+                            </gmd:description>
+                        </gmd:MD_Identifier>
+                    </gmd:aggregateDataSetIdentifier>
+                    <gmd:associationType>
+                        <gmd:DS_AssociationTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/gmxCodelists.xml#DS_AssociationTypeCode" codeListValue="LargerWorkCitation">LargerWorkCitation</gmd:DS_AssociationTypeCode>
+                    </gmd:associationType>
+                </gmd:MD_AggregateInformation>
+            </gmd:aggregationInfo>
+            <!-- This is where View Related Information or Project Home Page RelatedUrls go.-->
+            <gmd:aggregationInfo>
+                <gmd:MD_AggregateInformation>
+                    <gmd:aggregateDataSetName>
+                        <gmd:CI_Citation>
+                            <gmd:title>
+                                <gco:CharacterString>OPERA Project Homepage</gco:CharacterString>
+                            </gmd:title>
+                            <gmd:date gco:nilReason="unknown"/>
+                            <gmd:citedResponsibleParty>
+                                <gmd:CI_ResponsibleParty>
+                                    <gmd:contactInfo>
+                                        <gmd:CI_Contact>
+                                            <gmd:onlineResource>
+                                                <gmd:CI_OnlineResource>
+                                                    <gmd:linkage>
+                                                        <gmd:URL>https://www.jpl.nasa.gov/go/opera</gmd:URL>
+                                                    </gmd:linkage>
+                                                    <gmd:description>
+                                                        <gco:CharacterString>OPERA Project Homepage</gco:CharacterString>
+                                                    </gmd:description>
+                                                    <gmd:function>
+                                                        <gmd:CI_OnLineFunctionCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/gmxCodelists.xml#CI_OnLineFunctionCode" codeListValue="information">information</gmd:CI_OnLineFunctionCode>
+                                                    </gmd:function>
+                                                </gmd:CI_OnlineResource>
+                                            </gmd:onlineResource>
+                                        </gmd:CI_Contact>
+                                    </gmd:contactInfo>
+                                    <gmd:role>
+                                        <gmd:CI_RoleCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/gmxCodelists.xml#CI_RoleCode" codeListValue="custodian">custodian</gmd:CI_RoleCode>
+                                    </gmd:role>
+                                </gmd:CI_ResponsibleParty>
+                            </gmd:citedResponsibleParty>
+                        </gmd:CI_Citation>
+                    </gmd:aggregateDataSetName>
+                    <gmd:associationType>
+                        <gmd:DS_AssociationTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/gmxCodelists.xml#DS_AssociationTypeCode" codeListValue="LargerWorkCitation">LargerWorkCitation</gmd:DS_AssociationTypeCode>
+                    </gmd:associationType>
+                </gmd:MD_AggregateInformation>
+            </gmd:aggregationInfo>
+            <gmd:spatialRepresentationType>
+                <gmd:MD_SpatialRepresentationTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/gmxCodelists.xml#MD_SpatialRepresentationTypeCode" codeListValue="grid">grid</gmd:MD_SpatialRepresentationTypeCode>
+            </gmd:spatialRepresentationType>
+            <!-- This is the language used in the granule -->
+            <gmd:language>
+                <gco:CharacterString>eng</gco:CharacterString>
+            </gmd:language>
+            <!-- this is the character set used in the granule -->
+            <gmd:characterSet>
+                <gmd:MD_CharacterSetCode codeList="http://www.ngdc.noaa.gov/metadata/published/xsd/schema/resources/Codelist/gmxCodelists.xml#MD_CharacterSetCode" codeListValue="utf8">utf8</gmd:MD_CharacterSetCode>
+            </gmd:characterSet>
+            <gmd:topicCategory>
+                <gmd:MD_TopicCategoryCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/gmxCodelists.xml#MD_TopicCategoryCode" codeListValue="geoscientificInformation">geoscientificInformation</gmd:MD_TopicCategoryCode>
+            </gmd:topicCategory>
+            <gmd:environmentDescription>
+                <gco:CharacterString>Data product generated in GeoTIFF format with ISO 19115 conformant metadata.</gco:CharacterString>
+            </gmd:environmentDescription>
+            <!-- This section documents the granules spatial and temporal extent as well as the grid mapping names and the projection names - NOT the TilingIdentificationSystem. -->
+            <gmd:extent>
+                <!-- the EX_Extent id must exist with boundingExtent -->
+                <gmd:EX_Extent id="boundingExtent">
+                    <!--Bounding Rectangle-->
+                    <gmd:geographicElement>
+                        <gmd:EX_GeographicBoundingBox>
+                            <gmd:westBoundLongitude>
+                                <gco:Decimal>{{ product_output.geospatial_lon_min }}{# doc ID ISO_OPERA_westBoundLongitude #}</gco:Decimal>
+                            </gmd:westBoundLongitude>
+                            <gmd:eastBoundLongitude>
+                                <gco:Decimal>{{ product_output.geospatial_lon_max }}{# doc ID ISO_OPERA_eastBoundLongitude #}</gco:Decimal>
+                            </gmd:eastBoundLongitude>
+                            <gmd:southBoundLatitude>
+                                <gco:Decimal>{{ product_output.geospatial_lat_min }}{# doc ID ISO_OPERA_southBoundLatitude #}</gco:Decimal>
+                            </gmd:southBoundLatitude>
+                            <gmd:northBoundLatitude>
+                                <gco:Decimal>{{ product_output.geospatial_lat_max }}{# doc ID ISO_OPERA_northBoundLatitude #}</gco:Decimal>
+                            </gmd:northBoundLatitude>
+                        </gmd:EX_GeographicBoundingBox>
+                    </gmd:geographicElement>
+                    <!-- This is the granules temporal extent -->
+                    <gmd:temporalElement>
+                        <!--RangeDateTime-->
+                        <gmd:EX_TemporalExtent id="boundingTemporalExtent">
+                            <gmd:extent>
+                                <gml:TimePeriod gml:id="DISP_Time_Range">
+                                    <gml:beginPosition>{{ product_output.acquisitionDate }}{# ISO_OPERA_refDateTime #}</gml:beginPosition>
+                                    <gml:endPosition>{{ product_output.acquisitionDate }}{# ISO_OPERA_secDateTime #}</gml:endPosition>
+                                </gml:TimePeriod>
+                            </gmd:extent>
+                        </gmd:EX_TemporalExtent>
+                    </gmd:temporalElement>
+                </gmd:EX_Extent>
+            </gmd:extent>
+            <gmd:supplementalInformation/>
+        </gmd:MD_DataIdentification>
+    </gmd:identificationInfo>
+    <!-- This is the Measured Parameters section - it needs to be in its own contentInfo section - not within Additional Attributes, DayNightFlag, or CloudCover -->
+    <gmd:contentInfo>
+        <gmd:MD_CoverageDescription>
+            <gmd:attributeDescription>
+                <gco:RecordType>MeasuredParameters</gco:RecordType>
+            </gmd:attributeDescription>
+            <gmd:contentType>
+                <gmd:MD_CoverageContentTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/gmxCodelists.xml#MD_CoverageContentTypeCode" codeListValue="physicalMeasurement">physicalMeasurement</gmd:MD_CoverageContentTypeCode>
+            </gmd:contentType>
+            <gmd:dimension>
+                <gmd:MD_Band>
+                    <gmd:otherProperty>
+                        <gco:Record>
+                            <eos:AdditionalAttributes>
+                                {%- for attribute in product_output.MeasuredParameters.values() %}
+                                <eos:AdditionalAttribute>
+                                    <eos:reference>
+                                        <eos:EOS_AdditionalAttributeDescription>
+                                            <eos:type>
+                                                <eos:EOS_AdditionalAttributeTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeTypeCode" codeListValue="{{ attribute.attr_type }}">{{ attribute.attr_type }}</eos:EOS_AdditionalAttributeTypeCode>
+                                            </eos:type>
+                                            <eos:name>
+                                                <gco:CharacterString>{{ attribute.name }}</gco:CharacterString>
+                                            </eos:name>
+                                            <eos:description>
+                                                <gco:CharacterString>{{ attribute.attr_description }}</gco:CharacterString>
+                                            </eos:description>
+                                            <eos:dataType>
+                                                <eos:EOS_AdditionalAttributeDataTypeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/eosCodelists.xml#EOS_AdditionalAttributeDataTypeCode" codeListValue="{{ attribute.data_type }}">{{ attribute.data_type }}</eos:EOS_AdditionalAttributeDataTypeCode>
+                                            </eos:dataType>
+                                        </eos:EOS_AdditionalAttributeDescription>
+                                    </eos:reference>
+                                    <eos:value>
+                                        <gco:CharacterString>{{ attribute.value }}</gco:CharacterString>
+                                    </eos:value>
+                                </eos:AdditionalAttribute>
+                                {%- endfor %}
+                            </eos:AdditionalAttributes>
+                        </gco:Record>
+                    </gmd:otherProperty>
+                </gmd:MD_Band>
+            </gmd:dimension>
+        </gmd:MD_CoverageDescription>
+    </gmd:contentInfo>
+    <!-- This section holds the Related URLs that pertain to distributions - where UMM-G RelatedUrl/Type = GET SERVICE, GET DATA, OPENDAP DATA ACCESS -->
+    <gmd:distributionInfo>
+        <gmd:MD_Distribution>
+            <gmd:distributor>
+                <gmd:MD_Distributor>
+                    <gmd:distributionFormat>
+                        <gmd:MD_Format>
+                            <gmd:name>
+                                <gco:CharacterString>GeoTIFF</gco:CharacterString>
+                            </gmd:name>
+                        </gmd:MD_Format>
+                    </gmd:distributionFormat>
+                    <gmd:distributorContact gco:nilReason="missing"/>
+                    <gmd:distributorTransferOptions gco:nilReason="missing"/>
+                    <gmd:distributionOrderProcess>
+                        <gmd:MD_StandardOrderProcess>
+                            <gmd:fees>
+                                <gco:CharacterString>free</gco:CharacterString>
+                            </gmd:fees>
+                        </gmd:MD_StandardOrderProcess>
+                    </gmd:distributionOrderProcess>
+                </gmd:MD_Distributor>
+            </gmd:distributor>
+        </gmd:MD_Distribution>
+    </gmd:distributionInfo>
+    <!-- This is the data quality section. It holds ReprocessingActual, ProductionDateTime, PGEVersionClass, Some AdditionalAttributes, and InputGranules.
+         The MeasuredParameters go into its own dataQualityInfo Section. -->
+    <gmd:dataQualityInfo>
+        <gmd:DQ_DataQuality>
+            <!-- this lists that the scope for the data quality section pertains to the data set - the granule. -->
+            <gmd:scope>
+                <gmd:DQ_Scope>
+                    <gmd:level>
+                        <gmd:MD_ScopeCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/gmxCodelists.xml#MD_ScopeCode" codeListValue="dataset">dataset</gmd:MD_ScopeCode>
+                    </gmd:level>
+                </gmd:DQ_Scope>
+            </gmd:scope>
+            <gmd:lineage>
+                <gmd:LI_Lineage>
+                    <gmd:statement>
+                        <gco:CharacterString>OPERA L3 DISP Static Layers product generated by JPL using Sentinel-1 A/B input data and SAS version {{ catalog_metadata.SAS_Version }}{# ISO_OPERA_SASVersionId #}</gco:CharacterString>
+                    </gmd:statement>
+                    <!-- This section contains the PGEVersionClass -->
+                    <gmd:processStep>
+                        <gmi:LE_ProcessStep>
+                            <gmd:description>
+                                <gco:CharacterString>PGEVersionClass</gco:CharacterString>
+                            </gmd:description>
+                            <gmi:processingInformation>
+                                <eos:EOS_Processing>
+                                    <gmi:identifier>
+                                        <gmd:MD_Identifier>
+                                            <gmd:code>
+                                                <gco:CharacterString>PGEName: {{ catalog_metadata.PGE_Name }}{# ISO_OPERA_pgeName #} PGEVersion: {{ catalog_metadata.PGE_Version|truncate(10, True, '', 0) }}{# ISO_OPERA_PGEVersionId #}</gco:CharacterString>
+                                            </gmd:code>
+                                            <gmd:codeSpace>
+                                                <gco:CharacterString>gov.nasa.esdis.umm.pgeversionclass</gco:CharacterString>
+                                            </gmd:codeSpace>
+                                            <gmd:description>
+                                                <gco:CharacterString>PGEVersionClass</gco:CharacterString>
+                                            </gmd:description>
+                                        </gmd:MD_Identifier>
+                                    </gmi:identifier>
+                                </eos:EOS_Processing>
+                            </gmi:processingInformation>
+                            <gmi:output>
+                                <gmd:LI_Source>
+                                    <gmd:description>
+                                        <gco:CharacterString>Surface Displacement Static Layers (DISP-STATIC) Product - {{ custom_data.GranuleFilename }}{# ISO_OPERA_ProducerGranuleId #}</gco:CharacterString>
+                                    </gmd:description>
+                                </gmd:LI_Source>
+                            </gmi:output>
+                        </gmi:LE_ProcessStep>
+                    </gmd:processStep>
+                    <!-- This is the production date time -->
+                    <gmd:processStep>
+                        <gmi:LE_ProcessStep>
+                            <gmd:description>
+                                <gco:CharacterString>ProductionDateTime</gco:CharacterString>
+                            </gmd:description>
+                            <gmd:dateTime>
+                                <gco:DateTime>{{ catalog_metadata.Production_DateTime }}{# ISO_OPERA_CreationDateTime_Product #}</gco:DateTime>
+                            </gmd:dateTime>
+                        </gmi:LE_ProcessStep>
+                    </gmd:processStep>
+                    <!-- This section holds the GranuleInputs -->
+                    {%- for input_list_item in catalog_metadata.Input_Files %}
+                    <gmd:source>
+                        <gmi:LE_Source>
+                            <gmd:description>
+                                <gco:CharacterString>GranuleInput</gco:CharacterString>
+                            </gmd:description>
+                            <gmd:sourceCitation>
+                                <gmd:CI_Citation>
+                                    <gmd:title>
+                                        <gmx:FileName src="{{ input_list_item }}{# ISO_OPERA_InputGranuleN #}">
+                                            {{ input_list_item }}{# ISO_OPERA_InputGranuleN #}
+                                        </gmx:FileName>
+                                    </gmd:title>
+                                    <gmd:date gco:nilReason="unknown"/>
+                                </gmd:CI_Citation>
+                            </gmd:sourceCitation>
+                        </gmi:LE_Source>
+                    </gmd:source>
+                    {%- endfor %}
+                    <gmd:source>
+                        <gmd:LI_Source>
+                            <gmd:description>
+                                <gco:CharacterString>Reference DEM - {{ run_config.Groups.PGE.DynamicAncillaryFilesGroup.AncillaryFileMap.dem_file }}{# ISO_OPERA_digitalElevationModelFile #}</gco:CharacterString>
+                            </gmd:description>
+                        </gmd:LI_Source>
+                    </gmd:source>
+                    {%- if run_config.Groups.PGE.DynamicAncillaryFilesGroup.AncillaryFileMap.static_layers_files is not none %}
+                    {%- for rtc_static_layers_file in run_config.Groups.PGE.DynamicAncillaryFilesGroup.AncillaryFileMap.rtc_static_layers_files %}
+                    <gmd:source>
+                        <gmd:LI_Source>
+                            <gmd:description>
+                                <gco:CharacterString>RTC Static Layer File - {{ rtc_static_layers_file }}{# ISO_OPERA_staticLayerFile #}</gco:CharacterString>
+                            </gmd:description>
+                        </gmd:LI_Source>
+                    </gmd:source>
+                    {%- endfor %}
+                    {%- endif %}
+                </gmd:LI_Lineage>
+            </gmd:lineage>
+        </gmd:DQ_DataQuality>
+    </gmd:dataQualityInfo>
+    <gmd:metadataMaintenance>
+        <gmd:MD_MaintenanceInformation>
+            <gmd:maintenanceAndUpdateFrequency>
+                <gmd:MD_MaintenanceFrequencyCode codeList="https://cdn.earthdata.nasa.gov/iso/resources/Codelist/gmxCodelists.xml#MD_MaintenanceFrequencyCode" codeListValue="asNeeded">asNeeded</gmd:MD_MaintenanceFrequencyCode>
+            </gmd:maintenanceAndUpdateFrequency>
+        </gmd:MD_MaintenanceInformation>
+    </gmd:metadataMaintenance>
+</gmi:MI_Metadata>
