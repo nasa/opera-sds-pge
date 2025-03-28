@@ -1284,7 +1284,7 @@ class DispS1StaticExecutor(DispS1StaticPreProcessorMixin, DispS1StaticPostProces
     """
 
     NAME = "DISP-S1-STATIC"
-    """Short name for the DISP-S1 PGE"""
+    """Short name for the DISP-S1-STATIC PGE"""
 
     # SAS_VERSION is inherited from parent DISP-S1 PGE, but is considered a CalVal release for the
     # DISP-S1-STATIC workflow
