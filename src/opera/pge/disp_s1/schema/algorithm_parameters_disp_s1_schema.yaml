@@ -219,6 +219,8 @@ recommended_temporal_coherence_threshold: num()
 recommended_similarity_threshold: num()
 # Number of output products to create in parallel.
 num_parallel_products: int()
+# When creating `recommended_mask`, use the `connected_component_label` layer to hide pixels whose label == 0.
+recommended_use_conncomp: bool()
 ---
 x_y_object:
     x: int()
