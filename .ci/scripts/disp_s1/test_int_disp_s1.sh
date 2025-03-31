@@ -143,16 +143,17 @@ done
 
 echo "Testing DISP-S1 Static Layers Workflow"
 
-expected_data_dir="${TMP_DIR}/${EXPECTED_DATA%.*}/golden_output_static"
+INPUT_DATA="disp_s1_static_r6.6_calval_expected_input.zip"
+EXPECTED_DATA="disp_s1_static_r6.6_calval_expected_output.zip"
+RUNCONFIG="opera_pge_disp_s1_static_r6.6_calval_runconfig.yaml"
+
+test_int_setup_test_data
+
+input_dir="${TMP_DIR}/${INPUT_DATA%.*}"
+expected_data_dir="${TMP_DIR}/${EXPECTED_DATA%.*}/golden_output"
 
 echo "Input data directory: ${input_dir}"
 echo "Expected data directory: ${expected_data_dir}"
-
-# Copy the RunConfig for the static workflow
-static_runconfig="opera_pge_disp_s1_static_r6.6_calval_runconfig.yaml"
-local_static_runconfig="${SCRIPT_DIR}/${static_runconfig}"
-echo "Copying runconfig file $local_static_runconfig to $runconfig_dir"
-cp ${local_static_runconfig} ${runconfig_dir}
 
 output_dir="${TMP_DIR}/output_disp_s1/static"
 
