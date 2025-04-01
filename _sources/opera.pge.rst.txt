@@ -14,6 +14,8 @@ Submodules
    opera.pge.dswx_s1
    opera.pge.disp_s1
    opera.pge.dswx_ni
+   opera.pge.dist_s1
+   opera.pge.tropo
 
 Module contents
 ---------------

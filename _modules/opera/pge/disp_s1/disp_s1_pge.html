@@ -100,8 +100,11 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.error_codes</span><span class="w"> </span><span class="kn">import</span> <span class="n">ErrorCode</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.h5_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_cslc_s1_product_metadata</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.h5_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_disp_s1_product_metadata</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.input_validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate_algorithm_parameters_config</span><span class="p">,</span> <span class="n">validate_disp_inputs</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.render_jinja2</span><span class="w"> </span><span class="kn">import</span> <span class="n">augment_hdf5_measured_parameters</span><span class="p">,</span> <span class="n">render_jinja2</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.input_validation</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">validate_algorithm_parameters_config</span><span class="p">,</span>
+                                         <span class="n">validate_disp_inputs</span><span class="p">,</span>
+                                         <span class="n">validate_disp_static_inputs</span><span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.render_jinja2</span><span class="w"> </span><span class="kn">import</span> <span class="n">augment_hdf5_measured_parameters</span><span class="p">,</span> <span class="n">render_jinja2</span><span class="p">,</span> <span class="n">augment_measured_parameters</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.tiff_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_geotiff_metadata</span><span class="p">,</span> <span class="n">get_geotiff_dimensions</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.time</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_time_for_filename</span><span class="p">,</span> <span class="n">get_catalog_metadata_datetime_str</span>
 
 
@@ -119,12 +122,49 @@
 
     <span class="n">_pre_mixin_name</span> <span class="o">=</span> <span class="s2">&quot;DispS1PreProcessorMixin&quot;</span>
 
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_runconfig_needed_options</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The SAS schema for the DISP-S1 PGEs validates for both baseline and static workflows.</span>
+<span class="sd">        This could lead to missing required options and/or unexpected options falling through</span>
+<span class="sd">        the cracks during yamale validation due to the workflows having distinct sets of options.</span>
+<span class="sd">        This function does a final check on the schema to ensure the SAS gets all needed and no</span>
+<span class="sd">        extra options for the configured workflow.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">sas_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">sas_config</span>
+
+        <span class="n">extra_keys</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">missing_required_keys</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="s1">&#39;cslc_file_list&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sas_config</span><span class="p">[</span><span class="s1">&#39;input_file_group&#39;</span><span class="p">]:</span>
+            <span class="n">missing_required_keys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;input_file_list.cslc_file_list&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s1">&#39;algorithm_parameters_file&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sas_config</span><span class="p">[</span><span class="s1">&#39;dynamic_ancillary_file_group&#39;</span><span class="p">]:</span>
+            <span class="n">missing_required_keys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;dynamic_ancillary_file_group.algorithm_parameters_file&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s1">&#39;save_compressed_slc&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sas_config</span><span class="p">[</span><span class="s1">&#39;product_path_group&#39;</span><span class="p">]:</span>
+            <span class="n">missing_required_keys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;product_path_group.save_compressed_slc&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s1">&#39;gpu_enabled&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sas_config</span><span class="p">[</span><span class="s1">&#39;worker_settings&#39;</span><span class="p">]:</span>
+            <span class="n">missing_required_keys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;worker_settings.gpu_enabled&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s1">&#39;rtc_static_layers_files&#39;</span> <span class="ow">in</span> <span class="n">sas_config</span><span class="p">[</span><span class="s1">&#39;dynamic_ancillary_file_group&#39;</span><span class="p">]:</span>
+            <span class="n">extra_keys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;dynamic_ancillary_file_group.rtc_static_layers_files&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing_required_keys</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Missing required options in RunConfig: </span><span class="si">{</span><span class="n">missing_required_keys</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">RUN_CONFIG_VALIDATION_FAILED</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">extra_keys</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Unexpected options found in RunConfig: </span><span class="si">{</span><span class="n">extra_keys</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">RUN_CONFIG_VALIDATION_FAILED</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+
 <div class="viewcode-block" id="DispS1PreProcessorMixin.run_preprocessor"><a class="viewcode-back" href="../../../../opera.pge.disp_s1.html#opera.pge.disp_s1.disp_s1_pge.DispS1PreProcessorMixin.run_preprocessor">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">run_preprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Executes the pre-processing steps for DISP-S1 PGE initialization.</span>
 <span class="sd">        The DispS1PreProcessorMixin version of this class performs all actions</span>
-<span class="sd">        of the base PreProcessorMixin class, and adds an input validation step</span>
-<span class="sd">        for the inputs defined within the RunConfig.</span>
+<span class="sd">        of the base PreProcessorMixin class, and adds input validation steps</span>
+<span class="sd">        for the RunConfig and the inputs defined within it.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -133,6 +173,8 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">run_preprocessor</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_runconfig_needed_options</span><span class="p">()</span>
 
         <span class="c1"># If debug mode is enabled, skip the input validation, since we might</span>
         <span class="c1"># be working with only a partial set of inputs/ancillaries</span>
@@ -924,10 +966,10 @@
     <span class="n">LEVEL</span> <span class="o">=</span> <span class="s2">&quot;L3&quot;</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Processing Level for DISP-S1 Products&quot;&quot;&quot;</span>
 
-    <span class="n">PGE_VERSION</span> <span class="o">=</span> <span class="s2">&quot;3.0.4&quot;</span>
+    <span class="n">PGE_VERSION</span> <span class="o">=</span> <span class="s2">&quot;3.0.5&quot;</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Version of the PGE (overrides default from base_pge)&quot;&quot;&quot;</span>
 
-    <span class="n">SAS_VERSION</span> <span class="o">=</span> <span class="s2">&quot;0.5.5&quot;</span>  <span class="c1"># Final release https://github.com/opera-adt/disp-s1/releases/tag/v0.5.5</span>
+    <span class="n">SAS_VERSION</span> <span class="o">=</span> <span class="s2">&quot;0.5.7&quot;</span>  <span class="c1"># Final release https://github.com/opera-adt/disp-s1/releases/tag/v0.5.7</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pge_name</span><span class="p">,</span> <span class="n">runconfig_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">pge_name</span><span class="p">,</span> <span class="n">runconfig_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -938,6 +980,402 @@
                 <span class="s1">&#39;*.nc&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_netcdf_filename</span><span class="p">,</span>
                 <span class="s1">&#39;*displacement.png&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_browse_filename</span><span class="p">,</span>
                 <span class="s1">&#39;compressed*.h5&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compressed_cslc_filename</span>
+            <span class="p">}</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DispS1StaticPreProcessorMixin"><a class="viewcode-back" href="../../../../opera.pge.disp_s1.html#opera.pge.disp_s1.disp_s1_pge.DispS1StaticPreProcessorMixin">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">DispS1StaticPreProcessorMixin</span><span class="p">(</span><span class="n">DispS1PreProcessorMixin</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Mixin class responsible for handling all pre-processing steps for the DISP-S1-STATIC</span>
+<span class="sd">    PGE. The pre-processing phase is defined as all steps necessary prior</span>
+<span class="sd">    to SAS execution.</span>
+
+<span class="sd">    In addition to the base functionality inherited from PreProcessorMixin, this</span>
+<span class="sd">    mixin adds an input validation step to ensure that input(s) defined by the</span>
+<span class="sd">    RunConfig exist and are valid.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_pre_mixin_name</span> <span class="o">=</span> <span class="s2">&quot;DispS1PreProcessorMixin&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_runconfig_needed_options</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The SAS schema for the DISP-S1 PGEs validates for both baseline and static workflows.</span>
+<span class="sd">        This could lead to missing required options and/or unexpected options falling through</span>
+<span class="sd">        the cracks during yamale validation due to the workflows having distinct sets of options.</span>
+<span class="sd">        This function does a final check on the schema to ensure the SAS gets all needed and no</span>
+<span class="sd">        extra options for the configured workflow.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">sas_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">sas_config</span>
+
+        <span class="n">extra_keys</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">missing_required_keys</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="s1">&#39;cslc_file_list&#39;</span> <span class="ow">in</span> <span class="n">sas_config</span><span class="p">[</span><span class="s1">&#39;input_file_group&#39;</span><span class="p">]:</span>
+            <span class="n">extra_keys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;input_file_list.cslc_file_list&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s1">&#39;algorithm_parameters_file&#39;</span> <span class="ow">in</span> <span class="n">sas_config</span><span class="p">[</span><span class="s1">&#39;dynamic_ancillary_file_group&#39;</span><span class="p">]:</span>
+            <span class="n">extra_keys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;dynamic_ancillary_file_group.algorithm_parameters_file&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s1">&#39;save_compressed_slc&#39;</span> <span class="ow">in</span> <span class="n">sas_config</span><span class="p">[</span><span class="s1">&#39;product_path_group&#39;</span><span class="p">]:</span>
+            <span class="n">extra_keys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;product_path_group.save_compressed_slc&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s1">&#39;gpu_enabled&#39;</span> <span class="ow">in</span> <span class="n">sas_config</span><span class="p">[</span><span class="s1">&#39;worker_settings&#39;</span><span class="p">]:</span>
+            <span class="n">extra_keys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;worker_settings.gpu_enabled&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s1">&#39;rtc_static_layers_files&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sas_config</span><span class="p">[</span><span class="s1">&#39;dynamic_ancillary_file_group&#39;</span><span class="p">]:</span>
+            <span class="n">missing_required_keys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;dynamic_ancillary_file_group.rtc_static_layers_files&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing_required_keys</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Missing required options in RunConfig: </span><span class="si">{</span><span class="n">missing_required_keys</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">RUN_CONFIG_VALIDATION_FAILED</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">extra_keys</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Unexpected options found in RunConfig: </span><span class="si">{</span><span class="n">extra_keys</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">RUN_CONFIG_VALIDATION_FAILED</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+
+<div class="viewcode-block" id="DispS1StaticPreProcessorMixin.run_preprocessor"><a class="viewcode-back" href="../../../../opera.pge.disp_s1.html#opera.pge.disp_s1.disp_s1_pge.DispS1StaticPreProcessorMixin.run_preprocessor">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">run_preprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Executes the pre-processing steps for DISP-S1-STATIC PGE initialization.</span>
+<span class="sd">        The DispS1StaticPreProcessorMixin version of this class performs all actions</span>
+<span class="sd">        of the base PreProcessorMixin class, and adds input validation steps</span>
+<span class="sd">        for the RunConfig and the inputs defined within it.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        **kwargs: dict</span>
+<span class="sd">            Any keyword arguments needed by the pre-processor</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">PreProcessorMixin</span><span class="o">.</span><span class="n">run_preprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_runconfig_needed_options</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">debug_switch</span><span class="p">:</span>
+            <span class="n">validate_disp_static_inputs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="DispS1StaticPostProcessorMixin"><a class="viewcode-back" href="../../../../opera.pge.disp_s1.html#opera.pge.disp_s1.disp_s1_pge.DispS1StaticPostProcessorMixin">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">DispS1StaticPostProcessorMixin</span><span class="p">(</span><span class="n">DispS1PostProcessorMixin</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Mixin class responsible for handling all post-processing steps for the DISP-S1-STATIC</span>
+<span class="sd">    PGE. The post-processing phase is defined as all steps required after SAS</span>
+<span class="sd">    execution has completed, prior to handover of output products to PCM.</span>
+
+<span class="sd">    In addition to the base functionality inherited from PostProcessorMixin, this</span>
+<span class="sd">    mixin adds an output validation step to ensure that the output file(s) defined</span>
+<span class="sd">    by the RunConfig exist and are valid.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_post_mixin_name</span> <span class="o">=</span> <span class="s2">&quot;DispS1StaticPostProcessorMixin&quot;</span>
+    <span class="n">_product_metadata_cache</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">_product_filename_cache</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_output</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Evaluates the output files generated from SAS execution to ensure:</span>
+<span class="sd">            - That three expected .tif files exist in the output directory designated</span>
+<span class="sd">              by the RunConfig and are non-zero in size</span>
+<span class="sd">            - .png file corresponding to the expected output los_enu.tif product exists</span>
+<span class="sd">              alongside and is non-zero in size</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">output_dir</span> <span class="o">=</span> <span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">output_product_path</span><span class="p">)</span>
+
+        <span class="c1"># Validate .nc product file</span>
+        <span class="n">tiff_files</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="s1">&#39;*.tif&#39;</span><span class="p">))</span>
+        <span class="n">png_files</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="s1">&#39;*.png&#39;</span><span class="p">))</span>
+
+        <span class="n">expected_num_outputs</span> <span class="o">=</span> <span class="mi">3</span>
+        <span class="n">expected_num_png_outputs</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tiff_files</span><span class="p">)</span> <span class="o">!=</span> <span class="n">expected_num_outputs</span><span class="p">:</span>
+            <span class="n">error_msg</span> <span class="o">=</span> <span class="s2">&quot;The SAS did not create the expected number of output products&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INVALID_OUTPUT</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">png_files</span><span class="p">)</span> <span class="o">!=</span> <span class="n">expected_num_png_outputs</span><span class="p">:</span>
+            <span class="n">error_msg</span> <span class="o">=</span> <span class="s2">&quot;The SAS did not create the expected output browse images&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INVALID_OUTPUT</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">tiff_files</span> <span class="o">+</span> <span class="n">png_files</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">st_size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">error_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SAS produced an output file </span><span class="si">{</span><span class="n">basename</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="si">}</span><span class="s2"> that is empty&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INVALID_OUTPUT</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_core_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inter_filename</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the core file name component for products produced by the</span>
+<span class="sd">        DISP-S1-STATIC PGE.</span>
+
+<span class="sd">        The core file name component of the DISP-S1-STATIC PGE consists of:</span>
+
+<span class="sd">        &lt;PROJECT&gt;_&lt;LEVEL&gt;_&lt;PGE NAME&gt;_&lt;FrameID&gt;_&lt;ValidityStartDate&gt;_&lt;Sensor&gt;_&lt;ProductVersion&gt;</span>
+
+<span class="sd">        Callers of this function are responsible for assignment of any other</span>
+<span class="sd">        product-specific fields, such as the file extension.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        inter_filename : str, optional</span>
+<span class="sd">            The intermediate filename of the output product to generate the</span>
+<span class="sd">            core filename for. This parameter may be used to inspect the file</span>
+<span class="sd">            in order to derive any necessary components of the returned filename.</span>
+<span class="sd">            Once the core filename is cached upon first call to this function,</span>
+<span class="sd">            this parameter may be omitted.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        core_filename : str</span>
+<span class="sd">            The filename component to assign to frame-based products created by</span>
+<span class="sd">            this PGE.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">core_filename</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">PROJECT</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">LEVEL</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">NAME</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+        <span class="c1"># FrameID: Unique frame identification number as a 5-digit string in</span>
+        <span class="c1"># the format FXXXXX</span>
+        <span class="n">frame_id</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;F</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">sas_config</span><span class="p">[</span><span class="s1">&#39;input_file_group&#39;</span><span class="p">][</span><span class="s1">&#39;frame_id&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">05d</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="c1">#TODO: Later deliveries will probably have a better way to derive sensor &amp; valid time</span>
+
+        <span class="n">input_file_sample</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">sas_config</span><span class="p">[</span><span class="s1">&#39;dynamic_ancillary_file_group&#39;</span><span class="p">][</span><span class="s1">&#39;static_layers_files&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">input_file_fields</span> <span class="o">=</span> <span class="n">basename</span><span class="p">(</span><span class="n">input_file_sample</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span>
+
+        <span class="n">sensor</span> <span class="o">=</span> <span class="n">input_file_fields</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span>
+        <span class="n">validity_start_date</span> <span class="o">=</span> <span class="n">input_file_fields</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+
+        <span class="n">inter_filename_parts</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">splitext</span><span class="p">(</span><span class="n">inter_filename</span><span class="p">))</span>
+        <span class="n">inter_filename_parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">inter_filename_parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">removesuffix</span><span class="p">(</span><span class="s1">&#39;.browse&#39;</span><span class="p">)</span>
+        <span class="n">inter_disp_product_filename</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">inter_filename_parts</span><span class="p">[:</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;tif&quot;</span><span class="p">])</span>
+
+        <span class="c1"># Check if we&#39;ve already cached the product metadata corresponding to</span>
+        <span class="c1"># this set of intermediate products (there can be multiple sets of</span>
+        <span class="c1"># .nc and .png output files when running in historical mode)</span>
+        <span class="k">if</span> <span class="n">inter_disp_product_filename</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_product_metadata_cache</span><span class="p">:</span>
+            <span class="n">disp_metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_product_metadata_cache</span><span class="p">[</span><span class="n">inter_disp_product_filename</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">disp_metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_collect_disp_s1_static_product_metadata</span><span class="p">(</span><span class="n">inter_disp_product_filename</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_product_metadata_cache</span><span class="p">[</span><span class="n">inter_disp_product_filename</span><span class="p">]</span> <span class="o">=</span> <span class="n">disp_metadata</span>
+
+        <span class="c1"># ProductVersion: OPERA DISP-S1-STATIC product version number with four</span>
+        <span class="c1"># characters, including the letter “v” and two digits indicating the</span>
+        <span class="c1"># major and minor versions, which are delimited by a period</span>
+        <span class="n">product_version</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">sas_config</span><span class="p">[</span><span class="s1">&#39;product_path_group&#39;</span><span class="p">][</span><span class="s1">&#39;product_version&#39;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">product_version</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;v&#39;</span><span class="p">):</span>
+            <span class="n">product_version</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;v</span><span class="si">{</span><span class="n">product_version</span><span class="si">}</span><span class="s1">&#39;</span>
+
+        <span class="n">disp_s1_static_product_filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">core_filename</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">frame_id</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">validity_start_date</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">sensor</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">product_version</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="c1"># Cache the file name for this set of DISP products, so it can be used</span>
+        <span class="c1"># with the ISO metadata later.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_product_filename_cache</span><span class="p">[</span><span class="n">inter_disp_product_filename</span><span class="p">]</span> <span class="o">=</span> <span class="n">disp_s1_static_product_filename</span>
+
+        <span class="k">return</span> <span class="n">disp_s1_static_product_filename</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_geotiff_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inter_filename</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the file name to use for GeoTIFF&#39;s produced by the DIST-S1-STATIC PGE.</span>
+
+<span class="sd">        The GeoTIFF filename for the Base PGE consists of:</span>
+
+<span class="sd">            &lt;Core filename&gt;.tif</span>
+
+<span class="sd">        Where &lt;Core filename&gt; is returned by DispS1StaticPostProcessorMixin._core_filename()</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        inter_filename : str</span>
+<span class="sd">            The intermediate filename of the output GeoTIFF to generate</span>
+<span class="sd">            a filename for. This parameter may be used to inspect the file</span>
+<span class="sd">            in order to derive any necessary components of the returned filename.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        geotiff_filename : str</span>
+<span class="sd">            The file name to assign to GeoTIFF product(s) created by this PGE.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># TODO:</span>
+        <span class="c1">#  I think there should be a better way to do this. The SAS outputs just the band names</span>
+        <span class="c1">#  (ie, dem_warped_utm.tif) But I need &#39;dist-s1-static&#39; in the mock filenames to match</span>
+        <span class="c1">#  the mock GDAL dataset, so I need this code to handle both filenames. I can&#39;t split on</span>
+        <span class="c1">#  &#39;_&#39; and mock the final OPERA naming convention since the layers have a varying number</span>
+        <span class="c1">#  of underscores, so I settled to mocking &quot;dist-s1-static-&lt;layer&gt;&quot; and splitting by &quot;-&quot;</span>
+        <span class="c1">#  to get the last field which is the band name. The SAS outputs don&#39;t contain any &quot;-&quot;s</span>
+        <span class="c1">#  so this split has no effect.</span>
+
+        <span class="n">band_name</span> <span class="o">=</span> <span class="n">splitext</span><span class="p">(</span><span class="n">basename</span><span class="p">(</span><span class="n">inter_filename</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_core_filename</span><span class="p">(</span><span class="n">inter_filename</span><span class="p">)</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">band_name</span><span class="si">}</span><span class="s2">.tif&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_ancillary_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Helper method to derive the core component of the file names for the</span>
+<span class="sd">        ancillary products associated to a PGE job (catalog metadata, log file,</span>
+<span class="sd">        etc...).</span>
+
+<span class="sd">        The core file name component DISP-S1-STATIC ancillary products consists of:</span>
+
+<span class="sd">        &lt;PROJECT&gt;_&lt;LEVEL&gt;_&lt;PGE NAME&gt;_&lt;FrameID&gt;_&lt;ProductVersion&gt;_&lt;ProductGenerationDateTime&gt;</span>
+
+<span class="sd">        Since these files are note specific to any particular DISP-S1-STATIC output</span>
+<span class="sd">        product, fields such as valid datetime and sensor are omitted from</span>
+<span class="sd">        this file pattern.</span>
+
+<span class="sd">        Also note that this file name does not include a file extension, which</span>
+<span class="sd">        should be added to the return value of this method by any callers to</span>
+<span class="sd">        distinguish the different formats of ancillary outputs produced by this</span>
+<span class="sd">        PGE.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ancillary_filename : str</span>
+<span class="sd">            The file name component to assign to ancillary products created by</span>
+<span class="sd">            this PGE.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">core_filename</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">PROJECT</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">LEVEL</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">NAME</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+        <span class="n">frame_id</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;F</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">sas_config</span><span class="p">[</span><span class="s1">&#39;input_file_group&#39;</span><span class="p">][</span><span class="s1">&#39;frame_id&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">05d</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="n">product_version</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">sas_config</span><span class="p">[</span><span class="s1">&#39;product_path_group&#39;</span><span class="p">][</span><span class="s1">&#39;product_version&#39;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">product_version</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;v&#39;</span><span class="p">):</span>
+            <span class="n">product_version</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;v</span><span class="si">{</span><span class="n">product_version</span><span class="si">}</span><span class="s1">&#39;</span>
+
+        <span class="n">product_generation_date_time</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">get_time_for_filename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">production_datetime</span><span class="p">)</span><span class="si">}</span><span class="s2">Z&quot;</span>
+
+        <span class="n">ancillary_filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">core_filename</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">frame_id</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">product_version</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">product_generation_date_time</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="k">return</span> <span class="n">ancillary_filename</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_custom_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inter_filename</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates the &quot;custom data&quot; dictionary used with the ISO metadata rendering.</span>
+
+<span class="sd">        Custom data contains all metadata information needed for the ISO template</span>
+<span class="sd">        that is not found within any of the other metadata sources (such as the</span>
+<span class="sd">        RunConfig, output product(s), or catalog metadata).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        inter_filename : str</span>
+<span class="sd">            The intermediate filename of the output product to generate a</span>
+<span class="sd">            core filename for. This core filename will be used as the &quot;granule&quot;</span>
+<span class="sd">            identifier within the returned metadata dictionary.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        custom_metadata : dict</span>
+<span class="sd">            Dictionary containing the custom metadata as expected by the ISO</span>
+<span class="sd">            metadata Jinja2 template.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">custom_metadata</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;ISO_OPERA_FilePackageName&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_core_filename</span><span class="p">(</span><span class="n">inter_filename</span><span class="p">),</span>
+            <span class="s1">&#39;ISO_OPERA_ProducerGranuleId&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_core_filename</span><span class="p">(</span><span class="n">inter_filename</span><span class="p">),</span>
+            <span class="s1">&#39;MetadataProviderAction&#39;</span><span class="p">:</span> <span class="s2">&quot;creation&quot;</span><span class="p">,</span>
+            <span class="s1">&#39;GranuleFilename&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_core_filename</span><span class="p">(</span><span class="n">inter_filename</span><span class="p">),</span>
+            <span class="s1">&#39;ISO_OPERA_ProjectKeywords&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;OPERA&#39;</span><span class="p">,</span> <span class="s1">&#39;JPL&#39;</span><span class="p">,</span> <span class="s1">&#39;DISP&#39;</span><span class="p">,</span> <span class="s1">&#39;Displacement&#39;</span><span class="p">,</span>
+                                          <span class="s1">&#39;Surface&#39;</span><span class="p">,</span> <span class="s1">&#39;Land&#39;</span><span class="p">,</span> <span class="s1">&#39;Global&#39;</span><span class="p">,</span> <span class="s1">&#39;STATIC&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;ISO_OPERA_PlatformKeywords&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;S1&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;ISO_OPERA_InstrumentKeywords&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Sentinel 1 A/B&#39;</span><span class="p">]</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">custom_metadata</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_collect_disp_s1_static_product_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">disp_product</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gathers the available metadata from a sample output DISP-S1-STATIC product for</span>
+<span class="sd">        use in filling out the ISO metadata template for the DISP-S1-STATIC PGE.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        disp_product : str</span>
+<span class="sd">            Path to the DISP-S1-STATIC GeoTIFF product to collect metadata from.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        output_product_metadata : dict</span>
+<span class="sd">            Dictionary containing DISP-S1-STATIC output product metadata, formatted</span>
+<span class="sd">            for use with the ISO metadata Jinja2 template.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">output_product_metadata</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">measured_parameters</span> <span class="o">=</span> <span class="n">get_geotiff_metadata</span><span class="p">(</span><span class="n">disp_product</span><span class="p">)</span>
+            <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;MeasuredParameters&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">augment_measured_parameters</span><span class="p">(</span>
+                <span class="n">measured_parameters</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">iso_measured_parameter_descriptions</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Failed to extract metadata from </span><span class="si">{</span><span class="n">disp_product</span><span class="si">}</span><span class="s1">, reason: </span><span class="si">{</span><span class="n">err</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">ISO_METADATA_COULD_NOT_EXTRACT_METADATA</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+
+        <span class="n">output_raster_width</span><span class="p">,</span> <span class="n">output_raster_height</span> <span class="o">=</span> <span class="n">get_geotiff_dimensions</span><span class="p">(</span><span class="n">disp_product</span><span class="p">)</span>
+
+        <span class="c1"># Add some fields on the dimensions of the data.</span>
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;xCoordinates&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="n">output_raster_width</span><span class="p">,</span>
+            <span class="s1">&#39;spacing&#39;</span><span class="p">:</span> <span class="mi">30</span>  <span class="c1"># meters/pixel</span>
+        <span class="p">}</span>
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;yCoordinates&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="n">output_raster_height</span><span class="p">,</span>
+            <span class="s1">&#39;spacing&#39;</span><span class="p">:</span> <span class="mi">30</span>  <span class="c1"># meters/pixel</span>
+        <span class="p">}</span>
+
+        <span class="c1"># TODO: Start/stop times will eventually be derived from product metadata</span>
+        <span class="n">input_file_sample</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">sas_config</span><span class="p">[</span><span class="s1">&#39;dynamic_ancillary_file_group&#39;</span><span class="p">][</span><span class="s1">&#39;static_layers_files&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">input_file_fields</span> <span class="o">=</span> <span class="n">basename</span><span class="p">(</span><span class="n">input_file_sample</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span>
+        <span class="n">validity_start_date</span> <span class="o">=</span> <span class="n">input_file_fields</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+        <span class="n">validity_start_date</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">validity_start_date</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span><span class="si">}</span><span class="s1">-</span><span class="si">{</span><span class="n">validity_start_date</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">6</span><span class="p">]</span><span class="si">}</span><span class="s1">-</span><span class="si">{</span><span class="n">validity_start_date</span><span class="p">[</span><span class="mi">6</span><span class="p">:</span><span class="mi">8</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span>
+
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;acquisitionDate&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">validity_start_date</span>
+
+        <span class="c1"># TODO: BBOX will be derived from product metadata</span>
+
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;geospatial_lon_min&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;geospatial_lon_max&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;geospatial_lat_min&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;geospatial_lat_max&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">return</span> <span class="n">output_product_metadata</span></div>
+
+
+<div class="viewcode-block" id="DispS1StaticExecutor"><a class="viewcode-back" href="../../../../opera.pge.disp_s1.html#opera.pge.disp_s1.disp_s1_pge.DispS1StaticExecutor">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">DispS1StaticExecutor</span><span class="p">(</span><span class="n">DispS1StaticPreProcessorMixin</span><span class="p">,</span> <span class="n">DispS1StaticPostProcessorMixin</span><span class="p">,</span> <span class="n">DispS1Executor</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Main class for execution of the DISP-S1-STATIC PGE, including the SAS layer.</span>
+<span class="sd">    This class essentially rolls up the DISP-STATIC-specific pre- and post-processor</span>
+<span class="sd">    functionality, while inheriting all other functionality for setup and execution</span>
+<span class="sd">    of the SAS from the baseline DISP-S1 Executor class.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">NAME</span> <span class="o">=</span> <span class="s2">&quot;DISP-S1-STATIC&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Short name for the DISP-S1-STATIC PGE&quot;&quot;&quot;</span>
+
+    <span class="c1"># SAS_VERSION is inherited from parent DISP-S1 PGE, but is considered a CalVal release for the</span>
+    <span class="c1"># DISP-S1-STATIC workflow</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pge_name</span><span class="p">,</span> <span class="n">runconfig_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">pge_name</span><span class="p">,</span> <span class="n">runconfig_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">rename_by_pattern_map</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="c1"># Note: ordering matters here!</span>
+                <span class="s1">&#39;*.tif&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geotiff_filename</span><span class="p">,</span>
+                <span class="s1">&#39;*.png&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_browse_filename</span><span class="p">,</span>
             <span class="p">}</span>
         <span class="p">)</span></div>
 </pre></div>

@@ -1,0 +1,877 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>opera.pge.dist_s1.dist_s1_pge &mdash; opera-sds-pge 6.0.0-er.2.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=136f5b14"></script>
+      <script src="../../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            opera-sds-pge
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../readme.html">opera-sds-pge</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">opera</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../authors.html">Credits</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">opera-sds-pge</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">opera.pge.dist_s1.dist_s1_pge</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for opera.pge.dist_s1.dist_s1_pge</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">==============</span>
+<span class="sd">dist_s1_pge.py</span>
+<span class="sd">==============</span>
+<span class="sd">Module defining the implementation for the Surface Disturbance (DIST) from Sentinel-1 A/C (S1) PGE.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">itertools</span><span class="w"> </span><span class="kn">import</span> <span class="n">chain</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">os.path</span><span class="w"> </span><span class="kn">import</span> <span class="n">join</span><span class="p">,</span> <span class="n">isdir</span><span class="p">,</span> <span class="n">isfile</span><span class="p">,</span> <span class="n">abspath</span><span class="p">,</span> <span class="n">basename</span><span class="p">,</span> <span class="n">splitext</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.pge.base.base_pge</span><span class="w"> </span><span class="kn">import</span> <span class="n">PreProcessorMixin</span><span class="p">,</span> <span class="n">PgeExecutor</span><span class="p">,</span> <span class="n">PostProcessorMixin</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.dataset_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_sensor_from_spacecraft_name</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.error_codes</span><span class="w"> </span><span class="kn">import</span> <span class="n">ErrorCode</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.geo_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_geographic_boundaries_from_mgrs_tile</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.input_validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_input_list</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.render_jinja2</span><span class="w"> </span><span class="kn">import</span> <span class="n">augment_measured_parameters</span><span class="p">,</span> <span class="n">render_jinja2</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.run_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_checksum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.tiff_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_geotiff_metadata</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.time</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_time_for_filename</span><span class="p">,</span> <span class="n">get_iso_time</span>
+
+
+<div class="viewcode-block" id="DistS1PreProcessorMixin"><a class="viewcode-back" href="../../../../opera.pge.dist_s1.html#opera.pge.dist_s1.dist_s1_pge.DistS1PreProcessorMixin">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">DistS1PreProcessorMixin</span><span class="p">(</span><span class="n">PreProcessorMixin</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Mixin class responsible for handling all pre-processing steps for the DIST-S1</span>
+<span class="sd">    PGE. The pre-processing phase is defined as all steps necessary prior</span>
+<span class="sd">    to SAS execution.</span>
+
+<span class="sd">    This particular pre-processor is currently a stub implementation, inheriting from the base pre-processor mixin</span>
+<span class="sd">    and adding nothing at this time. New functionalities will be added as new versions of the DIST-S1 SAS are released.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_pre_mixin_name</span> <span class="o">=</span> <span class="s2">&quot;DistS1PreProcessorMixin&quot;</span>
+    <span class="n">_valid_input_extensions</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;.tif&quot;</span><span class="p">,)</span>
+
+    <span class="n">_rtc_pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(?P&lt;id&gt;(?P&lt;project&gt;OPERA)_(?P&lt;level&gt;L2)_(?P&lt;product_type&gt;RTC)-(?P&lt;source&gt;S1)_&#39;</span>
+                              <span class="sa">r</span><span class="s1">&#39;(?P&lt;burst_id&gt;\w</span><span class="si">{4}</span><span class="s1">-\w</span><span class="si">{6}</span><span class="s1">-\w</span><span class="si">{3}</span><span class="s1">)_(?P&lt;acquisition_ts&gt;\d</span><span class="si">{8}</span><span class="s1">T\d</span><span class="si">{6}</span><span class="s1">Z)&#39;</span>
+                              <span class="sa">r</span><span class="s1">&#39;_(?P&lt;creation_ts&gt;\d</span><span class="si">{8}</span><span class="s1">T\d</span><span class="si">{6}</span><span class="s1">Z)_(?P&lt;sensor&gt;S1A|S1B|S1C)_(?P&lt;spacing&gt;30)_&#39;</span>
+                              <span class="sa">r</span><span class="s1">&#39;(?P&lt;product_version&gt;v\d+[.]\d+))(_(?P&lt;pol&gt;VV|VH|HH|HV|VV\+VH|HH\+HV))?&#39;</span>
+                              <span class="sa">r</span><span class="s1">&#39;[.](?P&lt;ext&gt;tif|tiff)$&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__validate_rtc_list_lengths</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">all_rtcs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Validate that the pre_rtc_copol &amp; pre_rtc_crosspol / post_rtc_copol &amp;</span>
+<span class="sd">        post_rtc_crosspol are the same lengths</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        all_rtcs : tuple(list(str), list(str), list(str), list(str))</span>
+<span class="sd">            4-tuple of lists of input RTC filenames in the order: pre_rtc_copol, pre_rtc_crosspol, post_rtc_copol,</span>
+<span class="sd">            post_rtc_crosspol</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">pre_rtc_copol</span><span class="p">,</span> <span class="n">pre_rtc_crosspol</span><span class="p">,</span> <span class="n">post_rtc_copol</span><span class="p">,</span> <span class="n">post_rtc_crosspol</span> <span class="o">=</span> <span class="n">all_rtcs</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pre_rtc_copol</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">pre_rtc_crosspol</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">post_rtc_copol</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">post_rtc_crosspol</span><span class="p">):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Lengths of input pre/post co/cross pol input RTC lists differ: pre </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">pre_rtc_copol</span><span class="p">)</span><span class="si">}</span><span class="s1"> &#39;</span>
+                   <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">pre_rtc_crosspol</span><span class="p">)</span><span class="si">}</span><span class="s1"> post </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">post_rtc_copol</span><span class="p">)</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">post_rtc_crosspol</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INVALID_INPUT</span><span class="p">,</span>
+                <span class="n">msg</span>
+            <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__validate_rtc_lists_are_pge_subset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">all_rtcs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Ensures all RTCs in the SAS group are also in the PGE group</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        all_rtcs : tuple(list(str), list(str), list(str), list(str))</span>
+<span class="sd">            4-tuple of lists of input RTC filenames in the order: pre_rtc_copol, pre_rtc_crosspol, post_rtc_copol,</span>
+<span class="sd">            post_rtc_crosspol</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">all_rtcs</span> <span class="o">=</span> <span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">(</span><span class="n">all_rtcs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">set</span><span class="p">([</span><span class="n">basename</span><span class="p">(</span><span class="n">rtc</span><span class="p">)</span> <span class="k">for</span> <span class="n">rtc</span> <span class="ow">in</span> <span class="n">all_rtcs</span><span class="p">])</span><span class="o">.</span><span class="n">issubset</span><span class="p">([</span><span class="n">basename</span><span class="p">(</span><span class="n">rtc</span><span class="p">)</span> <span class="k">for</span> <span class="n">rtc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">input_files</span><span class="p">]):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;RunConfig SAS group RTC file lists do not make a subset of PGE group Input File list&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INVALID_INPUT</span><span class="p">,</span>
+                <span class="n">msg</span>
+            <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__validate_rtc_filenames</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">all_rtcs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Validates that all input RTCs have the standard filename defined in the RTC product specification.</span>
+
+<span class="sd">        See: https://www.jpl.nasa.gov/go/opera/products/rtc-product/</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        all_rtcs : tuple(list(str), list(str), list(str), list(str))</span>
+<span class="sd">            4-tuple of lists of input RTC filenames in the order: pre_rtc_copol, pre_rtc_crosspol, post_rtc_copol,</span>
+<span class="sd">            post_rtc_crosspol</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        rtc_matches: List of re.Match objects</span>
+<span class="sd">            List of RTC filenames matched by a regular expression. Used in later validation. Only returns</span>
+<span class="sd">            if this validation is passing.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">rtc_matches</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_rtc_pattern</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">basename</span><span class="p">(</span><span class="n">rtc</span><span class="p">))</span> <span class="k">for</span> <span class="n">rtc</span> <span class="ow">in</span> <span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">(</span><span class="n">all_rtcs</span><span class="p">)]</span>
+        <span class="n">mismatches</span> <span class="o">=</span> <span class="p">[</span><span class="n">rtc</span> <span class="k">for</span> <span class="n">match</span><span class="p">,</span> <span class="n">rtc</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">rtc_matches</span><span class="p">,</span> <span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">(</span><span class="n">all_rtcs</span><span class="p">))</span> <span class="k">if</span> <span class="n">match</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">mismatches</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Invalid RTC filenames in RunConfig: </span><span class="si">{</span><span class="n">mismatches</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INVALID_INPUT</span><span class="p">,</span>
+                <span class="n">msg</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">rtc_matches</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__validate_rtc_homogeneity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rtc_matches</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Validates all RTCs are from either Sentinel-1A or Sentinel-1C.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        rtc_matches: List of re.Match objects</span>
+<span class="sd">            List of RTC filenames matched by a regular expression.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="n">match</span><span class="o">.</span><span class="n">groupdict</span><span class="p">()[</span><span class="s1">&#39;sensor&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">match</span> <span class="ow">in</span> <span class="n">rtc_matches</span><span class="p">]))</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;RunConfig contains RTCs from more than one S1 Sensor. Inputs should be all from S1A or S1C&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INVALID_INPUT</span><span class="p">,</span>
+                <span class="n">msg</span>
+            <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__validate_rtc_ordering</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">all_rtcs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Verifies the pre and post co- and cross-pol RTC lists are well-ordered.</span>
+
+<span class="sd">        First, the lists are sorted by burst ID, then acquisition time. They are then</span>
+<span class="sd">        checked so that each RTC in the copol lists have the same burst ID and acquisition</span>
+<span class="sd">        time as the RTC in the same position in the corresponding crosspol list.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        all_rtcs : tuple(list(str), list(str), list(str), list(str))</span>
+<span class="sd">            4-tuple of lists of input RTC filenames in the order: pre_rtc_copol, pre_rtc_crosspol, post_rtc_copol,</span>
+<span class="sd">            post_rtc_crosspol</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">is_sorted</span><span class="p">(</span><span class="n">iterable</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">e</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">iterable</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+                <span class="k">if</span> <span class="n">key</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">key</span><span class="p">(</span><span class="n">iterable</span><span class="p">[</span><span class="n">i</span><span class="p">]):</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">sort_fn</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rtc_pattern</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+            <span class="n">match_dict</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">groupdict</span><span class="p">()</span>
+
+            <span class="k">return</span> <span class="n">match_dict</span><span class="p">[</span><span class="s1">&#39;burst_id&#39;</span><span class="p">],</span> <span class="n">match_dict</span><span class="p">[</span><span class="s1">&#39;acquisition_ts&#39;</span><span class="p">]</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">compare_rtc_dates_and_bursts</span><span class="p">(</span><span class="n">copol</span><span class="p">,</span> <span class="n">crosspol</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">copol_rtc</span><span class="p">,</span> <span class="n">crosspol_rtc</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">copol</span><span class="p">,</span> <span class="n">crosspol</span><span class="p">):</span>
+                <span class="n">copol_rtc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rtc_pattern</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">copol_rtc</span><span class="p">))</span>
+                <span class="n">crosspol_rtc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rtc_pattern</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">crosspol_rtc</span><span class="p">))</span>
+
+                <span class="k">if</span> <span class="n">copol_rtc</span><span class="o">.</span><span class="n">groupdict</span><span class="p">()[</span><span class="s1">&#39;acquisition_ts&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">crosspol_rtc</span><span class="o">.</span><span class="n">groupdict</span><span class="p">()[</span><span class="s1">&#39;acquisition_ts&#39;</span><span class="p">]:</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+                <span class="k">if</span> <span class="n">copol_rtc</span><span class="o">.</span><span class="n">groupdict</span><span class="p">()[</span><span class="s1">&#39;burst_id&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">crosspol_rtc</span><span class="o">.</span><span class="n">groupdict</span><span class="p">()[</span><span class="s1">&#39;burst_id&#39;</span><span class="p">]:</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="n">pre_rtc_copol</span><span class="p">,</span> <span class="n">pre_rtc_crosspol</span><span class="p">,</span> <span class="n">post_rtc_copol</span><span class="p">,</span> <span class="n">post_rtc_crosspol</span> <span class="o">=</span> <span class="n">all_rtcs</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">([</span><span class="n">is_sorted</span><span class="p">(</span><span class="n">rtc_list</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">sort_fn</span><span class="p">)</span> <span class="k">for</span> <span class="n">rtc_list</span> <span class="ow">in</span> <span class="p">(</span><span class="n">pre_rtc_copol</span><span class="p">,</span> <span class="n">pre_rtc_crosspol</span><span class="p">,</span>
+                                                                      <span class="n">post_rtc_copol</span><span class="p">,</span> <span class="n">post_rtc_crosspol</span><span class="p">)]):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;One or more of the RunConfig SAS group RTC lists is badly ordered. Attempting to sort them&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="n">ErrorCode</span><span class="o">.</span><span class="n">LOGGED_WARNING_LINE</span><span class="p">,</span>
+                <span class="n">msg</span>
+            <span class="p">)</span>
+
+            <span class="n">pre_rtc_copol</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">sort_fn</span><span class="p">)</span>
+            <span class="n">pre_rtc_crosspol</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">sort_fn</span><span class="p">)</span>
+            <span class="n">post_rtc_copol</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">sort_fn</span><span class="p">)</span>
+            <span class="n">post_rtc_crosspol</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">sort_fn</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">compare_rtc_dates_and_bursts</span><span class="p">(</span><span class="n">pre_rtc_copol</span><span class="p">,</span> <span class="n">pre_rtc_crosspol</span><span class="p">):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Date or burst ID mismatch in pre_rtc copol and crosspol lists&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INVALID_INPUT</span><span class="p">,</span>
+                <span class="n">msg</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">compare_rtc_dates_and_bursts</span><span class="p">(</span><span class="n">post_rtc_copol</span><span class="p">,</span> <span class="n">post_rtc_crosspol</span><span class="p">):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Date or burst ID mismatch in post_rtc copol and crosspol lists&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INVALID_INPUT</span><span class="p">,</span>
+                <span class="n">msg</span>
+            <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__validate_co_and_cross_polarizations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">all_rtcs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Ensures the RTCs in the copol lists are co-polarized (VV or HH). Likewise,</span>
+<span class="sd">        ensures the RTCs in the crosspol lists are cross-polarized (VH or HV).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        all_rtcs : tuple(list(str), list(str), list(str), list(str))</span>
+<span class="sd">            4-tuple of lists of input RTC filenames in the order: pre_rtc_copol, pre_rtc_crosspol, post_rtc_copol,</span>
+<span class="sd">            post_rtc_crosspol</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">pre_rtc_copol</span><span class="p">,</span> <span class="n">pre_rtc_crosspol</span><span class="p">,</span> <span class="n">post_rtc_copol</span><span class="p">,</span> <span class="n">post_rtc_crosspol</span> <span class="o">=</span> <span class="n">all_rtcs</span>
+
+        <span class="k">for</span> <span class="n">rtc</span> <span class="ow">in</span> <span class="n">pre_rtc_copol</span> <span class="o">+</span> <span class="n">post_rtc_copol</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rtc_pattern</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">rtc</span><span class="p">))</span><span class="o">.</span><span class="n">groupdict</span><span class="p">()[</span><span class="s1">&#39;pol&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;VV&#39;</span><span class="p">,</span> <span class="s1">&#39;HH&#39;</span><span class="p">]:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Found non-copol RTC in copol input list: </span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">rtc</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                    <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INVALID_INPUT</span><span class="p">,</span>
+                    <span class="n">msg</span>
+                <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">rtc</span> <span class="ow">in</span> <span class="n">pre_rtc_crosspol</span> <span class="o">+</span> <span class="n">post_rtc_crosspol</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rtc_pattern</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">rtc</span><span class="p">))</span><span class="o">.</span><span class="n">groupdict</span><span class="p">()[</span><span class="s1">&#39;pol&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;VH&#39;</span><span class="p">,</span> <span class="s1">&#39;HV&#39;</span><span class="p">]:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Found non-crosspol RTC in crosspol input list: </span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">rtc</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                    <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INVALID_INPUT</span><span class="p">,</span>
+                    <span class="n">msg</span>
+                <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_rtcs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Performs the following validations on the input RTCs:</span>
+
+<span class="sd">        1. Verifies the co- and cross-pol RTC input lists are the same length</span>
+<span class="sd">        2. Verifies the combined SAS RTC input lists are a subset of the PGE input list</span>
+<span class="sd">        3. Verifies the input RTCs have standard filenames (important for later checks)</span>
+<span class="sd">        4. Ensures input RTCs are not from a mixture of Sentinel-1A and Sentinel-1C</span>
+<span class="sd">        5. Validates that the co- and cross-pol RTCs are in the same order (burst-ID &amp;</span>
+<span class="sd">           acquisition time)</span>
+<span class="sd">        6. Validates no cross-pol RTCs are in copol input lists and vice-versa</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">sas_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">sas_config</span>
+
+        <span class="n">pre_rtc_copol</span> <span class="o">=</span> <span class="n">sas_config</span><span class="p">[</span><span class="s2">&quot;run_config&quot;</span><span class="p">][</span><span class="s2">&quot;pre_rtc_copol&quot;</span><span class="p">]</span>
+        <span class="n">pre_rtc_crosspol</span> <span class="o">=</span> <span class="n">sas_config</span><span class="p">[</span><span class="s2">&quot;run_config&quot;</span><span class="p">][</span><span class="s2">&quot;pre_rtc_crosspol&quot;</span><span class="p">]</span>
+        <span class="n">post_rtc_copol</span> <span class="o">=</span> <span class="n">sas_config</span><span class="p">[</span><span class="s2">&quot;run_config&quot;</span><span class="p">][</span><span class="s2">&quot;post_rtc_copol&quot;</span><span class="p">]</span>
+        <span class="n">post_rtc_crosspol</span> <span class="o">=</span> <span class="n">sas_config</span><span class="p">[</span><span class="s2">&quot;run_config&quot;</span><span class="p">][</span><span class="s2">&quot;post_rtc_crosspol&quot;</span><span class="p">]</span>
+
+        <span class="n">all_rtcs</span> <span class="o">=</span> <span class="p">(</span><span class="n">pre_rtc_copol</span><span class="p">,</span> <span class="n">pre_rtc_crosspol</span><span class="p">,</span> <span class="n">post_rtc_copol</span><span class="p">,</span> <span class="n">post_rtc_crosspol</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__validate_rtc_list_lengths</span><span class="p">(</span><span class="n">all_rtcs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__validate_rtc_lists_are_pge_subset</span><span class="p">(</span><span class="n">all_rtcs</span><span class="p">)</span>
+        <span class="n">matches</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__validate_rtc_filenames</span><span class="p">(</span><span class="n">all_rtcs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__validate_rtc_homogeneity</span><span class="p">(</span><span class="n">matches</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__validate_rtc_ordering</span><span class="p">(</span><span class="n">all_rtcs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__validate_co_and_cross_polarizations</span><span class="p">(</span><span class="n">all_rtcs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="DistS1PreProcessorMixin.run_preprocessor"><a class="viewcode-back" href="../../../../opera.pge.dist_s1.html#opera.pge.dist_s1.dist_s1_pge.DistS1PreProcessorMixin.run_preprocessor">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">run_preprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Executes the pre-processing steps for DIST-S1 PGE initialization.</span>
+<span class="sd">        The DistS1PreProcessorMixin version of this class performs all actions</span>
+<span class="sd">        of the PreProcessorMixin class. Parameterization of the validation</span>
+<span class="sd">        functions is handled via specialized class attributes (i.e. _valid_input_extensions)</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        **kwargs: dict</span>
+<span class="sd">            Any keyword arguments needed by the pre-processor</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">run_preprocessor</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="n">check_input_list</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">input_files</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">valid_extensions</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_valid_input_extensions</span><span class="p">,</span>
+            <span class="n">check_zero_size</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_rtcs</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="DistS1PostProcessorMixin"><a class="viewcode-back" href="../../../../opera.pge.dist_s1.html#opera.pge.dist_s1.dist_s1_pge.DistS1PostProcessorMixin">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">DistS1PostProcessorMixin</span><span class="p">(</span><span class="n">PostProcessorMixin</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Mixin class responsible for handling all post-processing steps for the DIST-S1</span>
+<span class="sd">    PGE. The post-processing phase is defined as all steps required after SAS</span>
+<span class="sd">    execution has completed, prior to handover of output products to PCM.</span>
+
+<span class="sd">    This particular pre-processor is currently a stub implementation, inheriting from the base pre-processor mixin</span>
+<span class="sd">    and adding nothing at this time. New functionalities will be added as new versions of the DIST-S1 SAS are released.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_post_mixin_name</span> <span class="o">=</span> <span class="s2">&quot;DistS1PostProcessorMixin&quot;</span>
+    <span class="n">_cached_core_filename</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1"># May not need these since PGE produces 1 tile / execution</span>
+    <span class="n">_tile_metadata_cache</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">_tile_filename_cache</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="c1"># These layers are always produced and therefore must be present</span>
+    <span class="n">_main_output_layer_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;DIST-GEN-STATUS-ACQ&#39;</span><span class="p">,</span> <span class="s1">&#39;DIST-GEN-STATUS&#39;</span><span class="p">,</span> <span class="s1">&#39;GEN-METRIC&#39;</span><span class="p">,</span> <span class="s1">&#39;BROWSE&#39;</span><span class="p">]</span>
+
+    <span class="c1"># The production of these layers depends on the confirmation DB and may be absent</span>
+    <span class="n">_confirmation_db_output_layer_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;DATE-FIRST&#39;</span><span class="p">,</span> <span class="s1">&#39;DATE-LATEST&#39;</span><span class="p">,</span> <span class="s1">&#39;N-DIST&#39;</span><span class="p">,</span> <span class="s1">&#39;N-OBS&#39;</span><span class="p">]</span>
+
+    <span class="n">_valid_layer_names</span> <span class="o">=</span> <span class="n">_main_output_layer_names</span> <span class="o">+</span> <span class="n">_confirmation_db_output_layer_names</span>
+
+    <span class="n">_product_id_pattern</span> <span class="o">=</span> <span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(?P&lt;id&gt;(?P&lt;project&gt;OPERA)_(?P&lt;level&gt;L3)_(?P&lt;product_type&gt;DIST(-ALERT)?)-(?P&lt;source&gt;S1)_&#39;</span>
+                           <span class="sa">r</span><span class="s1">&#39;(?P&lt;tile_id&gt;T[^\W_]</span><span class="si">{5}</span><span class="s1">)_(?P&lt;acquisition_ts&gt;\d</span><span class="si">{8}</span><span class="s1">T\d</span><span class="si">{6}</span><span class="s1">Z)_(?P&lt;creation_ts&gt;\d</span><span class="si">{8}</span><span class="s1">T\d</span><span class="si">{6}</span><span class="s1">Z)_&#39;</span>
+                           <span class="sa">r</span><span class="s1">&#39;(?P&lt;sensor&gt;S1[AC]?)_(?P&lt;spacing&gt;30)_(?P&lt;product_version&gt;v\d+[.]\d+))&#39;</span><span class="p">)</span>
+
+    <span class="n">_granule_filename_pattern</span> <span class="o">=</span> <span class="p">(</span><span class="n">_product_id_pattern</span> <span class="o">+</span> <span class="sa">rf</span><span class="s1">&#39;((_(?P&lt;layer_name&gt;</span><span class="si">{</span><span class="s2">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_valid_layer_names</span><span class="p">)</span><span class="si">}</span><span class="s1">))|&#39;</span>
+                                                       <span class="sa">r</span><span class="s1">&#39;_BROWSE)?[.](?P&lt;ext&gt;tif|tiff|png)$&#39;</span><span class="p">)</span>
+
+    <span class="n">_product_id_re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">_product_id_pattern</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;$&#39;</span><span class="p">)</span>
+    <span class="n">_granule_filename_re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">_granule_filename_pattern</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_outputs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">output_product_path</span> <span class="o">=</span> <span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">output_product_path</span><span class="p">)</span>
+        <span class="n">output_products</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">output_product_path</span><span class="p">):</span>
+            <span class="n">dir_path</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">output_product_path</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">isdir</span><span class="p">(</span><span class="n">dir_path</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_product_id_re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
+                <span class="n">bands</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">generated_band_names</span> <span class="o">=</span> <span class="p">[]</span>
+
+                <span class="k">for</span> <span class="n">granule</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">dir_path</span><span class="p">):</span>
+                    <span class="n">granule_path</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">dir_path</span><span class="p">,</span> <span class="n">granule</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">isfile</span><span class="p">(</span><span class="n">granule_path</span><span class="p">):</span>
+                        <span class="n">match_result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_granule_filename_re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">granule</span><span class="p">)</span>
+
+                        <span class="k">if</span> <span class="n">match_result</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># or match_result.groupdict()[&#39;ext&#39;] != &#39;tif&#39;:</span>
+                            <span class="n">error_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Invalid product filename </span><span class="si">{</span><span class="n">granule</span><span class="si">}</span><span class="s1">&#39;</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INVALID_OUTPUT</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">)</span>
+
+                        <span class="n">match_dict</span> <span class="o">=</span> <span class="n">match_result</span><span class="o">.</span><span class="n">groupdict</span><span class="p">()</span>
+
+                        <span class="k">if</span> <span class="n">match_dict</span><span class="p">[</span><span class="s1">&#39;layer_name&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">match_dict</span><span class="p">[</span><span class="s1">&#39;ext&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;png&#39;</span><span class="p">:</span>
+                            <span class="n">match_dict</span><span class="p">[</span><span class="s1">&#39;layer_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;BROWSE&#39;</span>
+
+                        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">granule_path</span><span class="p">)</span><span class="o">.</span><span class="n">st_size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="n">error_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Output file </span><span class="si">{</span><span class="n">granule_path</span><span class="si">}</span><span class="s1"> is empty.&#39;</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INVALID_OUTPUT</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">)</span>
+                        <span class="k">elif</span> <span class="n">match_dict</span><span class="p">[</span><span class="s1">&#39;layer_name&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_valid_layer_names</span><span class="p">:</span>
+                            <span class="n">error_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Invalid layer name &quot;</span><span class="si">{</span><span class="n">match_dict</span><span class="p">[</span><span class="s2">&quot;layer_name&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&quot; in output.&#39;</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INVALID_OUTPUT</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">)</span>
+
+                        <span class="n">bands</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">granule_path</span><span class="p">)</span>
+                        <span class="n">generated_band_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">match_dict</span><span class="p">[</span><span class="s1">&#39;layer_name&#39;</span><span class="p">])</span>
+
+                        <span class="n">tile_id</span> <span class="o">=</span> <span class="n">match_dict</span><span class="p">[</span><span class="s1">&#39;tile_id&#39;</span><span class="p">]</span>
+                        <span class="n">file_id</span> <span class="o">=</span> <span class="n">match_dict</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
+
+                        <span class="k">if</span> <span class="n">tile_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tile_metadata_cache</span><span class="p">:</span>
+                            <span class="n">dist_metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_collect_dist_s1_product_metadata</span><span class="p">(</span><span class="n">granule_path</span><span class="p">)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">_tile_metadata_cache</span><span class="p">[</span><span class="n">tile_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">dist_metadata</span>
+
+                        <span class="k">if</span> <span class="n">file_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tile_filename_cache</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">_tile_filename_cache</span><span class="p">[</span><span class="n">tile_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">file_id</span>
+
+                <span class="c1"># Not sure how I should do this validation... The bands in self._confirmation_db_output_layer_names</span>
+                <span class="c1"># are only created if the confirmation db is available (&amp; might still be missing on initial runs</span>
+                <span class="c1"># with it available?)</span>
+                <span class="n">missing_main_output_bands</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_main_output_layer_names</span><span class="p">)</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">generated_band_names</span><span class="p">))</span>
+
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing_main_output_bands</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">error_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Some required output bands are missing: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">missing_main_output_bands</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INVALID_OUTPUT</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">)</span>
+
+                <span class="n">output_products</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dir_path</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">output_products</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">error_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Incorrect number of output granules generated: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">output_products</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INVALID_OUTPUT</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_ancillary_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Helper method to derive the core component of the file names for the</span>
+<span class="sd">        ancillary products associated to a PGE job (catalog metadata, log file,</span>
+<span class="sd">        etc...).</span>
+
+<span class="sd">        The core file name component for DIST-S1 ancillary products consists of:</span>
+
+<span class="sd">        &lt;PROJECT&gt;_&lt;LEVEL&gt;_&lt;PGE NAME&gt;_&lt;PROD TIMETAG&gt;_&lt;SENSOR&gt;_&lt;SPACING&gt;_&lt;PRODUCT VERSION&gt;</span>
+
+<span class="sd">        Since these files are not specific to any particular tile processed for</span>
+<span class="sd">        a DIST-S1 job, fields such as tile ID and acquisition time are omitted from</span>
+<span class="sd">        this file pattern.</span>
+
+<span class="sd">        Also note that this does not include a file extension, which should be</span>
+<span class="sd">        added to the return value of this method by any callers to distinguish</span>
+<span class="sd">        the different formats of ancillary outputs produced by this PGE.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ancillary_filename : str</span>
+<span class="sd">            The file name component to assign to ancillary products created by this PGE.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># TODO: Get this from metadata</span>
+        <span class="n">spacecraft_name</span> <span class="o">=</span> <span class="s2">&quot;SENTINEL-1A&quot;</span>
+        <span class="n">sensor</span> <span class="o">=</span> <span class="n">get_sensor_from_spacecraft_name</span><span class="p">(</span><span class="n">spacecraft_name</span><span class="p">)</span>
+        <span class="n">pixel_spacing</span> <span class="o">=</span> <span class="s2">&quot;30&quot;</span>
+
+        <span class="c1"># TODO - for now, use the PGE production time, but ideally this should</span>
+        <span class="c1">#        eventually match the production time assigned by the SAS, which</span>
+        <span class="c1">#        should be present in the product metadata</span>
+        <span class="n">processing_time</span> <span class="o">=</span> <span class="n">get_time_for_filename</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">production_datetime</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">processing_time</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;Z&#39;</span><span class="p">):</span>
+            <span class="n">processing_time</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">processing_time</span><span class="si">}</span><span class="s1">Z&#39;</span>
+
+        <span class="n">product_version</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">product_version</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">product_version</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;v&#39;</span><span class="p">):</span>
+            <span class="n">product_version</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;v</span><span class="si">{</span><span class="n">product_version</span><span class="si">}</span><span class="s1">&#39;</span>
+
+        <span class="n">ancillary_filename</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">PROJECT</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">LEVEL</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">NAME</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">processing_time</span><span class="si">}</span><span class="s2">_&quot;</span>
+                              <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sensor</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">pixel_spacing</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">product_version</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">ancillary_filename</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_catalog_metadata_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the file name to use for Catalog Metadata produced by the DIST-S1 PGE.</span>
+
+<span class="sd">        The Catalog Metadata file name for the DIST-S1 PGE consists of:</span>
+
+<span class="sd">            &lt;Ancillary filename&gt;.catalog.json</span>
+
+<span class="sd">        Where &lt;Ancillary filename&gt; is returned by DistS1PostProcessorMixin._ancillary_filename()</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        &lt;catalog metadata filename&gt; : str</span>
+<span class="sd">            The file name to assign to the Catalog Metadata product created by this PGE.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ancillary_filename</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;.catalog.json&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_log_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the file name to use for the PGE/SAS log file produced by the DIST-S1 PGE.</span>
+
+<span class="sd">        The log file name for the DIST-S1 PGE consists of:</span>
+
+<span class="sd">            &lt;Ancillary filename&gt;.log</span>
+
+<span class="sd">        Where &lt;Ancillary filename&gt; is returned by DistS1PostProcessorMixin._ancillary_filename()</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        log_filename : str</span>
+<span class="sd">            The file name to assign to the PGE/SAS log created by this PGE.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ancillary_filename</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;.log&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_qa_log_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the file name to use for the Quality Assurance application log</span>
+<span class="sd">        file produced by the DIST-S1 PGE.</span>
+
+<span class="sd">        The log file name for the DIST-S1 PGE consists of:</span>
+
+<span class="sd">            &lt;Ancillary filename&gt;.qa.log</span>
+
+<span class="sd">        Where &lt;Ancillary filename&gt; is returned by DistS1PostProcessorMixin._ancillary_filename()</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        log_filename : str</span>
+<span class="sd">            The file name to assign to the QA log created by this PGE.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ancillary_filename</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;.qa.log&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_iso_metadata_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the file name to use for ISO Metadata produced by the DIST-S1 PGE.</span>
+
+<span class="sd">        The ISO Metadata file name for the DIST-S1 PGE consists of:</span>
+
+<span class="sd">            &lt;DIST-S1 filename&gt;.iso.xml</span>
+
+<span class="sd">        Where &lt;DIST-S1 filename&gt; is:</span>
+
+<span class="sd">        &lt;PROJECT&gt;_&lt;LEVEL&gt;_&lt;PGE NAME&gt;_&lt;TILE ID&gt;_&lt;ACQ TIMESTAMP&gt;_&lt;PROD TIMETAG&gt;_&lt;SENSOR&gt;_&lt;SPACING&gt;_&lt;PRODUCT VERSION&gt;</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        &lt;iso metadata filename&gt; : str</span>
+<span class="sd">            The file name to assign to the ISO Metadata product created by this PGE.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Since we only produce 1 tile each execution, we only have one tile ID in here</span>
+        <span class="n">tile_id</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tile_filename_cache</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">iso_metadata_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tile_filename_cache</span><span class="p">[</span><span class="n">tile_id</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">iso_metadata_filename</span> <span class="o">+</span> <span class="s2">&quot;.iso.xml&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_collect_dist_s1_product_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">geotiff_product</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gathers the available metadata from an output DIST-S1 product for</span>
+<span class="sd">        use in filling out the ISO metadata template for the DIST-S1 PGE.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        geotiff_product : str</span>
+<span class="sd">            Path the GeoTIFF product to collect metadata from.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        output_product_metadata : dict</span>
+<span class="sd">            Dictionary containing DIST-S1 output product metadata, formatted</span>
+<span class="sd">            for use with the ISO metadata Jinja2 template.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">output_product_metadata</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">measured_parameters</span> <span class="o">=</span> <span class="n">get_geotiff_metadata</span><span class="p">(</span><span class="n">geotiff_product</span><span class="p">)</span>
+            <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;MeasuredParameters&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">augment_measured_parameters</span><span class="p">(</span>
+                <span class="n">measured_parameters</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">iso_measured_parameter_descriptions</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Failed to extract metadata from </span><span class="si">{</span><span class="n">geotiff_product</span><span class="si">}</span><span class="s1">, reason: </span><span class="si">{</span><span class="n">err</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">ISO_METADATA_COULD_NOT_EXTRACT_METADATA</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+
+        <span class="c1"># Get the Military Grid Reference System (MGRS) tile code and zone</span>
+        <span class="c1"># identifier from the intermediate file name</span>
+        <span class="n">mgrs_tile_id</span> <span class="o">=</span> <span class="n">basename</span><span class="p">(</span><span class="n">geotiff_product</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="mi">3</span><span class="p">]</span>
+
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;tileCode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mgrs_tile_id</span>
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;zoneIdentifier&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mgrs_tile_id</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
+
+        <span class="c1"># Translate the MGRS tile ID to a lat/lon bounding box</span>
+        <span class="p">(</span><span class="n">lat_min</span><span class="p">,</span>
+         <span class="n">lat_max</span><span class="p">,</span>
+         <span class="n">lon_min</span><span class="p">,</span>
+         <span class="n">lon_max</span><span class="p">)</span> <span class="o">=</span> <span class="n">get_geographic_boundaries_from_mgrs_tile</span><span class="p">(</span><span class="n">mgrs_tile_id</span><span class="p">)</span>
+
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;geospatial_lon_min&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lon_min</span>
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;geospatial_lon_max&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lon_max</span>
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;geospatial_lat_min&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lat_min</span>
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;geospatial_lat_max&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lat_max</span>
+
+        <span class="c1"># Add some fields on the dimensions of the data. These values should</span>
+        <span class="c1"># be the same for all DIST-S1 products, and were derived from the</span>
+        <span class="c1"># ADT product spec</span>
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;xCoordinates&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="mi">3600</span><span class="p">,</span>  <span class="c1"># pixels</span>
+            <span class="s1">&#39;spacing&#39;</span><span class="p">:</span> <span class="mi">30</span>  <span class="c1"># meters/pixel</span>
+        <span class="p">}</span>
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;yCoordinates&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="mi">3600</span><span class="p">,</span>  <span class="c1"># pixels</span>
+            <span class="s1">&#39;spacing&#39;</span><span class="p">:</span> <span class="mi">30</span>  <span class="c1"># meters/pixel</span>
+        <span class="p">}</span>
+
+        <span class="c1"># TODO: Replace these with metadata values sourced from the granule when available</span>
+        <span class="c1">#  (Or remove entirely if possible to refer to them straight through the MP dict)</span>
+
+        <span class="n">match_result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_granule_filename_re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">basename</span><span class="p">(</span><span class="n">geotiff_product</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">match_result</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># This really should not happen due to passing the _validate_outputs function but check anyway</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Failed to parse DIST-S1 filename </span><span class="si">{</span><span class="n">basename</span><span class="p">(</span><span class="n">geotiff_product</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INVALID_OUTPUT</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+
+        <span class="n">match_result</span> <span class="o">=</span> <span class="n">match_result</span><span class="o">.</span><span class="n">groupdict</span><span class="p">()</span>
+        <span class="n">acq_time</span> <span class="o">=</span> <span class="n">match_result</span><span class="p">[</span><span class="s1">&#39;acquisition_ts&#39;</span><span class="p">]</span>
+        <span class="n">acq_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">acq_time</span><span class="p">,</span> <span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">T%H%M%SZ&#39;</span><span class="p">)</span>
+
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;acquisition_start_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_iso_time</span><span class="p">(</span><span class="n">acq_time</span><span class="p">)</span>
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;acquisition_end_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_iso_time</span><span class="p">(</span><span class="n">acq_time</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">output_product_metadata</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_custom_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tile_filename</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates the &quot;custom data&quot; dictionary used with the ISO metadata rendering.</span>
+
+<span class="sd">        Custom data contains all metadata information needed for the ISO template</span>
+<span class="sd">        that is not found within any of the other metadata sources (such as the</span>
+<span class="sd">        RunConfig, output product(s), or catalog metadata).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        tile_filename : str</span>
+<span class="sd">            Tile filename to be used as the granule identifier within the</span>
+<span class="sd">            custom metadata.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        custom_metadata : dict</span>
+<span class="sd">            Dictionary containing the custom metadata as expected by the ISO</span>
+<span class="sd">            metadata Jinja2 template.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">custom_metadata</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;ISO_OPERA_FilePackageName&#39;</span><span class="p">:</span> <span class="n">tile_filename</span><span class="p">,</span>
+            <span class="s1">&#39;ISO_OPERA_ProducerGranuleId&#39;</span><span class="p">:</span> <span class="n">tile_filename</span><span class="p">,</span>
+            <span class="s1">&#39;MetadataProviderAction&#39;</span><span class="p">:</span> <span class="s2">&quot;creation&quot;</span><span class="p">,</span>
+            <span class="s1">&#39;GranuleFilename&#39;</span><span class="p">:</span> <span class="n">tile_filename</span><span class="p">,</span>
+            <span class="s1">&#39;ISO_OPERA_ProjectKeywords&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;OPERA&#39;</span><span class="p">,</span> <span class="s1">&#39;JPL&#39;</span><span class="p">,</span> <span class="s1">&#39;DIST&#39;</span><span class="p">,</span> <span class="s1">&#39;Surface&#39;</span><span class="p">,</span> <span class="s1">&#39;Disturbance&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;ISO_OPERA_PlatformKeywords&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;S1&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;ISO_OPERA_InstrumentKeywords&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Sentinel 1 A/C&#39;</span><span class="p">]</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">custom_metadata</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_iso_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a rendered version of the ISO metadata template for DIST-S1</span>
+<span class="sd">        output products using metadata from the following locations:</span>
+
+<span class="sd">            * RunConfig (in dictionary form)</span>
+<span class="sd">            * Output product (dictionary extracted from HDF5 product, per-tile)</span>
+<span class="sd">            * Catalog metadata</span>
+<span class="sd">            * &quot;Custom&quot; metadata (all metadata not found anywhere else)</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        rendered_template : str</span>
+<span class="sd">            The ISO metadata template for DSWX-S1 filled in with values from</span>
+<span class="sd">            the sourced metadata dictionaries.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Use the base PGE implemenation to validate existence of the template</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_create_iso_metadata</span><span class="p">()</span>
+
+        <span class="c1"># Since we only produce 1 tile each execution, we only have one tile ID in here</span>
+        <span class="n">tile_id</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tile_metadata_cache</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">tile_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tile_metadata_cache</span> <span class="ow">or</span> <span class="n">tile_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tile_filename_cache</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No file name or metadata cached for tile ID </span><span class="si">{</span><span class="n">tile_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">tile_metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tile_metadata_cache</span><span class="p">[</span><span class="n">tile_id</span><span class="p">]</span>
+        <span class="n">tile_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tile_filename_cache</span><span class="p">[</span><span class="n">tile_id</span><span class="p">]</span>
+
+        <span class="n">runconfig_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">asdict</span><span class="p">()</span>
+
+        <span class="n">product_output_dict</span> <span class="o">=</span> <span class="n">tile_metadata</span>
+
+        <span class="n">catalog_metadata_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_catalog_metadata</span><span class="p">()</span><span class="o">.</span><span class="n">asdict</span><span class="p">()</span>
+
+        <span class="n">custom_data_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_custom_metadata</span><span class="p">(</span><span class="n">tile_filename</span><span class="p">)</span>
+
+        <span class="n">iso_metadata</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;run_config&#39;</span><span class="p">:</span> <span class="n">runconfig_dict</span><span class="p">,</span>
+            <span class="s1">&#39;product_output&#39;</span><span class="p">:</span> <span class="n">product_output_dict</span><span class="p">,</span>
+            <span class="s1">&#39;catalog_metadata&#39;</span><span class="p">:</span> <span class="n">catalog_metadata_dict</span><span class="p">,</span>
+            <span class="s1">&#39;custom_data&#39;</span><span class="p">:</span> <span class="n">custom_data_dict</span>
+        <span class="p">}</span>
+
+        <span class="n">iso_template_path</span> <span class="o">=</span> <span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">iso_template_path</span><span class="p">)</span>
+
+        <span class="n">rendered_template</span> <span class="o">=</span> <span class="n">render_jinja2</span><span class="p">(</span><span class="n">iso_template_path</span><span class="p">,</span> <span class="n">iso_metadata</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">rendered_template</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_flatten_output_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Flattens the output directory since PCM expects all output files</span>
+<span class="sd">        to be in the output root.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">output_product_path</span> <span class="o">=</span> <span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">output_product_path</span><span class="p">)</span>
+        <span class="n">scratch_path</span> <span class="o">=</span> <span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">scratch_path</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">dirpath</span><span class="p">,</span> <span class="n">dirnames</span><span class="p">,</span> <span class="n">filenames</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">output_product_path</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">filenames</span><span class="p">:</span>
+                <span class="n">src</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dirpath</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+                <span class="n">dst</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_product_path</span><span class="p">,</span> <span class="n">basename</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span>
+
+                <span class="k">if</span> <span class="n">scratch_path</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">src</span> <span class="ow">and</span> <span class="n">src</span> <span class="o">!=</span> <span class="n">dst</span><span class="p">:</span>
+                    <span class="c1"># TODO: Change this to shutil.move() with the next SAS delivery. We need the output directory</span>
+                    <span class="c1">#  structure intact for the comparison script since it works on the whole directory</span>
+                    <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">src</span><span class="p">),</span> <span class="n">dst</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_checksum_output_products</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generates a dictionary mapping output product file names to the</span>
+<span class="sd">        corresponding MD5 checksum digest of the file&#39;s contents.</span>
+
+<span class="sd">        The products to generate checksums for are determined by scanning</span>
+<span class="sd">        the output product location specified by the RunConfig. Any files</span>
+<span class="sd">        within the directory that have the expected file extensions for output</span>
+<span class="sd">        products are then picked up for checksum generation.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        checksums : dict</span>
+<span class="sd">            Mapping of output product file names to MD5 checksums of said</span>
+<span class="sd">            products.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">output_products</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">get_output_product_filenames</span><span class="p">()</span>
+
+        <span class="c1"># Filter out any files that do not end with the expected extensions</span>
+        <span class="n">expected_extensions</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;.tif&#39;</span><span class="p">,</span> <span class="s1">&#39;.png&#39;</span><span class="p">)</span>
+        <span class="n">filtered_output_products</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">product</span><span class="p">:</span> <span class="n">splitext</span><span class="p">(</span><span class="n">product</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">expected_extensions</span><span class="p">,</span>
+            <span class="n">output_products</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Generate checksums on the filtered product list</span>
+        <span class="n">checksums</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">basename</span><span class="p">(</span><span class="n">output_product</span><span class="p">):</span> <span class="n">get_checksum</span><span class="p">(</span><span class="n">output_product</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">output_product</span> <span class="ow">in</span> <span class="n">filtered_output_products</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">checksums</span>
+
+<div class="viewcode-block" id="DistS1PostProcessorMixin.run_postprocessor"><a class="viewcode-back" href="../../../../opera.pge.dist_s1.html#opera.pge.dist_s1.dist_s1_pge.DistS1PostProcessorMixin.run_postprocessor">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">run_postprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Executes the post-processing steps for the DIST-S1 PGE.</span>
+<span class="sd">        The DistS1PostProcessorMixin version of this method currently</span>
+<span class="sd">        validates the output product files and performs other base</span>
+<span class="sd">        postprocessing steps (writing log file, etc).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        **kwargs: dict</span>
+<span class="sd">            Any keyword arguments needed by the post-processor</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Running postprocessor for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_post_mixin_name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_outputs</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_flatten_output_dir</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_run_sas_qa_executable</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stage_output_files</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="DistS1Executor"><a class="viewcode-back" href="../../../../opera.pge.dist_s1.html#opera.pge.dist_s1.dist_s1_pge.DistS1Executor">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">DistS1Executor</span><span class="p">(</span><span class="n">DistS1PreProcessorMixin</span><span class="p">,</span> <span class="n">DistS1PostProcessorMixin</span><span class="p">,</span> <span class="n">PgeExecutor</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Main class for execution of the DIST-S1 PGE, including the SAS layer.</span>
+<span class="sd">    This class essentially rolls up the DIST-specific pre- and post-processor</span>
+<span class="sd">    functionality, while inheriting all other functionality for setup and execution</span>
+<span class="sd">    of the SAS from the base PgeExecutor class.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">NAME</span> <span class="o">=</span> <span class="s2">&quot;DIST-S1&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Short name for the DIST-S1 PGE&quot;&quot;&quot;</span>
+
+    <span class="n">LEVEL</span> <span class="o">=</span> <span class="s2">&quot;L3&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Processing Level for DIST-S1 Products&quot;&quot;&quot;</span>
+
+    <span class="n">SAS_VERSION</span> <span class="o">=</span> <span class="s2">&quot;0.0.6&quot;</span>  <span class="c1"># Beta release https://github.com/opera-adt/dist-s1/releases/tag/v0.0.3</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Version of the SAS wrapped by this PGE, should be updated as needed&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pge_name</span><span class="p">,</span> <span class="n">runconfig_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">pge_name</span><span class="p">,</span> <span class="n">runconfig_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">rename_by_pattern_map</span> <span class="o">=</span> <span class="p">{}</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021-2025 California Institute of Technology.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

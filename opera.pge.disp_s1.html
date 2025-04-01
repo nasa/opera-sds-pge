@@ -123,13 +123,13 @@ of the SAS from the base PgeExecutor class.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="opera.pge.disp_s1.disp_s1_pge.DispS1Executor.PGE_VERSION">
-<span class="sig-name descname"><span class="pre">PGE_VERSION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'3.0.4'</span></em><a class="headerlink" href="#opera.pge.disp_s1.disp_s1_pge.DispS1Executor.PGE_VERSION" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">PGE_VERSION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'3.0.5'</span></em><a class="headerlink" href="#opera.pge.disp_s1.disp_s1_pge.DispS1Executor.PGE_VERSION" title="Permalink to this definition"></a></dt>
 <dd><p>Version of the PGE (overrides default from base_pge)</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="opera.pge.disp_s1.disp_s1_pge.DispS1Executor.SAS_VERSION">
-<span class="sig-name descname"><span class="pre">SAS_VERSION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'0.5.5'</span></em><a class="headerlink" href="#opera.pge.disp_s1.disp_s1_pge.DispS1Executor.SAS_VERSION" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">SAS_VERSION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'0.5.7'</span></em><a class="headerlink" href="#opera.pge.disp_s1.disp_s1_pge.DispS1Executor.SAS_VERSION" title="Permalink to this definition"></a></dt>
 <dd><p>Version of the SAS wrapped by this PGE (dummy value)</p>
 </dd></dl>
 
@@ -185,8 +185,62 @@ section now points to the converted .nc files in the scratch directory.</p>
 <span class="sig-name descname"><span class="pre">run_preprocessor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/opera/pge/disp_s1/disp_s1_pge.html#DispS1PreProcessorMixin.run_preprocessor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opera.pge.disp_s1.disp_s1_pge.DispS1PreProcessorMixin.run_preprocessor" title="Permalink to this definition"></a></dt>
 <dd><p>Executes the pre-processing steps for DISP-S1 PGE initialization.
 The DispS1PreProcessorMixin version of this class performs all actions
-of the base PreProcessorMixin class, and adds an input validation step
-for the inputs defined within the RunConfig.</p>
+of the base PreProcessorMixin class, and adds input validation steps
+for the RunConfig and the inputs defined within it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>**kwargs</strong> (<em>dict</em>) – Any keyword arguments needed by the pre-processor</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="opera.pge.disp_s1.disp_s1_pge.DispS1StaticExecutor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">opera.pge.disp_s1.disp_s1_pge.</span></span><span class="sig-name descname"><span class="pre">DispS1StaticExecutor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pge_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runconfig_path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/opera/pge/disp_s1/disp_s1_pge.html#DispS1StaticExecutor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opera.pge.disp_s1.disp_s1_pge.DispS1StaticExecutor" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#opera.pge.disp_s1.disp_s1_pge.DispS1StaticPreProcessorMixin" title="opera.pge.disp_s1.disp_s1_pge.DispS1StaticPreProcessorMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">DispS1StaticPreProcessorMixin</span></code></a>, <a class="reference internal" href="#opera.pge.disp_s1.disp_s1_pge.DispS1StaticPostProcessorMixin" title="opera.pge.disp_s1.disp_s1_pge.DispS1StaticPostProcessorMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">DispS1StaticPostProcessorMixin</span></code></a>, <a class="reference internal" href="#opera.pge.disp_s1.disp_s1_pge.DispS1Executor" title="opera.pge.disp_s1.disp_s1_pge.DispS1Executor"><code class="xref py py-class docutils literal notranslate"><span class="pre">DispS1Executor</span></code></a></p>
+<p>Main class for execution of the DISP-S1-STATIC PGE, including the SAS layer.
+This class essentially rolls up the DISP-STATIC-specific pre- and post-processor
+functionality, while inheriting all other functionality for setup and execution
+of the SAS from the baseline DISP-S1 Executor class.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="opera.pge.disp_s1.disp_s1_pge.DispS1StaticExecutor.NAME">
+<span class="sig-name descname"><span class="pre">NAME</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'DISP-S1-STATIC'</span></em><a class="headerlink" href="#opera.pge.disp_s1.disp_s1_pge.DispS1StaticExecutor.NAME" title="Permalink to this definition"></a></dt>
+<dd><p>Short name for the DISP-S1-STATIC PGE</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="opera.pge.disp_s1.disp_s1_pge.DispS1StaticPostProcessorMixin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">opera.pge.disp_s1.disp_s1_pge.</span></span><span class="sig-name descname"><span class="pre">DispS1StaticPostProcessorMixin</span></span><a class="reference internal" href="_modules/opera/pge/disp_s1/disp_s1_pge.html#DispS1StaticPostProcessorMixin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opera.pge.disp_s1.disp_s1_pge.DispS1StaticPostProcessorMixin" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#opera.pge.disp_s1.disp_s1_pge.DispS1PostProcessorMixin" title="opera.pge.disp_s1.disp_s1_pge.DispS1PostProcessorMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">DispS1PostProcessorMixin</span></code></a></p>
+<p>Mixin class responsible for handling all post-processing steps for the DISP-S1-STATIC
+PGE. The post-processing phase is defined as all steps required after SAS
+execution has completed, prior to handover of output products to PCM.</p>
+<p>In addition to the base functionality inherited from PostProcessorMixin, this
+mixin adds an output validation step to ensure that the output file(s) defined
+by the RunConfig exist and are valid.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="opera.pge.disp_s1.disp_s1_pge.DispS1StaticPreProcessorMixin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">opera.pge.disp_s1.disp_s1_pge.</span></span><span class="sig-name descname"><span class="pre">DispS1StaticPreProcessorMixin</span></span><a class="reference internal" href="_modules/opera/pge/disp_s1/disp_s1_pge.html#DispS1StaticPreProcessorMixin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opera.pge.disp_s1.disp_s1_pge.DispS1StaticPreProcessorMixin" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#opera.pge.disp_s1.disp_s1_pge.DispS1PreProcessorMixin" title="opera.pge.disp_s1.disp_s1_pge.DispS1PreProcessorMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">DispS1PreProcessorMixin</span></code></a></p>
+<p>Mixin class responsible for handling all pre-processing steps for the DISP-S1-STATIC
+PGE. The pre-processing phase is defined as all steps necessary prior
+to SAS execution.</p>
+<p>In addition to the base functionality inherited from PreProcessorMixin, this
+mixin adds an input validation step to ensure that input(s) defined by the
+RunConfig exist and are valid.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="opera.pge.disp_s1.disp_s1_pge.DispS1StaticPreProcessorMixin.run_preprocessor">
+<span class="sig-name descname"><span class="pre">run_preprocessor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/opera/pge/disp_s1/disp_s1_pge.html#DispS1StaticPreProcessorMixin.run_preprocessor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opera.pge.disp_s1.disp_s1_pge.DispS1StaticPreProcessorMixin.run_preprocessor" title="Permalink to this definition"></a></dt>
+<dd><p>Executes the pre-processing steps for DISP-S1-STATIC PGE initialization.
+The DispS1StaticPreProcessorMixin version of this class performs all actions
+of the base PreProcessorMixin class, and adds input validation steps
+for the RunConfig and the inputs defined within it.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>**kwargs</strong> (<em>dict</em>) – Any keyword arguments needed by the pre-processor</p>
