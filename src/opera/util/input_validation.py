@@ -114,11 +114,11 @@ def validate_slc_s1_inputs(runconfig, logger, name):
 
     for key, value in input_file_group_dict.items():
         if key == 'safe_file_path':
-            for index in range(len(value)):
-                check_input(value[index], logger, name, valid_extensions=('.zip',))
+            for item in value:
+                check_input(item, logger, name, valid_extensions=('.zip',))
         elif key == 'orbit_file_path':
-            for index in range(len(value)):
-                check_input(value[index], logger, name, valid_extensions=('.EOF',))
+            for item in value:
+                check_input(item, logger, name, valid_extensions=('.EOF',))
         elif key == 'dem_file':
             check_input(value, logger, name, valid_extensions=('.tif', '.tiff', '.vrt'))
         elif key == 'tec_file':
@@ -127,8 +127,8 @@ def validate_slc_s1_inputs(runconfig, logger, name):
             # This key could show up since it is in the schema, but it should
             # never be present in R2 production, so just ignore
             continue
-        elif key in ('burst_id', 'dem_description', 'dem_file_description',
-                     'source_data_access'):
+        elif key in {'burst_id', 'dem_description', 'dem_file_description',
+                     'source_data_access'}:
             # these fields are included in the SAS input paths, but are not
             # actually file paths, so skip them
             continue
@@ -260,8 +260,7 @@ def get_cslc_input_burst_id_set(cslc_input_file_list, logger, name):
     nl, tab, dtab = '\n', '\t', '\t\t'  # used to format log output in fstrings.
     # Filter and separate into 2 list: files with 'compressed' in the name, and
     # files without 'compressed' in the name.
-    compressed_input_file_list = list(filter((lambda filename: 'compressed' in filename),
-                                             cslc_input_file_list))
+    compressed_input_file_list = [filename for filename in cslc_input_file_list if 'compressed' in filename]
     single_input_file_list = list(set(cslc_input_file_list) - set(compressed_input_file_list))
 
     compressed_file_burst_id_set: set = get_burst_id_set(compressed_input_file_list, logger, name)
@@ -280,9 +279,9 @@ def get_cslc_input_burst_id_set(cslc_input_file_list, logger, name):
                f"{dtab}In 'uncompressed' set, but not in 'compressed' set:"
                f" {single_file_burst_id_set.difference(compressed_file_burst_id_set)}")
         logger.critical(name, ErrorCode.INVALID_INPUT, msg)
+
     # Case 3: uncompressed file and compressed files with matching burst id sets
-    else:
-        return compressed_file_burst_id_set
+    return compressed_file_burst_id_set
 
 
 def validate_disp_inputs(runconfig, logger, name):
@@ -359,23 +358,23 @@ def validate_disp_inputs(runconfig, logger, name):
 
 def validate_disp_static_inputs(runconfig, logger, name):
     """
-        Evaluates the list of inputs from the RunConfig to ensure they are valid for the static layers
-        workflow.
+    Evaluates the list of inputs from the RunConfig to ensure they are valid for the static layers
+    workflow.
 
-        The input products for DISP-S1 can be classified into two groups:
-            1) the main input products (the CSLC-STATIC burst products) and
-            2) the ancillary input products (DEM, RTC STATIC masks, etc).
+    The input products for DISP-S1 can be classified into two groups:
+        1) the main input products (the CSLC-STATIC burst products) and
+        2) the ancillary input products (DEM, RTC STATIC masks, etc).
 
-        Parameters
-        ----------
-        runconfig: file
-            Runconfig file passed by the calling PGE
-        logger: PgeLogger
-            Logger passed by the calling PGE
-        name:  str
-            pge name
+    Parameters
+    ----------
+    runconfig: file
+        Runconfig file passed by the calling PGE
+    logger: PgeLogger
+        Logger passed by the calling PGE
+    name:  str
+        pge name
 
-        """
+    """
     dyn_anc_file_group = runconfig.sas_config['dynamic_ancillary_file_group']
     static_anc_file_group = runconfig.sas_config['static_ancillary_file_group']
 

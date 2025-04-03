@@ -24,7 +24,7 @@ try:
     from osgeo import osr
 
     osr.UseExceptions()
-except (ImportError, ModuleNotFoundError):  # pragma: no cover
+except ImportError:  # pragma: no cover
     osr = MockOsr                           # pragma: no cover
 # pylint: enable=invalid-name
 
