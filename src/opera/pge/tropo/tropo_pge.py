@@ -24,7 +24,7 @@ class TROPOPreProcessorMixin(PreProcessorMixin):
     mixin adds an input validation step to ensure that input(s) defined by the
     RunConfig exist and are valid.
 
-     """
+    """
 
     _pre_mixin_name = "TROPOPreProcessorMixin"
 
@@ -34,6 +34,7 @@ class TROPOPreProcessorMixin(PreProcessorMixin):
         The TROPOPreProcessorMixin version of this class performs all actions
         of the base PreProcessorMixin class, and adds an input validation step for
         the inputs defined within the RunConfig (TODO).
+
         Parameters
         ----------
         **kwargs: dict
@@ -54,7 +55,7 @@ class TROPOPostProcessorMixin(PostProcessorMixin):
 
     _post_mixin_name = "TROPOPostProcessorMixin"
     _cached_core_filename = None
-    
+
     def _checksum_output_products(self):
         """
         Generates a dictionary mapping output product file names to the
@@ -96,6 +97,7 @@ class TROPOPostProcessorMixin(PostProcessorMixin):
         steps as the base PostProcessorMixin, but inserts a step to perform
         output product validation prior to staging and renaming of the output
         files (TODO).
+
         Parameters
         ----------
         **kwargs: dict
@@ -117,7 +119,7 @@ class TROPOExecutor(TROPOPreProcessorMixin, TROPOPostProcessorMixin, PgeExecutor
 
     LEVEL = "L4"
     """Processing Level for TROPO Products"""
-    
+
     PGE_VERSION = "3.0.0-er.1.0"
     """Version of the PGE"""
 
