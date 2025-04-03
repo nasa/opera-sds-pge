@@ -15,8 +15,9 @@ import html
 import json
 import os
 import re
+from collections.abc import Callable
 from functools import partial
-from typing import Optional
+from typing import Any, Optional
 
 import jinja2
 
@@ -118,8 +119,8 @@ def _make_undefined_handler_class(logger: PgeLogger):
     return LoggingUndefined
 
 
-def _try_parse_xml_string(s: str):
-    _ = etree.fromstring(s.encode('utf-8'))
+def _try_parse_xml_string(string: str):
+    _ = etree.fromstring(string.encode('utf-8'))
 
 
 JSON_VALIDATOR = json.loads
@@ -131,7 +132,7 @@ def render_jinja2(
         template_filename: str,
         input_data: dict,
         logger: PgeLogger = None,
-        validator=XML_VALIDATOR
+        validator: Callable[[str], Any] = XML_VALIDATOR
 ):
     """
     Renders from a jinja2 template using the specified input data.
@@ -149,7 +150,7 @@ def render_jinja2(
         will not raise exceptions or abort rendering. If not provided,
         the default Jinja2 error handling will apply for such errors,
         possibly including raised exceptions.
-    validator:
+    validator: collections.abc.Callable[[str], Any]
         Callable which, if provided, takes the rendered text as an input and
         attempts to parse it. Must raise an exception if given invalid input.
 
@@ -193,7 +194,7 @@ def render_jinja2(
 def python_type_to_xml_type(obj) -> str:
     """Returns a guess for the XML type of a Python object."""
     if isinstance(obj, str):
-        if obj.lower() in ['true', 'false']:
+        if obj.lower() in {'true', 'false'}:
             obj = obj.lower() == 'true'
         elif re.match(INTEGER_PATTERN, obj) is not None:
             obj = int(obj)
@@ -206,6 +207,7 @@ def python_type_to_xml_type(obj) -> str:
     return XML_TYPES[obj]
 
 
+# pylint: disable=unused-argument
 def augment_measured_parameters(measured_parameters: dict, mpc_path: Optional[str], logger: PgeLogger) -> dict:
     """
     Augment the measured parameters dict of GeoTIFF metadata into a dict of dicts
@@ -236,18 +238,20 @@ def augment_measured_parameters(measured_parameters: dict, mpc_path: Optional[st
     augmented_parameters : dict
        The metadata fields converted to a list with name, value, types, etc
     """
-    augmented_parameters = dict()
+    augmented_parameters = {}
 
     if mpc_path is not None:
-        with open(mpc_path) as f:
-            descriptions = yaml.safe_load(f)
+        with open(mpc_path, 'r', encoding='utf-8') as data:
+            descriptions = yaml.safe_load(data)
 
         missing_description_value = UNDEFINED_ERROR
     else:
-        descriptions = dict()
+        descriptions = {}
         missing_description_value = UNDEFINED_WARNING
 
-    for name, value in measured_parameters.items():
+    for name in measured_parameters:
+        value = measured_parameters[name]
+
         if isinstance(value, np.generic):
             value = value.item()
 
@@ -260,7 +264,7 @@ def augment_measured_parameters(measured_parameters: dict, mpc_path: Optional[st
         guessed_data_type = python_type_to_xml_type(value)
         guessed_attr_name = guess_attribute_display_name(name)
 
-        descriptions.setdefault(name, dict())
+        descriptions.setdefault(name, {})
 
         attr_description = descriptions[name].get('description', missing_description_value)
         data_type = descriptions[name].get('attribute_data_type', guessed_data_type)
@@ -271,10 +275,13 @@ def augment_measured_parameters(measured_parameters: dict, mpc_path: Optional[st
         if escape_html:
             value = html.escape(value)
 
-        augmented_parameters[name] = (
-            dict(name=attr_name, value=value, attr_type=attr_type,
-                 attr_description=attr_description, data_type=data_type)
-        )
+        augmented_parameters[name] = {
+            'name': attr_name,
+            'value': value,
+            'attr_type': attr_type,
+            'attr_description': attr_description,
+            'data_type': data_type
+        }
 
     return augmented_parameters
 
@@ -317,10 +324,11 @@ def augment_hdf5_measured_parameters(measured_parameters: dict, mpc_path: str, l
         The metadata fields converted to a list with name, value, types, etc
     """
     new_measured_parameters = {}
+    descriptions = {}
 
     if mpc_path:
-        with open(mpc_path) as f:
-            descriptions = yaml.safe_load(f)
+        with open(mpc_path, 'r', encoding='utf-8') as data:
+            descriptions = yaml.safe_load(data)
     else:
         msg = ('Measured parameters configuration is needed to extract the measured parameters attributes from the '
                'metadata')
@@ -329,12 +337,12 @@ def augment_hdf5_measured_parameters(measured_parameters: dict, mpc_path: str, l
     for parameter_var_name in descriptions:
         key_path = parameter_var_name.split(MEASURED_PARAMETER_PATH_SEPARATOR)
 
-        mp = measured_parameters
+        mp_item = measured_parameters
         missing = False
 
-        while len(key_path) > 0:
+        while len(key_path) > 0:  # pylint: disable=while-used
             try:
-                mp = mp[key_path.pop(0)]
+                mp_item = mp_item[key_path.pop(0)]
             except KeyError:
                 msg = (f'Measured parameters configuration contains a path {parameter_var_name} that is missing '
                        f'from the output product')
@@ -345,7 +353,7 @@ def augment_hdf5_measured_parameters(measured_parameters: dict, mpc_path: str, l
                     logger.critical("render_jinja2", ErrorCode.ISO_METADATA_DESCRIPTIONS_CONFIG_INVALID, msg)
 
         if not missing:
-            new_measured_parameters[parameter_var_name] = mp
+            new_measured_parameters[parameter_var_name] = mp_item
 
     return augment_measured_parameters(new_measured_parameters, mpc_path, logger)
 
@@ -353,17 +361,17 @@ def augment_hdf5_measured_parameters(measured_parameters: dict, mpc_path: str, l
 class NumpyEncoder(json.JSONEncoder):
     """Class to handle serialization of Numpy types during JSON enconding"""
 
-    def default(self, obj):
+    def default(self, o):
         """Serialize Numpy types to related python types."""
-        if isinstance(obj, np.integer):
-            return int(obj)
-        if isinstance(obj, np.floating):
-            return float(obj)
-        if isinstance(obj, np.ndarray):
-            return obj.tolist()
-        if isinstance(obj, np.bool_):
-            return bool(obj)
-        return super(NumpyEncoder, self).default(obj)
+        if isinstance(o, np.integer):
+            return int(o)
+        if isinstance(o, np.floating):
+            return float(o)
+        if isinstance(o, np.ndarray):
+            return o.tolist()
+        if isinstance(o, np.bool_):
+            return bool(o)
+        return super().default(o)
 
 
 def guess_attribute_display_name(var_name: str) -> str:
