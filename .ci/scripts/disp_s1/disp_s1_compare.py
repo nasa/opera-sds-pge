@@ -5,10 +5,12 @@ import logging
 import sys
 from pathlib import Path
 
-import h5py
-import numpy as np
 from dolphin import io
 from dolphin._types import Filename
+
+import h5py
+
+import numpy as np
 from numpy.typing import ArrayLike
 
 logging.basicConfig(level=logging.INFO)
@@ -467,8 +469,8 @@ def _validate_dataset(
             return
         if not np.array_equal(golden, test):
             msg = f"Dataset {golden_dataset.name} values do not match:"
-            msg += f" {golden = } vs. {test = }"
-            #raise ComparisonError(msg)
+            msg += f" {golden = } vs. {test = }"  # noqa: E202
+            # raise ComparisonError(msg)
             ComparisonError(msg)
         return
 
@@ -483,7 +485,7 @@ def _validate_dataset(
         ComparisonError(
             f"Dataset {golden_dataset.name} values do not match: Number of"
             f" pixels failed: {num_failed} / {num_pixels} ="
-            f" {100*num_failed / num_pixels:.2f}%"
+            f" {100 * num_failed / num_pixels:.2f}%"
         )
 
 

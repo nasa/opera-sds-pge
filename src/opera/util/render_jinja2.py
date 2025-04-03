@@ -207,7 +207,7 @@ def python_type_to_xml_type(obj) -> str:
     return XML_TYPES[obj]
 
 
-# pylint: disable=unused-argument
+# pylint: disable=unused-argument,consider-alternative-union-syntax
 def augment_measured_parameters(measured_parameters: dict, mpc_path: Optional[str], logger: PgeLogger) -> dict:
     """
     Augment the measured parameters dict of GeoTIFF metadata into a dict of dicts

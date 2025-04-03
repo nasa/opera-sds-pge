@@ -28,7 +28,6 @@ def _get_parser():
 
 def main():
     """Compare two DIST-S1 products provided on command line"""
-
     parser = _get_parser()
 
     args = parser.parse_args()

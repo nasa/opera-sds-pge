@@ -32,6 +32,8 @@ WARNING = "Warning"
 CRITICAL = "Critical"
 """Constants for logging levels"""
 
+# pylint: disable=too-many-positional-arguments
+
 
 def write(log_stream, severity, workflow, module, error_code, error_location,
           description, time_tag=None):
