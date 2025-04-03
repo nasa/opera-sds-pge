@@ -19,9 +19,12 @@ from functools import partial
 from typing import Optional
 
 import jinja2
-import numpy as np
-import yaml
+
 from lxml import etree
+
+import numpy as np
+
+import yaml
 
 from opera.util.error_codes import ErrorCode
 from opera.util.h5_utils import MEASURED_PARAMETER_PATH_SEPARATOR
