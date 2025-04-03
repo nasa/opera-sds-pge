@@ -15,16 +15,14 @@ import html
 import json
 import os
 import re
-
 from functools import partial
 from typing import Optional
 
 import jinja2
-import yaml
-
 import numpy as np
-
+import yaml
 from lxml import etree
+
 from opera.util.error_codes import ErrorCode
 from opera.util.h5_utils import MEASURED_PARAMETER_PATH_SEPARATOR
 from opera.util.logger import PgeLogger
@@ -351,7 +349,9 @@ def augment_hdf5_measured_parameters(measured_parameters: dict, mpc_path: str, l
 
 class NumpyEncoder(json.JSONEncoder):
     """Class to handle serialization of Numpy types during JSON enconding"""
+
     def default(self, obj):
+        """Serialize Numpy types to related python types."""
         if isinstance(obj, np.integer):
             return int(obj)
         if isinstance(obj, np.floating):

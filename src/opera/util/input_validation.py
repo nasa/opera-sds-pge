@@ -359,23 +359,23 @@ def validate_disp_inputs(runconfig, logger, name):
 
 def validate_disp_static_inputs(runconfig, logger, name):
     """
-        Evaluates the list of inputs from the RunConfig to ensure they are valid for the static layers
-        workflow.
+    Evaluates the list of inputs from the RunConfig to ensure they are valid for the static layers
+    workflow.
 
-        The input products for DISP-S1 can be classified into two groups:
-            1) the main input products (the CSLC-STATIC burst products) and
-            2) the ancillary input products (DEM, RTC STATIC masks, etc).
+    The input products for DISP-S1 can be classified into two groups:
+        1) the main input products (the CSLC-STATIC burst products) and
+        2) the ancillary input products (DEM, RTC STATIC masks, etc).
 
-        Parameters
-        ----------
-        runconfig: file
-            Runconfig file passed by the calling PGE
-        logger: PgeLogger
-            Logger passed by the calling PGE
-        name:  str
-            pge name
+    Parameters
+    ----------
+    runconfig: file
+        Runconfig file passed by the calling PGE
+    logger: PgeLogger
+        Logger passed by the calling PGE
+    name:  str
+        pge name
 
-        """
+    """
     dyn_anc_file_group = runconfig.sas_config['dynamic_ancillary_file_group']
     static_anc_file_group = runconfig.sas_config['static_ancillary_file_group']
 
