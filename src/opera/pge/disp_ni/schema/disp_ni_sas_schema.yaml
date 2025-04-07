@@ -33,10 +33,10 @@ dynamic_ancillary_file_group:
 
 static_ancillary_file_group:
   # JSON file containing list of reference date changes for each frame.
-  reference_date_database_json: any(str(), null(), required=False)
+  reference_date_database_json: any(str(), null())
 
   # JSON file containing the mapping from frame_id to bounds information
-  frame_to_bounds_json: any(str(), null(), required=false)
+  frame_to_bounds_json: any(str(), null())
 
 primary_executable:
   # Product type of the PGE.
