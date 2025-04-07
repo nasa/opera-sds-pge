@@ -7,7 +7,7 @@ disp_ni_pge.py
 Module defining the implementation for the Surface Displacement (DISP) from NISAR PGE.
 """
 
-from opera.pge.base.base_pge import PreProcessorMixin, PgeExecutor, PostProcessorMixin
+from opera.pge.base.base_pge import PgeExecutor, PostProcessorMixin, PreProcessorMixin
 
 
 class DispNIPreProcessorMixin(PreProcessorMixin):
@@ -28,6 +28,7 @@ class DispNIPreProcessorMixin(PreProcessorMixin):
         The DispNIPreProcessorMixin version of this class performs all actions
         of the PreProcessorMixin class. Parameterization of the validation
         functions is handled via specialized class attributes (i.e. _valid_input_extensions)
+
         Parameters
         ----------
         **kwargs: dict
@@ -55,6 +56,7 @@ class DispNIPostProcessorMixin(PostProcessorMixin):
         Executes the post-processing steps for the DISP-NI PGE.
         The DispNIPostProcessorMixin version of this method performs the same
         steps as the base PostProcessorMixin.
+
         Parameters
         ----------
         **kwargs: dict
