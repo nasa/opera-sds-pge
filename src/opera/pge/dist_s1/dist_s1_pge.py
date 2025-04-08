@@ -13,9 +13,9 @@ import re
 import shutil
 from datetime import datetime
 from itertools import chain
-from os.path import join, isdir, isfile, abspath, basename, splitext
+from os.path import abspath, basename, isdir, isfile, join, splitext
 
-from opera.pge.base.base_pge import PreProcessorMixin, PgeExecutor, PostProcessorMixin
+from opera.pge.base.base_pge import PgeExecutor, PostProcessorMixin, PreProcessorMixin
 from opera.util.dataset_utils import get_sensor_from_spacecraft_name
 from opera.util.error_codes import ErrorCode
 from opera.util.geo_utils import get_geographic_boundaries_from_mgrs_tile
@@ -23,7 +23,7 @@ from opera.util.input_validation import check_input_list
 from opera.util.render_jinja2 import augment_measured_parameters, render_jinja2
 from opera.util.run_utils import get_checksum
 from opera.util.tiff_utils import get_geotiff_metadata
-from opera.util.time import get_time_for_filename, get_iso_time
+from opera.util.time import get_iso_time, get_time_for_filename
 
 
 class DistS1PreProcessorMixin(PreProcessorMixin):
@@ -56,7 +56,6 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
             4-tuple of lists of input RTC filenames in the order: pre_rtc_copol, pre_rtc_crosspol, post_rtc_copol,
             post_rtc_crosspol
         """
-
         pre_rtc_copol, pre_rtc_crosspol, post_rtc_copol, post_rtc_crosspol = all_rtcs
 
         if len(pre_rtc_copol) != len(pre_rtc_crosspol) or len(post_rtc_copol) != len(post_rtc_crosspol):
@@ -78,7 +77,6 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
             4-tuple of lists of input RTC filenames in the order: pre_rtc_copol, pre_rtc_crosspol, post_rtc_copol,
             post_rtc_crosspol
         """
-
         all_rtcs = chain.from_iterable(all_rtcs)
 
         if not set([basename(rtc) for rtc in all_rtcs]).issubset([basename(rtc) for rtc in self.runconfig.input_files]):
@@ -107,7 +105,6 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
             List of RTC filenames matched by a regular expression. Used in later validation. Only returns
             if this validation is passing.
         """
-
         rtc_matches = [self._rtc_pattern.match(basename(rtc)) for rtc in chain.from_iterable(all_rtcs)]
         mismatches = [rtc for match, rtc in zip(rtc_matches, chain.from_iterable(all_rtcs)) if match is None]
 
@@ -218,7 +215,6 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
             4-tuple of lists of input RTC filenames in the order: pre_rtc_copol, pre_rtc_crosspol, post_rtc_copol,
             post_rtc_crosspol
         """
-
         pre_rtc_copol, pre_rtc_crosspol, post_rtc_copol, post_rtc_crosspol = all_rtcs
 
         for rtc in pre_rtc_copol + post_rtc_copol:
@@ -251,7 +247,6 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
            acquisition time)
         6. Validates no cross-pol RTCs are in copol input lists and vice-versa
         """
-
         sas_config = self.runconfig.sas_config
 
         pre_rtc_copol = sas_config["run_config"]["pre_rtc_copol"]
@@ -409,7 +404,6 @@ class DistS1PostProcessorMixin(PostProcessorMixin):
         ancillary_filename : str
             The file name component to assign to ancillary products created by this PGE.
         """
-
         # TODO: Get this from metadata
         spacecraft_name = "SENTINEL-1A"
         sensor = get_sensor_from_spacecraft_name(spacecraft_name)
@@ -740,7 +734,6 @@ class DistS1PostProcessorMixin(PostProcessorMixin):
         **kwargs: dict
             Any keyword arguments needed by the post-processor
         """
-
         print(f'Running postprocessor for {self._post_mixin_name}')
 
         self._validate_outputs()

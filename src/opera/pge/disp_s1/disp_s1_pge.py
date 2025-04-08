@@ -28,9 +28,9 @@ from opera.util.h5_utils import get_disp_s1_product_metadata
 from opera.util.input_validation import (validate_algorithm_parameters_config,
                                          validate_disp_inputs,
                                          validate_disp_static_inputs)
-from opera.util.render_jinja2 import augment_hdf5_measured_parameters, render_jinja2, augment_measured_parameters
-from opera.util.tiff_utils import get_geotiff_metadata, get_geotiff_dimensions
-from opera.util.time import get_time_for_filename, get_catalog_metadata_datetime_str
+from opera.util.render_jinja2 import augment_hdf5_measured_parameters, augment_measured_parameters, render_jinja2
+from opera.util.tiff_utils import get_geotiff_dimensions, get_geotiff_metadata
+from opera.util.time import get_catalog_metadata_datetime_str, get_time_for_filename
 
 
 class DispS1PreProcessorMixin(PreProcessorMixin):
@@ -55,7 +55,6 @@ class DispS1PreProcessorMixin(PreProcessorMixin):
         This function does a final check on the schema to ensure the SAS gets all needed and no
         extra options for the configured workflow.
         """
-
         sas_config = self.runconfig.sas_config
 
         extra_keys = []
@@ -931,7 +930,6 @@ class DispS1StaticPreProcessorMixin(DispS1PreProcessorMixin):
         This function does a final check on the schema to ensure the SAS gets all needed and no
         extra options for the configured workflow.
         """
-
         sas_config = self.runconfig.sas_config
 
         extra_keys = []
@@ -973,7 +971,6 @@ class DispS1StaticPreProcessorMixin(DispS1PreProcessorMixin):
             Any keyword arguments needed by the pre-processor
 
         """
-
         PreProcessorMixin.run_preprocessor(self, **kwargs)
 
         self._validate_runconfig_needed_options()
@@ -1007,7 +1004,6 @@ class DispS1StaticPostProcessorMixin(DispS1PostProcessorMixin):
               alongside and is non-zero in size
 
         """
-
         output_dir = abspath(self.runconfig.output_product_path)
 
         # Validate .nc product file
@@ -1065,7 +1061,7 @@ class DispS1StaticPostProcessorMixin(DispS1PostProcessorMixin):
         # the format FXXXXX
         frame_id = f"F{self.runconfig.sas_config['input_file_group']['frame_id']:05d}"
 
-        #TODO: Later deliveries will probably have a better way to derive sensor & valid time
+        # TODO: Later deliveries will probably have a better way to derive sensor & valid time
 
         input_file_sample = self.runconfig.sas_config['dynamic_ancillary_file_group']['static_layers_files'][0]
 
@@ -1125,7 +1121,6 @@ class DispS1StaticPostProcessorMixin(DispS1PostProcessorMixin):
         geotiff_filename : str
             The file name to assign to GeoTIFF product(s) created by this PGE.
         """
-
         # TODO:
         #  I think there should be a better way to do this. The SAS outputs just the band names
         #  (ie, dem_warped_utm.tif) But I need 'dist-s1-static' in the mock filenames to match
@@ -1234,7 +1229,6 @@ class DispS1StaticPostProcessorMixin(DispS1PostProcessorMixin):
             for use with the ISO metadata Jinja2 template.
 
         """
-
         output_product_metadata = dict()
 
         try:

@@ -28,7 +28,7 @@ try:
     from osgeo import osr
 
     osr.UseExceptions()
-except (ImportError, ModuleNotFoundError):  # pragma: no cover
+except ImportError:  # pragma: no cover
     osr = MockOsr                           # pragma: no cover
 # pylint: enable=import-error,invalid-name
 
@@ -64,10 +64,9 @@ def get_hdf5_group_as_dict(file_name, group_path, ignore_keys=None):
         if group_object is None:
             raise RuntimeError(f"An error occurred retrieving object '{group_path}' "
                                f"from file '{file_name}'.")
-        elif isinstance(group_object, h5py.Dataset):
-            result = convert_h5py_dataset(group_object)
-        else:
-            result = convert_h5py_group_to_dict(group_object, ignore_keys)
+
+        result = convert_h5py_dataset(group_object) if isinstance(group_object, h5py.Dataset) else \
+            convert_h5py_group_to_dict(group_object, ignore_keys)
 
     return result
 
@@ -133,12 +132,11 @@ def convert_h5py_dataset(dataset_object):
             result = dataset_object.asstr()[()]
         else:
             result = dataset_object[()]
+    elif isinstance(dataset_object[()], (bytes, np.bytes_)):
+        # decode bytes to str
+        result = dataset_object.asstr()[()]
     else:
-        if isinstance(dataset_object[()], (bytes, np.bytes_)):
-            # decode bytes to str
-            result = dataset_object.asstr()[()]
-        else:
-            result = dataset_object[()]
+        result = dataset_object[()]
 
     return result
 
@@ -268,7 +266,9 @@ def create_test_rtc_metadata_product(file_path):
         burstID_dset = identification_grp.create_dataset("burstID", data=b't069_147170_iw1')
         contactInformation_dset = identification_grp.create_dataset("contactInformation", data=b'operasds@jpl.nasa.gov')
         ceosAnalysisReadyDataDocumentIdentifier_dset = identification_grp.create_dataset(
-            "ceosAnalysisReadyDataDocumentIdentifier", data=b'https://ceos.org/ard/files/PFS/NRB/v5.5/CARD4L-PFS_NRB_v5.5.pdf')
+            "ceosAnalysisReadyDataDocumentIdentifier",
+            data=b'https://ceos.org/ard/files/PFS/NRB/v5.5/CARD4L-PFS_NRB_v5.5.pdf'
+        )
         ceosAnalysisReadyDataProductType_dset = identification_grp.create_dataset("ceosAnalysisReadyDataProductType",
                                                                                   data=b'Normalized Radar Backscatter')
         dataAccess_dset = identification_grp.create_dataset("dataAccess", data=b'(NOT PROVIDED)')
@@ -325,8 +325,10 @@ def get_cslc_s1_product_metadata(file_name):
     cslc_metadata = {
         'identification': get_hdf5_group_as_dict(file_name, f"{S1_SLC_HDF5_PREFIX}/identification"),
         'data': get_hdf5_group_as_dict(file_name, f"{S1_SLC_HDF5_PREFIX}/data", cslc_ignore_list),
-        'processing_information': get_hdf5_group_as_dict(file_name,
-                                                         f"{S1_SLC_HDF5_PREFIX}/metadata/processing_information"),
+        'processing_information': get_hdf5_group_as_dict(
+            file_name,
+            f"{S1_SLC_HDF5_PREFIX}/metadata/processing_information"
+        ),
         'orbit': get_hdf5_group_as_dict(file_name, f"{S1_SLC_HDF5_PREFIX}/metadata/orbit"),
         'quality_assurance': get_hdf5_group_as_dict(file_name, f"{S1_SLC_HDF5_PREFIX}/quality_assurance")
     }
@@ -568,6 +570,7 @@ def create_test_disp_metadata_product(
         omit_cslc_measured_parameters=False
 ):
     # pylint: disable=unused-variable,invalid-name,too-many-locals,too-many-statements,too-many-boolean-expressions
+    # pylint: disable=line-too-long
     """
     Creates a dummy DISP-S1 h5 metadata file with expected groups and datasets.
     This function is intended for use with unit tests, but is included in this
@@ -582,6 +585,7 @@ def create_test_disp_metadata_product(
         (https://github.com/opera-adt/disp-s1/blob/fa562e194f26ebdadfdbe6f0defe80b55f212b4a/src/disp_s1/product.py#L1614-L1647)
 
     """
+    # pylint: enable=line-too-long
     pge_runconfig_contents = """
     input_file_group:
         cslc_file_list:
@@ -686,7 +690,8 @@ def create_test_disp_metadata_product(
             "NASA Jet Propulsion Laboratory on AWS"))
         processing_start_datetime_dset = identification_grp.create_dataset("processing_start_datetime",
                                                                            data=np.bytes_("2025-01-17 22:47:38"))
-        product_data_polarization_dset = identification_grp.create_dataset("product_data_polarization", data=np.bytes_("VV"))
+        product_data_polarization_dset = identification_grp.create_dataset("product_data_polarization",
+                                                                           data=np.bytes_("VV"))
         product_data_access_dset = identification_grp.create_dataset("product_data_access", data=np.bytes_(
             "https://search.asf.alaska.edu/#/?dataset=OPERA-S1&productTypes=DISP-S1"))
         radar_center_frequency_dset = identification_grp.create_dataset("radar_center_frequency", data=5405000454.33435,

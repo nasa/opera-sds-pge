@@ -22,7 +22,7 @@ from os.path import basename, isfile
 import opera.util.time as time_util
 from opera.util import error_codes
 
-from .error_codes import ErrorCode, ERROR_CODE_PGE_OFFSET
+from .error_codes import ERROR_CODE_PGE_OFFSET, ErrorCode
 from .time import get_iso_time
 from .usage_metrics import get_os_metrics
 
@@ -31,6 +31,8 @@ DEBUG = "Debug"
 WARNING = "Warning"
 CRITICAL = "Critical"
 """Constants for logging levels"""
+
+# pylint: disable=too-many-positional-arguments
 
 
 def write(log_stream, severity, workflow, module, error_code, error_location,

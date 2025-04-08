@@ -300,7 +300,6 @@ class MockGdal:  # pragma: no cover
             """Return the width of the mock raster"""
             return 6867
 
-
     @staticmethod
     def Open(filename):
         """Mock implementation for gdal.Open. Returns an instance of the mock Dataset."""
@@ -324,7 +323,7 @@ class MockGdal:  # pragma: no cover
         elif 'disp_s1_static' in file_name or 'disp-s1-static' in file_name:
             return MockGdal.MockDispS1StaticGdalDataset()
         else:
-            raise ValueError(f'Filename does not appear to match existing mock GDAL datasets')
+            raise ValueError('Filename does not appear to match existing mock GDAL datasets')
 
 
 def mock_gdal_edit(args):
