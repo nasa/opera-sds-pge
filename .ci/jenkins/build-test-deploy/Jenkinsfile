@@ -244,11 +244,13 @@ pipeline {
                     sh ".ci/scripts/util/cleanup.sh ${DOCKER_TAG}"
                 }
                 catchError (buildResult: 'FAILURE', stageResult: 'FAILURE', message: 'Conda cleanup failed') {
-                    echo "Removing Sphinx build environment"
-                    sh "/var/lib/jenkins/conda_installs/${RUN_ID}/miniforge/bin/conda env remove --yes --name sphinx_env"
-                    sh "/var/lib/jenkins/conda_installs/${RUN_ID}/miniforge/bin/conda clean -ay"
-                    sh "/var/lib/jenkins/conda_installs/${RUN_ID}/miniforge/bin/conda init --reverse"
-                    sh "rm -rf /var/lib/jenkins/conda_installs/${RUN_ID}/"
+                    if (params.PUBLISH_DOCS) {
+                        echo "Removing Sphinx build environment"
+                        sh "/var/lib/jenkins/conda_installs/${RUN_ID}/miniforge/bin/conda env remove --yes --name sphinx_env"
+                        sh "/var/lib/jenkins/conda_installs/${RUN_ID}/miniforge/bin/conda clean -ay"
+                        sh "/var/lib/jenkins/conda_installs/${RUN_ID}/miniforge/bin/conda init --reverse"
+                        sh "rm -rf /var/lib/jenkins/conda_installs/${RUN_ID}/"
+                    }
                 }
                 deleteDir()
             }
