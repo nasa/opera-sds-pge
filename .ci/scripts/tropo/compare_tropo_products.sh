@@ -29,7 +29,7 @@ fi
 
 initialize_html_results_file "$OUTPUT_DIR" "$PGE_NAME"
 
-echo "<tr><th>Compare Result</th><th><ul><li>Expected file</li><li>Output file</li></ul></th><th>opera_tropo validate output</th></tr>" >> "$RESULTS_FILE"
+echo "<tr><th>Compare Result</th><th><ul><li>Output file</li><li>Expected file</li></ul></th><th>opera_tropo validate output</th></tr>" >> "$RESULTS_FILE"
 
 # overall_status values and their meaning
 # 0 - pass
@@ -93,7 +93,7 @@ do
 
     # add html breaks to newlines
     compare_out="${compare_out//$'\n'/<br>}"
-    update_html_results_file "${compare_result}" "${expected_file}" "${output_file}" "${compare_out}"
+    update_html_results_file "${compare_result}" "${output_file}" "${expected_file}" "${compare_out}"
 done
 
 finalize_html_results_file

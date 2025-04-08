@@ -26,6 +26,8 @@ fi
 
 initialize_html_results_file "$OUTPUT_DIR" "$PGE_NAME"
 
+echo "<tr><th>Compare Result</th><th><ul><li>Output file</li><li>Expected file</li></ul></th><th>rtc_s1_compare.py output</th></tr>" >> "$RESULTS_FILE"
+
 # overall_status values and their meaning
 # 0 - pass
 # 1 - failure to execute some part of this script
@@ -73,7 +75,7 @@ for burst_id in "${burst_ids[@]}"; do
 
     # add html breaks to newlines
     compare_output=${compare_output//$'\n'/<br>$'\n'}
-    update_html_results_file "${rtc_compare_result}" "${expected_files}" "${output_files}" "${compare_output}"
+    update_html_results_file "${rtc_compare_result}" "${output_files}" "${expected_files}" "${compare_output}"
 done
 
 finalize_html_results_file

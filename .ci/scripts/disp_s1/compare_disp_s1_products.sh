@@ -30,7 +30,7 @@ fi
 
 initialize_html_results_file "$OUTPUT_DIR" "$PGE_NAME"
 
-echo "<tr><th>Compare Result</th><th><ul><li>Expected file</li><li>Output file</li></ul></th><th>disp_s1_compare.py output</th></tr>" >> "$RESULTS_FILE"
+echo "<tr><th>Compare Result</th><th><ul><li>Output file</li><li>Expected file</li></ul></th><th>disp_s1_compare.py output</th></tr>" >> "$RESULTS_FILE"
 
 # overall_status values and their meaning
 # 0 - pass
