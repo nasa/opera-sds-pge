@@ -36,6 +36,7 @@ ${BUILD_SCRIPTS_DIR}/disp_s1/build_disp_s1.sh --tag ${TAG} --workspace ${WORKSPA
 ${BUILD_SCRIPTS_DIR}/dswx_ni/build_dswx_ni.sh --tag ${TAG} --workspace ${WORKSPACE}
 ${BUILD_SCRIPTS_DIR}/dist_s1/build_dist_s1.sh --tag ${TAG} --workspace ${WORKSPACE}
 ${BUILD_SCRIPTS_DIR}/tropo/build_tropo.sh --tag ${TAG} --workspace ${WORKSPACE}
+${BUILD_SCRIPTS_DIR}/disp_ni/build_disp_ni.sh --tag ${TAG} --workspace ${WORKSPACE}
 
 echo 'Build Complete'
 
