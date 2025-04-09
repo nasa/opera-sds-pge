@@ -27,6 +27,8 @@ fi
 
 initialize_html_results_file "$OUTPUT_DIR" "$PGE_NAME"
 
+echo "<tr><th>Compare Result</th><th><ul><li>Output file</li><li>Expected file</li></ul></th><th>dswx_compare.py output</th></tr>" >> "$RESULTS_FILE"
+
 # Compare output files against expected files
 for output_file in "$OUTPUT_DIR"/*
 do

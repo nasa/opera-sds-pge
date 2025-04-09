@@ -32,7 +32,7 @@ if [ ! -d "$EXPECTED_DIR" ]; then
 fi
 
 initialize_html_results_file "$OUTPUT_DIR" "$PGE_NAME"
-echo "<tr><th>Compare Result</th><th><ul><li>Expected file</li><li>Output file</li></ul></th><th>cslc_s1_compare.py output</th></tr>" >> "$RESULTS_FILE"
+echo "<tr><th>Compare Result</th><th><ul><li>Output file</li><li>Expected file</li></ul></th><th>cslc_s1_compare.py output</th></tr>" >> "$RESULTS_FILE"
 
 declare -a burst_ids=("t064_135518_iw1"
                       "t064_135519_iw1"
@@ -70,7 +70,7 @@ for burst_id in "${burst_ids[@]}"; do
     fi
 
     compare_out="${compare_out//$'\n'/<br>}"
-    update_html_results_file "${static_layers_compare_result}" "${ref_product}" "${sec_product}" "${compare_out}"
+    update_html_results_file "${static_layers_compare_result}" "${sec_product}" "${ref_product}" "${compare_out}"
 done
 
 finalize_html_results_file
