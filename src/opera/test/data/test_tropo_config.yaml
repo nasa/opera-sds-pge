@@ -6,7 +6,7 @@ RunConfig:
         PGEName: TROPO_PGE
       InputFilesGroup:
         InputFilePaths:
-        - tropo_pge_test/input_dir/ECMWF_TROP_202402151200_202402151200_1.nc
+        - tropo_pge_test/input_dir
       DynamicAncillaryFilesGroup:
         AncillaryFileMap: {}
       ProductPathGroup:
