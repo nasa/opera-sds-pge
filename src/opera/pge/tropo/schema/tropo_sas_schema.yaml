@@ -35,7 +35,8 @@ worker_settings:
   threads_per_worker: int(required=True, min=1)
 
   # Workers are given a target memory limit in dask.Client.
-  max_memory: int(required=False)
+  # Requires "GB" ex: 8GB
+  max_memory: str(required=False)
   
   # Dask local spill directory within work directory.
   dask_temp_dir: str(required=False)

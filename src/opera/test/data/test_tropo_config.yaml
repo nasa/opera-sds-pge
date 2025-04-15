@@ -64,7 +64,7 @@ RunConfig:
         threads_per_worker: 2
         # Max memory to use per worker in GB. 
         #   Type: integer.
-        max_memory: 8
+        max_memory: 8GB
         # Dask local spill directory 
         #   Type: string.
         dask_temp_dir: tmp
