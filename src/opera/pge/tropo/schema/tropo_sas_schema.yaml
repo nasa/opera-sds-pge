@@ -5,6 +5,9 @@
 input_file:
   # Path to HRES model file.
   input_file_path: str(required=True)
+  # Format of dates contained in s3 HRES folder.
+  # Default: "%Y%m%d"
+  date_fmt: str(required=False)
 
 primary_executable:
   # Product type of the PGE.
@@ -24,27 +27,44 @@ product_path_group:
   product_version: str(required=False)
 
 worker_settings:
-  # Number of workers to run in parallel 
+  # Number of workers to use in dask.Client.
   n_workers: int(required=True, min=1)
 
-  # Number of threads to use per worker. This sets the OMP_NUM_THREADS 
-  # environment variable in each python process.
+  # Number of threads to use per worker in dask.Client. This sets the 
+  # OMP_NUM_THREADS environment variable in each python process.
   threads_per_worker: int(required=True, min=1)
 
-  # Max memory to use per worker in GB. 
-  max_memory: int(required=False, min=2)
+  # Workers are given a target memory limit in dask.Client.
+  # Requires "GB" ex: 8GB
+  max_memory: str(required=False)
   
-  # Dask local spill directory 
+  # Dask local spill directory within work directory.
   dask_temp_dir: str(required=False)
 
   # Size (rows, columns) of blocks of data to load at a time.
   block_shape: list(int, required=False, min=2, max=2)
 
 output_options:
-  # Output height levels for ZTD, if empty use default HRES 145 levels.
+  # Output Date Format for OPERA TROPO
+  # Default: %Y%m%dT%H%M%S"
+  date_fmt: str(required=False)
+
+  # Time the config file was created
+  creation_time: str(required=False)
+
+  # Clip heights above specified maximum height.
+  max_height: int(required=False)
+
+  # Output height level to hydrostatic and wet delay
+  # Default: HRES native 145 height levels.
   output_heights: list(required=False)
 
+  # Ouput chunks (time, height, lat, lon).
+  # Default: (1, 64, 64, 64)
+  chunk_size: list(int, required=False, min=4, max=4)
+
   # Level of compression applied to netcdf
+  # Default: {"zlib": True, "complevel": 5, "shuffle": True}
   compression_kwargs: include('compression_kwargs_options', required=False)
 
 # Path to the output log file in addition to logging to stderr.
@@ -52,7 +72,6 @@ log_file: str(required=False)
 
 ---
 compression_kwargs_options:
-  compression_flag: bool(required=False)
   zlib: bool(required=False)
   complevel: int(required=False, min=0, max=9)
   shuffle: bool(required=False)

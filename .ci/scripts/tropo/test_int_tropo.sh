@@ -28,9 +28,9 @@ SAMPLE_TIME=1
 # RUNCONFIG should be the name of the runconfig file  in <repo_root>/.ci/scripts/tropo/
 [ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath "$(dirname "$(realpath "$0")")"/../../..)
 [ -z "${PGE_TAG}" ] && PGE_TAG="${USER}-dev"
-[ -z "${INPUT_DATA}" ] && INPUT_DATA="tropo_interface_0.1_expected_input.zip "
-[ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="tropo_interface_0.1_expected_output.zip "
-[ -z "${RUNCONFIG}" ] && RUNCONFIG="opera_pge_tropo_0.1_beta_runconfig.yaml"
+[ -z "${INPUT_DATA}" ] && INPUT_DATA="tropo_calval_0.2_expected_input.zip "
+[ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="tropo_calval_0.2_expected_output.zip "
+[ -z "${RUNCONFIG}" ] && RUNCONFIG="opera_pge_tropo_0.2_calval_runconfig.yaml"
 [ -z "${TMP_ROOT}" ] && TMP_ROOT="$DEFAULT_TMP_ROOT"
 
 # Create the test output directory in the work space
