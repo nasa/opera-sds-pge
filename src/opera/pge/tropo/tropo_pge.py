@@ -123,7 +123,7 @@ class TROPOExecutor(TROPOPreProcessorMixin, TROPOPostProcessorMixin, PgeExecutor
     PGE_VERSION = "3.0.0-er.1.0"
     """Version of the PGE"""
 
-    SAS_VERSION = "0.1"
+    SAS_VERSION = "0.2"
     """Version of the SAS wrapped by this PGE, should be updated as needed"""
 
     def __init__(self, pge_name, runconfig_path, **kwargs):
