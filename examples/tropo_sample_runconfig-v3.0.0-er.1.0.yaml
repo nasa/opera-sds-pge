@@ -20,7 +20,7 @@ RunConfig:
         # List of input files/directories
         # Must be a list of input netCDF files
         InputFilePaths:
-        - /home/ops/input_dir/20190613/D06130600061306001.zz.nc
+        - /home/ops/input_dir/ECMWF_TROP_202402151200_202402151200_1.nc
 
       DynamicAncillaryFilesGroup:
         # Map of ancillary file types to paths to the file
@@ -49,7 +49,7 @@ RunConfig:
         ProductIdentifier: TROPO
 
         # Product version specific to output products
-        ProductVersion: "0.1"
+        ProductVersion: "0.2"
 
         # Path to the executable to run, path must be reachable from
         # within the Docker container (i.e. findable with a "which" command)
@@ -124,7 +124,7 @@ RunConfig:
       input_file:
         # REQUIRED: path to HRES model file.
         #   Type: string | Path.
-        input_file_path: /home/ops/input_dir/20190613/D06130600061306001.zz.nc
+        input_file_path: /home/ops/input_dir/ECMWF_TROP_202402151200_202402151200_1.nc
       primary_executable:
         # Product type of the PGE.
         #   Type: string.
@@ -141,7 +141,7 @@ RunConfig:
         sas_output_path: /home/ops/output_dir
         # Version of the product, in <major>.<minor> format.
         #   Type: string.
-        product_version: '0.1'
+        product_version: '0.2'
       worker_settings:
         # Number of workers to run in parallel 
         #   Type: integer.
@@ -165,10 +165,19 @@ RunConfig:
         # Output height levels for ZTD, if empty use default HRES 145 levels.
         #   Type: list.
         output_heights: []
+        # Clip heights above specified maximum height.
+        #    Type: int
+        max_height: 81000
+        # Ouput chunks (time, height, lat, lon).
+        #   Type: array.
+        chunk_size:
+          - 1
+          - 64
+          - 64
+          - 64
         # Level of compression applied to netcdf
         #   Type: dict.
         compression_kwargs:
-          compression_flag: true
           zlib: true
           complevel: 5
           shuffle: true

@@ -6,7 +6,7 @@ RunConfig:
         PGEName: TROPO_PGE
       InputFilesGroup:
         InputFilePaths:
-        - tropo_pge_test/input_dir
+        - tropo_pge_test/input_dir/ECMWF_TROP_202402151200_202402151200_1.nc
       DynamicAncillaryFilesGroup:
         AncillaryFileMap: {}
       ProductPathGroup:
@@ -14,12 +14,12 @@ RunConfig:
         ScratchPath: tropo_pge_test/scratch_dir
       PrimaryExecutable:
         ProductIdentifier: TROPO
-        ProductVersion: "1.0"
+        ProductVersion: "0.2"
         ProgramPath: /bin/echo
         ProgramOptions:
         - 'hello world > tropo_pge_test/output_dir/tropo_test.nc;'
         - '/bin/echo TROPO invoked with RunConfig'
-        ErrorCodeBase: 400000
+        ErrorCodeBase: 800000
         SchemaPath: pge/tropo/schema/tropo_sas_schema.yaml
         AlgorithmParametersSchemaPath: 
         IsoMeasuredParameterDescriptions:
@@ -36,7 +36,7 @@ RunConfig:
       input_file:
         # REQUIRED: path to HRES model file.
         #   Type: string | Path.
-        input_file_path: input_data/D01010000010100001.zz.nc
+        input_file_path: input_data/ECMWF_TROP_202402151200_202402151200_1.nc
       primary_executable:
         # Product type of the PGE.
         #   Type: string.
@@ -53,7 +53,7 @@ RunConfig:
         sas_output_path: tropo_pge_test/output_dir
         # Version of the product, in <major>.<minor> format.
         #   Type: string.
-        product_version: '0.1'
+        product_version: '0.2'
       worker_settings:
         # Number of workers to run in parallel 
         #   Type: integer.
@@ -74,13 +74,22 @@ RunConfig:
           - 128
           - 128
       output_options:
+        # Ouput chunks (time, height, lat, lon).
+        #   Type: array.
+        chunk_size:
+          - 1
+          - 64
+          - 64
+          - 64
         # Output height levels for ZTD, if empty use default HRES 145 levels.
         #   Type: list.
         output_heights: []
+        # Clip heights above specified maximum height.
+        #    Type: int
+        max_height: 81000
         # Level of compression applied to netcdf
         #   Type: dict.
         compression_kwargs:
-          compression_flag: true
           zlib: true
           complevel: 5
           shuffle: true

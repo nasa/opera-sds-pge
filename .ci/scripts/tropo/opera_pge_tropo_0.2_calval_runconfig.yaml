@@ -6,7 +6,7 @@ RunConfig:
         PGEName: TROPO_PGE
       InputFilesGroup:
         InputFilePaths:
-        - /home/ops/input_dir/20190613/D06130600061306001.zz.nc
+        - /home/ops/input_dir/ECMWF_TROP_202402151200_202402151200_1.nc
       DynamicAncillaryFilesGroup:
         AncillaryFileMap: {}
       ProductPathGroup:
@@ -14,7 +14,7 @@ RunConfig:
         ScratchPath: /home/ops/scratch_dir
       PrimaryExecutable:
         ProductIdentifier: TROPO
-        ProductVersion: "0.1"
+        ProductVersion: "0.2"
         ProgramPath: opera_tropo
         ProgramOptions:
         - run
@@ -35,7 +35,7 @@ RunConfig:
       input_file:
         # REQUIRED: path to HRES model file.
         #   Type: string | Path.
-        input_file_path: /home/ops/input_dir/20190613/D06130600061306001.zz.nc
+        input_file_path: /home/ops/input_dir/ECMWF_TROP_202402151200_202402151200_1.nc
       primary_executable:
         # Product type of the PGE.
         #   Type: string.
@@ -52,7 +52,7 @@ RunConfig:
         sas_output_path: /home/ops/output_dir
         # Version of the product, in <major>.<minor> format.
         #   Type: string.
-        product_version: '0.1'
+        product_version: '0.2'
       worker_settings:
         # Number of workers to run in parallel 
         #   Type: integer.
@@ -73,13 +73,19 @@ RunConfig:
           - 128
           - 128
       output_options:
+        # Ouput chunks (time, height, lat, lon).
+        #   Type: array.
+        chunk_size:
+          - 1
+          - 64
+          - 64
+          - 64
         # Output height levels for ZTD, if empty use default HRES 145 levels.
         #   Type: list.
         output_heights: []
         # Level of compression applied to netcdf
         #   Type: dict.
         compression_kwargs:
-          compression_flag: true
           zlib: true
           complevel: 5
           shuffle: true
