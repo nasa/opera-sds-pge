@@ -20,6 +20,7 @@ from pkg_resources import resource_filename
 from opera.util.logger import PgeLogger
 from opera.util.run_utils import create_qa_command_line
 from opera.util.run_utils import create_sas_command_line
+from opera.util.run_utils import get_traceback_from_log
 from opera.util.run_utils import time_and_execute
 
 
@@ -39,6 +40,7 @@ class RunUtilsTestCase(unittest.TestCase):
         """
         cls.starting_dir = abspath(os.curdir)
         cls.test_dir = resource_filename(__name__, "")
+        cls.data_dir = os.path.join(cls.test_dir, os.pardir, "data")
 
         os.chdir(cls.test_dir)
 
@@ -195,3 +197,25 @@ class RunUtilsTestCase(unittest.TestCase):
         # Check for the erroneous run (note this test is generalized to work
         # on both linux and osx)
         self.assertIn(str(command_line), log)
+
+    def test_get_traceback_from_log(self):
+        """Tests for run_utils.get_traceback_from_log()"""
+        # Test with canned SAS log output that contains a Traceback section, along with
+        # other logging messages that should not be included (such as tqdm output)
+        with open(os.path.join(self.data_dir, "test_sas_log_with_traceback.txt"), "r") as infile:
+            log_contents = infile.read()
+
+        traceback_string = get_traceback_from_log(log_contents)
+
+        self.assertTrue(traceback_string)
+        self.assertTrue(traceback_string.startswith("Traceback (most recent call last)"))
+        self.assertTrue(traceback_string.endswith("IndexError: list index out of range"))
+
+        # Test with a sample log that has no Traceback in it
+        with open(os.path.join(self.data_dir, "test_sas_log.txt"), "r") as infile:
+            log_contents = infile.read()
+
+        traceback_string = get_traceback_from_log(log_contents)
+
+        # Should have gotten empty string back
+        self.assertFalse(traceback_string)
