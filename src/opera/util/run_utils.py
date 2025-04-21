@@ -70,18 +70,23 @@ def get_traceback_from_log(log_contents):
 
     Returns
     -------
-        traceback_match : re.Match
-            The result of the regex search for a traceback. If none could be found,
-            None will be returned.
+    traceback_string : str
+        The parsed result of the regex search for a traceback. If none could be
+        found, an empty string is returned.
 
     """
+    result = ""
+
     exception_pattern = re.compile(
         r"Traceback \(most recent call last\):(?:\n.*)+?\n(.*?(?:Exception|Error):)\s*(.+)"
     )
 
-    trackback_match = exception_pattern.search(log_contents)
+    traceback_match = exception_pattern.search(log_contents)
 
-    return trackback_match
+    if traceback_match:
+        result = traceback_match.string[traceback_match.start():traceback_match.end()].strip()
+
+    return result
 
 
 def create_sas_command_line(sas_program_path, sas_runconfig_path,
@@ -239,15 +244,15 @@ def time_and_execute(command_line, logger, execute_via_shell=False):
     logger.append(run_result.stdout.decode())
 
     if run_result.returncode:
-        # Parse out the traceback stack(s) from the log to include with the error
-        # message that will be propagated back to an SDS operator
-        traceback_match = get_traceback_from_log(run_result.stdout.decode())
+        # Parse out the traceback stack from the SAS log to include with the error
+        # message that's propagated back to an SDS operator
+        traceback_string = get_traceback_from_log(run_result.stdout.decode())
 
         error_msg = (f'Command "{str(command_line)}" failed with exit '
                      f'code {run_result.returncode}')
 
-        if traceback_match:
-            error_msg += f', Traceback from log:\n{traceback_match.string}'
+        if traceback_string:
+            error_msg += f', Traceback from log:\n{traceback_string}'
 
         logger.critical(module_name, ErrorCode.SAS_PROGRAM_FAILED, error_msg)
 

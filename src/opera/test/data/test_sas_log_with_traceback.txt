@@ -1,0 +1,128 @@
+<Example SAS output follows>
+Despeckling batch:   0%|          | 0/1 [00:00<?, ?it/s]
+Despeckling:   0%|          | 0/74 [00:00<?, ?it/s][A
+Despeckling:   1%|▏         | 1/74 [00:06<07:30,  6.18s/it][A
+Despeckling:   4%|▍         | 3/74 [00:06<01:56,  1.64s/it][A
+Despeckling:   7%|▋         | 5/74 [00:06<01:00,  1.15it/s][A
+Despeckling:   8%|▊         | 6/74 [00:08<01:12,  1.06s/it][A
+Despeckling:   9%|▉         | 7/74 [00:08<00:54,  1.22it/s][A
+Despeckling:  12%|█▏        | 9/74 [00:08<00:31,  2.04it/s][A
+Despeckling:  14%|█▎        | 10/74 [00:08<00:28,  2.26it/s][A
+Despeckling:  15%|█▍        | 11/74 [00:10<00:41,  1.51it/s][A
+Despeckling:  16%|█▌        | 12/74 [00:10<00:34,  1.82it/s][A
+Despeckling:  18%|█▊        | 13/74 [00:10<00:32,  1.86it/s][A
+Despeckling:  20%|██        | 15/74 [00:11<00:19,  2.97it/s][A
+Despeckling:  22%|██▏       | 16/74 [00:12<00:29,  1.98it/s][A
+Despeckling:  23%|██▎       | 17/74 [00:12<00:25,  2.21it/s][A
+Despeckling:  24%|██▍       | 18/74 [00:12<00:25,  2.22it/s][A
+Despeckling:  26%|██▌       | 19/74 [00:13<00:26,  2.09it/s][A
+Despeckling:  28%|██▊       | 21/74 [00:14<00:24,  2.19it/s][A
+Despeckling:  30%|██▉       | 22/74 [00:14<00:20,  2.57it/s][A
+Despeckling:  31%|███       | 23/74 [00:14<00:19,  2.57it/s][A
+Despeckling:  32%|███▏      | 24/74 [00:15<00:21,  2.33it/s][A
+Despeckling:  34%|███▍      | 25/74 [00:15<00:16,  2.93it/s][A
+Despeckling:  35%|███▌      | 26/74 [00:16<00:25,  1.86it/s][A
+Despeckling:  36%|███▋      | 27/74 [00:16<00:22,  2.11it/s][A
+Despeckling:  38%|███▊      | 28/74 [00:17<00:19,  2.38it/s][A
+Despeckling:  39%|███▉      | 29/74 [00:17<00:18,  2.41it/s][A
+Despeckling:  42%|████▏     | 31/74 [00:18<00:19,  2.17it/s][A
+Despeckling:  43%|████▎     | 32/74 [00:18<00:17,  2.42it/s][A
+Despeckling:  45%|████▍     | 33/74 [00:19<00:15,  2.64it/s][A
+Despeckling:  46%|████▌     | 34/74 [00:19<00:14,  2.71it/s][A
+Despeckling:  47%|████▋     | 35/74 [00:19<00:12,  3.10it/s][A
+Despeckling:  49%|████▊     | 36/74 [00:20<00:19,  1.91it/s][A
+Despeckling:  50%|█████     | 37/74 [00:20<00:14,  2.49it/s][A
+Despeckling:  51%|█████▏    | 38/74 [00:21<00:13,  2.59it/s][A
+Despeckling:  53%|█████▎    | 39/74 [00:21<00:13,  2.64it/s][A
+Despeckling:  54%|█████▍    | 40/74 [00:21<00:11,  3.06it/s][A
+Despeckling:  55%|█████▌    | 41/74 [00:22<00:17,  1.85it/s][A
+Despeckling:  57%|█████▋    | 42/74 [00:22<00:13,  2.32it/s][A
+Despeckling:  58%|█████▊    | 43/74 [00:23<00:12,  2.42it/s][A
+Despeckling:  59%|█████▉    | 44/74 [00:23<00:11,  2.60it/s][A
+Despeckling:  61%|██████    | 45/74 [00:23<00:10,  2.87it/s][A
+Despeckling:  62%|██████▏   | 46/74 [00:24<00:15,  1.79it/s][A
+Despeckling:  64%|██████▎   | 47/74 [00:24<00:11,  2.31it/s][A
+Despeckling:  65%|██████▍   | 48/74 [00:25<00:10,  2.39it/s][A
+Despeckling:  66%|██████▌   | 49/74 [00:25<00:08,  2.80it/s][A
+Despeckling:  68%|██████▊   | 50/74 [00:26<00:11,  2.11it/s][A
+Despeckling:  69%|██████▉   | 51/74 [00:27<00:14,  1.54it/s][A
+Despeckling:  70%|███████   | 52/74 [00:27<00:10,  2.03it/s][A
+Despeckling:  72%|███████▏  | 53/74 [00:27<00:08,  2.50it/s][A
+Despeckling:  73%|███████▎  | 54/74 [00:27<00:06,  3.03it/s][A
+Despeckling:  74%|███████▍  | 55/74 [00:28<00:07,  2.44it/s][A
+Despeckling:  76%|███████▌  | 56/74 [00:29<00:12,  1.41it/s][A
+Despeckling:  77%|███████▋  | 57/74 [00:30<00:09,  1.75it/s][A
+Despeckling:  80%|███████▉  | 59/74 [00:30<00:05,  2.88it/s][A
+Despeckling:  81%|████████  | 60/74 [00:30<00:05,  2.77it/s][A
+Despeckling:  82%|████████▏ | 61/74 [00:32<00:08,  1.62it/s][A
+Despeckling:  84%|████████▍ | 62/74 [00:32<00:06,  1.89it/s][A
+Despeckling:  85%|████████▌ | 63/74 [00:32<00:05,  2.04it/s][A
+Despeckling:  86%|████████▋ | 64/74 [00:32<00:04,  2.31it/s][A
+Despeckling:  88%|████████▊ | 65/74 [00:33<00:03,  2.63it/s][A
+Despeckling:  89%|████████▉ | 66/74 [00:34<00:04,  1.75it/s][A
+Despeckling:  91%|█████████ | 67/74 [00:34<00:03,  2.29it/s][A
+Despeckling:  92%|█████████▏| 68/74 [00:34<00:02,  2.39it/s][A
+Despeckling:  93%|█████████▎| 69/74 [00:35<00:01,  2.52it/s][A
+Despeckling:  95%|█████████▍| 70/74 [00:35<00:01,  2.88it/s][A
+Despeckling:  96%|█████████▌| 71/74 [00:36<00:01,  1.91it/s][A
+Despeckling:  97%|█████████▋| 72/74 [00:36<00:00,  2.48it/s][A
+Despeckling:  99%|█████████▊| 73/74 [00:36<00:00,  2.65it/s][A
+Despeckling: 100%|██████████| 74/74 [00:37<00:00,  2.57it/s][ADespeckling: 100%|██████████| 74/74 [00:37<00:00,  1.99it/s]
+Despeckling batch: 100%|██████████| 1/1 [00:54<00:00, 54.14s/it]Despeckling batch: 100%|██████████| 1/1 [00:54<00:00, 54.14s/it]
+<This line should not be included in captured Traceback>
+Traceback (most recent call last):
+  File "/opt/miniforge/envs/dist-s1-env/bin/dist-s1", line 8, in <module>
+    sys.exit(cli())
+             ~~~^^
+  File "/opt/miniforge/envs/dist-s1-env/lib/python3.13/site-packages/click/core.py", line 1161, in __call__
+    return self.main(*args, **kwargs)
+           ~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/opt/miniforge/envs/dist-s1-env/lib/python3.13/site-packages/click/core.py", line 1082, in main
+    rv = self.invoke(ctx)
+  File "/opt/miniforge/envs/dist-s1-env/lib/python3.13/site-packages/click/core.py", line 1697, in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+                           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/opt/miniforge/envs/dist-s1-env/lib/python3.13/site-packages/click/core.py", line 1443, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+           ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/miniforge/envs/dist-s1-env/lib/python3.13/site-packages/click/core.py", line 788, in invoke
+    return __callback(*args, **kwargs)
+  File "/opt/miniforge/envs/dist-s1-env/lib/python3.13/site-packages/dist_s1/__main__.py", line 181, in run_sas
+    run_dist_s1_sas_workflow(run_config)
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/opt/miniforge/envs/dist-s1-env/lib/python3.13/site-packages/dist_s1/workflows.py", line 340, in run_dist_s1_sas_workflow
+    _ = run_dist_s1_processing_workflow(run_config)
+  File "/opt/miniforge/envs/dist-s1-env/lib/python3.13/site-packages/dist_s1/workflows.py", line 278, in run_dist_s1_processing_workflow
+    run_normal_param_estimation_workflow(run_config)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/opt/miniforge/envs/dist-s1-env/lib/python3.13/site-packages/dist_s1/workflows.py", line 130, in run_normal_param_estimation_workflow
+    df_burst_distmetrics = run_config.df_burst_distmetrics
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/miniforge/envs/dist-s1-env/lib/python3.13/site-packages/dist_s1/data_models/runconfig_model.py", line 371, in df_burst_distmetrics
+    ] = df_dist_by_burst.apply(
+        ~~~~~~~~~~~~~~~~~~~~~~^
+        generate_burst_dist_paths,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+        n_lookbacks=self.n_lookbacks,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/opt/miniforge/envs/dist-s1-env/lib/python3.13/site-packages/pandas/core/frame.py", line 10374, in apply
+    return op.apply().__finalize__(self, method="apply")
+           ~~~~~~~~^^
+  File "/opt/miniforge/envs/dist-s1-env/lib/python3.13/site-packages/pandas/core/apply.py", line 916, in apply
+    return self.apply_standard()
+           ~~~~~~~~~~~~~~~~~~~^^
+  File "/opt/miniforge/envs/dist-s1-env/lib/python3.13/site-packages/pandas/core/apply.py", line 1063, in apply_standard
+    results, res_index = self.apply_series_generator()
+                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/opt/miniforge/envs/dist-s1-env/lib/python3.13/site-packages/pandas/core/apply.py", line 1081, in apply_series_generator
+    results[i] = self.func(v, *self.args, **self.kwargs)
+                 ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/miniforge/envs/dist-s1-env/lib/python3.13/site-packages/dist_s1/data_models/runconfig_model.py", line 54, in generate_burst_dist_paths
+    acq_date = date_lut[burst_id][n_lookbacks - lookback - 1]
+               ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+IndexError: list index out of range
+
+<Additional logging that should not be included in captured traceback>
