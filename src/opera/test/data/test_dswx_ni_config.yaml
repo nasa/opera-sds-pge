@@ -40,6 +40,7 @@ RunConfig:
         SchemaPath: pge/dswx_ni/schema/dswx_ni_sas_schema.yaml
         AlgorithmParametersSchemaPath: pge/dswx_ni/schema/algorithm_parameters_ni_schema.yaml
         IsoTemplatePath: pge/dswx_ni/templates/OPERA_ISO_metadata_L3_DSWx_NI_template.xml.jinja2
+        IsoMeasuredParameterDescriptions: pge/dswx_ni/templates/dswx_ni_measured_parameters.yaml
       QAExecutable:
         Enabled: false
         ProgramPath: null

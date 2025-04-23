@@ -16,7 +16,8 @@ from opera.pge.base.base_pge import PgeExecutor
 from opera.pge.dswx_s1.dswx_s1_pge import DSWxS1PostProcessorMixin, DSWxS1PreProcessorMixin
 from opera.util.error_codes import ErrorCode
 from opera.util.geo_utils import get_geographic_boundaries_from_mgrs_tile
-from opera.util.mock_utils import MockGdal
+from opera.util.render_jinja2 import augment_measured_parameters
+from opera.util.tiff_utils import get_geotiff_metadata
 from opera.util.time import get_time_for_filename
 
 
@@ -172,11 +173,16 @@ class DSWxNIPostProcessorMixin(DSWxS1PostProcessorMixin):
             for use with the ISO metadata Jinja2 template.
 
         """
+        output_product_metadata = {}
+
         # Extract all metadata assigned by the SAS at product creation time
-        # TODO: current DSWx-NI GeoTIFF products do not contain any metadata
-        #       so just use the mock set for the time being
         try:
-            output_product_metadata = MockGdal.MockDSWxNIGdalDataset().GetMetadata()
+            measured_parameters = get_geotiff_metadata(geotiff_product)
+            output_product_metadata['MeasuredParameters'] = augment_measured_parameters(
+                measured_parameters,
+                self.runconfig.iso_measured_parameter_descriptions,
+                self.logger
+            )
         except Exception as err:
             msg = f'Failed to extract metadata from {geotiff_product}, reason: {err}'
             self.logger.critical(self.name, ErrorCode.ISO_METADATA_COULD_NOT_EXTRACT_METADATA, msg)
