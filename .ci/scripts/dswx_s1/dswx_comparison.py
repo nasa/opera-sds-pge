@@ -14,7 +14,8 @@ COMPARISON_EXCEPTION_LIST = ['PROCESSING_DATETIME',
                              'INPUT_REFERENCE_WATER_SOURCE',
                              'INPUT_HAND_SOURCE',
                              'INPUT_SHORELINE_SOURCE',
-                             'SOFTWARE_VERSION',]
+                             'SOFTWARE_VERSION',
+                             'INPUT_L1_SLC_GRANULES']
 
 
 def _get_parser():
