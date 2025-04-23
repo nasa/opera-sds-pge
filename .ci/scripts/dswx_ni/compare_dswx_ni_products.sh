@@ -29,6 +29,12 @@ initialize_html_results_file "$OUTPUT_DIR" "$PGE_NAME"
 
 echo "<tr><th>Compare Result</th><th><ul><li>Output file</li><li>Expected file</li></ul></th><th>dswx_compare.py output</th></tr>" >> "$RESULTS_FILE"
 
+# overall_status values and their meaning
+# 0 - pass
+# 1 - failure to execute some part of this script
+# 2 - product validation failure
+overall_status=0
+
 # Compare output files against expected files
 for output_file in "$OUTPUT_DIR"/*
 do
