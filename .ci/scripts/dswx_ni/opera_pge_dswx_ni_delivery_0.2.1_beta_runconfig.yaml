@@ -31,24 +31,24 @@ RunConfig:
           # Path to the Digital Elevation Model
           # Must be either a single .tif, or a .vrt that points to one
           # or more .tif files
-          dem_file: /home/dswx_user/input_dir/ancillary_data/dem.tif
+          dem_file: /home/dswx_user/input_dir/ancillary_data/dem.vrt
 
           # Path to the Discrete Classification Map
           # Must point to a single .tif, or a .vrt that points to one or
           # more .tif files
-          hand_file: /home/dswx_user/input_dir/ancillary_data/hand.tif
+          hand_file: /home/dswx_user/input_dir/ancillary_data/hand.vrt
 
           # Path to the reference water map
           # Must point to a single .tif, or a .vrt that points to one or
           # more .tif files
-          reference_water_file: /home/dswx_user/input_dir/ancillary_data/reference_water.tif
+          reference_water_file: /home/dswx_user/input_dir/ancillary_data/reference_water.vrt
 
           # Path to the Worldcover map
           # Must point to a single .tif, or a .vrt that points to one or
           # more .tif files
-          worldcover_file: /home/dswx_user/input_dir/ancillary_data/worldcover.tif
+          worldcover_file: /home/dswx_user/input_dir/ancillary_data/worldcover.vrt
 
-          glad_classification_file: /home/dswx_user/input_dir/ancillary_data/glad_classification.tif
+          glad_classification_file: /home/dswx_user/input_dir/ancillary_data/glad.vrt
 
       ProductPathGroup:
         # Path to where output products should be stored
@@ -185,7 +185,7 @@ RunConfig:
             # HAND description
             hand_file_description: 'ASF HAND GLO30'
 
-            glad_classification_file: /home/dswx_user/input_dir/ancillary_data/glad_classification.vrt
+            glad_classification_file: /home/dswx_user/input_dir/ancillary_data/glad.vrt
 
             # placeholders for inundated vegetation
             mean_backscattering:
