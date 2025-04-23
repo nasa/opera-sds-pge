@@ -15,7 +15,10 @@ COMPARISON_EXCEPTION_LIST = ['PROCESSING_DATETIME',
                              'INPUT_HAND_SOURCE',
                              'INPUT_SHORELINE_SOURCE',
                              'SOFTWARE_VERSION',
-                             'INPUT_L1_SLC_GRANULES']
+                             # TODO: The following should be checked but DSWx-NI outputs them in an inconsistent order
+                             'INPUT_L1_SLC_GRANULES',
+                             'ZERO_DOPPLER_START_TIME',
+                             'ZERO_DOPPLER_END_TIME']
 
 
 def _get_parser():
@@ -28,10 +31,6 @@ def _get_parser():
                         type=str,
                         nargs=2,
                         help='Input images')
-
-    parser.add_argument('--ignore-metadata',
-                        action='store_true',
-                        help='Don\'t compare metadata')
 
     return parser
 
@@ -126,7 +125,7 @@ def _compare_dswx_sar_metadata(metadata_1, metadata_2):
     return metadata_error_message, flag_same_metadata
 
 
-def compare_dswx_sar_products(file_1, file_2, ignore_metadata=False):
+def compare_dswx_sar_products(file_1, file_2):
     """
     Compare DSWx-SAR products
 
@@ -136,8 +135,6 @@ def compare_dswx_sar_products(file_1, file_2, ignore_metadata=False):
             First DSWx-SAR product
        file_2: dict
             Second DSWx-SAR product
-       ignore_metadata: bool
-            Skip metadata comparison
     """
     if not os.path.isfile(file_1):
         print(f'ERROR file not found: {file_1}')
@@ -212,19 +209,18 @@ def compare_dswx_sar_products(file_1, file_2, ignore_metadata=False):
               f' differs from input 2 projection with content'
               f' "{projection_2}".')
 
-    if not ignore_metadata:
-        # compare metadata
-        metadata_error_message, flag_same_metadata = \
-            _compare_dswx_sar_metadata(metadata_1, metadata_2)
+    # compare metadata
+    metadata_error_message, flag_same_metadata = \
+        _compare_dswx_sar_metadata(metadata_1, metadata_2)
 
-        flag_same_metadata_str = _get_prefix_str(flag_same_metadata,
-                                                 flag_all_ok)
-        print(f'{flag_same_metadata_str}Comparing metadata')
+    flag_same_metadata_str = _get_prefix_str(flag_same_metadata,
+                                             flag_all_ok)
+    print(f'{flag_same_metadata_str}Comparing metadata')
 
-        if not flag_same_metadata:
-            print(prefix + metadata_error_message)
+    if not flag_same_metadata:
+        print(prefix + metadata_error_message)
 
-        return flag_all_ok[0]
+    return flag_all_ok[0]
 
 
 def main():
@@ -236,7 +232,7 @@ def main():
     file_1 = args.input_file[0]
     file_2 = args.input_file[1]
 
-    compare_dswx_sar_products(file_1, file_2, args.ignore_metadata)
+    compare_dswx_sar_products(file_1, file_2)
 
 
 if __name__ == '__main__':

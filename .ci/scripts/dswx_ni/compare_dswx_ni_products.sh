@@ -80,7 +80,7 @@ do
         else
            # compare output and expected files
            echo "python3 dswx_comparison.py $(basename -- ${expected_file}) ${output_file}"
-           compare_output=$(python3 $SCRIPT_DIR/dswx_comparison.py ${expected_file} $OUTPUT_DIR/${output_file} --ignore-metadata)
+           compare_output=$(python3 $SCRIPT_DIR/dswx_comparison.py ${expected_file} $OUTPUT_DIR/${output_file})
            echo "$compare_output"
         fi
 
