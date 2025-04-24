@@ -46,13 +46,14 @@ class TROPOPreProcessorMixin(PreProcessorMixin):
         """
         super().run_preprocessor(**kwargs)
         
-        check_input(
-            self.runconfig.sas_config["input_file"]["input_file_path"], 
-            self.logger, 
-            self.runconfig.pge_name, 
-            valid_extensions=(".nc",), 
-            check_zero_size=True
-        )
+        for input_file in self.runconfig.input_files:
+            check_input(
+                input_file,
+                self.logger, 
+                self.runconfig.pge_name, 
+                valid_extensions=(".nc",), 
+                check_zero_size=True
+            )
 
 
 class TROPOPostProcessorMixin(PostProcessorMixin):
@@ -72,12 +73,15 @@ class TROPOPostProcessorMixin(PostProcessorMixin):
         
     def _validate_outputs(self):
         """
+        Confirms that there exists one and only of each expected output type.
+        Also confirms that for each output:
+        - File has nonzero size
+        - Filename matches expected pattern
         """
-
         filename_pattern = re.compile(
             rf"^OPERA_L4_TROPO-ZENITH_\d{{8}}T\d{{6}}Z_\d{{8}}T\d{{6}}Z_HRES_{re.escape('v' + self.SAS_VERSION)}$"
         )
-        
+
         output_product_path = abspath(self.runconfig.output_product_path)
         output_product_files = listdir(output_product_path)
         
@@ -88,29 +92,30 @@ class TROPOPostProcessorMixin(PostProcessorMixin):
                 output_filename = next(gen)
             except StopIteration:
                 error_msg = f"Could not locate {filename_ext} file."
-                self.logger.critical(self.runconfig.pge_name, ErrorCode.OUTPUT_NOT_FOUND, error_msg)
+                self.logger.critical(self.name, ErrorCode.OUTPUT_NOT_FOUND, error_msg)
                 
             # Check for second file, if found raise error
             try:
                 next(gen)
                 error_msg = f"Found incorrect number of {filename_ext} files."
-                self.logger.critical(self.runconfig.pge_name, ErrorCode.INVALID_OUTPUT, error_msg)
-                
+                self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
+            except StopIteration:
+                pass
+            
             # Validate the one file found for this extension
-            except StopIteration:                
-                output_filepath = join(output_product_path, output_filename)
-                
-                # Check file size
-                file_size = getsize(output_filepath)
-                if not file_size > 0:
-                    error_msg = (f"Output file {output_filepath} size is {file_size}. "
-                         "Size must be greater than 0.")
-                    self.logger.critical(self.runconfig.pge_name, ErrorCode.INVALID_OUTPUT, error_msg)
-                
-                # Check filename matches expected pattern
-                if not bool(filename_pattern.match(splitext(output_filename)[0])):
-                    error_msg = f'Invalid product filename {output_filename}'
-                    self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
+            output_filepath = join(output_product_path, output_filename)
+            
+            # Check file size
+            file_size = getsize(output_filepath)
+            if not file_size > 0:
+                error_msg = (f"Output file {output_filename} size is {file_size}. "
+                        "Size must be greater than 0.")
+                self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
+            
+            # Check filename matches expected pattern
+            if not bool(filename_pattern.match(splitext(output_filename)[0])):
+                error_msg = f'Invalid product filename {output_filename}'
+                self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
                 
 
     def _checksum_output_products(self):
@@ -159,9 +164,11 @@ class TROPOPostProcessorMixin(PostProcessorMixin):
         **kwargs: dict
             Any keyword arguments needed by the post-processor
         """
-        super().run_postprocessor(**kwargs)
         
         self._validate_outputs()
+        
+        super().run_postprocessor(**kwargs)
+        
 
 
 class TROPOExecutor(TROPOPreProcessorMixin, TROPOPostProcessorMixin, PgeExecutor):

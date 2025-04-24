@@ -6,7 +6,7 @@ RunConfig:
         PGEName: TROPO_PGE
       InputFilesGroup:
         InputFilePaths:
-        - tropo_pge_test/input_dir
+        - tropo_pge_test/input_dir/ECMWF_TROP_202402151200_202402151200_1.nc
       DynamicAncillaryFilesGroup:
         AncillaryFileMap: {}
       ProductPathGroup:
@@ -17,7 +17,6 @@ RunConfig:
         ProductVersion: "0.2"
         ProgramPath: /bin/echo
         ProgramOptions:
-        - 'hello world > tropo_pge_test/output_dir/tropo_test.nc;'
         - '/bin/echo TROPO invoked with RunConfig'
         ErrorCodeBase: 800000
         SchemaPath: pge/tropo/schema/tropo_sas_schema.yaml
