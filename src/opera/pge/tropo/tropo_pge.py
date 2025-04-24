@@ -165,9 +165,11 @@ class TROPOPostProcessorMixin(PostProcessorMixin):
             Any keyword arguments needed by the post-processor
         """
         
+        print(f'Running postprocessor for {self._post_mixin_name}')
+
+        self._run_sas_qa_executable()
         self._validate_outputs()
-        
-        super().run_postprocessor(**kwargs)
+        self._stage_output_files()
         
 
 
