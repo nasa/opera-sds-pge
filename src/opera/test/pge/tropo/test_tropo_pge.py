@@ -203,7 +203,7 @@ class TROPOPgeTestCase(unittest.TestCase):
             self._run_and_check_error(
                 runconfig, 
                 test_runconfig_path, 
-                f"Could not locate {missing_file} file."
+                f"Could not locate specified input {missing_file}."
             )
 
             # Test: Empty file
@@ -275,7 +275,7 @@ class TROPOPgeTestCase(unittest.TestCase):
             self._run_and_check_error(
                 runconfig, 
                 test_runconfig_path, 
-                f"Output file {empty_nc_file} size is 0. Size must be greater than 0."
+                "Output file empty.nc size is 0. Size must be greater than 0."
             )
             
             self._reset_output_dir()
