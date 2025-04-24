@@ -352,10 +352,15 @@ class DistS1PgeTestCase(unittest.TestCase):
 
             runconfig_dict = deepcopy(backup_runconfig)
 
-            s1c_file = os.path.join(self.input_dir, 'OPERA_L2_RTC-S1_T137-292325-IW1_20241022T015921Z_20241022T180523Z_S1C_30_v1.0_VV.tif')
+            s1c_file = os.path.join(self.input_dir, 'OPERA_L2_RTC-S1_T137-292324-IW1_20241103T015918Z_20241103T071409Z_S1C_30_v1.0_VV.tif')
 
-            runconfig_dict['RunConfig']['Groups']['PGE']['InputFilesGroup']['InputFilePaths'][0] = s1c_file
-            runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['pre_rtc_copol'][0] = s1c_file
+            pre_rtc_copol = runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['pre_rtc_copol']
+            pre_rtc_crosspol = runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['pre_rtc_crosspol']
+
+            pge_input_index = len(pre_rtc_copol) + len(pre_rtc_crosspol)
+
+            runconfig_dict['RunConfig']['Groups']['PGE']['InputFilesGroup']['InputFilePaths'][pge_input_index] = s1c_file
+            runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['post_rtc_copol'][0] = s1c_file
 
             with open(s1c_file, 'wb') as fp:
                 fp.write(random.randbytes(1024))

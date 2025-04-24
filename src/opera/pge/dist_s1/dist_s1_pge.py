@@ -87,7 +87,7 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
                 msg
             )
 
-    def __validate_rtc_filenames(self, all_rtcs):
+    def __validate_rtc_filenames(self, baseline_rtcs, current_rtcs):
         """
         Validates that all input RTCs have the standard filename defined in the RTC product specification.
 
@@ -95,9 +95,10 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
 
         Parameters
         ----------
-        all_rtcs : tuple(list(str), list(str), list(str), list(str))
-            4-tuple of lists of input RTC filenames in the order: pre_rtc_copol, pre_rtc_crosspol, post_rtc_copol,
-            post_rtc_crosspol
+        baseline_rtcs : tuple(list(str), list(str))
+            2-tuple of lists of input baseline RTC filenames in the order: pre_rtc_copol, pre_rtc_crosspol
+        current_rtcs : tuple(list(str), list(str))
+            2-tuple of lists of input current RTC filenames in the order: post_rtc_copol, post_rtc_crosspol
 
         Returns
         -------
@@ -105,8 +106,14 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
             List of RTC filenames matched by a regular expression. Used in later validation. Only returns
             if this validation is passing.
         """
-        rtc_matches = [self._rtc_pattern.match(basename(rtc)) for rtc in chain.from_iterable(all_rtcs)]
-        mismatches = [rtc for match, rtc in zip(rtc_matches, chain.from_iterable(all_rtcs)) if match is None]
+        baseline_matches = [self._rtc_pattern.match(basename(rtc)) for rtc in chain.from_iterable(baseline_rtcs)]
+        current_matches = [self._rtc_pattern.match(basename(rtc)) for rtc in chain.from_iterable(current_rtcs)]
+
+        mismatches = [
+            rtc for match, rtc in zip(
+                baseline_matches + current_matches, chain.from_iterable(baseline_rtcs + current_rtcs)
+            ) if match is None
+        ]
 
         if len(mismatches) > 0:
             msg = f'Invalid RTC filenames in RunConfig: {mismatches}'
@@ -116,7 +123,7 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
                 msg
             )
 
-        return rtc_matches
+        return baseline_matches, current_matches
 
     def __validate_rtc_homogeneity(self, rtc_matches):
         """
@@ -242,7 +249,7 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
         1. Verifies the co- and cross-pol RTC input lists are the same length
         2. Verifies the combined SAS RTC input lists are a subset of the PGE input list
         3. Verifies the input RTCs have standard filenames (important for later checks)
-        4. Ensures input RTCs are not from a mixture of Sentinel-1A and Sentinel-1C
+        4. Ensures input RTCs (current set) are not from a mixture of Sentinel-1A and Sentinel-1C
         5. Validates that the co- and cross-pol RTCs are in the same order (burst-ID &
            acquisition time)
         6. Validates no cross-pol RTCs are in copol input lists and vice-versa
@@ -255,11 +262,13 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
         post_rtc_crosspol = sas_config["run_config"]["post_rtc_crosspol"]
 
         all_rtcs = (pre_rtc_copol, pre_rtc_crosspol, post_rtc_copol, post_rtc_crosspol)
+        baseline_rtcs = (pre_rtc_copol, pre_rtc_crosspol)
+        current_rtcs = (post_rtc_copol, post_rtc_crosspol)
 
         self.__validate_rtc_list_lengths(all_rtcs)
         self.__validate_rtc_lists_are_pge_subset(all_rtcs)
-        matches = self.__validate_rtc_filenames(all_rtcs)
-        self.__validate_rtc_homogeneity(matches)
+        baseline_matches, current_matches = self.__validate_rtc_filenames(baseline_rtcs, current_rtcs)
+        self.__validate_rtc_homogeneity(current_matches)  # Per ADT: Baseline can be heterogeneous
         self.__validate_rtc_ordering(all_rtcs)
         self.__validate_co_and_cross_polarizations(all_rtcs)
 
