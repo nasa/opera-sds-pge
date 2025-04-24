@@ -7,11 +7,15 @@ tropo_pge.py
 Module defining the implementation for the TROPO PGE.
 """
 
-from os.path import basename, splitext
+from os.path import abspath, basename, exists, getsize, join, splitext
+from os import listdir
+import re
 
 from opera.pge.base.base_pge import PgeExecutor
 from opera.pge.base.base_pge import PostProcessorMixin
 from opera.pge.base.base_pge import PreProcessorMixin
+from opera.util.error_codes import ErrorCode
+from opera.util.input_validation import check_input
 from opera.util.run_utils import get_checksum
 
 
@@ -33,7 +37,7 @@ class TROPOPreProcessorMixin(PreProcessorMixin):
         Executes the pre-processing steps for TROPO PGE initialization.
         The TROPOPreProcessorMixin version of this class performs all actions
         of the base PreProcessorMixin class, and adds an input validation step for
-        the inputs defined within the RunConfig (TODO).
+        the inputs defined within the RunConfig.
 
         Parameters
         ----------
@@ -41,6 +45,15 @@ class TROPOPreProcessorMixin(PreProcessorMixin):
             Any keyword arguments needed by the pre-processor
         """
         super().run_preprocessor(**kwargs)
+        
+        for input_file in self.runconfig.input_files:
+            check_input(
+                input_file,
+                self.logger, 
+                self.runconfig.pge_name, 
+                valid_extensions=(".nc",), 
+                check_zero_size=True
+            )
 
 
 class TROPOPostProcessorMixin(PostProcessorMixin):
@@ -50,11 +63,60 @@ class TROPOPostProcessorMixin(PostProcessorMixin):
     execution has completed, prior to handover of output products to PCM.
     In addition to the base functionality inherited from PostProcessorMixin, this
     mixin adds an output validation step to ensure that the output file(s) defined
-    by the RunConfig exist and are valid (TODO).
+    by the RunConfig exist and are valid.
     """
 
     _post_mixin_name = "TROPOPostProcessorMixin"
     _cached_core_filename = None
+    
+    _expected_extensions = ('.nc', '.png')
+        
+    def _validate_outputs(self):
+        """
+        Confirms that there exists one and only of each expected output type.
+        Also confirms that for each output:
+        - File has nonzero size
+        - Filename matches expected pattern
+        """
+        filename_pattern = re.compile(
+            rf"^OPERA_L4_TROPO-ZENITH_\d{{8}}T\d{{6}}Z_\d{{8}}T\d{{6}}Z_HRES_{re.escape('v' + self.SAS_VERSION)}$"
+        )
+
+        output_product_path = abspath(self.runconfig.output_product_path)
+        output_product_files = listdir(output_product_path)
+        
+        # Confirm one and only one of each expected output type
+        for filename_ext in self._expected_extensions:
+            gen = (f for f in output_product_files if splitext(f)[1] == filename_ext)
+            try:
+                output_filename = next(gen)
+            except StopIteration:
+                error_msg = f"Could not locate {filename_ext} file."
+                self.logger.critical(self.name, ErrorCode.OUTPUT_NOT_FOUND, error_msg)
+                
+            # Check for second file, if found raise error
+            try:
+                next(gen)
+                error_msg = f"Found incorrect number of {filename_ext} files."
+                self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
+            except StopIteration:
+                pass
+            
+            # Validate the one file found for this extension
+            output_filepath = join(output_product_path, output_filename)
+            
+            # Check file size
+            file_size = getsize(output_filepath)
+            if not file_size > 0:
+                error_msg = (f"Output file {output_filename} size is {file_size}. "
+                        "Size must be greater than 0.")
+                self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
+            
+            # Check filename matches expected pattern
+            if not bool(filename_pattern.match(splitext(output_filename)[0])):
+                error_msg = f'Invalid product filename {output_filename}'
+                self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
+                
 
     def _checksum_output_products(self):
         """
@@ -76,9 +138,8 @@ class TROPOPostProcessorMixin(PostProcessorMixin):
         output_products = self.runconfig.get_output_product_filenames()
 
         # Filter out any files that do not end with the expected extensions
-        expected_extensions = ('.nc', '.png')
         filtered_output_products = filter(
-            lambda product: splitext(product)[-1] in expected_extensions,
+            lambda product: splitext(product)[-1] in self._expected_extensions,
             output_products
         )
 
@@ -96,14 +157,20 @@ class TROPOPostProcessorMixin(PostProcessorMixin):
         The TROPOPostProcessorMixin version of this method performs the same
         steps as the base PostProcessorMixin, but inserts a step to perform
         output product validation prior to staging and renaming of the output
-        files (TODO).
+        files.
 
         Parameters
         ----------
         **kwargs: dict
             Any keyword arguments needed by the post-processor
         """
-        super().run_postprocessor(**kwargs)
+        
+        print(f'Running postprocessor for {self._post_mixin_name}')
+
+        self._run_sas_qa_executable()
+        self._validate_outputs()
+        self._stage_output_files()
+        
 
 
 class TROPOExecutor(TROPOPreProcessorMixin, TROPOPostProcessorMixin, PgeExecutor):
