@@ -55,7 +55,7 @@ class TROPOPgeTestCase(unittest.TestCase):
 
         # Create the input dir expected by the test RunConfig and add a
         # dummy input file
-        self.input_dir = join(self.working_dir.name, "tropo_pge_test/input_dir")
+        self.input_dir = abspath(join(self.working_dir.name, "tropo_pge_test/input_dir"))
         os.makedirs(self.input_dir, exist_ok=True)
         
         rc = RunConfig(join(self.data_dir, 'test_tropo_config.yaml'))
