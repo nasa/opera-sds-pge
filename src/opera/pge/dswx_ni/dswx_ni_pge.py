@@ -10,6 +10,8 @@ from NISAR (NI) PGE.
 """
 
 import re
+from ast import literal_eval
+from datetime import datetime
 from os.path import basename, join
 
 from opera.pge.base.base_pge import PgeExecutor
@@ -133,13 +135,14 @@ class DSWxNIPostProcessorMixin(DSWxS1PostProcessorMixin):
         # Metadata fields we need for ancillary file name should be equivalent
         # across all tiles, so just take the first set of cached metadata as
         # a representative
+        dswx_metadata = list(self._tile_metadata_cache.values())[0]['MeasuredParameters']
+
         sensor = 'LSAR'  # fixed for NISAR-based products
         pixel_spacing = "30"  # fixed for tile-based products
 
-        # TODO - for now, use the PGE production time, but ideally this should
-        #        eventually match the production time assigned by the SAS, which
-        #        should be present in the product metadata
-        production_time = get_time_for_filename(self.production_datetime)
+        production_time = get_time_for_filename(
+            datetime.strptime(dswx_metadata['PROCESSING_DATETIME']['value'], '%Y-%m-%dT%H:%M:%SZ')
+        )
 
         if not production_time.endswith('Z'):
             production_time = f'{production_time}Z'
@@ -204,6 +207,22 @@ class DSWxNIPostProcessorMixin(DSWxS1PostProcessorMixin):
         output_product_metadata['geospatial_lon_max'] = lon_max
         output_product_metadata['geospatial_lat_min'] = lat_min
         output_product_metadata['geospatial_lat_max'] = lat_max
+
+        # TODO: These values should be reduced by the SAS, not the PGE
+
+        zero_doppler_start = output_product_metadata['MeasuredParameters']['ZERO_DOPPLER_START_TIME']['value']
+        zero_doppler_end = output_product_metadata['MeasuredParameters']['ZERO_DOPPLER_END_TIME']['value']
+
+        zero_doppler_start_v = literal_eval(zero_doppler_start)
+        zero_doppler_end_v = literal_eval(zero_doppler_end)
+
+        if isinstance(zero_doppler_start_v, list):
+            zero_doppler_start_v = min(zero_doppler_start_v)
+            output_product_metadata['MeasuredParameters']['ZERO_DOPPLER_START_TIME']['value'] = zero_doppler_start_v
+
+        if isinstance(zero_doppler_end_v, list):
+            zero_doppler_end_v = max(zero_doppler_end_v)
+            output_product_metadata['MeasuredParameters']['ZERO_DOPPLER_END_TIME']['value'] = zero_doppler_end_v
 
         # Add some fields on the dimensions of the data. These values should
         # be the same for all DSWx-NI products, and were derived from the
