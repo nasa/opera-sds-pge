@@ -46,6 +46,7 @@ runconfig:
             #   - average : overlapped areas are averaged.
             #   - first : choose one burst without average.
             mosaic_mode: 'first'
+            mosaic_posting_thresh: 40
             read_row_blk_size: 1000
             read_col_blk_size: 1100
             resamp_required: False

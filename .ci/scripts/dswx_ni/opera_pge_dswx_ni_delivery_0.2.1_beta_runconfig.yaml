@@ -20,8 +20,8 @@ RunConfig:
         # List of input files/directories
         # Must be a list of the input HDF5 GCOV NISAR products
         InputFilePaths: [
-          /home/dswx_user/input_dir/RTC/ALPSRP271200660_gcov.h5,
-          /home/dswx_user/input_dir/RTC/ALPSRP271200670_gcov.h5
+          /home/dswx_user/input_dir/GCOV/NISAR_L2_PR_GCOV_001_001_A_000_2000_SHNA_A_20240404T075658_20240404T075708_T00777_M_F_J_777.h5,
+          /home/dswx_user/input_dir/GCOV/NISAR_L2_PR_GCOV_001_001_A_000_2000_SHNA_A_20240404T075706_20240404T075716_T00777_M_F_J_777.h5
         ]
 
       DynamicAncillaryFilesGroup:
@@ -31,24 +31,24 @@ RunConfig:
           # Path to the Digital Elevation Model
           # Must be either a single .tif, or a .vrt that points to one
           # or more .tif files
-          dem_file: /home/dswx_user/input_dir/ancillary_data/dem.tif
+          dem_file: /home/dswx_user/input_dir/ancillary_data/dem.vrt
 
           # Path to the Discrete Classification Map
           # Must point to a single .tif, or a .vrt that points to one or
           # more .tif files
-          hand_file: /home/dswx_user/input_dir/ancillary_data/hand.tif
+          hand_file: /home/dswx_user/input_dir/ancillary_data/hand.vrt
 
           # Path to the reference water map
           # Must point to a single .tif, or a .vrt that points to one or
           # more .tif files
-          reference_water_file: /home/dswx_user/input_dir/ancillary_data/reference_water.tif
+          reference_water_file: /home/dswx_user/input_dir/ancillary_data/reference_water.vrt
 
           # Path to the Worldcover map
           # Must point to a single .tif, or a .vrt that points to one or
           # more .tif files
-          worldcover_file: /home/dswx_user/input_dir/ancillary_data/worldcover.tif
+          worldcover_file: /home/dswx_user/input_dir/ancillary_data/worldcover.vrt
 
-          glad_classification_file: /home/dswx_user/input_dir/ancillary_data/glad_classification.tif
+          glad_classification_file: /home/dswx_user/input_dir/ancillary_data/glad.vrt
 
       ProductPathGroup:
         # Path to where output products should be stored
@@ -106,6 +106,14 @@ RunConfig:
         # Consult the Docker image build scripts for more info
         IsoTemplatePath: /home/dswx_user/opera/pge/dswx_ni/templates/OPERA_ISO_metadata_L3_DSWx_NI_template.xml.jinja2
 
+        # Path to a YAML file mapping Measured Parameter metadata names to descriptions used to supplement the ISO xml
+        # metadata file
+        # Path should correspond to the file system within the Docker
+        # container, and typically should reference a template file bundled
+        # with the opera_pge installation directory within the container
+        # Consult the Docker image build scripts for more info
+        IsoMeasuredParameterDescriptions: pge/dswx_ni/templates/dswx_ni_measured_parameters.yaml
+
       QAExecutable:
         # Set to True to enable execution of an additional "Quality Assurance"
         # application after SAS execution has completed
@@ -141,43 +149,43 @@ RunConfig:
 
           input_file_group:
             input_file_path: [
-              /home/dswx_user/input_dir/RTC/ALPSRP271200660_gcov.h5,
-              /home/dswx_user/input_dir/RTC/ALPSRP271200670_gcov.h5
+              /home/dswx_user/input_dir/GCOV/NISAR_L2_PR_GCOV_001_001_A_000_2000_SHNA_A_20240404T075658_20240404T075708_T00777_M_F_J_777.h5,
+              /home/dswx_user/input_dir/GCOV/NISAR_L2_PR_GCOV_001_001_A_000_2000_SHNA_A_20240404T075706_20240404T075716_T00777_M_F_J_777.h5
             ]
 
             # Placeholder for historical GCOV data
             input_file_historical_path:
 
             # Specify the MGRS tile collection ID
-            input_mgrs_collection_id: MS_131_19
+            input_mgrs_collection_id: MS_30_26
 
           dynamic_ancillary_file_group:
             # Digital elevation model (Required)
-            dem_file: /home/dswx_user/input_dir/ancillary_data/dem.tif
+            dem_file: /home/dswx_user/input_dir/ancillary_data/dem.vrt
 
             # Digital elevation model source description
             dem_file_description: 'Copernicus DEM GLO-30 2021 WGS84'
 
             # ESA WorldCover map file
-            worldcover_file: /home/dswx_user/input_dir/ancillary_data/worldcover.tif
+            worldcover_file: /home/dswx_user/input_dir/ancillary_data/worldcover.vrt
 
             # ESA WorldCover map description
             worldcover_file_description: 'ESA WorldCover 10m 2020 v1.0'
 
             # Reference water body map (Required)
             # e.g., Pekel's water occurrence or seasonality map
-            reference_water_file: /home/dswx_user/input_dir/ancillary_data/reference_water.tif
+            reference_water_file: /home/dswx_user/input_dir/ancillary_data/reference_water.vrt
 
             # Reference water description
             reference_water_file_description: 'JRC Global Surface Water - collection from 1984 to 2021'
 
             # Height Above Nearest Drainage (Required)
-            hand_file: /home/dswx_user/input_dir/ancillary_data/hand.tif
+            hand_file: /home/dswx_user/input_dir/ancillary_data/hand.vrt
 
             # HAND description
             hand_file_description: 'ASF HAND GLO30'
 
-            glad_classification_file: /home/dswx_user/input_dir/ancillary_data/glad_classification.tif
+            glad_classification_file: /home/dswx_user/input_dir/ancillary_data/glad.vrt
 
             # placeholders for inundated vegetation
             mean_backscattering:
@@ -209,7 +217,7 @@ RunConfig:
             sas_output_path: /home/dswx_user/output_dir
 
             # TODO: this should become a string once SAS schema is fixed
-            product_version: 0.2
+            product_version: 0.1
 
             # DSWx-NI product format
             output_imagery_format: 'COG'
@@ -225,27 +233,6 @@ RunConfig:
             # If these fields are left empty, 1024 x 1024 will be used.
             # Height in pixels for the PNG browse image
             browse_image_height: 1024
-
-            # Width in pixels for the PNG browse image
-            browse_image_width: 1024
-
-            # Flag to collapse water classes if set to True. Default is True.
-            flag_collapse_wtr_classes: True
-
-            # Flag to exclude inundated vegetation from processing if set to True.
-            exclude_inundated_vegetation:  False
-
-            # Flag to set non-water pixels to NoData value if set to True.
-            set_not_water_to_nodata: False
-
-            # Flag to set HAND mask pixels to NoData value if set to True.
-            set_hand_mask_to_nodata: True
-
-            # Flag to set layover and shadow pixels to NoData value if set to True.
-            set_layover_shadow_to_nodata: True
-
-            # Flag to set ocean-masked pixels to NoData value if set to True.
-            set_ocean_masked_to_nodata: False
 
             # Save the full-res GeoTIFF Browse image in addition to the PNG
             save_tif_to_output: True

@@ -41,6 +41,7 @@ runconfig:
             mosaic_prefix: str(required=False)
             mosaic_cog_enable: bool(required=False)
             mosaic_mode: str(required=False)
+            mosaic_posting_thresh: num(required=False)
             resamp_required: bool(required=False)
             resamp_method: str(required=False)
             resamp_out_res: num(required=False)
@@ -114,7 +115,7 @@ runconfig:
             # estimate single threshold per tile. If True, the trimodal distribution is assumed,
             # the lowest threshold is estimated.
             multi_threshold: bool(required=False)
-            # Flag to adjust threshold where two gaussian distribution are not overlapped.
+            # Flag to adjust threshold where two gaussian distribution is not overlapped.
             # If 'adjust_if_nonoverlap' is enabled,
             # start to search the alternative threshold when two distributions are not
             # overlapped. The 'low_dist_percentile' is the percentile of

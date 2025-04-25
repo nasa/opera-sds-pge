@@ -10,13 +10,16 @@ from NISAR (NI) PGE.
 """
 
 import re
+from ast import literal_eval
+from datetime import datetime
 from os.path import basename, join
 
 from opera.pge.base.base_pge import PgeExecutor
 from opera.pge.dswx_s1.dswx_s1_pge import DSWxS1PostProcessorMixin, DSWxS1PreProcessorMixin
 from opera.util.error_codes import ErrorCode
 from opera.util.geo_utils import get_geographic_boundaries_from_mgrs_tile
-from opera.util.mock_utils import MockGdal
+from opera.util.render_jinja2 import augment_measured_parameters
+from opera.util.tiff_utils import get_geotiff_metadata
 from opera.util.time import get_time_for_filename
 
 
@@ -132,13 +135,14 @@ class DSWxNIPostProcessorMixin(DSWxS1PostProcessorMixin):
         # Metadata fields we need for ancillary file name should be equivalent
         # across all tiles, so just take the first set of cached metadata as
         # a representative
+        dswx_metadata = list(self._tile_metadata_cache.values())[0]['MeasuredParameters']
+
         sensor = 'LSAR'  # fixed for NISAR-based products
         pixel_spacing = "30"  # fixed for tile-based products
 
-        # TODO - for now, use the PGE production time, but ideally this should
-        #        eventually match the production time assigned by the SAS, which
-        #        should be present in the product metadata
-        production_time = get_time_for_filename(self.production_datetime)
+        production_time = get_time_for_filename(
+            datetime.strptime(dswx_metadata['PROCESSING_DATETIME']['value'], '%Y-%m-%dT%H:%M:%SZ')
+        )
 
         if not production_time.endswith('Z'):
             production_time = f'{production_time}Z'
@@ -172,11 +176,16 @@ class DSWxNIPostProcessorMixin(DSWxS1PostProcessorMixin):
             for use with the ISO metadata Jinja2 template.
 
         """
+        output_product_metadata = {}
+
         # Extract all metadata assigned by the SAS at product creation time
-        # TODO: current DSWx-NI GeoTIFF products do not contain any metadata
-        #       so just use the mock set for the time being
         try:
-            output_product_metadata = MockGdal.MockDSWxNIGdalDataset().GetMetadata()
+            measured_parameters = get_geotiff_metadata(geotiff_product)
+            output_product_metadata['MeasuredParameters'] = augment_measured_parameters(
+                measured_parameters,
+                self.runconfig.iso_measured_parameter_descriptions,
+                self.logger
+            )
         except Exception as err:
             msg = f'Failed to extract metadata from {geotiff_product}, reason: {err}'
             self.logger.critical(self.name, ErrorCode.ISO_METADATA_COULD_NOT_EXTRACT_METADATA, msg)
@@ -198,6 +207,22 @@ class DSWxNIPostProcessorMixin(DSWxS1PostProcessorMixin):
         output_product_metadata['geospatial_lon_max'] = lon_max
         output_product_metadata['geospatial_lat_min'] = lat_min
         output_product_metadata['geospatial_lat_max'] = lat_max
+
+        # TODO: These values should be reduced by the SAS, not the PGE
+
+        zero_doppler_start = output_product_metadata['MeasuredParameters']['ZERO_DOPPLER_START_TIME']['value']
+        zero_doppler_end = output_product_metadata['MeasuredParameters']['ZERO_DOPPLER_END_TIME']['value']
+
+        zero_doppler_start_v = literal_eval(zero_doppler_start)
+        zero_doppler_end_v = literal_eval(zero_doppler_end)
+
+        if isinstance(zero_doppler_start_v, list):
+            zero_doppler_start_v = min(zero_doppler_start_v)
+            output_product_metadata['MeasuredParameters']['ZERO_DOPPLER_START_TIME']['value'] = zero_doppler_start_v
+
+        if isinstance(zero_doppler_end_v, list):
+            zero_doppler_end_v = max(zero_doppler_end_v)
+            output_product_metadata['MeasuredParameters']['ZERO_DOPPLER_END_TIME']['value'] = zero_doppler_end_v
 
         # Add some fields on the dimensions of the data. These values should
         # be the same for all DSWx-NI products, and were derived from the
@@ -353,7 +378,7 @@ class DSWxNIExecutor(DSWxNIPreProcessorMixin, DSWxNIPostProcessorMixin, PgeExecu
     LEVEL = "L3"
     """Processing Level for DSWx-NI Products"""
 
-    SAS_VERSION = "0.2"  # Beta release https://github.com/opera-adt/DSWX-SAR/releases/tag/DSWx-NI-v0.2
+    SAS_VERSION = "0.2.1"  # Beta release https://github.com/opera-adt/DSWX-SAR/releases/tag/DSWx-NI-v0.2.1
     """Version of the SAS wrapped by this PGE, should be updated as needed"""
 
     def __init__(self, pge_name, runconfig_path, **kwargs):
