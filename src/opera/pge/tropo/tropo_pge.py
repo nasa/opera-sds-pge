@@ -187,7 +187,7 @@ class TROPOExecutor(TROPOPreProcessorMixin, TROPOPostProcessorMixin, PgeExecutor
     LEVEL = "L4"
     """Processing Level for TROPO Products"""
 
-    PGE_VERSION = "3.0.0-er.1.0"
+    PGE_VERSION = "3.0.0-er.2.0"
     """Version of the PGE"""
 
     SAS_VERSION = "0.2"
