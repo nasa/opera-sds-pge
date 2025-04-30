@@ -248,10 +248,7 @@ pipeline {
             steps {
                 withCredentials([string(credentialsId: params.GHCR_TOKEN, variable: 'TOKEN')]) {
                     sh label: 'GHCR login',
-                       script: """
-                         set +x
-                         echo ${TOKEN} | docker login ghcr.io -u collinss-jpl --password-stdin
-                       """
+                       script: 'echo ${TOKEN} | docker login ghcr.io -u collinss-jpl --password-stdin'
                 }
 
                 script {
@@ -261,10 +258,8 @@ pipeline {
 
                         sh label: 'Retag & push',
                            script: """
-                             set +x
-
                              docker tag ${DOCKER_IMAGE} ${GHCR_IMAGE_PREFIX}/${DOCKER_IMAGE_SUFFIX}:${DOCKER_TAG}
-                             echo docker push ${GHCR_IMAGE_PREFIX}/${DOCKER_IMAGE_SUFFIX}:${DOCKER_TAG}
+                             docker push ${GHCR_IMAGE_PREFIX}/${DOCKER_IMAGE_SUFFIX}:${DOCKER_TAG}
                            """
                     }
                 }
