@@ -258,8 +258,8 @@ pipeline {
 
                         sh label: 'Retag & push',
                            script: """
-                             docker tag ${DOCKER_IMAGE} ${GHCR_IMAGE_PREFIX}/${DOCKER_IMAGE_SUFFIX}:${DOCKER_TAG}
-                             docker push ${GHCR_IMAGE_PREFIX}/${DOCKER_IMAGE_SUFFIX}:${DOCKER_TAG}
+                             docker tag ${DOCKER_IMAGE} ${GHCR_IMAGE_PREFIX}/${DOCKER_IMAGE}
+                             docker push ${GHCR_IMAGE_PREFIX}/${DOCKER_IMAGE}
                            """
                     }
                 }
