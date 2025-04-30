@@ -193,12 +193,12 @@ pipeline {
                     )
 
                     DOCKER_IMAGE_SUFFIXES.tokenize(',').each { DOCKER_IMAGE_SUFFIX ->
-                        DOCKER_IMAGE = "${DOCKER_IMAGE_PREFIX}/${DOCKER_IMAGE_SUFFIX}:${DOCKER_TAG}"
-                        TAR_FILE_NAME = "${DOCKER_IMAGE_PREFIX}-${DOCKER_IMAGE_SUFFIX}-${DOCKER_TAG}.tar"
+                        def DOCKER_IMAGE = "${DOCKER_IMAGE_PREFIX}/${DOCKER_IMAGE_SUFFIX}:${DOCKER_TAG}"
+                        def TAR_FILE_NAME = "${DOCKER_IMAGE_PREFIX}-${DOCKER_IMAGE_SUFFIX}-${DOCKER_TAG}.tar"
                         echo "Saving Docker image ${DOCKER_IMAGE} to tar file ${TAR_FILE_NAME}"
                         sh "docker save -o ${TAR_FILE_NAME} ${DOCKER_IMAGE}"
                         sh "gzip -f ${TAR_FILE_NAME}"
-                        TAR_GZ_FILE_NAME = "${TAR_FILE_NAME}.gz"
+                        def TAR_GZ_FILE_NAME = "${TAR_FILE_NAME}.gz"
 
                         echo "Uploading ${DOCKER_IMAGE} tar file to Artifactory-FN"
 
@@ -231,7 +231,7 @@ pipeline {
                     )
 
                     DOCKER_IMAGE_SUFFIXES.tokenize(',').each { DOCKER_IMAGE_SUFFIX ->
-                        DOCKER_IMAGE = "${DOCKER_IMAGE_PREFIX}/${DOCKER_IMAGE_SUFFIX}:${DOCKER_TAG}"
+                        def DOCKER_IMAGE = "${DOCKER_IMAGE_PREFIX}/${DOCKER_IMAGE_SUFFIX}:${DOCKER_TAG}"
                         sh "docker tag ${DOCKER_IMAGE} ${ART_DOCKER_REGISTRY}${ART_DOCKER_PATH}${DOCKER_IMAGE}"
                         echo "Publishing ${DOCKER_IMAGE} to Artifactory FN Docker Registry"
                         rtDockerPush(
@@ -253,7 +253,7 @@ pipeline {
 
                 script {
                     DOCKER_IMAGE_SUFFIXES.tokenize(',').each { DOCKER_IMAGE_SUFFIX ->
-                        DOCKER_IMAGE = "${DOCKER_IMAGE_PREFIX}/${DOCKER_IMAGE_SUFFIX}:${DOCKER_TAG}"
+                        def DOCKER_IMAGE = "${DOCKER_IMAGE_PREFIX}/${DOCKER_IMAGE_SUFFIX}:${DOCKER_TAG}"
                         echo "Publishing ${DOCKER_IMAGE} to GHCR"
 
                         sh label: 'Retag & push',
