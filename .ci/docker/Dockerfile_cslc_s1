@@ -34,7 +34,7 @@ LABEL org.label-schema.build-date=${BUILD_DATE_TIME} \
   org.label-schema.name="OPERA Product Generation Executable (PGE) Image" \
   org.label-schema.schema-version="1.0" \
   org.label-schema.vendor="California Institute of Technology" \
-  org.opencontainers.source="https://github.com/nasa/opera-sds-pge" \
+  org.opencontainers.image.source="https://github.com/nasa/opera-sds-pge" \
   maintainer="California Institute of Technology"
 
 # Copy the OPERA PGE software into the container
