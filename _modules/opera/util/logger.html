@@ -97,7 +97,7 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">opera.util.time</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">time_util</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">opera.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">error_codes</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">.error_codes</span><span class="w"> </span><span class="kn">import</span> <span class="n">ErrorCode</span><span class="p">,</span> <span class="n">ERROR_CODE_PGE_OFFSET</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.error_codes</span><span class="w"> </span><span class="kn">import</span> <span class="n">ERROR_CODE_PGE_OFFSET</span><span class="p">,</span> <span class="n">ErrorCode</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.time</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_iso_time</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.usage_metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_os_metrics</span>
 
@@ -106,6 +106,8 @@
 <span class="n">WARNING</span> <span class="o">=</span> <span class="s2">&quot;Warning&quot;</span>
 <span class="n">CRITICAL</span> <span class="o">=</span> <span class="s2">&quot;Critical&quot;</span>
 <span class="sd">&quot;&quot;&quot;Constants for logging levels&quot;&quot;&quot;</span>
+
+<span class="c1"># pylint: disable=too-many-positional-arguments</span>
 
 
 <div class="viewcode-block" id="write"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.write">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">write</span><span class="p">(</span><span class="n">log_stream</span><span class="p">,</span> <span class="n">severity</span><span class="p">,</span> <span class="n">workflow</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">error_code</span><span class="p">,</span> <span class="n">error_location</span><span class="p">,</span>

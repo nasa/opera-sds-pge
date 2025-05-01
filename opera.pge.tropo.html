@@ -19,7 +19,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="opera.util package" href="opera.util.html" />
+    <link rel="next" title="opera.pge.disp_ni package" href="opera.pge.disp_ni.html" />
     <link rel="prev" title="opera.pge.dist_s1 package" href="opera.pge.dist_s1.html" /> 
 </head>
 
@@ -122,13 +122,13 @@ of the SAS from the base PgeExecutor class.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="opera.pge.tropo.tropo_pge.TROPOExecutor.PGE_VERSION">
-<span class="sig-name descname"><span class="pre">PGE_VERSION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'3.0.0-er.1.0'</span></em><a class="headerlink" href="#opera.pge.tropo.tropo_pge.TROPOExecutor.PGE_VERSION" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">PGE_VERSION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'3.0.0-er.2.0'</span></em><a class="headerlink" href="#opera.pge.tropo.tropo_pge.TROPOExecutor.PGE_VERSION" title="Permalink to this definition"></a></dt>
 <dd><p>Version of the PGE</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="opera.pge.tropo.tropo_pge.TROPOExecutor.SAS_VERSION">
-<span class="sig-name descname"><span class="pre">SAS_VERSION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'0.1'</span></em><a class="headerlink" href="#opera.pge.tropo.tropo_pge.TROPOExecutor.SAS_VERSION" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">SAS_VERSION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'0.2'</span></em><a class="headerlink" href="#opera.pge.tropo.tropo_pge.TROPOExecutor.SAS_VERSION" title="Permalink to this definition"></a></dt>
 <dd><p>Version of the SAS wrapped by this PGE, should be updated as needed</p>
 </dd></dl>
 
@@ -143,7 +143,7 @@ PGE. The post-processing phase is defined as all steps required after SAS
 execution has completed, prior to handover of output products to PCM.
 In addition to the base functionality inherited from PostProcessorMixin, this
 mixin adds an output validation step to ensure that the output file(s) defined
-by the RunConfig exist and are valid (TODO).</p>
+by the RunConfig exist and are valid.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="opera.pge.tropo.tropo_pge.TROPOPostProcessorMixin.run_postprocessor">
 <span class="sig-name descname"><span class="pre">run_postprocessor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/opera/pge/tropo/tropo_pge.html#TROPOPostProcessorMixin.run_postprocessor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opera.pge.tropo.tropo_pge.TROPOPostProcessorMixin.run_postprocessor" title="Permalink to this definition"></a></dt>
@@ -151,9 +151,12 @@ by the RunConfig exist and are valid (TODO).</p>
 The TROPOPostProcessorMixin version of this method performs the same
 steps as the base PostProcessorMixin, but inserts a step to perform
 output product validation prior to staging and renaming of the output
-files (TODO).
-:param **kwargs: Any keyword arguments needed by the post-processor
-:type **kwargs: dict</p>
+files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>**kwargs</strong> (<em>dict</em>) – Any keyword arguments needed by the post-processor</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -174,9 +177,12 @@ RunConfig exist and are valid.</p>
 <dd><p>Executes the pre-processing steps for TROPO PGE initialization.
 The TROPOPreProcessorMixin version of this class performs all actions
 of the base PreProcessorMixin class, and adds an input validation step for
-the inputs defined within the RunConfig (TODO).
-:param **kwargs: Any keyword arguments needed by the pre-processor
-:type **kwargs: dict</p>
+the inputs defined within the RunConfig.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>**kwargs</strong> (<em>dict</em>) – Any keyword arguments needed by the pre-processor</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -192,7 +198,7 @@ the inputs defined within the RunConfig (TODO).
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="opera.pge.dist_s1.html" class="btn btn-neutral float-left" title="opera.pge.dist_s1 package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="opera.util.html" class="btn btn-neutral float-right" title="opera.util package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="opera.pge.disp_ni.html" class="btn btn-neutral float-right" title="opera.pge.disp_ni package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

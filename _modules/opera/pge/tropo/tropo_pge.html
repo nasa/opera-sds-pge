@@ -82,11 +82,15 @@
 <span class="sd">Module defining the implementation for the TROPO PGE.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">os.path</span><span class="w"> </span><span class="kn">import</span> <span class="n">basename</span><span class="p">,</span> <span class="n">splitext</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">os.path</span><span class="w"> </span><span class="kn">import</span> <span class="n">abspath</span><span class="p">,</span> <span class="n">basename</span><span class="p">,</span> <span class="n">exists</span><span class="p">,</span> <span class="n">getsize</span><span class="p">,</span> <span class="n">join</span><span class="p">,</span> <span class="n">splitext</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">os</span><span class="w"> </span><span class="kn">import</span> <span class="n">listdir</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">opera.pge.base.base_pge</span><span class="w"> </span><span class="kn">import</span> <span class="n">PgeExecutor</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">opera.pge.base.base_pge</span><span class="w"> </span><span class="kn">import</span> <span class="n">PostProcessorMixin</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">opera.pge.base.base_pge</span><span class="w"> </span><span class="kn">import</span> <span class="n">PreProcessorMixin</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.error_codes</span><span class="w"> </span><span class="kn">import</span> <span class="n">ErrorCode</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.input_validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_input</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.run_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_checksum</span>
 
 
@@ -99,7 +103,7 @@
 <span class="sd">    mixin adds an input validation step to ensure that input(s) defined by the</span>
 <span class="sd">    RunConfig exist and are valid.</span>
 
-<span class="sd">     &quot;&quot;&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">_pre_mixin_name</span> <span class="o">=</span> <span class="s2">&quot;TROPOPreProcessorMixin&quot;</span>
 
@@ -108,13 +112,23 @@
 <span class="sd">        Executes the pre-processing steps for TROPO PGE initialization.</span>
 <span class="sd">        The TROPOPreProcessorMixin version of this class performs all actions</span>
 <span class="sd">        of the base PreProcessorMixin class, and adds an input validation step for</span>
-<span class="sd">        the inputs defined within the RunConfig (TODO).</span>
+<span class="sd">        the inputs defined within the RunConfig.</span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        **kwargs: dict</span>
 <span class="sd">            Any keyword arguments needed by the pre-processor</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">run_preprocessor</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">run_preprocessor</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        
+        <span class="k">for</span> <span class="n">input_file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">input_files</span><span class="p">:</span>
+            <span class="n">check_input</span><span class="p">(</span>
+                <span class="n">input_file</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> 
+                <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">pge_name</span><span class="p">,</span> 
+                <span class="n">valid_extensions</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;.nc&quot;</span><span class="p">,),</span> 
+                <span class="n">check_zero_size</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="TROPOPostProcessorMixin"><a class="viewcode-back" href="../../../../opera.pge.tropo.html#opera.pge.tropo.tropo_pge.TROPOPostProcessorMixin">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">TROPOPostProcessorMixin</span><span class="p">(</span><span class="n">PostProcessorMixin</span><span class="p">):</span>
@@ -124,12 +138,61 @@
 <span class="sd">    execution has completed, prior to handover of output products to PCM.</span>
 <span class="sd">    In addition to the base functionality inherited from PostProcessorMixin, this</span>
 <span class="sd">    mixin adds an output validation step to ensure that the output file(s) defined</span>
-<span class="sd">    by the RunConfig exist and are valid (TODO).</span>
+<span class="sd">    by the RunConfig exist and are valid.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">_post_mixin_name</span> <span class="o">=</span> <span class="s2">&quot;TROPOPostProcessorMixin&quot;</span>
     <span class="n">_cached_core_filename</span> <span class="o">=</span> <span class="kc">None</span>
     
+    <span class="n">_expected_extensions</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;.nc&#39;</span><span class="p">,</span> <span class="s1">&#39;.png&#39;</span><span class="p">)</span>
+        
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_outputs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Confirms that there exists one and only of each expected output type.</span>
+<span class="sd">        Also confirms that for each output:</span>
+<span class="sd">        - File has nonzero size</span>
+<span class="sd">        - Filename matches expected pattern</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">filename_pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+            <span class="sa">rf</span><span class="s2">&quot;^OPERA_L4_TROPO-ZENITH_\d</span><span class="se">{{</span><span class="s2">8</span><span class="se">}}</span><span class="s2">T\d</span><span class="se">{{</span><span class="s2">6</span><span class="se">}}</span><span class="s2">Z_\d</span><span class="se">{{</span><span class="s2">8</span><span class="se">}}</span><span class="s2">T\d</span><span class="se">{{</span><span class="s2">6</span><span class="se">}}</span><span class="s2">Z_HRES_</span><span class="si">{</span><span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="s1">&#39;v&#39;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="bp">self</span><span class="o">.</span><span class="n">SAS_VERSION</span><span class="p">)</span><span class="si">}</span><span class="s2">$&quot;</span>
+        <span class="p">)</span>
+
+        <span class="n">output_product_path</span> <span class="o">=</span> <span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">output_product_path</span><span class="p">)</span>
+        <span class="n">output_product_files</span> <span class="o">=</span> <span class="n">listdir</span><span class="p">(</span><span class="n">output_product_path</span><span class="p">)</span>
+        
+        <span class="c1"># Confirm one and only one of each expected output type</span>
+        <span class="k">for</span> <span class="n">filename_ext</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_expected_extensions</span><span class="p">:</span>
+            <span class="n">gen</span> <span class="o">=</span> <span class="p">(</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">output_product_files</span> <span class="k">if</span> <span class="n">splitext</span><span class="p">(</span><span class="n">f</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">filename_ext</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">output_filename</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">gen</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+                <span class="n">error_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Could not locate </span><span class="si">{</span><span class="n">filename_ext</span><span class="si">}</span><span class="s2"> file.&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">OUTPUT_NOT_FOUND</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">)</span>
+                
+            <span class="c1"># Check for second file, if found raise error</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="nb">next</span><span class="p">(</span><span class="n">gen</span><span class="p">)</span>
+                <span class="n">error_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Found incorrect number of </span><span class="si">{</span><span class="n">filename_ext</span><span class="si">}</span><span class="s2"> files.&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INVALID_OUTPUT</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+                <span class="k">pass</span>
+            
+            <span class="c1"># Validate the one file found for this extension</span>
+            <span class="n">output_filepath</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">output_product_path</span><span class="p">,</span> <span class="n">output_filename</span><span class="p">)</span>
+            
+            <span class="c1"># Check file size</span>
+            <span class="n">file_size</span> <span class="o">=</span> <span class="n">getsize</span><span class="p">(</span><span class="n">output_filepath</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">file_size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">error_msg</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Output file </span><span class="si">{</span><span class="n">output_filename</span><span class="si">}</span><span class="s2"> size is </span><span class="si">{</span><span class="n">file_size</span><span class="si">}</span><span class="s2">. &quot;</span>
+                        <span class="s2">&quot;Size must be greater than 0.&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INVALID_OUTPUT</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">)</span>
+            
+            <span class="c1"># Check filename matches expected pattern</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">bool</span><span class="p">(</span><span class="n">filename_pattern</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">splitext</span><span class="p">(</span><span class="n">output_filename</span><span class="p">)[</span><span class="mi">0</span><span class="p">])):</span>
+                <span class="n">error_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Invalid product filename </span><span class="si">{</span><span class="n">output_filename</span><span class="si">}</span><span class="s1">&#39;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INVALID_OUTPUT</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">)</span>
+                
+
     <span class="k">def</span><span class="w"> </span><span class="nf">_checksum_output_products</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generates a dictionary mapping output product file names to the</span>
@@ -150,9 +213,8 @@
         <span class="n">output_products</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">get_output_product_filenames</span><span class="p">()</span>
 
         <span class="c1"># Filter out any files that do not end with the expected extensions</span>
-        <span class="n">expected_extensions</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;.nc&#39;</span><span class="p">,</span> <span class="s1">&#39;.png&#39;</span><span class="p">)</span>
         <span class="n">filtered_output_products</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span>
-            <span class="k">lambda</span> <span class="n">product</span><span class="p">:</span> <span class="n">splitext</span><span class="p">(</span><span class="n">product</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">expected_extensions</span><span class="p">,</span>
+            <span class="k">lambda</span> <span class="n">product</span><span class="p">:</span> <span class="n">splitext</span><span class="p">(</span><span class="n">product</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_expected_extensions</span><span class="p">,</span>
             <span class="n">output_products</span>
         <span class="p">)</span>
 
@@ -170,13 +232,20 @@
 <span class="sd">        The TROPOPostProcessorMixin version of this method performs the same</span>
 <span class="sd">        steps as the base PostProcessorMixin, but inserts a step to perform</span>
 <span class="sd">        output product validation prior to staging and renaming of the output</span>
-<span class="sd">        files (TODO).</span>
+<span class="sd">        files.</span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        **kwargs: dict</span>
 <span class="sd">            Any keyword arguments needed by the post-processor</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">run_postprocessor</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+        
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Running postprocessor for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_post_mixin_name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_run_sas_qa_executable</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_outputs</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stage_output_files</span><span class="p">()</span></div></div>
+        
 
 
 <div class="viewcode-block" id="TROPOExecutor"><a class="viewcode-back" href="../../../../opera.pge.tropo.html#opera.pge.tropo.tropo_pge.TROPOExecutor">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">TROPOExecutor</span><span class="p">(</span><span class="n">TROPOPreProcessorMixin</span><span class="p">,</span> <span class="n">TROPOPostProcessorMixin</span><span class="p">,</span> <span class="n">PgeExecutor</span><span class="p">):</span>
@@ -192,11 +261,11 @@
 
     <span class="n">LEVEL</span> <span class="o">=</span> <span class="s2">&quot;L4&quot;</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Processing Level for TROPO Products&quot;&quot;&quot;</span>
-    
-    <span class="n">PGE_VERSION</span> <span class="o">=</span> <span class="s2">&quot;3.0.0-er.1.0&quot;</span>
+
+    <span class="n">PGE_VERSION</span> <span class="o">=</span> <span class="s2">&quot;3.0.0-er.2.0&quot;</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Version of the PGE&quot;&quot;&quot;</span>
 
-    <span class="n">SAS_VERSION</span> <span class="o">=</span> <span class="s2">&quot;0.1&quot;</span>
+    <span class="n">SAS_VERSION</span> <span class="o">=</span> <span class="s2">&quot;0.2&quot;</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Version of the SAS wrapped by this PGE, should be updated as needed&quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pge_name</span><span class="p">,</span> <span class="n">runconfig_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>

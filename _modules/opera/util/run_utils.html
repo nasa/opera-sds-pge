@@ -145,18 +145,23 @@
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">        traceback_match : re.Match</span>
-<span class="sd">            The result of the regex search for a traceback. If none could be found,</span>
-<span class="sd">            None will be returned.</span>
+<span class="sd">    traceback_string : str</span>
+<span class="sd">        The parsed result of the regex search for a traceback. If none could be</span>
+<span class="sd">        found, an empty string is returned.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
     <span class="n">exception_pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
         <span class="sa">r</span><span class="s2">&quot;Traceback \(most recent call last\):(?:\n.*)+?\n(.*?(?:Exception|Error):)\s*(.+)&quot;</span>
     <span class="p">)</span>
 
-    <span class="n">trackback_match</span> <span class="o">=</span> <span class="n">exception_pattern</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">log_contents</span><span class="p">)</span>
+    <span class="n">traceback_match</span> <span class="o">=</span> <span class="n">exception_pattern</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">log_contents</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">trackback_match</span></div>
+    <span class="k">if</span> <span class="n">traceback_match</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">traceback_match</span><span class="o">.</span><span class="n">string</span><span class="p">[</span><span class="n">traceback_match</span><span class="o">.</span><span class="n">start</span><span class="p">():</span><span class="n">traceback_match</span><span class="o">.</span><span class="n">end</span><span class="p">()]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">result</span></div>
 
 
 <div class="viewcode-block" id="create_sas_command_line"><a class="viewcode-back" href="../../../opera.util.html#opera.util.run_utils.create_sas_command_line">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">create_sas_command_line</span><span class="p">(</span><span class="n">sas_program_path</span><span class="p">,</span> <span class="n">sas_runconfig_path</span><span class="p">,</span>
@@ -314,15 +319,15 @@
     <span class="n">logger</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">run_result</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">decode</span><span class="p">())</span>
 
     <span class="k">if</span> <span class="n">run_result</span><span class="o">.</span><span class="n">returncode</span><span class="p">:</span>
-        <span class="c1"># Parse out the traceback stack(s) from the log to include with the error</span>
-        <span class="c1"># message that will be propagated back to an SDS operator</span>
-        <span class="n">traceback_match</span> <span class="o">=</span> <span class="n">get_traceback_from_log</span><span class="p">(</span><span class="n">run_result</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">decode</span><span class="p">())</span>
+        <span class="c1"># Parse out the traceback stack from the SAS log to include with the error</span>
+        <span class="c1"># message that&#39;s propagated back to an SDS operator</span>
+        <span class="n">traceback_string</span> <span class="o">=</span> <span class="n">get_traceback_from_log</span><span class="p">(</span><span class="n">run_result</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">decode</span><span class="p">())</span>
 
         <span class="n">error_msg</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Command &quot;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">command_line</span><span class="p">)</span><span class="si">}</span><span class="s1">&quot; failed with exit &#39;</span>
                      <span class="sa">f</span><span class="s1">&#39;code </span><span class="si">{</span><span class="n">run_result</span><span class="o">.</span><span class="n">returncode</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">traceback_match</span><span class="p">:</span>
-            <span class="n">error_msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;, Traceback from log:</span><span class="se">\n</span><span class="si">{</span><span class="n">traceback_match</span><span class="o">.</span><span class="n">string</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="k">if</span> <span class="n">traceback_string</span><span class="p">:</span>
+            <span class="n">error_msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;, Traceback from log:</span><span class="se">\n</span><span class="si">{</span><span class="n">traceback_string</span><span class="si">}</span><span class="s1">&#39;</span>
 
         <span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="n">module_name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">SAS_PROGRAM_FAILED</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">)</span>
 
