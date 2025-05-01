@@ -361,6 +361,7 @@ class DispS1PgeTestCase(unittest.TestCase):
         self.assertRegex(
             expected_ccslc_filename,
             rf'{pge.PROJECT}_L2_COMPRESSED-CSLC-S1_'
+            rf'F\d{{5}}_'
             rf'\w{{4}}-\w{{6}}-\w{{3}}_'
             rf'\d{{8}}T\d{{6}}Z_\d{{8}}T\d{{6}}Z_'
             rf'\d{{8}}T\d{{6}}Z_\d{{8}}T\d{{6}}Z_'

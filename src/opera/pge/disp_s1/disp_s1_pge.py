@@ -417,9 +417,9 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
 
         The compressed CSLC filename for the DISP-S1 PGE consists of:
 
-             <Project>_<Level>_COMPRESSED-CSLC-S1_<BurstID>_<ReferenceDateTime>_\
-             <FirstDateTime>_<LastDateTime>_<ProductGenerationDateTime>_\
-             <Polarization>_<ProductVersion>.h5
+             <Project>_<Level>_COMPRESSED-CSLC-S1_<FrameID>_<BurstID>_\
+             <ReferenceDateTime>_<FirstDateTime>_<LastDateTime>_\
+             <ProductGenerationDateTime>_<Polarization>_<ProductVersion>.h5
 
         Parameters
         ----------
@@ -436,6 +436,7 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
         """
         level = "L2"
         name = "COMPRESSED-CSLC-S1"
+        frame_id = f"F{self.runconfig.sas_config['input_file_group']['frame_id']:05d}"
 
         ccslc_regex = (r'compressed_(?P<burst_id>\w{4}_\w{6}_\w{3})_'
                        r'(?P<ref_date>\d{8})_'
@@ -486,7 +487,7 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
         # Carry the file extension over from the original filename
         ext = result.groupdict()["ext"]
 
-        return (f"{self.PROJECT}_{level}_{name}_{burst_id}_"
+        return (f"{self.PROJECT}_{level}_{name}_{frame_id}_{burst_id}_"
                 f"{ref_date}T000000Z_{start_date}T000000Z_"
                 f"{stop_date}T000000Z_{prod_time}_"
                 f"{polarization}_v{product_version}.{ext}")
