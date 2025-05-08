@@ -12,6 +12,7 @@ pipeline {
                  returnStdout: true,
                  script: 'echo $$'
                  ).trim()}"""
+        GHCR_IMAGE_PREFIX = 'ghcr.io/nasa/opera-sds-pge'
     }
     parameters {
         // TODO: update default value as newer PGE's are added
@@ -19,6 +20,8 @@ pipeline {
                description: 'Comma-delimited list of PGE names to include for build/test/deploy')
         booleanParam(name: 'PUBLISH_DOCS', defaultValue: true,
                      description: 'Publish sphinx documentation to ghpages')
+        booleanParam(name: 'PUSH_TO_GHCR', defaultValue: false,
+                     description: 'If selected, also push built PGE container(s) to GHCR (Only select for non ER/RC releases)')
         string(name: 'ART_URL', defaultValue: 'https://artifactory-fn.jpl.nasa.gov/artifactory',
                description: 'Artifactory-FN URL.')
         string(name: 'ART_TAR_PATH', defaultValue: 'general/gov/nasa/jpl/opera/sds/pge/',
@@ -38,6 +41,11 @@ pipeline {
                     defaultValue: '8443f80e-014a-4dea-b122-5ca34d8aaab1',
                     credentialType: 'org.jenkinsci.plugins.plaincredentials.impl.StringCredentialsImpl',
                     description: 'GitHub OAUTH Token for user collinss-jpl on github.com',
+                    required: true)
+        credentials(name: 'GHCR_TOKEN',
+                    defaultValue: '702a7ee2-815c-46c4-bbb8-6550be70a339',
+                    credentialType: 'org.jenkinsci.plugins.plaincredentials.impl.StringCredentialsImpl',
+                    description: 'github.com ghcr push token for user collinss-jpl',
                     required: true)
     }
     stages {
@@ -185,12 +193,12 @@ pipeline {
                     )
 
                     DOCKER_IMAGE_SUFFIXES.tokenize(',').each { DOCKER_IMAGE_SUFFIX ->
-                        DOCKER_IMAGE = "${DOCKER_IMAGE_PREFIX}/${DOCKER_IMAGE_SUFFIX}:${DOCKER_TAG}"
-                        TAR_FILE_NAME = "${DOCKER_IMAGE_PREFIX}-${DOCKER_IMAGE_SUFFIX}-${DOCKER_TAG}.tar"
+                        def DOCKER_IMAGE = "${DOCKER_IMAGE_PREFIX}/${DOCKER_IMAGE_SUFFIX}:${DOCKER_TAG}"
+                        def TAR_FILE_NAME = "${DOCKER_IMAGE_PREFIX}-${DOCKER_IMAGE_SUFFIX}-${DOCKER_TAG}.tar"
                         echo "Saving Docker image ${DOCKER_IMAGE} to tar file ${TAR_FILE_NAME}"
                         sh "docker save -o ${TAR_FILE_NAME} ${DOCKER_IMAGE}"
                         sh "gzip -f ${TAR_FILE_NAME}"
-                        TAR_GZ_FILE_NAME = "${TAR_FILE_NAME}.gz"
+                        def TAR_GZ_FILE_NAME = "${TAR_FILE_NAME}.gz"
 
                         echo "Uploading ${DOCKER_IMAGE} tar file to Artifactory-FN"
 
@@ -223,7 +231,7 @@ pipeline {
                     )
 
                     DOCKER_IMAGE_SUFFIXES.tokenize(',').each { DOCKER_IMAGE_SUFFIX ->
-                        DOCKER_IMAGE = "${DOCKER_IMAGE_PREFIX}/${DOCKER_IMAGE_SUFFIX}:${DOCKER_TAG}"
+                        def DOCKER_IMAGE = "${DOCKER_IMAGE_PREFIX}/${DOCKER_IMAGE_SUFFIX}:${DOCKER_TAG}"
                         sh "docker tag ${DOCKER_IMAGE} ${ART_DOCKER_REGISTRY}${ART_DOCKER_PATH}${DOCKER_IMAGE}"
                         echo "Publishing ${DOCKER_IMAGE} to Artifactory FN Docker Registry"
                         rtDockerPush(
@@ -231,6 +239,28 @@ pipeline {
                             image: "${ART_DOCKER_REGISTRY}${ART_DOCKER_PATH}${DOCKER_IMAGE}",
                             targetRepo: "docker-develop-local"
                         )
+                    }
+                }
+            }
+        }
+        stage('(Optional) Push Docker images to GHCR'){
+            when { expression { return params.GHCR_TOKEN } }
+            steps {
+                withCredentials([string(credentialsId: params.GHCR_TOKEN, variable: 'TOKEN')]) {
+                    sh label: 'GHCR login',
+                       script: 'echo ${TOKEN} | docker login ghcr.io -u collinss-jpl --password-stdin'
+                }
+
+                script {
+                    DOCKER_IMAGE_SUFFIXES.tokenize(',').each { DOCKER_IMAGE_SUFFIX ->
+                        def DOCKER_IMAGE = "${DOCKER_IMAGE_PREFIX}/${DOCKER_IMAGE_SUFFIX}:${DOCKER_TAG}"
+                        echo "Publishing ${DOCKER_IMAGE} to GHCR"
+
+                        sh label: 'Retag & push',
+                           script: """
+                             docker tag ${DOCKER_IMAGE} ${GHCR_IMAGE_PREFIX}/${DOCKER_IMAGE}
+                             docker push ${GHCR_IMAGE_PREFIX}/${DOCKER_IMAGE}
+                           """
                     }
                 }
             }
