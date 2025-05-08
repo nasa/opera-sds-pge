@@ -708,7 +708,11 @@ RunConfig:
         water_mask_path:
         apply_water_mask: false
         memory_strategy: high
+        device: best
         tqdm_enabled: true
+        batch_size_for_despeckling: 25
+        n_workers_for_despeckling: 8
+        n_workers_for_norm_param_estimation: 8
         n_lookbacks: 3
         moderate_confidence_threshold: 3.5
         high_confidence_threshold: 5.5

@@ -24,7 +24,7 @@ BUILD_DATE_TIME=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
 # defaults, SAS image should be updated as necessary for new image releases from ADT
 [ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath $(dirname $(realpath $0))/../../..)
 [ -z "${TAG}" ] && TAG="${USER}-dev"
-[ -z "${SAS_IMAGE}" ] && SAS_IMAGE="ghcr.io/opera-adt/dist-s1:0.0.6"
+[ -z "${SAS_IMAGE}" ] && SAS_IMAGE="ghcr.io/opera-adt/dist-s1:0.0.9"
 
 echo "WORKSPACE: $WORKSPACE"
 echo "IMAGE: $IMAGE"
