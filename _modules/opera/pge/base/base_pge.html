@@ -5,14 +5,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera.pge.base.base_pge &mdash; opera-sds-pge 6.0.0-er.2.0 documentation</title>
+  <title>opera.pge.base.base_pge &mdash; opera-sds-pge 3.0.0-rc.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
 
   
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=136f5b14"></script>
+      <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=e9509664"></script>
       <script src="../../../../_static/doctools.js?v=888ff710"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../../../_static/js/theme.js"></script>
@@ -91,9 +91,6 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">lru_cache</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">os.path</span><span class="w"> </span><span class="kn">import</span> <span class="n">abspath</span><span class="p">,</span> <span class="n">basename</span><span class="p">,</span> <span class="n">exists</span><span class="p">,</span> <span class="n">join</span><span class="p">,</span> <span class="n">splitext</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">pkg_resources</span><span class="w"> </span><span class="kn">import</span> <span class="n">resource_filename</span>
-
-<span class="kn">import</span><span class="w"> </span><span class="nn">yamale</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">yamale</span><span class="w"> </span><span class="kn">import</span> <span class="n">YamaleError</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">yaml</span>
@@ -212,6 +209,7 @@
                                  <span class="sa">f</span><span class="s1">&#39;Creating output product directory </span><span class="si">{</span><span class="n">output_product_path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
                 <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">output_product_path</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
+            <span class="c1"># TODO: add a cleanup function on the post-processor to remove scratch dir?</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">exists</span><span class="p">(</span><span class="n">scratch_path</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">CREATING_WORKING_DIRECTORY</span><span class="p">,</span>
                                  <span class="sa">f</span><span class="s1">&#39;Creating scratch directory </span><span class="si">{</span><span class="n">scratch_path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
@@ -254,34 +252,6 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">qa_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">LOG_FILE_INIT_COMPLETE</span><span class="p">,</span>
                                 <span class="s1">&#39;Log file configuration complete&#39;</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_iso_descriptions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;If given, check if the run-config description file exists and is valid&quot;&quot;&quot;</span>
-        <span class="n">description_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">iso_measured_parameter_descriptions</span>
-
-        <span class="k">if</span> <span class="n">description_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">description_file</span> <span class="o">=</span> <span class="n">abspath</span><span class="p">(</span><span class="n">description_file</span><span class="p">)</span>
-
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">exists</span><span class="p">(</span><span class="n">description_file</span><span class="p">):</span>
-                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Could not load description file </span><span class="si">{</span><span class="n">description_file</span><span class="si">}</span><span class="s1">, file does not exist.&#39;</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">ISO_METADATA_DESCRIPTIONS_CONFIG_NOT_FOUND</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
-
-            <span class="n">schema_file</span> <span class="o">=</span> <span class="n">resource_filename</span><span class="p">(</span>
-                <span class="s1">&#39;opera&#39;</span><span class="p">,</span>
-                <span class="s1">&#39;pge/base/schema/iso_metadata_measured_parameters_config_schema.yaml&#39;</span>
-            <span class="p">)</span>
-
-            <span class="n">schema</span> <span class="o">=</span> <span class="n">yamale</span><span class="o">.</span><span class="n">make_schema</span><span class="p">(</span><span class="n">schema_file</span><span class="p">)</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="n">yamale</span><span class="o">.</span><span class="n">make_data</span><span class="p">(</span><span class="n">description_file</span><span class="p">)</span>
-
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">yamale</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">schema</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-            <span class="k">except</span> <span class="n">yamale</span><span class="o">.</span><span class="n">YamaleError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
-                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;The provided measured parameters description config is of invalid format: </span><span class="si">{</span><span class="n">error</span><span class="si">}</span><span class="s1">&#39;</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">ISO_METADATA_DESCRIPTIONS_CONFIG_INVALID</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Measured parameters descriptions were not provided&#39;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">ISO_METADATA_NO_DESCRIPTIONS</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
-
 <div class="viewcode-block" id="PreProcessorMixin.run_preprocessor"><a class="viewcode-back" href="../../../../opera.pge.base.html#opera.pge.base.base_pge.PreProcessorMixin.run_preprocessor">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">run_preprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>  <span class="c1"># pylint: disable=unused-argument</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Executes the pre-processing steps for PGE initialization.</span>
@@ -295,12 +265,12 @@
 <span class="sd">            Any keyword arguments needed by the pre-processor</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># TODO: better way to handle trace statements before logger has been created?</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Running preprocessor for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_pre_mixin_name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_initialize_logger</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_load_runconfig</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_runconfig</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_iso_descriptions</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_initialize_qa_logger</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_setup_directories</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_configure_logger</span><span class="p">()</span></div></div>
@@ -405,8 +375,8 @@
             <span class="s1">&#39;PGE_Name&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">pge_name</span><span class="p">,</span>
             <span class="s1">&#39;PGE_Version&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">PGE_VERSION</span><span class="p">,</span>
             <span class="s1">&#39;SAS_Version&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">SAS_VERSION</span><span class="p">,</span>
-            <span class="s1">&#39;Input_Files&#39;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">basename</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">get_input_filenames</span><span class="p">())),</span>
-            <span class="s1">&#39;Ancillary_Files&#39;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">basename</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">get_ancillary_filenames</span><span class="p">())),</span>
+            <span class="s1">&#39;Input_Files&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">get_input_filenames</span><span class="p">(),</span>
+            <span class="s1">&#39;Ancillary_Files&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">get_ancillary_filenames</span><span class="p">(),</span>
             <span class="s1">&#39;Production_DateTime&#39;</span><span class="p">:</span> <span class="n">get_catalog_metadata_datetime_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">production_datetime</span><span class="p">),</span>
             <span class="s1">&#39;Output_Product_Checksums&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_checksum_output_products</span><span class="p">()</span>
         <span class="p">}</span>
@@ -418,23 +388,9 @@
 <span class="sd">        Creates the ISO metadata utilized by the DAAC&#39;s for indexing output</span>
 <span class="sd">        products submitted by OPERA. Inheritors of PostProcessorMixin must</span>
 <span class="sd">        provide their own implementations, as ISO metadata is not applicable</span>
-<span class="sd">        to the base PGE. Rather, this implementation may be optionally invoked</span>
-<span class="sd">        by inheritors to perform common validation checks on the ISO template to</span>
-<span class="sd">        be used with the PGE.</span>
+<span class="sd">        to the base PGE.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">iso_template_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">iso_template_path</span>
-
-        <span class="k">if</span> <span class="n">iso_template_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;ISO template path not provided in runconfig&quot;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">ISO_METADATA_TEMPLATE_NOT_PROVIDED_WHEN_NEEDED</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
-
-        <span class="n">iso_template_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">iso_template_path</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">iso_template_path</span><span class="p">):</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Could not load ISO template </span><span class="si">{</span><span class="n">iso_template_path</span><span class="si">}</span><span class="s2">, file does not exist&quot;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">ISO_METADATA_TEMPLATE_NOT_FOUND</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
-
         <span class="c1"># Base PGE does not produce ISO metadata.</span>
         <span class="k">return</span> <span class="kc">None</span>
 
@@ -888,7 +844,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2021-2025 California Institute of Technology.</p>
+    <p>&#169; Copyright 2021-2023 California Institute of Technology.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

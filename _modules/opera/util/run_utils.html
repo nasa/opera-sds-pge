@@ -5,14 +5,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera.util.run_utils &mdash; opera-sds-pge 6.0.0-er.2.0 documentation</title>
+  <title>opera.util.run_utils &mdash; opera-sds-pge 3.0.0-rc.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
 
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=136f5b14"></script>
+      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=e9509664"></script>
       <script src="../../../_static/doctools.js?v=888ff710"></script>
       <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -87,7 +87,6 @@
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">hashlib</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
@@ -126,42 +125,6 @@
 <div class="viewcode-block" id="get_extension"><a class="viewcode-back" href="../../../opera.util.html#opera.util.run_utils.get_extension">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">get_extension</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns the file extension (including the dot) of the provided file name.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">file_name</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
-
-
-<div class="viewcode-block" id="get_traceback_from_log"><a class="viewcode-back" href="../../../opera.util.html#opera.util.run_utils.get_traceback_from_log">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">get_traceback_from_log</span><span class="p">(</span><span class="n">log_contents</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Utilizes a regular expression to parse and return a traceback stack from</span>
-<span class="sd">    provided log contents.</span>
-
-<span class="sd">    Notes</span>
-<span class="sd">    -----</span>
-<span class="sd">    The regular expression used with this function was derived from the following</span>
-<span class="sd">    Stack Exchange answer: https://stackoverflow.com/a/53658873</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    log_contents : str</span>
-<span class="sd">        The log contents to parse for a traceback stack.</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    traceback_string : str</span>
-<span class="sd">        The parsed result of the regex search for a traceback. If none could be</span>
-<span class="sd">        found, an empty string is returned.</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-
-    <span class="n">exception_pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
-        <span class="sa">r</span><span class="s2">&quot;Traceback \(most recent call last\):(?:\n.*)+?\n(.*?(?:Exception|Error):)\s*(.+)&quot;</span>
-    <span class="p">)</span>
-
-    <span class="n">traceback_match</span> <span class="o">=</span> <span class="n">exception_pattern</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">log_contents</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">traceback_match</span><span class="p">:</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">traceback_match</span><span class="o">.</span><span class="n">string</span><span class="p">[</span><span class="n">traceback_match</span><span class="o">.</span><span class="n">start</span><span class="p">():</span><span class="n">traceback_match</span><span class="o">.</span><span class="n">end</span><span class="p">()]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-
-    <span class="k">return</span> <span class="n">result</span></div>
 
 
 <div class="viewcode-block" id="create_sas_command_line"><a class="viewcode-back" href="../../../opera.util.html#opera.util.run_utils.create_sas_command_line">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">create_sas_command_line</span><span class="p">(</span><span class="n">sas_program_path</span><span class="p">,</span> <span class="n">sas_runconfig_path</span><span class="p">,</span>
@@ -211,9 +174,9 @@
             <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">access</span><span class="p">(</span><span class="n">executable_path</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">X_OK</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Requested SAS program path </span><span class="si">{</span><span class="n">sas_program_path</span><span class="si">}</span><span class="s2"> exists, &quot;</span>
                               <span class="sa">f</span><span class="s2">&quot;but does not have execute permissions.&quot;</span><span class="p">)</span>
+        <span class="c1"># Otherwise, sas_program_path might be a python module path</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not find the configured SAS executable from the RunConfig file &quot;</span>
-                          <span class="sa">f</span><span class="s2">&quot;with path </span><span class="si">{</span><span class="n">sas_program_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">command_line</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;python3&#39;</span><span class="p">,</span> <span class="s1">&#39;-m&#39;</span><span class="p">,</span> <span class="n">sas_program_path</span><span class="p">]</span>
 
     <span class="c1"># Add any provided arguments</span>
     <span class="k">if</span> <span class="n">sas_program_options</span><span class="p">:</span>
@@ -268,9 +231,9 @@
             <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">access</span><span class="p">(</span><span class="n">executable_path</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">X_OK</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Requested QA program path </span><span class="si">{</span><span class="n">qa_program_path</span><span class="si">}</span><span class="s2"> exists, &quot;</span>
                               <span class="sa">f</span><span class="s2">&quot;but does not have execute permissions.&quot;</span><span class="p">)</span>
+        <span class="c1"># Otherwise, qa_program_path might be a python module path</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not find the configured QA executable from the RunConfig file &quot;</span>
-                          <span class="sa">f</span><span class="s2">&quot;with path </span><span class="si">{</span><span class="n">qa_program_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">command_line</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;python3&#39;</span><span class="p">,</span> <span class="s1">&#39;-m&#39;</span><span class="p">,</span> <span class="n">qa_program_path</span><span class="p">]</span>
 
     <span class="c1"># Add any provided arguments</span>
     <span class="k">if</span> <span class="n">qa_program_options</span><span class="p">:</span>
@@ -315,19 +278,15 @@
                                 <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">STDOUT</span><span class="p">,</span>
                                 <span class="n">shell</span><span class="o">=</span><span class="n">execute_via_shell</span><span class="p">)</span>
 
-    <span class="c1"># Append the full stdout/stderr captured by the subprocess to our log</span>
+    <span class="c1"># Append the stdout/stderr captured by the subprocess to our log</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">run_result</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">decode</span><span class="p">())</span>
 
+    <span class="n">tail</span> <span class="o">=</span> <span class="n">run_result</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">tail</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tail</span><span class="p">[</span><span class="o">-</span><span class="mi">20</span><span class="p">:])</span>
+
     <span class="k">if</span> <span class="n">run_result</span><span class="o">.</span><span class="n">returncode</span><span class="p">:</span>
-        <span class="c1"># Parse out the traceback stack from the SAS log to include with the error</span>
-        <span class="c1"># message that&#39;s propagated back to an SDS operator</span>
-        <span class="n">traceback_string</span> <span class="o">=</span> <span class="n">get_traceback_from_log</span><span class="p">(</span><span class="n">run_result</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">decode</span><span class="p">())</span>
-
         <span class="n">error_msg</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Command &quot;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">command_line</span><span class="p">)</span><span class="si">}</span><span class="s1">&quot; failed with exit &#39;</span>
-                     <span class="sa">f</span><span class="s1">&#39;code </span><span class="si">{</span><span class="n">run_result</span><span class="o">.</span><span class="n">returncode</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">traceback_string</span><span class="p">:</span>
-            <span class="n">error_msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;, Traceback from log:</span><span class="se">\n</span><span class="si">{</span><span class="n">traceback_string</span><span class="si">}</span><span class="s1">&#39;</span>
+                     <span class="sa">f</span><span class="s1">&#39;code </span><span class="si">{</span><span class="n">run_result</span><span class="o">.</span><span class="n">returncode</span><span class="si">}</span><span class="s1">, traceback:</span><span class="se">\n</span><span class="si">{</span><span class="n">tail</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
         <span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="n">module_name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">SAS_PROGRAM_FAILED</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">)</span>
 
@@ -345,7 +304,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2021-2025 California Institute of Technology.</p>
+    <p>&#169; Copyright 2021-2023 California Institute of Technology.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

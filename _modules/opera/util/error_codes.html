@@ -5,14 +5,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera.util.error_codes &mdash; opera-sds-pge 6.0.0-er.2.0 documentation</title>
+  <title>opera.util.error_codes &mdash; opera-sds-pge 3.0.0-rc.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
 
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=136f5b14"></script>
+      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=e9509664"></script>
       <script src="../../../_static/doctools.js?v=888ff710"></script>
       <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -88,9 +88,6 @@
 <span class="n">CODES_PER_RANGE</span> <span class="o">=</span> <span class="mi">1000</span>
 <span class="sd">&quot;&quot;&quot;Number of error codes allocated to each range&quot;&quot;&quot;</span>
 
-<span class="n">ERROR_CODE_PGE_OFFSET</span> <span class="o">=</span> <span class="mi">10000</span>
-<span class="sd">&quot;&quot;&quot;Base offset used to distinguish error codes by PGE type&quot;&quot;&quot;</span>
-
 <span class="n">INFO_RANGE_START</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="sd">&quot;&quot;&quot;Starting value for the Info code range&quot;&quot;&quot;</span>
 
@@ -162,7 +159,6 @@
     <span class="n">LOGGING_COULD_NOT_INCREMENT_SEVERITY</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
     <span class="n">LOGGING_RESYNC_FAILED</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
     <span class="n">LOGGED_WARNING_LINE</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
-    <span class="n">ISO_METADATA_NO_DESCRIPTIONS</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
 
     <span class="c1"># Critical - 3000 to 3999</span>
     <span class="n">RUN_CONFIG_VALIDATION_FAILED</span> <span class="o">=</span> <span class="n">CRITICAL_RANGE_START</span>
@@ -183,16 +179,11 @@
     <span class="n">QA_SAS_PROGRAM_FAILED</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
     <span class="n">ISO_METADATA_TEMPLATE_NOT_FOUND</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
     <span class="n">ISO_METADATA_GOT_SOME_RENDERING_ERRORS</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
-    <span class="n">ISO_METADATA_COULD_NOT_EXTRACT_METADATA</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
     <span class="n">ISO_METADATA_RENDER_FAILED</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
     <span class="n">SAS_OUTPUT_FILE_HAS_MISSING_DATA</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
     <span class="n">LOGGED_CRITICAL_LINE</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
     <span class="n">DYNAMIC_IMPORT_FAILED</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
     <span class="n">GRIB_TO_NETCDF_CONVERSION_FAILED</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
-    <span class="n">ISO_METADATA_TEMPLATE_NOT_PROVIDED_WHEN_NEEDED</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
-    <span class="n">ISO_METADATA_DESCRIPTIONS_CONFIG_INVALID</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
-    <span class="n">ISO_METADATA_DESCRIPTIONS_CONFIG_NOT_FOUND</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
-    <span class="n">ISO_METADATA_NO_ENTRY_FOR_DESCRIPTION</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
 
 <div class="viewcode-block" id="ErrorCode.describe"><a class="viewcode-back" href="../../../opera.util.html#opera.util.error_codes.ErrorCode.describe">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">describe</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
@@ -211,7 +202,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2021-2025 California Institute of Technology.</p>
+    <p>&#169; Copyright 2021-2023 California Institute of Technology.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

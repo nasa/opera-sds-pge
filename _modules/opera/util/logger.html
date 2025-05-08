@@ -5,14 +5,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera.util.logger &mdash; opera-sds-pge 6.0.0-er.2.0 documentation</title>
+  <title>opera.util.logger &mdash; opera-sds-pge 3.0.0-rc.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
 
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=136f5b14"></script>
+      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=e9509664"></script>
       <script src="../../../_static/doctools.js?v=888ff710"></script>
       <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -97,17 +97,9 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">opera.util.time</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">time_util</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">opera.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">error_codes</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">.error_codes</span><span class="w"> </span><span class="kn">import</span> <span class="n">ERROR_CODE_PGE_OFFSET</span><span class="p">,</span> <span class="n">ErrorCode</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.error_codes</span><span class="w"> </span><span class="kn">import</span> <span class="n">ErrorCode</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.time</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_iso_time</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.usage_metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_os_metrics</span>
-
-<span class="n">INFO</span> <span class="o">=</span> <span class="s2">&quot;Info&quot;</span>
-<span class="n">DEBUG</span> <span class="o">=</span> <span class="s2">&quot;Debug&quot;</span>
-<span class="n">WARNING</span> <span class="o">=</span> <span class="s2">&quot;Warning&quot;</span>
-<span class="n">CRITICAL</span> <span class="o">=</span> <span class="s2">&quot;Critical&quot;</span>
-<span class="sd">&quot;&quot;&quot;Constants for logging levels&quot;&quot;&quot;</span>
-
-<span class="c1"># pylint: disable=too-many-positional-arguments</span>
 
 
 <div class="viewcode-block" id="write"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.write">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">write</span><span class="p">(</span><span class="n">log_stream</span><span class="p">,</span> <span class="n">severity</span><span class="p">,</span> <span class="n">workflow</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">error_code</span><span class="p">,</span> <span class="n">error_location</span><span class="p">,</span>
@@ -183,18 +175,19 @@
 <span class="sd">        The severity level associated to the provided error code.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">error_code_offset</span> <span class="o">=</span> <span class="n">error_code</span> <span class="o">%</span> <span class="n">ERROR_CODE_PGE_OFFSET</span>
+    <span class="c1"># TODO: constants for max codes and severity strings</span>
+    <span class="n">error_code_offset</span> <span class="o">=</span> <span class="n">error_code</span> <span class="o">%</span> <span class="mi">10000</span>
 
     <span class="k">if</span> <span class="n">error_code_offset</span> <span class="o">&lt;</span> <span class="n">error_codes</span><span class="o">.</span><span class="n">DEBUG_RANGE_START</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">INFO</span>
+        <span class="k">return</span> <span class="s2">&quot;Info&quot;</span>
 
     <span class="k">if</span> <span class="n">error_code_offset</span> <span class="o">&lt;</span> <span class="n">error_codes</span><span class="o">.</span><span class="n">WARNING_RANGE_START</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">DEBUG</span>
+        <span class="k">return</span> <span class="s2">&quot;Debug&quot;</span>
 
     <span class="k">if</span> <span class="n">error_code_offset</span> <span class="o">&lt;</span> <span class="n">error_codes</span><span class="o">.</span><span class="n">CRITICAL_RANGE_START</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">WARNING</span>
+        <span class="k">return</span> <span class="s2">&quot;Warning&quot;</span>
 
-    <span class="k">return</span> <span class="n">CRITICAL</span></div>
+    <span class="k">return</span> <span class="s2">&quot;Critical&quot;</span></div>
 
 
 <div class="viewcode-block" id="standardize_severity_string"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.standardize_severity_string">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">standardize_severity_string</span><span class="p">(</span><span class="n">severity</span><span class="p">):</span>
@@ -216,10 +209,10 @@
 
     <span class="c1"># Convert some potential log level name variations</span>
     <span class="k">if</span> <span class="n">severity</span> <span class="o">==</span> <span class="s1">&#39;Warn&#39;</span><span class="p">:</span>
-        <span class="n">severity</span> <span class="o">=</span> <span class="n">WARNING</span>
+        <span class="n">severity</span> <span class="o">=</span> <span class="s1">&#39;Warning&#39;</span>
 
     <span class="k">if</span> <span class="n">severity</span> <span class="o">==</span> <span class="s1">&#39;Error&#39;</span><span class="p">:</span>
-        <span class="n">severity</span> <span class="o">=</span> <span class="n">CRITICAL</span>
+        <span class="n">severity</span> <span class="o">=</span> <span class="s1">&#39;Critical&#39;</span>
 
     <span class="k">return</span> <span class="n">severity</span></div>
 
@@ -334,10 +327,10 @@
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_make_blank_log_count_by_severity_dict</span><span class="p">():</span>
         <span class="k">return</span> <span class="p">{</span>
-            <span class="n">DEBUG</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="n">INFO</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="n">WARNING</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="n">CRITICAL</span><span class="p">:</span> <span class="mi">0</span>
+            <span class="s2">&quot;Debug&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;Info&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;Warning&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;Critical&quot;</span><span class="p">:</span> <span class="mi">0</span>
         <span class="p">}</span>
 
 <div class="viewcode-block" id="PgeLogger.get_log_count_by_severity_dict"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.PgeLogger.get_log_count_by_severity_dict">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_log_count_by_severity_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -390,6 +383,8 @@
 
         <span class="n">caller</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">currentframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_back</span>
 
+        <span class="c1"># TODO: Can the number of back frames be determined implicitly?</span>
+        <span class="c1">#       i.e. back up until the first non-logging frame is reached?</span>
         <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">additional_back_frames</span><span class="p">):</span>
             <span class="n">caller</span> <span class="o">=</span> <span class="n">caller</span><span class="o">.</span><span class="n">f_back</span>
 
@@ -414,7 +409,7 @@
 <span class="sd">            Description message to write to the log.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">INFO</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">error_code_offset</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Info&quot;</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">error_code_offset</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span>
                    <span class="n">additional_back_frames</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PgeLogger.debug"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.PgeLogger.debug">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">debug</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">error_code_offset</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
@@ -432,7 +427,7 @@
 <span class="sd">            Description message to write to the log.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">DEBUG</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">error_code_offset</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Debug&quot;</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">error_code_offset</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span>
                    <span class="n">additional_back_frames</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PgeLogger.warning"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.PgeLogger.warning">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">warning</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">error_code_offset</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
@@ -450,7 +445,7 @@
 <span class="sd">            Description message to write to the log.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">WARNING</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">error_code_offset</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Warning&quot;</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">error_code_offset</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span>
                    <span class="n">additional_back_frames</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PgeLogger.critical"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.PgeLogger.critical">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">critical</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">error_code_offset</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
@@ -479,7 +474,7 @@
 <span class="sd">            parameter is provided as the exception string.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">CRITICAL</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">error_code_offset</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Critical&quot;</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">error_code_offset</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span>
                    <span class="n">additional_back_frames</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">close_log_stream</span><span class="p">()</span>
@@ -513,11 +508,11 @@
 
 <div class="viewcode-block" id="PgeLogger.get_warning_count"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.PgeLogger.get_warning_count">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_warning_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the number of messages logged at the warning level.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_log_count_by_severity</span><span class="p">(</span><span class="n">WARNING</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_log_count_by_severity</span><span class="p">(</span><span class="s1">&#39;Warning&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PgeLogger.get_critical_count"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.PgeLogger.get_critical_count">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_critical_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the number of messages logged at the critical level.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_log_count_by_severity</span><span class="p">(</span><span class="n">CRITICAL</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_log_count_by_severity</span><span class="p">(</span><span class="s1">&#39;Critical&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PgeLogger.move"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.PgeLogger.move">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">move</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_filename</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -622,10 +617,10 @@
 
             <span class="c1"># Map the error code based on message severity</span>
             <span class="n">error_code</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="n">DEBUG</span><span class="p">:</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">LOGGED_DEBUG_LINE</span><span class="p">,</span>
-                <span class="n">INFO</span><span class="p">:</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">LOGGED_INFO_LINE</span><span class="p">,</span>
-                <span class="n">WARNING</span><span class="p">:</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">LOGGED_WARNING_LINE</span><span class="p">,</span>
-                <span class="n">CRITICAL</span><span class="p">:</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">LOGGED_CRITICAL_LINE</span>
+                <span class="s2">&quot;Debug&quot;</span><span class="p">:</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">LOGGED_DEBUG_LINE</span><span class="p">,</span>
+                <span class="s2">&quot;Info&quot;</span><span class="p">:</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">LOGGED_INFO_LINE</span><span class="p">,</span>
+                <span class="s2">&quot;Warning&quot;</span><span class="p">:</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">LOGGED_WARNING_LINE</span><span class="p">,</span>
+                <span class="s2">&quot;Critical&quot;</span><span class="p">:</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">LOGGED_CRITICAL_LINE</span>
             <span class="p">}[</span><span class="n">severity</span><span class="p">]</span>
 
             <span class="c1"># Add the error code base</span>
@@ -694,7 +689,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2021-2025 California Institute of Technology.</p>
+    <p>&#169; Copyright 2021-2023 California Institute of Technology.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

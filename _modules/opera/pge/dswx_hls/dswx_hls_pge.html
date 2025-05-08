@@ -5,14 +5,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera.pge.dswx_hls.dswx_hls_pge &mdash; opera-sds-pge 6.0.0-er.2.0 documentation</title>
+  <title>opera.pge.dswx_hls.dswx_hls_pge &mdash; opera-sds-pge 3.0.0-rc.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
 
   
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=136f5b14"></script>
+      <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=e9509664"></script>
       <script src="../../../../_static/doctools.js?v=888ff710"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../../../_static/js/theme.js"></script>
@@ -100,7 +100,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.error_codes</span><span class="w"> </span><span class="kn">import</span> <span class="n">ErrorCode</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.geo_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_geographic_boundaries_from_mgrs_tile</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.input_validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate_dswx_inputs</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.render_jinja2</span><span class="w"> </span><span class="kn">import</span> <span class="n">augment_measured_parameters</span><span class="p">,</span> <span class="n">render_jinja2</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.render_jinja2</span><span class="w"> </span><span class="kn">import</span> <span class="n">render_jinja2</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.tiff_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_geotiff_hls_dataset</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.tiff_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_geotiff_hls_sensor_product_id</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.tiff_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_geotiff_metadata</span>
@@ -187,7 +187,6 @@
 
         <span class="c1"># Get a list of input files to check for invalid platform metadata</span>
         <span class="n">list_of_input_tifs</span> <span class="o">=</span> <span class="p">[]</span>
-
         <span class="k">for</span> <span class="n">input_file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">input_files</span><span class="p">:</span>
             <span class="n">input_file_path</span> <span class="o">=</span> <span class="n">abspath</span><span class="p">(</span><span class="n">input_file</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">isdir</span><span class="p">(</span><span class="n">input_file_path</span><span class="p">):</span>
@@ -196,6 +195,7 @@
                 <span class="n">list_of_input_tifs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">input_file_path</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">input_tif</span> <span class="ow">in</span> <span class="n">list_of_input_tifs</span><span class="p">:</span>
+
             <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^HLS\.L30.*&quot;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">input_tif</span><span class="p">)):</span>
                 <span class="n">input_tif_metadata</span> <span class="o">=</span> <span class="n">get_geotiff_metadata</span><span class="p">(</span><span class="n">input_tif</span><span class="p">)</span>
                 <span class="k">if</span> <span class="s1">&#39;LANDSAT_PRODUCT_ID&#39;</span> <span class="ow">in</span> <span class="n">input_tif_metadata</span><span class="p">:</span>
@@ -208,12 +208,10 @@
             <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^HLS\.S30.*&quot;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">input_tif</span><span class="p">)):</span>
                 <span class="n">input_tif_metadata</span> <span class="o">=</span> <span class="n">get_geotiff_metadata</span><span class="p">(</span><span class="n">input_tif</span><span class="p">)</span>
                 <span class="k">if</span> <span class="s1">&#39;PRODUCT_URI&#39;</span> <span class="ow">in</span> <span class="n">input_tif_metadata</span><span class="p">:</span>
-                    <span class="c1"># For DSWx-HLS, we only want inputs from Sentinel 2-A/B/C/D</span>
-                    <span class="n">valid_s30_product_types</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;S2A&quot;</span><span class="p">,</span> <span class="s2">&quot;S2B&quot;</span><span class="p">,</span> <span class="s2">&quot;S2C&quot;</span><span class="p">,</span> <span class="s2">&quot;S2D&quot;</span><span class="p">)</span>
-
-                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">rf</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">valid_s30_product_type</span><span class="si">}</span><span class="s2">.*&quot;</span><span class="p">,</span> <span class="n">input_tif_metadata</span><span class="p">[</span><span class="s1">&#39;PRODUCT_URI&#39;</span><span class="p">])</span>
-                               <span class="k">for</span> <span class="n">valid_s30_product_type</span> <span class="ow">in</span> <span class="n">valid_s30_product_types</span><span class="p">):</span>
-                        <span class="n">error_msg</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Input file </span><span class="si">{</span><span class="n">input_tif</span><span class="si">}</span><span class="s2"> appears to not be a supported Sentinel 2 data type, &quot;</span>
+                    <span class="n">data_is_S2A</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;S2A.*&quot;</span><span class="p">,</span> <span class="n">input_tif_metadata</span><span class="p">[</span><span class="s1">&#39;PRODUCT_URI&#39;</span><span class="p">])</span>
+                    <span class="n">data_is_S2B</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;S2B.*&quot;</span><span class="p">,</span> <span class="n">input_tif_metadata</span><span class="p">[</span><span class="s1">&#39;PRODUCT_URI&#39;</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">data_is_S2A</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">data_is_S2B</span><span class="p">:</span>
+                        <span class="n">error_msg</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Input file </span><span class="si">{</span><span class="n">input_tif</span><span class="si">}</span><span class="s2"> appears to not be Sentinel 2 A/B data, &quot;</span>
                                      <span class="sa">f</span><span class="s2">&quot;metadata PRODUCT_URI is </span><span class="si">{</span><span class="n">input_tif_metadata</span><span class="p">[</span><span class="s1">&#39;PRODUCT_URI&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INVALID_INPUT</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">)</span>
 
@@ -494,8 +492,6 @@
         <span class="n">output_products</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">get_output_product_filenames</span><span class="p">()</span>
         <span class="n">representative_product</span> <span class="o">=</span> <span class="kc">None</span>
 
-        <span class="n">output_product_metadata</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-
         <span class="k">for</span> <span class="n">output_product</span> <span class="ow">in</span> <span class="n">output_products</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">basename</span><span class="p">(</span><span class="n">output_product</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">renamed_files</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="ow">and</span> <span class="n">basename</span><span class="p">(</span><span class="n">output_product</span><span class="p">)</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;tif&quot;</span><span class="p">):</span>
                 <span class="n">representative_product</span> <span class="o">=</span> <span class="n">output_product</span>
@@ -506,16 +502,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">ISO_METADATA_RENDER_FAILED</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
 
         <span class="c1"># Extract all metadata assigned by the SAS at product creation time</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">measured_parameters</span> <span class="o">=</span> <span class="n">get_geotiff_metadata</span><span class="p">(</span><span class="n">representative_product</span><span class="p">)</span>
-            <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;MeasuredParameters&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">augment_measured_parameters</span><span class="p">(</span>
-                <span class="n">measured_parameters</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">iso_measured_parameter_descriptions</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
-            <span class="p">)</span>
-        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Failed to extract metadata from </span><span class="si">{</span><span class="n">representative_product</span><span class="si">}</span><span class="s1">, reason: </span><span class="si">{</span><span class="n">err</span><span class="si">}</span><span class="s1">&#39;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">ISO_METADATA_COULD_NOT_EXTRACT_METADATA</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+        <span class="n">output_product_metadata</span> <span class="o">=</span> <span class="n">get_geotiff_metadata</span><span class="p">(</span><span class="n">representative_product</span><span class="p">)</span>
 
         <span class="c1"># Get the Military Grid Reference System (MGRS) tile code and zone identifier</span>
         <span class="c1"># from the name of the input HLS dataset</span>
@@ -538,31 +525,26 @@
         <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;geospatial_lat_min&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lat_min</span>
         <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;geospatial_lat_max&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lat_max</span>
 
-        <span class="c1"># Note: In DSWx-HLS SENSING_TIME represents the Worldwide Reference System (WRS) center sensing time.</span>
-        <span class="c1"># The ISO metadata calls for a beginning time and an ending time, so the center time will be written to both</span>
-        <span class="c1"># the beginning time slot and the ending time slot.</span>
         <span class="c1"># Split the sensing time into the beginning/end portions</span>
-        <span class="n">sensing_time_entry</span> <span class="o">=</span> <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;MeasuredParameters&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;SENSING_TIME&#39;</span><span class="p">)</span>
-        <span class="n">sensing_time_value</span> <span class="o">=</span> <span class="n">sensing_time_entry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">)</span>
-        <span class="n">first_sensing_time</span> <span class="o">=</span> <span class="n">sensing_time_value</span>
+        <span class="n">sensing_time</span> <span class="o">=</span> <span class="n">output_product_metadata</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;SENSING_TIME&#39;</span><span class="p">)</span>
 
         <span class="c1"># Sensing time can contain multiple times delimited by semicolon,</span>
         <span class="c1"># just take the first one</span>
-        <span class="k">if</span> <span class="s1">&#39;;&#39;</span> <span class="ow">in</span> <span class="n">sensing_time_value</span><span class="p">:</span>
-            <span class="n">first_sensing_time</span> <span class="o">=</span> <span class="n">sensing_time_value</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;;&#39;</span><span class="p">,</span> <span class="n">maxsplit</span><span class="o">=</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s1">&#39;;&#39;</span> <span class="ow">in</span> <span class="n">sensing_time</span><span class="p">:</span>
+            <span class="n">sensing_time</span> <span class="o">=</span> <span class="n">sensing_time</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;;&#39;</span><span class="p">,</span> <span class="n">maxsplit</span><span class="o">=</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="c1"># Certain datasets have been observed with multiple sensing times</span>
         <span class="c1"># concatenated by a plus sign, for this case just take the first of the</span>
         <span class="c1"># times</span>
-        <span class="k">if</span> <span class="s1">&#39;+&#39;</span> <span class="ow">in</span> <span class="n">first_sensing_time</span><span class="p">:</span>
-            <span class="n">first_sensing_time</span> <span class="o">=</span> <span class="n">first_sensing_time</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;+&#39;</span><span class="p">,</span> <span class="n">maxsplit</span><span class="o">=</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s1">&#39;+&#39;</span> <span class="ow">in</span> <span class="n">sensing_time</span><span class="p">:</span>
+            <span class="n">sensing_time</span> <span class="o">=</span> <span class="n">sensing_time</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;+&#39;</span><span class="p">,</span> <span class="n">maxsplit</span><span class="o">=</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 
-        <span class="c1"># Set beginning and ending time to the center time, since ISO metadata</span>
+        <span class="c1"># Set beginning and end time to single time parsed, since ISO metadata</span>
         <span class="c1"># requires both</span>
-        <span class="n">sensing_time_begin</span> <span class="o">=</span> <span class="n">sensing_time_end</span> <span class="o">=</span> <span class="n">first_sensing_time</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">sensing_time_begin</span> <span class="o">=</span> <span class="n">sensing_time_end</span> <span class="o">=</span> <span class="n">sensing_time</span>
 
-        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;sensingTimeBegin&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sensing_time_begin</span>
-        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;sensingTimeEnd&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sensing_time_end</span>
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;sensingTimeBegin&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sensing_time_begin</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;sensingTimeEnd&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sensing_time_end</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
 
         <span class="c1"># Add some fields on the dimensions of the data. These values should</span>
         <span class="c1"># be the same for all DSWx-HLS products, and were derived from the</span>
@@ -622,9 +604,6 @@
 <span class="sd">            the sourced metadata dictionaries.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># Use the base PGE implementation to validate existence of the template</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_create_iso_metadata</span><span class="p">()</span>
-
         <span class="n">runconfig_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">asdict</span><span class="p">()</span>
 
         <span class="n">product_output_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_collect_dswx_hls_product_metadata</span><span class="p">()</span>
@@ -641,6 +620,10 @@
         <span class="p">}</span>
 
         <span class="n">iso_template_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">iso_template_path</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">iso_template_path</span><span class="p">):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Could not load ISO template </span><span class="si">{</span><span class="n">iso_template_path</span><span class="si">}</span><span class="s2">, file does not exist&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">ISO_METADATA_TEMPLATE_NOT_FOUND</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
 
         <span class="n">rendered_template</span> <span class="o">=</span> <span class="n">render_jinja2</span><span class="p">(</span><span class="n">iso_template_path</span><span class="p">,</span> <span class="n">iso_metadata</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>
 
@@ -684,7 +667,7 @@
     <span class="n">LEVEL</span> <span class="o">=</span> <span class="s2">&quot;L3&quot;</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Processing Level for DSWx-HLS Products&quot;&quot;&quot;</span>
 
-    <span class="n">PGE_VERSION</span> <span class="o">=</span> <span class="s2">&quot;1.0.3&quot;</span>
+    <span class="n">PGE_VERSION</span> <span class="o">=</span> <span class="s2">&quot;1.0.2&quot;</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Version of the PGE (overrides default from base_pge)&quot;&quot;&quot;</span>
 
     <span class="n">SAS_VERSION</span> <span class="o">=</span> <span class="s2">&quot;1.0.1&quot;</span>  <span class="c1"># Final release 4.1 https://github.com/nasa/PROTEUS/releases/tag/v1.0.1</span>
@@ -709,7 +692,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2021-2025 California Institute of Technology.</p>
+    <p>&#169; Copyright 2021-2023 California Institute of Technology.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
