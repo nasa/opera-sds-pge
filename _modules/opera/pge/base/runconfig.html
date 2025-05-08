@@ -5,14 +5,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera.pge.base.runconfig &mdash; opera-sds-pge 3.0.0-rc.2.0 documentation</title>
+  <title>opera.pge.base.runconfig &mdash; opera-sds-pge 6.0.0-er.3.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
 
   
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=e9509664"></script>
+      <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=62ba114d"></script>
       <script src="../../../../_static/doctools.js?v=888ff710"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../../../_static/js/theme.js"></script>
@@ -270,7 +270,6 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="k">return</span> <span class="nb">object</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
-            <span class="c1"># TODO: create exceptions package with more intuitive exception class names</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s1">&#39;Expected field </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">error</span><span class="p">)</span><span class="si">}</span><span class="s1"> is missing from RunConfig &#39;</span>
                 <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
@@ -401,11 +400,27 @@
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">iso_template_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the ISO Template Path for a Primary Executable&quot;&quot;&quot;</span>
-        <span class="n">iso_template_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pge_config</span><span class="p">[</span><span class="s1">&#39;PrimaryExecutable&#39;</span><span class="p">][</span><span class="s1">&#39;IsoTemplatePath&#39;</span><span class="p">]</span>
+        <span class="n">iso_template_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pge_config</span><span class="p">[</span><span class="s1">&#39;PrimaryExecutable&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;IsoTemplatePath&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">iso_template_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
         <span class="k">return</span> <span class="p">(</span>
             <span class="n">iso_template_path</span>
             <span class="k">if</span> <span class="n">isabs</span><span class="p">(</span><span class="n">iso_template_path</span><span class="p">)</span>
             <span class="k">else</span> <span class="n">resource_filename</span><span class="p">(</span><span class="s1">&#39;opera&#39;</span><span class="p">,</span> <span class="n">iso_template_path</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">iso_measured_parameter_descriptions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the ISO Measured Parameters description file Path for a Primary Executable&quot;&quot;&quot;</span>
+        <span class="n">iso_descriptions_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pge_config</span><span class="p">[</span><span class="s1">&#39;PrimaryExecutable&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;IsoMeasuredParameterDescriptions&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">iso_descriptions_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">iso_descriptions_path</span>
+            <span class="k">if</span> <span class="n">isabs</span><span class="p">(</span><span class="n">iso_descriptions_path</span><span class="p">)</span>
+            <span class="k">else</span> <span class="n">resource_filename</span><span class="p">(</span><span class="s1">&#39;opera&#39;</span><span class="p">,</span> <span class="n">iso_descriptions_path</span><span class="p">)</span>
         <span class="p">)</span>
 
     <span class="nd">@property</span>
@@ -517,7 +532,7 @@
         <span class="k">for</span> <span class="n">ancillary_mapping</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ancillary_file_map</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ancillary_mapping</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
                 <span class="n">result</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">ancillary_mapping</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">ancillary_mapping</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ancillary_mapping</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">result</span></div>
@@ -554,7 +569,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2021-2023 California Institute of Technology.</p>
+    <p>&#169; Copyright 2021-2025 California Institute of Technology.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

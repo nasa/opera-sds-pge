@@ -6,21 +6,21 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera.util package &mdash; opera-sds-pge 3.0.0-rc.2.0 documentation</title>
+  <title>opera.util package &mdash; opera-sds-pge 6.0.0-er.3.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
 
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=e9509664"></script>
+      <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=62ba114d"></script>
       <script src="_static/doctools.js?v=888ff710"></script>
       <script src="_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Contributing" href="contributing.html" />
-    <link rel="prev" title="opera.pge.cslc_s1 package" href="opera.pge.cslc_s1.html" /> 
+    <link rel="prev" title="opera.pge.disp_ni package" href="opera.pge.disp_ni.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -117,6 +117,12 @@
 <dd><p>Starting value for the Debug code range</p>
 </dd></dl>
 
+<dl class="py data">
+<dt class="sig sig-object py" id="opera.util.error_codes.ERROR_CODE_PGE_OFFSET">
+<span class="sig-prename descclassname"><span class="pre">opera.util.error_codes.</span></span><span class="sig-name descname"><span class="pre">ERROR_CODE_PGE_OFFSET</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10000</span></em><a class="headerlink" href="#opera.util.error_codes.ERROR_CODE_PGE_OFFSET" title="Permalink to this definition"></a></dt>
+<dd><p>Base offset used to distinguish error codes by PGE type</p>
+</dd></dl>
+
 <dl class="py class">
 <dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">opera.util.error_codes.</span></span><span class="sig-name descname"><span class="pre">ErrorCode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/opera/util/error_codes.html#ErrorCode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opera.util.error_codes.ErrorCode" title="Permalink to this definition"></a></dt>
@@ -181,7 +187,7 @@ the RunConfig to determine the final, logged error code.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode.DYNAMIC_IMPORT_FAILED">
-<span class="sig-name descname"><span class="pre">DYNAMIC_IMPORT_FAILED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3021</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.DYNAMIC_IMPORT_FAILED" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">DYNAMIC_IMPORT_FAILED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3022</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.DYNAMIC_IMPORT_FAILED" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -196,7 +202,7 @@ the RunConfig to determine the final, logged error code.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode.GRIB_TO_NETCDF_CONVERSION_FAILED">
-<span class="sig-name descname"><span class="pre">GRIB_TO_NETCDF_CONVERSION_FAILED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3022</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.GRIB_TO_NETCDF_CONVERSION_FAILED" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">GRIB_TO_NETCDF_CONVERSION_FAILED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3023</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.GRIB_TO_NETCDF_CONVERSION_FAILED" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -230,18 +236,48 @@ the RunConfig to determine the final, logged error code.</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode.ISO_METADATA_COULD_NOT_EXTRACT_METADATA">
+<span class="sig-name descname"><span class="pre">ISO_METADATA_COULD_NOT_EXTRACT_METADATA</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3018</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.ISO_METADATA_COULD_NOT_EXTRACT_METADATA" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode.ISO_METADATA_DESCRIPTIONS_CONFIG_INVALID">
+<span class="sig-name descname"><span class="pre">ISO_METADATA_DESCRIPTIONS_CONFIG_INVALID</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3025</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.ISO_METADATA_DESCRIPTIONS_CONFIG_INVALID" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode.ISO_METADATA_DESCRIPTIONS_CONFIG_NOT_FOUND">
+<span class="sig-name descname"><span class="pre">ISO_METADATA_DESCRIPTIONS_CONFIG_NOT_FOUND</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3026</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.ISO_METADATA_DESCRIPTIONS_CONFIG_NOT_FOUND" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode.ISO_METADATA_GOT_SOME_RENDERING_ERRORS">
 <span class="sig-name descname"><span class="pre">ISO_METADATA_GOT_SOME_RENDERING_ERRORS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3017</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.ISO_METADATA_GOT_SOME_RENDERING_ERRORS" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode.ISO_METADATA_NO_DESCRIPTIONS">
+<span class="sig-name descname"><span class="pre">ISO_METADATA_NO_DESCRIPTIONS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2008</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.ISO_METADATA_NO_DESCRIPTIONS" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode.ISO_METADATA_NO_ENTRY_FOR_DESCRIPTION">
+<span class="sig-name descname"><span class="pre">ISO_METADATA_NO_ENTRY_FOR_DESCRIPTION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3027</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.ISO_METADATA_NO_ENTRY_FOR_DESCRIPTION" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode.ISO_METADATA_RENDER_FAILED">
-<span class="sig-name descname"><span class="pre">ISO_METADATA_RENDER_FAILED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3018</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.ISO_METADATA_RENDER_FAILED" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">ISO_METADATA_RENDER_FAILED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3019</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.ISO_METADATA_RENDER_FAILED" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode.ISO_METADATA_TEMPLATE_NOT_FOUND">
 <span class="sig-name descname"><span class="pre">ISO_METADATA_TEMPLATE_NOT_FOUND</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3016</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.ISO_METADATA_TEMPLATE_NOT_FOUND" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode.ISO_METADATA_TEMPLATE_NOT_PROVIDED_WHEN_NEEDED">
+<span class="sig-name descname"><span class="pre">ISO_METADATA_TEMPLATE_NOT_PROVIDED_WHEN_NEEDED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3024</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.ISO_METADATA_TEMPLATE_NOT_PROVIDED_WHEN_NEEDED" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -251,7 +287,7 @@ the RunConfig to determine the final, logged error code.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode.LOGGED_CRITICAL_LINE">
-<span class="sig-name descname"><span class="pre">LOGGED_CRITICAL_LINE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3020</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.LOGGED_CRITICAL_LINE" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">LOGGED_CRITICAL_LINE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3021</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.LOGGED_CRITICAL_LINE" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -401,7 +437,7 @@ the RunConfig to determine the final, logged error code.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="opera.util.error_codes.ErrorCode.SAS_OUTPUT_FILE_HAS_MISSING_DATA">
-<span class="sig-name descname"><span class="pre">SAS_OUTPUT_FILE_HAS_MISSING_DATA</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3019</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.SAS_OUTPUT_FILE_HAS_MISSING_DATA" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">SAS_OUTPUT_FILE_HAS_MISSING_DATA</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3020</span></em><a class="headerlink" href="#opera.util.error_codes.ErrorCode.SAS_OUTPUT_FILE_HAS_MISSING_DATA" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -485,6 +521,12 @@ integer values.</p>
 Original Authors: Alice Stanboli, David White
 Adapted By: Scott Collins, Jim Hofman</p>
 </section>
+<dl class="py data">
+<dt class="sig sig-object py" id="opera.util.logger.CRITICAL">
+<span class="sig-prename descclassname"><span class="pre">opera.util.logger.</span></span><span class="sig-name descname"><span class="pre">CRITICAL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Critical'</span></em><a class="headerlink" href="#opera.util.logger.CRITICAL" title="Permalink to this definition"></a></dt>
+<dd><p>Constants for logging levels</p>
+</dd></dl>
+
 <dl class="py class">
 <dt class="sig sig-object py" id="opera.util.logger.PgeLogger">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">opera.util.logger.</span></span><span class="sig-name descname"><span class="pre">PgeLogger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">workflow</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_code_base</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/opera/util/logger.html#PgeLogger"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opera.util.logger.PgeLogger" title="Permalink to this definition"></a></dt>
@@ -937,6 +979,28 @@ with subprocess.run.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="opera.util.run_utils.get_traceback_from_log">
+<span class="sig-prename descclassname"><span class="pre">opera.util.run_utils.</span></span><span class="sig-name descname"><span class="pre">get_traceback_from_log</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log_contents</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/opera/util/run_utils.html#get_traceback_from_log"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opera.util.run_utils.get_traceback_from_log" title="Permalink to this definition"></a></dt>
+<dd><p>Utilizes a regular expression to parse and return a traceback stack from
+provided log contents.</p>
+<p class="rubric">Notes</p>
+<p>The regular expression used with this function was derived from the following
+Stack Exchange answer: <a class="reference external" href="https://stackoverflow.com/a/53658873">https://stackoverflow.com/a/53658873</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>log_contents</strong> (<em>str</em>) – The log contents to parse for a traceback stack.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>traceback_string</strong> – The parsed result of the regex search for a traceback. If none could be
+found, an empty string is returned.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="opera.util.run_utils.time_and_execute">
 <span class="sig-prename descclassname"><span class="pre">opera.util.run_utils.</span></span><span class="sig-name descname"><span class="pre">time_and_execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command_line</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">execute_via_shell</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/opera/util/run_utils.html#time_and_execute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opera.util.run_utils.time_and_execute" title="Permalink to this definition"></a></dt>
 <dd><p>Executes the provided command line via subprocess while collecting the
@@ -1123,14 +1187,14 @@ metrics gathering, for use with the OPERA PGE Subsystem.</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="opera.pge.cslc_s1.html" class="btn btn-neutral float-left" title="opera.pge.cslc_s1 package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="opera.pge.disp_ni.html" class="btn btn-neutral float-left" title="opera.pge.disp_ni package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="contributing.html" class="btn btn-neutral float-right" title="Contributing" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2021-2023 California Institute of Technology.</p>
+    <p>&#169; Copyright 2021-2025 California Institute of Technology.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
