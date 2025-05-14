@@ -1,0 +1,85 @@
+Conventions:
+  attribute_data_type: string
+  attribute_type: contentInformation
+  description: NetCDF-4 conventions adopted in this product
+  display_name: Conventions
+title:
+  attribute_data_type: string
+  attribute_type: contentInformation
+  description: "OPERA_L4_TROPO-ZENITH"
+  display_name: Title
+institution:
+  attribute_data_type: string
+  attribute_type: contentInformation
+  description: Name of producing agency (e.g. “NASA JPL”).
+  display_name: Institution
+contact:
+  attribute_data_type: string
+  attribute_type: contentInformation
+  description: Contact information for the producer of the product. (e.g., "opera-sds-ops@jpl.nasa.gov").
+  display_name: Contact
+source:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Source provider (e.g. ECMWF)
+  display_name: Source
+platform:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Numerical Weather Model input. (e.g. Model High Resolution 15-day Forecast (HRES))
+  display_name: Platform
+spatial_resolution:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Spatial resolution of source and product (e.g. 0.07deg)
+  display_name: SpatialResolution
+temporal_resolution:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Temporal resolution of source and product (e.g. 6 hours)
+  display_name: TemporalResolution
+source_url:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Source url documentation, (e.g. https://www.ecmwf.int/en/forecasts/datasets/set-i for HRES)
+  display_name: SourceUrl
+references:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Url documentation for software (e.g. "https://raider.readthedocs.io/en/latest/" for RAiDER)
+  display_name: Reference
+mission_name:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: "OEPRA"
+  display_name: MissionName
+description:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: OPERA One-way Tropospheric Zenith-integrated Delay for Synthetic Aperture Radar
+  display_name: Description
+comment:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Intersect/interpolate with DEM, project to slant-range and multiply with -4pi/wavelength (2way) to get SAR correction
+  display_name: Comment
+software:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: RAiDER
+  display_name: Software
+software_version:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: "0.5.3"
+  display_name: SoftwareVersion
+reference_document:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Name and version of Product Description Document to use as reference for product. (TBD)
+  display_name: ReferenceDocument
+history:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Created on processing datetime, e.g. 2025-02-06 01:14:14.265581+00:00 (UTC)
+  display_name: History
