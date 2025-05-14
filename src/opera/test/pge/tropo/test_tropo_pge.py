@@ -23,6 +23,7 @@ import yaml
 from opera.pge import RunConfig
 from opera.pge.tropo.tropo_pge import TROPOExecutor
 from opera.util import PgeLogger
+from opera.util.render_jinja2 import UNDEFINED_ERROR
 
 
 class TROPOPgeTestCase(unittest.TestCase):
@@ -121,6 +122,21 @@ class TROPOPgeTestCase(unittest.TestCase):
         # Check that a RunConfig for the SAS was isolated within the scratch directory
         expected_sas_config_file = join(pge.runconfig.scratch_path, 'test_tropo_config_sas.yaml')
         self.assertTrue(os.path.exists(expected_sas_config_file))
+        
+        # Check that the catalog metadata file was created in the output directory
+        expected_catalog_metadata_file = join(
+            pge.runconfig.output_product_path, pge._catalog_metadata_filename())
+        self.assertTrue(os.path.exists(expected_catalog_metadata_file))
+
+        # # Check that the ISO metadata file was created and filled in as expected
+        expected_iso_metadata_file = join(
+            pge.runconfig.output_product_path, pge._iso_metadata_filename())
+        self.assertTrue(os.path.exists(expected_iso_metadata_file))
+
+        with open(expected_iso_metadata_file, 'r', encoding='utf-8') as infile:
+            iso_contents = infile.read()
+
+        self.assertNotIn(UNDEFINED_ERROR, iso_contents)
 
         # Check that the log file was created and moved into the output directory
         expected_log_file = pge.logger.get_file_name()
