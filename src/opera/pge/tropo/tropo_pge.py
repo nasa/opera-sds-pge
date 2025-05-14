@@ -298,11 +298,10 @@ class TROPOPostProcessorMixin(PostProcessorMixin):
 
         # For each output file name, assign the final file name matching the
         # expected conventions. Also extracts netCDF output product.
-        nc_output_product = None
         for output_product in output_products:
             self._assign_filename(output_product, self.runconfig.output_product_path)
             if splitext(output_product)[1] == 'nc':
-                nc_output_product = output_product                
+                self._cached_core_filename = output_product                
 
         # Write the catalog metadata to disk with the appropriate filename
         catalog_metadata = self._create_catalog_metadata()
@@ -323,7 +322,7 @@ class TROPOPostProcessorMixin(PostProcessorMixin):
             msg = f"Failed to write catalog metadata file {cat_meta_filepath}, reason: {str(err)}"
             self.logger.critical(self.name, ErrorCode.CATALOG_METADATA_CREATION_FAILED, msg)
 
-        tropo_metadata = self._collect_tropo_product_metadata(nc_output_product)
+        tropo_metadata = self._collect_tropo_product_metadata(self._cached_core_filename)
 
         # Generate the ISO metadata for use with product submission to DAAC(s)
         iso_metadata = self._create_iso_metadata(tropo_metadata)
