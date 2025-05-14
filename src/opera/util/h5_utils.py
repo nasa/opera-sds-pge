@@ -953,7 +953,8 @@ def create_test_tropo_metadata_product(file_path):
     }
     
     with h5py.File(file_path, 'w') as outfile:
-        outfile.attrs = tropo_attrs
+        for k,v in tropo_attrs.items():
+            outfile.attrs[k] = v
         lon_data = np.random.uniform(low=-180, high=180, size=(5120,))
         lat_data = np.random.uniform(low=-90, high=90, size=(2560,))
         
