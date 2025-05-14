@@ -995,6 +995,10 @@ class DispS1StaticPostProcessorMixin(DispS1PostProcessorMixin):
     _post_mixin_name = "DispS1StaticPostProcessorMixin"
     _product_metadata_cache = {}
     _product_filename_cache = {}
+    _band_rename_dict = {
+        'dem_warped_utm': 'dem',
+        'los_enu': 'line_of_sight_enu'
+    }
 
     def _validate_output(self):
         """
@@ -1132,6 +1136,7 @@ class DispS1StaticPostProcessorMixin(DispS1PostProcessorMixin):
         #  so this split has no effect.
 
         band_name = splitext(basename(inter_filename))[0].split('-')[-1]
+        band_name = self._band_rename_dict.get(band_name, band_name)
 
         return f"{self._core_filename(inter_filename)}_{band_name}.tif"
 
