@@ -23,6 +23,7 @@ import yaml
 from opera.pge import RunConfig
 from opera.pge.tropo.tropo_pge import TROPOExecutor
 from opera.util import PgeLogger
+from opera.util.h5_utils import create_test_tropo_metadata_product
 from opera.util.render_jinja2 import UNDEFINED_ERROR
 
 
@@ -66,6 +67,8 @@ class TROPOPgeTestCase(unittest.TestCase):
             Path(dummy_file_path).parent.mkdir(parents=True, exist_ok=True)
             with open(dummy_file_path, "wb") as f:
                 f.write(random.randbytes(1024))
+                
+        create_test_tropo_metadata_product(join(self.input_dir, 'ECMWF_TROP_202402151200_202402151200_1.nc'))
                 
         # Create the output directories expected by the test Runconfig file and add
         # dummy output files
