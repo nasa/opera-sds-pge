@@ -67,9 +67,7 @@ class TROPOPgeTestCase(unittest.TestCase):
             Path(dummy_file_path).parent.mkdir(parents=True, exist_ok=True)
             with open(dummy_file_path, "wb") as f:
                 f.write(random.randbytes(1024))
-                
-        create_test_tropo_metadata_product(join(self.input_dir, 'ECMWF_TROP_202402151200_202402151200_1.nc'))
-                
+                                
         # Create the output directories expected by the test Runconfig file and add
         # dummy output files
         self.test_output_dir = abspath(join(self.working_dir.name, "tropo_pge_test/output_dir"))
@@ -78,8 +76,9 @@ class TROPOPgeTestCase(unittest.TestCase):
         sas_version = rc.sas_config["product_path_group"]["product_version"]
         self.base_filename = f"OPERA_L4_TROPO-ZENITH_20250101T010101Z_20250101T010101Z_HRES_v{sas_version}"
         
-        for extension in (".nc", ".png"):
-            self._write_valid_output(extension)
+        self._write_valid_output(".png")
+            
+        create_test_tropo_metadata_product(join(self.test_output_dir, f'{self.base_filename}.nc'))
 
         os.chdir(self.working_dir.name)
 
