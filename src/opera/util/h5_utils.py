@@ -141,6 +141,39 @@ def convert_h5py_dataset(dataset_object):
     return result
 
 
+def get_hdf5_attrs_as_dict(file_name, group_path):
+    """
+    Returns HDF5 group attributes as a python dict for a given file and group
+    path.
+
+    Variable data are not included.
+
+    Parameters
+    ----------
+    file_name : str
+        File system path and filename for the HDF5 file to use.
+    group_path : str
+        Group path within the HDF5 file.
+    ignore_keys : iterable, optional
+        Keys within the group to not include in the returned dict.
+
+    Returns
+    -------
+    group_dict : dict
+        Python dict containing variable data from the group path location.
+
+    """
+    with h5py.File(file_name, 'r') as h5file:
+        group_object = h5file.get(group_path)
+
+        if group_object is None:
+            raise RuntimeError(f"An error occurred retrieving object '{group_path}' "
+                               f"from file '{file_name}'.")
+
+        result = {k:v.decode('UTF-8') for k,v in group_object.attrs.items()}
+
+    return result
+
 def get_rtc_s1_product_metadata(file_name):
     """
     Returns a python dict containing the RTC-S1 product_output metadata
@@ -830,3 +863,45 @@ def create_test_disp_metadata_product(
                                                                                   data=np.bytes_("0.15.1"))
             source_data_software_s1_reader_version_dset = metadata_grp.create_dataset(
                 "source_data_software_s1_reader_version", data=np.bytes_("0.2.4"))
+
+
+def get_tropo_product_metadata(file_name):
+    """
+    Returns a python dict containing the TROPO metadata
+    which will be used with the ISO metadata template.
+
+    Parameters
+    ----------
+    file_name : str
+        the TROPO metadata file.
+
+    Returns
+    -------
+    tropo_metadata : dict
+        python dict containing the HDF5 file metadata which is used in the
+        ISO template.
+    """
+    # TODO: replace dummy hardcoded metadata with call to get_hdf5_attrs_as_dict()
+    # tropo_metadata = get_hdf5_attrs_as_dict(file_name, "/")
+    
+    dummy_tropo_metadata = {
+        "Conventions": "CF-1.8",
+        "title": "OPERA_L4_TROPO-ZENITH",
+        "institution": "NASA Jet Propulsion Laboratory (JPL)",
+        "contact": "opera-sds-ops@jpl.nasa.gov",
+        "source": "ECMWF",
+        "platform": "Model High Resolution 15-day Forecast (HRES)",
+        "spatial_resolution": "~0.07deg",
+        "temporal_resolution": "6h",
+        "source_url": "https://www.ecmwf.int/en/forecasts/datasets/set-i",
+        "references": "https://raider.readthedocs.io/en/latest/",
+        "mission_name": "OPERA",
+        "description": "OPERA One-way Tropospheric Zenith-integrated Delay for Synthetic Aperture Radar",
+        "comment": "Intersect/interpolate with DEM, project to slant range and multiple with -4pi/radar wavelength (2 way) to get SAR correction",
+        "software": "RAiDER",
+        "software_version": "0.5.3",
+        "reference_document": "TBD",
+        "history": "Created on: 2025-03-24 21:28:42.426525+00:00",
+        "reference_time": "2024-02-15 12:00:00"
+    }
+    return dummy_tropo_metadata
