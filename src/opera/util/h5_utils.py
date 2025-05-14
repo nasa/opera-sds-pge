@@ -141,7 +141,7 @@ def convert_h5py_dataset(dataset_object):
     return result
 
 
-def get_hdf5_attrs_as_dict(file_name, group_path):
+def get_hdf5_attrs_as_dict(file_name, group_path, ignore_keys=None):
     """
     Returns HDF5 group attributes as a python dict for a given file and group
     path.
@@ -170,10 +170,56 @@ def get_hdf5_attrs_as_dict(file_name, group_path):
             raise RuntimeError(f"An error occurred retrieving object '{group_path}' "
                                f"from file '{file_name}'.")
 
-        result = {k:v.decode('UTF-8') for k,v in group_object.attrs.items()}
+        group_dict = {k:v.decode('UTF-8') for k,v in group_object.attrs.items() if k not in ignore_keys}
 
-    return result
+    return group_dict
+                               
+        
+def get_extent_from_coordinates(file_name, group_path, longitude='longitude', latitude='latitude'):
+    """
+    Returns spatial extent as (min_lon, max_lon, min_lat, max_lat).
 
+    Variable data are not included.
+
+    Parameters
+    ----------
+    file_name : str
+        File system path and filename for the HDF5 file to use.
+    group_path : str
+        Group path within the HDF5 file.
+    longitude : str
+        Name of longitude coordinate found in group_path.
+    latitude : str
+        Name of latitude coordinate found in group_path.
+
+    Returns
+    -------
+    extent : (float, float, float, float)
+        Tuple containing (min_lon, max_lon, min_lat, max_lat).
+
+    """
+    with h5py.File(file_name, 'r') as h5file:
+        group_object = h5file.get(group_path)
+
+        if group_object is None:
+            raise RuntimeError(f"An error occurred retrieving object '{group_path}' "
+                            f"from file '{file_name}'.")
+        if longitude not in group_object:
+            raise RuntimeError(f"An error occured retrieving variable '{longitude}'"
+                            f"from group path '{group_path}' in file '{file_name}'.")
+        if latitude not in group_object:
+            raise RuntimeError(f"An error occured retrieving variable '{latitude}'"
+                            f"from group path '{group_path}' in file '{file_name}'.")
+        
+        extent = (
+            min(group_object[longitude]), 
+            max(group_object[longitude]),
+            min(group_object[latitude]), 
+            max(group_object[latitude])
+        )
+            
+        return extent
+        
 def get_rtc_s1_product_metadata(file_name):
     """
     Returns a python dict containing the RTC-S1 product_output metadata
@@ -881,10 +927,11 @@ def get_tropo_product_metadata(file_name):
         python dict containing the HDF5 file metadata which is used in the
         ISO template.
     """
-    # TODO: replace dummy hardcoded metadata with call to get_hdf5_attrs_as_dict()
-    # tropo_metadata = get_hdf5_attrs_as_dict(file_name, "/")
+    tropo_metadata = get_hdf5_attrs_as_dict(file_name, "/")
+    return tropo_metadata
     
-    dummy_tropo_metadata = {
+def create_test_tropo_metadata_product(file_path):
+    tropo_attrs = {
         "Conventions": "CF-1.8",
         "title": "OPERA_L4_TROPO-ZENITH",
         "institution": "NASA Jet Propulsion Laboratory (JPL)",
@@ -904,4 +951,11 @@ def get_tropo_product_metadata(file_name):
         "history": "Created on: 2025-03-24 21:28:42.426525+00:00",
         "reference_time": "2024-02-15 12:00:00"
     }
-    return dummy_tropo_metadata
+    
+    with h5py.File(file_path, 'w') as outfile:
+        outfile.attrs = tropo_attrs
+        lon_data = np.random.uniform(low=-180, high=180, size=(5120,))
+        lat_data = np.random.uniform(low=-90, high=90, size=(2560,))
+        
+        longitude_dset = outfile.create_dataset("longitude", data=lon_data, dtype='float64')
+        latitude_dset = outfile.create_dataset("latitude", data=lat_data, dtype='float64')
