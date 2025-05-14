@@ -7,6 +7,7 @@ tropo_pge.py
 Module defining the implementation for the TROPO PGE.
 """
 
+from datetime import datetime, timedelta
 from os.path import abspath, basename, exists, getsize, join, splitext
 from os import listdir
 import re
@@ -18,7 +19,7 @@ from opera.util.error_codes import ErrorCode
 from opera.util.input_validation import check_input
 from opera.util.render_jinja2 import augment_hdf5_measured_parameters, render_jinja2
 from opera.util.run_utils import get_checksum
-from opera.util.h5_utils import get_tropo_product_metadata
+from opera.util.h5_utils import get_extent_from_coordinates, get_tropo_product_metadata
 
 
 class TROPOPreProcessorMixin(PreProcessorMixin):
@@ -151,6 +152,28 @@ class TROPOPostProcessorMixin(PostProcessorMixin):
         }
 
         return checksums
+    
+    def _parse_temporal_resolution(self, time_res: str):
+        match = re.fullmatch(r'(\d+)([smhdw])', time_res.strip().lower())
+        if not match:
+            raise ValueError(f"Invalid temporal resolution format: {time_res}")
+        
+        value, unit = match.groups()
+        value = int(value)
+
+        unit_map = {
+            's': 'seconds',
+            'm': 'minutes',
+            'h': 'hours',
+            'd': 'days',
+            'w': 'weeks',
+        }
+
+        if unit not in unit_map:
+            raise ValueError(f"Unsupported time unit: {unit}")
+
+        return timedelta(**{unit_map[unit]: value})
+
 
     def _collect_tropo_product_metadata(self, tropo_product):
         '''
@@ -169,7 +192,28 @@ class TROPOPostProcessorMixin(PostProcessorMixin):
         except Exception as err:
             msg = f'Failed to extract metadata from {tropo_product}, reason: {err}'
             self.logger.critical(self.name, ErrorCode.ISO_METADATA_COULD_NOT_EXTRACT_METADATA, msg)
-    
+
+        # Determine time bounds
+        ref_time = datetime.fromisoformat(measured_parameters["reference_time"])
+        time_res_delta = self._parse_temporal_resolution(measured_parameters["temporal_resolution"])
+        output_product_metadata['temporal_extent']['start_time'] = ref_time
+        output_product_metadata['temporal_extent']['end_time'] = ref_time + time_res_delta
+        
+        spatial_extent = get_extent_from_coordinates(tropo_product, "/")
+        output_product_metadata['spatial_extent']['lon_min'] = spatial_extent[0]
+        output_product_metadata['spatial_extent']['lon_max'] = spatial_extent[1]
+        output_product_metadata['spatial_extent']['lat_min'] = spatial_extent[2]
+        output_product_metadata['spatial_extent']['lat_max'] = spatial_extent[3]
+        
+        output_product_metadata['xCoordinates'] = {
+            'size': 5120,
+            'spacing': 8000 # 0.07 degrees is ~8km
+        }
+        output_product_metadata['yCoordinates'] = {
+            'size': 2560,
+            'spacing': 8000 # 0.07 degrees is ~8km
+        }
+        
         return output_product_metadata
     
     def _create_custom_metadata(self, granule_filename):
@@ -253,9 +297,12 @@ class TROPOPostProcessorMixin(PostProcessorMixin):
         output_products = self.runconfig.get_output_product_filenames()
 
         # For each output file name, assign the final file name matching the
-        # expected conventions
+        # expected conventions. Also extracts netCDF output product.
+        nc_output_product = None
         for output_product in output_products:
             self._assign_filename(output_product, self.runconfig.output_product_path)
+            if splitext(output_product)[1] == 'nc':
+                nc_output_product = output_product                
 
         # Write the catalog metadata to disk with the appropriate filename
         catalog_metadata = self._create_catalog_metadata()
@@ -276,7 +323,7 @@ class TROPOPostProcessorMixin(PostProcessorMixin):
             msg = f"Failed to write catalog metadata file {cat_meta_filepath}, reason: {str(err)}"
             self.logger.critical(self.name, ErrorCode.CATALOG_METADATA_CREATION_FAILED, msg)
 
-        tropo_metadata = self._collect_tropo_product_metadata()
+        tropo_metadata = self._collect_tropo_product_metadata(nc_output_product)
 
         # Generate the ISO metadata for use with product submission to DAAC(s)
         iso_metadata = self._create_iso_metadata(tropo_metadata)
