@@ -209,6 +209,8 @@ class TROPOPostProcessorMixin(PostProcessorMixin):
             'lat_max': spatial_extent[3]
         }
         
+        output_product_metadata["zone_identifier"] = "global"
+        
         output_product_metadata['xCoordinates'] = {
             'size': 5120,
             'spacing': 8000 # 0.07 degrees is ~8km
@@ -302,7 +304,7 @@ class TROPOPostProcessorMixin(PostProcessorMixin):
         # expected conventions. Also extracts netCDF output product.
         nc_product = None
         for output_product in output_products:
-            if splitext(output_product)[1] == 'nc':
+            if output_product.endswith('nc'):
                 nc_product = output_product
             self._assign_filename(output_product, self.runconfig.output_product_path)
 
