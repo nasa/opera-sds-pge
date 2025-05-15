@@ -224,6 +224,8 @@ class DispNIPgeTestCase(unittest.TestCase):
 class MockRunConfig:
     """Mock runconfig for testing"""
 
+    pge_name = "DISP_NI_PGE"
+
     def __init__(self, sas_config):
         self._sas_config_dict = sas_config
 

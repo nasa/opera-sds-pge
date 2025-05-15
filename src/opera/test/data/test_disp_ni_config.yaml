@@ -54,7 +54,7 @@ RunConfig:
                 # REQUIRED: list of paths to GSLC files.
                 #   Type: array.
                 gslc_file_list:
-                    - input_slcs/NISAR_L2_GSLC_NI_F150_20070703T062138Z_20240528T200959Z_NI_HH_v0.1.h5
+                    - disp_ni_pge_test/input_dir/NISAR_L2_GSLC_NI_F150_20070703T062138Z_20240528T200959Z_NI_HH_v0.1.h5
                 # REQUIRED: Frame ID of the gslcs contained in `gslc_file_list`.
                 #   Type: integer.
                 frame_id: 150
@@ -67,20 +67,20 @@ RunConfig:
             dynamic_ancillary_file_group:
                 # REQUIRED: Path to file containing SAS algorithm parameters.
                 #   Type: string.
-                algorithm_parameters_file: disp_s1_pge_test/input_dir/algorithm_parameters_historical.yaml
+                algorithm_parameters_file: disp_ni_pge_test/input_dir/test_disp_ni_algorithm_parameters.yaml
                 # Optional Byte mask file used to ignore low correlation/bad data (e.g water mask).
                 #   Convention is 0 for no data/invalid, and 1 for good data. Dtype must be uint8.
                 #   Type: string | null.
-                mask_file: disp_s1_pge_test/input_dir/water_mask.tif
+                mask_file: disp_ni_pge_test/input_dir/water_mask.tif
                 # Path to the DEM file covering full frame. If none provided, corrections using DEM are
                 #   skipped.
                 #   Type: string | null.
-                dem_file: disp_s1_pge_test/input_dir/dem.tif
+                dem_file: disp_ni_pge_test/input_dir/dem.tif
                 # List of paths to GUNW files for ionosphere, SET and static geometry layers.
                 #   Type: array | null.
                 gunw_files:
-                    - disp_s1_pge_test/input_dir/NISAR_L2_PR_GUNW_001_005_A_219_220_4020_SH_20060630T000000_20060630T000000_20060815T000000_20060815T000000_P01101_M_F_J_001.h5
-                    - disp_s1_pge_test/input_dir/NISAR_L2_PR_GUNW_001_005_A_219_220_4020_SH_20060815T000000_20060815T000000_20060930T000000_20060930T000000_P01101_M_F_J_001.h5
+                    - disp_ni_pge_test/input_dir/NISAR_L2_PR_GUNW_001_005_A_219_220_4020_SH_20060630T000000_20060630T000000_20060815T000000_20060815T000000_P01101_M_F_J_001.h5
+                    - disp_ni_pge_test/input_dir/NISAR_L2_PR_GUNW_001_005_A_219_220_4020_SH_20060815T000000_20060815T000000_20060930T000000_20060930T000000_P01101_M_F_J_001.h5
                 # List of paths to troposphere weather model files (1 per date). If none provided,
                 #   troposphere corrections are skipped.
                 #   Type: array | null.
@@ -88,10 +88,10 @@ RunConfig:
             static_ancillary_file_group:
                 # JSON file containing the mapping from frame_id to bounds information.
                 #   Type: string | null.
-                frame_to_bounds_json: disp_s1_pge_test/input_dir/Frame_to_bounds_DISP-NI_v0.1.json
+                frame_to_bounds_json: disp_ni_pge_test/input_dir/Frame_to_bounds_DISP-NI_v0.1.json
                 # JSON file containing list of reference date changes for each frame.
                 #   Type: string | null.
-                reference_date_database_json: disp_s1_pge_test/input_dir/opera-disp-nisar-reference-dates-dummy.json
+                reference_date_database_json: disp_ni_pge_test/input_dir/opera-disp-nisar-reference-dates-dummy.json
             primary_executable:
                 # Product type of the PGE.
                 #   Type: string.
@@ -99,13 +99,13 @@ RunConfig:
             product_path_group:
                 # REQUIRED: Directory where PGE will place results.
                 #   Type: string.
-                product_path: disp_s1_pge_test/output_dir
+                product_path: disp_ni_pge_test/output_dir
                 # Path to the scratch directory.
                 #   Type: string.
-                scratch_path: disp_s1_pge_test/scratch_dir
+                scratch_path: disp_ni_pge_test/scratch_dir
                 # Path to the SAS output directory.
                 #   Type: string.
-                sas_output_path: disp_s1_pge_test/output_dir
+                sas_output_path: disp_ni_pge_test/output_dir
                 # Version of the product, in <major>.<minor> format.
                 #   Type: string.
                 product_version: '0.1'
@@ -132,4 +132,4 @@ RunConfig:
                     - 512
             # Path to the output log file in addition to logging to stderr.
             #   Type: string | null.
-            log_file: disp_s1_pge_test/output_dir/log_sas.log
+            log_file: disp_ni_pge_test/output_dir/log_sas.log

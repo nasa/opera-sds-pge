@@ -209,7 +209,7 @@ class DispS1PostProcessorMixin(PostProcessorMixin):
 
         product_type = self.runconfig.sas_config['primary_executable']['product_type']
 
-        if product_type == 'DISP_S1_FORWARD' and len(nc_files) > 1:
+        if product_type in {'DISP_S1_FORWARD', 'DISP_NISAR_FORWARD'} and len(nc_files) > 1:
             error_msg = f"The SAS created too many files with the expected '.nc' extension: {nc_files}"
             self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
 

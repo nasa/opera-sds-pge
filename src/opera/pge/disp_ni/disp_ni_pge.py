@@ -7,20 +7,29 @@ disp_ni_pge.py
 Module defining the implementation for the Surface Displacement (DISP) from NISAR PGE.
 """
 
-from opera.pge.base.base_pge import PgeExecutor, PostProcessorMixin, PreProcessorMixin
+from opera.pge.base.base_pge import PgeExecutor
+from opera.pge.disp_s1.disp_s1_pge import DispS1PostProcessorMixin, DispS1PreProcessorMixin
 
 
-class DispNIPreProcessorMixin(PreProcessorMixin):
+class DispNIPreProcessorMixin(DispS1PreProcessorMixin):
     """
     Mixin class responsible for handling all pre-processing steps for the DISP-NI
     PGE. The pre-processing phase is defined as all steps necessary prior
     to SAS execution.
-    This particular pre-processor is currently a stub implementation, inheriting from the base pre-processor mixin
-    and adding nothing at this time. New functionalities will be added as new versions of the DISP-NI SAS are released.
+    This particular pre-processor inherits from the DISP-S1 pre-processor mixin
+    with one check disabled currently as it does not apply to DISP-NI currently.
+    but may in the future.
     """
 
     _pre_mixin_name = "DispNIPreProcessorMixin"
     _valid_input_extensions = (".tif",)
+
+    def _validate_runconfig_needed_options(self):
+        """
+        Bypass this method for NISAR. It may need to be re-implemented if we have a
+        DISP-NI-STATIC PGE in the future.
+        """
+        pass
 
     def run_preprocessor(self, **kwargs):
         """
@@ -37,13 +46,13 @@ class DispNIPreProcessorMixin(PreProcessorMixin):
         super().run_preprocessor(**kwargs)
 
 
-class DispNIPostProcessorMixin(PostProcessorMixin):
+class DispNIPostProcessorMixin(DispS1PostProcessorMixin):
     """
     Mixin class responsible for handling all post-processing steps for the DISP-NI
     PGE. The post-processing phase is defined as all steps required after SAS
     execution has completed, prior to handover of output products to PCM.
-    This particular pre-processor is currently a stub implementation, inheriting from the base pre-processor mixin
-    and adding nothing at this time. New functionalities will be added as new versions of the DISP-NI SAS are released.
+    This particular post-processor inherits from the DISP-S1 post-processor mixin
+    with no changes or additions at present.
     """
 
     _post_mixin_name = "DispNIPostProcessorMixin"
