@@ -95,7 +95,7 @@ RunConfig:
             primary_executable:
                 # Product type of the PGE.
                 #   Type: string.
-                product_type: DISP_NISAR_HISTORICAL
+                product_type: DISP_NISAR_FORWARD
             product_path_group:
                 # REQUIRED: Directory where PGE will place results.
                 #   Type: string.

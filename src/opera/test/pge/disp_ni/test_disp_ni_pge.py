@@ -12,9 +12,11 @@ import shutil
 import tempfile
 import unittest
 from io import StringIO
-from os.path import abspath, join
+from os.path import abspath, join, exists
 
 from pkg_resources import resource_filename
+
+import yaml
 
 from opera.pge import RunConfig
 from opera.pge.disp_ni.disp_ni_pge import DispNIExecutor
@@ -165,7 +167,7 @@ class DispNIPgeTestCase(unittest.TestCase):
         self.assertEqual(runconfig['num_parallel_products'], 3)
         # self.assertFalse(runconfig['recommended_use_conncomp'])
 
-    def test_disp_s1_pge_execution(self):
+    def test_disp_ni_pge_execution(self):
         """
         Test execution of the DispNIExecutor class and its associated mixins
         using a test RunConfig that creates dummy expected output files and logs
@@ -203,6 +205,8 @@ class DispNIPgeTestCase(unittest.TestCase):
         expected_sas_config_file = join(pge.runconfig.scratch_path, 'test_disp_ni_config_sas.yaml')
         self.assertTrue(os.path.exists(expected_sas_config_file))
 
+        # TODO: Test for catalog & ISO XML when ready
+
         # Check that the log file was created and moved into the output directory
         expected_log_file = pge.logger.get_file_name()
         self.assertTrue(os.path.exists(expected_log_file))
@@ -219,6 +223,215 @@ class DispNIPgeTestCase(unittest.TestCase):
             log_contents = infile.read()
 
         self.assertIn(f"DISP-NI invoked with RunConfig {expected_sas_config_file}", log_contents)
+
+    def test_disp_ni_pge_validate_inputs(self):
+        """
+        Test that the validate_disp_inputs function is able to detect non-existent files,
+        zero-size files, and invalid extensions in filenames. Also check that
+        valid files pass validation.
+        """
+        ...
+
+    def test_disp_ni_pge_validate_product_output(self):
+        """Test off-nominal output conditions"""
+        runconfig_path = join(self.data_dir, 'test_disp_ni_config.yaml')
+        test_runconfig_path = join(self.data_dir, 'test_off_nominal_output.yaml')
+
+        with open(runconfig_path, 'r', encoding='utf-8') as infile:
+            runconfig_dict = yaml.safe_load(infile)
+
+        try:
+            # No .nc files
+            runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']['ProgramOptions'] = \
+                ['-p disp_ni_pge_test/output_dir/compressed_slcs; echo ']
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+                yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+
+            pge = DispNIExecutor(pge_name="DispNIPgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn("The SAS did not create any output file(s) with the expected '.nc' extension", log_contents)
+            shutil.rmtree(pge.runconfig.output_product_path)
+
+        finally:
+            if exists(test_runconfig_path):
+                os.unlink(test_runconfig_path)
+
+            # Too many .nc files
+            runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']['ProgramOptions'] = \
+                ['-p disp_ni_pge_test/output_dir/compressed_slcs;',
+                 'dd if=/dev/urandom of=disp_ni_pge_test/output_dir/20180101_20180330.nc bs=1M count=1;',
+                 'dd if=/dev/urandom of=disp_ni_pge_test/output_dir/20180101_20180331.nc bs=1M count=1; echo ']
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+                yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+
+            pge = DispNIExecutor(pge_name="DispNIPgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn("The SAS created too many files with the expected '.nc' extension:", log_contents)
+            shutil.rmtree(pge.runconfig.output_product_path)
+
+            # Empty product file
+            runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']['ProgramOptions'] = \
+                ['-p disp_ni_pge_test/output_dir/compressed_slcs;',
+                 'touch disp_ni_pge_test/output_dir/20180101_20180330.nc; echo ']
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+                yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+
+            pge = DispNIExecutor(pge_name="DispNIPgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn("SAS output file 20180101_20180330.nc exists, but is empty", log_contents)
+            shutil.rmtree(pge.runconfig.output_product_path)
+
+            # PNG file is missing
+            runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']['ProgramOptions'] = \
+                ['-p disp_ni_pge_test/output_dir/compressed_slcs;',
+                 'dd if=/dev/urandom of=disp_ni_pge_test/output_dir/20180101_20180330.nc bs=1M count=1;',
+                 '/bin/echo DISP-S1 invoked with RunConfig']
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+                yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+
+            pge = DispNIExecutor(pge_name="DispNIPgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn("SAS output file 20180101_20180330.short_wavelength_displacement.png does not exist", log_contents)
+            shutil.rmtree(pge.runconfig.output_product_path)
+
+            # PNG is zero sized
+            runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']['ProgramOptions'] = \
+                ['-p disp_ni_pge_test/output_dir/compressed_slcs;',
+                 'dd if=/dev/urandom of=disp_ni_pge_test/output_dir/20180101_20180330.nc bs=1M count=1;',
+                 'touch disp_ni_pge_test/output_dir/20180101_20180330.short_wavelength_displacement.png;',
+                 '/bin/echo DISP-S1 invoked with RunConfig']
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+                yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+
+            pge = DispNIExecutor(pge_name="DispNIPgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn("SAS output file 20180101_20180330.short_wavelength_displacement.png exists, but is empty",
+                          log_contents)
+            shutil.rmtree(pge.runconfig.output_product_path)
+
+            # compressed_slc directory does not exist
+            runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']['ProgramOptions'] = \
+                ['-p disp_ni_pge_test/output_dir/not_compressed_slcs;',
+                 'dd if=/dev/urandom of=disp_ni_pge_test/output_dir/20180101_20180330.nc bs=1M count=1;',
+                 'dd if=/dev/urandom of=disp_ni_pge_test/output_dir/20180101_20180330.displacement.png bs=1M count=1;',
+                 'dd if=/dev/urandom of=disp_ni_pge_test/output_dir/20180101_20180330.short_wavelength_displacement.png'
+                 ' bs=1M count=1;', 'bs=1M count=1;', '/bin/echo DISP-S1 invoked with RunConfig']
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+                yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+
+            pge = DispNIExecutor(pge_name="DispNIPgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn("SAS output directory 'compressed_slcs' does not exist", log_contents)
+            shutil.rmtree(pge.runconfig.output_product_path)
+
+            # compressed_slc directory exists but is empty
+            runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']['ProgramOptions'] = \
+                ['-p disp_ni_pge_test/output_dir/compressed_slcs;',
+                 'dd if=/dev/urandom of=disp_ni_pge_test/output_dir/20180101_20180330.nc bs=1M count=1;',
+                 'dd if=/dev/urandom of=disp_ni_pge_test/output_dir/20180101_20180330.displacement.png bs=1M count=1;',
+                 'dd if=/dev/urandom of=disp_ni_pge_test/output_dir/20180101_20180330.'
+                 'short_wavelength_displacement.png bs=1M count=1;',
+                 'bs=1M count=1;', '/bin/echo DISP-S1 invoked with RunConfig']
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+                yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+
+            pge = DispNIExecutor(pge_name="DispNIPgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn("SAS output directory 'compressed_slcs' exists, but is empty", log_contents)
+            shutil.rmtree(pge.runconfig.output_product_path)
+
+            # File in compressed_slc directory is zero sized
+            runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']['ProgramOptions'] = \
+                ['-p disp_ni_pge_test/output_dir/compressed_slcs;',
+                 'dd if=/dev/urandom of=disp_ni_pge_test/output_dir/20180101_20180330.nc bs=1M count=1;',
+                 'dd if=/dev/urandom of=disp_ni_pge_test/output_dir/20180101_20180330.displacement.png bs=1M count=1;',
+                 'dd if=/dev/urandom of=disp_ni_pge_test/output_dir/20180101_20180330.short_wavelength_displacement.'
+                 'png bs=1M count=1;',
+                 'touch disp_ni_pge_test/output_dir/compressed_slcs/'
+                 'compressed_slc_t087_185684_iw2_20180222_20180330.h5;',
+                 # noqa E501
+                 '/bin/echo DISP-S1 invoked with RunConfig']
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+                yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+
+            pge = DispNIExecutor(pge_name="DispNIPgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn(
+                "Compressed CSLC file 'compressed_slc_t087_185684_iw2_20180222_20180330.h5' exists, but is empty",
+                log_contents)
+            shutil.rmtree(pge.runconfig.output_product_path)
 
 
 class MockRunConfig:
