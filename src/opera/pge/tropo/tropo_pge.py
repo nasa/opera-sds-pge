@@ -154,6 +154,23 @@ class TROPOPostProcessorMixin(PostProcessorMixin):
         return checksums
     
     def _parse_temporal_resolution(self, time_res: str):
+        """
+        Converts a time resolution string of the format "{value}{unit}"
+        to a datetime timedelta object. TROPO products define a 
+        temporal_resolution metadata attribute, ex: "6h".
+        
+        Parameters
+        ----------
+        time_res : str
+            Contents of the temporal_resolution attribute from a TROPO
+            output NetCDF product.
+            
+        Returns
+        ----------
+        time_delta : timedelta
+            Datetime timedelta object used to compute the end time of
+            a TROPO output product.
+        """
         match = re.fullmatch(r'(\d+)([smhdw])', time_res.strip().lower())
         if not match:
             raise ValueError(f"Invalid temporal resolution format: {time_res}")
@@ -172,13 +189,25 @@ class TROPOPostProcessorMixin(PostProcessorMixin):
         if unit not in unit_map:
             raise ValueError(f"Unsupported time unit: {unit}")
 
-        return timedelta(**{unit_map[unit]: value})
+        time_delta = timedelta(**{unit_map[unit]: value})
+        return time_delta
 
 
     def _collect_tropo_product_metadata(self, tropo_product):
         '''
-         to extract metadata from a product, then creates the Measured Parameters dictionary for 
-         use with ISO XML template (see utils.render_jinja2.augment_hdf5_measured_parameters)
+        Gathers the available metadata from a sample output TROPO product for
+        use in filling out the ISO metadata template fro the TROPO pge.
+        
+        Parameters
+        ----------
+        tropo_product : str
+            Path to the TROPO NetCDF product to collect metadata from.
+
+        Returns
+        -------
+        output_product_metadata : dict
+            Dictionary containing TROPO output product metadata, formatted
+            for use with the ISO metadata Jinja2 template.
         '''
         output_product_metadata = dict()
         
