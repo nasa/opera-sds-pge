@@ -507,12 +507,12 @@
                         </gmd:EX_GeographicBoundingBox>
                     </gmd:geographicElement>
                     <!-- This section documents the ZoneIdentifier -->
-                    {# <gmd:geographicElement>
+                    <gmd:geographicElement>
                         <gmd:EX_GeographicDescription id="ZoneIdentifier">
                             <gmd:geographicIdentifier>
                                 <gmd:MD_Identifier>
                                     <gmd:code>
-                                        <gco:CharacterString>{{ product_output.zoneIdentifier }}{# ISO_OPERA_zoneIdentifier #}</gco:CharacterString>
+                                        <gco:CharacterString>{{ product_output.zone_identifier }}{# ISO_OPERA_zoneIdentifier #}</gco:CharacterString>
                                     </gmd:code>
                                     <gmd:codeSpace>
                                         <gco:CharacterString>gov.nasa.esdis.umm.zoneidentifier</gco:CharacterString>
@@ -523,7 +523,7 @@
                                 </gmd:MD_Identifier>
                             </gmd:geographicIdentifier>
                         </gmd:EX_GeographicDescription>
-                    </gmd:geographicElement> #}
+                    </gmd:geographicElement>
                     <!-- This is the granules temporal extent -->
                     <gmd:temporalElement>
                         <!--RangeDateTime-->
