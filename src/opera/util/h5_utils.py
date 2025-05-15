@@ -938,6 +938,20 @@ def get_tropo_product_metadata(file_name):
     return tropo_metadata
     
 def create_test_tropo_metadata_product(file_path):
+    """
+    Creates a dummy TROPO netCDF metadata file with expected global attributes
+    and latitude and longitude arrays. This function is intended for use with 
+    unit tests, but is included in this module, so it will be importable from 
+    within a built container. 
+    
+    Global attribute values are currently written in TROPO products as Numpy 
+    byte strings, which has been reflected here.
+
+    Parameters
+    ----------
+    file_path : str
+        Full path to write the dummy TROPO netCDF metadata file to.
+    """
     tropo_attrs = {
         "Conventions": np.bytes_("CF-1.8"),
         "title": np.bytes_("OPERA_L4_TROPO-ZENITH"),
