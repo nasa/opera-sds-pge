@@ -243,7 +243,7 @@ class TROPOPostProcessorMixin(PostProcessorMixin):
 
         return custom_metadata
     
-    def _create_iso_metadata(self, tropo_metadata):
+    def _create_iso_metadata(self, tropo_metadata, product_filename):
         """
         Creates a rendered version of the ISO metadata template for TROPO
         output products using metadata from the following locations:
@@ -269,15 +269,13 @@ class TROPOPostProcessorMixin(PostProcessorMixin):
         # Use the base PGE implemenation to validate existence of the template
         super()._create_iso_metadata()
         
-        granule_filename = self._cached_core_filename
-
         runconfig_dict = self.runconfig.asdict()
 
         product_output_dict = tropo_metadata
 
         catalog_metadata_dict = self._create_catalog_metadata().asdict()
 
-        custom_data_dict = self._create_custom_metadata(granule_filename)
+        custom_data_dict = self._create_custom_metadata(product_filename)
 
         iso_metadata = {
             'run_config': runconfig_dict,
@@ -298,10 +296,11 @@ class TROPOPostProcessorMixin(PostProcessorMixin):
 
         # For each output file name, assign the final file name matching the
         # expected conventions. Also extracts netCDF output product.
+        nc_product = None
         for output_product in output_products:
-            self._assign_filename(output_product, self.runconfig.output_product_path)
             if splitext(output_product)[1] == 'nc':
-                self._cached_core_filename = output_product                
+                nc_product = output_product
+            self._assign_filename(output_product, self.runconfig.output_product_path)
 
         # Write the catalog metadata to disk with the appropriate filename
         catalog_metadata = self._create_catalog_metadata()
@@ -322,10 +321,10 @@ class TROPOPostProcessorMixin(PostProcessorMixin):
             msg = f"Failed to write catalog metadata file {cat_meta_filepath}, reason: {str(err)}"
             self.logger.critical(self.name, ErrorCode.CATALOG_METADATA_CREATION_FAILED, msg)
 
-        tropo_metadata = self._collect_tropo_product_metadata(self._cached_core_filename)
+        tropo_metadata = self._collect_tropo_product_metadata(nc_product)
 
         # Generate the ISO metadata for use with product submission to DAAC(s)
-        iso_metadata = self._create_iso_metadata(tropo_metadata)
+        iso_metadata = self._create_iso_metadata(tropo_metadata, nc_product)
 
         iso_meta_filename = self._iso_metadata_filename()
         iso_meta_filepath = join(self.runconfig.output_product_path, iso_meta_filename)
