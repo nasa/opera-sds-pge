@@ -307,23 +307,30 @@ def validate_disp_inputs(runconfig, logger, name):
     dyn_anc_file_group = runconfig.sas_config['dynamic_ancillary_file_group']
     static_anc_file_group = runconfig.sas_config['static_ancillary_file_group']
 
-    check_input_list(input_file_group['cslc_file_list'], logger, name,
-                     valid_extensions=('.h5',), check_zero_size=True)
-
-    cslc_burst_id_set = get_cslc_input_burst_id_set(
-        runconfig.sas_config['input_file_group']['cslc_file_list'],
-        logger, name
-    )
-
-    if ('static_layers_files' in dyn_anc_file_group and
-            isinstance(dyn_anc_file_group['static_layers_files'], list) and
-            len(dyn_anc_file_group['static_layers_files']) > 0):
-        check_input_list(dyn_anc_file_group['static_layers_files'], logger, name,
+    if runconfig.pge_name == 'DISP_S1_PGE':
+        check_input_list(input_file_group['cslc_file_list'], logger, name,
                          valid_extensions=('.h5',), check_zero_size=True)
-        check_disp_s1_ancillary_burst_ids(cslc_burst_id_set,
-                                          dyn_anc_file_group['static_layers_files'],
-                                          logger,
-                                          name)
+
+        cslc_burst_id_set = get_cslc_input_burst_id_set(
+            runconfig.sas_config['input_file_group']['cslc_file_list'],
+            logger, name
+        )
+
+        if ('static_layers_files' in dyn_anc_file_group and
+                isinstance(dyn_anc_file_group['static_layers_files'], list) and
+                len(dyn_anc_file_group['static_layers_files']) > 0):
+            check_input_list(dyn_anc_file_group['static_layers_files'], logger, name,
+                             valid_extensions=('.h5',), check_zero_size=True)
+            check_disp_s1_ancillary_burst_ids(cslc_burst_id_set,
+                                              dyn_anc_file_group['static_layers_files'],
+                                              logger,
+                                              name)
+    else:
+        check_input_list(input_file_group['gslc_file_list'], logger, name,
+                         valid_extensions=('.h5',), check_zero_size=True)
+
+        # TODO: Is there a NI equivalent to the burst set - ancillaries validation of DISP-S1?
+        #  I don't seem to see a burst ID in the input filenames
 
     if 'mask_file' in dyn_anc_file_group and dyn_anc_file_group['mask_file']:
         check_input(dyn_anc_file_group['mask_file'], logger, name,
@@ -345,6 +352,12 @@ def validate_disp_inputs(runconfig, logger, name):
         check_input_list(dyn_anc_file_group['troposphere_files'], logger, name,
                          valid_extensions=('.nc', '.h5', '.grb'), check_zero_size=True)
 
+    if ('gunw_files' in dyn_anc_file_group and
+            isinstance(dyn_anc_file_group['gunw_files'], list) and
+            len(dyn_anc_file_group['gunw_files']) > 0):
+        check_input_list(dyn_anc_file_group['gunw_files'], logger, name,
+                         valid_extensions=('.h5',), check_zero_size=True)
+
     if ('frame_to_burst_json' in static_anc_file_group and
             static_anc_file_group['frame_to_burst_json'] is not None):
         check_input(static_anc_file_group['frame_to_burst_json'], logger, name,
@@ -353,6 +366,11 @@ def validate_disp_inputs(runconfig, logger, name):
     if ('reference_date_database_json' in static_anc_file_group and
             static_anc_file_group['reference_date_database_json'] is not None):
         check_input(static_anc_file_group['reference_date_database_json'], logger,
+                    name, valid_extensions=('.json',), check_zero_size=True)
+
+    if ('frame_to_bounds_json' in static_anc_file_group and
+            static_anc_file_group['frame_to_bounds_json'] is not None):
+        check_input(static_anc_file_group['frame_to_bounds_json'], logger,
                     name, valid_extensions=('.json',), check_zero_size=True)
 
 
