@@ -196,14 +196,18 @@ class TROPOPostProcessorMixin(PostProcessorMixin):
         # Determine time bounds
         ref_time = datetime.fromisoformat(measured_parameters["reference_time"])
         time_res_delta = self._parse_temporal_resolution(measured_parameters["temporal_resolution"])
-        output_product_metadata['temporal_extent']['start_time'] = ref_time
-        output_product_metadata['temporal_extent']['end_time'] = ref_time + time_res_delta
+        output_product_metadata['temporal_extent'] = {
+            'start_time': ref_time,
+            'end_time': ref_time + time_res_delta
+        }
         
         spatial_extent = get_extent_from_coordinates(tropo_product, "/")
-        output_product_metadata['spatial_extent']['lon_min'] = spatial_extent[0]
-        output_product_metadata['spatial_extent']['lon_max'] = spatial_extent[1]
-        output_product_metadata['spatial_extent']['lat_min'] = spatial_extent[2]
-        output_product_metadata['spatial_extent']['lat_max'] = spatial_extent[3]
+        output_product_metadata['spatial_extent'] = {
+            'lon_min': spatial_extent[0],
+            'lon_max': spatial_extent[1],
+            'lat_min': spatial_extent[2],
+            'lat_max': spatial_extent[3]
+        }
         
         output_product_metadata['xCoordinates'] = {
             'size': 5120,
