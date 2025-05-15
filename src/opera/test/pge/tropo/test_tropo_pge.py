@@ -76,8 +76,11 @@ class TROPOPgeTestCase(unittest.TestCase):
         sas_version = rc.sas_config["product_path_group"]["product_version"]
         self.base_filename = f"OPERA_L4_TROPO-ZENITH_20250101T010101Z_20250101T010101Z_HRES_v{sas_version}"
         
-        for file_ext in (".nc", ".png"):
-            self._write_valid_output(file_ext)
+        self._write_valid_output(".png")
+        
+        self.tropo_metadata_path = abspath(join(self.test_output_dir, f'{self.base_filename}.nc'))
+
+        create_test_tropo_metadata_product(self.tropo_metadata_path)
             
         os.chdir(self.working_dir.name)
 
@@ -209,32 +212,26 @@ class TROPOPgeTestCase(unittest.TestCase):
         pge.run_preprocessor()
 
         # Create a sample metadata file within the output directory of the PGE
-        output_dir = join(os.curdir, "tropo_pge_test/output_dir")
+        tropo_metadata = pge._collect_tropo_product_metadata(self.tropo_metadata_path)
 
-        disp_metadata_path = abspath(join(output_dir, f'{self.base_filename}.nc'))
-
-        create_test_tropo_metadata_product(disp_metadata_path)
-
-        disp_metadata = pge._collect_tropo_product_metadata(disp_metadata_path)
-
-        iso_metadata = pge._create_iso_metadata(disp_metadata_path, disp_metadata)
+        iso_metadata = pge._create_iso_metadata(tropo_metadata, self.tropo_metadata_path)
 
         self.assertNotIn(UNDEFINED_ERROR, iso_metadata)
 
-        os.unlink(disp_metadata_path)
+        os.unlink(self.tropo_metadata_path)
 
         # Test no file from which to extract data
-        disp_metadata_path = join(output_dir, 'No_file.nc')
+        tropo_metadata_path = join(self.test_output_dir, 'No_file.nc')
 
         with self.assertRaises(RuntimeError):
-            pge._collect_tropo_product_metadata(disp_metadata_path)
+            pge._collect_tropo_product_metadata(tropo_metadata_path)
 
         # Verify the proper Runtime error message
         log_file = pge.logger.get_file_name()
         self.assertTrue(exists(log_file))
         with open(log_file, 'r', encoding='utf-8') as l_file:
             log = l_file.read()
-        self.assertIn(f'Failed to extract metadata from {disp_metadata_path}', log)
+        self.assertIn(f'Failed to extract metadata from {tropo_metadata_path}', log)
     
     def test_tropo_pge_input_validation(self):
         """
