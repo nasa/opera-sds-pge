@@ -141,7 +141,7 @@ def convert_h5py_dataset(dataset_object):
     return result
 
 
-def get_hdf5_attrs_as_dict(file_name, group_path, ignore_keys=None):
+def get_hdf5_attrs_as_dict(file_name, group_path, ignore_keys=[]):
     """
     Returns HDF5 group attributes as a python dict for a given file and group
     path.
@@ -163,14 +163,21 @@ def get_hdf5_attrs_as_dict(file_name, group_path, ignore_keys=None):
         Python dict containing variable data from the group path location.
 
     """
-    with h5py.File(file_name, 'r') as h5file:
+    with h5py.File(file_name, "r") as h5file:
         group_object = h5file.get(group_path)
 
         if group_object is None:
             raise RuntimeError(f"An error occurred retrieving object '{group_path}' "
                                f"from file '{file_name}'.")
 
-        group_dict = {k:v.decode('UTF-8') for k,v in group_object.attrs.items() if k not in ignore_keys}
+        group_dict = dict()
+        for k, v in group_object.attrs.items():
+            if k in ignore_keys:
+                continue
+            if isinstance(v, str):
+                group_dict[k] = v
+            elif isinstance(v, np.bytes_):
+                group_dict[k] = v.decode("UTF-8")
 
     return group_dict
                                
@@ -932,24 +939,24 @@ def get_tropo_product_metadata(file_name):
     
 def create_test_tropo_metadata_product(file_path):
     tropo_attrs = {
-        "Conventions": "CF-1.8",
-        "title": "OPERA_L4_TROPO-ZENITH",
-        "institution": "NASA Jet Propulsion Laboratory (JPL)",
-        "contact": "opera-sds-ops@jpl.nasa.gov",
-        "source": "ECMWF",
-        "platform": "Model High Resolution 15-day Forecast (HRES)",
-        "spatial_resolution": "~0.07deg",
-        "temporal_resolution": "6h",
-        "source_url": "https://www.ecmwf.int/en/forecasts/datasets/set-i",
-        "references": "https://raider.readthedocs.io/en/latest/",
-        "mission_name": "OPERA",
-        "description": "OPERA One-way Tropospheric Zenith-integrated Delay for Synthetic Aperture Radar",
-        "comment": "Intersect/interpolate with DEM, project to slant range and multiple with -4pi/radar wavelength (2 way) to get SAR correction",
-        "software": "RAiDER",
-        "software_version": "0.5.3",
-        "reference_document": "TBD",
-        "history": "Created on: 2025-03-24 21:28:42.426525+00:00",
-        "reference_time": "2024-02-15 12:00:00"
+        "Conventions": np.bytes_("CF-1.8"),
+        "title": np.bytes_("OPERA_L4_TROPO-ZENITH"),
+        "institution": np.bytes_("NASA Jet Propulsion Laboratory (JPL)"),
+        "contact": np.bytes_("opera-sds-ops@jpl.nasa.gov"),
+        "source": np.bytes_("ECMWF"),
+        "platform": np.bytes_("Model High Resolution 15-day Forecast (HRES)"),
+        "spatial_resolution": np.bytes_("~0.07deg"),
+        "temporal_resolution": np.bytes_("6h"),
+        "source_url": np.bytes_("https://www.ecmwf.int/en/forecasts/datasets/set-i"),
+        "references": np.bytes_("https://raider.readthedocs.io/en/latest/"),
+        "mission_name": np.bytes_("OPERA"),
+        "description": np.bytes_("OPERA One-way Tropospheric Zenith-integrated Delay for Synthetic Aperture Radar"),
+        "comment": np.bytes_("Intersect/interpolate with DEM, project to slant range and multiple with -4pi/radar wavelength (2 way) to get SAR correction"),
+        "software": np.bytes_("RAiDER"),
+        "software_version": np.bytes_("0.5.3"),
+        "reference_document": np.bytes_("TBD"),
+        "history": np.bytes_("Created on: 2025-03-24 21:28:42.426525+00:00"),
+        "reference_time": np.bytes_("2024-02-15 12:00:00")
     }
     
     with h5py.File(file_path, 'w') as outfile:
