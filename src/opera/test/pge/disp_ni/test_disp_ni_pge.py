@@ -21,6 +21,7 @@ import yaml
 from opera.pge import RunConfig
 from opera.pge.disp_ni.disp_ni_pge import DispNIExecutor
 from opera.util import PgeLogger
+from opera.util.input_validation import validate_disp_inputs
 
 
 class DispNIPgeTestCase(unittest.TestCase):
@@ -230,7 +231,76 @@ class DispNIPgeTestCase(unittest.TestCase):
         zero-size files, and invalid extensions in filenames. Also check that
         valid files pass validation.
         """
-        ...
+        # Test non-existent file detection
+
+        test_filename = 'non_existent_input_file'
+        sas_config = {
+            'input_file_group': {
+                'gslc_file_list': [
+                    test_filename
+                ]
+            },
+            'dynamic_ancillary_file_group': {
+            },
+            'static_ancillary_file_group': {
+            }
+        }
+        runconfig = MockRunConfig(sas_config)
+        logger = PgeLogger()
+        with self.assertRaises(RuntimeError):
+            validate_disp_inputs(runconfig, logger, "DISP-NI")
+
+        # Check to see that the RuntimeError is as expected
+        logger.close_log_stream()
+        log_file = logger.get_file_name()
+        self.assertTrue(exists(log_file))
+        with open(log_file, 'r', encoding='utf-8') as lfile:
+            log = lfile.read()
+        self.assertIn(f'Could not locate specified input {test_filename}.', log)
+
+        # Test invalid file extension
+
+        logger = PgeLogger()
+        test_filename = "NISAR_L2_GSLC_NI_F150_20070703T062138Z_20240528T200959Z_NI_HH_v0.1.inv"
+        with open(test_filename, 'w') as ief:
+            ief.write("\n")
+        sas_config['input_file_group']['gslc_file_list'] = [test_filename]
+        runconfig = MockRunConfig(sas_config)
+        with self.assertRaises(RuntimeError):
+            validate_disp_inputs(runconfig, logger, "DISP-NI")
+
+        # Check to see that the RuntimeError is as expected
+        logger.close_log_stream()
+        log_file = logger.get_file_name()
+        self.assertTrue(exists(log_file))
+        with open(log_file, 'r', encoding='utf-8') as lfile:
+            log = lfile.read()
+        self.assertIn(f'Input file {test_filename} does not have an expected file extension', log)
+        os.remove(test_filename)
+
+        # Test for non-zero file size
+
+        logger = PgeLogger()
+        test_filename = "NISAR_L2_GSLC_NI_F150_20070703T062138Z_20240528T200959Z_NI_HH_v0.1_zero_size_file.h5"
+        open(test_filename, 'w').close()
+        self.assertTrue(exists(test_filename))
+        sas_config['input_file_group']['gslc_file_list'] = [test_filename]
+        runconfig = MockRunConfig(sas_config)
+        with self.assertRaises(RuntimeError):
+            validate_disp_inputs(runconfig, logger, "DISP-NI")
+
+        # Check to see that the RuntimeError is as expected
+        logger.close_log_stream()
+        log_file = logger.get_file_name()
+        self.assertTrue(exists(log_file))
+        with open(log_file, 'r', encoding='utf-8') as lfile:
+            log = lfile.read()
+        self.assertIn(f'Input file {test_filename} size is 0. Size must be greater than 0.', log)
+        os.remove(test_filename)
+
+        # Test all input files with valid files
+
+        # TODO: Something to check here? I think S1 runs ancillary <-> input checks here - does NI have those yet?
 
     def test_disp_ni_pge_validate_product_output(self):
         """Test off-nominal output conditions"""
