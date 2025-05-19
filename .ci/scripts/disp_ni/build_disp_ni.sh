@@ -47,6 +47,9 @@ trap build_script_cleanup EXIT
 # Copy files to the staging area and build the PGE docker image
 copy_pge_files $WORKSPACE $STAGING_DIR $PGE_NAME
 
+# DISP-NI PGE inherits from DISP-S1 code, so it needs to be included in the container as well
+mkdir -p ${STAGING_DIR}/opera/pge/disp_s1; cp -r ${WORKSPACE}/src/opera/pge/disp_s1/disp_s1.py ${STAGING_DIR}/opera/pge/disp_s1/
+
 # Create a VERSION file in the staging area to track version and build time
 printf "pge_version: ${TAG}\npge_build_datetime: ${BUILD_DATE_TIME}\n" \
     > ${STAGING_DIR}/opera/VERSION \
