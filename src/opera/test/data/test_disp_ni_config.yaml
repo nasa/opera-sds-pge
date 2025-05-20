@@ -55,6 +55,7 @@ RunConfig:
                 #   Type: array.
                 gslc_file_list:
                     - disp_ni_pge_test/input_dir/NISAR_L2_GSLC_NI_F150_20070703T062138Z_20240528T200959Z_NI_HH_v0.1.h5
+                    - disp_ni_pge_test/input_dir/NISAR_L2_GSLC_NI_F150_20070818T062132Z_20240528T200952Z_NI_HH_v0.1.h5
                 # REQUIRED: Frame ID of the gslcs contained in `gslc_file_list`.
                 #   Type: integer.
                 frame_id: 150

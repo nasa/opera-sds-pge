@@ -62,6 +62,7 @@ class DispNIPgeTestCase(unittest.TestCase):
 
         # Create non-empty dummy input files expected by test runconfig
         dummy_input_files = ['NISAR_L2_GSLC_NI_F150_20070703T062138Z_20240528T200959Z_NI_HH_v0.1.h5',
+                             'NISAR_L2_GSLC_NI_F150_20070818T062132Z_20240528T200952Z_NI_HH_v0.1.h5',
                              'dem.tif', 'water_mask.tif',
                              'NISAR_L2_PR_GUNW_001_005_A_219_220_4020_SH_20060630T000000_20060630T000000_20060815T000000_20060815T000000_P01101_M_F_J_001.h5',
                              'NISAR_L2_PR_GUNW_001_005_A_219_220_4020_SH_20060815T000000_20060815T000000_20060930T000000_20060930T000000_P01101_M_F_J_001.h5',

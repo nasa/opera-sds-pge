@@ -330,8 +330,18 @@ def validate_disp_inputs(runconfig, logger, name):
         check_input_list(input_file_group['gslc_file_list'], logger, name,
                          valid_extensions=('.h5',), check_zero_size=True)
 
-        # TODO: Is there a NI equivalent to the burst set - ancillaries validation of DISP-S1?
-        #  I don't seem to see a burst ID in the input filenames
+        # TODO:
+        #  1: Verify with ADT that GSLC and GUNW must be equally sized
+        #  2: Figure out if our comparison between GSLC and GUNW can be more spatial like with DISP-S1 checking bursts
+
+        if ('gunw_files' in dyn_anc_file_group and isinstance(dyn_anc_file_group['gunw_files'], list) and
+                len(dyn_anc_file_group['gunw_files']) > 0):
+            check_input_list(dyn_anc_file_group['gunw_files'], logger, name,
+                             valid_extensions=('.h5',), check_zero_size=True)
+
+            if len(input_file_group['gslc_file_list']) != len(dyn_anc_file_group['gunw_files']):
+                msg = 'Differing numbers of GSLC files and GUNW files'
+                logger.critical(name, ErrorCode.INVALID_INPUT, msg)
 
     if 'mask_file' in dyn_anc_file_group and dyn_anc_file_group['mask_file']:
         check_input(dyn_anc_file_group['mask_file'], logger, name,
