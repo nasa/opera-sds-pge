@@ -56,7 +56,11 @@ def get_hdf5_group_as_dict(file_name, group_path, ignore_keys=None):
     -------
     group_dict : dict
         Python dict containing variable data from the group path location.
-
+        
+    Raises
+    -------
+    RuntimeError
+        If group_path is not able to be retrieved from the opened h5file
     """
     with h5py.File(file_name, 'r') as h5file:
         group_object = h5file.get(group_path)
@@ -141,6 +145,108 @@ def convert_h5py_dataset(dataset_object):
     return result
 
 
+def get_hdf5_attrs_as_dict(file_name, group_path, ignore_keys=None):
+    """
+    Returns HDF5 group attributes as a python dict for a given file and group
+    path.
+
+    Variable data are not included.
+
+    Parameters
+    ----------
+    file_name : str
+        File system path and filename for the HDF5 file to use.
+    group_path : str
+        Group path within the HDF5 file.
+    ignore_keys : iterable, optional
+        Keys within the group to not include in the returned dict.
+
+    Returns
+    -------
+    group_dict : dict
+        Python dict containing variable data from the group path location.
+
+    Raises
+    -------
+    RuntimeError
+        If group_path is not able to be retrieved from the opened h5file
+    """
+    
+    if ignore_keys is None:
+        ignore_keys = []
+    
+    with h5py.File(file_name, "r") as h5file:
+        group_object = h5file.get(group_path)
+
+        if group_object is None:
+            raise RuntimeError(f"An error occurred retrieving object '{group_path}' "
+                               f"from file '{file_name}'.")
+
+        group_dict = dict()
+        for k, v in group_object.attrs.items():
+            if k in ignore_keys:
+                continue
+            if isinstance(v, str):
+                group_dict[k] = v
+            elif isinstance(v, np.bytes_):
+                group_dict[k] = v.decode("UTF-8")
+
+    return group_dict
+                               
+        
+def get_extent_from_coordinates(file_name, group_path, longitude='longitude', latitude='latitude'):
+    """
+    Returns spatial extent as (min_lon, max_lon, min_lat, max_lat).
+
+    Variable data are not included.
+
+    Parameters
+    ----------
+    file_name : str
+        File system path and filename for the HDF5 file to use.
+    group_path : str
+        Group path within the HDF5 file.
+    longitude : str
+        Name of longitude coordinate found in group_path.
+    latitude : str
+        Name of latitude coordinate found in group_path.
+
+    Returns
+    -------
+    extent : (float, float, float, float)
+        Tuple containing (min_lon, max_lon, min_lat, max_lat).
+        
+    Raises
+    -------
+    RuntimeError
+        If group_path is not able to be retrieved from the opened h5file
+    RuntimeError
+        If longitude variable is not contained within the group object.
+    RuntimeError
+        If latitude variable is not contained within the group object.
+    """
+    with h5py.File(file_name, 'r') as h5file:
+        group_object = h5file.get(group_path)
+
+        if group_object is None:
+            raise RuntimeError(f"An error occurred retrieving object '{group_path}' "
+                            f"from file '{file_name}'.")
+        if longitude not in group_object:
+            raise RuntimeError(f"An error occured retrieving variable '{longitude}'"
+                            f"from group path '{group_path}' in file '{file_name}'.")
+        if latitude not in group_object:
+            raise RuntimeError(f"An error occured retrieving variable '{latitude}'"
+                            f"from group path '{group_path}' in file '{file_name}'.")
+        
+        extent = (
+            min(group_object[longitude]), 
+            max(group_object[longitude]),
+            min(group_object[latitude]), 
+            max(group_object[latitude])
+        )
+            
+        return extent
+        
 def get_rtc_s1_product_metadata(file_name):
     """
     Returns a python dict containing the RTC-S1 product_output metadata
@@ -830,3 +936,68 @@ def create_test_disp_metadata_product(
                                                                                   data=np.bytes_("0.15.1"))
             source_data_software_s1_reader_version_dset = metadata_grp.create_dataset(
                 "source_data_software_s1_reader_version", data=np.bytes_("0.2.4"))
+
+
+def get_tropo_product_metadata(file_name):
+    """
+    Returns a python dict containing the TROPO metadata
+    which will be used with the ISO metadata template.
+
+    Parameters
+    ----------
+    file_name : str
+        the TROPO metadata file.
+
+    Returns
+    -------
+    tropo_metadata : dict
+        python dict containing the HDF5 file metadata which is used in the
+        ISO template.
+    """
+    tropo_metadata = get_hdf5_attrs_as_dict(file_name, "/")
+    return tropo_metadata
+    
+def create_test_tropo_metadata_product(file_path):
+    """
+    Creates a dummy TROPO netCDF metadata file with expected global attributes
+    and latitude and longitude arrays. This function is intended for use with 
+    unit tests, but is included in this module, so it will be importable from 
+    within a built container. 
+    
+    Global attribute values are currently written in TROPO products as Numpy 
+    byte strings, which has been reflected here.
+
+    Parameters
+    ----------
+    file_path : str
+        Full path to write the dummy TROPO netCDF metadata file to.
+    """
+    tropo_attrs = {
+        "Conventions": np.bytes_("CF-1.8"),
+        "title": np.bytes_("OPERA_L4_TROPO-ZENITH"),
+        "institution": np.bytes_("NASA Jet Propulsion Laboratory (JPL)"),
+        "contact": np.bytes_("opera-sds-ops@jpl.nasa.gov"),
+        "source": np.bytes_("ECMWF"),
+        "platform": np.bytes_("Model High Resolution 15-day Forecast (HRES)"),
+        "spatial_resolution": np.bytes_("~0.07deg"),
+        "temporal_resolution": np.bytes_("6h"),
+        "source_url": np.bytes_("https://www.ecmwf.int/en/forecasts/datasets/set-i"),
+        "references": np.bytes_("https://raider.readthedocs.io/en/latest/"),
+        "mission_name": np.bytes_("OPERA"),
+        "description": np.bytes_("OPERA One-way Tropospheric Zenith-integrated Delay for Synthetic Aperture Radar"),
+        "comment": np.bytes_("Intersect/interpolate with DEM, project to slant range and multiple with -4pi/radar wavelength (2 way) to get SAR correction"),
+        "software": np.bytes_("RAiDER"),
+        "software_version": np.bytes_("0.5.3"),
+        "reference_document": np.bytes_("TBD"),
+        "history": np.bytes_("Created on: 2025-03-24 21:28:42.426525+00:00"),
+        "reference_time": np.bytes_("2024-02-15 12:00:00")
+    }
+    
+    with h5py.File(file_path, 'w') as outfile:
+        for k,v in tropo_attrs.items():
+            outfile.attrs[k] = v
+        lon_data = np.random.uniform(low=-180, high=180, size=(5120,))
+        lat_data = np.random.uniform(low=-90, high=90, size=(2560,))
+        
+        longitude_dset = outfile.create_dataset("longitude", data=lon_data, dtype='float64')
+        latitude_dset = outfile.create_dataset("latitude", data=lat_data, dtype='float64')

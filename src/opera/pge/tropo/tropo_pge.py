@@ -7,6 +7,7 @@ tropo_pge.py
 Module defining the implementation for the TROPO PGE.
 """
 
+from datetime import datetime, timedelta
 from os.path import abspath, basename, exists, getsize, join, splitext
 from os import listdir
 import re
@@ -16,7 +17,9 @@ from opera.pge.base.base_pge import PostProcessorMixin
 from opera.pge.base.base_pge import PreProcessorMixin
 from opera.util.error_codes import ErrorCode
 from opera.util.input_validation import check_input
+from opera.util.render_jinja2 import augment_hdf5_measured_parameters, render_jinja2
 from opera.util.run_utils import get_checksum
+from opera.util.h5_utils import get_extent_from_coordinates, get_tropo_product_metadata
 
 
 class TROPOPreProcessorMixin(PreProcessorMixin):
@@ -117,7 +120,6 @@ class TROPOPostProcessorMixin(PostProcessorMixin):
                 error_msg = f'Invalid product filename {output_filename}'
                 self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
                 
-
     def _checksum_output_products(self):
         """
         Generates a dictionary mapping output product file names to the
@@ -150,7 +152,277 @@ class TROPOPostProcessorMixin(PostProcessorMixin):
         }
 
         return checksums
+    
+    def _parse_temporal_resolution(self, time_res: str):
+        """
+        Converts a time resolution string of the format "{value}{unit}"
+        to a datetime timedelta object. TROPO products define a 
+        temporal_resolution metadata attribute, ex: "6h".
+        
+        Parameters
+        ----------
+        time_res : str
+            Contents of the temporal_resolution attribute from a TROPO
+            output NetCDF product.
+            
+        Returns
+        ----------
+        time_delta : timedelta
+            Datetime timedelta object used to compute the end time of
+            a TROPO output product.
+            
+        Raises
+        ------
+        ValueError
+            If time_res is not a valid time format string.
+        ValueError
+            If time unit extracted from time_res is not one of the
+            supported units: s, m, h, d, w.
+        """
+        match = re.fullmatch(r'(\d+)([smhdw])', time_res.strip().lower())
+        if not match:
+            raise ValueError(f"Invalid temporal resolution format: {time_res}")
+        
+        value, unit = match.groups()
+        value = int(value)
 
+        unit_map = {
+            's': 'seconds',
+            'm': 'minutes',
+            'h': 'hours',
+            'd': 'days',
+            'w': 'weeks',
+        }
+
+        if unit not in unit_map:
+            raise ValueError(f"Unsupported time unit: {unit}")
+
+        time_delta = timedelta(**{unit_map[unit]: value})
+        return time_delta
+
+
+    def _collect_tropo_product_metadata(self, tropo_product):
+        """
+        Gathers the available metadata from a sample output TROPO product for
+        use in filling out the ISO metadata template fro the TROPO pge.
+        
+        Parameters
+        ----------
+        tropo_product : str
+            Path to the TROPO NetCDF product to collect metadata from.
+
+        Returns
+        -------
+        output_product_metadata : dict
+            Dictionary containing TROPO output product metadata, formatted
+            for use with the ISO metadata Jinja2 template.
+        """
+        output_product_metadata = dict()
+        
+        try:
+            measured_parameters = get_tropo_product_metadata(tropo_product)
+            output_product_metadata['MeasuredParameters'] = augment_hdf5_measured_parameters(
+                measured_parameters,
+                self.runconfig.iso_measured_parameter_descriptions,
+                self.logger
+            )
+        except Exception as err:
+            msg = f'Failed to extract metadata from {tropo_product}, reason: {err}'
+            self.logger.critical(self.name, ErrorCode.ISO_METADATA_COULD_NOT_EXTRACT_METADATA, msg)
+
+        # Determine time bounds
+        ref_time = datetime.fromisoformat(measured_parameters["reference_time"])
+        time_res_delta = self._parse_temporal_resolution(measured_parameters["temporal_resolution"])
+        
+        # TODO: end_time needs confirmation
+        output_product_metadata['temporal_extent'] = {
+            'start_time': ref_time,
+            'end_time': ref_time + time_res_delta
+        }
+        
+        spatial_extent = get_extent_from_coordinates(tropo_product, "/")
+        output_product_metadata['spatial_extent'] = {
+            'lon_min': spatial_extent[0],
+            'lon_max': spatial_extent[1],
+            'lat_min': spatial_extent[2],
+            'lat_max': spatial_extent[3]
+        }
+        
+        # TODO: this is a placeholder
+        output_product_metadata["zone_identifier"] = "global"
+        
+        # TODO: spacing value needs confirmation
+        output_product_metadata['xCoordinates'] = {
+            'size': 5120,
+            'spacing': 8000 # 0.07 degrees is ~8km
+        }
+        output_product_metadata['yCoordinates'] = {
+            'size': 2560,
+            'spacing': 8000 # 0.07 degrees is ~8km
+        }
+        
+        return output_product_metadata
+    
+    def _create_custom_metadata(self, granule_filename):
+        """
+        Creates the "custom data" dictionary used with the ISO metadata rendering.
+
+        Custom data contains all metadata information needed for the ISO template
+        that is not found within any of the other metadata sources (such as the
+        RunConfig, output product(s), or catalog metadata).
+
+        Returns
+        -------
+        custom_metadata : dict
+            Dictionary containing the custom metadata as expected by the ISO
+            metadata Jinja2 template.
+
+        """
+        custom_metadata = {
+            'ISO_OPERA_FilePackageName': granule_filename,
+            'ISO_OPERA_ProducerGranuleId': granule_filename,
+            'MetadataProviderAction': "creation",
+            'GranuleFilename': granule_filename,
+            'ISO_OPERA_ProjectKeywords': ['OPERA', 'JPL', 'TROPO', 'Troposphere', 'Zenith', 'Radar', 'Delays'],
+            'ISO_OPERA_PlatformKeywords': ['TROPO'],
+            'ISO_OPERA_InstrumentKeywords': ['TROPO']
+        }
+
+        return custom_metadata
+    
+    def _create_iso_metadata(self, tropo_metadata, product_filename):
+        """
+        Creates a rendered version of the ISO metadata template for TROPO
+        output products using metadata from the following locations:
+
+            * RunConfig (in dictionary form)
+            * Output product (dictionary extracted from NetCDF product attributes)
+            * Catalog metadata
+            * "Custom" metadata (all metadata not found anywhere else)
+
+        Parameters
+        ----------
+        tropo_metadata : dict
+            The product metadata corresponding to a NetCDF product to
+            be included as the "product_output" metadata in the rendered ISO xml.
+
+        Returns
+        -------
+        rendered_template : str
+            The ISO metadata template for TROPO filled in with values from the
+            sourced metadata dictionaries.
+
+        """
+        # Use the base PGE implemenation to validate existence of the template
+        super()._create_iso_metadata()
+        
+        runconfig_dict = self.runconfig.asdict()
+
+        product_output_dict = tropo_metadata
+
+        catalog_metadata_dict = self._create_catalog_metadata().asdict()
+
+        custom_data_dict = self._create_custom_metadata(product_filename)
+
+        iso_metadata = {
+            'run_config': runconfig_dict,
+            'product_output': product_output_dict,
+            'catalog_metadata': catalog_metadata_dict,
+            'custom_data': custom_data_dict
+        }
+
+        iso_template_path = abspath(self.runconfig.iso_template_path)
+
+        rendered_template = render_jinja2(iso_template_path, iso_metadata, self.logger)
+
+        return rendered_template    
+    
+    def _stage_output_files(self):
+        """
+        Ensures that all output products produced by both the SAS and this PGE
+        are staged to the output location defined by the RunConfig. This includes
+        reassignment of file names to meet the file-naming conventions required
+        by the PGE.
+
+        In addition to staging of the output products created by the SAS, this
+        function is also responsible for ensuring the catalog metadata, ISO
+        metadata, and combined PGE/SAS log are also written to the expected
+        output product location with the appropriate file names.
+        """
+        # Gather the list of output files produced by the SAS
+        output_products = self.runconfig.get_output_product_filenames()
+
+        #Extracts netCDF output product.
+        nc_product = None
+        for output_product in output_products:
+            if output_product.endswith('.nc'):
+                nc_product = output_product
+                break
+        
+        # For each output file name, assign the final file name matching the
+        # expected conventions.   
+        for output_product in output_products:
+            self._assign_filename(output_product, self.runconfig.output_product_path)
+
+        # Write the catalog metadata to disk with the appropriate filename
+        catalog_metadata = self._create_catalog_metadata()
+
+        if not catalog_metadata.validate(catalog_metadata.get_schema_file_path()):
+            msg = f"Failed to create valid catalog metadata, reason(s):\n {catalog_metadata.get_error_msg()}"
+            self.logger.critical(self.name, ErrorCode.INVALID_CATALOG_METADATA, msg)
+
+        cat_meta_filename = self._catalog_metadata_filename()
+        cat_meta_filepath = join(self.runconfig.output_product_path, cat_meta_filename)
+
+        self.logger.info(self.name, ErrorCode.CREATING_CATALOG_METADATA,
+                         f"Writing Catalog Metadata to {cat_meta_filepath}")
+
+        try:
+            catalog_metadata.write(cat_meta_filepath)
+        except OSError as err:
+            msg = f"Failed to write catalog metadata file {cat_meta_filepath}, reason: {str(err)}"
+            self.logger.critical(self.name, ErrorCode.CATALOG_METADATA_CREATION_FAILED, msg)
+
+        tropo_metadata = self._collect_tropo_product_metadata(nc_product)
+
+        # Generate the ISO metadata for use with product submission to DAAC(s)
+        iso_metadata = self._create_iso_metadata(tropo_metadata, nc_product)
+
+        iso_meta_filename = self._iso_metadata_filename()
+        iso_meta_filepath = join(self.runconfig.output_product_path, iso_meta_filename)
+
+        if iso_metadata:
+            self.logger.info(self.name, ErrorCode.RENDERING_ISO_METADATA,
+                             f"Writing ISO Metadata to {iso_meta_filepath}")
+            with open(iso_meta_filepath, 'w', encoding='utf-8') as outfile:
+                outfile.write(iso_metadata)
+
+        # Write the QA application log to disk with the appropriate filename,
+        # if necessary
+        if self.runconfig.qa_enabled:
+            qa_log_filename = self._qa_log_filename()
+            qa_log_filepath = join(self.runconfig.output_product_path, qa_log_filename)
+            self.qa_logger.move(qa_log_filepath)
+
+            try:
+                self._finalize_log(self.qa_logger)
+            except OSError as err:
+                msg = f"Failed to write QA log file to {qa_log_filepath}, reason: {str(err)}"
+                self.logger.critical(self.name, ErrorCode.LOG_FILE_CREATION_FAILED, msg)
+
+        # Lastly, write the combined PGE/SAS log to disk with the appropriate filename
+        log_filename = self._log_filename()
+        log_filepath = join(self.runconfig.output_product_path, log_filename)
+        self.logger.move(log_filepath)
+
+        try:
+            self._finalize_log(self.logger)
+        except OSError as err:
+            msg = f"Failed to write log file to {log_filepath}, reason: {str(err)}"
+
+            # Log stream might be closed by this point so raise an Exception instead
+            raise RuntimeError(msg)
+    
     def run_postprocessor(self, **kwargs):
         """
         Executes the post-processing steps for the TROPO PGE.

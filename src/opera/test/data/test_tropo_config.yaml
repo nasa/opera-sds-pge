@@ -21,9 +21,9 @@ RunConfig:
         ErrorCodeBase: 800000
         SchemaPath: pge/tropo/schema/tropo_sas_schema.yaml
         AlgorithmParametersSchemaPath: 
-        IsoMeasuredParameterDescriptions:
+        IsoMeasuredParameterDescriptions: pge/tropo/templates/tropo_measured_parameters.yaml
         DataValidityStartDate:
-        IsoTemplatePath: ""
+        IsoTemplatePath: pge/tropo/templates/OPERA_ISO_metadata_L4_TROPO_template.xml.jinja2
       QAExecutable:
         Enabled: false
         ProgramPath: null

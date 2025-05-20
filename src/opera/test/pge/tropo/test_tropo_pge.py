@@ -14,7 +14,7 @@ import tempfile
 import unittest
 from io import StringIO
 import os
-from os.path import abspath, join
+from os.path import abspath, exists, join
 from os import listdir
 
 from pkg_resources import resource_filename
@@ -23,6 +23,8 @@ import yaml
 from opera.pge import RunConfig
 from opera.pge.tropo.tropo_pge import TROPOExecutor
 from opera.util import PgeLogger
+from opera.util.h5_utils import create_test_tropo_metadata_product
+from opera.util.render_jinja2 import UNDEFINED_ERROR
 
 
 class TROPOPgeTestCase(unittest.TestCase):
@@ -65,7 +67,7 @@ class TROPOPgeTestCase(unittest.TestCase):
             Path(dummy_file_path).parent.mkdir(parents=True, exist_ok=True)
             with open(dummy_file_path, "wb") as f:
                 f.write(random.randbytes(1024))
-                
+                                
         # Create the output directories expected by the test Runconfig file and add
         # dummy output files
         self.test_output_dir = abspath(join(self.working_dir.name, "tropo_pge_test/output_dir"))
@@ -74,9 +76,12 @@ class TROPOPgeTestCase(unittest.TestCase):
         sas_version = rc.sas_config["product_path_group"]["product_version"]
         self.base_filename = f"OPERA_L4_TROPO-ZENITH_20250101T010101Z_20250101T010101Z_HRES_v{sas_version}"
         
-        for extension in (".nc", ".png"):
-            self._write_valid_output(extension)
+        self._write_valid_output(".png")
+        
+        self.tropo_metadata_path = abspath(join(self.test_output_dir, f'{self.base_filename}.nc'))
 
+        create_test_tropo_metadata_product(self.tropo_metadata_path)
+            
         os.chdir(self.working_dir.name)
 
     def tearDown(self) -> None:
@@ -121,6 +126,21 @@ class TROPOPgeTestCase(unittest.TestCase):
         # Check that a RunConfig for the SAS was isolated within the scratch directory
         expected_sas_config_file = join(pge.runconfig.scratch_path, 'test_tropo_config_sas.yaml')
         self.assertTrue(os.path.exists(expected_sas_config_file))
+        
+        # Check that the catalog metadata file was created in the output directory
+        expected_catalog_metadata_file = join(
+            pge.runconfig.output_product_path, pge._catalog_metadata_filename())
+        self.assertTrue(os.path.exists(expected_catalog_metadata_file))
+
+        # # Check that the ISO metadata file was created and filled in as expected
+        expected_iso_metadata_file = join(
+            pge.runconfig.output_product_path, pge._iso_metadata_filename())
+        self.assertTrue(os.path.exists(expected_iso_metadata_file))
+        
+        with open(expected_iso_metadata_file, 'r', encoding='utf-8') as infile:
+            iso_contents = infile.read()
+
+        self.assertNotIn(UNDEFINED_ERROR, iso_contents)
 
         # Check that the log file was created and moved into the output directory
         expected_log_file = pge.logger.get_file_name()
@@ -182,6 +202,41 @@ class TROPOPgeTestCase(unittest.TestCase):
         file_path = join(self.test_output_dir, file_name)
         with open(file_path, "wb") as f:
             f.write(random.randbytes(1024))
+    
+    def test_iso_metadata_creation(self):
+        """
+        Test that the ISO metadata template is fully filled out when realistic
+        TROPO product metadata is available.
+        """
+        runconfig_path = join(self.data_dir, 'test_tropo_config.yaml')
+
+        pge = TROPOExecutor(pge_name="TROPOPgeTest", runconfig_path=runconfig_path)
+
+        # Run only the pre-processor steps to ingest the runconfig and set
+        # up directories
+        pge.run_preprocessor()
+
+        # Create a sample metadata file within the output directory of the PGE
+        tropo_metadata = pge._collect_tropo_product_metadata(self.tropo_metadata_path)
+
+        iso_metadata = pge._create_iso_metadata(tropo_metadata, self.tropo_metadata_path)
+
+        self.assertNotIn(UNDEFINED_ERROR, iso_metadata)
+
+        os.unlink(self.tropo_metadata_path)
+
+        # Test no file from which to extract data
+        tropo_metadata_path = join(self.test_output_dir, 'No_file.nc')
+
+        with self.assertRaises(RuntimeError):
+            pge._collect_tropo_product_metadata(tropo_metadata_path)
+
+        # Verify the proper Runtime error message
+        log_file = pge.logger.get_file_name()
+        self.assertTrue(exists(log_file))
+        with open(log_file, 'r', encoding='utf-8') as l_file:
+            log = l_file.read()
+        self.assertIn(f'Failed to extract metadata from {tropo_metadata_path}', log)
     
     def test_tropo_pge_input_validation(self):
         """

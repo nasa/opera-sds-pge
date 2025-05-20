@@ -83,8 +83,7 @@ RunConfig:
         # container, and typically should reference a template file bundled
         # with the opera_pge installation directory within the container
         # Consult the Docker image build scripts for more info
-        # TBD for TROPO
-        IsoMeasuredParameterDescriptions: ""
+        IsoMeasuredParameterDescriptions: /home/ops/opera/pge/tropo/templates/tropo_measured_parameters.yaml
 
         # Path to the Jinja2 template used to generate the ISO xml
         # metadata file
@@ -92,8 +91,7 @@ RunConfig:
         # container, and typically should reference a template file bundled
         # with the opera_pge installation directory within the container
         # Consult the Docker image build scripts for more info
-        # TBD for TROPO
-        IsoTemplatePath: ""
+        IsoTemplatePath: /home/ops/opera/pge/tropo/templates/OPERA_ISO_metadata_L4_TROPO_template.xml.jinja2
 
       QAExecutable:
         # Set to True to enable execution of an additional "Quality Assurance"
