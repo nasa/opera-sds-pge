@@ -136,6 +136,11 @@ class TROPOPgeTestCase(unittest.TestCase):
         expected_iso_metadata_file = join(
             pge.runconfig.output_product_path, pge._iso_metadata_filename())
         self.assertTrue(os.path.exists(expected_iso_metadata_file))
+        
+        with open(expected_iso_metadata_file, 'r', encoding='utf-8') as infile:
+            iso_contents = infile.read()
+
+        self.assertNotIn(UNDEFINED_ERROR, iso_contents)
 
         # Check that the log file was created and moved into the output directory
         expected_log_file = pge.logger.get_file_name()
