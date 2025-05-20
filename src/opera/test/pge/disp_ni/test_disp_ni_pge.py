@@ -300,8 +300,43 @@ class DispNIPgeTestCase(unittest.TestCase):
         os.remove(test_filename)
 
         # Test all input files with valid files
+        test_filenames = [
+            "NISAR_L2_GSLC_NI_F150_20070703T062138Z_20240528T200959Z_NI_HH_v0.1.h5",
+            "NISAR_L2_GSLC_NI_F150_20070818T062132Z_20240528T200952Z_NI_HH_v0.1.h5"
+        ]
+        test_gunw_filenames = [
+            "NISAR_L2_PR_GUNW_001_005_A_219_220_4020_SH_20060630T000000_20060630T000000_20060815T000000_20060815T000000_P01101_M_F_J_001.h5",
+            "NISAR_L2_PR_GUNW_001_005_A_219_220_4020_SH_20060815T000000_20060815T000000_20060930T000000_20060930T000000_P01101_M_F_J_001.h5"
+        ]
+        for test_f in test_filenames + test_gunw_filenames:
+            with open(test_f, 'w') as ief:
+                ief.write("\n")
+            self.assertTrue(exists(test_f))
 
-        # TODO: Something to check here? I think S1 runs ancillary <-> input checks here - does NI have those yet?
+        logger = PgeLogger()
+        sas_config['input_file_group']['gslc_file_list'] = test_filenames
+        runconfig = MockRunConfig(sas_config)
+        validate_disp_inputs(runconfig, logger, "DISP-NI")
+
+        logger = PgeLogger()
+        sas_config['dynamic_ancillary_file_group']['gunw_files'] = test_gunw_filenames
+        runconfig = MockRunConfig(sas_config)
+        validate_disp_inputs(runconfig, logger, "DISP-NI")
+
+        logger = PgeLogger()
+        sas_config['dynamic_ancillary_file_group']['gunw_files'] = test_gunw_filenames[:1]
+        runconfig = MockRunConfig(sas_config)
+        with self.assertRaises(RuntimeError):
+            validate_disp_inputs(runconfig, logger, "DISP-NI")
+
+        log_file = logger.get_file_name()
+        self.assertTrue(exists(log_file))
+        with open(log_file, 'r', encoding='utf-8') as lfile:
+            log = lfile.read()
+        self.assertIn('Differing numbers of GSLC files and GUNW files', log)
+
+        for test_f in test_filenames + test_gunw_filenames:
+            os.remove(test_f)
 
     def test_disp_ni_pge_validate_product_output(self):
         """Test off-nominal output conditions"""
