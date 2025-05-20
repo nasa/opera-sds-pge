@@ -56,7 +56,11 @@ def get_hdf5_group_as_dict(file_name, group_path, ignore_keys=None):
     -------
     group_dict : dict
         Python dict containing variable data from the group path location.
-
+        
+    Raises
+    -------
+    RuntimeError
+        If group_path is not able to be retrieved from the opened h5file
     """
     with h5py.File(file_name, 'r') as h5file:
         group_object = h5file.get(group_path)
@@ -141,7 +145,7 @@ def convert_h5py_dataset(dataset_object):
     return result
 
 
-def get_hdf5_attrs_as_dict(file_name, group_path, ignore_keys=[]):
+def get_hdf5_attrs_as_dict(file_name, group_path, ignore_keys=None):
     """
     Returns HDF5 group attributes as a python dict for a given file and group
     path.
@@ -162,7 +166,15 @@ def get_hdf5_attrs_as_dict(file_name, group_path, ignore_keys=[]):
     group_dict : dict
         Python dict containing variable data from the group path location.
 
+    Raises
+    -------
+    RuntimeError
+        If group_path is not able to be retrieved from the opened h5file
     """
+    
+    if ignore_keys is None:
+        ignore_keys = []
+    
     with h5py.File(file_name, "r") as h5file:
         group_object = h5file.get(group_path)
 
@@ -203,7 +215,15 @@ def get_extent_from_coordinates(file_name, group_path, longitude='longitude', la
     -------
     extent : (float, float, float, float)
         Tuple containing (min_lon, max_lon, min_lat, max_lat).
-
+        
+    Raises
+    -------
+    RuntimeError
+        If group_path is not able to be retrieved from the opened h5file
+    RuntimeError
+        If longitude variable is not contained within the group object.
+    RuntimeError
+        If latitude variable is not contained within the group object.
     """
     with h5py.File(file_name, 'r') as h5file:
         group_object = h5file.get(group_path)
