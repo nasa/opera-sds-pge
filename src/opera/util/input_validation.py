@@ -286,12 +286,13 @@ def get_cslc_input_burst_id_set(cslc_input_file_list, logger, name):
 
 def validate_disp_inputs(runconfig, logger, name):
     """
-    Evaluates the list of inputs from the RunConfig to ensure they are valid.
+    Evaluates the list of inputs from the RunConfig to ensure they are valid for use with
+    the DISP-S1 or DISP-NI PGEs.
 
-    The input products for DISP-S1 can be classified into two groups:
-        1) the main input products (the CSLC burst products) and
+    The input products for DISP-S1/NI can be classified into two groups:
+        1) the main input products (the CSLC/GSLC burst products) and
         2) the ancillary input products (DEM, geometry, amplitude mean/distortion,
-           water mask, tec files, and weather model).
+           water mask, tec files, gunw files, and weather model).
 
     Parameters
     ----------
