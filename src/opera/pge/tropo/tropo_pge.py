@@ -170,6 +170,14 @@ class TROPOPostProcessorMixin(PostProcessorMixin):
         time_delta : timedelta
             Datetime timedelta object used to compute the end time of
             a TROPO output product.
+            
+        Raises
+        ------
+        ValueError
+            If time_res is not a valid time format string.
+        ValueError
+            If time unit extracted from time_res is not one of the
+            supported units: s, m, h, d, w.
         """
         match = re.fullmatch(r'(\d+)([smhdw])', time_res.strip().lower())
         if not match:
@@ -194,7 +202,7 @@ class TROPOPostProcessorMixin(PostProcessorMixin):
 
 
     def _collect_tropo_product_metadata(self, tropo_product):
-        '''
+        """
         Gathers the available metadata from a sample output TROPO product for
         use in filling out the ISO metadata template fro the TROPO pge.
         
@@ -208,7 +216,7 @@ class TROPOPostProcessorMixin(PostProcessorMixin):
         output_product_metadata : dict
             Dictionary containing TROPO output product metadata, formatted
             for use with the ISO metadata Jinja2 template.
-        '''
+        """
         output_product_metadata = dict()
         
         try:
@@ -275,7 +283,7 @@ class TROPOPostProcessorMixin(PostProcessorMixin):
             'ISO_OPERA_ProducerGranuleId': granule_filename,
             'MetadataProviderAction': "creation",
             'GranuleFilename': granule_filename,
-            'ISO_OPERA_ProjectKeywords': ['OPERA', 'JPL', 'DSWx', 'Dynamic', 'Surface', 'Water', 'Extent'],
+            'ISO_OPERA_ProjectKeywords': ['OPERA', 'JPL', 'TROPO', 'Troposphere', 'Zenith', 'Radar', 'Delays'],
             'ISO_OPERA_PlatformKeywords': ['TROPO'],
             'ISO_OPERA_InstrumentKeywords': ['TROPO']
         }
@@ -330,6 +338,17 @@ class TROPOPostProcessorMixin(PostProcessorMixin):
         return rendered_template    
     
     def _stage_output_files(self):
+        """
+        Ensures that all output products produced by both the SAS and this PGE
+        are staged to the output location defined by the RunConfig. This includes
+        reassignment of file names to meet the file-naming conventions required
+        by the PGE.
+
+        In addition to staging of the output products created by the SAS, this
+        function is also responsible for ensuring the catalog metadata, ISO
+        metadata, and combined PGE/SAS log are also written to the expected
+        output product location with the appropriate file names.
+        """
         # Gather the list of output files produced by the SAS
         output_products = self.runconfig.get_output_product_filenames()
 
@@ -337,7 +356,7 @@ class TROPOPostProcessorMixin(PostProcessorMixin):
         # expected conventions. Also extracts netCDF output product.
         nc_product = None
         for output_product in output_products:
-            if output_product.endswith('nc'):
+            if output_product.endswith('.nc'):
                 nc_product = output_product
             self._assign_filename(output_product, self.runconfig.output_product_path)
 
