@@ -117,7 +117,7 @@
                     <gmd:authority>
                         <gmd:CI_Citation>
                             <gmd:title>
-                                <gco:CharacterString>Universal Transverse Mercator (UTM)</gco:CharacterString>
+                                <gco:CharacterString>World Geodetic System 1984 (WGS84)</gco:CharacterString>
                             </gmd:title>
                         </gmd:CI_Citation>
                     </gmd:authority>
@@ -593,7 +593,7 @@
                     <gmd:distributionFormat>
                         <gmd:MD_Format>
                             <gmd:name>
-                                <gco:CharacterString>GeoTIFF</gco:CharacterString>
+                                <gco:CharacterString>NetCDF</gco:CharacterString>
                             </gmd:name>
                         </gmd:MD_Format>
                     </gmd:distributionFormat>
@@ -690,22 +690,6 @@
                         </gmi:LE_Source>
                     </gmd:source>
                     {%- endfor %}
-                    <!--
-                    <gmd:source>
-                        <gmd:LI_Source>
-                            <gmd:description>
-{#                                <gco:CharacterString>Reference DEM - {{ run_config.Groups.PGE.DynamicAncillaryFilesGroup.AncillaryFileMap.dem_file }}{# ISO_OPERA_digitalElevationModelFile #}</gco:CharacterString>#}
-                            </gmd:description>
-                        </gmd:LI_Source>
-                    </gmd:source>
-                    <gmd:source>
-                        <gmd:LI_Source>
-                            <gmd:description>
-{#                                <gco:CharacterString>Reference Water File - {{ run_config.Groups.PGE.DynamicAncillaryFilesGroup.AncillaryFileMap.mask_file }}{# ISO_OPERA_waterMaskFile #}</gco:CharacterString>#}
-                            </gmd:description>
-                        </gmd:LI_Source>
-                    </gmd:source>
-                    -->
                 </gmd:LI_Lineage>
             </gmd:lineage>
         </gmd:DQ_DataQuality>
