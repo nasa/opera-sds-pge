@@ -467,7 +467,7 @@ def create_test_cslc_metadata_product(file_path):
         instrument_name_dset = identification_grp.create_dataset("instrument_name", data=np.bytes_('C-SAR'))
         is_geocoded_flag_dset = identification_grp.create_dataset("is_geocoded", data=True, dtype='bool')
         look_direction_dset = identification_grp.create_dataset("look_direction", data=np.bytes_("Right"))
-        mission_id_dset = identification_grp.create_dataset("mission_id", data=np.bytes_("S1C"))
+        mission_id_dset = identification_grp.create_dataset("mission_id", data=np.bytes_("S1A"))
         orbit_pass_direction_dset = identification_grp.create_dataset("orbit_pass_direction",
                                                                       data=np.bytes_("Ascending"))
         processing_center_dset = identification_grp.create_dataset("processing_center",
@@ -585,7 +585,7 @@ def create_test_cslc_metadata_product(file_path):
         ipf_version_dset = input_burst_metadata_grp.create_dataset("ipf_version", data=np.bytes_("3.51"))
         iw2_mid_range_dset = input_burst_metadata_grp.create_dataset("iw2_mid_range", data=876175.1695277416,
                                                                      dtype='float64')
-        platform_id_dset = input_burst_metadata_grp.create_dataset("platform_id", data=np.bytes_("S1C"))
+        platform_id_dset = input_burst_metadata_grp.create_dataset("platform_id", data=np.bytes_("S1A"))
         polarization_dset = input_burst_metadata_grp.create_dataset("polarization", data=np.bytes_("VV"))
         prf_raw_data_dset = input_burst_metadata_grp.create_dataset("prf_raw_data", data=1717.128973878037,
                                                                     dtype='float64')
