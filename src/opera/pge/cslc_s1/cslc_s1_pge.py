@@ -696,7 +696,7 @@ class CslcS1PostProcessorMixin(PostProcessorMixin):
             'GranuleFilename': self._core_filename(),
             'ISO_OPERA_ProjectKeywords': ['OPERA', 'JPL', 'CSLC', 'Co-registered', 'Single', 'Look', 'Complex'],
             'ISO_OPERA_PlatformKeywords': ['S1'],
-            'ISO_OPERA_InstrumentKeywords': ['Sentinel 1 A/B']
+            'ISO_OPERA_InstrumentKeywords': ['Sentinel 1 A/B/C']
         }
 
         return custom_metadata
@@ -869,7 +869,7 @@ class CslcS1Executor(CslcS1PreProcessorMixin, CslcS1PostProcessorMixin, PgeExecu
     PGE_VERSION = "2.1.1"
     """Version of the PGE (overrides default from base_pge)"""
 
-    SAS_VERSION = "0.5.5"  # Final release https://github.com/opera-adt/COMPASS/releases/tag/v0.5.5
+    SAS_VERSION = "0.5.6"  # Final release https://github.com/opera-adt/COMPASS/releases/tag/v0.5.6
     """Version of the SAS wrapped by this PGE, should be updated as needed"""
 
     def __init__(self, pge_name, runconfig_path, **kwargs):
