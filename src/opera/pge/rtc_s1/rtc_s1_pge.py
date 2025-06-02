@@ -307,7 +307,7 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
         else:
             production_time = f"_{get_time_for_filename(self.production_datetime)}Z"
 
-        # Get the sensor (should be either S1A or S1B)
+        # Get the sensor (should be one of S1A, S1B, or S1C)
         sensor = get_sensor_from_spacecraft_name(product_metadata['identification']['platform'])
 
         # Spacing is assumed to be identical in both X and Y direction
@@ -592,7 +592,7 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
         # a representative
         product_metadata = list(self._burst_metadata_cache.values())[0]
 
-        # Get the sensor (should be either S1A or S1B)
+        # Get the sensor (should be one of S1A, S1B, or S1C)
         sensor = get_sensor_from_spacecraft_name(product_metadata['identification']['platform'])
 
         # Spacing is assumed to be identical in both X and Y direction
