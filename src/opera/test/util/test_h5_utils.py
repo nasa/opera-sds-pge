@@ -88,8 +88,8 @@ class H5UtilsTestCase(unittest.TestCase):
             self.assertEqual(product_output['orbit']['orbitType'], "POE")
             self.assertEqual(product_output['processingInformation']['inputs']['demSource'], 'dem.tif')
             for po, eo in zip(product_output['processingInformation']['inputs']['annotationFiles'],
-                              ['calibration-s1b-iw1-slc-vv-20180504t104508-20180504t104533-010770-013aee-004.xml',
-                               'noise-s1b-iw1-slc-vv-20180504t104508-20180504t104533-010770-013aee-004.xml']):
+                              ['calibration-s1c-iw1-slc-vv-20180504t104508-20180504t104533-010770-013aee-004.xml',
+                               'noise-s1c-iw1-slc-vv-20180504t104508-20180504t104533-010770-013aee-004.xml']):
                 self.assertEqual(po, eo)
             self.assertEqual(product_output['processingInformation']['algorithms']['geocoding'], 'area_projection')
             self.assertEqual(product_output['identification']['trackNumber'], 147170)
