@@ -24,12 +24,11 @@ SAMPLE_TIME=15
 # defaults, test data and runconfig files should be updated as-needed to use
 # the latest available as defaults for use with the Jenkins pipeline call
 # INPUT/OUTPUT_DATA should be the name of the test data archive in s3://operasds-dev-pge/${PGE_NAME}/
-# RUNCONFIG should be the name of the runconfig in s3://operasds-dev-pge/${PGE_NAME}/
 [ -z "${WORKSPACE}" ] && WORKSPACE="$(realpath "$(dirname "$(realpath "$0")")"/../../..)"
 [ -z "${PGE_TAG}" ] && PGE_TAG="${USER}-dev"
-[ -z "${INPUT_DATA}" ] && INPUT_DATA="rtc_s1_final_1.0.2_expected_input_data.zip"
-[ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="rtc_s1_final_1.0.2_expected_output.zip"
-[ -z "${RUNCONFIG}" ] && RUNCONFIG="opera_pge_rtc_s1_delivery_5.2_final_runconfig.yaml"
+[ -z "${INPUT_DATA}" ] && INPUT_DATA="rtc_s1_final_1.0.4_expected_input_data.zip"
+[ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="rtc_s1_final_1.0.4_expected_output.zip"
+[ -z "${RUNCONFIG}" ] && RUNCONFIG="opera_pge_rtc_s1_delivery_5.3_final_runconfig.yaml"
 [ -z "${TMP_ROOT}" ] && TMP_ROOT="$DEFAULT_TMP_ROOT"
 
 # Create the test output directory in the work space
@@ -54,7 +53,7 @@ input_dir="${TMP_DIR}/${INPUT_DATA%.*}/input_dir"
 runconfig_dir="${TMP_DIR}/runconfig"
 
 # Copy the RunConfig for the static layers workflow
-static_runconfig="opera_pge_rtc_s1_static_delivery_5.2_final_runconfig.yaml"
+static_runconfig="opera_pge_rtc_s1_static_delivery_5.3_final_runconfig.yaml"
 local_static_runconfig="${SCRIPT_DIR}/${static_runconfig}"
 echo "Copying runconfig file $local_static_runconfig to $runconfig_dir/"
 cp ${local_static_runconfig} ${runconfig_dir}
