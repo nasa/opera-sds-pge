@@ -307,7 +307,7 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
         else:
             production_time = f"_{get_time_for_filename(self.production_datetime)}Z"
 
-        # Get the sensor (should be either S1A or S1B)
+        # Get the sensor (should be one of S1A, S1B, or S1C)
         sensor = get_sensor_from_spacecraft_name(product_metadata['identification']['platform'])
 
         # Spacing is assumed to be identical in both X and Y direction
@@ -592,7 +592,7 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
         # a representative
         product_metadata = list(self._burst_metadata_cache.values())[0]
 
-        # Get the sensor (should be either S1A or S1B)
+        # Get the sensor (should be one of S1A, S1B, or S1C)
         sensor = get_sensor_from_spacecraft_name(product_metadata['identification']['platform'])
 
         # Spacing is assumed to be identical in both X and Y direction
@@ -957,7 +957,7 @@ class RtcS1Executor(RtcS1PreProcessorMixin, RtcS1PostProcessorMixin, PgeExecutor
     PGE_VERSION = "2.1.1"
     """Version of the PGE (overrides default from base_pge)"""
 
-    SAS_VERSION = "1.0.2"  # Final release https://github.com/opera-adt/RTC/releases/tag/v1.0.2
+    SAS_VERSION = "1.0.4"  # Final release https://github.com/opera-adt/RTC/releases/tag/v1.0.4
     """Version of the SAS wrapped by this PGE, should be updated as needed"""
 
     SOURCE = "S1"

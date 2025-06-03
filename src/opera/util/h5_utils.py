@@ -304,12 +304,12 @@ def create_test_rtc_metadata_product(file_path):
         processingInformation_inputs_grp = outfile.create_group(f"{S1_SLC_HDF5_PREFIX}"
                                                                 f"/metadata/processingInformation/inputs")
         demSource_dset = processingInformation_inputs_grp.create_dataset("demSource", data=b'dem.tif')
-        annotationFiles = np.array([b'calibration-s1b-iw1-slc-vv-20180504t104508-20180504t104533-010770-013aee-004.xml',
-                                    b'noise-s1b-iw1-slc-vv-20180504t104508-20180504t104533-010770-013aee-004.xml'])
+        annotationFiles = np.array([b'calibration-s1c-iw1-slc-vv-20180504t104508-20180504t104533-010770-013aee-004.xml',
+                                    b'noise-s1c-iw1-slc-vv-20180504t104508-20180504t104533-010770-013aee-004.xml'])
         annotationFiles_dset = processingInformation_inputs_grp.create_dataset("annotationFiles", data=annotationFiles)
-        l1SlcGranules = np.array([b'S1B_IW_SLC__1SDV_20180504T104507_20180504T104535_010770_013AEE_919F.zip'])
+        l1SlcGranules = np.array([b'S1C_IW_SLC__1SDV_20180504T104507_20180504T104535_010770_013AEE_919F.zip'])
         l1SlcGranules_dset = processingInformation_inputs_grp.create_dataset("l1SlcGranules", data=l1SlcGranules)
-        orbitFiles = np.array([b'S1B_OPER_AUX_POEORB_OPOD_20180524T110543_V20180503T225942_20180505T005942.EOF'])
+        orbitFiles = np.array([b'S1C_OPER_AUX_POEORB_OPOD_20180524T110543_V20180503T225942_20180505T005942.EOF'])
         orbitFiles_dset = processingInformation_inputs_grp.create_dataset("orbitFiles", data=orbitFiles)
 
         processingInformation_algorithms_grp = outfile.create_group(
@@ -380,11 +380,11 @@ def create_test_rtc_metadata_product(file_path):
         dataAccess_dset = identification_grp.create_dataset("dataAccess", data=b'(NOT PROVIDED)')
         diagnosticModeFlag_dset = identification_grp.create_dataset("diagnosticModeFlag", data=False, dtype='bool')
         institution_dset = identification_grp.create_dataset("institution", data=b'NASA JPL')
-        instrumentName_dset = identification_grp.create_dataset("instrumentName", data=b'Sentinel-1B CSAR')
+        instrumentName_dset = identification_grp.create_dataset("instrumentName", data=b'Sentinel-1C CSAR')
         isGeocodedFlag = identification_grp.create_dataset("isGeocoded", data=True, dtype='bool')
         lookDirection_dset = identification_grp.create_dataset("lookDirection", data=b'Right')
         orbitPassDirection_dset = identification_grp.create_dataset("orbitPassDirection", data=b'Descending')
-        platform_dset = identification_grp.create_dataset("platform", data=b'Sentinel-1B')
+        platform_dset = identification_grp.create_dataset("platform", data=b'Sentinel-1C')
         processingDateTime_dset = identification_grp.create_dataset("processingDateTime",
                                                                     data=np.bytes_('2023-03-23T20:32:18.962836Z'))
         processingType_dset = identification_grp.create_dataset("processingType", data=b'UNDEFINED')

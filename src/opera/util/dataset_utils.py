@@ -99,6 +99,7 @@ def get_sensor_from_spacecraft_name(spacecraft_name):
             'LANDSAT-9': 'L9',
             'SENTINEL-1A': 'S1A',
             'SENTINEL-1B': 'S1B',
+            'SENTINEL-1C': 'S1C',
             'SENTINEL-2A': 'S2A',
             'SENTINEL-2B': 'S2B',
             'SENTINEL-2C': 'S2C',
