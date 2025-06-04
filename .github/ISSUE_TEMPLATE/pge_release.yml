@@ -21,6 +21,7 @@ body:
           - [ ] Run the Release pipeline in Jenkins to push the container images to Artifactory
             - See above note if the release branch does not show up in the list of available branches within the Jenkins Release Pipeline
             - If the version number within `src/opera/_package.py` was changed by this release, then ensure the "Publish Docs" option within the Release Pipeline is selected. Otherwise deselect it
+            - If the PGE being released is not a pre-release (i.e., not an engineering release or release candidate), then ensure the "PUSH_TO_GHCR" option is selected. Otherwise, deselect it
           - [ ] Create a PR for the release branch. 
             - If there have been no major changes to the code (aside from version number updates), the branch can be merged immediately without review
           - [ ] Pull the merged branch back into your local checkout of `main`, then tag the latest commit as `<version>` and push the tag to `origin`
