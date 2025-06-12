@@ -97,7 +97,7 @@ run_config:
   metric_value_upper_lim: num(required=False)
 
   # PLACEHOLDER FOR base_date PARAMETER DESCRIPTION
-  base_date: ~
+#  base_date: ~
 
   # Path for directory where output product will be written
   product_dst_dir: str(required=False)
