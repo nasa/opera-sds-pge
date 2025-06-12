@@ -72,7 +72,7 @@ RunConfig:
 
         # Path to the executable to run, path must be reachable from
         # within the Docker container (i.e. findable with a "which" command)
-        ProgramPath: /opt/miniforge/envs/dist-s1-env/bin/dist-s1
+        ProgramPath: /opt/conda/envs/dist-s1-env/bin/dist-s1
 
         # List of command-line options to use with ProgramPath
         ProgramOptions:
@@ -168,10 +168,10 @@ RunConfig:
         water_mask_path:
         apply_water_mask: false
         memory_strategy: high
-        device: best
+        device: cpu
         tqdm_enabled: true
         batch_size_for_despeckling: 25
-        n_workers_for_despeckling: 8
+        n_workers_for_despeckling: 4
         n_workers_for_norm_param_estimation: 8
         n_lookbacks: 3
         moderate_confidence_threshold: 3.5
@@ -179,3 +179,4 @@ RunConfig:
         product_dst_dir: dist_s1_pge_test/output_dir
         bucket:
         bucket_prefix: ''
+        confirmation_strategy: use_prev_product
