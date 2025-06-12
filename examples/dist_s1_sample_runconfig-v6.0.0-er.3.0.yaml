@@ -72,7 +72,7 @@ RunConfig:
 
         # Path to the executable to run, path must be reachable from
         # within the Docker container (i.e. findable with a "which" command)
-        ProgramPath: /opt/miniforge/envs/dist-s1-env/bin/dist-s1
+        ProgramPath: /opt/conda/envs/dist-s1-env/bin/dist-s1
 
         # List of command-line options to use with ProgramPath
         ProgramOptions:

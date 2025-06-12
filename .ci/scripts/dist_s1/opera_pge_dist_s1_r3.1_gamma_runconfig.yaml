@@ -349,7 +349,7 @@ RunConfig:
       PrimaryExecutable:
         ProductIdentifier: DIST_S1
         ProductVersion: "0.1"
-        ProgramPath: /opt/miniforge/envs/dist-s1-env/bin/dist-s1
+        ProgramPath: /opt/conda/envs/dist-s1-env/bin/dist-s1
         ProgramOptions:
           - run_sas
           - --runconfig_yml_path
