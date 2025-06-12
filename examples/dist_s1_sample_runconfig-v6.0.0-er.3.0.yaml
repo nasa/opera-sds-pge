@@ -171,7 +171,7 @@ RunConfig:
         device: cpu
         tqdm_enabled: true
         batch_size_for_despeckling: 25
-        n_workers_for_despeckling: 8
+        n_workers_for_despeckling: 4
         n_workers_for_norm_param_estimation: 8
         n_lookbacks: 3
         moderate_confidence_threshold: 3.5
