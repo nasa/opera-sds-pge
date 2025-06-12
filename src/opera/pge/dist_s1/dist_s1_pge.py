@@ -765,7 +765,7 @@ class DistS1Executor(DistS1PreProcessorMixin, DistS1PostProcessorMixin, PgeExecu
     LEVEL = "L3"
     """Processing Level for DIST-S1 Products"""
 
-    SAS_VERSION = "0.0.9"  # Beta release https://github.com/opera-adt/dist-s1/releases/tag/v0.0.9
+    SAS_VERSION = "1.0.1"  # Beta release https://github.com/opera-adt/dist-s1/releases/tag/v1.0.1
     """Version of the SAS wrapped by this PGE, should be updated as needed"""
 
     def __init__(self, pge_name, runconfig_path, **kwargs):

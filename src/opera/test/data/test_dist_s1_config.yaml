@@ -82,7 +82,7 @@ RunConfig:
         water_mask_path:
         apply_water_mask: false
         memory_strategy: high
-        device: best
+        device: cpu
         tqdm_enabled: true
         batch_size_for_despeckling: 25
         n_workers_for_despeckling: 8
@@ -92,3 +92,4 @@ RunConfig:
         high_confidence_threshold: 5.5
         bucket:
         bucket_prefix: ''
+        confirmation_strategy: use_prev_product
