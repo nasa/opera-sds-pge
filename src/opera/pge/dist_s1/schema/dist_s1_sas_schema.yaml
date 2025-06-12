@@ -16,7 +16,7 @@ run_config:
   post_rtc_crosspol: list(str(), required=True)
 
   # PLACEHOLDER FOR pre_dist_s1_product PARAMETER DESCRIPTION
-  pre_dist_s1_product: list(str(), required=True)
+  pre_dist_s1_product: list(str(), required=False)
 
   # A string representing the MGRS (Military Grid Reference System) tile identifier for output product.
   mgrs_tile_id: str(required=True)
