@@ -314,10 +314,11 @@ class DistS1PostProcessorMixin(PostProcessorMixin):
     _tile_filename_cache = {}
 
     # These layers are always produced and therefore must be present
-    _main_output_layer_names = ['DIST-GEN-STATUS-ACQ', 'DIST-GEN-STATUS', 'GEN-METRIC', 'BROWSE']
+    _main_output_layer_names = ['GEN-DIST-STATUS-ACQ', 'GEN-DIST-STATUS', 'GEN-METRIC', 'BROWSE']
 
     # The production of these layers depends on the confirmation DB and may be absent
-    _confirmation_db_output_layer_names = ['DATE-FIRST', 'DATE-LATEST', 'N-DIST', 'N-OBS']
+    _confirmation_db_output_layer_names = ['GEN-DIST-CONF', 'GEN-DIST-COUNT', 'GEN-DIST-DATE', 'GEN-DIST-DUR',
+                                           'GEN-DIST-LAST-DATE', 'GEN-DIST-PERC', 'GEN-METRIC-MAX']
 
     _valid_layer_names = _main_output_layer_names + _confirmation_db_output_layer_names
 
@@ -693,8 +694,6 @@ class DistS1PostProcessorMixin(PostProcessorMixin):
                 dst = os.path.join(output_product_path, basename(filename))
 
                 if scratch_path not in src and src != dst:
-                    # TODO: Change this to shutil.move() with the next SAS delivery. We need the output directory
-                    #  structure intact for the comparison script since it works on the whole directory
                     shutil.copy(str(src), dst)
 
     def _checksum_output_products(self):
@@ -765,7 +764,7 @@ class DistS1Executor(DistS1PreProcessorMixin, DistS1PostProcessorMixin, PgeExecu
     LEVEL = "L3"
     """Processing Level for DIST-S1 Products"""
 
-    SAS_VERSION = "0.0.9"  # Beta release https://github.com/opera-adt/dist-s1/releases/tag/v0.0.9
+    SAS_VERSION = "1.0.1"  # Beta release https://github.com/opera-adt/dist-s1/releases/tag/v1.0.1
     """Version of the SAS wrapped by this PGE, should be updated as needed"""
 
     def __init__(self, pge_name, runconfig_path, **kwargs):
