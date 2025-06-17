@@ -8,17 +8,17 @@ Unit tests for the pge/tropo/tropo_pge.py module.
 """
 
 import glob
-from pathlib import Path
+import os
 import random
 import tempfile
 import unittest
 from io import StringIO
-import os
-from os.path import abspath, exists, join
 from os import listdir
+from os.path import abspath, exists, join
+from pathlib import Path
 
-from pkg_resources import resource_filename
 import yaml
+from pkg_resources import resource_filename
 
 from opera.pge import RunConfig
 from opera.pge.tropo.tropo_pge import TROPOExecutor
@@ -59,7 +59,7 @@ class TROPOPgeTestCase(unittest.TestCase):
         # dummy input file
         self.input_dir = abspath(join(self.working_dir.name, "tropo_pge_test/input_dir"))
         os.makedirs(self.input_dir, exist_ok=True)
-        
+
         rc = RunConfig(join(self.data_dir, 'test_tropo_config.yaml'))
 
         for file_path in rc.input_files:
@@ -67,21 +67,15 @@ class TROPOPgeTestCase(unittest.TestCase):
             Path(dummy_file_path).parent.mkdir(parents=True, exist_ok=True)
             with open(dummy_file_path, "wb") as f:
                 f.write(random.randbytes(1024))
-                                
-        # Create the output directories expected by the test Runconfig file and add
-        # dummy output files
+
+        # Set up expected output product paths
         self.test_output_dir = abspath(join(self.working_dir.name, "tropo_pge_test/output_dir"))
-        os.makedirs(self.test_output_dir, exist_ok=True)
-        
+
         sas_version = rc.sas_config["product_path_group"]["product_version"]
         self.base_filename = f"OPERA_L4_TROPO-ZENITH_20250101T010101Z_20250101T010101Z_HRES_v{sas_version}"
-        
-        self._write_valid_output(".png")
-        
+
         self.tropo_metadata_path = abspath(join(self.test_output_dir, f'{self.base_filename}.nc'))
 
-        create_test_tropo_metadata_product(self.tropo_metadata_path)
-            
         os.chdir(self.working_dir.name)
 
     def tearDown(self) -> None:
@@ -126,7 +120,7 @@ class TROPOPgeTestCase(unittest.TestCase):
         # Check that a RunConfig for the SAS was isolated within the scratch directory
         expected_sas_config_file = join(pge.runconfig.scratch_path, 'test_tropo_config_sas.yaml')
         self.assertTrue(os.path.exists(expected_sas_config_file))
-        
+
         # Check that the catalog metadata file was created in the output directory
         expected_catalog_metadata_file = join(
             pge.runconfig.output_product_path, pge._catalog_metadata_filename())
@@ -136,7 +130,7 @@ class TROPOPgeTestCase(unittest.TestCase):
         expected_iso_metadata_file = join(
             pge.runconfig.output_product_path, pge._iso_metadata_filename())
         self.assertTrue(os.path.exists(expected_iso_metadata_file))
-        
+
         with open(expected_iso_metadata_file, 'r', encoding='utf-8') as infile:
             iso_contents = infile.read()
 
@@ -162,7 +156,7 @@ class TROPOPgeTestCase(unittest.TestCase):
             - write the test runconfig to test_runconfig_path,
             - execute PGE with test runconfig,
             - assert expected error is in log message.
-            
+
         Paramaters
         ----------
         runconfig: dict
@@ -170,8 +164,8 @@ class TROPOPgeTestCase(unittest.TestCase):
         test_runconfig_path: str
             Path to location where testing runconfig yaml will be written
         expected_log_message: str
-            The string expected to be found in the log for the given case being tested. 
-            Comes from input_validation.py        
+            The string expected to be found in the log for the given case being tested.
+            Comes from input_validation.py
         """
 
         with open(test_runconfig_path, 'w', encoding='utf-8') as input_path:
@@ -189,20 +183,20 @@ class TROPOPgeTestCase(unittest.TestCase):
             log_contents = infile.read()
 
         self.assertIn(expected_log_message, log_contents)
-    
+
     def _reset_output_dir(self):
         """Removes .png and .nc files from output dir"""
         for filename in listdir(self.test_output_dir):
             filepath = join(self.test_output_dir, filename)
             if filepath.endswith('.png') or filepath.endswith('.nc'):
                 os.remove(filepath)
-    
+
     def _write_valid_output(self, extension: str):
         file_name = f"{self.base_filename}{extension}"
         file_path = join(self.test_output_dir, file_name)
         with open(file_path, "wb") as f:
             f.write(random.randbytes(1024))
-    
+
     def test_iso_metadata_creation(self):
         """
         Test that the ISO metadata template is fully filled out when realistic
@@ -217,6 +211,7 @@ class TROPOPgeTestCase(unittest.TestCase):
         pge.run_preprocessor()
 
         # Create a sample metadata file within the output directory of the PGE
+        create_test_tropo_metadata_product(self.tropo_metadata_path)
         tropo_metadata = pge._collect_tropo_product_metadata(self.tropo_metadata_path)
 
         iso_metadata = pge._create_iso_metadata(tropo_metadata, self.tropo_metadata_path)
@@ -237,7 +232,7 @@ class TROPOPgeTestCase(unittest.TestCase):
         with open(log_file, 'r', encoding='utf-8') as l_file:
             log = l_file.read()
         self.assertIn(f'Failed to extract metadata from {tropo_metadata_path}', log)
-    
+
     def test_tropo_pge_input_validation(self):
         """
         Test the input validation checks made by TropoPreProcessorMixin:
@@ -251,13 +246,13 @@ class TROPOPgeTestCase(unittest.TestCase):
         with open(runconfig_path, 'r', encoding='utf-8') as stream:
             runconfig = yaml.safe_load(stream)
 
-        try:           
+        try:
             # Test: Nonexistent file
             missing_file = os.path.join(self.input_dir, 'non_existent_file.nc')
             runconfig['RunConfig']['Groups']['PGE']['InputFilesGroup']['InputFilePaths'] = [missing_file]
             self._run_and_check_error(
-                runconfig, 
-                test_runconfig_path, 
+                runconfig,
+                test_runconfig_path,
                 f"Could not locate specified input {missing_file}."
             )
 
@@ -266,26 +261,26 @@ class TROPOPgeTestCase(unittest.TestCase):
             runconfig['RunConfig']['Groups']['PGE']['InputFilesGroup']['InputFilePaths'] = [empty_file]
             os.system(f"touch {empty_file}")
             self._run_and_check_error(
-                runconfig, 
-                test_runconfig_path, 
+                runconfig,
+                test_runconfig_path,
                 f"Input file {empty_file} size is 0. Size must be greater than 0."
             )
-            
+
             # Test: Wrong file extension
             wrong_type_file = os.path.join(self.input_dir, 'wrong_input_type.png')
             runconfig['RunConfig']['Groups']['PGE']['InputFilesGroup']['InputFilePaths'] = [wrong_type_file]
             with open(wrong_type_file, 'wb') as fp:
                 fp.write(random.randbytes(1024))
             self._run_and_check_error(
-                runconfig, 
-                test_runconfig_path, 
+                runconfig,
+                test_runconfig_path,
                 f"Input file {wrong_type_file} does not have an expected file extension."
             )
 
         finally:
             if os.path.exists(test_runconfig_path):
                 os.unlink(test_runconfig_path)
-    
+
     def test_tropo_pge_output_validation(self):
         """Test the output validation checks made by TropoPostProcessorMixin:
         - Missing expected file
@@ -299,16 +294,20 @@ class TROPOPgeTestCase(unittest.TestCase):
 
         with open(runconfig_path, 'r', encoding='utf-8') as stream:
             runconfig = yaml.safe_load(stream)
-        
+
+        os.makedirs(self.test_output_dir, exist_ok=True)
+
         try:
-            # Test: Missing file(s)
+            # Test: Missing output file(s)
+            runconfig['RunConfig']['Groups']['PGE']['PrimaryExecutable']['ProgramPath'] = '/bin/echo'
+            runconfig['RunConfig']['Groups']['PGE']['PrimaryExecutable']['ProgramOptions'] = ['TROPO invoked with RunConfig']
             self._reset_output_dir()
             self._run_and_check_error(
-                runconfig, 
-                test_runconfig_path, 
+                runconfig,
+                test_runconfig_path,
                 "Could not locate .nc file."
             )
-            
+
             # Test: >1 .png file
             self._write_valid_output(".nc")
             png_file = os.path.join(self.test_output_dir, 'png_output_1.png')
@@ -316,36 +315,36 @@ class TROPOPgeTestCase(unittest.TestCase):
             png_file = os.path.join(self.test_output_dir, 'png_output_2.png')
             os.system(f"touch {png_file}")
             self._run_and_check_error(
-                runconfig, 
-                test_runconfig_path, 
+                runconfig,
+                test_runconfig_path,
                 "Found incorrect number of .png files."
             )
-            
+
             self._reset_output_dir()
-            
+
             # Check for empty nc file
             empty_nc_file = os.path.join(self.test_output_dir, 'empty.nc')
             os.system(f"touch {empty_nc_file}")
             self._write_valid_output(".png")
             self._run_and_check_error(
-                runconfig, 
-                test_runconfig_path, 
+                runconfig,
+                test_runconfig_path,
                 "Output file empty.nc size is 0. Size must be greater than 0."
             )
-            
+
             self._reset_output_dir()
-            
+
             # Check for nc filename convention matching
             dummy_file_path = os.path.join(self.test_output_dir, 'dummy_file.nc')
             with open(dummy_file_path, "wb") as f:
                 f.write(random.randbytes(1024))
             self._write_valid_output(".png")
             self._run_and_check_error(
-                runconfig, 
-                test_runconfig_path, 
+                runconfig,
+                test_runconfig_path,
                 "Invalid product filename dummy_file.nc"
-            )            
-            
+            )
+
         finally:
             if os.path.exists(test_runconfig_path):
                 os.unlink(test_runconfig_path)
