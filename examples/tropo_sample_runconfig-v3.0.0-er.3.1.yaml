@@ -1,11 +1,11 @@
-# Sample RunConfig for use with the TROPO PGE v3.0.0-er.3.0
+# Sample RunConfig for use with the TROPO PGE v3.0.0-er.3.1
 # This RunConfig should require minimal changes in order to be used with the
 # OPERA PCM.
 
 RunConfig:
   # Name for the RunCOnfig, may be any string
   Name: OPERA-TROPO-PGE-SAMPLE-CONFIG
-  
+
   Groups:
     # PGE-specific RunConfig section
     # This section is only used by the PGE, however, paths to inputs/outputs
@@ -33,7 +33,7 @@ RunConfig:
         # Must correspond to the file system within the Docker container,
         # and must have write permissions for the User/Group used with
         # the "Docker run" command
-        OutputProductPath: /home/ops/output_dir 
+        OutputProductPath: /home/ops/output_dir
 
         # Path to a scratch directory for the PGE and SAS to store
         # intermediate files that will not be needed after PGE execution
@@ -104,7 +104,7 @@ RunConfig:
 
         # List of command-line options to use with ProgramPath
         ProgramOptions: []
-        
+
       DebugLevelGroup:
         # Set to True to enable Debug mode (Note: currently a no-op for this PGE)
         DebugSwitch: false
@@ -117,7 +117,7 @@ RunConfig:
 
     # SAS-specific RunConfig section
     # Prior to SAS execution by the PGE, the section below starting at "SAS"
-    # is isolated into its own YAML file for use with the SAS 
+    # is isolated into its own YAML file for use with the SAS
     SAS:
       input_file:
         # REQUIRED: path to HRES model file.
@@ -141,17 +141,17 @@ RunConfig:
         #   Type: string.
         product_version: '0.2'
       worker_settings:
-        # Number of workers to run in parallel 
+        # Number of workers to run in parallel
         #   Type: integer.
         n_workers: 4
         # Number of threads to use per worker. This sets the OMP_NUM_THREADS environment variable in
         #   each python process.
         #   Type: integer.
         threads_per_worker: 2
-        # Max memory to use per worker in GB. 
+        # Max memory to use per worker in GB.
         #   Type: string.
         max_memory: 8GB
-        # Dask local spill directory 
+        # Dask local spill directory
         #   Type: string.
         dask_temp_dir: tmp
         # Size (rows, columns) of blocks of data to load at a time.
@@ -162,7 +162,7 @@ RunConfig:
       output_options:
         # Output height levels for ZTD.
         #   Type: list.
-        output_heights: 
+        output_heights:
           - -500.0
           - -300.0
           - -200.0
