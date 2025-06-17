@@ -7,19 +7,19 @@ tropo_pge.py
 Module defining the implementation for the TROPO PGE.
 """
 
-from datetime import datetime, timedelta
-from os.path import abspath, basename, exists, getsize, join, splitext
-from os import listdir
 import re
+from datetime import datetime, timedelta
+from os import listdir
+from os.path import abspath, basename, getsize, join, splitext
 
 from opera.pge.base.base_pge import PgeExecutor
 from opera.pge.base.base_pge import PostProcessorMixin
 from opera.pge.base.base_pge import PreProcessorMixin
 from opera.util.error_codes import ErrorCode
+from opera.util.h5_utils import get_extent_from_coordinates, get_tropo_product_metadata
 from opera.util.input_validation import check_input
 from opera.util.render_jinja2 import augment_hdf5_measured_parameters, render_jinja2
 from opera.util.run_utils import get_checksum
-from opera.util.h5_utils import get_extent_from_coordinates, get_tropo_product_metadata
 
 
 class TROPOPreProcessorMixin(PreProcessorMixin):
@@ -48,13 +48,13 @@ class TROPOPreProcessorMixin(PreProcessorMixin):
             Any keyword arguments needed by the pre-processor
         """
         super().run_preprocessor(**kwargs)
-        
+
         for input_file in self.runconfig.input_files:
             check_input(
                 input_file,
-                self.logger, 
-                self.runconfig.pge_name, 
-                valid_extensions=(".nc",), 
+                self.logger,
+                self.runconfig.pge_name,
+                valid_extensions=(".nc",),
                 check_zero_size=True
             )
 
@@ -71,9 +71,9 @@ class TROPOPostProcessorMixin(PostProcessorMixin):
 
     _post_mixin_name = "TROPOPostProcessorMixin"
     _cached_core_filename = None
-    
+
     _expected_extensions = ('.nc', '.png')
-        
+
     def _validate_outputs(self):
         """
         Confirms that there exists one and only of each expected output type.
@@ -87,7 +87,7 @@ class TROPOPostProcessorMixin(PostProcessorMixin):
 
         output_product_path = abspath(self.runconfig.output_product_path)
         output_product_files = listdir(output_product_path)
-        
+
         # Confirm one and only one of each expected output type
         for filename_ext in self._expected_extensions:
             gen = (f for f in output_product_files if splitext(f)[1] == filename_ext)
@@ -96,7 +96,7 @@ class TROPOPostProcessorMixin(PostProcessorMixin):
             except StopIteration:
                 error_msg = f"Could not locate {filename_ext} file."
                 self.logger.critical(self.name, ErrorCode.OUTPUT_NOT_FOUND, error_msg)
-                
+
             # Check for second file, if found raise error
             try:
                 next(gen)
@@ -104,22 +104,26 @@ class TROPOPostProcessorMixin(PostProcessorMixin):
                 self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
             except StopIteration:
                 pass
-            
+
             # Validate the one file found for this extension
             output_filepath = join(output_product_path, output_filename)
-            
+
             # Check file size
             file_size = getsize(output_filepath)
             if not file_size > 0:
                 error_msg = (f"Output file {output_filename} size is {file_size}. "
                         "Size must be greater than 0.")
                 self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
-            
+
             # Check filename matches expected pattern
-            if not bool(filename_pattern.match(splitext(output_filename)[0])):
+            match = filename_pattern.match(splitext(output_filename)[0])
+            if not bool(match):
                 error_msg = f'Invalid product filename {output_filename}'
                 self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
-                
+            else:
+                # Cache the core filename for later use
+                self._cached_core_filename = match.group(0)
+
     def _checksum_output_products(self):
         """
         Generates a dictionary mapping output product file names to the
@@ -152,25 +156,25 @@ class TROPOPostProcessorMixin(PostProcessorMixin):
         }
 
         return checksums
-    
+
     def _parse_temporal_resolution(self, time_res: str):
         """
         Converts a time resolution string of the format "{value}{unit}"
-        to a datetime timedelta object. TROPO products define a 
+        to a datetime timedelta object. TROPO products define a
         temporal_resolution metadata attribute, ex: "6h".
-        
+
         Parameters
         ----------
         time_res : str
             Contents of the temporal_resolution attribute from a TROPO
             output NetCDF product.
-            
+
         Returns
         ----------
         time_delta : timedelta
             Datetime timedelta object used to compute the end time of
             a TROPO output product.
-            
+
         Raises
         ------
         ValueError
@@ -182,7 +186,7 @@ class TROPOPostProcessorMixin(PostProcessorMixin):
         match = re.fullmatch(r'(\d+)([smhdw])', time_res.strip().lower())
         if not match:
             raise ValueError(f"Invalid temporal resolution format: {time_res}")
-        
+
         value, unit = match.groups()
         value = int(value)
 
@@ -200,12 +204,11 @@ class TROPOPostProcessorMixin(PostProcessorMixin):
         time_delta = timedelta(**{unit_map[unit]: value})
         return time_delta
 
-
     def _collect_tropo_product_metadata(self, tropo_product):
         """
         Gathers the available metadata from a sample output TROPO product for
         use in filling out the ISO metadata template fro the TROPO pge.
-        
+
         Parameters
         ----------
         tropo_product : str
@@ -218,7 +221,7 @@ class TROPOPostProcessorMixin(PostProcessorMixin):
             for use with the ISO metadata Jinja2 template.
         """
         output_product_metadata = dict()
-        
+
         try:
             measured_parameters = get_tropo_product_metadata(tropo_product)
             output_product_metadata['MeasuredParameters'] = augment_hdf5_measured_parameters(
@@ -233,13 +236,13 @@ class TROPOPostProcessorMixin(PostProcessorMixin):
         # Determine time bounds
         ref_time = datetime.fromisoformat(measured_parameters["reference_time"])
         time_res_delta = self._parse_temporal_resolution(measured_parameters["temporal_resolution"])
-        
+
         # TODO: end_time needs confirmation
         output_product_metadata['temporal_extent'] = {
             'start_time': ref_time,
             'end_time': ref_time + time_res_delta
         }
-        
+
         spatial_extent = get_extent_from_coordinates(tropo_product, "/")
         output_product_metadata['spatial_extent'] = {
             'lon_min': spatial_extent[0],
@@ -247,10 +250,10 @@ class TROPOPostProcessorMixin(PostProcessorMixin):
             'lat_min': spatial_extent[2],
             'lat_max': spatial_extent[3]
         }
-        
+
         # TODO: this is a placeholder
         output_product_metadata["zone_identifier"] = "global"
-        
+
         # TODO: spacing value needs confirmation
         output_product_metadata['xCoordinates'] = {
             'size': 5120,
@@ -260,9 +263,9 @@ class TROPOPostProcessorMixin(PostProcessorMixin):
             'size': 2560,
             'spacing': 8000 # 0.07 degrees is ~8km
         }
-        
+
         return output_product_metadata
-    
+
     def _create_custom_metadata(self, granule_filename):
         """
         Creates the "custom data" dictionary used with the ISO metadata rendering.
@@ -289,7 +292,7 @@ class TROPOPostProcessorMixin(PostProcessorMixin):
         }
 
         return custom_metadata
-    
+
     def _create_iso_metadata(self, tropo_metadata, product_filename):
         """
         Creates a rendered version of the ISO metadata template for TROPO
@@ -315,7 +318,7 @@ class TROPOPostProcessorMixin(PostProcessorMixin):
         """
         # Use the base PGE implemenation to validate existence of the template
         super()._create_iso_metadata()
-        
+
         runconfig_dict = self.runconfig.asdict()
 
         product_output_dict = tropo_metadata
@@ -335,8 +338,40 @@ class TROPOPostProcessorMixin(PostProcessorMixin):
 
         rendered_template = render_jinja2(iso_template_path, iso_metadata, self.logger)
 
-        return rendered_template    
-    
+        return rendered_template
+
+    def _core_filename(self, inter_filename=None):  # pylint: disable=unused-argument
+        """
+        Returns the core file name component for products produced by the
+        TROPO PGE.
+
+        The core file name component of the TROPO PGE consists of:
+
+            <PROJECT>_<LEVEL>_<PGE NAME>_<WEATHER MODEL TIMETAG>_<PROD TIMETAG>_<NWP NAME>_<NWP SPACING>_<PRODUCT VERSION>
+
+        Notes
+        -----
+        The core filename is derived from the output product file name assigned
+        by the TROPO SAS. During output product validation, this PGE caches
+        the core filename in the _cached_core_filename attribute, so this
+        method should only be called after the outputs have been validated.
+
+        Parameters
+        ----------
+        inter_filename : str, optional
+            The intermediate filename of the output product to generate the
+            core filename for. Currenly unused by this method.
+
+        Returns
+        -------
+        core_filename : str
+            The core file name component to assign to products created by this PGE.
+
+        """
+        # _validate_outputs() should have been called prior to this method to
+        # set _cached_core_filename
+        return self._cached_core_filename
+
     def _stage_output_files(self):
         """
         Ensures that all output products produced by both the SAS and this PGE
@@ -358,9 +393,9 @@ class TROPOPostProcessorMixin(PostProcessorMixin):
             if output_product.endswith('.nc'):
                 nc_product = output_product
                 break
-        
+
         # For each output file name, assign the final file name matching the
-        # expected conventions.   
+        # expected conventions.
         for output_product in output_products:
             self._assign_filename(output_product, self.runconfig.output_product_path)
 
@@ -422,7 +457,7 @@ class TROPOPostProcessorMixin(PostProcessorMixin):
 
             # Log stream might be closed by this point so raise an Exception instead
             raise RuntimeError(msg)
-    
+
     def run_postprocessor(self, **kwargs):
         """
         Executes the post-processing steps for the TROPO PGE.
@@ -436,13 +471,12 @@ class TROPOPostProcessorMixin(PostProcessorMixin):
         **kwargs: dict
             Any keyword arguments needed by the post-processor
         """
-        
+
         print(f'Running postprocessor for {self._post_mixin_name}')
 
         self._run_sas_qa_executable()
         self._validate_outputs()
         self._stage_output_files()
-        
 
 
 class TROPOExecutor(TROPOPreProcessorMixin, TROPOPostProcessorMixin, PgeExecutor):
@@ -462,7 +496,7 @@ class TROPOExecutor(TROPOPreProcessorMixin, TROPOPostProcessorMixin, PgeExecutor
     PGE_VERSION = "3.0.0-er.3.0"
     """Version of the PGE"""
 
-    SAS_VERSION = "0.2"
+    SAS_VERSION = "0.2"  # https://github.com/opera-adt/tropo/releases/tag/v0.2
     """Version of the SAS wrapped by this PGE, should be updated as needed"""
 
     def __init__(self, pge_name, runconfig_path, **kwargs):

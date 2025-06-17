@@ -15,12 +15,15 @@ RunConfig:
       PrimaryExecutable:
         ProductIdentifier: TROPO
         ProductVersion: "0.2"
-        ProgramPath: /bin/echo
+        ProgramPath: mkdir
         ProgramOptions:
-        - '/bin/echo TROPO invoked with RunConfig'
+          - '-p tropo_pge_test/output_dir;'
+          - 'python3 -c "from opera.util.h5_utils import create_test_tropo_metadata_product; create_test_tropo_metadata_product(\"tropo_pge_test/output_dir/OPERA_L4_TROPO-ZENITH_20250101T010101Z_20250101T010101Z_HRES_v0.2.nc\")";'
+          - 'dd if=/dev/urandom of=tropo_pge_test/output_dir/OPERA_L4_TROPO-ZENITH_20250101T010101Z_20250101T010101Z_HRES_v0.2.png bs=1M count=1;'
+          - '/bin/echo TROPO invoked with RunConfig'
         ErrorCodeBase: 800000
         SchemaPath: pge/tropo/schema/tropo_sas_schema.yaml
-        AlgorithmParametersSchemaPath: 
+        AlgorithmParametersSchemaPath:
         IsoMeasuredParameterDescriptions: pge/tropo/templates/tropo_measured_parameters.yaml
         DataValidityStartDate:
         IsoTemplatePath: pge/tropo/templates/OPERA_ISO_metadata_L4_TROPO_template.xml.jinja2
@@ -54,17 +57,17 @@ RunConfig:
         #   Type: string.
         product_version: '0.2'
       worker_settings:
-        # Number of workers to run in parallel 
+        # Number of workers to run in parallel
         #   Type: integer.
         n_workers: 4
         # Number of threads to use per worker. This sets the OMP_NUM_THREADS environment variable in
         #   each python process.
         #   Type: integer.
         threads_per_worker: 2
-        # Max memory to use per worker in GB. 
+        # Max memory to use per worker in GB.
         #   Type: integer.
         max_memory: 8GB
-        # Dask local spill directory 
+        # Dask local spill directory
         #   Type: string.
         dask_temp_dir: tmp
         # Size (rows, columns) of blocks of data to load at a time.
@@ -82,7 +85,7 @@ RunConfig:
           - 64
         # Output height levels for ZTD.
         #   Type: list.
-        output_heights: 
+        output_heights:
           - -500.0
           - -300.0
           - -200.0
