@@ -28,7 +28,7 @@ from opera.pge import RunConfig
 from opera.pge.disp_s1.disp_s1_pge import DispS1Executor, DispS1StaticExecutor
 from opera.util import PgeLogger
 from opera.util.h5_utils import create_test_cslc_metadata_product
-from opera.util.h5_utils import create_test_disp_metadata_product
+from opera.util.h5_utils import create_test_disp_s1_metadata_product
 from opera.util.h5_utils import get_disp_s1_product_metadata
 from opera.util.input_validation import validate_disp_inputs
 from opera.util.mock_utils import MockGdal
@@ -387,7 +387,7 @@ class DispS1PgeTestCase(unittest.TestCase):
 
         disp_metadata_path = abspath(join(output_dir, '20170217_20170430.nc'))
 
-        create_test_disp_metadata_product(disp_metadata_path)
+        create_test_disp_s1_metadata_product(disp_metadata_path)
 
         disp_metadata = pge._collect_disp_s1_product_metadata(disp_metadata_path)
 
@@ -429,7 +429,7 @@ class DispS1PgeTestCase(unittest.TestCase):
 
         disp_metadata_path = abspath(join(output_dir, '20170217_20170430.nc'))
 
-        create_test_disp_metadata_product(disp_metadata_path, omit_cslc_measured_parameters=True)
+        create_test_disp_s1_metadata_product(disp_metadata_path, omit_cslc_measured_parameters=True)
 
         disp_metadata = pge._collect_disp_s1_product_metadata(disp_metadata_path)
 

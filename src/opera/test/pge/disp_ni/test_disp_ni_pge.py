@@ -207,18 +207,47 @@ class DispNIPgeTestCase(unittest.TestCase):
         expected_sas_config_file = join(pge.runconfig.scratch_path, 'test_disp_ni_config_sas.yaml')
         self.assertTrue(os.path.exists(expected_sas_config_file))
 
-        # TODO: Test for catalog & ISO XML when ready
+        # Check that the catalog metadata file was created in the output directory
+        expected_catalog_metadata_file = join(
+            pge.runconfig.output_product_path, pge._catalog_metadata_filename())
+        self.assertTrue(os.path.exists(expected_catalog_metadata_file))
+
+        expected_inter_filename = abspath("disp_ni_pge_test/output_dir/20060630_20060930.nc")
+        expected_browse_filename = abspath("disp_ni_pge_test/output_dir/20060630_20060930.displacement.png")
+
+        # Check that the ISO metadata file was created and all placeholders were
+        # filled in
+        expected_iso_metadata_file = join(
+            pge.runconfig.output_product_path, pge._iso_metadata_filename(expected_inter_filename))
+        self.assertTrue(os.path.exists(expected_iso_metadata_file))
 
         # Check that the log file was created and moved into the output directory
         expected_log_file = pge.logger.get_file_name()
         self.assertTrue(os.path.exists(expected_log_file))
 
         # Lastly, check that the dummy output products were created and renamed
-        self.assertTrue(os.path.exists(join(pge.runconfig.output_product_path, '20060630_20060930.nc')))
-        self.assertTrue(os.path.exists(join(pge.runconfig.output_product_path,
-                                            '20060630_20060930.short_wavelength_displacement.png')))
-        self.assertTrue(os.path.exists(join(pge.runconfig.output_product_path, 'compressed_slcs',
-                                            'compressed_20060630_20060630_20071118.h5')))
+        expected_disp_product = join(
+            pge.runconfig.output_product_path,
+            pge._netcdf_filename(
+                inter_filename=expected_inter_filename
+            )
+        )
+        self.assertTrue(os.path.exists(expected_disp_product))
+
+        expected_browse_product = join(
+            pge.runconfig.output_product_path,
+            pge._browse_filename(
+                inter_filename=expected_browse_filename
+            )
+        )
+        self.assertTrue(os.path.exists(expected_browse_product))
+
+        for compressed_gslc in ['compressed_20060630_20060630_20071118.h5',]:
+            expected_compressed_gslc_product = join(
+                pge.runconfig.output_product_path,
+                pge._compressed_gslc_filename(compressed_gslc)
+            )
+            self.assertTrue(os.path.exists(expected_compressed_gslc_product))
 
         # Open and read the log
         with open(expected_log_file, 'r', encoding='utf-8') as infile:

@@ -671,7 +671,7 @@ def get_disp_s1_product_metadata(file_name):
     return disp_metadata
 
 
-def create_test_disp_metadata_product(
+def create_test_disp_s1_metadata_product(
         file_path,
         omit_cslc_measured_parameters=False
 ):
@@ -936,6 +936,287 @@ def create_test_disp_metadata_product(
                                                                                   data=np.bytes_("0.15.1"))
             source_data_software_s1_reader_version_dset = metadata_grp.create_dataset(
                 "source_data_software_s1_reader_version", data=np.bytes_("0.2.4"))
+
+
+def create_test_disp_ni_metadata_product(
+        file_path,
+        omit_cslc_measured_parameters=False
+):
+    # pylint: disable=unused-variable,invalid-name,too-many-locals,too-many-statements,too-many-boolean-expressions
+    # pylint: disable=line-too-long
+    """
+    Creates a dummy DISP-NI h5 metadata file with expected groups and datasets.
+    This function is intended for use with unit tests, but is included in this
+    module, so it will be importable from within a built container.
+
+    Parameters
+    ----------
+    file_path : str
+        Full path to write the dummy DISP H5 metadata file to.
+    omit_cslc_measured_parameters : bool
+        If true, do not create dummy datasets for datasets copied from the input CSLC
+        (https://github.com/opera-adt/disp-s1/blob/fa562e194f26ebdadfdbe6f0defe80b55f212b4a/src/disp_s1/product.py#L1614-L1647)
+
+    """
+    # pylint: enable=line-too-long
+    pge_runconfig_contents = """
+    input_file_group:
+        gslc_file_list:
+          - input_dir/NISAR_L2_GSLC_NI_F150_20070703T062138Z_20240528T200959Z_NI_HH_v0.1.h5
+          - input_dir/NISAR_L2_GSLC_NI_F150_20070818T062132Z_20240528T200952Z_NI_HH_v0.1.h5
+        frame_id: 150
+        polarization: HH
+    log_file: output/pge_logfile.log
+    """
+
+    algorithm_parameters_contents = """
+    dummy yaml data
+    """
+
+    dolphin_workflow_config_contents = """
+    dummy yaml data
+    """
+
+    with h5py.File(file_path, 'w') as outfile:
+        x_dset = outfile.create_dataset("x", data=np.zeros(10, ), dtype='float64')
+        y_dset = outfile.create_dataset("y", data=np.zeros(10, ), dtype='float64')
+
+        identification_grp = outfile.create_group("/identification")
+        frame_id_dset = identification_grp.create_dataset("frame_id", data=123, dtype='int64')
+        product_version_dset = identification_grp.create_dataset("product_version",
+                                                                 data=np.bytes_("0.1"))
+        reference_zero_doppler_start_time_dset = identification_grp.create_dataset("reference_zero_doppler_start_time",
+                                                                                   data=np.bytes_(
+                                                                                       "2017-02-17 13:27:50.139658"))
+        reference_zero_doppler_end_time_dset = identification_grp.create_dataset("reference_zero_doppler_end_time",
+                                                                                 data=np.bytes_(
+                                                                                     "2017-02-17 13:27:55.979493"))
+        secondary_zero_doppler_start_time_dset = identification_grp.create_dataset("secondary_zero_doppler_start_time",
+                                                                                   data=np.bytes_(
+                                                                                       "2017-04-30 13:27:52.049224"))
+        secondary_zero_doppler_end_time_dset = identification_grp.create_dataset("secondary_zero_doppler_end_time",
+                                                                                 data=np.bytes_(
+                                                                                     "2017-04-30 13:27:57.891116"))
+        bounding_polygon_dset = identification_grp.create_dataset(
+              "bounding_polygon",
+              data=np.bytes_(
+                  "MULTIPOLYGON (((-117.991314446001 35.1275713258456, -118.70098146508 35.0239385663585, "
+                  "-118.664527379612 34.9449217347989, -118.654394159539 34.8328073033373, -118.613166382556 "
+                  "34.7035231582165, -118.615316671575 34.6456077689387, -118.526911187075 34.2131135972892, "
+                  "-117.82452421634 34.3169733269742, -117.828815084691 34.4216437108976, -117.991314446001 "
+                  "35.1275713258456)))")
+        )
+        radar_wavelength_dset = identification_grp.create_dataset("radar_wavelength",
+                                                                  data=0.05546576, dtype='float64')
+        reference_datetime_dset = identification_grp.create_dataset("reference_datetime",
+                                                                    data=np.bytes_("2022-11-07 00:00:00.000000"))
+        secondary_datetime_dset = identification_grp.create_dataset("secondary_datetime",
+                                                                    data=np.bytes_("2022-12-13 00:00:00.000000"))
+        average_temporal_coherence_dset = identification_grp.create_dataset("average_temporal_coherence",
+                                                                            data=0.9876175064678105, dtype='float64')
+        ceos_analysis_ready_data_document_identifier_dset = identification_grp.create_dataset(
+            "ceos_analysis_ready_data_document_identifier",
+            data=np.bytes_("https://ceos.org/ard/files/PFS/SAR/v1.2/CEOS-ARD_PFS_Synthetic_Aperture_Radar_v1.2.pdf"))
+        source_data_processing_facility_dset = identification_grp.create_dataset(
+            "source_data_processing_facility",
+            data=np.bytes_("NASA Jet Propulsion Laboratory on AWS")
+        )
+        source_data_imaging_geometry_dset = identification_grp.create_dataset(
+            "source_data_imaging_geometry",
+            data=np.bytes_("Geocoded")
+        )
+        source_data_acquisition_polarization_dset = identification_grp.create_dataset(
+            "source_data_acquisition_polarization",
+            data=np.bytes_("VV/VH")
+        )
+        source_data_access_dset = identification_grp.create_dataset(
+            "source_data_access",
+            data=np.bytes_(
+                "https://search.asf.alaska.edu/#/?dataset=OPERA-NI&productTypes=CSLC")
+        )
+        source_data_x_spacing_dset = identification_grp.create_dataset("source_data_x_spacing", data=10, dtype='int64')
+        source_data_y_spacing_dset = identification_grp.create_dataset("source_data_y_spacing", data=10, dtype='int64')
+        near_range_incidence_angle_dset = identification_grp.create_dataset("near_range_incidence_angle", data=33.0,
+                                                                            dtype='float32')
+        far_range_incidence_angle_dset = identification_grp.create_dataset("far_range_incidence_angle", data=47,
+                                                                           dtype='float32')
+        product_sample_spacing_dset = identification_grp.create_dataset("product_sample_spacing", data=30,
+                                                                        dtype='int64')
+        nodata_pixel_count_dset = identification_grp.create_dataset("nodata_pixel_count", data=1747139,
+                                                                    dtype='int64')
+        product_bounding_box_dset = identification_grp.create_dataset("product_bounding_box", data=np.bytes_(
+            "337260.0,3785100.0,424920.0,3889440.0"))
+        # product_pixel_coordinate_convention_dset = identification_grp.create_dataset(
+        #     "product_pixel_coordinate_convention", data=np.bytes_("center"))
+        # mission_id_dset = identification_grp.create_dataset("mission_id", data=np.bytes_("S1A"))
+        # if not omit_cslc_measured_parameters:
+        #     instrument_name_dset = identification_grp.create_dataset("instrument_name", data=np.bytes_("C-SAR"))
+        #     look_direction_dset = identification_grp.create_dataset("look_direction", data=np.bytes_("Right"))
+        #     track_number_dset = identification_grp.create_dataset("track_number", data=27, dtype='int64')
+        #     orbit_pass_direction_dset = identification_grp.create_dataset("orbit_pass_direction",
+        #                                                                   data=np.bytes_("Descending"))
+        #     absolute_orbit_number_dset = identification_grp.create_dataset("absolute_orbit_number", data=15324,
+        #                                                                    dtype="int64")
+
+        acquisition_mode_dset = identification_grp.create_dataset("acquisition_mode", data=np.bytes_("IW"))
+        ceos_analysis_ready_data_product_type_dset = identification_grp.create_dataset(
+            "ceos_analysis_ready_data_product_type", data=np.bytes_("InSAR"))
+        ceos_number_of_input_granules_dset = identification_grp.create_dataset("ceos_number_of_input_granules",
+                                                                               data=14, dtype="int64")
+        processing_facility_dset = identification_grp.create_dataset("processing_facility", data=np.bytes_(
+            "NASA Jet Propulsion Laboratory on AWS"))
+        processing_start_datetime_dset = identification_grp.create_dataset("processing_start_datetime",
+                                                                           data=np.bytes_("2025-01-17 22:47:38"))
+        product_data_polarization_dset = identification_grp.create_dataset("product_data_polarization",
+                                                                           data=np.bytes_("VV"))
+        product_data_access_dset = identification_grp.create_dataset("product_data_access", data=np.bytes_(
+            "https://search.asf.alaska.edu/#/?dataset=OPERA-S1&productTypes=DISP-S1"))
+        radar_center_frequency_dset = identification_grp.create_dataset("radar_center_frequency", data=5405000454.33435,
+                                                                        dtype="float64")
+        source_data_azimuth_resolutions_dset = identification_grp.create_dataset("source_data_azimuth_resolutions",
+                                                                                 data=np.bytes_("[3-10, 30-50, 7-10]"))
+        source_data_dem_name_dset = identification_grp.create_dataset("source_data_dem_name",
+                                                                      data=np.bytes_("Copernicus GLO-30"))
+        source_data_earliest_acquisition_dset = identification_grp.create_dataset("source_data_earliest_acquisition",
+                                                                                  data=np.bytes_("2017-02-17T00:00:00"))
+        source_data_earliest_processing_datetime_dset = identification_grp.create_dataset(
+            "source_data_earliest_processing_datetime", data=np.bytes_("2024-06-25T00:00:00"))
+        source_data_file_list_dset = identification_grp.create_dataset("source_data_file_list", data=np.bytes_(
+            "NISAR_L2_GSLC_NI_F150_20060630T061920Z_20240528T200256Z_NI_HH_v0.1,"
+            "NISAR_L2_GSLC_NI_F150_20060815T061952Z_20240528T200246Z_NI_HH_v0.1,"
+            "NISAR_L2_GSLC_NI_F150_20060930T062029Z_20240528T200242Z_NI_HH_v0.1,"
+            "NISAR_L2_GSLC_NI_F150_20061115T062055Z_20240528T200248Z_NI_HH_v0.1,"
+            "NISAR_L2_GSLC_NI_F150_20061231T062124Z_20240528T200247Z_NI_HH_v0.1,"
+            "NISAR_L2_GSLC_NI_F150_20070215T062136Z_20240528T201122Z_NI_HH_v0.1,"
+            "NISAR_L2_GSLC_NI_F150_20070518T062142Z_20240528T201124Z_NI_HH_v0.1,"
+            "NISAR_L2_GSLC_NI_F150_20070703T062138Z_20240528T200959Z_NI_HH_v0.1,"
+            "NISAR_L2_GSLC_NI_F150_20070818T062132Z_20240528T200952Z_NI_HH_v0.1,"
+            "NISAR_L2_GSLC_NI_F150_20071003T062119Z_20240528T201004Z_NI_HH_v0.1,"
+            "NISAR_L2_GSLC_NI_F150_20071118T062059Z_20240528T201835Z_NI_HH_v0.1"))
+        source_data_latest_acquisition_dset = identification_grp.create_dataset("source_data_latest_acquisition",
+                                                                                data=np.bytes_("2017-04-30T00:00:00"))
+        source_data_latest_processing_datetime_dset = identification_grp.create_dataset(
+            "source_data_latest_processing_datetime", data=np.bytes_("2024-06-26T00:00:00"))
+        source_data_max_noise_equivalent_sigma_zero_dset = identification_grp.create_dataset(
+            "source_data_max_noise_equivalent_sigma_zero", data=-22.0, dtype="float64")
+        source_data_original_institution_dset = identification_grp.create_dataset(
+            "source_data_original_institution",
+            data=np.bytes_(
+                "NASA's Jet Propulsion Laboratory (JPL) and ISRO (Indian Space Research Organisation)"
+            )
+        )
+        source_data_polarization_dset = identification_grp.create_dataset("source_data_polarization",
+                                                                          data=np.bytes_("HH"))
+        source_data_range_resolutions_dset = identification_grp.create_dataset("source_data_range_resolutions",
+                                                                               data=np.bytes_("[3-10, 30-50, 7-10]"))
+        source_data_reference_orbit_type_dset = identification_grp.create_dataset("source_data_reference_orbit_type",
+                                                                                  data=np.bytes_("custom"))
+        source_data_satellite_names_dset = identification_grp.create_dataset("source_data_satellite_names",
+                                                                             data=np.bytes_("NI"))
+        source_data_secondary_orbit_type_dset = identification_grp.create_dataset("source_data_secondary_orbit_type",
+                                                                                  data=np.bytes_("custom"))
+        static_layers_data_access_dset = identification_grp.create_dataset(
+           "static_layers_data_access",
+           data=np.bytes_(
+               "https://search.asf.alaska.edu/#/?dataset=OPERA-S1&productTypes=DISP-S1-STATIC&frame=150")
+        )
+        radar_band_dset = identification_grp.create_dataset("radar_band", data=np.bytes_("C"))
+
+        metadata_grp = outfile.create_group("/metadata")
+
+        # product_landing_page_doi_dset = metadata_grp.create_dataset(
+        #     "product_landing_page_doi",
+        #     data=np.bytes_("https://doi.org/10.5067/SNWG/OPL3DISPS1-V1")
+        # )
+        disp_nisar_software_version_dset = metadata_grp.create_dataset("disp_nisar_software_version",
+                                                                       data=np.bytes_(
+                                                                           "0.1.1.post1.dev0+g5193e97.d20250326"
+                                                                       ))
+        dolphin_software_version_dset = metadata_grp.create_dataset("dolphin_software_version",
+                                                                    data=np.bytes_("0.36.2"))
+        pge_runconfig_dset = metadata_grp.create_dataset("pge_runconfig",
+                                                         data=np.bytes_(pge_runconfig_contents))
+        algorithm_parameters_yaml_dset = metadata_grp.create_dataset("algorithm_parameters_yaml",
+                                                                     data=np.bytes_(algorithm_parameters_contents))
+        dolphin_workflow_config_dset = metadata_grp.create_dataset("dolphin_workflow_config",
+                                                                   data=np.bytes_(dolphin_workflow_config_contents))
+        algorithm_theoretical_basis_document_id_dset = metadata_grp.create_dataset(
+            "algorithm_theoretical_basis_document_id", data=np.bytes_("JPL D-108765"))
+        ceos_product_measurement_projection_dset = metadata_grp.create_dataset(
+            "ceos_product_measurement_projection", data=np.bytes_("line of sight"))
+        ceos_atmospheric_phase_correction_dset = metadata_grp.create_dataset("ceos_atmospheric_phase_correction",
+                                                                             data=np.bytes_("None"))
+        ceos_gridding_convention_dset = metadata_grp.create_dataset("ceos_gridding_convention",
+                                                                    data=np.bytes_("Snap to grid"))
+        ceos_insar_pair_baseline_criteria_information_dset = metadata_grp.create_dataset(
+            "ceos_insar_pair_baseline_criteria_information", data=np.bytes_("All"))
+        ceos_insar_azimuth_common_band_filtering_dset = metadata_grp.create_dataset(
+            "ceos_insar_azimuth_common_band_filtering", data=np.bytes_("False"))
+        ceos_insar_range_spectral_shift_filtering_dset = metadata_grp.create_dataset(
+            "ceos_insar_range_spectral_shift_filtering", data=np.bytes_("False"))
+        ceos_insar_orbital_baseline_refinement_dset = metadata_grp.create_dataset(
+            "ceos_insar_orbital_baseline_refinement", data=np.bytes_("False"))
+        ceos_shp_selection_selection_criteria_dset = metadata_grp.create_dataset(
+            "ceos_shp_selection_selection_criteria", data=np.bytes_("glrt"))
+        ceos_shp_selection_window_size = metadata_grp.create_dataset(
+            "ceos_shp_selection_window_size", data=np.bytes_("11x23"))
+        ceos_shp_selection_selection_threshold = metadata_grp.create_dataset(
+            "ceos_shp_selection_selection_threshold", data=0.001, dtype="float64")
+        ceos_ionospheric_phase_correction_dset = metadata_grp.create_dataset("ceos_ionospheric_phase_correction",
+                                                                             data=np.bytes_("None"))
+        ceos_noise_removal_dset = metadata_grp.create_dataset("ceos_noise_removal", data=np.bytes_("No"))
+        ceos_absolute_geolocation_ground_range_bias_dset = metadata_grp.create_dataset(
+            "ceos_absolute_geolocation_ground_range_bias", data=-0.06, dtype="float64")
+        ceos_absolute_geolocation_ground_range_stddev_dset = metadata_grp.create_dataset(
+            "ceos_absolute_geolocation_ground_range_stddev", data=0.38, dtype="float64")
+        ceos_absolute_geolocation_azimuth_bias_dset = metadata_grp.create_dataset(
+            "ceos_absolute_geolocation_azimuth_bias", data=-0.04, dtype="float64")
+        ceos_absolute_geolocation_azimuth_stddev_dset = metadata_grp.create_dataset(
+            "ceos_absolute_geolocation_azimuth_stddev", data=0.46, dtype="float64")
+        ceos_persistent_scatterer_amplitude_dispersion_threshold_dset = metadata_grp.create_dataset(
+            "ceos_persistent_scatterer_amplitude_dispersion_threshold", data=0.15, dtype="float64")
+        ceos_persistent_scatterer_selection_criteria_dset = metadata_grp.create_dataset(
+            "ceos_persistent_scatterer_selection_criteria", data=np.bytes_("Amplitude Dispersion"))
+        ceos_persistent_scatterer_selection_criteria_doi_dset = metadata_grp.create_dataset(
+            "ceos_persistent_scatterer_selection_criteria_doi", data=np.bytes_("https://doi.org/10.1109/36.898661"))
+        ceos_phase_similarity_metric_doi_dset = metadata_grp.create_dataset(
+            "ceos_phase_similarity_metric_doi",
+            data=np.bytes_(
+                "https://doi.org/10.1109/TGRS.2022.3210868")
+        )
+        ceos_estimated_phase_quality_metric_algorithm_dset = metadata_grp.create_dataset(
+            "ceos_estimated_phase_quality_metric_algorithm", data=np.bytes_("Gaussian filtering"))
+        ceos_phase_unwrapping_method_dset = metadata_grp.create_dataset("ceos_phase_unwrapping_method",
+                                                                        data=np.bytes_("snaphu"))
+        ceos_phase_unwrapping_snaphu_doi_dset = metadata_grp.create_dataset(
+            "ceos_phase_unwrapping_snaphu_doi",data=np.bytes_("https://doi.org/10.1364/JOSAA.18.000338"))
+        ceos_phase_unwrapping_spurt_doi_dset = metadata_grp.create_dataset(
+            "ceos_phase_unwrapping_spurt_doi", data=np.bytes_("'https://doi.org/10.1016/j.rse.2023.113456'"))
+        ceos_phase_unwrapping_similarity_threshold_dset = metadata_grp.create_dataset(
+            "ceos_phase_unwrapping_similarity_threshold", data=0.3, dtype="float64")
+        product_pixel_coordinate_convention_dset = metadata_grp.create_dataset("product_pixel_coordinate_convention",
+                                                                               data=np.bytes_("pixel_center"))
+        product_specification_document_id_dset = metadata_grp.create_dataset("product_specification_document_id",
+                                                                             data=np.bytes_("JPL D-108772"))
+
+        # if not omit_cslc_measured_parameters:
+        #     platform_id_dset = metadata_grp.create_dataset("platform_id", data=np.bytes_("S1A"))
+        #     slant_range_mid_swath_dset = metadata_grp.create_dataset("slant_range_mid_swath", data=875720.2393261964,
+        #                                                              dtype="float64")
+        #     source_data_software_COMPASS_version_dset = metadata_grp.create_dataset(
+        #         "source_data_software_COMPASS_version",
+        #         data=np.bytes_("0.5.5")
+        #     )
+        #     source_data_software_ISCE3_version_dset = metadata_grp.create_dataset("source_data_software_ISCE3_version",
+        #                                                                           data=np.bytes_("0.15.1"))
+        #     source_data_software_s1_reader_version_dset = metadata_grp.create_dataset(
+        #         "source_data_software_s1_reader_version", data=np.bytes_("0.2.4"))
+
+        lsar_id_grp = outfile.create_group('/science/LSAR/identification')
+
+        look_direction_dset = lsar_id_grp.create_dataset("look_direction", data=np.bytes_("Right"))
+        orbit_pass_direction_dset = lsar_id_grp.create_dataset("orbitPassDirection", data=np.bytes_("Ascending"))
+        track_number_dset = lsar_id_grp.create_dataset("trackNumber", data=1, dtype="ubyte")
 
 
 def get_tropo_product_metadata(file_name):
