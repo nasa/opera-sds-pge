@@ -22,6 +22,8 @@ from opera.pge import RunConfig
 from opera.pge.disp_ni.disp_ni_pge import DispNIExecutor
 from opera.util import PgeLogger
 from opera.util.input_validation import validate_disp_inputs
+from opera.util.h5_utils import create_test_disp_ni_metadata_product
+from opera.util.render_jinja2 import UNDEFINED_ERROR
 
 
 class DispNIPgeTestCase(unittest.TestCase):
@@ -567,6 +569,47 @@ class DispNIPgeTestCase(unittest.TestCase):
                 "Compressed CSLC file 'compressed_slc_t087_185684_iw2_20180222_20180330.h5' exists, but is empty",
                 log_contents)
             shutil.rmtree(pge.runconfig.output_product_path)
+
+    def test_iso_metadata_creation(self):
+        """
+        Test that the ISO metadata template is fully filled out when realistic
+        DISP-NI product metadata is available.
+        """
+        runconfig_path = join(self.data_dir, 'test_disp_ni_config.yaml')
+
+        pge = DispNIExecutor(pge_name="DispNIPgeTest", runconfig_path=runconfig_path)
+
+        # Run only the pre-processor steps to ingest the runconfig and set
+        # up directories
+        pge.run_preprocessor()
+
+        # Create a sample metadata file within the output directory of the PGE
+        output_dir = join(os.curdir, "disp_ni_pge_test/output_dir")
+
+        disp_metadata_path = abspath(join(output_dir, '20170217_20170430.nc'))
+
+        create_test_disp_ni_metadata_product(disp_metadata_path)
+
+        disp_metadata = pge._collect_disp_s1_product_metadata(disp_metadata_path)
+
+        iso_metadata = pge._create_iso_metadata(disp_metadata_path, disp_metadata)
+
+        self.assertNotIn(UNDEFINED_ERROR, iso_metadata)
+
+        os.unlink(disp_metadata_path)
+
+        # Test no file from which to extract data
+        disp_metadata_path = join(output_dir, 'No_file.nc')
+
+        with self.assertRaises(RuntimeError):
+            pge._collect_disp_s1_product_metadata(disp_metadata_path)
+
+        # Verify the proper Runtime error message
+        log_file = pge.logger.get_file_name()
+        self.assertTrue(exists(log_file))
+        with open(log_file, 'r', encoding='utf-8') as l_file:
+            log = l_file.read()
+        self.assertIn(f'Failed to extract metadata from {disp_metadata_path}', log)
 
 
 class MockRunConfig:

@@ -255,7 +255,6 @@ class DispNIPostProcessorMixin(DispS1PostProcessorMixin):
             for use with the ISO metadata Jinja2 template.
 
         """
-
         # Extract all metadata assigned by the SAS at product creation time
         try:
             output_product_metadata = get_disp_product_metadata(disp_product)
@@ -329,7 +328,6 @@ class DispNIPostProcessorMixin(DispS1PostProcessorMixin):
         custom_metadata['ISO_OPERA_InstrumentKeywords'] = ['NISAR']
 
         return custom_metadata
-
 
     def run_postprocessor(self, **kwargs):
         """
