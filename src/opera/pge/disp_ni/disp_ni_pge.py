@@ -216,11 +216,6 @@ class DispNIPostProcessorMixin(DispS1PostProcessorMixin):
             f"{self.PROJECT}_{self.LEVEL}_{self.NAME}"
         )
 
-        # TODO: Determine the following three fields from metadata (hardcode for now)
-        orbit_track = "001"
-        orbit_direction = "A"
-        mode = "05"
-
         frame_id = f"{self.runconfig.sas_config['input_file_group']['frame_id']:03d}"
         pol = self.runconfig.sas_config['input_file_group']['polarization']
 
@@ -232,8 +227,7 @@ class DispNIPostProcessorMixin(DispS1PostProcessorMixin):
         product_generation_date_time = f"{get_time_for_filename(self.production_datetime)}Z"
 
         ancillary_filename = (
-            f"{core_filename}_{orbit_track}_{orbit_direction}_{frame_id}_{mode}_{pol}_"
-            f"{product_version}_{product_generation_date_time}"
+            f"{core_filename}_{frame_id}_{pol}_{product_version}_{product_generation_date_time}"
         )
 
         return ancillary_filename
