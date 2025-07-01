@@ -99,11 +99,6 @@ class DispNIPostProcessorMixin(DispS1PostProcessorMixin):
             f"{self.PROJECT}_{self.LEVEL}_{self.NAME}"
         )
 
-        # TODO: Determine the following three fields from metadata (hardcode for now)
-        orbit_track = "001"
-        orbit_direction = "A"
-        mode = "05"
-
         frame_id = f"{self.runconfig.sas_config['input_file_group']['frame_id']:03d}"
         pol = self.runconfig.sas_config['input_file_group']['polarization']
 
@@ -117,6 +112,16 @@ class DispNIPostProcessorMixin(DispS1PostProcessorMixin):
         else:
             disp_metadata = self._collect_disp_ni_product_metadata(inter_disp_product_filename)
             self._product_metadata_cache[inter_disp_product_filename] = disp_metadata
+
+        # TODO: Update when metadata fields are relocated
+        orbit_track = f'{disp_metadata["extra"]["trackNumber"]:03d}'
+        if disp_metadata["extra"]["orbitPassDirection"].lower() == 'ascending':
+            orbit_direction = 'A'
+        else:
+            orbit_direction = 'B'
+
+        # TODO: This is hardcoded. Where in the metadata?
+        mode = "05"
 
         # ReferenceDateTime: The acquisition sensing start date and time of
         # the input satellite imagery for the first burst in the frame of the
@@ -251,9 +256,7 @@ class DispNIPostProcessorMixin(DispS1PostProcessorMixin):
         """
         # Extract all metadata assigned by the SAS at product creation time
         try:
-            output_product_metadata = get_disp_product_metadata(disp_product)
-
-            # get_catalog_metadata_datetime_str(self.production_datetime)
+            output_product_metadata = get_disp_product_metadata(disp_product, extra='/science/LSAR/identification')
 
             # Add hardcoded values to metadata
             output_product_metadata['static'] = {

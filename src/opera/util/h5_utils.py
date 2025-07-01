@@ -56,7 +56,7 @@ def get_hdf5_group_as_dict(file_name, group_path, ignore_keys=None):
     -------
     group_dict : dict
         Python dict containing variable data from the group path location.
-        
+
     Raises
     -------
     RuntimeError
@@ -171,10 +171,9 @@ def get_hdf5_attrs_as_dict(file_name, group_path, ignore_keys=None):
     RuntimeError
         If group_path is not able to be retrieved from the opened h5file
     """
-    
     if ignore_keys is None:
         ignore_keys = []
-    
+
     with h5py.File(file_name, "r") as h5file:
         group_object = h5file.get(group_path)
 
@@ -192,8 +191,8 @@ def get_hdf5_attrs_as_dict(file_name, group_path, ignore_keys=None):
                 group_dict[k] = v.decode("UTF-8")
 
     return group_dict
-                               
-        
+
+
 def get_extent_from_coordinates(file_name, group_path, longitude='longitude', latitude='latitude'):
     """
     Returns spatial extent as (min_lon, max_lon, min_lat, max_lat).
@@ -215,7 +214,7 @@ def get_extent_from_coordinates(file_name, group_path, longitude='longitude', la
     -------
     extent : (float, float, float, float)
         Tuple containing (min_lon, max_lon, min_lat, max_lat).
-        
+
     Raises
     -------
     RuntimeError
@@ -237,16 +236,16 @@ def get_extent_from_coordinates(file_name, group_path, longitude='longitude', la
         if latitude not in group_object:
             raise RuntimeError(f"An error occured retrieving variable '{latitude}'"
                             f"from group path '{group_path}' in file '{file_name}'.")
-        
+
         extent = (
-            min(group_object[longitude]), 
+            min(group_object[longitude]),
             max(group_object[longitude]),
-            min(group_object[latitude]), 
+            min(group_object[latitude]),
             max(group_object[latitude])
         )
-            
+
         return extent
-        
+
 def get_rtc_s1_product_metadata(file_name):
     """
     Returns a python dict containing the RTC-S1 product_output metadata
@@ -645,7 +644,7 @@ def create_test_cslc_metadata_product(file_path):
         std_dest = local_incidence_angle_grp.create_dataset('std', data=3.5223963260650635, dtype='float64')
 
 
-def get_disp_s1_product_metadata(file_name):
+def get_disp_s1_product_metadata(file_name, **extra_groups):
     """
     Returns a python dict containing the DISP S1 metadata
     which will be used with the ISO metadata template.
@@ -654,6 +653,10 @@ def get_disp_s1_product_metadata(file_name):
     ----------
     file_name : str
         the DISP S1 metadata file.
+    extra_groups:
+        kwargs for mapping additional HDF5 groups into the metadata dict.
+        Should only be used in development versions of the PGE if SAS outputs
+        necessary information into different groups.
 
     Returns
     -------
@@ -667,6 +670,12 @@ def get_disp_s1_product_metadata(file_name):
         'identification': get_hdf5_group_as_dict(file_name, "/identification"),
         'metadata': get_hdf5_group_as_dict(file_name, "/metadata")
     }
+
+    for extra_group in extra_groups:
+        if extra_group in disp_metadata:
+            raise ValueError("Repeated extra group")
+
+        disp_metadata[extra_group] = get_hdf5_group_as_dict(file_name, extra_groups[extra_group])
 
     return disp_metadata
 
@@ -1237,15 +1246,15 @@ def get_tropo_product_metadata(file_name):
     """
     tropo_metadata = get_hdf5_attrs_as_dict(file_name, "/")
     return tropo_metadata
-    
+
 def create_test_tropo_metadata_product(file_path):
     """
     Creates a dummy TROPO netCDF metadata file with expected global attributes
-    and latitude and longitude arrays. This function is intended for use with 
-    unit tests, but is included in this module, so it will be importable from 
-    within a built container. 
-    
-    Global attribute values are currently written in TROPO products as Numpy 
+    and latitude and longitude arrays. This function is intended for use with
+    unit tests, but is included in this module, so it will be importable from
+    within a built container.
+
+    Global attribute values are currently written in TROPO products as Numpy
     byte strings, which has been reflected here.
 
     Parameters
@@ -1266,19 +1275,20 @@ def create_test_tropo_metadata_product(file_path):
         "references": np.bytes_("https://raider.readthedocs.io/en/latest/"),
         "mission_name": np.bytes_("OPERA"),
         "description": np.bytes_("OPERA One-way Tropospheric Zenith-integrated Delay for Synthetic Aperture Radar"),
-        "comment": np.bytes_("Intersect/interpolate with DEM, project to slant range and multiple with -4pi/radar wavelength (2 way) to get SAR correction"),
+        "comment": np.bytes_("Intersect/interpolate with DEM, project to slant range and multiple with -4pi/radar "
+                             "wavelength (2 way) to get SAR correction"),
         "software": np.bytes_("RAiDER"),
         "software_version": np.bytes_("0.5.3"),
         "reference_document": np.bytes_("TBD"),
         "history": np.bytes_("Created on: 2025-03-24 21:28:42.426525+00:00"),
         "reference_time": np.bytes_("2024-02-15 12:00:00")
     }
-    
+
     with h5py.File(file_path, 'w') as outfile:
         for k,v in tropo_attrs.items():
             outfile.attrs[k] = v
         lon_data = np.random.uniform(low=-180, high=180, size=(5120,))
         lat_data = np.random.uniform(low=-90, high=90, size=(2560,))
-        
+
         longitude_dset = outfile.create_dataset("longitude", data=lon_data, dtype='float64')
         latitude_dset = outfile.create_dataset("latitude", data=lat_data, dtype='float64')
