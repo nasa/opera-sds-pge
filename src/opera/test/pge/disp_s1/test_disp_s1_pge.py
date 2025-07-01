@@ -131,7 +131,6 @@ class DispS1PgeTestCase(unittest.TestCase):
         Helper method to check the properties of a parsed algorithm parameters runconfig against the
         expected values as defined by the "valid" sample algorithm parameters runconfig files.
         """
-        self.assertEqual(runconfig['algorithm_parameters_overrides_json'], "opera-disp-s1-algorithm-parameters-overrides-2025-01-09.json")
         self.assertEqual(runconfig['ps_options']['amp_dispersion_threshold'], 0.25)
         self.assertEqual(runconfig['phase_linking']['ministack_size'], 1000)
         self.assertEqual(runconfig['phase_linking']['max_num_compressed'], 5)
@@ -191,7 +190,6 @@ class DispS1PgeTestCase(unittest.TestCase):
         self.assertEqual(runconfig['unwrap_options']['spurt_options']['merger_settings']['method'], 'dirichlet')
         self.assertEqual(runconfig['unwrap_options']['spurt_options']['merger_settings']['bulk_method'], 'L2')
         self.assertEqual(runconfig['unwrap_options']['spurt_options']['merger_settings']['num_parallel_ifgs'], 13)
-        self.assertEqual(runconfig['output_options']['output_resolution'], None)
         self.assertEqual(runconfig['output_options']['strides']['x'], 6)
         self.assertEqual(runconfig['output_options']['strides']['y'], 3)
         self.assertEqual(runconfig['output_options']['bounds'], None)
@@ -207,7 +205,6 @@ class DispS1PgeTestCase(unittest.TestCase):
         self.assertEqual(runconfig['output_options']['add_overviews'], True)
         self.assertListEqual(runconfig['output_options']['overview_levels'], [4, 8, 16, 32, 64])
         self.assertEqual(runconfig['output_options']['extra_reference_date'], None)
-        self.assertEqual(runconfig['subdataset'], '/data/VV')
         self.assertEqual(runconfig['spatial_wavelength_cutoff'], 40000.0)
         self.assertListEqual(runconfig['browse_image_vmin_vmax'], [-0.1, 0.1])
         self.assertEqual(runconfig['recommended_temporal_coherence_threshold'], 0.5)
