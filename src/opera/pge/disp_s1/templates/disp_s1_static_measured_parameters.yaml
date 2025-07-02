@@ -1,152 +1,139 @@
+ACQUISITION_MODE:
+  attribute_data_type: string
+  attribute_type: instrumentInformation
+  description: Radar acquisition mode for input products
+  display_name: AcquisitionMode
 AREA_OR_POINT:
   attribute_data_type: string
   attribute_type: processingInformation
   description: Indicates that pixel values are assumed to represent an area rather than points
   display_name: AreaOrPoint
-LAYER_NAME:
-  attribute_data_type: string
-  attribute_type: contentInformation
-  description: Product layer name
-  display_name: LayerName
-LAYER_DESCRIPTION:
-  attribute_data_type: string
-  attribute_type: contentInformation
-  description: Product layer description
-  display_name: LayerDescription
-ABSOLUTE_ORBIT_NUMBER:
-  attribute_data_type: int
-  attribute_type: instrumentInformation
-  description: Absolute orbit number
-  display_name: AbsoluteOrbitNumber
-TRACK_NUMBER:
-  attribute_data_type: int
-  attribute_type: processingInformation
-  description: Track number
-  display_name: TrackNumber
-PLATFORM:
-  attribute_data_type: string
-  attribute_type: platformInformation
-  description: Name of the sensor platform (e.g., “Sentinel-1A”)
-  display_name: Platform
-INSTRUMENT_NAME:
-  attribute_data_type: string
-  attribute_type: instrumentInformation
-  description: Name of the instrument used to collect the remote sensing data provided in this product (e.g., “Sentinel-1A CSAR”)
-  display_name: InstrumentName
-PRODUCT_TYPE:
-  attribute_data_type: string
-  attribute_type: processingInformation
-  description: 'The product type: “DISP-S1-STATIC”'
-  display_name: ProductType
-PROJECT:
-  attribute_data_type: string
-  attribute_type: processingInformation
-  description: 'The project name: “OPERA”'
-  display_name: Project
-INSTITUTION:
-  attribute_data_type: string
-  attribute_type: processingInformation
-  description: 'Institution that created this product: “NASA JPL”'
-  display_name: Institution
-CONTACT_INFORMATION:
-  attribute_data_type: string
-  attribute_type: contentInformation
-  description: 'Contact information for producer of the product: "opera-sds@jpl.nasa.gov"'
-  display_name: ContactInformation
-PRODUCT_VERSION:
-  attribute_data_type: string
-  attribute_type: processingInformation
-  description: 'The product version (same as in the product filename): “1.0”'
-  display_name: ProductVersion
-PRODUCT_SPECIFICATION_VERSION:
-  attribute_data_type: string
-  attribute_type: processingInformation
-  description: 'Product specification version which represents the schema of this product: “1.0”'
-  display_name: ProductSpecificationVersion
-ACQUISITION_MODE:
-  attribute_data_type: string
-  attribute_type: instrumentInformation
-  description: 'Acquisition mode: “IW”'
-  display_name: AcquisitionMode
-LOOK_DIRECTION:
-  attribute_data_type: string
-  attribute_type: processingInformation
-  description: 'Look direction: “right”'
-  display_name: LookDirection
-ORBIT_PASS_DIRECTION:
-  attribute_data_type: string
-  attribute_type: processingInformation
-  description: Orbit direction can be ascending or descending
-  display_name: OrbitPassDirection
-PROCESSING_DATETIME:
-  attribute_data_type: string
-  attribute_type: processingInformation
-  description: 'RTC-S1 product processing date. Format: YYYY-MM-DDTHH:MM:SSZ.'
-  display_name: ProcessingDateTime
-RADAR_BAND:
-  attribute_data_type: string
-  attribute_type: instrumentInformation
-  description: 'Acquired frequency band: “C”'
-  display_name: RadarBand
-identification/ceos_analysis_ready_data_document_identifier:
+CEOS_ANALYSIS_READY_DATA_DOCUMENT_IDENTIFIER:
   attribute_data_type: string
   attribute_type: contentInformation
   description: CEOS Analysis Ready Data (CARD) document identifier
   display_name: CeosAnalysisReadyDataDocumentIdentifier
   escape_html: true
-PRODUCT_DATA_ACCESS:
+CONTACT_INFORMATION:
+  attribute_data_type: string
+  attribute_type: contentInformation
+  description: Contact information for producer of this product
+  display_name: ContactInformation
+DISP_S1_SOFTWARE_VERSION:
   attribute_data_type: string
   attribute_type: processingInformation
-  description: Location from where this product can be retrieved (URL or DOI)
-  display_name: ProductDataAccess
-  escape_html: true
-BOUNDING_BOX:
-  attribute_data_type: string
-  attribute_type: contentInformation
-  description: Bounding box of the product, in order of xmin, ymin, xmax, ymax
-  display_name: BoundingBox
-BOUNDING_BOX_EPSG_CODE:
-  attribute_data_type: string
-  attribute_type: contentInformation
-  description: EPSG code used to represent BOUNDING_BOX coordinates
-  display_name: BoundingBoxEPSGCode
-BOUNDING_BOX_PIXEL_COORDINATE_CONVENTION:
-  attribute_data_type: string
-  attribute_type: contentInformation
-  description: 'Pixel coordinate convention used to represent BOUNDING_BOX coordinates: “edges/corners”'
-  display_name: BoundingBoxPixelCoordinateConvention
+  description: Version of the disp-s1 software used to generate the product
+  display_name: DispS1SoftwareVersion
 FRAME_ID:
   attribute_data_type: string
   attribute_type: processingInformation
-  description: Frame identification (Frame ID)
+  description: OPERA DISP-S1 Frame ID of the processed frame
   display_name: FrameID
-ZERO_DOPPLER_START_TIME:
+IMAGING_GEOMETRY:
+  attribute_data_type: string
+  attribute_type: contentInformation
+  description: Imaging geometry of input coregistered SLCs and Static Layer products
+  display_name: ImagingGeometry
+INSTITUTION:
   attribute_data_type: string
   attribute_type: processingInformation
-  description: Azimuth start time of the product in the format YYYY-MM-DDThh:mm:ss.sZ
-  display_name: ZeroDopplerStartTime
-ZERO_DOPPLER_END_TIME:
+  description: Institution that created this product
+  display_name: Institution
+INSTRUMENT_NAME:
+  attribute_data_type: string
+  attribute_type: instrumentInformation
+  description: Name of the instrument used to collect the remote sensing data
+  display_name: InstrumentName
+LOOK_DIRECTION:
   attribute_data_type: string
   attribute_type: processingInformation
-  description: Azimuth stop time of the product in the format YYYY-MM-DDThh:mm:ss.sZ
-  display_name: ZeroDopplerEndTime
-INPUT_L2_CSLC_STATIC_GRANULES:
+  description: Look direction (left or right) for input products
+  display_name: LookDirection
+ORBIT_DIRECTION:
   attribute_data_type: string
   attribute_type: processingInformation
-  description: List of input L1 SLC products used
-  display_name: InputL2CSLCStaticGranules
-INPUT_DEM_SOURCE:
+  description: Orbit direction of the processed frame (ascending or descending)
+  display_name: OrbitDirection
+PLATFORM:
+  attribute_data_type: string
+  attribute_type: platformInformation
+  description: Platform name
+  display_name: Platform
+PROCESSING_DATETIME:
   attribute_data_type: string
   attribute_type: processingInformation
-  description: Description of the input DEM
-  display_name: InputDEMSource
-SOFTWARE_VERSION:
+  description: 'RTC-S1 product processing date. Format: YYYY-MM-DDTHH:MM:SSZ'
+  display_name: ProcessingDateTime
+PROCESSING_FACILITY:
   attribute_data_type: string
   attribute_type: processingInformation
-  description: The algorithm software version used to generate the DISP-S1-STATIC product.
-  display_name: SoftwareVersion
-DOLPHIN_VERSION:
+  description: Processing facility that created this product
+  display_name: ProcessingFacility
+PRODUCT_DATA_ACCESS:
   attribute_data_type: string
   attribute_type: processingInformation
-  description: Version of the Dolphin framework used for processing
-  display_name: DolphinVersion
+  description: Location from where this product can be retrieved, expressed as a URL or DOI
+  display_name: ProductDataAccess
+  escape_html: true
+PRODUCT_LANDING_PAGE_DOI:
+  attribute_data_type: string
+  attribute_type: contentInformation
+  description: DOI of the product landing page
+  display_name: ProductLandingPageDOI
+  escape_html: true
+PRODUCT_SAMPLE_SPACING:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: 'Spacing between adjacent X/Y samples of product in UTM coordinates'
+  display_name: ProductSampleSpacing
+PRODUCT_SPECIFICATION_VERSION:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Product specification version which represents the schema of this product
+  display_name: ProductSpecificationVersion
+PRODUCT_VERSION:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: 'The product version (same as in the product filename)'
+  display_name: ProductVersion
+PROJECT:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: The project name
+  display_name: Project
+RADAR_BAND:
+  attribute_data_type: string
+  attribute_type: instrumentInformation
+  description: Acquired radar frequency band
+  display_name: RadarBand
+SOURCE_DATA_ACCESS:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Location from where the source data can be retrieved, expressed as a URL or DOI
+  display_name: SourceDataAccess
+  escape_html: true
+SOURCE_DATA_ORIGINAL_INSTITUTION:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Original processing instutution of Sentinel-1 SLC data
+  display_name: SourceDataOriginalInstitution
+TRACK_NUMBER:
+  attribute_data_type: int
+  attribute_type: processingInformation
+  description: 'Track Number/Relative orbit number of source data of the processed frame'
+  display_name: TrackNumber
+dem_egm_model:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Dynamic Elevation Map EGM model
+  display_name: DemEgmModel
+dem_interpolation_algorithm:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Dynamic Elevation Map interpolation algorithm
+  display_name: DemInterpolationAlgorithm
+input_dem_source:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Source of the input Dynamic Elevation Map used
+  display_name: InputDemSource

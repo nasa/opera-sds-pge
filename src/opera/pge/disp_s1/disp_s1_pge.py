@@ -1237,8 +1237,15 @@ class DispS1StaticPostProcessorMixin(DispS1PostProcessorMixin):
 
         try:
             measured_parameters = get_geotiff_metadata(disp_product)
+
+            # Remove the description fields pulled from the GeoTIFF metadata,
+            # these are already encoded into the measured parameter augmentation
+            pruned_measured_parameters = {k: v
+                                          for k, v in measured_parameters.items()
+                                          if not k.endswith('_DESCRIPTION')}
+
             output_product_metadata['MeasuredParameters'] = augment_measured_parameters(
-                measured_parameters,
+                pruned_measured_parameters,
                 self.runconfig.iso_measured_parameter_descriptions,
                 self.logger
             )
@@ -1267,7 +1274,6 @@ class DispS1StaticPostProcessorMixin(DispS1PostProcessorMixin):
         output_product_metadata['acquisitionDate'] = validity_start_date
 
         # TODO: BBOX will be derived from product metadata
-
         output_product_metadata['geospatial_lon_min'] = 0
         output_product_metadata['geospatial_lon_max'] = 0
         output_product_metadata['geospatial_lat_min'] = 0
