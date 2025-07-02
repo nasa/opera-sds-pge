@@ -1082,9 +1082,7 @@ class DispS1StaticPostProcessorMixin(DispS1PostProcessorMixin):
         # Check if we've already cached the product metadata corresponding to
         # this set of intermediate products (there can be multiple sets of
         # .nc and .png output files when running in historical mode)
-        if inter_disp_product_filename in self._product_metadata_cache:
-            disp_metadata = self._product_metadata_cache[inter_disp_product_filename]
-        else:
+        if inter_disp_product_filename not in self._product_metadata_cache:
             disp_metadata = self._collect_disp_s1_static_product_metadata(inter_disp_product_filename)
             self._product_metadata_cache[inter_disp_product_filename] = disp_metadata
 
