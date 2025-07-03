@@ -326,7 +326,62 @@ class MockGdal:  # pragma: no cover
 
         def __init__(self):
             self.dummy_metadata = {
+                'ACQUISITION_MODE': 'IW',
+                'ACQUISITION_MODE_DESCRIPTION': 'Radar acquisition mode for input products',
                 'AREA_OR_POINT': 'Area',
+                'CEOS_ANALYSIS_READY_DATA_DOCUMENT_IDENTIFIER': 'https://ceos.org/ard/files/PFS/SAR/v1.2/CEOS-ARD_PFS_Synthetic_Aperture_Radar_v1.2.pdf',
+                'CEOS_ANALYSIS_READY_DATA_DOCUMENT_IDENTIFIER_DESCRIPTION': 'CEOS Analysis Ready Data (CARD) document '
+                                                                            'identifier',
+                'CONTACT_INFORMATION': 'opera-sds-ops@jpl.nasa.gov',
+                'CONTACT_INFORMATION_DESCRIPTION': 'Contact information for producer of this '
+                                                   'product',
+                'DISP_S1_SOFTWARE_VERSION': '0.5.9',
+                'DISP_S1_SOFTWARE_VERSION_DESCRIPTION': 'Version of the disp-s1 software used '
+                                                        'to generate the product.',
+                'FRAME_ID': '11115',
+                'FRAME_ID_DESCRIPTION': 'OPERA DISP-S1 Frame ID of the processed frame',
+                'IMAGING_GEOMETRY': 'Geocoded',
+                'IMAGING_GEOMETRY_DESCRIPTION': 'Imaging geometry of input coregistered SLCs '
+                                                'and Static Layer products',
+                'INSTITUTION': 'NASA JPL',
+                'INSTRUMENT_NAME': 'Sentinel-1 CSAR',
+                'INSTRUMENT_NAME_DESCRIPTION': 'Name of the instrument used to collect the '
+                                               'remote sensing data',
+                'LOOK_DIRECTION': 'right',
+                'LOOK_DIRECTION_DESCRIPTION': 'Look direction (left or right) for input '
+                                              'products',
+                'ORBIT_DIRECTION': 'Descending',
+                'ORBIT_DIRECTION_DESCRIPTION': 'Orbit direction of the processed frame '
+                                               '(ascending or descending)',
+                'PLATFORM': 'Sentinel-1',
+                'PLATFORM_DESCRIPTION': 'Platform name',
+                'PROCESSING_DATETIME': '2025-07-02T00:22:27.883367Z',
+                'PROCESSING_FACILITY': 'NASA Jet Propulsion Laboratory on AWS',
+                'PRODUCT_DATA_ACCESS': 'https://search.asf.alaska.edu/#/?dataset=OPERA-S1&productTypes=DISP-S1-STATIC',
+                'PRODUCT_DATA_ACCESS_DESCRIPTION': 'Location from where this product can be '
+                                                   'retrieved, expressed as a URL or DOI.',
+                'PRODUCT_LANDING_PAGE_DOI': 'https://doi.org/10.5067/SNWG/OPL3DISPS1-V1',
+                'PRODUCT_SAMPLE_SPACING': '30',
+                'PRODUCT_SAMPLE_SPACING_DESCRIPTION': 'Spacing between adjacent X/Y samples '
+                                                      'of product in UTM coordinates',
+                'PRODUCT_SPECIFICATION_VERSION': '1.0',
+                'PRODUCT_VERSION': '1.0',
+                'PROJECT': 'OPERA',
+                'RADAR_BAND': 'C',
+                'RADAR_BAND_DESCRIPTION': 'Acquired radar frequency band',
+                'SOURCE_DATA_ACCESS': 'https://search.asf.alaska.edu/#/?dataset=OPERA-S1&productTypes=CSLC-S1-STATIC,RTC-S1-STATIC',
+                'SOURCE_DATA_ACCESS_DESCRIPTION': 'Location from where the source data can be '
+                                                  'retrieved, expressed as a URL or DOI.',
+                'SOURCE_DATA_ORIGINAL_INSTITUTION': 'European Space Agency Copernicus Program',
+                'SOURCE_DATA_ORIGINAL_INSTITUTION_DESCRIPTION': 'Original processing '
+                                                                'institution of Sentinel-1 '
+                                                                'SLC data',
+                'TRACK_NUMBER': '42',
+                'TRACK_NUMBER_DESCRIPTION': 'Track Number/Relative orbit number of source '
+                                            'data of the processed frame',
+                'dem_egm_model': 'Earth Gravitational Model 2008 (EGM2008)',
+                'dem_interpolation_algorithm': 'biquintic',
+                'input_dem_source': 'Copernicus GLO-30 DEM for OPERA'
             }
 
         def GetMetadata(self):

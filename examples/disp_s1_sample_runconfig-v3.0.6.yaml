@@ -166,6 +166,12 @@ RunConfig:
         # REQUIRED: Frame ID of the bursts contained in `cslc_file_list`.
         #   Type: integer.
         frame_id: 11114
+
+        # (For FORWARD/'Catch up' HISTORICAL processing mode) last processed date for the frame. If
+        #  provided, the SAS will only output products whose secondary datetime is *after*
+        #  `last_processed`. Otherwise, the SAS will output all products.
+        #  Type: string | null.
+        last_processed:
       dynamic_ancillary_file_group:
         # REQUIRED: Path to file containing SAS algorithm parameters.
         #   Type: string.
@@ -190,6 +196,11 @@ RunConfig:
           - /home/mamba/input_dir/jplg3470.22i
 
       static_ancillary_file_group:
+        # JSON file containing frame-specific algorithm parameters to override the
+        # defaults passed in the `algorithm_parameters.yaml`.
+        #   Type: string | null.
+        algorithm_parameters_overrides_json: opera-disp-s1-algorithm-parameters-overrides.json
+
         # JSON file containing the mapping from frame_id to frame/burst information.
         #   Type: string | null.
         frame_to_burst_json: /home/mamba/input_dir/opera-s1-disp-frame-to-burst.json
@@ -199,7 +210,7 @@ RunConfig:
         #   Type: string | null.
         reference_date_database_json: /home/mamba/input_dir/opera-s1-disp-reference-date.json
       primary_executable:
-        # Product type of the PGE. Should be one of: DISP_S1_FORWARD or DISP_S1_HISTORICAL
+        # Product type of the PGE. Should be one of: DISP_S1_FORWARD, DISP_S1_HISTORICAL or DISP_S1_STATIC
         #   Type: string.
         product_type: DISP_S1_FORWARD
       product_path_group:
@@ -222,7 +233,7 @@ RunConfig:
       worker_settings:
         # Whether to use GPU for processing (if available).
         #   Type: boolean.
-        gpu_enabled: true
+        gpu_enabled: false
         # Number of threads to use per worker. This sets the OMP_NUM_THREADS environment variable.
         #   Type: integer.
         threads_per_worker: 2

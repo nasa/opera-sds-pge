@@ -120,8 +120,9 @@ RunConfig:
           - /home/mamba/input_dir/input_slcs/OPERA_L2_CSLC-S1_T027-056726-IW1_20170430T132754Z_20240626T015700Z_S1A_VV_v1.1.h5
 
         frame_id: 7091
+        last_processed:
       dynamic_ancillary_file_group:
-        algorithm_parameters_file: /home/mamba/runconfig/opera_pge_disp_s1_r6.7_final_algorithm_parameters_historical.yaml
+        algorithm_parameters_file: /home/mamba/runconfig/opera_pge_disp_s1_r6.9_final_algorithm_parameters_historical.yaml
         static_layers_files:
           - /home/mamba/input_dir/dynamic_ancillary_files/static_layers/OPERA_L2_CSLC-S1-STATIC_T027-056725-IW1_20140403_S1A_v1.0.h5
           - /home/mamba/input_dir/dynamic_ancillary_files/static_layers/OPERA_L2_CSLC-S1-STATIC_T027-056726-IW1_20140403_S1A_v1.0.h5
@@ -175,6 +176,7 @@ RunConfig:
           - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg3600.17i
         troposphere_files:
       static_ancillary_file_group:
+        algorithm_parameters_overrides_json: /home/mamba/input_dir/static_ancillary_files/opera-disp-s1-algorithm-parameters-overrides-2025-06-17.json
         frame_to_burst_json: /home/mamba/input_dir/static_ancillary_files/opera-s1-disp-0.9.0-frame-to-burst.json.zip
         reference_date_database_json: /home/mamba/input_dir/static_ancillary_files/opera-disp-s1-reference-dates-2025-02-13.json
       primary_executable:

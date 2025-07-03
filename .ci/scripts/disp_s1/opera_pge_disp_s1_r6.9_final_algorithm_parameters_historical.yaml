@@ -1,7 +1,3 @@
-# JSON file containing frame-specific algorithm parameters to override the defaults passed
-#   in the `algorithm_parameters.yaml`.
-#   Type: string | null.
-algorithm_parameters_overrides_json: /home/mamba/input_dir/static_ancillary_files/opera-disp-s1-algorithm-parameters-overrides-2025-02-21.json
 ps_options:
   # Amplitude dispersion threshold to consider a pixel a PS.
   #   Type: number.
@@ -98,7 +94,7 @@ unwrap_options:
     # Threshold on the correlation raster to use for interpolation. Pixels with less than this
     #   value are replaced by a weighted combination of neighboring pixels.
     #   Type: number.
-    interpolation_cor_threshold: 0.3
+    interpolation_cor_threshold: 0.2
     # Threshold on the correlation raster to use for interpolation. Pixels with less than this
     #   value are replaced by a weighted combination of neighboring pixels.
     #   Type: number.
@@ -167,13 +163,13 @@ unwrap_options:
     tiler_settings:
       # Maximum number of tiles allowed.
       #   Type: integer.
-      max_tiles: 64
+      max_tiles: 25
       # Number of points used for determining tiles based on density.
       #   Type: integer.
       target_points_for_generation: 120000
       # Target points per tile when generating tiles.
       #   Type: integer.
-      target_points_per_tile: 700000
+      target_points_per_tile: 1400000
       # Dilation factor of non-overlapping tiles. 0.05 would lead to 5 percent dilation of the
       #   tile.
       #   Type: number.
@@ -186,7 +182,7 @@ unwrap_options:
       # Number of workers for spatial unwrapping in parallel. Set value to <=0 to let workflow use
       #   (ncpus - 1).
       #   Type: integer.
-      s_worker_count: 5
+      s_worker_count: 3
       # Temporal unwrapping operations over spatial links are performed in batches and each batch
       #   is solved in parallel.
       #   Type: integer.
@@ -223,7 +219,7 @@ unwrap_options:
       # Number of interferograms to merge in one batch. Use zero to merge all interferograms in a
       #   single batch.
       #   Type: integer.
-      num_parallel_ifgs: 42
+      num_parallel_ifgs: 21
 timeseries_options:
   # Whether to run the inversion step after unwrapping, if more than a single-reference
   #   network is used.
@@ -254,9 +250,6 @@ timeseries_options:
   #   Type: integer.
   num_parallel_blocks: 4
 output_options:
-  # Output (x, y) resolution (in units of input data).
-  #   Type: object | null.
-  output_resolution:
   # Alternative to specifying output resolution: Specify the (x, y) strides (decimation
   #   factor) to perform while processing input. For example, strides of [4, 2] would turn an
   #   input resolution of [5, 10] into an output resolution of [20, 20].
@@ -298,32 +291,21 @@ output_options:
   #   can be useful for visualizing the data with web mapping tools. See
   #   https://gdal.org/programs/gdaladdo.html for more.
   #   Type: boolean.
-  add_overviews: true
-  # List of overview levels to create (if `add_overviews=True`).
-  #   Type: array.
-  overview_levels:
-    - 4
-    - 8
-    - 16
-    - 32
-    - 64
+  add_overviews: false
   # Specify an extra reference datetime in UTC. Adding this lets you to create and unwrap two
   #   single reference networks; the later resets at the given date (e.g. for a large
   #   earthquake event). If passing strings, formats accepted are YYYY-MM-
   #   DD[T]HH:MM[:SS[.ffffff]][Z or [±]HH[:]MM], or YYYY-MM-DD.
   #   Type: string | null.
   extra_reference_date:
-# Name of the subdataset to use in the input NetCDF files.
-#   Type: string.
-subdataset: /data/VV
 # When creating `recommended_mask`, pixels with temporal coherence below this threshold and
 #   with similarity below `recommended_similarity_threshold` are masked.
 #   Type: number.
-recommended_temporal_coherence_threshold: 0.5
+recommended_temporal_coherence_threshold: 0.6
 # When creating `recommended_mask`, pixels with similarity below this threshold and with
 #   temporal coherence below `recommended_temporal_coherence_threshold` are masked.
 #   Type: number.
-recommended_similarity_threshold: 0.30
+recommended_similarity_threshold: 0.4
 # When creating `recommended_mask`, use the `connected_component_label`"
 #   layer to hide pixels whose label == 0.
 #   Type: boolean.
@@ -331,7 +313,7 @@ recommended_use_conncomp: false
 # Spatial wavelength cutoff (in meters) for the spatial filter. Used to create the short
 #   wavelength displacement layer.
 #   Type: number.
-spatial_wavelength_cutoff: 40000.0
+spatial_wavelength_cutoff: 30000.0
 # `vmin, vmax` matplotlib arguments (in meters) passed to browse image creator.
 #   Type: array.
 browse_image_vmin_vmax:
@@ -339,4 +321,4 @@ browse_image_vmin_vmax:
   - 0.05
 # Number of output products to create in parallel.
 #   Type: integer.
-num_parallel_products: 3
+num_parallel_products: 4
