@@ -16,7 +16,7 @@ import unittest
 import numpy as np
 
 from opera.util.h5_utils import create_test_cslc_metadata_product
-from opera.util.h5_utils import create_test_disp_metadata_product
+from opera.util.h5_utils import create_test_disp_s1_metadata_product
 from opera.util.h5_utils import create_test_rtc_metadata_product
 from opera.util.h5_utils import get_cslc_s1_product_metadata
 from opera.util.h5_utils import get_disp_s1_product_metadata
@@ -42,7 +42,7 @@ class H5UtilsTestCase(unittest.TestCase):
     def test_get_disp_s1_product_metadata(self):
         """Test retrieval of product metadata from HDF5 files"""
         file_name = os.path.join(tempfile.gettempdir(), "test_disp_metadata_file.hdf5")
-        create_test_disp_metadata_product(file_name)
+        create_test_disp_s1_metadata_product(file_name)
 
         try:
             product_output = get_disp_s1_product_metadata(file_name)
