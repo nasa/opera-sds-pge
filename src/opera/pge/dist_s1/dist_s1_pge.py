@@ -333,6 +333,60 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
         self.__validate_co_and_cross_polarizations(all_rtcs)
         self.__validate_no_duplicates(baseline_matches + current_matches)
 
+    def _validate_previous_product(self):
+        """
+        Run validations for previous product input.
+
+        Checks:
+        1. All files exist
+        2. All files are nonempty
+        3. All files are .tif files
+        4. Correct number of files (one for each TIFF layer) provided
+        5. All files are named conformant to DIST-S1 product specification
+        6. Exact set of layers provided (ie, no duplicates)
+        """
+        sas_config = self.runconfig.sas_config
+        previous_product = sas_config["run_config"].get("pre_dist_s1_product", [])
+
+        check_input_list(
+            previous_product,
+            self.logger,
+            self.name,
+            valid_extensions=self._valid_input_extensions,
+            check_zero_size=True
+        )
+
+        geotiff_layer_names = set([layer for layer in _valid_layer_names if layer != 'BROWSE'])
+
+        if len(previous_product) != len(geotiff_layer_names):
+            msg = f'Unexpected number of files in previous product: {len(previous_product)}'
+            self.logger.critical(
+                self.name,
+                ErrorCode.INVALID_INPUT,
+                msg
+            )
+
+        product_band_matches = [_granule_filename_re.match(basename(f)) for f in previous_product]
+
+        if None in product_band_matches:
+            msg = 'One or more previous-product inputs has an invalid filename'
+            self.logger.critical(
+                self.name,
+                ErrorCode.INVALID_INPUT,
+                msg
+            )
+
+        provided_layer_names = set([match.groupdict()['layer_name'] for match in product_band_matches])
+
+        if provided_layer_names != geotiff_layer_names:
+            msg = (f'Incomplete input product provided. Missing layers: '
+                   f'{geotiff_layer_names.difference(provided_layer_names)}')
+            self.logger.critical(
+                self.name,
+                ErrorCode.INVALID_INPUT,
+                msg
+            )
+
     def run_preprocessor(self, **kwargs):
         """
         Executes the pre-processing steps for DIST-S1 PGE initialization.
@@ -355,6 +409,12 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
             check_zero_size=True
         )
         self._validate_rtcs()
+
+        sas_config = self.runconfig.sas_config
+        previous_product = sas_config["run_config"].get("pre_dist_s1_product", [])
+
+        if previous_product:
+            self._validate_previous_product()
 
 
 class DistS1PostProcessorMixin(PostProcessorMixin):
