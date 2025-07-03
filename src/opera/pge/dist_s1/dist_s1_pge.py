@@ -102,9 +102,10 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
 
         Returns
         -------
-        rtc_matches: List of re.Match objects
-            List of RTC filenames matched by a regular expression. Used in later validation. Only returns
-            if this validation is passing.
+        rtc_matches: Tuple of lists of re.Match objects
+            2-Tuple of lists of RTC filenames matched by a regular expression. First for the baseline RTC set.
+            the second for the current RTC set. Used in later validations. Only returns if this validation is
+            passing.
         """
         baseline_matches = [self._rtc_pattern.match(basename(rtc)) for rtc in chain.from_iterable(baseline_rtcs)]
         current_matches = [self._rtc_pattern.match(basename(rtc)) for rtc in chain.from_iterable(current_rtcs)]
@@ -242,6 +243,43 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
                     msg
                 )
 
+    def __validate_no_duplicates(self, rtc_matches):
+        """
+        Ensures the inputs contain no RTCs with duplicate burst ID & acquisition timestamps, (ie,
+        no duplicate products produced at different times)
+
+        Parameters
+        ----------
+        rtc_matches : list(re.Match)
+            List of regex matches of the input RTC filenames
+        """
+        burst_acq_set = set()
+        duplicates = []
+
+        for rtc in rtc_matches:
+            match_dict = rtc.groupdict()
+
+            # Only use either co or cross pol since other validations will fail if
+            # a repeat is in one but not the other
+            if match_dict['pol'] not in ['VV', 'HH']:
+                continue
+
+            burst_acq = (match_dict['burst_id'], match_dict['acquisition_ts'])
+
+            if burst_acq in burst_acq_set:
+                duplicates.append(burst_acq)
+            else:
+                burst_acq_set.add(burst_acq)
+
+        if len(duplicates) > 0:
+            msg = (f'Found duplicate RTC product(s) in input with the following burst ID - acquisition '
+                   f'time pairs: {duplicates}')
+            self.logger.critical(
+                self.name,
+                ErrorCode.INVALID_INPUT,
+                msg
+            )
+
     def _validate_rtcs(self):
         """
         Performs the following validations on the input RTCs:
@@ -271,6 +309,7 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
         self.__validate_rtc_homogeneity(current_matches)  # Per ADT: Baseline can be heterogeneous
         self.__validate_rtc_ordering(all_rtcs)
         self.__validate_co_and_cross_polarizations(all_rtcs)
+        self.__validate_no_duplicates(baseline_matches + current_matches)
 
     def run_preprocessor(self, **kwargs):
         """

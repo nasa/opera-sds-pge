@@ -14,8 +14,9 @@ import shutil
 import tempfile
 import unittest
 from copy import deepcopy
+from datetime import datetime
 from io import StringIO
-from os.path import abspath, join
+from os.path import abspath, basename, dirname, join
 from pathlib import Path
 from unittest.mock import patch
 
@@ -28,6 +29,7 @@ from opera.pge.dist_s1.dist_s1_pge import DistS1Executor
 from opera.util import PgeLogger
 from opera.util.mock_utils import MockGdal
 from opera.util.render_jinja2 import UNDEFINED_ERROR
+from opera.util.time import get_time_for_filename
 
 
 class DistS1PgeTestCase(unittest.TestCase):
@@ -54,7 +56,7 @@ class DistS1PgeTestCase(unittest.TestCase):
     def setUp(self) -> None:
         """Use the temporary directory as the working directory"""
         self.working_dir = tempfile.TemporaryDirectory(
-            prefix="test_dist_s1_pge_", suffix="_temp", dir=os.curdir
+            prefix="test_dist_s1_pge_", suffix="_temp", dir=abspath(os.curdir)
         )
 
         # Create the input dir expected by the test RunConfig and add a
@@ -547,6 +549,52 @@ class DistS1PgeTestCase(unittest.TestCase):
                 log_contents = infile.read()
 
             self.assertIn(f"Found non-crosspol RTC in crosspol input list", log_contents)
+
+            # Test 7: duplicate RTCs
+
+            runconfig_dict = deepcopy(backup_runconfig)
+
+            sample_input_rtc = runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['pre_rtc_copol'][-1]
+            sample_input_rtc_dir = dirname(sample_input_rtc)
+            sample_input_rtc = str(basename(sample_input_rtc))
+
+            duplicate_input_rtc_fields = sample_input_rtc.split('_')
+            duplicate_input_rtc_fields[5] = f'{get_time_for_filename(datetime.now())}Z'
+            duplicate_copol_rtc = '_'.join(duplicate_input_rtc_fields)
+
+            duplicate_input_rtc_fields[9] = 'VH.tif'
+            duplicate_crosspol_rtc = '_'.join(duplicate_input_rtc_fields)
+
+            runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['pre_rtc_copol'].append(
+                join(sample_input_rtc_dir, duplicate_copol_rtc)
+            )
+            runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['pre_rtc_crosspol'].append(
+                join(sample_input_rtc_dir, duplicate_crosspol_rtc)
+            )
+
+            runconfig_dict['RunConfig']['Groups']['PGE']['InputFilesGroup']['InputFilePaths'].extend([
+                join(sample_input_rtc_dir, duplicate_copol_rtc),
+                join(sample_input_rtc_dir, duplicate_crosspol_rtc),
+            ])
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as input_path:
+                yaml.safe_dump(runconfig_dict, input_path, sort_keys=False)
+
+            self._create_dummy_input_files(test_runconfig_path)
+
+            pge = DistS1Executor(pge_name="DistS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            # Open the log file, and check that the validation error details were captured
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn("Found duplicate RTC product(s) in input", log_contents)
         finally:
             if os.path.exists(test_runconfig_path):
                 os.unlink(test_runconfig_path)
