@@ -30,7 +30,7 @@ RunConfig:
 
             PrimaryExecutable:
                 ProductIdentifier: DISP_S1
-                ProductVersion: "0.4"
+                ProductVersion: "1.0"
                 ProgramPath: mkdir
                 ProgramOptions:
                     - '-p disp_s1_pge_test/output_dir/compressed_slcs;'
@@ -61,6 +61,7 @@ RunConfig:
                     - disp_s1_pge_test/input_dir/t087_185678_iw2_20180222.h5
 
                 frame_id: 123
+                last_processed:
 
             dynamic_ancillary_file_group:
                 algorithm_parameters_file: disp_s1_pge_test/input_dir/test_disp_s1_algorithm_parameters.yaml
@@ -78,6 +79,7 @@ RunConfig:
             static_ancillary_file_group:
                 frame_to_burst_json: disp_s1_pge_test/input_dir/opera-s1-disp-frame-to-burst.json
                 reference_date_database_json: disp_s1_pge_test/input_dir/opera-disp-s1-reference-dates.json
+                algorithm_parameters_overrides_json: disp_s1_pge_test/input_dir/opera-disp-s1-algorithm-parameters-overrides.json
 
             primary_executable:
                 product_type: DISP_S1_FORWARD
@@ -86,7 +88,7 @@ RunConfig:
                 product_path: disp_s1_pge_test/output_dir
                 scratch_path: disp_s1_pge_test/scratch_dir
                 sas_output_path: disp_s1_pge_test/output_dir
-                product_version: "0.4"
+                product_version: "1.0"
                 save_compressed_slc: true
 
             worker_settings:

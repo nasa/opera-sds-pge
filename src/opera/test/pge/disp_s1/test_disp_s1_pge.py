@@ -131,7 +131,6 @@ class DispS1PgeTestCase(unittest.TestCase):
         Helper method to check the properties of a parsed algorithm parameters runconfig against the
         expected values as defined by the "valid" sample algorithm parameters runconfig files.
         """
-        self.assertEqual(runconfig['algorithm_parameters_overrides_json'], "opera-disp-s1-algorithm-parameters-overrides-2025-01-09.json")
         self.assertEqual(runconfig['ps_options']['amp_dispersion_threshold'], 0.25)
         self.assertEqual(runconfig['phase_linking']['ministack_size'], 1000)
         self.assertEqual(runconfig['phase_linking']['max_num_compressed'], 5)
@@ -191,7 +190,6 @@ class DispS1PgeTestCase(unittest.TestCase):
         self.assertEqual(runconfig['unwrap_options']['spurt_options']['merger_settings']['method'], 'dirichlet')
         self.assertEqual(runconfig['unwrap_options']['spurt_options']['merger_settings']['bulk_method'], 'L2')
         self.assertEqual(runconfig['unwrap_options']['spurt_options']['merger_settings']['num_parallel_ifgs'], 13)
-        self.assertEqual(runconfig['output_options']['output_resolution'], None)
         self.assertEqual(runconfig['output_options']['strides']['x'], 6)
         self.assertEqual(runconfig['output_options']['strides']['y'], 3)
         self.assertEqual(runconfig['output_options']['bounds'], None)
@@ -207,7 +205,6 @@ class DispS1PgeTestCase(unittest.TestCase):
         self.assertEqual(runconfig['output_options']['add_overviews'], True)
         self.assertListEqual(runconfig['output_options']['overview_levels'], [4, 8, 16, 32, 64])
         self.assertEqual(runconfig['output_options']['extra_reference_date'], None)
-        self.assertEqual(runconfig['subdataset'], '/data/VV')
         self.assertEqual(runconfig['spatial_wavelength_cutoff'], 40000.0)
         self.assertListEqual(runconfig['browse_image_vmin_vmax'], [-0.1, 0.1])
         self.assertEqual(runconfig['recommended_temporal_coherence_threshold'], 0.5)
@@ -262,8 +259,7 @@ class DispS1PgeTestCase(unittest.TestCase):
         expected_inter_filename = abspath("disp_s1_pge_test/output_dir/20170217_20170430.nc")
         expected_browse_filename = abspath("disp_s1_pge_test/output_dir/20170217_20170430.displacement.png")
 
-        # Check that the ISO metadata file was created and all placeholders were
-        # filled in
+        # Check that the ISO metadata file was created
         expected_iso_metadata_file = join(
             pge.runconfig.output_product_path, pge._iso_metadata_filename(expected_inter_filename))
         self.assertTrue(os.path.exists(expected_iso_metadata_file))
@@ -465,7 +461,6 @@ class DispS1PgeTestCase(unittest.TestCase):
             self.assertIn(expected_log_msg, log)
 
         os.unlink(disp_metadata_path)
-
 
     def test_validate_algorithm_parameters_config(self):
         """Test basic parsing and validation of an algorithm parameters RunConfig file"""
@@ -1129,6 +1124,39 @@ class DispS1PgeTestCase(unittest.TestCase):
             log_contents = infile.read()
 
         self.assertIn(f"DISP-S1-STATIC invoked with RunConfig {expected_sas_config_file}", log_contents)
+
+    @patch.object(opera.util.tiff_utils, "gdal", MockGdal)
+    def test_static_iso_metadata_creation(self):
+        """
+        Test that the ISO metadata template is fully filled out when realistic
+        DISP-S1-STATIC product metadata is available.
+        """
+        runconfig_path = join(self.data_dir, 'test_disp_s1_static_config.yaml')
+
+        pge = DispS1StaticExecutor(pge_name="DispS1StaticPgeTest", runconfig_path=runconfig_path)
+
+        # Run only the pre-processor steps to ingest the runconfig and set
+        # up directories
+        pge.run_preprocessor()
+
+        # Create a sample output file within the output directory of the PGE,
+        # the actual metadata will be pulled from the mock GDAL implementation
+        output_dir = join(os.curdir, "disp_s1_pge_test/output_dir")
+        dummy_tif_file = join(
+            output_dir, 'OPERA_L3_DISP-S1-STATIC_F11115_20140403_S1A_v1.0_dem.tif'
+        )
+
+        with open(dummy_tif_file, 'w') as outfile:
+            outfile.write('dummy disp-s1-static data')
+
+        # Initialize the core filename for the catalog metadata generation step
+        #pge._core_filename()
+
+        disp_metadata = pge._collect_disp_s1_static_product_metadata(dummy_tif_file)
+
+        iso_metadata = pge._create_iso_metadata(dummy_tif_file, disp_metadata)
+
+        self.assertNotIn(UNDEFINED_ERROR, iso_metadata)
 
 
 class MockRunConfig:

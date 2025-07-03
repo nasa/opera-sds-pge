@@ -894,7 +894,7 @@ class DispS1Executor(DispS1PreProcessorMixin, DispS1PostProcessorMixin, PgeExecu
     PGE_VERSION = "3.0.6"
     """Version of the PGE (overrides default from base_pge)"""
 
-    SAS_VERSION = "0.5.7"  # Final release https://github.com/opera-adt/disp-s1/releases/tag/v0.5.7
+    SAS_VERSION = "0.5.9"  # Final release https://github.com/opera-adt/disp-s1/releases/tag/v0.5.9
 
     def __init__(self, pge_name, runconfig_path, **kwargs):
         super().__init__(pge_name, runconfig_path, **kwargs)
@@ -1082,9 +1082,7 @@ class DispS1StaticPostProcessorMixin(DispS1PostProcessorMixin):
         # Check if we've already cached the product metadata corresponding to
         # this set of intermediate products (there can be multiple sets of
         # .nc and .png output files when running in historical mode)
-        if inter_disp_product_filename in self._product_metadata_cache:
-            disp_metadata = self._product_metadata_cache[inter_disp_product_filename]
-        else:
+        if inter_disp_product_filename not in self._product_metadata_cache:
             disp_metadata = self._collect_disp_s1_static_product_metadata(inter_disp_product_filename)
             self._product_metadata_cache[inter_disp_product_filename] = disp_metadata
 
@@ -1239,8 +1237,15 @@ class DispS1StaticPostProcessorMixin(DispS1PostProcessorMixin):
 
         try:
             measured_parameters = get_geotiff_metadata(disp_product)
+
+            # Remove the description fields pulled from the GeoTIFF metadata,
+            # these are already encoded into the measured parameter augmentation
+            pruned_measured_parameters = {k: v
+                                          for k, v in measured_parameters.items()
+                                          if not k.endswith('_DESCRIPTION')}
+
             output_product_metadata['MeasuredParameters'] = augment_measured_parameters(
-                measured_parameters,
+                pruned_measured_parameters,
                 self.runconfig.iso_measured_parameter_descriptions,
                 self.logger
             )
@@ -1269,7 +1274,6 @@ class DispS1StaticPostProcessorMixin(DispS1PostProcessorMixin):
         output_product_metadata['acquisitionDate'] = validity_start_date
 
         # TODO: BBOX will be derived from product metadata
-
         output_product_metadata['geospatial_lon_min'] = 0
         output_product_metadata['geospatial_lon_max'] = 0
         output_product_metadata['geospatial_lat_min'] = 0
