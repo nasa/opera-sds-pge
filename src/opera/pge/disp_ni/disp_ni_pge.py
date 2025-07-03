@@ -121,7 +121,7 @@ class DispNIPostProcessorMixin(DispS1PostProcessorMixin):
             orbit_direction = 'B'
 
         # TODO: This is hardcoded. Where in the metadata?
-        mode = "05"
+        mode = "40"
 
         # ReferenceDateTime: The acquisition sensing start date and time of
         # the input satellite imagery for the first burst in the frame of the
