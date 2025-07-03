@@ -26,6 +26,28 @@ from opera.util.tiff_utils import get_geotiff_metadata
 from opera.util.time import get_iso_time, get_time_for_filename
 
 
+# Product regexes at module level since they're used in both pre- and post-processors
+
+# These layers are always produced and therefore must be present
+_main_output_layer_names = ['GEN-DIST-STATUS-ACQ', 'GEN-DIST-STATUS', 'GEN-METRIC', 'BROWSE']
+
+# The production of these layers depends on the confirmation DB and may be absent
+_confirmation_db_output_layer_names = ['GEN-DIST-CONF', 'GEN-DIST-COUNT', 'GEN-DIST-DATE', 'GEN-DIST-DUR',
+                                       'GEN-DIST-LAST-DATE', 'GEN-DIST-PERC', 'GEN-METRIC-MAX']
+
+_valid_layer_names = _main_output_layer_names + _confirmation_db_output_layer_names
+
+_product_id_pattern = (r'(?P<id>(?P<project>OPERA)_(?P<level>L3)_(?P<product_type>DIST(-ALERT)?)-(?P<source>S1)_'
+                       r'(?P<tile_id>T[^\W_]{5})_(?P<acquisition_ts>\d{8}T\d{6}Z)_(?P<creation_ts>\d{8}T\d{6}Z)_'
+                       r'(?P<sensor>S1[AC]?)_(?P<spacing>30)_(?P<product_version>v\d+[.]\d+))')
+
+_granule_filename_pattern = (_product_id_pattern + rf'((_(?P<layer_name>{"|".join(_valid_layer_names)}))|'
+                                                   r'_BROWSE)?[.](?P<ext>tif|tiff|png)$')
+
+_product_id_re = re.compile(_product_id_pattern + r'$')
+_granule_filename_re = re.compile(_granule_filename_pattern)
+
+
 class DistS1PreProcessorMixin(PreProcessorMixin):
     """
     Mixin class responsible for handling all pre-processing steps for the DIST-S1
@@ -352,39 +374,20 @@ class DistS1PostProcessorMixin(PostProcessorMixin):
     _tile_metadata_cache = {}
     _tile_filename_cache = {}
 
-    # These layers are always produced and therefore must be present
-    _main_output_layer_names = ['GEN-DIST-STATUS-ACQ', 'GEN-DIST-STATUS', 'GEN-METRIC', 'BROWSE']
-
-    # The production of these layers depends on the confirmation DB and may be absent
-    _confirmation_db_output_layer_names = ['GEN-DIST-CONF', 'GEN-DIST-COUNT', 'GEN-DIST-DATE', 'GEN-DIST-DUR',
-                                           'GEN-DIST-LAST-DATE', 'GEN-DIST-PERC', 'GEN-METRIC-MAX']
-
-    _valid_layer_names = _main_output_layer_names + _confirmation_db_output_layer_names
-
-    _product_id_pattern = (r'(?P<id>(?P<project>OPERA)_(?P<level>L3)_(?P<product_type>DIST(-ALERT)?)-(?P<source>S1)_'
-                           r'(?P<tile_id>T[^\W_]{5})_(?P<acquisition_ts>\d{8}T\d{6}Z)_(?P<creation_ts>\d{8}T\d{6}Z)_'
-                           r'(?P<sensor>S1[AC]?)_(?P<spacing>30)_(?P<product_version>v\d+[.]\d+))')
-
-    _granule_filename_pattern = (_product_id_pattern + rf'((_(?P<layer_name>{"|".join(_valid_layer_names)}))|'
-                                                       r'_BROWSE)?[.](?P<ext>tif|tiff|png)$')
-
-    _product_id_re = re.compile(_product_id_pattern + r'$')
-    _granule_filename_re = re.compile(_granule_filename_pattern)
-
     def _validate_outputs(self):
         output_product_path = abspath(self.runconfig.output_product_path)
         output_products = []
 
         for file in os.listdir(output_product_path):
             dir_path = join(output_product_path, file)
-            if isdir(dir_path) and self._product_id_re.match(file):
+            if isdir(dir_path) and _product_id_re.match(file):
                 bands = []
                 generated_band_names = []
 
                 for granule in os.listdir(dir_path):
                     granule_path = join(dir_path, granule)
                     if isfile(granule_path):
-                        match_result = self._granule_filename_re.match(granule)
+                        match_result = _granule_filename_re.match(granule)
 
                         if match_result is None:  # or match_result.groupdict()['ext'] != 'tif':
                             error_msg = f'Invalid product filename {granule}'
@@ -398,7 +401,7 @@ class DistS1PostProcessorMixin(PostProcessorMixin):
                         if os.stat(granule_path).st_size == 0:
                             error_msg = f'Output file {granule_path} is empty.'
                             self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
-                        elif match_dict['layer_name'] not in self._valid_layer_names:
+                        elif match_dict['layer_name'] not in _valid_layer_names:
                             error_msg = f'Invalid layer name "{match_dict["layer_name"]}" in output.'
                             self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
 
@@ -418,7 +421,7 @@ class DistS1PostProcessorMixin(PostProcessorMixin):
                 # Not sure how I should do this validation... The bands in self._confirmation_db_output_layer_names
                 # are only created if the confirmation db is available (& might still be missing on initial runs
                 # with it available?)
-                missing_main_output_bands = set(self._main_output_layer_names).difference(set(generated_band_names))
+                missing_main_output_bands = set(_main_output_layer_names).difference(set(generated_band_names))
 
                 if len(missing_main_output_bands) > 0:
                     error_msg = f'Some required output bands are missing: {list(missing_main_output_bands)}'
@@ -620,7 +623,7 @@ class DistS1PostProcessorMixin(PostProcessorMixin):
         # TODO: Replace these with metadata values sourced from the granule when available
         #  (Or remove entirely if possible to refer to them straight through the MP dict)
 
-        match_result = self._granule_filename_re.match(basename(geotiff_product))
+        match_result = _granule_filename_re.match(basename(geotiff_product))
 
         if match_result is None:
             # This really should not happen due to passing the _validate_outputs function but check anyway
