@@ -295,7 +295,10 @@ class DistS1PgeTestCase(unittest.TestCase):
         try:
             # Test 1: Detect co/crosspol length mismatch
 
-            s1_file = os.path.join(self.input_dir, 'OPERA_L2_RTC-S1_T137-292325-IW1_20241022T015921Z_20241022T180523Z_S1A_30_v1.0_VV.tif')
+            s1_file = os.path.join(
+                self.input_dir,
+                'OPERA_L2_RTC-S1_T137-292325-IW1_20241022T015921Z_20241022T180523Z_S1A_30_v1.0_VV.tif'
+            )
 
             runconfig_dict['RunConfig']['Groups']['PGE']['InputFilesGroup']['InputFilePaths'].append(s1_file)
             runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['pre_rtc_copol'].append(s1_file)
@@ -354,7 +357,10 @@ class DistS1PgeTestCase(unittest.TestCase):
 
             runconfig_dict = deepcopy(backup_runconfig)
 
-            s1c_file = os.path.join(self.input_dir, 'OPERA_L2_RTC-S1_T137-292324-IW1_20241103T015918Z_20241103T071409Z_S1C_30_v1.0_VV.tif')
+            s1c_file = os.path.join(
+                self.input_dir,
+                'OPERA_L2_RTC-S1_T137-292324-IW1_20241103T015918Z_20241103T071409Z_S1C_30_v1.0_VV.tif'
+            )
 
             pre_rtc_copol = runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['pre_rtc_copol']
             pre_rtc_crosspol = runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['pre_rtc_crosspol']
@@ -433,13 +439,19 @@ class DistS1PgeTestCase(unittest.TestCase):
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
 
-            self.assertIn("One or more of the RunConfig SAS group RTC lists is badly ordered. Attempting to sort them", log_contents)
+            self.assertIn(
+                "One or more of the RunConfig SAS group RTC lists is badly ordered. Attempting to sort them",
+                log_contents
+            )
 
             # Test 5b: Badly ordered RTCs - Unfixable - Date mismatch
 
             runconfig_dict = deepcopy(backup_runconfig)
 
-            s1_file = os.path.join(self.input_dir, 'OPERA_L2_RTC-S1_T137-292318-IW1_20240904T015859Z_20240904T150822Z_S1A_30_v1.0_VV.tif')
+            s1_file = os.path.join(
+                self.input_dir,
+                'OPERA_L2_RTC-S1_T137-292318-IW1_20240904T015859Z_20240904T150822Z_S1A_30_v1.0_VV.tif'
+            )
 
             runconfig_dict['RunConfig']['Groups']['PGE']['InputFilesGroup']['InputFilePaths'][0] = s1_file
             runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['pre_rtc_copol'][0] = s1_file
@@ -468,7 +480,10 @@ class DistS1PgeTestCase(unittest.TestCase):
 
             runconfig_dict = deepcopy(backup_runconfig)
 
-            s1_file = os.path.join(self.input_dir, 'OPERA_L2_RTC-S1_T137-292317-IW1_20250102T015857Z_20250102T190143Z_S1A_30_v1.0_VV.tif')
+            s1_file = os.path.join(
+                self.input_dir,
+                'OPERA_L2_RTC-S1_T137-292317-IW1_20250102T015857Z_20250102T190143Z_S1A_30_v1.0_VV.tif'
+            )
 
             pre_rtc_copol = runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['pre_rtc_copol']
             pre_rtc_crosspol = runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['pre_rtc_crosspol']
