@@ -656,13 +656,19 @@ def get_disp_s1_product_metadata(file_name, **extra_groups):
     extra_groups:
         kwargs for mapping additional HDF5 groups into the metadata dict.
         Should only be used in development versions of the PGE if SAS outputs
-        necessary information into different groups.
+        necessary information into different groups. Keywords here must not
+        be any of 'x', 'y', 'identification', or 'metadata'.
 
     Returns
     -------
     disp_metadata : dict
         python dict containing the HDF5 file metadata which is used in the
         ISO template.
+
+    Raises
+    ------
+    ValueError
+        If any of the kwargs keys are one of 'x', 'y', 'identification', or 'metadata'
     """
     disp_metadata = {
         'x': get_hdf5_group_as_dict(file_name, "/x"),
