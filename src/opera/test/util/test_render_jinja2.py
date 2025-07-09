@@ -11,6 +11,7 @@ import os
 import shutil
 import tempfile
 import unittest
+from glob import glob
 from os.path import abspath, join
 
 from pkg_resources import resource_filename
@@ -194,6 +195,11 @@ class RenderJinja2TestCase(unittest.TestCase):
             log_contents
         )
 
+        self.assertEqual(
+            len(glob(join(self.working_dir.name, 'bad_json_*.json'))),
+            1
+        )
+
     def testRenderJinja2ValidateYAML(self):
         template_file = join(self.data_dir, 'render_jinja_yaml_test_template.yaml.jinja2')
         logger = PgeLogger()
@@ -227,6 +233,11 @@ class RenderJinja2TestCase(unittest.TestCase):
             log_contents
         )
 
+        self.assertEqual(
+            len(glob(join(self.working_dir.name, 'bad_yaml_*.yaml'))),
+            1
+        )
+
     def testRenderJinja2ValidateXML(self):
         template_file = join(self.data_dir, 'render_jinja_xml_test_template.xml.jinja2')
         logger = PgeLogger()
@@ -258,4 +269,9 @@ class RenderJinja2TestCase(unittest.TestCase):
         self.assertIn(
             'Failed to render jinja2 template. Err: "EntityRef: expecting \';\', line 3, column 40" @ 3:40.',
             log_contents
+        )
+
+        self.assertEqual(
+            len(glob(join(self.working_dir.name, 'bad_xml_*.xml'))),
+            1
         )
