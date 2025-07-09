@@ -16,7 +16,7 @@ import json
 import os
 import re
 from collections.abc import Callable
-from functools import partial
+from datetime import datetime
 from typing import Any, Optional
 
 import jinja2
@@ -27,9 +27,12 @@ import numpy as np
 
 import yaml
 
+from yaml.scanner import ScannerError
+
 from opera.util.error_codes import ErrorCode
 from opera.util.h5_utils import MEASURED_PARAMETER_PATH_SEPARATOR
 from opera.util.logger import PgeLogger
+import opera.util.time as time_util
 
 XML_TYPES = {
     str: 'string',
@@ -119,20 +122,119 @@ def _make_undefined_handler_class(logger: PgeLogger):
     return LoggingUndefined
 
 
-def _try_parse_xml_string(string: str):
-    _ = etree.fromstring(string.encode('utf-8'))
+def _validate_rendered_json_string(string: str, output_directory: str, logger: PgeLogger):
+    try:
+        _ = json.loads(string)
+    except json.JSONDecodeError as err:
+        msg_lines = ['Rendered JSON not valid!']
+
+        rendered_lines = string.splitlines()
+
+        err_line, err_col = err.lineno, err.colno
+        err_line_index = err_line - 1
+
+        msg_lines.extend(rendered_lines[max(err_line_index - 2, 0):err_line_index + 1])
+        msg_lines.append(f'{" " * (err_col - 1)}^')
+        msg_lines.extend(rendered_lines[err_line_index + 1:min(err_line_index + 2, len(rendered_lines))])
+
+        if output_directory is not None:
+            dumpfile_name = f'bad_json_{time_util.get_time_for_filename(datetime.now())}.json'
+            dumpfile_path = os.path.join(output_directory, dumpfile_name)
+
+            with open(dumpfile_path, 'w', encoding='utf-8') as f:
+                f.write(string)
+
+            msg_lines.append(f'Failed to render jinja2 template. Err: "{err.args[0]}" @ {err_line}:{err_col}. Rendered'
+                             f' text dumped to {dumpfile_path}')
+        else:
+            msg_lines.append(f'Failed to render jinja2 template. Err: "{err.args[0]}" @ {err_line}:{err_col}.')
+
+        logger.critical(
+            "render_jinja2",
+            ErrorCode.LOGGED_CRITICAL_LINE,
+            msg_lines,
+        )
 
 
-JSON_VALIDATOR = json.loads
-YAML_VALIDATOR = partial(yaml.load, Loader=yaml.SafeLoader)
-XML_VALIDATOR = _try_parse_xml_string
+def _validate_rendered_yaml_string(string: str, output_directory: str, logger: PgeLogger):
+    try:
+        _ = yaml.load(string, Loader=yaml.SafeLoader)
+    except ScannerError as err:
+        msg_lines = ['Rendered YAML not valid!']
+
+        rendered_lines = string.strip().splitlines()
+
+        err_line, err_col = err.problem_mark.line, err.problem_mark.column
+        err_line_index = err_line - 1
+
+        msg_lines.extend(rendered_lines[max(err_line_index - 2, 0):err_line_index + 1])
+        msg_lines.append(f'{" " * (err_col - 1)}^')
+        msg_lines.extend(rendered_lines[err_line_index + 1:min(err_line_index + 2, len(rendered_lines))])
+
+        if output_directory is not None:
+            dumpfile_name = f'bad_yaml_{time_util.get_time_for_filename(datetime.now())}.yaml'
+            dumpfile_path = os.path.join(output_directory, dumpfile_name)
+
+            with open(dumpfile_path, 'w', encoding='utf-8') as f:
+                f.write(string)
+
+            msg_lines.append(f'Failed to render jinja2 template. Err: "{err.problem}" @ {err_line}:{err_col}. Rendered'
+                             f' text dumped to {dumpfile_path}')
+        else:
+            msg_lines.append(f'Failed to render jinja2 template. Err: "{err.problem}" @ {err_line}:{err_col}.')
+
+        logger.critical(
+            "render_jinja2",
+            ErrorCode.LOGGED_CRITICAL_LINE,
+            msg_lines,
+        )
+
+
+def _validate_rendered_xml_string(string: str, output_directory: str, logger: PgeLogger):
+    try:
+        _ = etree.fromstring(string.encode('utf-8'))
+    except etree.XMLSyntaxError as err:
+        msg_lines = ['Rendered XML not valid!']
+
+        rendered_lines = string.splitlines()
+
+        err_line, err_col = err.position
+        err_line_index = err_line - 1
+
+        msg_lines.extend(rendered_lines[max(err_line_index - 2, 0):err_line_index+1])
+        msg_lines.append(f'{" " * (err_col-1)}^')
+        msg_lines.extend(rendered_lines[err_line_index+1:min(err_line_index+2, len(rendered_lines))])
+
+        if output_directory is not None:
+            dumpfile_name = f'bad_xml_{time_util.get_time_for_filename(datetime.now())}.xml'
+            dumpfile_path = os.path.join(output_directory, dumpfile_name)
+
+            with open(dumpfile_path, 'w', encoding='utf-8') as f:
+                f.write(string)
+
+            msg_lines.append(f'Failed to render jinja2 template. Err: "{err.msg}" @ {err_line}:{err_col}. Rendered'
+                             f' text dumped to {dumpfile_path}')
+        else:
+            msg_lines.append(f'Failed to render jinja2 template. Err: "{err.msg}" @ {err_line}:{err_col}.')
+
+        logger.critical(
+            "render_jinja2",
+            ErrorCode.LOGGED_CRITICAL_LINE,
+            msg_lines,
+        )
+
+
+JSON_VALIDATOR = _validate_rendered_json_string
+YAML_VALIDATOR = _validate_rendered_yaml_string
+XML_VALIDATOR = _validate_rendered_xml_string
 
 
 def render_jinja2(
         template_filename: str,
         input_data: dict,
         logger: PgeLogger = None,
-        validator: Callable[[str], Any] = XML_VALIDATOR
+        output_directory: str = None,
+        validator: Optional[Callable[[str, str, PgeLogger], Any]] = XML_VALIDATOR
 ):
     """
     Renders from a jinja2 template using the specified input data.
@@ -150,9 +252,12 @@ def render_jinja2(
         will not raise exceptions or abort rendering. If not provided,
         the default Jinja2 error handling will apply for such errors,
         possibly including raised exceptions.
-    validator: collections.abc.Callable[[str], Any]
+    output_directory: str
+        Optional directory which, if validator fails, the rendered text will
+        be dumped to.
+    validator: collections.abc.Callable[[str, str, PgeLogger], Any]
         Callable which, if provided, takes the rendered text as an input and
-        attempts to parse it. Must raise an exception if given invalid input.
+        attempts to parse it. Must call logger.critical if given invalid input.
 
     Returns
     -------
@@ -183,10 +288,7 @@ def render_jinja2(
     rendered_text = template.render(input_data)
 
     if validator is not None:
-        try:
-            validator(rendered_text)
-        except Exception as err:
-            raise RuntimeError(f"Error parsing rendered ISO XML: {err}") from err
+        validator(rendered_text, output_directory, logger)
 
     return rendered_text
 
