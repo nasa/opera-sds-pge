@@ -303,8 +303,9 @@ class PgeLogger:
         error_code_offset : int
             Error code offset to add to this logger's error code base value
             to determine the final error code associated with the log message.
-        description : str
-            Description message to write to the log.
+        description : str, list(str)
+            Description message to write to the log. Can be a single string or
+            a list of strings. Strings with newlines will be split.
         additional_back_frames : int, optional
             Number of call-stack frames to "back up" to in order to determine
             the calling function and line number.
@@ -320,9 +321,18 @@ class PgeLogger:
 
         location = caller.f_code.co_filename + ':' + str(caller.f_lineno)
 
-        write(self.log_stream, severity, self.workflow, module,
-              self.error_code_base + error_code_offset,
-              location, description)
+        log_lines = []
+
+        if isinstance(description, str):
+            log_lines.extend(description.splitlines())
+        else:
+            for string in description:
+                log_lines.extend(string.splitlines())
+
+        for log_line in log_lines:
+            write(self.log_stream, severity, self.workflow, module,
+                  self.error_code_base + error_code_offset,
+                  location, log_line)
 
     def info(self, module, error_code_offset, description):
         """
@@ -335,8 +345,9 @@ class PgeLogger:
         error_code_offset : int
             Error code offset to add to this logger's error code base value
             to determine the final error code associated with the log message.
-        description : str
-            Description message to write to the log.
+        description : str, list(str)
+            Description message to write to the log. Can be a single string or
+            a list of strings. Strings with newlines will be split.
 
         """
         self.write(INFO, module, error_code_offset, description,
@@ -353,8 +364,9 @@ class PgeLogger:
         error_code_offset : int
             Error code offset to add to this logger's error code base value
             to determine the final error code associated with the log message.
-        description : str
-            Description message to write to the log.
+        description : str, list(str)
+            Description message to write to the log. Can be a single string or
+            a list of strings. Strings with newlines will be split.
 
         """
         self.write(DEBUG, module, error_code_offset, description,
@@ -371,8 +383,9 @@ class PgeLogger:
         error_code_offset : int
             Error code offset to add to this logger's error code base value
             to determine the final error code associated with the log message.
-        description : str
-            Description message to write to the log.
+        description : str, list(str)
+            Description message to write to the log. Can be a single string or
+            a list of strings. Strings with newlines will be split.
 
         """
         self.write(WARNING, module, error_code_offset, description,
@@ -394,8 +407,9 @@ class PgeLogger:
         error_code_offset : int
             Error code offset to add to this logger's error code base value
             to determine the final error code associated with the log message.
-        description : str
-            Description message to write to the log.
+        description : str, list(str)
+            Description message to write to the log. Can be a single string or
+            a list of strings. Strings with newlines will be split.
 
         Raises
         ------
