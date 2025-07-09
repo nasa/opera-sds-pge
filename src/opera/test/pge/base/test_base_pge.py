@@ -295,7 +295,10 @@ class BasePgeTestCase(unittest.TestCase):
             log_contents = infile.read()
 
         self.assertIn(
-            'Could not create one or more working directories. reason: \n'
+            'Could not create one or more working directories. reason: ',
+            log_contents
+        )
+        self.assertIn(
             'Mock OSError from os.makedirs',
             log_contents
         )
