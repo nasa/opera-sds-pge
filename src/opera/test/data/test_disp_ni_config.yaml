@@ -29,8 +29,7 @@ RunConfig:
                 ProgramPath: mkdir
                 ProgramOptions:
                     - '-p disp_ni_pge_test/output_dir/compressed_slcs;'
-#                    - 'python3 -c "from opera.util.h5_utils import create_test_disp_metadata_product; create_test_disp_metadata_product(\"disp_ni_pge_test/output_dir/20170217_20170430.nc\")";'
-                    - 'dd if=/dev/urandom of=disp_ni_pge_test/output_dir/20060630_20060930.nc bs=1M count=1;'
+                    - 'python3 -c "from opera.util.h5_utils import create_test_disp_ni_metadata_product; create_test_disp_ni_metadata_product(\"disp_ni_pge_test/output_dir/20060630_20060930.nc\")";'
                     - 'dd if=/dev/urandom of=disp_ni_pge_test/output_dir/20060630_20060930.short_wavelength_displacement.png bs=1M count=1;'
                     - 'dd if=/dev/urandom of=disp_ni_pge_test/output_dir/compressed_slcs/compressed_20060630_20060630_20071118.h5 bs=1M count=1;'
                     - '/bin/echo DISP-NI invoked with RunConfig'
