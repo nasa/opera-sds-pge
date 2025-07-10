@@ -21,7 +21,7 @@ static/ProductSource:
 static/ProcessingDateTime:
   attribute_data_type: string
   attribute_type: processingInformation
-  description: DISP-S1 product processing datetime.
+  description: DISP-NI product processing datetime.
   display_name: ProcessingDateTime
 identification/frame_id:
   attribute_data_type: string
@@ -92,7 +92,7 @@ identification/source_data_processing_facility:
 identification/source_data_imaging_geometry:
   attribute_data_type: string
   attribute_type: contentInformation
-  description: Imaging geometry of input coregistered SLCs
+  description: Imaging geometry of input Geocoded SLCs
   display_name: SourceDataImagingGeometry
 identification/source_data_acquisition_polarization:
   attribute_data_type: string
@@ -469,15 +469,15 @@ metadata/product_specification_document_id:
 #  attribute_type: contentInformation
 #  description: x/y coordinate convention referring to pixel center or corner.
 #  display_name: ProductPixelCoordinateConvention
-#metadata/source_data_software_ISCE3_version:  # Description copied from CSLC processing_information/algorithms/ISCE3_version
+#metadata/source_data_software_ISCE3_version:
 #  attribute_data_type: string
 #  attribute_type: processingInformation
 #  description: ISCE3 version used for processing
 #  display_name: SourceDataSoftwareISCE3Version
 #  optional: true  # Non-guarenteed copy from CLSC
-#metadata/source_data_software_nisar_reader_version:  # Description copied from CSLC processing_information/algorithms/s1_reader_version
+#metadata/source_data_software_nisar_reader_version:
 #  attribute_data_type: string
 #  attribute_type: processingInformation
-#  description: S1 reader version used for processing
-#  display_name: SourceDataSoftwareS1ReaderVersion
+#  description: NISAR reader version used for processing
+#  display_name: SourceDataSoftwareNISARReaderVersion
 #  optional: true  # Non-guarenteed copy from CLSC
