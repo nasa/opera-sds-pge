@@ -1061,16 +1061,15 @@ def create_test_disp_ni_metadata_product(
                                                                     dtype='int64')
         product_bounding_box_dset = identification_grp.create_dataset("product_bounding_box", data=np.bytes_(
             "337260.0,3785100.0,424920.0,3889440.0"))
-        # product_pixel_coordinate_convention_dset = identification_grp.create_dataset(
-        #     "product_pixel_coordinate_convention", data=np.bytes_("center"))
-        # mission_id_dset = identification_grp.create_dataset("mission_id", data=np.bytes_("S1A"))
-        # if not omit_cslc_measured_parameters:
-        #     instrument_name_dset = identification_grp.create_dataset("instrument_name", data=np.bytes_("C-SAR"))
-        #     look_direction_dset = identification_grp.create_dataset("look_direction", data=np.bytes_("Right"))
-        #     track_number_dset = identification_grp.create_dataset("track_number", data=27, dtype='int64')
-        #     orbit_pass_direction_dset = identification_grp.create_dataset("orbit_pass_direction",
-        #                                                                   data=np.bytes_("Descending"))
-        #     absolute_orbit_number_dset = identification_grp.create_dataset("absolute_orbit_number", data=15324,
+
+        # TODO: The commented out datasets in this function are for fields defined in the spec but not present in
+        #  current SAS outputs
+        # instrument_name_dset = identification_grp.create_dataset("instrument_name", data=np.bytes_("C-SAR"))
+        # look_direction_dset = identification_grp.create_dataset("look_direction", data=np.bytes_("Right"))
+        # track_number_dset = identification_grp.create_dataset("track_number", data=27, dtype='int64')
+        # orbit_pass_direction_dset = identification_grp.create_dataset("orbit_pass_direction",
+        #                                                               data=np.bytes_("Descending"))
+        # relative_orbit_number_dset = identification_grp.create_dataset("relative_orbit_number", data=15324,
         #                                                                    dtype="int64")
 
         acquisition_mode_dset = identification_grp.create_dataset("acquisition_mode", data=np.bytes_("IW"))
@@ -1127,7 +1126,7 @@ def create_test_disp_ni_metadata_product(
         source_data_reference_orbit_type_dset = identification_grp.create_dataset("source_data_reference_orbit_type",
                                                                                   data=np.bytes_("custom"))
         source_data_satellite_names_dset = identification_grp.create_dataset("source_data_satellite_names",
-                                                                             data=np.bytes_("NI"))
+                                                                             data=np.bytes_("NISAR"))
         source_data_secondary_orbit_type_dset = identification_grp.create_dataset("source_data_secondary_orbit_type",
                                                                                   data=np.bytes_("custom"))
         static_layers_data_access_dset = identification_grp.create_dataset(
@@ -1139,10 +1138,6 @@ def create_test_disp_ni_metadata_product(
 
         metadata_grp = outfile.create_group("/metadata")
 
-        # product_landing_page_doi_dset = metadata_grp.create_dataset(
-        #     "product_landing_page_doi",
-        #     data=np.bytes_("https://doi.org/10.5067/SNWG/OPL3DISPS1-V1")
-        # )
         disp_nisar_software_version_dset = metadata_grp.create_dataset("disp_nisar_software_version",
                                                                        data=np.bytes_(
                                                                            "0.1.1.post1.dev0+g5193e97.d20250326"
@@ -1214,18 +1209,22 @@ def create_test_disp_ni_metadata_product(
         product_specification_document_id_dset = metadata_grp.create_dataset("product_specification_document_id",
                                                                              data=np.bytes_("JPL D-108772"))
 
-        # if not omit_cslc_measured_parameters:
-        #     platform_id_dset = metadata_grp.create_dataset("platform_id", data=np.bytes_("S1A"))
-        #     slant_range_mid_swath_dset = metadata_grp.create_dataset("slant_range_mid_swath", data=875720.2393261964,
-        #                                                              dtype="float64")
-        #     source_data_software_COMPASS_version_dset = metadata_grp.create_dataset(
-        #         "source_data_software_COMPASS_version",
-        #         data=np.bytes_("0.5.5")
-        #     )
-        #     source_data_software_ISCE3_version_dset = metadata_grp.create_dataset("source_data_software_ISCE3_version",
-        #                                                                           data=np.bytes_("0.15.1"))
-        #     source_data_software_s1_reader_version_dset = metadata_grp.create_dataset(
-        #         "source_data_software_s1_reader_version", data=np.bytes_("0.2.4"))
+        # product_pixel_coordinate_convention_dset = metadata_grp.create_dataset(
+        #     "product_pixel_coordinate_convention", data=np.bytes_("center"))
+        # product_landing_page_doi_dset = metadata_grp.create_dataset(
+        #     "product_landing_page_doi",
+        #     data=np.bytes_("https://doi.org/10.5067/SNWG/OPL3DISPS1-V1")
+        # )
+        # slant_range_mid_swath_dset = metadata_grp.create_dataset("slant_range_mid_swath", data=875720.2393261964,
+        #                                                          dtype="float64")
+        # source_data_software_COMPASS_version_dset = metadata_grp.create_dataset(
+        #     "source_data_software_COMPASS_version",
+        #     data=np.bytes_("0.5.5")
+        # )
+        # source_data_software_ISCE3_version_dset = metadata_grp.create_dataset("source_data_software_ISCE3_version",
+        #                                                                       data=np.bytes_("0.15.1"))
+        # source_data_software_nisar_reader_version_dset = metadata_grp.create_dataset(
+        #     "source_data_software_nisar_reader_version", data=np.bytes_("0.2.4"))
 
         lsar_id_grp = outfile.create_group('/science/LSAR/identification')
 
