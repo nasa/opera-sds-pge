@@ -73,7 +73,7 @@ class DispNIPostProcessorMixin(DispS1PostProcessorMixin):
 
         The core file name component of the DISP-NI PGE consists of:
 
-        <PROJECT>_<LEVEL>_<PGE NAME>_<REL>_<P>_<FRM>_<MODE>_<PO>_\
+        <PROJECT>_<LEVEL>_<PGE NAME>_<TRACK>_<DIRECTION>_<FRAME>_<BANDWIDTH>_<POLARIZATION>_\
         <ReferenceDateTime>_<SecondaryDateTime>_<ProductVersion>_\
         <ProductGenerationDateTime>
 
@@ -165,7 +165,7 @@ class DispNIPostProcessorMixin(DispS1PostProcessorMixin):
 
         The compressed GSLC filename for the DISP-NI PGE consists of:
 
-             <Project>_<Level>_COMPRESSED-GSLC-NI_<REL>_<P>_<FRM>_<MODE>_\
+             <Project>_<Level>_COMPRESSED-GSLC-NI_<TRACK>_<DIRECTION>_<DIRECTION>_<BANDWIDTH>_\
              <ReferenceDateTime>_<FirstDateTime>_<LastDateTime>_\
              <ProductGenerationDateTime>_<Polarization>_<ProductVersion>.h5
 
@@ -198,7 +198,7 @@ class DispNIPostProcessorMixin(DispS1PostProcessorMixin):
 
         The core file name component DISP-NI ancillary products consists of:
 
-        <PROJECT>_<LEVEL>_<PGE NAME>_<REL>_<P>_<FRM>_<MODE>_<PO>_
+        <PROJECT>_<LEVEL>_<PGE NAME>_<TRACK>_<DIRECTION>_<FRAME>_<BANDWIDTH>_<POLARIZATION>_
         <ProductVersion>_<ProductGenerationDateTime>
 
         Since these files are note specific to any particular DISP-NI output
