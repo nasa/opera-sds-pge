@@ -103,9 +103,9 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
         Returns
         -------
         rtc_matches: Tuple of lists of re.Match objects
-            2-Tuple of lists of RTC filenames matched by a regular expression. First for the baseline RTC set.
-            the second for the current RTC set. Used in later validations. Only returns if this validation is
-            passing.
+            2-Tuple of lists of RTC filenames matched by a regular expression. The first for the baseline RTC set,
+            the second for the current RTC set. They are used in later validations. Only returns if this validation
+            is passing.
         """
         baseline_matches = [self._rtc_pattern.match(basename(rtc)) for rtc in chain.from_iterable(baseline_rtcs)]
         current_matches = [self._rtc_pattern.match(basename(rtc)) for rtc in chain.from_iterable(current_rtcs)]
