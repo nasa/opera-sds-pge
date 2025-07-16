@@ -102,8 +102,8 @@ class DistS1PgeTestCase(unittest.TestCase):
             Product ID to create the output files for.
         band_data: tuple of str
             Files to add to the output directory.
-        directory: str
-            Directory to create the test files in.
+        directory: str (optional)
+            Directory to create the test files in. If not provided, the test case output directory is used.
         empty_file: bool
             if 'True' do not add text to the file (leave empty)
             if 'False' (default) add 'Test data string' to the file
