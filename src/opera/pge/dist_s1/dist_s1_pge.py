@@ -324,10 +324,10 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
         6. Exact set of layers provided (ie, no duplicates)
         """
         sas_config = self.runconfig.sas_config
-        previous_product = sas_config["run_config"].get("pre_dist_s1_product", [])
+        previous_products = sas_config["run_config"].get("pre_dist_s1_product", [])
 
         check_input_list(
-            previous_product,
+            previous_products,
             self.logger,
             self.name,
             valid_extensions=self._valid_input_extensions,
@@ -336,15 +336,17 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
 
         geotiff_layer_names = set(self._valid_previous_product_input_layer_names)
 
-        if len(previous_product) != len(geotiff_layer_names):
-            msg = f'Unexpected number of files in previous product: {len(previous_product)}'
+        if len(previous_products) != len(geotiff_layer_names):
+            msg = f'Unexpected number of files in previous product: {len(previous_products)}'
             self.logger.critical(
                 self.name,
                 ErrorCode.INVALID_INPUT,
                 msg
             )
 
-        product_band_matches = [self._granule_filename_re.match(basename(f)) for f in previous_product]
+        product_band_matches = [
+            self._granule_filename_re.match(basename(previous_product)) for previous_product in previous_products
+        ]
 
         if None in product_band_matches:
             msg = 'One or more previous-product inputs has an invalid filename'
