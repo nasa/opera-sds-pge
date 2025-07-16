@@ -14,8 +14,9 @@ import shutil
 import tempfile
 import unittest
 from copy import deepcopy
+from datetime import datetime
 from io import StringIO
-from os.path import abspath, join
+from os.path import abspath, basename, dirname, join
 from pathlib import Path
 from unittest.mock import patch
 
@@ -28,6 +29,7 @@ from opera.pge.dist_s1.dist_s1_pge import DistS1Executor
 from opera.util import PgeLogger
 from opera.util.mock_utils import MockGdal
 from opera.util.render_jinja2 import UNDEFINED_ERROR
+from opera.util.time import get_time_for_filename
 
 
 class DistS1PgeTestCase(unittest.TestCase):
@@ -54,7 +56,7 @@ class DistS1PgeTestCase(unittest.TestCase):
     def setUp(self) -> None:
         """Use the temporary directory as the working directory"""
         self.working_dir = tempfile.TemporaryDirectory(
-            prefix="test_dist_s1_pge_", suffix="_temp", dir=os.curdir
+            prefix="test_dist_s1_pge_", suffix="_temp", dir=abspath(os.curdir)
         )
 
         # Create the input dir expected by the test RunConfig and add a
@@ -90,7 +92,7 @@ class DistS1PgeTestCase(unittest.TestCase):
             with open(dummy_file_path, "wb") as f:
                 f.write(random.randbytes(1024))
 
-    def generate_band_data_output(self, product_id, band_data, empty_file=False, clear=True):
+    def generate_band_data_output(self, product_id, band_data, directory=None, empty_file=False, clear=True):
         """
         Add files to the output directory.
 
@@ -100,6 +102,8 @@ class DistS1PgeTestCase(unittest.TestCase):
             Product ID to create the output files for.
         band_data: tuple of str
             Files to add to the output directory.
+        directory: str (optional)
+            Directory to create the test files in. If not provided, the test case output directory is used.
         empty_file: bool
             if 'True' do not add text to the file (leave empty)
             if 'False' (default) add 'Test data string' to the file
@@ -113,7 +117,10 @@ class DistS1PgeTestCase(unittest.TestCase):
         #              'OPERA_L3_DIST-S1_GEN-METRIC.tif', 'OPERA_L3_DIST-S1_N-DIST.tif',
         #              'OPERA_L3_DIST-S1_N-OBS.tif')
 
-        dir_path = join(self.test_output_dir, product_id)
+        if directory is None:
+            directory = self.test_output_dir
+
+        dir_path = join(directory, product_id)
 
         if clear:
             if os.path.exists(dir_path):
@@ -195,7 +202,7 @@ class DistS1PgeTestCase(unittest.TestCase):
 
         self.assertIn(f"DIST-S1 invoked with RunConfig {expected_sas_config_file}", log_contents)
 
-    def test_dist_s1_pge_input_validation(self):
+    def test_dist_s1_pge_input_basic_validations(self):
         """Test the input validation checks made by DistS1PreProcessorMixin."""
         runconfig_path = join(self.data_dir, 'test_dist_s1_config.yaml')
         test_runconfig_path = join(self.data_dir, 'invalid_dist_s1_runconfig.yaml')
@@ -293,7 +300,10 @@ class DistS1PgeTestCase(unittest.TestCase):
         try:
             # Test 1: Detect co/crosspol length mismatch
 
-            s1_file = os.path.join(self.input_dir, 'OPERA_L2_RTC-S1_T137-292325-IW1_20241022T015921Z_20241022T180523Z_S1A_30_v1.0_VV.tif')
+            s1_file = os.path.join(
+                self.input_dir,
+                'OPERA_L2_RTC-S1_T137-292325-IW1_20241022T015921Z_20241022T180523Z_S1A_30_v1.0_VV.tif'
+            )
 
             runconfig_dict['RunConfig']['Groups']['PGE']['InputFilesGroup']['InputFilePaths'].append(s1_file)
             runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['pre_rtc_copol'].append(s1_file)
@@ -352,7 +362,10 @@ class DistS1PgeTestCase(unittest.TestCase):
 
             runconfig_dict = deepcopy(backup_runconfig)
 
-            s1c_file = os.path.join(self.input_dir, 'OPERA_L2_RTC-S1_T137-292324-IW1_20241103T015918Z_20241103T071409Z_S1C_30_v1.0_VV.tif')
+            s1c_file = os.path.join(
+                self.input_dir,
+                'OPERA_L2_RTC-S1_T137-292324-IW1_20241103T015918Z_20241103T071409Z_S1C_30_v1.0_VV.tif'
+            )
 
             pre_rtc_copol = runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['pre_rtc_copol']
             pre_rtc_crosspol = runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['pre_rtc_crosspol']
@@ -431,13 +444,19 @@ class DistS1PgeTestCase(unittest.TestCase):
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
 
-            self.assertIn("One or more of the RunConfig SAS group RTC lists is badly ordered. Attempting to sort them", log_contents)
+            self.assertIn(
+                "One or more of the RunConfig SAS group RTC lists is badly ordered. Attempting to sort them",
+                log_contents
+            )
 
             # Test 5b: Badly ordered RTCs - Unfixable - Date mismatch
 
             runconfig_dict = deepcopy(backup_runconfig)
 
-            s1_file = os.path.join(self.input_dir, 'OPERA_L2_RTC-S1_T137-292318-IW1_20240904T015859Z_20240904T150822Z_S1A_30_v1.0_VV.tif')
+            s1_file = os.path.join(
+                self.input_dir,
+                'OPERA_L2_RTC-S1_T137-292318-IW1_20240904T015859Z_20240904T150822Z_S1A_30_v1.0_VV.tif'
+            )
 
             runconfig_dict['RunConfig']['Groups']['PGE']['InputFilesGroup']['InputFilePaths'][0] = s1_file
             runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['pre_rtc_copol'][0] = s1_file
@@ -466,7 +485,10 @@ class DistS1PgeTestCase(unittest.TestCase):
 
             runconfig_dict = deepcopy(backup_runconfig)
 
-            s1_file = os.path.join(self.input_dir, 'OPERA_L2_RTC-S1_T137-292317-IW1_20250102T015857Z_20250102T190143Z_S1A_30_v1.0_VV.tif')
+            s1_file = os.path.join(
+                self.input_dir,
+                'OPERA_L2_RTC-S1_T137-292317-IW1_20250102T015857Z_20250102T190143Z_S1A_30_v1.0_VV.tif'
+            )
 
             pre_rtc_copol = runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['pre_rtc_copol']
             pre_rtc_crosspol = runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['pre_rtc_crosspol']
@@ -547,6 +569,265 @@ class DistS1PgeTestCase(unittest.TestCase):
                 log_contents = infile.read()
 
             self.assertIn(f"Found non-crosspol RTC in crosspol input list", log_contents)
+
+            # Test 7: duplicate RTCs
+
+            runconfig_dict = deepcopy(backup_runconfig)
+
+            sample_input_rtc = runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['pre_rtc_copol'][-1]
+            sample_input_rtc_dir = dirname(sample_input_rtc)
+            sample_input_rtc = str(basename(sample_input_rtc))
+
+            duplicate_input_rtc_fields = sample_input_rtc.split('_')
+            duplicate_input_rtc_fields[5] = f'{get_time_for_filename(datetime.now())}Z'
+            duplicate_copol_rtc = '_'.join(duplicate_input_rtc_fields)
+
+            duplicate_input_rtc_fields[9] = 'VH.tif'
+            duplicate_crosspol_rtc = '_'.join(duplicate_input_rtc_fields)
+
+            runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['pre_rtc_copol'].append(
+                join(sample_input_rtc_dir, duplicate_copol_rtc)
+            )
+            runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['pre_rtc_crosspol'].append(
+                join(sample_input_rtc_dir, duplicate_crosspol_rtc)
+            )
+
+            runconfig_dict['RunConfig']['Groups']['PGE']['InputFilesGroup']['InputFilePaths'].extend([
+                join(sample_input_rtc_dir, duplicate_copol_rtc),
+                join(sample_input_rtc_dir, duplicate_crosspol_rtc),
+            ])
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as input_path:
+                yaml.safe_dump(runconfig_dict, input_path, sort_keys=False)
+
+            self._create_dummy_input_files(test_runconfig_path)
+
+            pge = DistS1Executor(pge_name="DistS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            # Open the log file, and check that the validation error details were captured
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn("Found duplicate RTC product(s) with the following burst ID - acquisition "
+                          "time pairs: ", log_contents)
+        finally:
+            if os.path.exists(test_runconfig_path):
+                os.unlink(test_runconfig_path)
+
+    def test_dist_s1_pge_input_prev_product_validations(self):
+        """Test the input previous product validation checks made by DistS1PreProcessorMixin."""
+        runconfig_path = join(self.data_dir, 'test_dist_s1_config.yaml')
+        test_runconfig_path = join(self.data_dir, 'invalid_dist_s1_runconfig.yaml')
+
+        with open(runconfig_path, 'r', encoding='utf-8') as stream:
+            runconfig_dict = yaml.safe_load(stream)
+
+        backup_runconfig = deepcopy(runconfig_dict)
+
+        sample_bands = [
+            'OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.1_GEN-DIST-STATUS.tif',
+            'OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.1_GEN-DIST-CONF.tif',
+            'OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.1_GEN-DIST-COUNT.tif',
+            'OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.1_GEN-DIST-DATE.tif',
+            'OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.1_GEN-DIST-DUR.tif',
+            'OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.1_GEN-DIST-LAST-DATE.tif',
+            'OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.1_GEN-DIST-PERC.tif',
+            'OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.1_GEN-METRIC-MAX.tif',
+        ]
+
+        sample_png = 'OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.1.png'
+        sample_duplicate = 'OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20250703T175000Z_S1_30_v0.1_GEN-DIST-DUR.tif'
+
+        try:
+            # Test 1: Non-existent files
+
+            runconfig_dict = deepcopy(backup_runconfig)
+
+            runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['pre_dist_s1_product'] = [
+                join(self.input_dir, 'dist', layer) for layer in sample_bands
+            ]
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as input_path:
+                yaml.safe_dump(runconfig_dict, input_path, sort_keys=False)
+
+            pge = DistS1Executor(pge_name="DistS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            # Open the log file, and check that the validation error details were captured
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn("Could not locate specified input", log_contents)
+
+            # Test 2: Empty files
+
+            self.generate_band_data_output(
+                'dist',
+                tuple(sample_bands),
+                directory=self.input_dir,
+                empty_file=True
+            )
+
+            pge = DistS1Executor(pge_name="DistS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            # Open the log file, and check that the validation error details were captured
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn("Size must be greater than 0", log_contents)
+
+            # Test 3: Bad extensions
+
+            runconfig_dict = deepcopy(backup_runconfig)
+
+            runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['pre_dist_s1_product'] = [
+                join(self.input_dir, 'dist', layer) for layer in sample_bands + [sample_png]
+            ]
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as input_path:
+                yaml.safe_dump(runconfig_dict, input_path, sort_keys=False)
+
+            self.generate_band_data_output(
+                'dist',
+                tuple(sample_bands + [sample_png]),
+                directory=self.input_dir,
+                clear=True
+            )
+
+            pge = DistS1Executor(pge_name="DistS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            # Open the log file, and check that the validation error details were captured
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn("does not have an expected file extension", log_contents)
+
+            # Test 4: Bad filenames
+
+            runconfig_dict = deepcopy(backup_runconfig)
+
+            invalid_sample_bands = deepcopy(sample_bands)
+            invalid_sample_bands[0] = 'gen-dist-status-acq.tif'
+
+            runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['pre_dist_s1_product'] = [
+                join(self.input_dir, 'dist', layer) for layer in invalid_sample_bands
+            ]
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as input_path:
+                yaml.safe_dump(runconfig_dict, input_path, sort_keys=False)
+
+            self.generate_band_data_output(
+                'dist',
+                tuple(invalid_sample_bands),
+                directory=self.input_dir,
+                clear=True
+            )
+
+            pge = DistS1Executor(pge_name="DistS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            # Open the log file, and check that the validation error details were captured
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn("One or more previous-product inputs has an invalid filename", log_contents)
+
+            # Test 5: Wrong number
+
+            runconfig_dict = deepcopy(backup_runconfig)
+
+            invalid_sample_bands = sample_bands[1:]
+
+            runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['pre_dist_s1_product'] = [
+                join(self.input_dir, 'dist', layer) for layer in invalid_sample_bands
+            ]
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as input_path:
+                yaml.safe_dump(runconfig_dict, input_path, sort_keys=False)
+
+            self.generate_band_data_output(
+                'dist',
+                tuple(invalid_sample_bands),
+                directory=self.input_dir,
+                clear=True
+            )
+
+            pge = DistS1Executor(pge_name="DistS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            # Open the log file, and check that the validation error details were captured
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn("Unexpected number of files in previous product", log_contents)
+
+            # Test 6: Incorrect set of layers
+
+            runconfig_dict = deepcopy(backup_runconfig)
+
+            invalid_sample_bands = deepcopy(sample_bands)
+            invalid_sample_bands[0] = sample_duplicate
+
+            runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['pre_dist_s1_product'] = [
+                join(self.input_dir, 'dist', layer) for layer in invalid_sample_bands
+            ]
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as input_path:
+                yaml.safe_dump(runconfig_dict, input_path, sort_keys=False)
+
+            self.generate_band_data_output(
+                'dist',
+                tuple(invalid_sample_bands),
+                directory=self.input_dir,
+                clear=True
+            )
+
+            pge = DistS1Executor(pge_name="DistS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            # Open the log file, and check that the validation error details were captured
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn("Incomplete input product provided", log_contents)
         finally:
             if os.path.exists(test_runconfig_path):
                 os.unlink(test_runconfig_path)
