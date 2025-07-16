@@ -391,9 +391,9 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
         self._validate_rtcs()
 
         sas_config = self.runconfig.sas_config
-        previous_product = sas_config["run_config"].get("pre_dist_s1_product", [])
+        previous_products = sas_config["run_config"].get("pre_dist_s1_product", [])
 
-        if previous_product:
+        if previous_products:
             self._validate_previous_product()
 
 
