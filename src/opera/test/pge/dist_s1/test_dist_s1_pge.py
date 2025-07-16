@@ -614,7 +614,8 @@ class DistS1PgeTestCase(unittest.TestCase):
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
 
-            self.assertIn("Found duplicate RTC product(s) in input", log_contents)
+            self.assertIn("Found duplicate RTC product(s) with the following burst ID - acquisition "
+                          "time pairs: ", log_contents)
         finally:
             if os.path.exists(test_runconfig_path):
                 os.unlink(test_runconfig_path)

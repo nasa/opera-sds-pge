@@ -272,7 +272,7 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
                 burst_acq_set.add(burst_acq)
 
         if len(duplicates) > 0:
-            msg = (f'Found duplicate RTC product(s) in input with the following burst ID - acquisition '
+            msg = (f'Found duplicate RTC product(s) with the following burst ID - acquisition '
                    f'time pairs: {duplicates}')
             self.logger.critical(
                 self.name,
