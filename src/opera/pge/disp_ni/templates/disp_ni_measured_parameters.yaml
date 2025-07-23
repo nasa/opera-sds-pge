@@ -1,1 +1,483 @@
-{}
+static/Project:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Name of the project.
+  display_name: Project
+static/ProductLevel:
+  attribute_data_type: int
+  attribute_type: processingInformation
+  description: Product level.
+  display_name: ProductLevel
+static/ProductType:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Product type.
+  display_name: ProductType
+static/ProductSource:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Source data for the product.
+  display_name: ProductSource
+static/ProcessingDateTime:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: DISP-NI product processing datetime.
+  display_name: ProcessingDateTime
+identification/frame_id:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: ID number of the processed frame.
+  display_name: FrameId
+identification/product_version:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Version of the product
+  display_name: ProductVersion
+identification/reference_zero_doppler_start_time:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Zero doppler start time of the first burst contained in the frame for the reference acquisition
+  display_name: ReferenceZeroDopplerStartTime
+identification/reference_zero_doppler_end_time:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Zero doppler start time of the last burst contained in the frame for the reference acquisition
+  display_name: ReferenceZeroDopplerEndTime
+identification/secondary_zero_doppler_start_time:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Zero doppler start time of the first burst contained in the frame for the secondary acquisition
+  display_name: SecondaryZeroDopplerStartTime
+identification/secondary_zero_doppler_end_time:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Zero doppler start time of the last burst contained in the frame for the secondary acquisition
+  display_name: SecondaryZeroDopplerEndTime
+identification/bounding_polygon:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: WKT representation of bounding polygon of the image
+  display_name: BoundingPolygon
+identification/radar_wavelength:
+  attribute_data_type: float
+  attribute_type: processingInformation
+  description: Wavelength of the transmitted signal
+  display_name: RadarWavelength
+identification/reference_datetime:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: UTC datetime of the acquisition sensing start of the reference epoch to which the unwrapped phase is referenced
+  display_name: ReferenceDatetime
+identification/secondary_datetime:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: UTC datetime of the acquisition sensing start of current acquisition used to create the unwrapped phase
+  display_name: SecondaryDatetime
+identification/average_temporal_coherence:
+  attribute_data_type: float
+  attribute_type: processingInformation
+  description: Mean value of valid pixels within temporal_coherence_layer
+  display_name: AverageTemporalCoherence
+identification/ceos_analysis_ready_data_document_identifier:
+  attribute_data_type: string
+  attribute_type: contentInformation
+  description: CEOS Analysis Ready Data (CARD) document identifier
+  display_name: CeosAnalysisReadyDataDocumentIdentifier
+  escape_html: true
+identification/source_data_processing_facility:
+  attribute_data_type: string
+  attribute_type: contentInformation
+  description: Product processing facility
+  display_name: SourceDataProcessingFacility
+identification/source_data_imaging_geometry:
+  attribute_data_type: string
+  attribute_type: contentInformation
+  description: Imaging geometry of input Geocoded SLCs
+  display_name: SourceDataImagingGeometry
+identification/source_data_acquisition_polarization:
+  attribute_data_type: string
+  attribute_type: contentInformation
+  description: Polarization type of source radar acquisition
+  display_name: SourceDataAcquisitionPolarization
+identification/source_data_access:
+  attribute_data_type: string
+  attribute_type: contentInformation
+  description: The metadata identifies the location from where the source data can be retrieved, expressed as a URL or DOI
+  display_name: SourceDataAccess
+  escape_html: true
+identification/source_data_x_spacing:
+  attribute_data_type: int
+  attribute_type: contentInformation
+  description: Pixel spacing of source geocoded SLC data in the x-direction
+  display_name: SourceDataXSpacing
+identification/source_data_y_spacing:
+  attribute_data_type: int
+  attribute_type: contentInformation
+  description: Pixel spacing of source geocoded SLC data in the y-direction
+  display_name: SourceDataYSpacing
+identification/near_range_incidence_angle:
+  attribute_data_type: float
+  attribute_type: contentInformation
+  description: Incidence angle at the near range of the displacement frame
+  display_name: NearRangeIncidenceAngle
+identification/far_range_incidence_angle:
+  attribute_data_type: float
+  attribute_type: contentInformation
+  description: Incidence angle at the far range of the displacement frame
+  display_name: FarRangeIncidenceAngle
+identification/product_sample_spacing:
+  attribute_data_type: int
+  attribute_type: contentInformation
+  description: Spacing between adjacent X/Y samples of displacement product in UTM coordinates
+  display_name: ProductSampleSpacing
+identification/nodata_pixel_count:
+  attribute_data_type: int
+  attribute_type: contentInformation
+  description: Number of nodata pixels
+  display_name: NodataPixelCount
+identification/product_bounding_box:
+  attribute_data_type: string
+  attribute_type: contentInformation
+  description: Opposite corners of the product file in the UTM coordinates as (west, south, east, north)
+  display_name: ProductBoundingBox
+
+# TODO: The following commented out params (and others in this file) are for expected metadata fields (defined in the
+#  spec) but not currently provided by the latest SAS delivery.
+
+#identification/instrument_name:
+#  attribute_data_type: string
+#  attribute_type: instrumentInformation
+#  description: Instrument name
+#  display_name: InstrumentName
+#  optional: true  # Non-guarenteed copy from GLSC
+#identification/look_direction:
+#  attribute_data_type: string
+#  attribute_type: processingInformation
+#  description: Look direction can be left or right
+#  display_name: LookDirection
+#  optional: true  # Non-guarenteed copy from GLSC
+#identification/track_number:
+#  attribute_data_type: int
+#  attribute_type: processingInformation
+#  description: Track number
+#  display_name: TrackNumber
+#  optional: true  # Non-guarenteed copy from GLSC
+#identification/orbit_pass_direction:
+#  attribute_data_type: string
+#  attribute_type: processingInformation
+#  description: Orbit direction can be ascending or descending
+#  display_name: OrbitPassDirection
+#  optional: true  # Non-guarenteed copy from GLSC
+#identification/relative_orbit_number:
+#  attribute_data_type: int
+#  attribute_type: instrumentInformation
+#  description: Relative orbit number
+#  display_name: RelativeeOrbitNumber
+#  optional: true  # Non-guarenteed copy from GLSC
+
+
+identification/static_layers_data_access:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: URL of the static layers product associated with this Displacement product. This includes the radar unit look vector for each pixel.
+  display_name: StaticLayersDataAccess
+  escape_html: true
+identification/radar_band:
+  attribute_data_type: string
+  attribute_type: instrumentInformation
+  description: Acquired radar frequency band.
+  display_name: RadarBand
+identification/acquisition_mode:
+  attribute_data_type: string
+  attribute_type: instrumentInformation
+  description: Radar acquisition mode for input products.
+  display_name: AcquisitionMode
+identification/ceos_analysis_ready_data_product_type:
+  attribute_data_type: string
+  attribute_type: contentInformation
+  description: CEOS Analysis Ready Data (CARD) product type name
+  display_name: CEOSAnalysisReadyDataProductType
+identification/ceos_number_of_input_granules:
+  attribute_data_type: int
+  attribute_type: processingInformation
+  description: Number of input data granule used during processing.
+  display_name: CEOSNumberOfInputGranules
+identification/processing_facility:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Product processing facility.
+  display_name: ProcessingFacility
+identification/processing_start_datetime:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: UTC datetime of the start of processing for this product.
+  display_name: ProcessingStartDatetime
+identification/product_data_polarization:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Radar polarization of displacement products
+  display_name: ProductDataPolarization
+identification/product_data_access:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: The metadata identifies the location from where the source data can be retrieved, expressed as a URL or DOI.
+  display_name: ProductDataAccess
+  escape_html: true
+identification/radar_center_frequency:
+  attribute_data_type: float
+  attribute_type: instrumentInformation
+  description: Radar center frequency of input products.
+  display_name: RadarCenterFrequency
+identification/source_data_azimuth_resolutions:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Azimuth resolution from L1 NISAR SLCs.
+  display_name: SourceDataAzimuthResolutions
+identification/source_data_dem_name:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Name of Digital Elevation Model used during input data processing.
+  display_name: SourceDataDEMName
+identification/source_data_earliest_acquisition:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Datetime of earliest input granule used during processing.
+  display_name: SourceDataEarliestAcquisition
+identification/source_data_earliest_processing_datetime:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Earliest processing datetime of input granules.
+  display_name: SourceDataEarliestProcessingDatetime
+identification/source_data_file_list:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: List of input Geocoded SLC granules used to create displacement frame.
+  display_name: SourceDataFileList
+identification/source_data_latest_acquisition:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Datetime of latest input granule used during processing.
+  display_name: SourceDataLatestAcquisition
+identification/source_data_latest_processing_datetime:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Latest processing datetime of input granules.
+  display_name: SourceDataLatestProcessingDatetime
+identification/source_data_max_noise_equivalent_sigma_zero:
+  attribute_data_type: float
+  attribute_type: processingInformation
+  description: Maximum Noise equivalent sigma0 in dB.
+  display_name: SourceDataMaxNoiseEquivalentSigmaZero
+identification/source_data_original_institution:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Original processing institution of NISAR SLC data.
+  display_name: SourceDataOriginalInstitution
+identification/source_data_polarization:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Radar polarization of input products used
+  display_name: SourceDataPolarization
+identification/source_data_range_resolutions:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Range resolution from source L1 NISAR SLCs.
+  display_name: SourceDataRangeResolution
+identification/source_data_reference_orbit_type:
+  attribute_data_type: string
+  attribute_type: platformInformation
+  description: Type of orbit (precise, restituted) used during input data processing for the reference acquisition.
+  display_name: SourceDataReferenceOrbitType
+identification/source_data_satellite_names:
+  attribute_data_type: string
+  attribute_type: platformInformation
+  description: Names of satellites included in input granules.
+  display_name: SourceDataSatelliteNames
+identification/source_data_secondary_orbit_type:
+  attribute_data_type: string
+  attribute_type: platformInformation
+  description: Type of orbit (precise, restituted) used during input data processing for the secondary acquisition
+  display_name: SourceDataSecondaryOrbitType
+
+#####
+#metadata/product_landing_page_doi:
+#  attribute_data_type: string
+#  attribute_type: contentInformation
+#  description: DOI for landing page containing DISP-NI product information
+#  display_name: ProductLandingPageDoi
+#  escape_html: true
+metadata/disp_nisar_software_version:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Version of the disp-ni software used to generate the product
+  display_name: DispNISARSoftwareVersion
+metadata/dolphin_software_version:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Version of the Dolphin software used to generate the product
+  display_name: DolphinSoftwareVersion
+
+# TODO: This should eventually change to DOI from Doc ID
+metadata/algorithm_theoretical_basis_document_id:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Document ID for Algorithm Theoretical Basis Document (ATBD)
+  display_name: AlgorithmTheoreticalBasisDocumentID
+  escape_html: true
+metadata/ceos_product_measurement_projection:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Projection of the displacement image (Line of sight, Horizontal, Veritcal)
+  display_name: CEOSProductMeasurementProjection
+metadata/ceos_atmospheric_phase_correction:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Method used to correct for atmosphere phase noise.
+  display_name: CEOSAtmosphericPhaseCorrection
+metadata/ceos_gridding_convention:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Whether a consistent gridding/sampling frame is used for ascending/descending frames.
+  display_name: CEOSGriddingConvention
+metadata/ceos_insar_pair_baseline_criteria_information:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: InSAR pair baseline selection criteria.
+  display_name: CEOSInSARPairBaselineCriteriaInformation
+metadata/ceos_insar_azimuth_common_band_filtering:
+  attribute_data_type: boolean
+  attribute_type: processingInformation
+  description: Flag to indicate if azimuth filtering applied during interferogram formation
+  display_name: CEOSInsarAzimuthCommonBandFiltering
+metadata/ceos_insar_range_spectral_shift_filtering:
+  attribute_data_type: boolean
+  attribute_type: processingInformation
+  description: Flag to indicate if range spectral shift filtering applied during interferogram formation
+  display_name: CEOSInsarRangeSpectralShiftFiltering
+metadata/ceos_insar_orbital_baseline_refinement:
+  attribute_data_type: boolean
+  attribute_type: processingInformation
+  description: Flag to indicate if baseline refinement applied during interferogram formation
+  display_name: CEOSInsarOrbitalBaselineRefinement
+metadata/ceos_shp_selection_selection_criteria:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Name of statistically homogeneous pixel selection criteria
+  display_name: CEOSShpSelectionSelectionCriteria
+metadata/ceos_shp_selection_window_size:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Size of window as (rows x columns) in pixels to search for SHPs
+  display_name: CEOSShpSelectionWindowSize
+metadata/ceos_shp_selection_selection_threshold:
+  attribute_data_type: float
+  attribute_type: processingInformation
+  description: Threshold for selecting statistically homogenous pixels
+  display_name: CEOSShpSelectionSelectionThreshold
+metadata/ceos_ionospheric_phase_correction:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Method used to correct for ionospheric phase noise.
+  display_name: CEOSIonosphericPhaseCorrection
+metadata/ceos_noise_removal:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Flag if noise removal has been applied (Y/N). Metadata should include the noise removal algorithm and reference to the algorithm as URL or DOI.
+  display_name: CEOSNoiseRemoval
+metadata/ceos_absolute_geolocation_ground_range_bias:
+  attribute_data_type: float
+  attribute_type: processingInformation
+  description: Estimated mean absolute geolocation error for input geocoded SLCs, as assessed via corner reflector analysis, in the ground range direction
+  display_name: CEOSAbsoluteGeolocationGroundRangeBias
+metadata/ceos_absolute_geolocation_ground_range_stddev:
+  attribute_data_type: float
+  attribute_type: processingInformation
+  description: Estimated standard deviation of absolute geolocation error for input geocoded SLCs, as assessed via corner reflector analysis, in the ground range direction
+  display_name: CEOSAbsoluteGeolocationGroundRangeStddev
+metadata/ceos_absolute_geolocation_azimuth_bias:
+  attribute_data_type: float
+  attribute_type: processingInformation
+  description: Estimated mean absolute geolocation error for input geocoded SLCs, as assessed via corner reflector analysis, in the azimuth direction
+  display_name: CEOSAbsoluteGeolocationAzimuthBias
+metadata/ceos_absolute_geolocation_azimuth_stddev:
+  attribute_data_type: float
+  attribute_type: processingInformation
+  description: Estimated standard deviation of absolute geolocation error for input geocoded SLCs, as assessed via corner reflector analysis, in the azimuth direction
+  display_name: CEOSAbsoluteGeolocationAzimuthStddev
+metadata/ceos_persistent_scatterer_amplitude_dispersion_threshold:
+  attribute_data_type: float
+  attribute_type: processingInformation
+  description: Threshold for persistent scatterer selection
+  display_name: CEOSPersistentScattererAmplitudeDispersionThreshold
+metadata/ceos_persistent_scatterer_selection_criteria:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Name of persistent scatterer selection criteria.
+  display_name: CEOSPersistentScattererSelectionCriteria
+metadata/ceos_persistent_scatterer_selection_criteria_doi:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: DOI of reference describing persistent scatterer selection criteria.
+  display_name: CEOSPersistentScattererSelectionCriteriaDOI
+  escape_html: true
+metadata/ceos_phase_similarity_metric_doi:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: DOI of reference describing phase cosine similarity metric.
+  display_name: CEOSPhaseSimilarityMetricDOI
+  escape_html: true
+metadata/ceos_estimated_phase_quality_metric_algorithm:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Algorithm used on wrapped phase to create estimated phase quality metric
+  display_name: CEOSEstimatedPhaseQualityMetricAlgorithm
+metadata/ceos_phase_unwrapping_method:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Name of phase unwrapping method.
+  display_name: CEOSPhaseUnwrappingMethod
+metadata/ceos_phase_unwrapping_snaphu_doi:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: DOI to reference describing SNAPHU phase unwrapping algorithm.
+  display_name: CEOSPhaseUnwrappingSnaphuDOI
+  escape_html: true
+metadata/ceos_phase_unwrapping_spurt_doi:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: DOI to reference describing spurt phase unwrapping algorithm
+  display_name: CEOSPhaseUnwrappingSpurtDoi
+  escape_html: true
+metadata/ceos_phase_unwrapping_similarity_threshold:
+  attribute_data_type: float
+  attribute_type: processingInformation
+  description: Threshold on phase similarity used to mask and interpolate interferogram before unwrapping
+  display_name: CEOSPhaseUnwrappingSimilarityThreshold
+metadata/platform_id:  # Description copied from GSLC processing_information/input_burst_metadata/platform_id
+  attribute_data_type: string
+  attribute_type: platformInformation
+  description: Sensor platform identification string (e.g., NISAR)
+  display_name: PlatformID
+  optional: true  # Non-guarenteed copy from GLSC
+metadata/product_specification_document_id:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Document identifier for Product Specification.
+  display_name: ProductSpecificationDocumentID
+#metadata/product_pixel_coordinate_convention:
+#  attribute_data_type: string
+#  attribute_type: contentInformation
+#  description: x/y coordinate convention referring to pixel center or corner.
+#  display_name: ProductPixelCoordinateConvention
+#metadata/source_data_software_ISCE3_version:
+#  attribute_data_type: string
+#  attribute_type: processingInformation
+#  description: ISCE3 version used for processing
+#  display_name: SourceDataSoftwareISCE3Version
+#  optional: true  # Non-guarenteed copy from CLSC
+#metadata/source_data_software_nisar_reader_version:
+#  attribute_data_type: string
+#  attribute_type: processingInformation
+#  description: NISAR reader version used for processing
+#  display_name: SourceDataSoftwareNISARReaderVersion
+#  optional: true  # Non-guarenteed copy from CLSC

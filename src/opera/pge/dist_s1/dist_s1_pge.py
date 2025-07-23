@@ -102,9 +102,10 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
 
         Returns
         -------
-        rtc_matches: List of re.Match objects
-            List of RTC filenames matched by a regular expression. Used in later validation. Only returns
-            if this validation is passing.
+        rtc_matches: Tuple of lists of re.Match objects
+            2-Tuple of lists of RTC filenames matched by a regular expression. The first for the baseline RTC set,
+            the second for the current RTC set. They are used in later validations. Only returns if this validation
+            is passing.
         """
         baseline_matches = [self._rtc_pattern.match(basename(rtc)) for rtc in chain.from_iterable(baseline_rtcs)]
         current_matches = [self._rtc_pattern.match(basename(rtc)) for rtc in chain.from_iterable(current_rtcs)]
@@ -242,6 +243,43 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
                     msg
                 )
 
+    def __validate_no_duplicates(self, rtc_matches):
+        """
+        Ensures the inputs contain no RTCs with duplicate burst ID & acquisition timestamps, (ie,
+        no duplicate products produced at different times)
+
+        Parameters
+        ----------
+        rtc_matches : list(re.Match)
+            List of regex matches of the input RTC filenames
+        """
+        burst_acq_set = set()
+        duplicates = []
+
+        for rtc in rtc_matches:
+            match_dict = rtc.groupdict()
+
+            # Only use either co or cross pol since other validations will fail if
+            # a repeat is in one but not the other
+            if match_dict['pol'] not in ['VV', 'HH']:
+                continue
+
+            burst_acq = (match_dict['burst_id'], match_dict['acquisition_ts'])
+
+            if burst_acq in burst_acq_set:
+                duplicates.append(burst_acq)
+            else:
+                burst_acq_set.add(burst_acq)
+
+        if len(duplicates) > 0:
+            msg = (f'Found duplicate RTC product(s) with the following burst ID - acquisition '
+                   f'time pairs: {duplicates}')
+            self.logger.critical(
+                self.name,
+                ErrorCode.INVALID_INPUT,
+                msg
+            )
+
     def _validate_rtcs(self):
         """
         Performs the following validations on the input RTCs:
@@ -271,6 +309,63 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
         self.__validate_rtc_homogeneity(current_matches)  # Per ADT: Baseline can be heterogeneous
         self.__validate_rtc_ordering(all_rtcs)
         self.__validate_co_and_cross_polarizations(all_rtcs)
+        self.__validate_no_duplicates(baseline_matches + current_matches)
+
+    def _validate_previous_product(self):
+        """
+        Run validations for previous product input.
+
+        Checks:
+        1. All files exist
+        2. All files are nonempty
+        3. All files are .tif files
+        4. Correct number of files (one for each TIFF layer) provided
+        5. All files are named conformant to DIST-S1 product specification
+        6. Exact set of layers provided (ie, no duplicates)
+        """
+        sas_config = self.runconfig.sas_config
+        previous_products = sas_config["run_config"].get("pre_dist_s1_product", [])
+
+        check_input_list(
+            previous_products,
+            self.logger,
+            self.name,
+            valid_extensions=self._valid_input_extensions,
+            check_zero_size=True
+        )
+
+        geotiff_layer_names = set(self._valid_previous_product_input_layer_names)
+
+        if len(previous_products) != len(geotiff_layer_names):
+            msg = f'Unexpected number of files in previous product: {len(previous_products)}'
+            self.logger.critical(
+                self.name,
+                ErrorCode.INVALID_INPUT,
+                msg
+            )
+
+        product_band_matches = [
+            self._granule_filename_re.match(basename(previous_product)) for previous_product in previous_products
+        ]
+
+        if None in product_band_matches:
+            msg = 'One or more previous-product inputs has an invalid filename'
+            self.logger.critical(
+                self.name,
+                ErrorCode.INVALID_INPUT,
+                msg
+            )
+
+        provided_layer_names = set([match.groupdict()['layer_name'] for match in product_band_matches])
+
+        if provided_layer_names != geotiff_layer_names:
+            msg = (f'Incomplete input product provided. Missing layers: '
+                   f'{geotiff_layer_names.difference(provided_layer_names)}')
+            self.logger.critical(
+                self.name,
+                ErrorCode.INVALID_INPUT,
+                msg
+            )
 
     def run_preprocessor(self, **kwargs):
         """
@@ -295,6 +390,12 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
         )
         self._validate_rtcs()
 
+        sas_config = self.runconfig.sas_config
+        previous_products = sas_config["run_config"].get("pre_dist_s1_product", [])
+
+        if previous_products:
+            self._validate_previous_product()
+
 
 class DistS1PostProcessorMixin(PostProcessorMixin):
     """
@@ -312,25 +413,6 @@ class DistS1PostProcessorMixin(PostProcessorMixin):
     # May not need these since PGE produces 1 tile / execution
     _tile_metadata_cache = {}
     _tile_filename_cache = {}
-
-    # These layers are always produced and therefore must be present
-    _main_output_layer_names = ['GEN-DIST-STATUS-ACQ', 'GEN-DIST-STATUS', 'GEN-METRIC', 'BROWSE']
-
-    # The production of these layers depends on the confirmation DB and may be absent
-    _confirmation_db_output_layer_names = ['GEN-DIST-CONF', 'GEN-DIST-COUNT', 'GEN-DIST-DATE', 'GEN-DIST-DUR',
-                                           'GEN-DIST-LAST-DATE', 'GEN-DIST-PERC', 'GEN-METRIC-MAX']
-
-    _valid_layer_names = _main_output_layer_names + _confirmation_db_output_layer_names
-
-    _product_id_pattern = (r'(?P<id>(?P<project>OPERA)_(?P<level>L3)_(?P<product_type>DIST(-ALERT)?)-(?P<source>S1)_'
-                           r'(?P<tile_id>T[^\W_]{5})_(?P<acquisition_ts>\d{8}T\d{6}Z)_(?P<creation_ts>\d{8}T\d{6}Z)_'
-                           r'(?P<sensor>S1[AC]?)_(?P<spacing>30)_(?P<product_version>v\d+[.]\d+))')
-
-    _granule_filename_pattern = (_product_id_pattern + rf'((_(?P<layer_name>{"|".join(_valid_layer_names)}))|'
-                                                       r'_BROWSE)?[.](?P<ext>tif|tiff|png)$')
-
-    _product_id_re = re.compile(_product_id_pattern + r'$')
-    _granule_filename_re = re.compile(_granule_filename_pattern)
 
     def _validate_outputs(self):
         output_product_path = abspath(self.runconfig.output_product_path)
@@ -762,6 +844,29 @@ class DistS1Executor(DistS1PreProcessorMixin, DistS1PostProcessorMixin, PgeExecu
     functionality, while inheriting all other functionality for setup and execution
     of the SAS from the base PgeExecutor class.
     """
+
+    # These layers are always produced and therefore must be present
+    _main_output_layer_names = ['GEN-DIST-STATUS-ACQ', 'GEN-DIST-STATUS', 'GEN-METRIC', 'BROWSE']
+
+    # The production of these layers depends on the confirmation DB and may be absent
+    _confirmation_db_output_layer_names = ['GEN-DIST-CONF', 'GEN-DIST-COUNT', 'GEN-DIST-DATE', 'GEN-DIST-DUR',
+                                           'GEN-DIST-LAST-DATE', 'GEN-DIST-PERC', 'GEN-METRIC-MAX']
+
+    _valid_layer_names = _main_output_layer_names + _confirmation_db_output_layer_names
+
+    _valid_previous_product_input_layer_names = [
+        layer for layer in _valid_layer_names if layer not in {'BROWSE', 'GEN-DIST-STATUS-ACQ', 'GEN-METRIC'}
+    ]
+
+    _product_id_pattern = (r'(?P<id>(?P<project>OPERA)_(?P<level>L3)_(?P<product_type>DIST(-ALERT)?)-(?P<source>S1)_'
+                           r'(?P<tile_id>T[^\W_]{5})_(?P<acquisition_ts>\d{8}T\d{6}Z)_(?P<creation_ts>\d{8}T\d{6}Z)_'
+                           r'(?P<sensor>S1[AC]?)_(?P<spacing>30)_(?P<product_version>v\d+[.]\d+))')
+
+    _granule_filename_pattern = (_product_id_pattern + rf'((_(?P<layer_name>{"|".join(_valid_layer_names)}))|'
+                                                       r'_BROWSE)?[.](?P<ext>tif|tiff|png)$')
+
+    _product_id_re = re.compile(_product_id_pattern + r'$')
+    _granule_filename_re = re.compile(_granule_filename_pattern)
 
     NAME = "DIST-S1"
     """Short name for the DIST-S1 PGE"""

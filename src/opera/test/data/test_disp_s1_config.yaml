@@ -34,7 +34,7 @@ RunConfig:
                 ProgramPath: mkdir
                 ProgramOptions:
                     - '-p disp_s1_pge_test/output_dir/compressed_slcs;'
-                    - 'python3 -c "from opera.util.h5_utils import create_test_disp_metadata_product; create_test_disp_metadata_product(\"disp_s1_pge_test/output_dir/20170217_20170430.nc\")";'
+                    - 'python3 -c "from opera.util.h5_utils import create_test_disp_s1_metadata_product; create_test_disp_s1_metadata_product(\"disp_s1_pge_test/output_dir/20170217_20170430.nc\")";'
                     - 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/20170217_20170430.short_wavelength_displacement.png bs=1M count=1;'
                     - 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/compressed_slcs/compressed_t027_056725_iw1_20170217_20170217_20170430.h5 bs=1M count=1;'
                     - 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/compressed_slcs/compressed_t027_056726_iw1_20170217_20170217_20170430.h5 bs=1M count=1;'
