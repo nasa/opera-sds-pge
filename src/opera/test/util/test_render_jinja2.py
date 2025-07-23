@@ -11,6 +11,7 @@ import os
 import shutil
 import tempfile
 import unittest
+from glob import glob
 from os.path import abspath, join
 
 from pkg_resources import resource_filename
@@ -55,7 +56,7 @@ class RenderJinja2TestCase(unittest.TestCase):
         -------
         """
         self.working_dir = tempfile.TemporaryDirectory(
-            prefix="test_met_file_", suffix='_temp', dir=os.curdir
+            prefix="test_met_file_", suffix='_temp', dir=os.path.abspath(os.curdir)
         )
         os.chdir(self.working_dir.name)
 
@@ -163,31 +164,90 @@ class RenderJinja2TestCase(unittest.TestCase):
 
     def testRenderJinja2ValidateJSON(self):
         template_file = join(self.data_dir, 'render_jinja_json_test_template.json.jinja2')
+        logger = PgeLogger()
 
         # Test for valid JSON
-        rendered_text = render_jinja2(template_file, {'foo': {'bar': '"bar"'}}, validator=JSON_VALIDATOR)
+        rendered_text = render_jinja2(
+            template_file,
+            {'foo': {'bar': '"bar"'}},
+            logger,
+            self.working_dir.name,
+            validator=JSON_VALIDATOR
+        )
 
         # Test for invalid JSON
         with self.assertRaises(RuntimeError):
-            rendered_text = render_jinja2(template_file, {'foo': {'bar': '"bar'}}, validator=JSON_VALIDATOR)
+            rendered_text = render_jinja2(
+                template_file,
+                {'foo': {'bar': '"bar'}},
+                logger,
+                self.working_dir.name,
+                validator=JSON_VALIDATOR
+            )
+
+        log_file = logger.get_file_name()
+
+        with open(log_file, 'r', encoding='utf-8') as infile:
+            log_contents = infile.read()
+
+        self.assertIn(
+            'Failed to render jinja2 template. Err: "Invalid control character at: line 2 column 14 (char 15)" @ 2:14.',
+            log_contents
+        )
+
+        self.assertEqual(
+            len(glob(join(self.working_dir.name, 'bad_json_*.json'))),
+            1
+        )
 
     def testRenderJinja2ValidateYAML(self):
         template_file = join(self.data_dir, 'render_jinja_yaml_test_template.yaml.jinja2')
+        logger = PgeLogger()
 
         # Test for valid YAML
-        rendered_text = render_jinja2(template_file, {'foo': {'bar': 'bar'}}, validator=YAML_VALIDATOR)
+        rendered_text = render_jinja2(
+            template_file,
+            {'foo': {'bar': 'bar'}},
+            logger,
+            self.working_dir.name,
+            validator=YAML_VALIDATOR
+        )
 
         # Test for invalid YAML
         with self.assertRaises(RuntimeError):
-            rendered_text = render_jinja2(template_file, {'foo': {'bar': ' : bar'}}, validator=YAML_VALIDATOR)
+            rendered_text = render_jinja2(
+                template_file,
+                {'foo': {'bar': ' : bar'}},
+                logger,
+                self.working_dir.name,
+                validator=YAML_VALIDATOR
+            )
+
+        log_file = logger.get_file_name()
+
+        with open(log_file, 'r', encoding='utf-8') as infile:
+            log_contents = infile.read()
+
+        self.assertIn(
+            'Failed to render jinja2 template. Err: "mapping values are not allowed here" @ 2:8.',
+            log_contents
+        )
+
+        self.assertEqual(
+            len(glob(join(self.working_dir.name, 'bad_yaml_*.yaml'))),
+            1
+        )
 
     def testRenderJinja2ValidateXML(self):
         template_file = join(self.data_dir, 'render_jinja_xml_test_template.xml.jinja2')
+        logger = PgeLogger()
 
         # Test for valid XML
         rendered_text = render_jinja2(
             template_file,
             {'foo': {'bar': 'http://example.com?foo=foo&amp;bar=bar'}},
+            logger,
+            self.working_dir.name,
             validator=XML_VALIDATOR
         )
 
@@ -196,5 +256,22 @@ class RenderJinja2TestCase(unittest.TestCase):
             rendered_text = render_jinja2(
                 template_file,
                 {'foo': {'bar': 'http://example.com?foo=foo&bar=bar'}},
+                logger,
+                self.working_dir.name,
                 validator=XML_VALIDATOR
             )
+
+        log_file = logger.get_file_name()
+
+        with open(log_file, 'r', encoding='utf-8') as infile:
+            log_contents = infile.read()
+
+        self.assertIn(
+            'Failed to render jinja2 template. Err: "EntityRef: expecting \';\', line 3, column 40" @ 3:40.',
+            log_contents
+        )
+
+        self.assertEqual(
+            len(glob(join(self.working_dir.name, 'bad_xml_*.xml'))),
+            1
+        )
