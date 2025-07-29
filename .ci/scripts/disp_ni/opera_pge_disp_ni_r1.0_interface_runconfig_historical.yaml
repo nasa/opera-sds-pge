@@ -89,7 +89,7 @@ RunConfig:
       dynamic_ancillary_file_group:
         # REQUIRED: Path to file containing SAS algorithm parameters.
         #   Type: string.
-        algorithm_parameters_file: /home/mamba/runconfig/algorithm_parameters_historical.yaml
+        algorithm_parameters_file: /home/mamba/runconfig/opera_pge_disp_ni_r1.0_interface_algorithm_parameters_historical.yaml
         # Optional Byte mask file used to ignore low correlation/bad data (e.g water mask).
         #   Convention is 0 for no data/invalid, and 1 for good data. Dtype must be uint8.
         #   Type: string | null.
