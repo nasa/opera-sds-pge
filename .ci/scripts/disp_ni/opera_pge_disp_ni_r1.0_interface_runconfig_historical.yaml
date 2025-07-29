@@ -1,0 +1,166 @@
+RunConfig:
+  Name: OPERA-DISP-NI-PGE-INT-TEST-CONFIG
+
+  Groups:
+    PGE:
+      PGENameGroup:
+        PGEName: DISP_NI_PGE
+
+      InputFilesGroup:
+        InputFilePaths:
+          - /home/mamba/input_dir/input_slcs/NISAR_L2_GSLC_NI_F150_20060630T061920Z_20240528T200256Z_NI_HH_v0.1.h5
+          - /home/mamba/input_dir/input_slcs/NISAR_L2_GSLC_NI_F150_20060815T061952Z_20240528T200246Z_NI_HH_v0.1.h5
+          - /home/mamba/input_dir/input_slcs/NISAR_L2_GSLC_NI_F150_20060930T062029Z_20240528T200242Z_NI_HH_v0.1.h5
+          - /home/mamba/input_dir/input_slcs/NISAR_L2_GSLC_NI_F150_20061115T062055Z_20240528T200248Z_NI_HH_v0.1.h5
+          - /home/mamba/input_dir/input_slcs/NISAR_L2_GSLC_NI_F150_20061231T062124Z_20240528T200247Z_NI_HH_v0.1.h5
+          - /home/mamba/input_dir/input_slcs/NISAR_L2_GSLC_NI_F150_20070215T062136Z_20240528T201122Z_NI_HH_v0.1.h5
+          - /home/mamba/input_dir/input_slcs/NISAR_L2_GSLC_NI_F150_20070518T062142Z_20240528T201124Z_NI_HH_v0.1.h5
+          - /home/mamba/input_dir/input_slcs/NISAR_L2_GSLC_NI_F150_20070703T062138Z_20240528T200959Z_NI_HH_v0.1.h5
+          - /home/mamba/input_dir/input_slcs/NISAR_L2_GSLC_NI_F150_20070818T062132Z_20240528T200952Z_NI_HH_v0.1.h5
+          - /home/mamba/input_dir/input_slcs/NISAR_L2_GSLC_NI_F150_20071003T062119Z_20240528T201004Z_NI_HH_v0.1.h5
+          - /home/mamba/input_dir/input_slcs/NISAR_L2_GSLC_NI_F150_20071118T062059Z_20240528T201835Z_NI_HH_v0.1.h5
+
+      DynamicAncillaryFilesGroup:
+        AncillaryFileMap:
+          dem_file:
+          mask_file: /home/mamba/input_dir/dynamic_ancillary_files/water_mask.tif
+          gunw_files:
+            - /home/mamba/input_dir/dynamic_ancillary_files/gunw_files/NISAR_L2_PR_GUNW_001_005_A_219_220_4020_SH_20060630T000000_20060630T000000_20060815T000000_20060815T000000_P01101_M_F_J_001.h5
+            - /home/mamba/input_dir/dynamic_ancillary_files/gunw_files/NISAR_L2_PR_GUNW_001_005_A_219_220_4020_SH_20060815T000000_20060815T000000_20060930T000000_20060930T000000_P01101_M_F_J_001.h5
+            - /home/mamba/input_dir/dynamic_ancillary_files/gunw_files/NISAR_L2_PR_GUNW_001_005_A_219_220_4020_SH_20060930T000000_20060930T000000_20061115T000000_20061115T000000_P01101_M_F_J_001.h5
+            - /home/mamba/input_dir/dynamic_ancillary_files/gunw_files/NISAR_L2_PR_GUNW_001_005_A_219_220_4020_SH_20061115T000000_20061115T000000_20061231T000000_20061231T000000_P01101_M_F_J_001.h5
+            - /home/mamba/input_dir/dynamic_ancillary_files/gunw_files/NISAR_L2_PR_GUNW_001_005_A_219_220_4020_SH_20061231T000000_20061231T000000_20070215T000000_20070215T000000_P01101_M_F_J_001.h5
+            - /home/mamba/input_dir/dynamic_ancillary_files/gunw_files/NISAR_L2_PR_GUNW_001_005_A_219_220_4020_SH_20070215T000000_20070215T000000_20070518T000000_20070518T000000_P01101_M_F_J_001.h5
+            - /home/mamba/input_dir/dynamic_ancillary_files/gunw_files/NISAR_L2_PR_GUNW_001_005_A_219_220_4020_SH_20070518T000000_20070518T000000_20070703T000000_20070703T000000_P01101_M_F_J_001.h5
+            - /home/mamba/input_dir/dynamic_ancillary_files/gunw_files/NISAR_L2_PR_GUNW_001_005_A_219_220_4020_SH_20070703T000000_20070703T000000_20070818T000000_20070818T000000_P01101_M_F_J_001.h5
+            - /home/mamba/input_dir/dynamic_ancillary_files/gunw_files/NISAR_L2_PR_GUNW_001_005_A_219_220_4020_SH_20070818T000000_20070818T000000_20071003T000000_20071003T000000_P01101_M_F_J_001.h5
+            - /home/mamba/input_dir/dynamic_ancillary_files/gunw_files/NISAR_L2_PR_GUNW_001_005_A_219_220_4020_SH_20071003T000000_20071003T000000_20071118T000000_20071118T000000_P01101_M_F_J_001.h5
+            - /home/mamba/input_dir/dynamic_ancillary_files/gunw_files/NISAR_L2_PR_GUNW_001_005_A_219_220_4020_SH_20071118T000000_20071118T000000_20080103T000000_20080103T000000_P01101_M_F_J_001.h5
+          troposphere_files:
+      ProductPathGroup:
+        OutputProductPath: /home/mamba/output_dir
+        ScratchPath: /home/mamba/scratch_dir
+
+      PrimaryExecutable:
+        ProductIdentifier: DISP_N1
+        ProductVersion: "1.0"
+        ProgramPath: disp-nisar
+        ProgramOptions:
+          - run
+        ErrorCodeBase: 900000
+        SchemaPath: /home/mamba/opera/pge/disp_ni/schema/disp_ni_sas_schema.yaml
+        AlgorithmParametersSchemaPath: /home/mamba/opera/pge/disp_ni/schema/algorithm_parameters_disp_ni_schema.yaml
+        IsoTemplatePath: /home/mamba/opera/pge/disp_ni/templates/OPERA_ISO_metadata_L3_DISP_NI_template.xml.jinja2
+        IsoMeasuredParameterDescriptions: /home/mamba/opera/pge/disp_ni/templates/disp_ni_measured_parameters.yaml
+
+      QAExecutable:
+        Enabled: True
+        ProgramPath: /home/mamba/opera/.ci/scripts/disp_ni/compare_disp_ni_products.sh
+        ProgramOptions: []
+
+      DebugLevelGroup:
+        DebugSwitch: False
+        ExecuteViaShell: False
+    SAS:
+      input_file_group:
+        # REQUIRED: list of paths to GSLC files.
+        #   Type: array.
+        gslc_file_list:
+          - /home/mamba/input_dir/input_slcs/NISAR_L2_GSLC_NI_F150_20060630T061920Z_20240528T200256Z_NI_HH_v0.1.h5
+          - /home/mamba/input_dir/input_slcs/NISAR_L2_GSLC_NI_F150_20060815T061952Z_20240528T200246Z_NI_HH_v0.1.h5
+          - /home/mamba/input_dir/input_slcs/NISAR_L2_GSLC_NI_F150_20060930T062029Z_20240528T200242Z_NI_HH_v0.1.h5
+          - /home/mamba/input_dir/input_slcs/NISAR_L2_GSLC_NI_F150_20061115T062055Z_20240528T200248Z_NI_HH_v0.1.h5
+          - /home/mamba/input_dir/input_slcs/NISAR_L2_GSLC_NI_F150_20061231T062124Z_20240528T200247Z_NI_HH_v0.1.h5
+          - /home/mamba/input_dir/input_slcs/NISAR_L2_GSLC_NI_F150_20070215T062136Z_20240528T201122Z_NI_HH_v0.1.h5
+          - /home/mamba/input_dir/input_slcs/NISAR_L2_GSLC_NI_F150_20070518T062142Z_20240528T201124Z_NI_HH_v0.1.h5
+          - /home/mamba/input_dir/input_slcs/NISAR_L2_GSLC_NI_F150_20070703T062138Z_20240528T200959Z_NI_HH_v0.1.h5
+          - /home/mamba/input_dir/input_slcs/NISAR_L2_GSLC_NI_F150_20070818T062132Z_20240528T200952Z_NI_HH_v0.1.h5
+          - /home/mamba/input_dir/input_slcs/NISAR_L2_GSLC_NI_F150_20071003T062119Z_20240528T201004Z_NI_HH_v0.1.h5
+          - /home/mamba/input_dir/input_slcs/NISAR_L2_GSLC_NI_F150_20071118T062059Z_20240528T201835Z_NI_HH_v0.1.h5
+        # REQUIRED: Frame ID of the gslcs contained in `gslc_file_list`.
+        #   Type: integer.
+        frame_id: 150
+        # REQUIRED: Frequency in which gslcs are acquired.
+        #   Type: string.
+        frequency: frequencyA
+        # REQUIRED: Polarization of the gslcs contained in `gslc_file_list`.
+        #   Type: string.
+        polarization: HH
+      dynamic_ancillary_file_group:
+        # REQUIRED: Path to file containing SAS algorithm parameters.
+        #   Type: string.
+        algorithm_parameters_file: /home/mamba/runconfig/algorithm_parameters_historical.yaml
+        # Optional Byte mask file used to ignore low correlation/bad data (e.g water mask).
+        #   Convention is 0 for no data/invalid, and 1 for good data. Dtype must be uint8.
+        #   Type: string | null.
+        mask_file: /home/mamba/input_dir/dynamic_ancillary_files/water_mask.tif
+        # Path to the DEM file covering full frame. If none provided, corrections using DEM are
+        #   skipped.
+        #   Type: string | null.
+        dem_file:
+        # List of paths to GUNW files for ionosphere, SET and static geometry layers.
+        #   Type: array | null.
+        gunw_files:
+          - /home/mamba/input_dir/dynamic_ancillary_files/gunw_files/NISAR_L2_PR_GUNW_001_005_A_219_220_4020_SH_20060630T000000_20060630T000000_20060815T000000_20060815T000000_P01101_M_F_J_001.h5
+          - /home/mamba/input_dir/dynamic_ancillary_files/gunw_files/NISAR_L2_PR_GUNW_001_005_A_219_220_4020_SH_20060815T000000_20060815T000000_20060930T000000_20060930T000000_P01101_M_F_J_001.h5
+          - /home/mamba/input_dir/dynamic_ancillary_files/gunw_files/NISAR_L2_PR_GUNW_001_005_A_219_220_4020_SH_20060930T000000_20060930T000000_20061115T000000_20061115T000000_P01101_M_F_J_001.h5
+          - /home/mamba/input_dir/dynamic_ancillary_files/gunw_files/NISAR_L2_PR_GUNW_001_005_A_219_220_4020_SH_20061115T000000_20061115T000000_20061231T000000_20061231T000000_P01101_M_F_J_001.h5
+          - /home/mamba/input_dir/dynamic_ancillary_files/gunw_files/NISAR_L2_PR_GUNW_001_005_A_219_220_4020_SH_20061231T000000_20061231T000000_20070215T000000_20070215T000000_P01101_M_F_J_001.h5
+          - /home/mamba/input_dir/dynamic_ancillary_files/gunw_files/NISAR_L2_PR_GUNW_001_005_A_219_220_4020_SH_20070215T000000_20070215T000000_20070518T000000_20070518T000000_P01101_M_F_J_001.h5
+          - /home/mamba/input_dir/dynamic_ancillary_files/gunw_files/NISAR_L2_PR_GUNW_001_005_A_219_220_4020_SH_20070518T000000_20070518T000000_20070703T000000_20070703T000000_P01101_M_F_J_001.h5
+          - /home/mamba/input_dir/dynamic_ancillary_files/gunw_files/NISAR_L2_PR_GUNW_001_005_A_219_220_4020_SH_20070703T000000_20070703T000000_20070818T000000_20070818T000000_P01101_M_F_J_001.h5
+          - /home/mamba/input_dir/dynamic_ancillary_files/gunw_files/NISAR_L2_PR_GUNW_001_005_A_219_220_4020_SH_20070818T000000_20070818T000000_20071003T000000_20071003T000000_P01101_M_F_J_001.h5
+          - /home/mamba/input_dir/dynamic_ancillary_files/gunw_files/NISAR_L2_PR_GUNW_001_005_A_219_220_4020_SH_20071003T000000_20071003T000000_20071118T000000_20071118T000000_P01101_M_F_J_001.h5
+          - /home/mamba/input_dir/dynamic_ancillary_files/gunw_files/NISAR_L2_PR_GUNW_001_005_A_219_220_4020_SH_20071118T000000_20071118T000000_20080103T000000_20080103T000000_P01101_M_F_J_001.h5
+        # List of paths to troposphere weather model files (1 per date). If none provided,
+        #   troposphere corrections are skipped.
+        #   Type: array | null.
+        troposphere_files:
+      static_ancillary_file_group:
+        # JSON file containing the mapping from frame_id to bounds information.
+        #   Type: string | null.
+        frame_to_bounds_json: /home/mamba/input_dir/static_ancillary_files/Frame_to_bounds_DISP-NI_v0.1.json
+        # JSON file containing list of reference date changes for each frame.
+        #   Type: string | null.
+        reference_date_database_json: /home/mamba/input_dir/static_ancillary_files/opera-disp-nisar-reference-dates-dummy.json
+      primary_executable:
+        # Product type of the PGE.
+        #   Type: string.
+        product_type: DISP_NISAR_HISTORICAL
+      product_path_group:
+        # REQUIRED: Directory where PGE will place results.
+        #   Type: string.
+        product_path: /home/mamba/output_dir
+        # Path to the scratch directory.
+        #   Type: string.
+        scratch_path: /home/mamba/scratch_dir
+        # Path to the SAS output directory.
+        #   Type: string.
+        sas_output_path: /home/mamba/output_dir
+        # Version of the product, in <major>.<minor> format.
+        #   Type: string.
+        product_version: '0.1'
+        # Whether the SAS should output and save the Compressed SLCs in addition to the standard
+        #   product output.
+        #   Type: boolean.
+        save_compressed_slc: true
+      worker_settings:
+        # Whether to use GPU for processing (if available).
+        #   Type: boolean.
+        gpu_enabled: false
+        # Number of threads to use per worker. This sets the OMP_NUM_THREADS environment variable in
+        #   each python process.
+        #   Type: integer.
+        threads_per_worker: 16
+        # If processing separate spatial bursts, number of bursts to run in parallel for wrapped-
+        #   phase-estimation.
+        #   Type: integer.
+        n_parallel_bursts: 4
+        # Size (rows, columns) of blocks of data to load at a time.
+        #   Type: array.
+        block_shape:
+          - 512
+          - 512
+      # Path to the output log file in addition to logging to stderr.
+      #   Type: string | null.
+      log_file: /home/mamba/output_dir/log_sas.log
