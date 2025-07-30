@@ -30,7 +30,7 @@ fi
 
 initialize_html_results_file "$OUTPUT_DIR" "$PGE_NAME"
 
-echo "<tr><th>Compare Result</th><th><ul><li>Output file</li><li>Expected file</li></ul></th><th>disp_ni_compare.py output</th></tr>" >> "$RESULTS_FILE"
+echo "<tr><th>Compare Result</th><th><ul><li>Output file</li><li>Expected file</li></ul></th><th>disp-nisar validate output</th></tr>" >> "$RESULTS_FILE"
 
 # overall_status values and their meaning
 # 0 - pass
@@ -68,10 +68,7 @@ do
             echo "No expected file found for product $output_file in expected directory $EXPECTED_DIR"
             overall_status=1
         else
-#            compare_out=$(${SCRIPT_DIR}/disp_ni_compare.py \
-#                --golden "${expected_file}" --test "${OUTPUT_DIR}/${output_file}" \
-#                --exclude_groups pge_runconfig dolphin_workflow_config dolphin_workflow_config algorithm_parameters_yaml processing_start_datetime ) || compare_exit_status=$?
-            compare_out=$(disp-nisar validate "${expected_file}" "${OUTPUT_DIR}/${output_file}") || compare_exit_status=$?
+            compare_out=$(disp-nisar validate "${expected_file}" "${OUTPUT_DIR}/${output_file}" 2>&1) || compare_exit_status=$?
 
             if [[ $compare_exit_status -ne 0 ]]; then
                 echo "File comparison failed. Output and expected files differ for ${output_file}"
