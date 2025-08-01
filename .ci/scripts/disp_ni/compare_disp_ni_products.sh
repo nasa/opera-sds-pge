@@ -2,7 +2,7 @@
 
 # Script used to orchestrate the pairwise comparison of output and expected
 # DISP-NI products. Each individual pair of products is compared using the
-# disp_ni_compare.py script
+# validation utility included in the DISP-NI SAS
 
 set -e
 umask 002
