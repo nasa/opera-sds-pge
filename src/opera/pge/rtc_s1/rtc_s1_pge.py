@@ -832,7 +832,12 @@ class RtcS1PostProcessorMixin(PostProcessorMixin):
 
         iso_template_path = os.path.abspath(self.runconfig.iso_template_path)
 
-        rendered_template = render_jinja2(iso_template_path, iso_metadata, self.logger)
+        rendered_template = render_jinja2(
+            iso_template_path,
+            iso_metadata,
+            self.logger,
+            self.runconfig.output_product_path
+        )
 
         return rendered_template
 
