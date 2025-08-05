@@ -1,0 +1,239 @@
+# Sample RunConfig for use with the DISP-NI PGE v6.0.0-ER.1.0
+# This RunConfig should require minimal changes in order to be used with the
+# OPERA PCM.
+
+RunConfig:
+  # Name for the RunConfig, may be any string
+  Name: OPERA-DISP-NI-PGE-SAMPLE-CONFIG
+
+  Groups:
+    # PGE-specific RunConfig section
+    # This section is only used by the PGE, however, paths to inputs/outputs
+    # should align with the similar sections of the SAS RunConfig
+    PGE:
+      PGENameGroup:
+        # Name of the PGE for use with this RunConfig, should always be
+        # DISP_NI_PGE when using with the DISP-NI PGE
+        PGEName: DISP_NI_PGE
+
+      InputFilesGroup:
+        # List of input files
+        # Must be a list containing the path to the input GSLC products,
+        # as well as the paths to any compressed SLC products.
+        # Paths must correspond to the file system within the Docker container
+        InputFilePaths:
+          - /home/mamba/input_dir/input_slcs/NISAR_L2_GSLC_NI_F150_20060630T061920Z_20240528T200256Z_NI_HH_v0.1.h5
+          - /home/mamba/input_dir/input_slcs/NISAR_L2_GSLC_NI_F150_20060815T061952Z_20240528T200246Z_NI_HH_v0.1.h5
+          - /home/mamba/input_dir/input_slcs/NISAR_L2_GSLC_NI_F150_20060930T062029Z_20240528T200242Z_NI_HH_v0.1.h5
+          - /home/mamba/input_dir/input_slcs/NISAR_L2_GSLC_NI_F150_20061115T062055Z_20240528T200248Z_NI_HH_v0.1.h5
+          - /home/mamba/input_dir/input_slcs/NISAR_L2_GSLC_NI_F150_20061231T062124Z_20240528T200247Z_NI_HH_v0.1.h5
+
+      DynamicAncillaryFilesGroup:
+        # Map of ancillary file types to paths to the file
+        # Paths must correspond to the file system within the Docker container
+        AncillaryFileMap:
+          # Path to the DEM file covering full frame. If none provided, corrections using DEM are skipped.
+          dem_file:
+
+          # Optional Byte mask file (.tif or .vrt) used to ignore low correlation/bad data (e.g water mask).
+          # Convention is 0 for no data/invalid, and 1 for good data. Dtype must be uint8.
+          mask_file: /home/mamba/input_dir/dynamic_ancillary_files/water_mask.tif
+
+          # List of paths to GUNW files for ionosphere, SET and static geometry layers
+          gunw_files:
+            - /home/mamba/input_dir/dynamic_ancillary_files/gunw_files/NISAR_L2_PR_GUNW_001_005_A_219_220_4020_SH_20060630T000000_20060630T000000_20060815T000000_20060815T000000_P01101_M_F_J_001.h5
+            - /home/mamba/input_dir/dynamic_ancillary_files/gunw_files/NISAR_L2_PR_GUNW_001_005_A_219_220_4020_SH_20060815T000000_20060815T000000_20060930T000000_20060930T000000_P01101_M_F_J_001.h5
+            - /home/mamba/input_dir/dynamic_ancillary_files/gunw_files/NISAR_L2_PR_GUNW_001_005_A_219_220_4020_SH_20060930T000000_20060930T000000_20061115T000000_20061115T000000_P01101_M_F_J_001.h5
+            - /home/mamba/input_dir/dynamic_ancillary_files/gunw_files/NISAR_L2_PR_GUNW_001_005_A_219_220_4020_SH_20061115T000000_20061115T000000_20061231T000000_20061231T000000_P01101_M_F_J_001.h5
+            - /home/mamba/input_dir/dynamic_ancillary_files/gunw_files/NISAR_L2_PR_GUNW_001_005_A_219_220_4020_SH_20061231T000000_20061231T000000_20070215T000000_20070215T000000_P01101_M_F_J_001.h5
+
+          # List of paths to troposphere weather model files (1 per date). If none provided, troposphere
+          #  corrections are skipped.
+          troposphere_files:
+
+      ProductPathGroup:
+        # Path to where output products should be stored
+        # Must correspond to the file system within the Docker container,
+        # and must have write permissions for the User/Group used with
+        # the "Docker run" command
+        OutputProductPath: /home/mamba/output_dir
+
+        # Path to a scratch directory for the PGE and SAS to store
+        # intermediate files that will not be needed after PGE execution
+        # completes
+        # Must correspond to the file system within the Docker container,
+        # and must have write permissions for the User/Group used with
+        # the "Docker run" command
+        ScratchPath: /home/mamba/scratch_dir
+
+      PrimaryExecutable:
+        # Identifier for the PGE executable, should always be DISP_NI for
+        # this PGE
+        ProductIdentifier: DISP_NI
+
+        # Product version specific to output products
+        ProductVersion: "1.0"
+
+        # Path to the executable to run, path must be reachable from
+        # within the Docker container (i.e. findable with a "which" command)
+        ProgramPath: disp-nisar
+
+        # List of command-line options to use with ProgramPath
+        ProgramOptions:
+          - run
+
+        # The Error Code base value added to the offset values to make
+        # error codes unique per-PGE
+        ErrorCodeBase: 900000
+
+        # Path to the Yamale schema used to validate the SAS portion
+        # of the RunConfig
+        # Path should correspond to the file system within the Docker
+        # container, and typically should reference a schema file bundled
+        # with the opera_pge installation directory within the container
+        # Consult the Docker image build scripts for more info
+        SchemaPath: /home/mamba/opera/pge/disp_ni/schema/disp_ni_sas_schema.yaml
+
+        # Path to the Yamale schema used specifically to validate the
+        # algorithm parameters config, which is stored within a separate
+        # yaml file referenced within the SAS portion of this RunConfig
+        AlgorithmParametersSchemaPath: /home/mamba/opera/pge/disp_ni/schema/algorithm_parameters_disp_ni_schema.yaml
+
+        # Path to the Jinja2 template used to generate the ISO xml
+        # metadata file
+        # Path should correspond to the file system within the Docker
+        # container, and typically should reference a template file bundled
+        # with the opera_pge installation directory within the container
+        # Consult the Docker image build scripts for more info
+        IsoTemplatePath: /home/mamba/opera/pge/disp_ni/templates/OPERA_ISO_metadata_L3_DISP_NI_template.xml.jinja2
+
+        # Path to a YAML file mapping Measured Parameter metadata names to descriptions used to supplement the ISO xml
+        # metadata file
+        # Path should correspond to the file system within the Docker
+        # container, and typically should reference a template file bundled
+        # with the opera_pge installation directory within the container
+        # Consult the Docker image build scripts for more info
+        IsoMeasuredParameterDescriptions: /home/mamba/opera/pge/disp_ni/templates/disp_ni_measured_parameters.yaml
+
+      QAExecutable:
+        # Set to True to enable execution of an additional "Quality Assurance"
+        # application after SAS execution has completed
+        Enabled: False
+
+        # Path to the executable to run, path must be reachable from
+        # within the Docker container (i.e. findable with a "which" command)
+        ProgramPath:
+
+        # List of command-line options to use with ProgramPath
+        ProgramOptions: []
+
+      DebugLevelGroup:
+        # Set to True to enable Debug mode
+        # For the DISP-NI PGE, enabling Debug mode will bypass the input product
+        # validation step, which can be useful when executing the PGE with
+        # an incomplete set of ancillary inputs (missing bursts, etc...)
+        DebugSwitch: False
+
+        # Set to True to have the PGE invoke the SAS/QA executables via
+        # a shell, rather than a Python subprocess
+        # This allows shell-style syntax to be used in ProgramPath and
+        # ProgramOptions, which can be useful for testing
+        ExecuteViaShell: False
+
+    # SAS-specific RunConfig section
+    # Prior to SAS execution by the PGE, the section below starting at "input_file_group"
+    # is isolated into its own YAML file for use with the SAS
+    SAS:
+      input_file_group:
+        # REQUIRED: List of paths to GSLC files.
+        #   Type: list.
+        gslc_file_list:
+          - /home/mamba/input_dir/input_slcs/NISAR_L2_GSLC_NI_F150_20060630T061920Z_20240528T200256Z_NI_HH_v0.1.h5
+          - /home/mamba/input_dir/input_slcs/NISAR_L2_GSLC_NI_F150_20060815T061952Z_20240528T200246Z_NI_HH_v0.1.h5
+          - /home/mamba/input_dir/input_slcs/NISAR_L2_GSLC_NI_F150_20060930T062029Z_20240528T200242Z_NI_HH_v0.1.h5
+          - /home/mamba/input_dir/input_slcs/NISAR_L2_GSLC_NI_F150_20061115T062055Z_20240528T200248Z_NI_HH_v0.1.h5
+          - /home/mamba/input_dir/input_slcs/NISAR_L2_GSLC_NI_F150_20061231T062124Z_20240528T200247Z_NI_HH_v0.1.h5
+
+        # REQUIRED: Frame ID of the bursts contained in `gslc_file_list`.
+        #   Type: integer.
+        frame_id: 150
+
+        # REQUIRED: Frequency in which gslcs are acquired.
+        #   Type: string.
+        frequency: frequencyA
+        # REQUIRED: Polarization of the gslcs contained in `gslc_file_list`.
+        #   Type: string.
+        polarization: HH
+      dynamic_ancillary_file_group:
+                # REQUIRED: Path to file containing SAS algorithm parameters.
+        #   Type: string.
+        algorithm_parameters_file: /home/mamba/runconfig/opera_pge_disp_ni_r1.0_interface_algorithm_parameters_historical.yaml
+        # Optional Byte mask file used to ignore low correlation/bad data (e.g water mask).
+        #   Convention is 0 for no data/invalid, and 1 for good data. Dtype must be uint8.
+        #   Type: string | null.
+        mask_file: /home/mamba/input_dir/dynamic_ancillary_files/water_mask.tif
+        # Path to the DEM file covering full frame. If none provided, corrections using DEM are
+        #   skipped.
+        #   Type: string | null.
+        dem_file:
+        # List of paths to GUNW files for ionosphere, SET and static geometry layers.
+        #   Type: array | null.
+        gunw_files:
+          - /home/mamba/input_dir/dynamic_ancillary_files/gunw_files/NISAR_L2_PR_GUNW_001_005_A_219_220_4020_SH_20060630T000000_20060630T000000_20060815T000000_20060815T000000_P01101_M_F_J_001.h5
+          - /home/mamba/input_dir/dynamic_ancillary_files/gunw_files/NISAR_L2_PR_GUNW_001_005_A_219_220_4020_SH_20060815T000000_20060815T000000_20060930T000000_20060930T000000_P01101_M_F_J_001.h5
+          - /home/mamba/input_dir/dynamic_ancillary_files/gunw_files/NISAR_L2_PR_GUNW_001_005_A_219_220_4020_SH_20060930T000000_20060930T000000_20061115T000000_20061115T000000_P01101_M_F_J_001.h5
+          - /home/mamba/input_dir/dynamic_ancillary_files/gunw_files/NISAR_L2_PR_GUNW_001_005_A_219_220_4020_SH_20061115T000000_20061115T000000_20061231T000000_20061231T000000_P01101_M_F_J_001.h5
+          - /home/mamba/input_dir/dynamic_ancillary_files/gunw_files/NISAR_L2_PR_GUNW_001_005_A_219_220_4020_SH_20061231T000000_20061231T000000_20070215T000000_20070215T000000_P01101_M_F_J_001.h5
+        # List of paths to troposphere weather model files (1 per date). If none provided,
+        #   troposphere corrections are skipped.
+        #   Type: array | null.
+        troposphere_files:
+
+      static_ancillary_file_group:
+                # JSON file containing the mapping from frame_id to bounds information.
+        #   Type: string | null.
+        frame_to_bounds_json: /home/mamba/input_dir/static_ancillary_files/Frame_to_bounds_DISP-NI_v0.1.json
+        # JSON file containing list of reference date changes for each frame.
+        #   Type: string | null.
+        reference_date_database_json: /home/mamba/input_dir/static_ancillary_files/opera-disp-nisar-reference-dates-dummy.json
+      primary_executable:
+        # Product type of the PGE. Should be one of: DISP_NI_FORWARD or DISP_NI_HISTORICAL
+        #   Type: string.
+        product_type: DISP_NISAR_HISTORICAL
+      product_path_group:
+        # REQUIRED: Directory where PGE will place results.
+        #   Type: string.
+        product_path: /home/mamba/output_dir
+        # Path to the scratch directory.
+        #   Type: string.
+        scratch_path: /home/mamba/scratch_dir
+        # Path to the SAS output directory.
+        #   Type: string.
+        sas_output_path: /home/mamba/output_dir
+        # Version of the product.
+        #   Type: string.
+        product_version: "1.0"
+        # Whether the SAS should output and save the Compressed SLCs in addition to the standard
+        #   product output.
+        #   Type: boolean.
+        save_compressed_slc: true
+      worker_settings:
+        # Whether to use GPU for processing (if available).
+        #   Type: boolean.
+        gpu_enabled: false
+        # Number of threads to use per worker. This sets the OMP_NUM_THREADS environment variable in
+        #   each python process.
+        #   Type: integer.
+        threads_per_worker: 16
+        # If processing separate spatial bursts, number of bursts to run in parallel for wrapped-
+        #   phase-estimation.
+        #   Type: integer.
+        n_parallel_bursts: 4
+        # Size (rows, columns) of blocks of data to load at a time.
+        #   Type: array.
+        block_shape:
+          - 512
+          - 512
+      # Path to the output log file in addition to logging to stderr.
+      #   Type: string | null.
+      log_file: /home/mamba/output_dir/log_sas.log
