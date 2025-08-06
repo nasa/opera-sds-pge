@@ -12,7 +12,7 @@ import tempfile
 import unittest
 from os.path import abspath, exists
 
-from pkg_resources import resource_filename
+from importlib.resources import files
 
 from opera.util.metfile import MetFile
 
@@ -33,7 +33,7 @@ class MetFileTestCase(unittest.TestCase):
 
         """
         cls.starting_dir = abspath(os.curdir)
-        cls.test_dir = resource_filename(__name__, "")
+        cls.test_dir = str(files(__name__))
 
         os.chdir(cls.test_dir)
 

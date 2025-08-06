@@ -14,7 +14,7 @@ import unittest
 from os.path import abspath, join
 from unittest import skipIf
 
-from pkg_resources import resource_filename
+from importlib.resources import files
 
 from opera.util.geo_utils import get_geographic_boundaries_from_mgrs_tile
 from opera.util.geo_utils import translate_utm_bbox_to_lat_lon
@@ -43,7 +43,7 @@ class GeoUtilsTestCase(unittest.TestCase):
     def setUpClass(cls) -> None:
         """Set directories"""
         cls.starting_dir = abspath(os.curdir)
-        cls.test_dir = resource_filename(__name__, "")
+        cls.test_dir = str(files(__name__))
         cls.data_dir = join(cls.test_dir, os.pardir, "data")
 
         os.chdir(cls.test_dir)

@@ -16,7 +16,7 @@ from io import StringIO
 from os.path import abspath, exists, join
 from random import randint
 
-from pkg_resources import resource_filename
+from importlib.resources import files
 
 from opera.util.error_codes import (CODES_PER_RANGE,
                                     CRITICAL_RANGE_START,
@@ -49,7 +49,7 @@ class LoggerTestCase(unittest.TestCase):
 
         """
         cls.starting_dir = abspath(os.curdir)
-        cls.test_dir = resource_filename(__name__, "")
+        cls.test_dir = str(files(__name__))
         cls.data_dir = join(cls.test_dir, os.pardir, "data")
 
         cls.config_file = join(cls.data_dir, "test_base_pge_config.yaml")

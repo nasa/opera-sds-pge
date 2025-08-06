@@ -14,7 +14,7 @@ import unittest
 from datetime import datetime
 from os.path import abspath, join
 
-from pkg_resources import resource_filename
+from importlib.resources import files
 
 from opera.util.time import get_catalog_metadata_datetime_str
 from opera.util.time import get_current_iso_time
@@ -34,7 +34,7 @@ class TimeTestCase(unittest.TestCase):
 
         """
         cls.starting_dir = abspath(os.curdir)
-        cls.test_dir = resource_filename(__name__, "")
+        cls.test_dir = str(files(__name__))
         cls.data_dir = join(cls.test_dir, os.pardir, "data")
 
         os.chdir(cls.test_dir)

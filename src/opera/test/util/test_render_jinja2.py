@@ -14,7 +14,7 @@ import unittest
 from glob import glob
 from os.path import abspath, join
 
-from pkg_resources import resource_filename
+from importlib.resources import files
 
 from opera.util.logger import PgeLogger
 from opera.util.render_jinja2 import JSON_VALIDATOR, render_jinja2, UNDEFINED_ERROR, XML_VALIDATOR, YAML_VALIDATOR
@@ -36,7 +36,7 @@ class RenderJinja2TestCase(unittest.TestCase):
 
         """
         cls.starting_dir = abspath(os.curdir)
-        cls.test_dir = resource_filename(__name__, "")
+        cls.test_dir = str(files(__name__))
         cls.data_dir = join(cls.test_dir, os.pardir, "data")
 
         os.chdir(cls.test_dir)

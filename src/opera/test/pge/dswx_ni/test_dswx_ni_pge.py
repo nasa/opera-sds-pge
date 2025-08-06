@@ -16,7 +16,7 @@ from io import StringIO
 from os.path import abspath, join
 from unittest.mock import patch
 
-from pkg_resources import resource_filename
+from importlib.resources import files
 
 import yaml
 
@@ -41,7 +41,7 @@ class DswxNIPgeTestCase(unittest.TestCase):
     def setUpClass(cls) -> None:
         """Set up directories and files for testing"""
         cls.starting_dir = abspath(os.curdir)
-        cls.test_dir = resource_filename(__name__, "")
+        cls.test_dir = str(files(__name__))
         cls.data_dir = join(cls.test_dir, os.pardir, os.pardir, "data")
 
         os.chdir(cls.test_dir)

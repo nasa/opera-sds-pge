@@ -12,7 +12,7 @@ import tempfile
 import unittest
 from os.path import join
 
-from pkg_resources import resource_filename
+from importlib.resources import files
 
 from yamale import YamaleError
 
@@ -28,7 +28,7 @@ class RunconfigTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         """Initialize class variables for required paths"""
-        cls.test_dir = resource_filename(__name__, "")
+        cls.test_dir = str(files(__name__))
         cls.data_dir = join(cls.test_dir, os.pardir, os.pardir, "data")
         cls.valid_config_full = join(cls.data_dir, "valid_runconfig_full.yaml")
         cls.valid_config_no_sas = join(cls.data_dir, "valid_runconfig_no_sas.yaml")
@@ -50,10 +50,10 @@ class RunconfigTestCase(unittest.TestCase):
         self.assertEqual(runconfig.sas_program_path, "pybind_opera.workflows.example_workflow")
         self.assertListEqual(runconfig.sas_program_options, ["--debug", "--restart"])
         self.assertEqual(runconfig.error_code_base, 100000)
-        self.assertEqual(runconfig.sas_schema_path, resource_filename("opera", "test/data/sample_sas_schema.yaml"))
-        self.assertEqual(runconfig.iso_template_path, resource_filename("opera", "sample_iso_template.xml.jinja2"))
-        self.assertEqual(runconfig.iso_measured_parameter_descriptions,
-                         resource_filename("opera", "sample_iso_measured_parameter_descriptions.yaml"))
+        self.assertEqual(runconfig.sas_schema_path, str(files("opera").joinpath("test/data/sample_sas_schema.yaml")))        
+        self.assertEqual(runconfig.iso_template_path, str(files("opera").joinpath("sample_iso_template.xml.jinja2")))
+        self.assertEqual(runconfig.iso_measured_parameter_descriptions, 
+                         str(files("opera").joinpath("sample_iso_measured_parameter_descriptions.yaml")))
         self.assertEqual(runconfig.qa_enabled, True)
         self.assertEqual(runconfig.qa_program_path, "/opt/QualityAssurance/sample_qa.py")
         self.assertListEqual(runconfig.qa_program_options, ["--debug"])

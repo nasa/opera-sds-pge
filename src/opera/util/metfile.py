@@ -18,13 +18,13 @@ import os
 
 import jsonschema
 
-from pkg_resources import resource_filename
+from importlib.resources import files
 
 
 class MetFile:
     """Class used to read and write .json catalog metadata files."""
 
-    SCHEMA_PATH = resource_filename('opera', 'pge/base/schema/catalog_metadata_schema.json')
+    SCHEMA_PATH = str(files('opera').joinpath('pge/base/schema/catalog_metadata_schema.json'))
 
     def __init__(self, met_dict=None):
         """

@@ -14,7 +14,7 @@ import unittest
 from os.path import abspath, join
 from pathlib import Path
 
-from pkg_resources import resource_filename
+from importlib.resources import files
 
 from opera.pge import PgeExecutor, RunConfig
 from opera.scripts import pge_main
@@ -36,7 +36,7 @@ class PgeMainTestCase(unittest.TestCase):
 
         """
         cls.starting_dir = abspath(os.curdir)
-        cls.test_dir = resource_filename(__name__, "")
+        cls.test_dir = str(files(__name__))
         cls.data_dir = join(cls.test_dir, os.pardir, "data")
         cls.scripts_dir = abspath(join(os.pardir, os.pardir, 'scripts'))
 

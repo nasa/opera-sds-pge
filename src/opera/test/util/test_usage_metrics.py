@@ -14,7 +14,7 @@ import unittest
 from os.path import abspath, join
 from sys import platform
 
-from pkg_resources import resource_filename
+from importlib.resources import files
 
 from opera.util.usage_metrics import get_os_metrics
 
@@ -32,7 +32,7 @@ class UsageMetricsTestCase(unittest.TestCase):
 
         """
         cls.starting_dir = abspath(os.curdir)
-        cls.test_dir = resource_filename(__name__, "")
+        cls.test_dir = str(files(__name__))
         cls.data_dir = join(cls.test_dir, os.pardir, "data")
 
         os.chdir(cls.test_dir)
