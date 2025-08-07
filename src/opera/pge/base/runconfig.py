@@ -16,14 +16,14 @@ Adapted By: Scott Collins
 import os
 from os.path import abspath, basename, isabs, isdir, isfile, join
 
-from pkg_resources import resource_filename
+from importlib.resources import files
 
 import yamale
 
 import yaml
 
 
-BASE_PGE_SCHEMA = resource_filename('opera', 'pge/base/schema/base_pge_schema.yaml')
+BASE_PGE_SCHEMA = str(files('opera').joinpath('pge/base/schema/base_pge_schema.yaml'))
 """Path to the Yamale schema applicable to the PGE portion of each RunConfig"""
 
 
@@ -277,7 +277,7 @@ class RunConfig:
         return (
             sas_schema_path
             if isabs(sas_schema_path)
-            else resource_filename('opera', sas_schema_path)
+            else str(files('opera').joinpath(sas_schema_path))
         )
 
     @property
@@ -290,7 +290,7 @@ class RunConfig:
             return (
                 algorithm_parameters_schema_path
                 if isabs(algorithm_parameters_schema_path)
-                else resource_filename('opera', algorithm_parameters_schema_path)
+                else str(files('opera').joinpath(algorithm_parameters_schema_path))
             )
 
     @property
@@ -332,7 +332,7 @@ class RunConfig:
         return (
             iso_template_path
             if isabs(iso_template_path)
-            else resource_filename('opera', iso_template_path)
+            else str(files('opera').joinpath(iso_template_path))
         )
 
     @property
@@ -345,7 +345,7 @@ class RunConfig:
         return (
             iso_descriptions_path
             if isabs(iso_descriptions_path)
-            else resource_filename('opera', iso_descriptions_path)
+            else str(files('opera').joinpath(iso_descriptions_path))
         )
 
     @property

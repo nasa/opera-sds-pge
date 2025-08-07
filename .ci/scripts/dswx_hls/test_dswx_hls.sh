@@ -41,7 +41,13 @@ chmod -R 775 ${TEST_RESULTS_DIR}
 # Docker image rather than code found on the host.
 DOCKER_RUN="docker run --rm \
     -v ${WORKSPACE}:/workspace \
+    -v ${WORKSPACE}/src/opera/test/__init__.py:${CONTAINER_HOME}/opera/test/__init__.py \
+    -v ${WORKSPACE}/src/opera/test/pge/base:${CONTAINER_HOME}/opera/test/pge/base \
+    -v ${WORKSPACE}/src/opera/test/pge/${PGE_NAME}:${CONTAINER_HOME}/opera/test/pge/${PGE_NAME} \
+    -v ${WORKSPACE}/src/opera/test/scripts:${CONTAINER_HOME}/opera/test/scripts \
+    -v ${WORKSPACE}/src/opera/test/util:${CONTAINER_HOME}/opera/test/util \
     -v ${WORKSPACE}/src/opera/test/data:${CONTAINER_HOME}/opera/test/data \
+    -e PYLINTHOME=/workspace/${TEST_RESULTS_REL_DIR}/.cache/pylint \
     -w /workspace/${TEST_RESULTS_REL_DIR} \
     -u ${UID}:$(id -g) \
     --entrypoint ${CONDA_ROOT}/bin/pge_tests_entrypoint.sh \
@@ -78,7 +84,7 @@ ${DOCKER_RUN} pylint \
     ${CONTAINER_HOME}/opera
 
 # pytest (including code coverage)
-${DOCKER_RUN} bash -c "pytest \
+${DOCKER_RUN} bash -c "pytest -p no:cacheprovider \
     --junit-xml=/workspace/${TEST_RESULTS_REL_DIR}/${PGE_NAME}/pytest-junit.xml \
     --cov=${CONTAINER_HOME}/opera/pge/base \
     --cov=${CONTAINER_HOME}/opera/pge/${PGE_NAME} \
@@ -86,10 +92,10 @@ ${DOCKER_RUN} bash -c "pytest \
     --cov=${CONTAINER_HOME}/opera/util \
     --cov-report=term \
     --cov-report=html:/workspace/${TEST_RESULTS_REL_DIR}/${PGE_NAME}/coverage_html \
-    /workspace/src/opera/test/pge/base \
-    /workspace/src/opera/test/pge/${PGE_NAME} \
-    /workspace/src/opera/test/scripts \
-    /workspace/src/opera/test/util > /workspace/${TEST_RESULTS_REL_DIR}/${PGE_NAME}/pytest.log 2>&1"
+    ${CONTAINER_HOME}/opera/test/pge/base \
+    ${CONTAINER_HOME}/opera/test/pge/${PGE_NAME} \
+    ${CONTAINER_HOME}/opera/test/scripts \
+    ${CONTAINER_HOME}/opera/test/util > /workspace/${TEST_RESULTS_REL_DIR}/${PGE_NAME}/pytest.log 2>&1"
 
 echo "DSWx-HLS PGE Docker image test complete"
 

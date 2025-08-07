@@ -14,7 +14,7 @@ import unittest
 from os.path import abspath, join
 from pathlib import Path
 
-from pkg_resources import resource_filename
+from opera.test import path
 
 from opera.pge import PgeExecutor, RunConfig
 from opera.scripts import pge_main
@@ -36,7 +36,8 @@ class PgeMainTestCase(unittest.TestCase):
 
         """
         cls.starting_dir = abspath(os.curdir)
-        cls.test_dir = resource_filename(__name__, "")
+        with path('opera.test', 'scripts') as test_dir_path:
+            cls.test_dir = str(test_dir_path)
         cls.data_dir = join(cls.test_dir, os.pardir, "data")
         cls.scripts_dir = abspath(join(os.pardir, os.pardir, 'scripts'))
 
@@ -46,17 +47,11 @@ class PgeMainTestCase(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls) -> None:
-        """
-        At completion re-establish starting directory
-        -------
-        """
+        """At completion re-establish starting directory"""
         os.chdir(cls.starting_dir)
 
     def setUp(self) -> None:
-        """
-        Use the temporary directory as the working directory
-        -------
-        """
+        """Use the temporary directory as the working directory"""
         self.working_dir = tempfile.TemporaryDirectory(
             prefix="test_pge_main_", suffix='temp', dir=os.curdir
         )
@@ -68,10 +63,7 @@ class PgeMainTestCase(unittest.TestCase):
         Path('input/input_file02.h5').touch()
 
     def tearDown(self) -> None:
-        """
-        Return to starting directory
-        -------
-        """
+        """Return to starting directory"""
         os.chdir(self.test_dir)
         self.working_dir.cleanup()
 

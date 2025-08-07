@@ -16,7 +16,7 @@ from fnmatch import fnmatch
 from functools import lru_cache
 from os.path import abspath, basename, exists, join, splitext
 
-from pkg_resources import resource_filename
+from importlib.resources import files
 
 import yamale
 from yamale import YamaleError
@@ -190,11 +190,7 @@ class PreProcessorMixin:
                 msg = f'Could not load description file {description_file}, file does not exist.'
                 self.logger.critical(self.name, ErrorCode.ISO_METADATA_DESCRIPTIONS_CONFIG_NOT_FOUND, msg)
 
-            schema_file = resource_filename(
-                'opera',
-                'pge/base/schema/iso_metadata_measured_parameters_config_schema.yaml'
-            )
-
+            schema_file = str(files('opera').joinpath('pge/base/schema/iso_metadata_measured_parameters_config_schema.yaml'))
             schema = yamale.make_schema(schema_file)
             data = yamale.make_data(description_file)
 

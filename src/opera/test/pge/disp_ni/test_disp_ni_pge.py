@@ -14,7 +14,7 @@ import unittest
 from io import StringIO
 from os.path import abspath, join, exists
 
-from pkg_resources import resource_filename
+from opera.test import path
 
 import yaml
 
@@ -38,7 +38,8 @@ class DispNIPgeTestCase(unittest.TestCase):
     def setUpClass(cls) -> None:
         """Set up directories and files for testing"""
         cls.starting_dir = abspath(os.curdir)
-        cls.test_dir = resource_filename(__name__, "")
+        with path('opera.test.pge', 'disp_ni') as test_dir_path:
+            cls.test_dir = str(test_dir_path)
         cls.data_dir = join(cls.test_dir, os.pardir, os.pardir, "data")
 
         os.chdir(cls.test_dir)
