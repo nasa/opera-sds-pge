@@ -498,7 +498,7 @@ class TROPOExecutor(TROPOPreProcessorMixin, TROPOPostProcessorMixin, PgeExecutor
     LEVEL = "L4"
     """Processing Level for TROPO Products"""
 
-    PGE_VERSION = "3.0.0-er.3.1"
+    PGE_VERSION = "3.0.0-rc.1.0"
     """Version of the PGE"""
 
     SAS_VERSION = "1.0"  # https://github.com/opera-adt/tropo/releases/tag/v1.0.0
