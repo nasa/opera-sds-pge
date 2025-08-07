@@ -9,7 +9,7 @@ Data System (SDS).
 Prerequisites
 -------------
 
-- Python 3.8 or above
+- Python 3.10 or above
 
 Setup for Developers
 ---------------------
