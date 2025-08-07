@@ -41,6 +41,11 @@ chmod -R 775 ${TEST_RESULTS_DIR}
 # Docker image rather than code found on the host.
 DOCKER_RUN="docker run --rm \
     -v ${WORKSPACE}:/workspace \
+    -v ${WORKSPACE}/src/opera/test/__init__.py:${CONTAINER_HOME}/opera/test/__init__.py \
+    -v ${WORKSPACE}/src/opera/test/pge/base:${CONTAINER_HOME}/opera/test/pge/base \
+    -v ${WORKSPACE}/src/opera/test/pge/${PGE_NAME}:${CONTAINER_HOME}/opera/test/pge/${PGE_NAME} \
+    -v ${WORKSPACE}/src/opera/test/scripts:${CONTAINER_HOME}/opera/test/scripts \
+    -v ${WORKSPACE}/src/opera/test/util:${CONTAINER_HOME}/opera/test/util \
     -v ${WORKSPACE}/src/opera/test/data:${CONTAINER_HOME}/opera/test/data \
     -w /workspace/${TEST_RESULTS_REL_DIR} \
     -u ${UID}:$(id -g) \
@@ -86,10 +91,10 @@ ${DOCKER_RUN} bash -c "source /usr/local/bin/_activate_current_env.sh; pytest \
     --cov=${CONTAINER_HOME}/opera/util \
     --cov-report=term \
     --cov-report=html:/workspace/${TEST_RESULTS_REL_DIR}/${PGE_NAME}/coverage_html \
-    /workspace/src/opera/test/pge/base \
-    /workspace/src/opera/test/pge/${PGE_NAME} \
-    /workspace/src/opera/test/scripts \
-    /workspace/src/opera/test/util > /workspace/${TEST_RESULTS_REL_DIR}/${PGE_NAME}/pytest.log 2>&1"
+    ${CONTAINER_HOME}/opera/test/pge/base \
+    ${CONTAINER_HOME}/opera/test/pge/${PGE_NAME} \
+    ${CONTAINER_HOME}/opera/test/scripts \
+    ${CONTAINER_HOME}/opera/test/util > /workspace/${TEST_RESULTS_REL_DIR}/${PGE_NAME}/pytest.log 2>&1"
 
 echo "DISP-S1 PGE Docker image test complete"
 
