@@ -47,6 +47,7 @@ DOCKER_RUN="docker run --rm \
     -v ${WORKSPACE}/src/opera/test/scripts:${CONTAINER_HOME}/opera/test/scripts \
     -v ${WORKSPACE}/src/opera/test/util:${CONTAINER_HOME}/opera/test/util \
     -v ${WORKSPACE}/src/opera/test/data:${CONTAINER_HOME}/opera/test/data \
+    -e PYLINTHOME=/workspace/${TEST_RESULTS_REL_DIR}/.cache/pylint \
     -w /workspace/${TEST_RESULTS_REL_DIR} \
     -u ${UID}:$(id -g) \
     --entrypoint conda \
