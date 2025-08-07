@@ -21,7 +21,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 import yaml
-from importlib.resources import files
+from opera.test import path
 
 import opera.util.tiff_utils
 from opera.pge import RunConfig
@@ -43,7 +43,8 @@ class DistS1PgeTestCase(unittest.TestCase):
     def setUpClass(cls) -> None:
         """Set up directories and files for testing"""
         cls.starting_dir = abspath(os.curdir)
-        cls.test_dir = str(files(__name__))
+        with path('opera.test.pge', 'dist_s1') as test_dir_path:
+            cls.test_dir = str(test_dir_path)
         cls.data_dir = join(cls.test_dir, os.pardir, os.pardir, "data")
 
         os.chdir(cls.test_dir)

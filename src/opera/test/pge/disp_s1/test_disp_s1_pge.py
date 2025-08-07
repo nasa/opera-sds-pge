@@ -17,7 +17,7 @@ from os.path import abspath, exists, join
 from subprocess import CompletedProcess, Popen
 from unittest.mock import patch
 
-from importlib.resources import files
+from opera.test import path
 
 import pytest
 
@@ -73,7 +73,8 @@ class DispS1PgeTestCase(unittest.TestCase):
     def setUpClass(cls) -> None:
         """Set up directories and files for testing"""
         cls.starting_dir = abspath(os.curdir)
-        cls.test_dir = str(files(__name__))
+        with path('opera.test.pge', 'disp_s1') as test_dir_path:
+            cls.test_dir = str(test_dir_path)
         cls.data_dir = join(cls.test_dir, os.pardir, os.pardir, "data")
 
         os.chdir(cls.test_dir)

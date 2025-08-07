@@ -15,7 +15,7 @@ import unittest
 from os.path import abspath
 from unittest.mock import patch
 
-from importlib.resources import files
+from opera.test import path
 
 from opera.util.logger import PgeLogger
 from opera.util.run_utils import create_qa_command_line
@@ -39,7 +39,8 @@ class RunUtilsTestCase(unittest.TestCase):
 
         """
         cls.starting_dir = abspath(os.curdir)
-        cls.test_dir = str(files(__name__))
+        with path('opera.test', 'util') as test_dir_path:
+            cls.test_dir = str(test_dir_path)
         cls.data_dir = os.path.join(cls.test_dir, os.pardir, "data")
 
         os.chdir(cls.test_dir)

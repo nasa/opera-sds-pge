@@ -18,7 +18,7 @@ from os.path import abspath, exists, join
 from pathlib import Path
 
 import yaml
-from importlib.resources import files
+from opera.test import path
 
 from opera.pge import RunConfig
 from opera.pge.tropo.tropo_pge import TROPOExecutor
@@ -39,7 +39,8 @@ class TROPOPgeTestCase(unittest.TestCase):
     def setUpClass(cls) -> None:
         """Set up directories and files for testing"""
         cls.starting_dir = abspath(os.curdir)
-        cls.test_dir = str(files(__name__))
+        with path('opera.test.pge', 'tropo') as test_dir_path:
+            cls.test_dir = str(test_dir_path)
         cls.data_dir = join(cls.test_dir, os.pardir, os.pardir, "data")
 
         os.chdir(cls.test_dir)
