@@ -86,7 +86,7 @@ ${DOCKER_RUN} ${ENTRYPOINT} pylint \
     ${CONTAINER_HOME}/opera
 
 # pytest (including code coverage)
-${DOCKER_RUN} ${ENTRYPOINT} pytest \
+${DOCKER_RUN} ${ENTRYPOINT} pytest -p no:cacheprovider \
     --junit-xml=/workspace/${TEST_RESULTS_REL_DIR}/${PGE_NAME}/pytest-junit.xml \
     --cov=${CONTAINER_HOME}/opera/pge/base \
     --cov=${CONTAINER_HOME}/opera/pge/${PGE_NAME} \

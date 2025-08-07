@@ -86,7 +86,7 @@ ${DOCKER_RUN} ${ENTRYPOINT} bash -c "export HOME=/home/mamba/opera; pylint \
     ${CONTAINER_HOME}/opera"
 
 # pytest (including code coverage)
-${DOCKER_RUN} ${ENTRYPOINT} bash -c "pytest \
+${DOCKER_RUN} ${ENTRYPOINT} bash -c "pytest -p no:cacheprovider \
     --junit-xml=/workspace/${TEST_RESULTS_REL_DIR}/${PGE_NAME}/pytest-junit.xml \
     --cov=${CONTAINER_HOME}/opera/pge/base \
     --cov=${CONTAINER_HOME}/opera/pge/${PGE_NAME} \
