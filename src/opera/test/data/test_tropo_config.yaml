@@ -14,12 +14,12 @@ RunConfig:
         ScratchPath: tropo_pge_test/scratch_dir
       PrimaryExecutable:
         ProductIdentifier: TROPO
-        ProductVersion: "0.2"
+        ProductVersion: "1.0"
         ProgramPath: mkdir
         ProgramOptions:
           - '-p tropo_pge_test/output_dir;'
-          - 'python3 -c "from opera.util.h5_utils import create_test_tropo_metadata_product; create_test_tropo_metadata_product(\"tropo_pge_test/output_dir/OPERA_L4_TROPO-ZENITH_20250101T010101Z_20250101T010101Z_HRES_v0.2.nc\")";'
-          - 'dd if=/dev/urandom of=tropo_pge_test/output_dir/OPERA_L4_TROPO-ZENITH_20250101T010101Z_20250101T010101Z_HRES_v0.2.png bs=1M count=1;'
+          - 'python3 -c "from opera.util.h5_utils import create_test_tropo_metadata_product; create_test_tropo_metadata_product(\"tropo_pge_test/output_dir/OPERA_L4_TROPO-ZENITH_20250101T010101Z_20250101T010101Z_HRES_v1.0.nc\")";'
+          - 'dd if=/dev/urandom of=tropo_pge_test/output_dir/OPERA_L4_TROPO-ZENITH_20250101T010101Z_20250101T010101Z_HRES_v1.0.png bs=1M count=1;'
           - '/bin/echo TROPO invoked with RunConfig'
         ErrorCodeBase: 800000
         SchemaPath: pge/tropo/schema/tropo_sas_schema.yaml
@@ -55,7 +55,7 @@ RunConfig:
         sas_output_path: tropo_pge_test/output_dir
         # Version of the product, in <major>.<minor> format.
         #   Type: string.
-        product_version: '0.2'
+        product_version: '1.0'
       worker_settings:
         # Number of workers to run in parallel
         #   Type: integer.

@@ -41,7 +41,7 @@ temporal_resolution:
 source_url:
   attribute_data_type: string
   attribute_type: processingInformation
-  description: Source url documentation, (e.g. https://www.ecmwf.int/en/forecasts/datasets/set-i for HRES)
+  description: Source url documentation (e.g. https://www.ecmwf.int/en/forecasts/datasets/set-i for HRES)
   display_name: SourceUrl
   escape_html: true
 references:
@@ -77,7 +77,7 @@ software_version:
 reference_document:
   attribute_data_type: string
   attribute_type: processingInformation
-  description: Name and version of Product Description Document to use as reference for product. (TBD)
+  description: Name and version of Product Description Document to use as reference for product. (JPL D-108783)
   display_name: ReferenceDocument
 history:
   attribute_data_type: string

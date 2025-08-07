@@ -35,13 +35,15 @@ worker_settings:
   threads_per_worker: int(required=True, min=1)
 
   # Workers are given a target memory limit in dask.Client.
-  # Requires "GB" ex: 8GB
+  # Requires "GB" ex: 6GB
   max_memory: str(required=False)
   
   # Dask local spill directory within work directory.
+  # Default: "tmp"
   dask_temp_dir: str(required=False)
 
   # Size (rows, columns) of blocks of data to load at a time.
+  # Default: (128, 128)
   block_shape: list(int, required=False, min=2, max=2)
 
 output_options:
@@ -53,6 +55,7 @@ output_options:
   creation_time: str(required=False)
 
   # Clip heights above specified maximum height.
+  # Default: 81000
   max_height: int(required=False)
 
   # Output height level to hydrostatic and wet delay

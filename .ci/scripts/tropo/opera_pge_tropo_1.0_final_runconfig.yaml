@@ -14,7 +14,7 @@ RunConfig:
         ScratchPath: /home/ops/scratch_dir
       PrimaryExecutable:
         ProductIdentifier: TROPO
-        ProductVersion: "0.2"
+        ProductVersion: "1.0"
         ProgramPath: opera_tropo
         ProgramOptions:
         - run
@@ -52,7 +52,7 @@ RunConfig:
         sas_output_path: /home/ops/output_dir
         # Version of the product, in <major>.<minor> format.
         #   Type: string.
-        product_version: '0.2'
+        product_version: '1.0'
       worker_settings:
         # Number of workers to run in parallel 
         #   Type: integer.

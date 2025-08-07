@@ -501,7 +501,7 @@ class TROPOExecutor(TROPOPreProcessorMixin, TROPOPostProcessorMixin, PgeExecutor
     PGE_VERSION = "3.0.0-er.3.1"
     """Version of the PGE"""
 
-    SAS_VERSION = "0.2"  # https://github.com/opera-adt/tropo/releases/tag/v0.2
+    SAS_VERSION = "1.0"  # https://github.com/opera-adt/tropo/releases/tag/v1.0.0
     """Version of the SAS wrapped by this PGE, should be updated as needed"""
 
     def __init__(self, pge_name, runconfig_path, **kwargs):
