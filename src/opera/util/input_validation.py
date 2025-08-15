@@ -488,7 +488,7 @@ def validate_dswx_inputs(runconfig, logger, name, valid_extensions=None):
 def validate_algorithm_parameters_config(name, algorithm_parameters_schema_file_path,
                                          algorithm_parameters_runconfig, logger):
     """
-    The DSWx-S1 and DISP-S1 interface SAS uses two runconfig files; one for the
+    The DSWx-S1/NI, DISP-S1/NI and DIST-S1 SASs use two runconfig files; one for the
     main SAS, and another for algorithm parameters.  This allows for independent
     modification of algorithm parameters within its own runconfig file.
 
@@ -501,7 +501,7 @@ def validate_algorithm_parameters_config(name, algorithm_parameters_schema_file_
     under ['PrimaryExecutable']['AlgorithmParametersSchemaPath'] in the PGE
     section of the runconfig file.
 
-    For compatibility with the other PGE 'AlgorithmParametersSchemaPath' is optional.
+    For compatibility with the other PGEs, 'AlgorithmParametersSchemaPath' is optional.
 
     """
     #  If it was decided not to provide a path to the schema file, validation is impossible.

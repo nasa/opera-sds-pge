@@ -19,7 +19,7 @@ from opera.pge.base.base_pge import PgeExecutor, PostProcessorMixin, PreProcesso
 from opera.util.dataset_utils import get_sensor_from_spacecraft_name
 from opera.util.error_codes import ErrorCode
 from opera.util.geo_utils import get_geographic_boundaries_from_mgrs_tile
-from opera.util.input_validation import check_input_list
+from opera.util.input_validation import check_input_list, validate_algorithm_parameters_config
 from opera.util.render_jinja2 import augment_measured_parameters, render_jinja2
 from opera.util.run_utils import get_checksum
 from opera.util.tiff_utils import get_geotiff_metadata
@@ -316,15 +316,35 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
         Run validations for previous product input.
 
         Checks:
-        1. All files exist
-        2. All files are nonempty
-        3. All files are .tif files
-        4. Correct number of files (one for each TIFF layer) provided
-        5. All files are named conformant to DIST-S1 product specification
-        6. Exact set of layers provided (ie, no duplicates)
+        1. Product ID
+        2. All files exist
+        3. All files are nonempty
+        4. All files are .tif files
+        5. Correct number of files (one for each TIFF layer) provided
+        6. All files are named conformant to DIST-S1 product specification
+        7. Exact set of layers provided (ie, no duplicates)
         """
         sas_config = self.runconfig.sas_config
-        previous_products = sas_config["run_config"].get("pre_dist_s1_product", [])
+        previous_product = sas_config["run_config"].get("pre_dist_s1_product")
+
+        # Yes, the SAS checks for this
+        if re.match(self._product_id_pattern, basename(previous_product)) is None:
+            msg = f'Previous product directory name {basename(previous_product)} is not a valid product ID'
+            self.logger.critical(
+                self.name,
+                ErrorCode.INVALID_INPUT,
+                msg
+            )
+
+        if not isdir(previous_product):
+            msg = f'Previous product directory {previous_product} does not exist'
+            self.logger.critical(
+                self.name,
+                ErrorCode.INVALID_INPUT,
+                msg
+            )
+
+        previous_products = [os.path.join(previous_product, layer) for layer in os.listdir(previous_product)]
 
         check_input_list(
             previous_products,
@@ -391,10 +411,21 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
         self._validate_rtcs()
 
         sas_config = self.runconfig.sas_config
-        previous_products = sas_config["run_config"].get("pre_dist_s1_product", [])
+        previous_product = sas_config["run_config"].get("pre_dist_s1_product", None)
 
-        if previous_products:
+        if previous_product:
             self._validate_previous_product()
+
+        # DIST-S1 runconfig structure doesn't support runconfig.algorithm_parameters_file_config_path getter
+        algorithm_parameters = sas_config["run_config"].get("algo_config_path", None)
+
+        if algorithm_parameters:
+            validate_algorithm_parameters_config(
+                self.name,
+                self.runconfig.algorithm_parameters_schema_path,
+                algorithm_parameters,
+                self.logger
+            )
 
 
 class DistS1PostProcessorMixin(PostProcessorMixin):
