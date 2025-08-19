@@ -350,7 +350,7 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
             previous_products,
             self.logger,
             self.name,
-            valid_extensions=self._valid_input_extensions,
+            valid_extensions=self._valid_input_extensions + ('.png',),  # Add PNG since this will contain a browse img
             check_zero_size=True
         )
 
