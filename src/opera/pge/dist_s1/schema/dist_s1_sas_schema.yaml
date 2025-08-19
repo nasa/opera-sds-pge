@@ -16,7 +16,7 @@ run_config:
   post_rtc_crosspol: list(str(), required=True)
 
   # Path to prior DIST-S1 product. If None, no prior product is used and confirmation is not performed.
-  pre_dist_s1_product: str(required=False)
+  prior_dist_s1_product: str(required=False)
 
   # A string representing the MGRS (Military Grid Reference System) tile identifier for output product.
   mgrs_tile_id: str(required=True)

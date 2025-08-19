@@ -98,19 +98,19 @@ class DistS1PgeTestCase(unittest.TestCase):
                 f.write(random.randbytes(1024))
 
     def _compare_algorithm_parameters_runconfig_to_expected(self, runconfig):
-        self.assertEqual(runconfig['interpolation_method'], 'bilinear')
-        self.assertEqual(runconfig['low_confidence_alert_threshold'], 3.8)
-        self.assertEqual(runconfig['high_confidence_alert_threshold'], 6.2)
-        self.assertEqual(runconfig['device'], 'cpu')
-        self.assertFalse(runconfig['apply_despeckling'])
-        self.assertTrue(runconfig['apply_logit_to_inputs'])
-        self.assertEqual(runconfig['memory_strategy'], 'high')
-        self.assertEqual(runconfig['batch_size_for_norm_param_estimation'], 1)
-        self.assertEqual(runconfig['stride_for_norm_param_estimation'], 8)
-        self.assertEqual(runconfig['n_workers_for_despeckling'], 4)
-        self.assertEqual(runconfig['n_workers_for_norm_param_estimation'], 1)
-        self.assertFalse(runconfig['tqdm_enabled'])
-        self.assertFalse(runconfig['model_compilation'])
+        self.assertEqual(runconfig['algo_config']['interpolation_method'], 'bilinear')
+        self.assertEqual(runconfig['algo_config']['low_confidence_alert_threshold'], 3.8)
+        self.assertEqual(runconfig['algo_config']['high_confidence_alert_threshold'], 6.2)
+        self.assertEqual(runconfig['algo_config']['device'], 'cpu')
+        self.assertFalse(runconfig['algo_config']['apply_despeckling'])
+        self.assertTrue(runconfig['algo_config']['apply_logit_to_inputs'])
+        self.assertEqual(runconfig['algo_config']['memory_strategy'], 'high')
+        self.assertEqual(runconfig['algo_config']['batch_size_for_norm_param_estimation'], 1)
+        self.assertEqual(runconfig['algo_config']['stride_for_norm_param_estimation'], 8)
+        self.assertEqual(runconfig['algo_config']['n_workers_for_despeckling'], 4)
+        self.assertEqual(runconfig['algo_config']['n_workers_for_norm_param_estimation'], 1)
+        self.assertFalse(runconfig['algo_config']['tqdm_enabled'])
+        self.assertFalse(runconfig['algo_config']['model_compilation'])
 
     def generate_band_data_output(self, product_id, band_data, directory=None, empty_file=False, clear=True):
         """
@@ -678,7 +678,7 @@ class DistS1PgeTestCase(unittest.TestCase):
 
             bad_product_id = 'previous_dist_product'
 
-            runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['pre_dist_s1_product'] = join(
+            runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['prior_dist_s1_product'] = join(
                 self.input_dir,
                 bad_product_id
             )
@@ -702,7 +702,7 @@ class DistS1PgeTestCase(unittest.TestCase):
 
             runconfig_dict = deepcopy(backup_runconfig)
 
-            runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['pre_dist_s1_product'] = prev_product_dir
+            runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['prior_dist_s1_product'] = prev_product_dir
 
             with open(test_runconfig_path, 'w', encoding='utf-8') as input_path:
                 yaml.safe_dump(runconfig_dict, input_path, sort_keys=False)
@@ -1045,7 +1045,7 @@ class DistS1PgeTestCase(unittest.TestCase):
         backup_ap = deepcopy(ap_dict)
 
         try:
-            ap_dict['unexpected_option'] = 42
+            ap_dict['algo_config']['unexpected_option'] = 42
 
             with open(test_ap_path, 'w', encoding='utf-8') as input_path:
                 yaml.safe_dump(ap_dict, input_path, sort_keys=False)
@@ -1066,7 +1066,7 @@ class DistS1PgeTestCase(unittest.TestCase):
 
             ap_dict = deepcopy(backup_ap)
 
-            ap_dict['high_confidence_alert_threshold'] = 16.2
+            ap_dict['algo_config']['high_confidence_alert_threshold'] = 16.2
 
             with open(test_ap_path, 'w', encoding='utf-8') as input_path:
                 yaml.safe_dump(ap_dict, input_path, sort_keys=False)
@@ -1087,7 +1087,7 @@ class DistS1PgeTestCase(unittest.TestCase):
 
             ap_dict = deepcopy(backup_ap)
 
-            ap_dict['interpolation_method'] = 'unsupported'
+            ap_dict['algo_config']['interpolation_method'] = 'unsupported'
 
             with open(test_ap_path, 'w', encoding='utf-8') as input_path:
                 yaml.safe_dump(ap_dict, input_path, sort_keys=False)
@@ -1108,7 +1108,7 @@ class DistS1PgeTestCase(unittest.TestCase):
 
             ap_dict = deepcopy(backup_ap)
 
-            ap_dict['tqdm_enabled'] = 'wrong type'
+            ap_dict['algo_config']['tqdm_enabled'] = 'wrong type'
 
             with open(test_ap_path, 'w', encoding='utf-8') as input_path:
                 yaml.safe_dump(ap_dict, input_path, sort_keys=False)

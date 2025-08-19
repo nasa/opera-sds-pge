@@ -82,7 +82,7 @@ RunConfig:
         - dist_s1_pge_test/input_dir/test_data/10SGD_cropped/137/2024-11-03/OPERA_L2_RTC-S1_T137-292324-IW1_20241103T015918Z_20241103T071409Z_S1A_30_v1.0_VH.tif
         - dist_s1_pge_test/input_dir/test_data/10SGD_cropped/137/2024-11-03/OPERA_L2_RTC-S1_T137-292324-IW2_20241103T015919Z_20241103T074936Z_S1A_30_v1.0_VH.tif
         - dist_s1_pge_test/input_dir/test_data/10SGD_cropped/137/2024-11-03/OPERA_L2_RTC-S1_T137-292325-IW1_20241103T015921Z_20241103T074936Z_S1A_30_v1.0_VH.tif
-        pre_dist_s1_product:
+        prior_dist_s1_product:
         mgrs_tile_id: 10SGD
         dst_dir: dist_s1_pge_test/scratch_dir
         product_dst_dir: dist_s1_pge_test/output_dir
