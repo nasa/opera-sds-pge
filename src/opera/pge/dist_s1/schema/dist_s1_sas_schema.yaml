@@ -35,3 +35,6 @@ run_config:
 
   # Path to external algorithm config file. If None, SAS defaults are used.
   algo_config_path: str(required=False)
+
+  #
+  input_data_dir: str(required=False)
