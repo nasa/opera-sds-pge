@@ -81,7 +81,7 @@ algo_config:
 
   # Model source. If `external`, use externally supplied paths for weights and config. Otherwise, use
   # distmetrics.model_load.ALLOWED_MODELS for other models.
-  model_source: any(enum('external', 'internal'), null(), required=False)
+  model_source: any(enum('external', 'transformer_original', 'transformer_optimized', 'transformer_optimized_fine', 'transformer_anniversary_trained', 'transformer_anniversary_trained_optimized', 'transformer_anniversary_trained_optimized_fine'), null(), required=False)
 
   # Path to external model config file.
   model_cfg_path: str(required=False)
