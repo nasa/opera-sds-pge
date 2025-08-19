@@ -344,13 +344,17 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
                 msg
             )
 
-        previous_products = [os.path.join(previous_product, layer) for layer in os.listdir(previous_product)]
+        previous_products = [
+            os.path.join(previous_product, layer)
+            for layer in os.listdir(previous_product)
+            if splitext(layer)[-1] != '.png'  # Ignore browse image
+        ]
 
         check_input_list(
             previous_products,
             self.logger,
             self.name,
-            valid_extensions=self._valid_input_extensions + ('.png',),  # Add PNG since this will contain a browse img
+            valid_extensions=self._valid_input_extensions,
             check_zero_size=True
         )
 
