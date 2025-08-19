@@ -402,12 +402,15 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
         super().run_preprocessor(**kwargs)
 
         check_input_list(
-            self.runconfig.input_files,
+            [f for f in self.runconfig.input_files if not os.path.isdir(f)],  # See comment below
             self.logger,
             self.name,
             valid_extensions=self._valid_input_extensions,
             check_zero_size=True
         )
+        # One input is the directory of the previous product. This fails the valid extension check, so we exclude dirs
+        # here. We validate the previous product dir later. We could also move the previous product entry in the PGE
+        # runconfig group to the DynamicAncillaryFilesGroup
         self._validate_rtcs()
 
         sas_config = self.runconfig.sas_config
