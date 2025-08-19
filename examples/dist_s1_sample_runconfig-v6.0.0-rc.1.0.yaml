@@ -20,32 +20,33 @@ RunConfig:
         # List of input files/directories
         # Must be a list of input GeoTIFF files
         InputFilePaths:
-          - /home/ops/input_dir/2024-09-04/OPERA_L2_RTC-S1_T137-292318-IW1_20240904T015900Z_20240904T150822Z_S1A_30_v1.0_VV.tif
-          - /home/ops/input_dir/2024-09-16/OPERA_L2_RTC-S1_T137-292318-IW1_20240916T015901Z_20240916T114330Z_S1A_30_v1.0_VV.tif
-          - /home/ops/input_dir/2024-09-28/OPERA_L2_RTC-S1_T137-292318-IW1_20240928T015901Z_20240929T005548Z_S1A_30_v1.0_VV.tif
-          - /home/ops/input_dir/2024-10-10/OPERA_L2_RTC-S1_T137-292318-IW1_20241010T015902Z_20241010T101259Z_S1A_30_v1.0_VV.tif
-          - /home/ops/input_dir/2024-10-22/OPERA_L2_RTC-S1_T137-292318-IW1_20241022T015902Z_20241022T180854Z_S1A_30_v1.0_VV.tif
-          - /home/ops/input_dir/2024-09-04/OPERA_L2_RTC-S1_T137-292318-IW1_20240904T015900Z_20240904T150822Z_S1A_30_v1.0_VH.tif
-          - /home/ops/input_dir/2024-09-16/OPERA_L2_RTC-S1_T137-292318-IW1_20240916T015901Z_20240916T114330Z_S1A_30_v1.0_VH.tif
-          - /home/ops/input_dir/2024-09-28/OPERA_L2_RTC-S1_T137-292318-IW1_20240928T015901Z_20240929T005548Z_S1A_30_v1.0_VH.tif
-          - /home/ops/input_dir/2024-10-10/OPERA_L2_RTC-S1_T137-292318-IW1_20241010T015902Z_20241010T101259Z_S1A_30_v1.0_VH.tif
-          - /home/ops/input_dir/2024-10-22/OPERA_L2_RTC-S1_T137-292318-IW1_20241022T015902Z_20241022T180854Z_S1A_30_v1.0_VH.tif
-          - /home/ops/input_dir/2025-01-02/OPERA_L2_RTC-S1_T137-292318-IW1_20250102T015857Z_20250102T190143Z_S1A_30_v1.0_VV.tif
-          - /home/ops/input_dir/2025-01-02/OPERA_L2_RTC-S1_T137-292318-IW2_20250102T015858Z_20250102T190143Z_S1A_30_v1.0_VV.tif
-          - /home/ops/input_dir/2025-01-02/OPERA_L2_RTC-S1_T137-292319-IW1_20250102T015900Z_20250102T190143Z_S1A_30_v1.0_VV.tif
-          - /home/ops/input_dir/2025-01-02/OPERA_L2_RTC-S1_T137-292319-IW2_20250102T015901Z_20250102T190143Z_S1A_30_v1.0_VV.tif
-          - /home/ops/input_dir/2025-01-02/OPERA_L2_RTC-S1_T137-292320-IW1_20250102T015903Z_20250102T190143Z_S1A_30_v1.0_VV.tif
-          - /home/ops/input_dir/2025-01-02/OPERA_L2_RTC-S1_T137-292318-IW1_20250102T015857Z_20250102T190143Z_S1A_30_v1.0_VH.tif
-          - /home/ops/input_dir/2025-01-02/OPERA_L2_RTC-S1_T137-292318-IW2_20250102T015858Z_20250102T190143Z_S1A_30_v1.0_VH.tif
-          - /home/ops/input_dir/2025-01-02/OPERA_L2_RTC-S1_T137-292319-IW1_20250102T015900Z_20250102T190143Z_S1A_30_v1.0_VH.tif
-          - /home/ops/input_dir/2025-01-02/OPERA_L2_RTC-S1_T137-292319-IW2_20250102T015901Z_20250102T190143Z_S1A_30_v1.0_VH.tif
-          - /home/ops/input_dir/2025-01-02/OPERA_L2_RTC-S1_T137-292320-IW1_20250102T015903Z_20250102T190143Z_S1A_30_v1.0_VH.tif
+          - /home/ops/input_dir/out_1/11SLT/71/2022-01-01/OPERA_L2_RTC-S1_T071-151226-IW2_20220101T135243Z_20241217T000016Z_S1A_30_v1.0_VV.tif
+          - /home/ops/input_dir/out_1/11SLT/71/2022-01-13/OPERA_L2_RTC-S1_T071-151226-IW2_20220113T135242Z_20241219T014436Z_S1A_30_v1.0_VV.tif
+          - /home/ops/input_dir/out_1/11SLT/71/2022-01-01/OPERA_L2_RTC-S1_T071-151226-IW3_20220101T135244Z_20241217T000824Z_S1A_30_v1.0_VV.tif
+          - /home/ops/input_dir/out_1/11SLT/71/2022-01-13/OPERA_L2_RTC-S1_T071-151226-IW3_20220113T135243Z_20241219T014249Z_S1A_30_v1.0_VV.tif
+          - /home/ops/input_dir/out_1/11SLT/71/2022-01-01/OPERA_L2_RTC-S1_T071-151227-IW2_20220101T135245Z_20241217T000824Z_S1A_30_v1.0_VV.tif
+          - /home/ops/input_dir/out_1/11SLT/71/2022-01-01/OPERA_L2_RTC-S1_T071-151226-IW2_20220101T135243Z_20241217T000016Z_S1A_30_v1.0_VH.tif
+          - /home/ops/input_dir/out_1/11SLT/71/2022-01-13/OPERA_L2_RTC-S1_T071-151226-IW2_20220113T135242Z_20241219T014436Z_S1A_30_v1.0_VH.tif
+          - /home/ops/input_dir/out_1/11SLT/71/2022-01-01/OPERA_L2_RTC-S1_T071-151226-IW3_20220101T135244Z_20241217T000824Z_S1A_30_v1.0_VH.tif
+          - /home/ops/input_dir/out_1/11SLT/71/2022-01-13/OPERA_L2_RTC-S1_T071-151226-IW3_20220113T135243Z_20241219T014249Z_S1A_30_v1.0_VH.tif
+          - /home/ops/input_dir/out_1/11SLT/71/2022-01-01/OPERA_L2_RTC-S1_T071-151227-IW2_20220101T135245Z_20241217T000824Z_S1A_30_v1.0_VH.tif
+          - /home/ops/input_dir/out_1/11SLT/71/2025-01-21/OPERA_L2_RTC-S1_T071-151226-IW2_20250121T135246Z_20250121T180333Z_S1A_30_v1.0_VV.tif
+          - /home/ops/input_dir/out_1/11SLT/71/2025-01-21/OPERA_L2_RTC-S1_T071-151226-IW3_20250121T135247Z_20250121T180333Z_S1A_30_v1.0_VV.tif
+          - /home/ops/input_dir/out_1/11SLT/71/2025-01-21/OPERA_L2_RTC-S1_T071-151227-IW2_20250121T135249Z_20250121T180333Z_S1A_30_v1.0_VV.tif
+          - /home/ops/input_dir/out_1/11SLT/71/2025-01-21/OPERA_L2_RTC-S1_T071-151227-IW3_20250121T135250Z_20250121T180333Z_S1A_30_v1.0_VV.tif
+          - /home/ops/input_dir/out_1/11SLT/71/2025-01-21/OPERA_L2_RTC-S1_T071-151228-IW2_20250121T135252Z_20250121T180333Z_S1A_30_v1.0_VV.tif
+          - /home/ops/input_dir/out_1/11SLT/71/2025-01-21/OPERA_L2_RTC-S1_T071-151226-IW2_20250121T135246Z_20250121T180333Z_S1A_30_v1.0_VH.tif
+          - /home/ops/input_dir/out_1/11SLT/71/2025-01-21/OPERA_L2_RTC-S1_T071-151226-IW3_20250121T135247Z_20250121T180333Z_S1A_30_v1.0_VH.tif
+          - /home/ops/input_dir/out_1/11SLT/71/2025-01-21/OPERA_L2_RTC-S1_T071-151227-IW2_20250121T135249Z_20250121T180333Z_S1A_30_v1.0_VH.tif
+          - /home/ops/input_dir/out_1/11SLT/71/2025-01-21/OPERA_L2_RTC-S1_T071-151227-IW3_20250121T135250Z_20250121T180333Z_S1A_30_v1.0_VH.tif
+          - /home/ops/input_dir/out_1/11SLT/71/2025-01-21/OPERA_L2_RTC-S1_T071-151228-IW2_20250121T135252Z_20250121T180333Z_S1A_30_v1.0_VH.tif
+          - /home/ops/input_dir/product_0/OPERA_L3_DIST-ALERT-S1_T11SLT_20250109T135247Z_20250815T150519Z_S1_30_v0.1
 
       DynamicAncillaryFilesGroup:
         # Map of ancillary file types to paths to the file
         # Paths must correspond to the file system within the Docker container
-        # For now, this is empty
-        AncillaryFileMap: {}
+        AncillaryFileMap:
+          water_mask_path: /home/ops/input_dir/out_1/11SLT_water_mask.tif
 
       ProductPathGroup:
         # Path to where output products should be stored
@@ -77,7 +78,7 @@ RunConfig:
         # List of command-line options to use with ProgramPath
         ProgramOptions:
         - run_sas
-        - --runconfig_yml_path
+        - --run_config_path
 
         # The Error Code base value added to the offset values to make
         # error codes unique per-PGE
@@ -140,43 +141,36 @@ RunConfig:
     SAS:
       run_config:
         pre_rtc_copol:
-        - /home/ops/input_dir/2024-09-04/OPERA_L2_RTC-S1_T137-292318-IW1_20240904T015900Z_20240904T150822Z_S1A_30_v1.0_VV.tif
-        - /home/ops/input_dir/2024-09-16/OPERA_L2_RTC-S1_T137-292318-IW1_20240916T015901Z_20240916T114330Z_S1A_30_v1.0_VV.tif
-        - /home/ops/input_dir/2024-09-28/OPERA_L2_RTC-S1_T137-292318-IW1_20240928T015901Z_20240929T005548Z_S1A_30_v1.0_VV.tif
-        - /home/ops/input_dir/2024-10-10/OPERA_L2_RTC-S1_T137-292318-IW1_20241010T015902Z_20241010T101259Z_S1A_30_v1.0_VV.tif
-        - /home/ops/input_dir/2024-10-22/OPERA_L2_RTC-S1_T137-292318-IW1_20241022T015902Z_20241022T180854Z_S1A_30_v1.0_VV.tif
+          - /home/ops/input_dir/out_1/11SLT/71/2022-01-01/OPERA_L2_RTC-S1_T071-151226-IW2_20220101T135243Z_20241217T000016Z_S1A_30_v1.0_VV.tif
+          - /home/ops/input_dir/out_1/11SLT/71/2022-01-13/OPERA_L2_RTC-S1_T071-151226-IW2_20220113T135242Z_20241219T014436Z_S1A_30_v1.0_VV.tif
+          - /home/ops/input_dir/out_1/11SLT/71/2022-01-01/OPERA_L2_RTC-S1_T071-151226-IW3_20220101T135244Z_20241217T000824Z_S1A_30_v1.0_VV.tif
+          - /home/ops/input_dir/out_1/11SLT/71/2022-01-13/OPERA_L2_RTC-S1_T071-151226-IW3_20220113T135243Z_20241219T014249Z_S1A_30_v1.0_VV.tif
+          - /home/ops/input_dir/out_1/11SLT/71/2022-01-01/OPERA_L2_RTC-S1_T071-151227-IW2_20220101T135245Z_20241217T000824Z_S1A_30_v1.0_VV.tif
         pre_rtc_crosspol:
-        - /home/ops/input_dir/2024-09-04/OPERA_L2_RTC-S1_T137-292318-IW1_20240904T015900Z_20240904T150822Z_S1A_30_v1.0_VH.tif
-        - /home/ops/input_dir/2024-09-16/OPERA_L2_RTC-S1_T137-292318-IW1_20240916T015901Z_20240916T114330Z_S1A_30_v1.0_VH.tif
-        - /home/ops/input_dir/2024-09-28/OPERA_L2_RTC-S1_T137-292318-IW1_20240928T015901Z_20240929T005548Z_S1A_30_v1.0_VH.tif
-        - /home/ops/input_dir/2024-10-10/OPERA_L2_RTC-S1_T137-292318-IW1_20241010T015902Z_20241010T101259Z_S1A_30_v1.0_VH.tif
-        - /home/ops/input_dir/2024-10-22/OPERA_L2_RTC-S1_T137-292318-IW1_20241022T015902Z_20241022T180854Z_S1A_30_v1.0_VH.tif
+          - /home/ops/input_dir/out_1/11SLT/71/2022-01-01/OPERA_L2_RTC-S1_T071-151226-IW2_20220101T135243Z_20241217T000016Z_S1A_30_v1.0_VH.tif
+          - /home/ops/input_dir/out_1/11SLT/71/2022-01-13/OPERA_L2_RTC-S1_T071-151226-IW2_20220113T135242Z_20241219T014436Z_S1A_30_v1.0_VH.tif
+          - /home/ops/input_dir/out_1/11SLT/71/2022-01-01/OPERA_L2_RTC-S1_T071-151226-IW3_20220101T135244Z_20241217T000824Z_S1A_30_v1.0_VH.tif
+          - /home/ops/input_dir/out_1/11SLT/71/2022-01-13/OPERA_L2_RTC-S1_T071-151226-IW3_20220113T135243Z_20241219T014249Z_S1A_30_v1.0_VH.tif
+          - /home/ops/input_dir/out_1/11SLT/71/2022-01-01/OPERA_L2_RTC-S1_T071-151227-IW2_20220101T135245Z_20241217T000824Z_S1A_30_v1.0_VH.tif
         post_rtc_copol:
-        - /home/ops/input_dir/2025-01-02/OPERA_L2_RTC-S1_T137-292318-IW1_20250102T015857Z_20250102T190143Z_S1A_30_v1.0_VV.tif
-        - /home/ops/input_dir/2025-01-02/OPERA_L2_RTC-S1_T137-292318-IW2_20250102T015858Z_20250102T190143Z_S1A_30_v1.0_VV.tif
-        - /home/ops/input_dir/2025-01-02/OPERA_L2_RTC-S1_T137-292319-IW1_20250102T015900Z_20250102T190143Z_S1A_30_v1.0_VV.tif
-        - /home/ops/input_dir/2025-01-02/OPERA_L2_RTC-S1_T137-292319-IW2_20250102T015901Z_20250102T190143Z_S1A_30_v1.0_VV.tif
-        - /home/ops/input_dir/2025-01-02/OPERA_L2_RTC-S1_T137-292320-IW1_20250102T015903Z_20250102T190143Z_S1A_30_v1.0_VV.tif
+          - /home/ops/input_dir/out_1/11SLT/71/2025-01-21/OPERA_L2_RTC-S1_T071-151226-IW2_20250121T135246Z_20250121T180333Z_S1A_30_v1.0_VV.tif
+          - /home/ops/input_dir/out_1/11SLT/71/2025-01-21/OPERA_L2_RTC-S1_T071-151226-IW3_20250121T135247Z_20250121T180333Z_S1A_30_v1.0_VV.tif
+          - /home/ops/input_dir/out_1/11SLT/71/2025-01-21/OPERA_L2_RTC-S1_T071-151227-IW2_20250121T135249Z_20250121T180333Z_S1A_30_v1.0_VV.tif
+          - /home/ops/input_dir/out_1/11SLT/71/2025-01-21/OPERA_L2_RTC-S1_T071-151227-IW3_20250121T135250Z_20250121T180333Z_S1A_30_v1.0_VV.tif
+          - /home/ops/input_dir/out_1/11SLT/71/2025-01-21/OPERA_L2_RTC-S1_T071-151228-IW2_20250121T135252Z_20250121T180333Z_S1A_30_v1.0_VV.tif
         post_rtc_crosspol:
-        - /home/ops/input_dir/2025-01-02/OPERA_L2_RTC-S1_T137-292318-IW1_20250102T015857Z_20250102T190143Z_S1A_30_v1.0_VH.tif
-        - /home/ops/input_dir/2025-01-02/OPERA_L2_RTC-S1_T137-292318-IW2_20250102T015858Z_20250102T190143Z_S1A_30_v1.0_VH.tif
-        - /home/ops/input_dir/2025-01-02/OPERA_L2_RTC-S1_T137-292319-IW1_20250102T015900Z_20250102T190143Z_S1A_30_v1.0_VH.tif
-        - /home/ops/input_dir/2025-01-02/OPERA_L2_RTC-S1_T137-292319-IW2_20250102T015901Z_20250102T190143Z_S1A_30_v1.0_VH.tif
-        - /home/ops/input_dir/2025-01-02/OPERA_L2_RTC-S1_T137-292320-IW1_20250102T015903Z_20250102T190143Z_S1A_30_v1.0_VH.tif
-        mgrs_tile_id: 10SGD
-        dst_dir: dist_s1_pge_test/scratch_dir
-        water_mask_path:
-        apply_water_mask: false
-        memory_strategy: high
-        device: cpu
-        tqdm_enabled: true
-        batch_size_for_despeckling: 25
-        n_workers_for_despeckling: 4
-        n_workers_for_norm_param_estimation: 8
-        n_lookbacks: 3
-        moderate_confidence_threshold: 3.5
-        high_confidence_threshold: 5.5
-        product_dst_dir: dist_s1_pge_test/output_dir
+          - /home/ops/input_dir/out_1/11SLT/71/2025-01-21/OPERA_L2_RTC-S1_T071-151226-IW2_20250121T135246Z_20250121T180333Z_S1A_30_v1.0_VH.tif
+          - /home/ops/input_dir/out_1/11SLT/71/2025-01-21/OPERA_L2_RTC-S1_T071-151226-IW3_20250121T135247Z_20250121T180333Z_S1A_30_v1.0_VH.tif
+          - /home/ops/input_dir/out_1/11SLT/71/2025-01-21/OPERA_L2_RTC-S1_T071-151227-IW2_20250121T135249Z_20250121T180333Z_S1A_30_v1.0_VH.tif
+          - /home/ops/input_dir/out_1/11SLT/71/2025-01-21/OPERA_L2_RTC-S1_T071-151227-IW3_20250121T135250Z_20250121T180333Z_S1A_30_v1.0_VH.tif
+          - /home/ops/input_dir/out_1/11SLT/71/2025-01-21/OPERA_L2_RTC-S1_T071-151228-IW2_20250121T135252Z_20250121T180333Z_S1A_30_v1.0_VH.tif
+        prior_dist_s1_product: /home/ops/input_dir/product_0/OPERA_L3_DIST-ALERT-S1_T11SLT_20250109T135247Z_20250815T150519Z_S1_30_v0.1
+        mgrs_tile_id: 11SLT
+        dst_dir: /home/ops/scratch_dir
+        input_data_dir: /home/ops/input_dir/out_1
+        water_mask_path: /home/ops/input_dir/out_1/11SLT_water_mask.tif
+        apply_water_mask: true
+        product_dst_dir: /home/ops/output_dir
         bucket:
         bucket_prefix: ''
-        confirmation_strategy: use_prev_product
+        algo_config_path: /home/ops/runconfig_dir/algorithm_parameters.yaml
