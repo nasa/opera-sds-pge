@@ -360,13 +360,14 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
 
         geotiff_layer_names = set(self._valid_previous_product_input_layer_names)
 
-        if len(previous_products) != len(geotiff_layer_names):
-            msg = f'Unexpected number of files in previous product: {len(previous_products)}'
-            self.logger.critical(
-                self.name,
-                ErrorCode.INVALID_INPUT,
-                msg
-            )
+        # TODO: Verify (see dist_s1_pge.py:896)
+        # if len(previous_products) != len(geotiff_layer_names):
+        #     msg = f'Unexpected number of files in previous product: {len(previous_products)}'
+        #     self.logger.critical(
+        #         self.name,
+        #         ErrorCode.INVALID_INPUT,
+        #         msg
+        #     )
 
         product_band_matches = [
             self._granule_filename_re.match(basename(previous_product)) for previous_product in previous_products
@@ -382,7 +383,7 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
 
         provided_layer_names = set([match.groupdict()['layer_name'] for match in product_band_matches])
 
-        if provided_layer_names != geotiff_layer_names:
+        if provided_layer_names.intersection(geotiff_layer_names) != geotiff_layer_names:
             msg = (f'Incomplete input product provided. Missing layers: '
                    f'{geotiff_layer_names.difference(provided_layer_names)}')
             self.logger.critical(
@@ -892,6 +893,7 @@ class DistS1Executor(DistS1PreProcessorMixin, DistS1PostProcessorMixin, PgeExecu
 
     _valid_layer_names = _main_output_layer_names + _confirmation_db_output_layer_names
 
+    # TODO: Where did I get this? ADT provided sample with the omitted layers, so is this really a thing?
     _valid_previous_product_input_layer_names = [
         layer for layer in _valid_layer_names if layer not in {'BROWSE', 'GEN-DIST-STATUS-ACQ', 'GEN-METRIC'}
     ]
