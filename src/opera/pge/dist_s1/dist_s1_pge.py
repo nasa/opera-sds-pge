@@ -157,6 +157,11 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
             4-tuple of lists of input RTC filenames in the order: pre_rtc_copol, pre_rtc_crosspol, post_rtc_copol,
             post_rtc_crosspol
         """
+
+        # TODO: Eventually rework this function to verify every RTC burst present is in both co- and cross-pol lists3
+        #  rather than some idea of well-orderedness
+        from copy import deepcopy
+
         def is_sorted(iterable, key=lambda x: x) -> bool:
             for i, e in enumerate(iterable[1:]):
                 if key(e) < key(iterable[i]):
@@ -180,7 +185,7 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
                     return False
             return True
 
-        pre_rtc_copol, pre_rtc_crosspol, post_rtc_copol, post_rtc_crosspol = all_rtcs
+        pre_rtc_copol, pre_rtc_crosspol, post_rtc_copol, post_rtc_crosspol = deepcopy(all_rtcs)
 
         if not all([is_sorted(rtc_list, key=sort_fn) for rtc_list in (pre_rtc_copol, pre_rtc_crosspol,
                                                                       post_rtc_copol, post_rtc_crosspol)]):
