@@ -339,6 +339,22 @@ class DswxS1PgeTestCase(unittest.TestCase):
 
         pge._validate_output_product_filenames()
 
+        # Sentinel-1C test case
+        band_data = ('OPERA_L3_DSWx-S1_T34KDB_20250621T170411Z_20250820T183647Z_S1C_30_v1.0_B01_WTR.tif',
+                     'OPERA_L3_DSWx-S1_T34KDB_20250621T170411Z_20250820T183647Z_S1C_30_v1.0_B02_BWTR.tif',
+                     'OPERA_L3_DSWx-S1_T34KDB_20250621T170411Z_20250820T183647Z_S1C_30_v1.0_B03_CONF.tif',
+                     'OPERA_L3_DSWx-S1_T34KDB_20250621T170411Z_20250820T183647Z_S1C_30_v0.1_B04_DIAG.tif',
+                     'OPERA_L3_DSWx-S1_T34KDB_20250621T170411Z_20250820T183647Z_S1C_30_v1.0_BROWSE.tif',
+                     'OPERA_L3_DSWx-S1_T34KDB_20250621T170411Z_20250820T183647Z_S1C_30_v1.0_BROWSE.png')
+
+        self.generate_band_data_output(band_data, clear=True)
+
+        pge = DSWxS1Executor(pge_name="DSWxS1PgeTest", runconfig_path=runconfig_path)
+
+        pge.run_preprocessor()
+
+        pge._validate_output_product_filenames()
+
         # Change an extension name to an illegal extension
         band_data = ('OPERA_L3_DSWx-S1_T11SLS_20210101T120000Z_20210101T120000Z_S1A_30_v1.0_B01_WTR.jpg',
                      'OPERA_L3_DSWx-S1_T11SLS_20210101T120000Z_20210101T120000Z_S1A_30_v1.0_B02_BWTR.tif',

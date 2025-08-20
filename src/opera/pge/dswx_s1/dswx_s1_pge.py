@@ -18,6 +18,7 @@ from opera.pge.base.base_pge import PgeExecutor
 from opera.pge.base.base_pge import PostProcessorMixin
 from opera.pge.base.base_pge import PreProcessorMixin
 from opera.util.dataset_utils import get_sensor_from_spacecraft_name
+from opera.util.dataset_utils import get_spacecraft_name_from_sensor
 from opera.util.error_codes import ErrorCode
 from opera.util.geo_utils import get_geographic_boundaries_from_mgrs_tile
 from opera.util.input_validation import validate_algorithm_parameters_config
@@ -166,7 +167,7 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
         pattern = re.compile(
             r'(?P<file_id>(?P<project>OPERA)_(?P<level>L3)_(?P<product_type>DSWx)-(?P<source>S1)_'
             r'(?P<tile_id>T[^\W_]{5})_(?P<acquisition_ts>\d{8}T\d{6}Z)_(?P<creation_ts>\d{8}T\d{6}Z)_'
-            r'(?P<sensor>S1A|S1B)_(?P<spacing>30)_(?P<product_version>v\d+[.]\d+))(_(?P<band_index>B\d{2})_'
+            r'(?P<sensor>S1A|S1B|S1C|S1D)_(?P<spacing>30)_(?P<product_version>v\d+[.]\d+))(_(?P<band_index>B\d{2})_'
             r'(?P<band_name>WTR|BWTR|CONF|DIAG)|_BROWSE)?[.](?P<ext>tif|tiff|png)$'
         )
 
@@ -185,7 +186,7 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
 
                     # TODO: kludge since SAS hardcodes SPACECRAFT_NAME to "Sentinel-1A/B"
                     dswx_metadata['MeasuredParameters']['SPACECRAFT_NAME']['value'] = \
-                        "Sentinel-1A" if match_result.groupdict()['sensor'] == "S1A" else "Sentinel-1B"
+                         get_spacecraft_name_from_sensor(match_result.groupdict()['sensor'])
 
                     # Cache the metadata for this product for use when generating the ISO XML
                     self._tile_metadata_cache[tile_id] = dswx_metadata
