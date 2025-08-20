@@ -17,6 +17,8 @@ from re import match
 from opera.test import path
 
 from opera.util.dataset_utils import get_hls_filename_fields
+from opera.util.dataset_utils import get_sensor_from_spacecraft_name
+from opera.util.dataset_utils import get_spacecraft_name_from_sensor
 from opera.util.dataset_utils import parse_bounding_polygon_from_wkt
 
 
@@ -82,3 +84,25 @@ class DatasetUtilsTestCase(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             parse_bounding_polygon_from_wkt(sample_invalid_polygon)
+
+    def test_get_sensor_from_spacecraft_name(self):
+        """Test dataset_utils.get_sensor_from_spacecraft_name()"""
+        # Test with valid spacecraft names
+        self.assertEqual(get_sensor_from_spacecraft_name('Sentinel-1A'), 'S1A')
+        self.assertEqual(get_sensor_from_spacecraft_name('Sentinel-2B'), 'S2B')
+        self.assertEqual(get_sensor_from_spacecraft_name('Landsat-8'), 'L8')
+
+        # Test with invalid spacecraft name
+        with self.assertRaises(RuntimeError):
+            get_sensor_from_spacecraft_name('Invalid-Spacecraft')
+
+    def test_get_spacecraft_name_from_sensor(self):
+        """Test dataset_utils.get_spacecraft_name_from_sensor()"""
+        # Test with valid sensor names
+        self.assertEqual(get_spacecraft_name_from_sensor('S1A'), 'Sentinel-1A')
+        self.assertEqual(get_spacecraft_name_from_sensor('S2B'), 'Sentinel-2B')
+        self.assertEqual(get_spacecraft_name_from_sensor('L8'), 'Landsat-8')
+
+        # Test with invalid sensor name
+        with self.assertRaises(RuntimeError):
+            get_spacecraft_name_from_sensor('Invalid-Sensor')

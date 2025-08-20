@@ -109,6 +109,44 @@ def get_sensor_from_spacecraft_name(spacecraft_name):
         raise RuntimeError(f"Unknown spacecraft name '{spacecraft_name}'")
 
 
+def get_spacecraft_name_from_sensor(sensor_shortname):
+    """
+    Returns the full spacecraft name from the sensor short name.
+    The full spacecraft name is often included in metadata files, such as the
+    ISO XML.
+
+    Parameters
+    ----------
+    sensor_shortname : str
+        The sensor shortname for the provided spacecraft name
+
+    Returns
+    -------
+    spacecraft_name : str
+        Name of the spacecraft to translate to a sensor short name.
+
+    Raises
+    ------
+    RuntimeError
+        If an unknown sensor name is provided.
+
+    """
+    try:
+        return {
+            'L8': 'Landsat-8',
+            'L9': 'Landsat-9',
+            'S1A': 'Sentinel-1A',
+            'S1B': 'Sentinel-1B',
+            'S1C': 'Sentinel-1C',
+            'S2A': 'Sentinel-2A',
+            'S2B': 'Sentinel-2B',
+            'S2C': 'Sentinel-2C',
+            'S2D': 'Sentinel-2D'
+        }[sensor_shortname.upper()]
+    except KeyError:
+        raise RuntimeError(f"Unknown sensor name '{sensor_shortname}'")
+
+
 def parse_bounding_polygon_from_wkt(bounding_polygon_wkt_str):
     """
     Parses the list of polygon coordinates from a WKT formatted string, and
