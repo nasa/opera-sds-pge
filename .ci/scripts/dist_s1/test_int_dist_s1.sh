@@ -28,8 +28,8 @@ SAMPLE_TIME=1
 # RUNCONFIG should be the name of the runconfig file  in <repo_root>/.ci/scripts/dist-s1/
 [ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath "$(dirname "$(realpath "$0")")"/../../..)
 [ -z "${PGE_TAG}" ] && PGE_TAG="${USER}-dev"
-[ -z "${INPUT_DATA}" ] && INPUT_DATA="dist_s1_calval_mock_2.0.4_expected_input.zip "
-[ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="dist_s1_calval_mock_2.0.4_expected_output.zip "
+[ -z "${INPUT_DATA}" ] && INPUT_DATA="dist_s1_calval_2.0.4_expected_input.zip "
+[ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="dist_s1_calval_2.0.4_expected_output.zip "
 [ -z "${RUNCONFIG}" ] && RUNCONFIG="opera_pge_dist_s1_r4_calval_runconfig.yaml"
 [ -z "${TMP_ROOT}" ] && TMP_ROOT="$DEFAULT_TMP_ROOT"
 
