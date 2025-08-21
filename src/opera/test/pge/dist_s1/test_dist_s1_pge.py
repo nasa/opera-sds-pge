@@ -464,11 +464,6 @@ class DistS1PgeTestCase(unittest.TestCase):
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
 
-            self.assertIn(
-                "One or more of the RunConfig SAS group RTC lists is badly ordered. Attempting to sort them",
-                log_contents
-            )
-
             # Test 5b: Badly ordered RTCs - Unfixable - Date mismatch
 
             runconfig_dict = deepcopy(backup_runconfig)
@@ -499,7 +494,15 @@ class DistS1PgeTestCase(unittest.TestCase):
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
 
-            self.assertIn(f"Date or burst ID mismatch in pre_rtc copol and crosspol lists", log_contents)
+            self.assertIn(
+                "The following burst-id/time pairs had either mismatched or too many polarizations",
+                log_contents
+            )
+            self.assertIn(
+                "{(\'T137-292318-IW1\', \'20240904T015859Z\'): {\'VV\'}, "
+                "(\'T137-292324-IW1\', \'20241022T015918Z\'): {\'VH\'}}",
+                log_contents
+            )
 
             # Test 5c: Badly ordered RTCs - Unfixable - Burst mismatch
 
@@ -536,7 +539,15 @@ class DistS1PgeTestCase(unittest.TestCase):
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
 
-            self.assertIn(f"Date or burst ID mismatch in post_rtc copol and crosspol lists", log_contents)
+            self.assertIn(
+                "The following burst-id/time pairs had either mismatched or too many polarizations",
+                log_contents
+            )
+            self.assertIn(
+                "{(\'T137-292317-IW1\', \'20250102T015857Z\'): {\'VV\'}, "
+                "(\'T137-292324-IW1\', \'20241103T015918Z\'): {\'VH\'}}",
+                log_contents
+            )
 
             # Test 6a: crosspol in copol
 

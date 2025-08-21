@@ -143,13 +143,9 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
                 msg
             )
 
-    def __validate_rtc_ordering(self, all_rtcs):
+    def __validate_rtc_burst_parings(self, all_rtcs):
         """
-        Verifies the pre and post co- and cross-pol RTC lists are well-ordered.
-
-        First, the lists are sorted by burst ID, then acquisition time. They are then
-        checked so that each RTC in the copol lists have the same burst ID and acquisition
-        time as the RTC in the same position in the corresponding crosspol list.
+        Verifies each RTC burst is present in both co- and cross-polarization.
 
         Parameters
         ----------
@@ -158,59 +154,35 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
             post_rtc_crosspol
         """
 
-        # TODO: Eventually rework this function to verify every RTC burst present is in both co- and cross-pol lists3
-        #  rather than some idea of well-orderedness
-        from copy import deepcopy
+        pre_rtc_copol, pre_rtc_crosspol, post_rtc_copol, post_rtc_crosspol = all_rtcs
 
-        def is_sorted(iterable, key=lambda x: x) -> bool:
-            for i, e in enumerate(iterable[1:]):
-                if key(e) < key(iterable[i]):
-                    return False
-            return True
+        burst_map = {}
 
-        def sort_fn(path):
-            match = self._rtc_pattern.match(os.path.basename(path))
-            match_dict = match.groupdict()
+        for copol_rtc, crosspol_rtc in zip(pre_rtc_copol, pre_rtc_crosspol):
+            copol_rtc = self._rtc_pattern.match(os.path.basename(copol_rtc))
+            crosspol_rtc = self._rtc_pattern.match(os.path.basename(crosspol_rtc))
 
-            return match_dict['burst_id'], match_dict['acquisition_ts']
+            copol_key = (copol_rtc.groupdict()['burst_id'], copol_rtc.groupdict()['acquisition_ts'])
+            crosspol_key = (crosspol_rtc.groupdict()['burst_id'], crosspol_rtc.groupdict()['acquisition_ts'])
 
-        def compare_rtc_dates_and_bursts(copol, crosspol):
-            for copol_rtc, crosspol_rtc in zip(copol, crosspol):
-                copol_rtc = self._rtc_pattern.match(os.path.basename(copol_rtc))
-                crosspol_rtc = self._rtc_pattern.match(os.path.basename(crosspol_rtc))
+            burst_map.setdefault(copol_key, set()).add(copol_rtc.groupdict()['pol'])
+            burst_map.setdefault(crosspol_key, set()).add(crosspol_rtc.groupdict()['pol'])
 
-                if copol_rtc.groupdict()['acquisition_ts'] != crosspol_rtc.groupdict()['acquisition_ts']:
-                    return False
-                if copol_rtc.groupdict()['burst_id'] != crosspol_rtc.groupdict()['burst_id']:
-                    return False
-            return True
+        for copol_rtc, crosspol_rtc in zip(post_rtc_copol, post_rtc_crosspol):
+            copol_rtc = self._rtc_pattern.match(os.path.basename(copol_rtc))
+            crosspol_rtc = self._rtc_pattern.match(os.path.basename(crosspol_rtc))
 
-        pre_rtc_copol, pre_rtc_crosspol, post_rtc_copol, post_rtc_crosspol = deepcopy(all_rtcs)
+            copol_key = (copol_rtc.groupdict()['burst_id'], copol_rtc.groupdict()['acquisition_ts'])
+            crosspol_key = (crosspol_rtc.groupdict()['burst_id'], crosspol_rtc.groupdict()['acquisition_ts'])
 
-        if not all([is_sorted(rtc_list, key=sort_fn) for rtc_list in (pre_rtc_copol, pre_rtc_crosspol,
-                                                                      post_rtc_copol, post_rtc_crosspol)]):
-            msg = 'One or more of the RunConfig SAS group RTC lists is badly ordered. Attempting to sort them'
-            self.logger.warning(
-                self.name,
-                ErrorCode.LOGGED_WARNING_LINE,
-                msg
-            )
+            burst_map.setdefault(copol_key, set()).add(copol_rtc.groupdict()['pol'])
+            burst_map.setdefault(crosspol_key, set()).add(crosspol_rtc.groupdict()['pol'])
 
-            pre_rtc_copol.sort(key=sort_fn)
-            pre_rtc_crosspol.sort(key=sort_fn)
-            post_rtc_copol.sort(key=sort_fn)
-            post_rtc_crosspol.sort(key=sort_fn)
+        bad_bursts = {k: v for k, v in burst_map.items() if len(v) != 2}
 
-        if not compare_rtc_dates_and_bursts(pre_rtc_copol, pre_rtc_crosspol):
-            msg = 'Date or burst ID mismatch in pre_rtc copol and crosspol lists'
-            self.logger.critical(
-                self.name,
-                ErrorCode.INVALID_INPUT,
-                msg
-            )
-
-        if not compare_rtc_dates_and_bursts(post_rtc_copol, post_rtc_crosspol):
-            msg = 'Date or burst ID mismatch in post_rtc copol and crosspol lists'
+        if len(bad_bursts) > 0:
+            msg = (f'The following burst-id/time pairs had either mismatched or too many polarizations (ie, each '
+                   f'paring must contain exactly one co-polarized and exactly one cross-polarized burst): {bad_bursts}')
             self.logger.critical(
                 self.name,
                 ErrorCode.INVALID_INPUT,
@@ -312,9 +284,9 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
         self.__validate_rtc_lists_are_pge_subset(all_rtcs)
         baseline_matches, current_matches = self.__validate_rtc_filenames(baseline_rtcs, current_rtcs)
         self.__validate_rtc_homogeneity(current_matches)  # Per ADT: Baseline can be heterogeneous
-        self.__validate_rtc_ordering(all_rtcs)
         self.__validate_co_and_cross_polarizations(all_rtcs)
         self.__validate_no_duplicates(baseline_matches + current_matches)
+        self.__validate_rtc_burst_parings(all_rtcs)
 
     def _validate_previous_product(self):
         """
