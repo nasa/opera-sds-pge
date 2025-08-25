@@ -1,7 +1,7 @@
 algo_config:
     device: cpu
     memory_strategy: high
-    tqdm_enabled: true
+    tqdm_enabled: false
     n_workers_for_norm_param_estimation: 8
     batch_size_for_norm_param_estimation: 32
     stride_for_norm_param_estimation: 16
