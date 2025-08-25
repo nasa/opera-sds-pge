@@ -268,6 +268,8 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
         5. Validates that the co- and cross-pol RTCs are in the same order (burst-ID &
            acquisition time)
         6. Validates no cross-pol RTCs are in copol input lists and vice-versa
+        7. Validates each RTC burst at each input sensing time is available exactly once in co- and
+           cross-polarization
         """
         sas_config = self.runconfig.sas_config
 
