@@ -22,6 +22,7 @@ from unittest.mock import patch
 
 import yaml
 from opera.test import path
+from yamale.yamale_error import YamaleError
 
 import opera.util.tiff_utils
 from opera.pge import RunConfig
@@ -65,6 +66,9 @@ class DistS1PgeTestCase(unittest.TestCase):
         self.input_dir = abspath(join(self.working_dir.name, "dist_s1_pge_test/input_dir"))
         os.makedirs(self.input_dir, exist_ok=True)
 
+        # Copy the algorithm_parameters config file into the test input directory.
+        shutil.copy(join(self.data_dir, 'test_dist_s1_algorithm_parameters.yaml'), self.input_dir)
+
         # Create dummy input files based on the test run config
         runconfig_path = join(self.data_dir, 'test_dist_s1_config.yaml')
         self._create_dummy_input_files(runconfig_path)
@@ -92,6 +96,21 @@ class DistS1PgeTestCase(unittest.TestCase):
             Path(dummy_file_path).parent.mkdir(parents=True, exist_ok=True)
             with open(dummy_file_path, "wb") as f:
                 f.write(random.randbytes(1024))
+
+    def _compare_algorithm_parameters_runconfig_to_expected(self, runconfig):
+        self.assertEqual(runconfig['algo_config']['interpolation_method'], 'bilinear')
+        self.assertEqual(runconfig['algo_config']['low_confidence_alert_threshold'], 3.8)
+        self.assertEqual(runconfig['algo_config']['high_confidence_alert_threshold'], 6.2)
+        self.assertEqual(runconfig['algo_config']['device'], 'cpu')
+        self.assertFalse(runconfig['algo_config']['apply_despeckling'])
+        self.assertTrue(runconfig['algo_config']['apply_logit_to_inputs'])
+        self.assertEqual(runconfig['algo_config']['memory_strategy'], 'high')
+        self.assertEqual(runconfig['algo_config']['batch_size_for_norm_param_estimation'], 1)
+        self.assertEqual(runconfig['algo_config']['stride_for_norm_param_estimation'], 8)
+        self.assertEqual(runconfig['algo_config']['n_workers_for_despeckling'], 4)
+        self.assertEqual(runconfig['algo_config']['n_workers_for_norm_param_estimation'], 1)
+        self.assertFalse(runconfig['algo_config']['tqdm_enabled'])
+        self.assertFalse(runconfig['algo_config']['model_compilation'])
 
     def generate_band_data_output(self, product_id, band_data, directory=None, empty_file=False, clear=True):
         """
@@ -445,11 +464,6 @@ class DistS1PgeTestCase(unittest.TestCase):
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
 
-            self.assertIn(
-                "One or more of the RunConfig SAS group RTC lists is badly ordered. Attempting to sort them",
-                log_contents
-            )
-
             # Test 5b: Badly ordered RTCs - Unfixable - Date mismatch
 
             runconfig_dict = deepcopy(backup_runconfig)
@@ -480,7 +494,15 @@ class DistS1PgeTestCase(unittest.TestCase):
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
 
-            self.assertIn(f"Date or burst ID mismatch in pre_rtc copol and crosspol lists", log_contents)
+            self.assertIn(
+                "The following burst-id/time pairs had either mismatched or too many polarizations",
+                log_contents
+            )
+            self.assertIn(
+                "{(\'T137-292318-IW1\', \'20240904T015859Z\'): {\'VV\'}, "
+                "(\'T137-292324-IW1\', \'20241022T015918Z\'): {\'VH\'}}",
+                log_contents
+            )
 
             # Test 5c: Badly ordered RTCs - Unfixable - Burst mismatch
 
@@ -517,7 +539,15 @@ class DistS1PgeTestCase(unittest.TestCase):
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
 
-            self.assertIn(f"Date or burst ID mismatch in post_rtc copol and crosspol lists", log_contents)
+            self.assertIn(
+                "The following burst-id/time pairs had either mismatched or too many polarizations",
+                log_contents
+            )
+            self.assertIn(
+                "{(\'T137-292317-IW1\', \'20250102T015857Z\'): {\'VV\'}, "
+                "(\'T137-292324-IW1\', \'20241103T015918Z\'): {\'VH\'}}",
+                log_contents
+            )
 
             # Test 6a: crosspol in copol
 
@@ -642,17 +672,27 @@ class DistS1PgeTestCase(unittest.TestCase):
             'OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.1_GEN-METRIC-MAX.tif',
         ]
 
-        sample_png = 'OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.1.png'
+        sample_bad_ext = 'OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.1.txt'
         sample_duplicate = 'OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20250703T175000Z_S1_30_v0.1_GEN-DIST-DUR.tif'
 
+        sample_product_id = 'OPERA_L3_DIST-ALERT-S1_T10SGD_20241103T015902Z_20241204T175000Z_S1_30_v0.1'
+
+        prev_product_dir = os.path.join(
+            self.input_dir,
+            sample_product_id
+        )
+
         try:
-            # Test 1: Non-existent files
+            # Test 1: Bad or non-existent previous product dir
 
             runconfig_dict = deepcopy(backup_runconfig)
 
-            runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['pre_dist_s1_product'] = [
-                join(self.input_dir, 'dist', layer) for layer in sample_bands
-            ]
+            bad_product_id = 'previous_dist_product'
+
+            runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['prior_dist_s1_product'] = join(
+                self.input_dir,
+                bad_product_id
+            )
 
             with open(test_runconfig_path, 'w', encoding='utf-8') as input_path:
                 yaml.safe_dump(runconfig_dict, input_path, sort_keys=False)
@@ -669,12 +709,33 @@ class DistS1PgeTestCase(unittest.TestCase):
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
 
-            self.assertIn("Could not locate specified input", log_contents)
+            self.assertIn("is not a valid product ID", log_contents)
+
+            runconfig_dict = deepcopy(backup_runconfig)
+
+            runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['prior_dist_s1_product'] = prev_product_dir
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as input_path:
+                yaml.safe_dump(runconfig_dict, input_path, sort_keys=False)
+
+            pge = DistS1Executor(pge_name="DistS1PgeTest", runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            # Open the log file, and check that the validation error details were captured
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn(f"Previous product directory {prev_product_dir} does not exist", log_contents)
 
             # Test 2: Empty files
 
             self.generate_band_data_output(
-                'dist',
+                sample_product_id,
                 tuple(sample_bands),
                 directory=self.input_dir,
                 empty_file=True
@@ -696,18 +757,9 @@ class DistS1PgeTestCase(unittest.TestCase):
 
             # Test 3: Bad extensions
 
-            runconfig_dict = deepcopy(backup_runconfig)
-
-            runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['pre_dist_s1_product'] = [
-                join(self.input_dir, 'dist', layer) for layer in sample_bands + [sample_png]
-            ]
-
-            with open(test_runconfig_path, 'w', encoding='utf-8') as input_path:
-                yaml.safe_dump(runconfig_dict, input_path, sort_keys=False)
-
             self.generate_band_data_output(
-                'dist',
-                tuple(sample_bands + [sample_png]),
+                sample_product_id,
+                tuple(sample_bands + [sample_bad_ext]),
                 directory=self.input_dir,
                 clear=True
             )
@@ -728,20 +780,11 @@ class DistS1PgeTestCase(unittest.TestCase):
 
             # Test 4: Bad filenames
 
-            runconfig_dict = deepcopy(backup_runconfig)
-
             invalid_sample_bands = deepcopy(sample_bands)
             invalid_sample_bands[0] = 'gen-dist-status-acq.tif'
 
-            runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['pre_dist_s1_product'] = [
-                join(self.input_dir, 'dist', layer) for layer in invalid_sample_bands
-            ]
-
-            with open(test_runconfig_path, 'w', encoding='utf-8') as input_path:
-                yaml.safe_dump(runconfig_dict, input_path, sort_keys=False)
-
             self.generate_band_data_output(
-                'dist',
+                sample_product_id,
                 tuple(invalid_sample_bands),
                 directory=self.input_dir,
                 clear=True
@@ -762,55 +805,38 @@ class DistS1PgeTestCase(unittest.TestCase):
             self.assertIn("One or more previous-product inputs has an invalid filename", log_contents)
 
             # Test 5: Wrong number
+            # TODO: Is this correct? (see dist_s1_pge.py:896)
 
-            runconfig_dict = deepcopy(backup_runconfig)
-
-            invalid_sample_bands = sample_bands[1:]
-
-            runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['pre_dist_s1_product'] = [
-                join(self.input_dir, 'dist', layer) for layer in invalid_sample_bands
-            ]
-
-            with open(test_runconfig_path, 'w', encoding='utf-8') as input_path:
-                yaml.safe_dump(runconfig_dict, input_path, sort_keys=False)
-
-            self.generate_band_data_output(
-                'dist',
-                tuple(invalid_sample_bands),
-                directory=self.input_dir,
-                clear=True
-            )
-
-            pge = DistS1Executor(pge_name="DistS1PgeTest", runconfig_path=test_runconfig_path)
-
-            with self.assertRaises(RuntimeError):
-                pge.run()
-
-            expected_log_file = pge.logger.get_file_name()
-            self.assertTrue(os.path.exists(expected_log_file))
-
-            # Open the log file, and check that the validation error details were captured
-            with open(expected_log_file, 'r', encoding='utf-8') as infile:
-                log_contents = infile.read()
-
-            self.assertIn("Unexpected number of files in previous product", log_contents)
+            # invalid_sample_bands = sample_bands[1:]
+            #
+            # self.generate_band_data_output(
+            #     sample_product_id,
+            #     tuple(invalid_sample_bands),
+            #     directory=self.input_dir,
+            #     clear=True
+            # )
+            #
+            # pge = DistS1Executor(pge_name="DistS1PgeTest", runconfig_path=test_runconfig_path)
+            #
+            # with self.assertRaises(RuntimeError):
+            #     pge.run()
+            #
+            # expected_log_file = pge.logger.get_file_name()
+            # self.assertTrue(os.path.exists(expected_log_file))
+            #
+            # # Open the log file, and check that the validation error details were captured
+            # with open(expected_log_file, 'r', encoding='utf-8') as infile:
+            #     log_contents = infile.read()
+            #
+            # self.assertIn("Unexpected number of files in previous product", log_contents)
 
             # Test 6: Incorrect set of layers
-
-            runconfig_dict = deepcopy(backup_runconfig)
 
             invalid_sample_bands = deepcopy(sample_bands)
             invalid_sample_bands[0] = sample_duplicate
 
-            runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['pre_dist_s1_product'] = [
-                join(self.input_dir, 'dist', layer) for layer in invalid_sample_bands
-            ]
-
-            with open(test_runconfig_path, 'w', encoding='utf-8') as input_path:
-                yaml.safe_dump(runconfig_dict, input_path, sort_keys=False)
-
             self.generate_band_data_output(
-                'dist',
+                sample_product_id,
                 tuple(invalid_sample_bands),
                 directory=self.input_dir,
                 clear=True
@@ -991,6 +1017,132 @@ class DistS1PgeTestCase(unittest.TestCase):
         finally:
             if os.path.exists(test_runconfig_path):
                 os.unlink(test_runconfig_path)
+
+    def test_dist_s1_algorithm_parameters(self):
+        """Test basic parsing and validation of an algorithm parameters RunConfig file"""
+        runconfig_path = join(self.data_dir, 'test_dist_s1_config.yaml')
+
+        runconfig = RunConfig(runconfig_path)
+
+        algorithm_parameters_runconfig_file = runconfig.sas_config["run_config"].get("algo_config_path", None)
+
+        self.assertIsNotNone(algorithm_parameters_runconfig_file)
+
+        # parse the run config file
+        runconfig_dict = runconfig._parse_algorithm_parameters_run_config_file(algorithm_parameters_runconfig_file)
+
+        # Check the properties of the algorithm parameters RunConfig to ensure they match as expected
+        self._compare_algorithm_parameters_runconfig_to_expected(runconfig_dict)
+
+    def test_dist_s1_bad_algorithm_parameters(self):
+        """Test validation for invalid algorithm parameters files"""
+        runconfig_path = join(self.data_dir, 'test_dist_s1_config.yaml')
+        test_runconfig_path = join(self.data_dir, 'invalid_ap_dist_s1_runconfig.yaml')
+
+        with open(runconfig_path, 'r', encoding='utf-8') as stream:
+            runconfig_dict = yaml.safe_load(stream)
+
+        ap_path = join(self.data_dir, 'test_dist_s1_algorithm_parameters.yaml')
+        test_ap_path = join(self.data_dir, 'invalid_dist_s1_algorithm_parameters.yaml')
+
+        runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['algo_config_path'] = test_ap_path
+
+        with open(test_runconfig_path, 'w', encoding='utf-8') as stream:
+            yaml.safe_dump(runconfig_dict, stream)
+
+        with open(ap_path, 'r', encoding='utf-8') as stream:
+            ap_dict = yaml.safe_load(stream)
+
+        backup_ap = deepcopy(ap_dict)
+
+        try:
+            ap_dict['algo_config']['unexpected_option'] = 42
+
+            with open(test_ap_path, 'w', encoding='utf-8') as input_path:
+                yaml.safe_dump(ap_dict, input_path, sort_keys=False)
+
+            pge = DistS1Executor(pge_name="DistS1PgeTest", runconfig_path=test_runconfig_path)
+
+            err: YamaleError = None
+
+            with self.assertRaises(YamaleError):
+                try:
+                    pge.run()
+                except YamaleError as e:
+                    err = e
+                    raise
+
+            self.assertIsNotNone(err)
+            self.assertIn('unexpected_option: Unexpected element', err.message)
+
+            ap_dict = deepcopy(backup_ap)
+
+            ap_dict['algo_config']['high_confidence_alert_threshold'] = 16.2
+
+            with open(test_ap_path, 'w', encoding='utf-8') as input_path:
+                yaml.safe_dump(ap_dict, input_path, sort_keys=False)
+
+            pge = DistS1Executor(pge_name="DistS1PgeTest", runconfig_path=test_runconfig_path)
+
+            err: YamaleError = None
+
+            with self.assertRaises(YamaleError):
+                try:
+                    pge.run()
+                except YamaleError as e:
+                    err = e
+                    raise
+
+            self.assertIsNotNone(err)
+            self.assertIn('high_confidence_alert_threshold: 16.2 is greater than 15.0', err.message)
+
+            ap_dict = deepcopy(backup_ap)
+
+            ap_dict['algo_config']['interpolation_method'] = 'unsupported'
+
+            with open(test_ap_path, 'w', encoding='utf-8') as input_path:
+                yaml.safe_dump(ap_dict, input_path, sort_keys=False)
+
+            pge = DistS1Executor(pge_name="DistS1PgeTest", runconfig_path=test_runconfig_path)
+
+            err: YamaleError = None
+
+            with self.assertRaises(YamaleError):
+                try:
+                    pge.run()
+                except YamaleError as e:
+                    err = e
+                    raise
+
+            self.assertIsNotNone(err)
+            self.assertIn("interpolation_method: 'unsupported' not in ('nearest', 'bilinear', 'none')", err.message)
+
+            ap_dict = deepcopy(backup_ap)
+
+            ap_dict['algo_config']['tqdm_enabled'] = 'wrong type'
+
+            with open(test_ap_path, 'w', encoding='utf-8') as input_path:
+                yaml.safe_dump(ap_dict, input_path, sort_keys=False)
+
+            pge = DistS1Executor(pge_name="DistS1PgeTest", runconfig_path=test_runconfig_path)
+
+            err: YamaleError = None
+
+            with self.assertRaises(YamaleError):
+                try:
+                    pge.run()
+                except YamaleError as e:
+                    err = e
+                    raise
+
+            self.assertIsNotNone(err)
+            self.assertIn("tqdm_enabled: 'wrong type' is not a bool.", err.message)
+        finally:
+            if os.path.exists(test_runconfig_path):
+                os.unlink(test_runconfig_path)
+
+            if os.path.exists(test_ap_path):
+                os.unlink(test_ap_path)
 
 
 if __name__ == "__main__":

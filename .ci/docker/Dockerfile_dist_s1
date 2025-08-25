@@ -59,7 +59,7 @@ RUN set -ex \
     && apt-get install --no-install-recommends -y g++ \
     && apt-get clean \
     && python -m pip install -r ${PGE_DEST_DIR}/opera/requirements_numpy2.txt \
-    && conda install --yes --channel conda-forge hdf5 \
+    && conda install --yes --channel conda-forge hdf5 gdal \
     && chmod 777 $(find ${PGE_DEST_DIR} -type d)
 
 # Set the Docker entrypoint and clear the default command
