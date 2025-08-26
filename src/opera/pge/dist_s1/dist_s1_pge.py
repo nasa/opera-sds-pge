@@ -159,6 +159,8 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
         burst_map = {}
 
         for copol_rtc, crosspol_rtc in zip(pre_rtc_copol, pre_rtc_crosspol):
+            # By this point, all filenames will be matching the RTC pattern so we can safely
+            # assume this will not return None
             copol_rtc = self._rtc_pattern.match(os.path.basename(copol_rtc))
             crosspol_rtc = self._rtc_pattern.match(os.path.basename(crosspol_rtc))
 
@@ -169,6 +171,8 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
             burst_map.setdefault(crosspol_key, set()).add(crosspol_rtc.groupdict()['pol'])
 
         for copol_rtc, crosspol_rtc in zip(post_rtc_copol, post_rtc_crosspol):
+            # By this point, all filenames will be matching the RTC pattern so we can safely
+            # assume this will not return None
             copol_rtc = self._rtc_pattern.match(os.path.basename(copol_rtc))
             crosspol_rtc = self._rtc_pattern.match(os.path.basename(crosspol_rtc))
 
@@ -893,7 +897,7 @@ class DistS1Executor(DistS1PreProcessorMixin, DistS1PostProcessorMixin, PgeExecu
     LEVEL = "L3"
     """Processing Level for DIST-S1 Products"""
 
-    SAS_VERSION = "2.0.4"  # Beta release https://github.com/opera-adt/dist-s1/releases/tag/v2.0.4
+    SAS_VERSION = "2.0.4"  # CalVal release https://github.com/opera-adt/dist-s1/releases/tag/v2.0.4
     """Version of the SAS wrapped by this PGE, should be updated as needed"""
 
     def __init__(self, pge_name, runconfig_path, **kwargs):

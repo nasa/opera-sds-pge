@@ -5,7 +5,7 @@
 AREA_OR_POINT:
   attribute_data_type: string
   attribute_type: processingParameter
-  description: 'TBA'
+  description: 'Indicates that pixel values are assumed to represent an area rather than points.'
   display_name: AreaOrPoint
 algo_config_path:
   attribute_data_type: string
