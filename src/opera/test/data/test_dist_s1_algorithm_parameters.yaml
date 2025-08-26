@@ -1,0 +1,14 @@
+algo_config:
+  interpolation_method: bilinear
+  low_confidence_alert_threshold: 3.8
+  high_confidence_alert_threshold: 6.2
+  device: cpu
+  apply_despeckling: false
+  apply_logit_to_inputs: true
+  memory_strategy: high
+  batch_size_for_norm_param_estimation: 1
+  stride_for_norm_param_estimation: 8
+  n_workers_for_despeckling: 4
+  n_workers_for_norm_param_estimation: 1
+  tqdm_enabled: false
+  model_compilation: false

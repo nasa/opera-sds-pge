@@ -19,7 +19,7 @@ from opera.pge.base.base_pge import PgeExecutor, PostProcessorMixin, PreProcesso
 from opera.util.dataset_utils import get_sensor_from_spacecraft_name
 from opera.util.error_codes import ErrorCode
 from opera.util.geo_utils import get_geographic_boundaries_from_mgrs_tile
-from opera.util.input_validation import check_input_list
+from opera.util.input_validation import check_input_list, validate_algorithm_parameters_config
 from opera.util.render_jinja2 import augment_measured_parameters, render_jinja2
 from opera.util.run_utils import get_checksum
 from opera.util.tiff_utils import get_geotiff_metadata
@@ -143,13 +143,9 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
                 msg
             )
 
-    def __validate_rtc_ordering(self, all_rtcs):
+    def __validate_rtc_burst_parings(self, all_rtcs):
         """
-        Verifies the pre and post co- and cross-pol RTC lists are well-ordered.
-
-        First, the lists are sorted by burst ID, then acquisition time. They are then
-        checked so that each RTC in the copol lists have the same burst ID and acquisition
-        time as the RTC in the same position in the corresponding crosspol list.
+        Verifies each RTC burst is present in both co- and cross-polarization.
 
         Parameters
         ----------
@@ -157,55 +153,40 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
             4-tuple of lists of input RTC filenames in the order: pre_rtc_copol, pre_rtc_crosspol, post_rtc_copol,
             post_rtc_crosspol
         """
-        def is_sorted(iterable, key=lambda x: x) -> bool:
-            for i, e in enumerate(iterable[1:]):
-                if key(e) < key(iterable[i]):
-                    return False
-            return True
-
-        def sort_fn(path):
-            match = self._rtc_pattern.match(os.path.basename(path))
-            match_dict = match.groupdict()
-
-            return match_dict['burst_id'], match_dict['acquisition_ts']
-
-        def compare_rtc_dates_and_bursts(copol, crosspol):
-            for copol_rtc, crosspol_rtc in zip(copol, crosspol):
-                copol_rtc = self._rtc_pattern.match(os.path.basename(copol_rtc))
-                crosspol_rtc = self._rtc_pattern.match(os.path.basename(crosspol_rtc))
-
-                if copol_rtc.groupdict()['acquisition_ts'] != crosspol_rtc.groupdict()['acquisition_ts']:
-                    return False
-                if copol_rtc.groupdict()['burst_id'] != crosspol_rtc.groupdict()['burst_id']:
-                    return False
-            return True
 
         pre_rtc_copol, pre_rtc_crosspol, post_rtc_copol, post_rtc_crosspol = all_rtcs
 
-        if not all([is_sorted(rtc_list, key=sort_fn) for rtc_list in (pre_rtc_copol, pre_rtc_crosspol,
-                                                                      post_rtc_copol, post_rtc_crosspol)]):
-            msg = 'One or more of the RunConfig SAS group RTC lists is badly ordered. Attempting to sort them'
-            self.logger.warning(
-                self.name,
-                ErrorCode.LOGGED_WARNING_LINE,
-                msg
-            )
+        burst_map = {}
 
-            pre_rtc_copol.sort(key=sort_fn)
-            pre_rtc_crosspol.sort(key=sort_fn)
-            post_rtc_copol.sort(key=sort_fn)
-            post_rtc_crosspol.sort(key=sort_fn)
+        for copol_rtc, crosspol_rtc in zip(pre_rtc_copol, pre_rtc_crosspol):
+            # By this point, all filenames will be matching the RTC pattern so we can safely
+            # assume this will not return None
+            copol_rtc = self._rtc_pattern.match(os.path.basename(copol_rtc))
+            crosspol_rtc = self._rtc_pattern.match(os.path.basename(crosspol_rtc))
 
-        if not compare_rtc_dates_and_bursts(pre_rtc_copol, pre_rtc_crosspol):
-            msg = 'Date or burst ID mismatch in pre_rtc copol and crosspol lists'
-            self.logger.critical(
-                self.name,
-                ErrorCode.INVALID_INPUT,
-                msg
-            )
+            copol_key = (copol_rtc.groupdict()['burst_id'], copol_rtc.groupdict()['acquisition_ts'])
+            crosspol_key = (crosspol_rtc.groupdict()['burst_id'], crosspol_rtc.groupdict()['acquisition_ts'])
 
-        if not compare_rtc_dates_and_bursts(post_rtc_copol, post_rtc_crosspol):
-            msg = 'Date or burst ID mismatch in post_rtc copol and crosspol lists'
+            burst_map.setdefault(copol_key, set()).add(copol_rtc.groupdict()['pol'])
+            burst_map.setdefault(crosspol_key, set()).add(crosspol_rtc.groupdict()['pol'])
+
+        for copol_rtc, crosspol_rtc in zip(post_rtc_copol, post_rtc_crosspol):
+            # By this point, all filenames will be matching the RTC pattern so we can safely
+            # assume this will not return None
+            copol_rtc = self._rtc_pattern.match(os.path.basename(copol_rtc))
+            crosspol_rtc = self._rtc_pattern.match(os.path.basename(crosspol_rtc))
+
+            copol_key = (copol_rtc.groupdict()['burst_id'], copol_rtc.groupdict()['acquisition_ts'])
+            crosspol_key = (crosspol_rtc.groupdict()['burst_id'], crosspol_rtc.groupdict()['acquisition_ts'])
+
+            burst_map.setdefault(copol_key, set()).add(copol_rtc.groupdict()['pol'])
+            burst_map.setdefault(crosspol_key, set()).add(crosspol_rtc.groupdict()['pol'])
+
+        bad_bursts = {k: v for k, v in burst_map.items() if len(v) != 2}
+
+        if len(bad_bursts) > 0:
+            msg = (f'The following burst-id/time pairs had either mismatched or too many polarizations (ie, each '
+                   f'paring must contain exactly one co-polarized and exactly one cross-polarized burst): {bad_bursts}')
             self.logger.critical(
                 self.name,
                 ErrorCode.INVALID_INPUT,
@@ -291,6 +272,8 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
         5. Validates that the co- and cross-pol RTCs are in the same order (burst-ID &
            acquisition time)
         6. Validates no cross-pol RTCs are in copol input lists and vice-versa
+        7. Validates each RTC burst at each input sensing time is available exactly once in co- and
+           cross-polarization
         """
         sas_config = self.runconfig.sas_config
 
@@ -307,24 +290,48 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
         self.__validate_rtc_lists_are_pge_subset(all_rtcs)
         baseline_matches, current_matches = self.__validate_rtc_filenames(baseline_rtcs, current_rtcs)
         self.__validate_rtc_homogeneity(current_matches)  # Per ADT: Baseline can be heterogeneous
-        self.__validate_rtc_ordering(all_rtcs)
         self.__validate_co_and_cross_polarizations(all_rtcs)
         self.__validate_no_duplicates(baseline_matches + current_matches)
+        self.__validate_rtc_burst_parings(all_rtcs)
 
     def _validate_previous_product(self):
         """
         Run validations for previous product input.
 
         Checks:
-        1. All files exist
-        2. All files are nonempty
-        3. All files are .tif files
-        4. Correct number of files (one for each TIFF layer) provided
-        5. All files are named conformant to DIST-S1 product specification
-        6. Exact set of layers provided (ie, no duplicates)
+        1. Product ID
+        2. All files exist
+        3. All files are nonempty
+        4. All files are .tif files
+        5. Correct number of files (one for each TIFF layer) provided
+        6. All files are named conformant to DIST-S1 product specification
+        7. Exact set of layers provided (ie, no duplicates)
         """
         sas_config = self.runconfig.sas_config
-        previous_products = sas_config["run_config"].get("pre_dist_s1_product", [])
+        previous_product = sas_config["run_config"].get("prior_dist_s1_product")
+
+        # Yes, the SAS checks for this
+        if re.match(self._product_id_pattern, basename(previous_product)) is None:
+            msg = f'Previous product directory name {basename(previous_product)} is not a valid product ID'
+            self.logger.critical(
+                self.name,
+                ErrorCode.INVALID_INPUT,
+                msg
+            )
+
+        if not isdir(previous_product):
+            msg = f'Previous product directory {previous_product} does not exist'
+            self.logger.critical(
+                self.name,
+                ErrorCode.INVALID_INPUT,
+                msg
+            )
+
+        previous_products = [
+            os.path.join(previous_product, layer)
+            for layer in os.listdir(previous_product)
+            if splitext(layer)[-1] != '.png'  # Ignore browse image
+        ]
 
         check_input_list(
             previous_products,
@@ -336,13 +343,14 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
 
         geotiff_layer_names = set(self._valid_previous_product_input_layer_names)
 
-        if len(previous_products) != len(geotiff_layer_names):
-            msg = f'Unexpected number of files in previous product: {len(previous_products)}'
-            self.logger.critical(
-                self.name,
-                ErrorCode.INVALID_INPUT,
-                msg
-            )
+        # TODO: Verify (see dist_s1_pge.py:896)
+        # if len(previous_products) != len(geotiff_layer_names):
+        #     msg = f'Unexpected number of files in previous product: {len(previous_products)}'
+        #     self.logger.critical(
+        #         self.name,
+        #         ErrorCode.INVALID_INPUT,
+        #         msg
+        #     )
 
         product_band_matches = [
             self._granule_filename_re.match(basename(previous_product)) for previous_product in previous_products
@@ -358,7 +366,7 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
 
         provided_layer_names = set([match.groupdict()['layer_name'] for match in product_band_matches])
 
-        if provided_layer_names != geotiff_layer_names:
+        if provided_layer_names.intersection(geotiff_layer_names) != geotiff_layer_names:
             msg = (f'Incomplete input product provided. Missing layers: '
                    f'{geotiff_layer_names.difference(provided_layer_names)}')
             self.logger.critical(
@@ -382,19 +390,33 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
         super().run_preprocessor(**kwargs)
 
         check_input_list(
-            self.runconfig.input_files,
+            [f for f in self.runconfig.input_files if not os.path.isdir(f)],  # See comment below
             self.logger,
             self.name,
             valid_extensions=self._valid_input_extensions,
             check_zero_size=True
         )
+        # One input is the directory of the previous product. This fails the valid extension check, so we exclude dirs
+        # here. We validate the previous product dir later. We could also move the previous product entry in the PGE
+        # runconfig group to the DynamicAncillaryFilesGroup
         self._validate_rtcs()
 
         sas_config = self.runconfig.sas_config
-        previous_products = sas_config["run_config"].get("pre_dist_s1_product", [])
+        previous_product = sas_config["run_config"].get("prior_dist_s1_product", None)
 
-        if previous_products:
+        if previous_product:
             self._validate_previous_product()
+
+        # DIST-S1 runconfig structure doesn't support runconfig.algorithm_parameters_file_config_path getter
+        algorithm_parameters = sas_config["run_config"].get("algo_config_path", None)
+
+        if algorithm_parameters:
+            validate_algorithm_parameters_config(
+                self.name,
+                self.runconfig.algorithm_parameters_schema_path,
+                algorithm_parameters,
+                self.logger
+            )
 
 
 class DistS1PostProcessorMixin(PostProcessorMixin):
@@ -854,6 +876,7 @@ class DistS1Executor(DistS1PreProcessorMixin, DistS1PostProcessorMixin, PgeExecu
 
     _valid_layer_names = _main_output_layer_names + _confirmation_db_output_layer_names
 
+    # TODO: Where did I get this? ADT provided sample with the omitted layers, so is this really a thing?
     _valid_previous_product_input_layer_names = [
         layer for layer in _valid_layer_names if layer not in {'BROWSE', 'GEN-DIST-STATUS-ACQ', 'GEN-METRIC'}
     ]
@@ -874,7 +897,7 @@ class DistS1Executor(DistS1PreProcessorMixin, DistS1PostProcessorMixin, PgeExecu
     LEVEL = "L3"
     """Processing Level for DIST-S1 Products"""
 
-    SAS_VERSION = "1.0.1"  # Beta release https://github.com/opera-adt/dist-s1/releases/tag/v1.0.1
+    SAS_VERSION = "2.0.4"  # CalVal release https://github.com/opera-adt/dist-s1/releases/tag/v2.0.4
     """Version of the SAS wrapped by this PGE, should be updated as needed"""
 
     def __init__(self, pge_name, runconfig_path, **kwargs):

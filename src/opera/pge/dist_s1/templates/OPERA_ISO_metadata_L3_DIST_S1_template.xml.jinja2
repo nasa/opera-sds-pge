@@ -690,22 +690,15 @@
                         </gmi:LE_Source>
                     </gmd:source>
                     {%- endfor %}
-                    <!--
+                    {%- if run_config.Groups.PGE.DynamicAncillaryFilesGroup.AncillaryFileMap.water_mask_path is not none %}
                     <gmd:source>
                         <gmd:LI_Source>
                             <gmd:description>
-{#                                <gco:CharacterString>Reference DEM - {{ run_config.Groups.PGE.DynamicAncillaryFilesGroup.AncillaryFileMap.dem_file }}{# ISO_OPERA_digitalElevationModelFile #}</gco:CharacterString>#}
+                                <gco:CharacterString>Reference Water File - {{ run_config.Groups.PGE.DynamicAncillaryFilesGroup.AncillaryFileMap.water_mask_path | basename }}</gco:CharacterString>#}
                             </gmd:description>
                         </gmd:LI_Source>
                     </gmd:source>
-                    <gmd:source>
-                        <gmd:LI_Source>
-                            <gmd:description>
-{#                                <gco:CharacterString>Reference Water File - {{ run_config.Groups.PGE.DynamicAncillaryFilesGroup.AncillaryFileMap.mask_file }}{# ISO_OPERA_waterMaskFile #}</gco:CharacterString>#}
-                            </gmd:description>
-                        </gmd:LI_Source>
-                    </gmd:source>
-                    -->
+                    {%- endif %}
                 </gmd:LI_Lineage>
             </gmd:lineage>
         </gmd:DQ_DataQuality>

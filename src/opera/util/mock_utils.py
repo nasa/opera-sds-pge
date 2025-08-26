@@ -286,29 +286,61 @@ class MockGdal:  # pragma: no cover
 
         def __init__(self):
             self.dummy_metadata = {
-                'apply_water_mask': 'False',
-                'bucket': 'None',
-                'dst_dir': '/home/ops/scratch_dir',
-                'high_confidence_threshold': '5.5',
-                'memory_strategy': 'high',
-                'mgrs_tile_id': '10SGD',
-                'moderate_confidence_threshold': '3.5',
-                'n_lookbacks': '3',
-                'n_workers_for_despeckling': '5',
-                'post_rtc_opera_ids': 'OPERA_L2_RTC-S1_T137-292318-IW1_20250102T015857Z_20250102T190143Z_S1A_30_v1.0,'
-                                      'OPERA_L2_RTC-S1_T137-292318-IW2_20250102T015858Z_20250102T190143Z_S1A_30_v1.0,'
-                                      'OPERA_L2_RTC-S1_T137-292319-IW1_20250102T015900Z_20250102T190143Z_S1A_30_v1.0,'
-                                      'OPERA_L2_RTC-S1_T137-292319-IW2_20250102T015901Z_20250102T190143Z_S1A_30_v1.0,'
-                                      'OPERA_L2_RTC-S1_T137-292320-IW1_20250102T015903Z_20250102T190143Z_S1A_30_v1.0',
-                'pre_rtc_opera_ids': 'OPERA_L2_RTC-S1_T137-292318-IW1_20240904T015900Z_20240904T150822Z_S1A_30_v1.0,'
-                                     'OPERA_L2_RTC-S1_T137-292318-IW1_20240916T015901Z_20240916T114330Z_S1A_30_v1.0,'
-                                     'OPERA_L2_RTC-S1_T137-292318-IW1_20240928T015901Z_20240929T005548Z_S1A_30_v1.0,'
-                                     'OPERA_L2_RTC-S1_T137-292318-IW1_20241010T015902Z_20241010T101259Z_S1A_30_v1.0,'
-                                     'OPERA_L2_RTC-S1_T137-292318-IW1_20241022T015902Z_20241022T180854Z_S1A_30_v1.0',
-                'product_dst_dir': '/home/ops/output_dir',
-                'tqdm_enabled': 'True',
-                'version': '0.0.6',
-                'water_mask_path': 'None'
+                "algo_config_path": "/home/ops/runconfig/opera_pge_dist_s1_r4_calval_algorithm_parameters.yaml",
+                "apply_despeckling": "True",
+                "apply_logit_to_inputs": "True",
+                "apply_water_mask": "True",
+                "batch_size_for_norm_param_estimation": "32",
+                "bucket": "None",
+                "bucket_prefix": "None",
+                "confidence_upper_lim": "32000",
+                "confirmation_confidence_threshold": "31.5",
+                "delta_lookback_days_mw": "1095,730,365",
+                "device": "cpu",
+                "dst_dir": "/home/ops/scratch_dir",
+                "exclude_consecutive_no_dist": "1",
+                "high_confidence_alert_threshold": "5.5",
+                "input_data_dir": "/home/ops/input_dir/out_1",
+                "interpolation_method": "bilinear",
+                "lookback_strategy": "multi_window",
+                "low_confidence_alert_threshold": "3.5",
+                "max_obs_num_year": "253",
+                "max_pre_imgs_per_burst_mw": "3,3,4",
+                "memory_strategy": "high",
+                "metric_value_upper_lim": "100.0",
+                "mgrs_tile_id": "11SLT",
+                "model_cfg_path": "None",
+                "model_compilation": "False",
+                "model_dtype": "float32",
+                "model_source": "transformer_optimized",
+                "model_wts_path": "None",
+                "no_count_reset_thresh": "7",
+                "no_day_limit": "30",
+                "n_anniversaries_for_mw": "3",
+                "n_workers_for_despeckling": "8",
+                "n_workers_for_norm_param_estimation": "8",
+                "percent_reset_thresh": "10",
+                "post_date_buffer_days": "1",
+                "post_rtc_opera_ids": "OPERA_L2_RTC-S1_T071-151226-IW2_20250121T135246Z_20250121T180333Z_S1A_30_v1.0,"
+                                      "OPERA_L2_RTC-S1_T071-151226-IW3_20250121T135247Z_20250121T180333Z_S1A_30_v1.0,"
+                                      "OPERA_L2_RTC-S1_T071-151227-IW2_20250121T135249Z_20250121T180333Z_S1A_30_v1.0,"
+                                      "OPERA_L2_RTC-S1_T071-151227-IW3_20250121T135250Z_20250121T180333Z_S1A_30_v1.0,"
+                                      "OPERA_L2_RTC-S1_T071-151228-IW2_20250121T135252Z_20250121T180333Z_S1A_30_v1.0",
+                "pre_rtc_opera_ids": "OPERA_L2_RTC-S1_T071-151226-IW2_20220101T135243Z_20241217T000016Z_S1A_30_v1.0,"
+                                     "OPERA_L2_RTC-S1_T071-151226-IW2_20220113T135242Z_20241219T014436Z_S1A_30_v1.0,"
+                                     "OPERA_L2_RTC-S1_T071-151226-IW3_20220101T135244Z_20241217T000824Z_S1A_30_v1.0,"
+                                     "OPERA_L2_RTC-S1_T071-151226-IW3_20220113T135243Z_20241219T014249Z_S1A_30_v1.0,"
+                                     "OPERA_L2_RTC-S1_T071-151227-IW2_20220101T135245Z_20241217T000824Z_S1A_30_v1.0",
+                "prior_dist_s1_product": "/home/ops/input_dir/product_0/"
+                                         "OPERA_L3_DIST-ALERT-S1_T11SLT_20250109T135247Z_20250818T224409Z_S1_30_v0.1",
+                "prior_product_name": "OPERA_L3_DIST-ALERT-S1_T11SLT_20250109T135247Z_20250818T224409Z_S1_30_v0.1",
+                "product_dst_dir": "/home/ops/output_dir",
+                "stride_for_norm_param_estimation": "16",
+                "tqdm_enabled": "True",
+                "use_date_encoding": "False",
+                "version": "2.0.5.dev0+gb08df390f.d20250819",
+                "water_mask_path": "/home/ops/input_dir/out_1/11SLT_water_mask.tif",
+                "AREA_OR_POINT": "Area"
             }
 
         def GetMetadata(self):

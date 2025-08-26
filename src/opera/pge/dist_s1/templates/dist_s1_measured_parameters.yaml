@@ -1,72 +1,237 @@
+# TODO: It looks like the SAS dumps the runconfig + algorithm params as metadata. We will need to ensure future
+#  deliveries have better metadata, but for now we need to fill this out as follows to avoid !Not found! errors
+#  in the ISO XML.
+
+AREA_OR_POINT:
+  attribute_data_type: string
+  attribute_type: processingParameter
+  description: 'Indicates that pixel values are assumed to represent an area rather than points.'
+  display_name: AreaOrPoint
+algo_config_path:
+  attribute_data_type: string
+  attribute_type: processingParameter
+  description: 'Path to external algorithm config file.'
+  display_name: AlgoConfigPath
+apply_despeckling:
+  attribute_data_type: boolean
+  attribute_type: processingParameter
+  description: 'Whether to apply despeckling to the input data.'
+  display_name: ApplyDespeckling
+apply_logit_to_inputs:
+  attribute_data_type: boolean
+  attribute_type: processingParameter
+  description: 'Whether to apply logit transform to the input data.'
+  display_name: ApplyLogitToInputs
 apply_water_mask:
   attribute_data_type: boolean
   attribute_type: processingParameter
   description: 'TBA'
   display_name: ApplyWaterMask
+batch_size_for_norm_param_estimation:
+  attribute_data_type: int
+  attribute_type: processingParameter
+  description: 'Batch size for norm parameter estimation from the baseline.'
+  display_name: BatchSizeForNormParamEstimation
 bucket:
   attribute_data_type: string
   attribute_type: processingParameter
   description: 'TBA'
   display_name: Bucket
+bucket_prefix:
+  attribute_data_type: string
+  attribute_type: processingParameter
+  description: 'TBA'
+  display_name: BucketPrefix
+confidence_upper_lim:
+  attribute_data_type: int
+  attribute_type: processingParameter
+  description: 'Confidence upper limit for confirmation. Confidence is an accumulation of the metric over time.'
+  display_name: ConfidenceUpperLim
+confirmation_confidence_threshold:
+  attribute_data_type: float
+  attribute_type: processingParameter
+  description: 'This is the threshold for the confirmation process to determine if a disturbance is confirmed.'
+  display_name: ConfirmationConfidenceThreshold
+delta_lookback_days_mw:
+  attribute_data_type: string
+  attribute_type: processingParameter
+  description: 'Delta lookback days for each window relative to post-image acquisition date.'
+  display_name: DeltaLookbackDaysMw
+device:
+  attribute_data_type: string
+  attribute_type: processingParameter
+  description: 'Device to use for model inference.'
+  display_name: Device
 dst_dir:
   attribute_data_type: string
   attribute_type: processingParameter
-  description: 'TBA'
+  description: 'Scratch directory path.'
   display_name: DstDir
-high_confidence_threshold:
+exclude_consecutive_no_dist:
+  attribute_data_type: int
+  attribute_type: processingParameter
+  description: 'Boolean activation of consecutive no disturbance tracking during confirmation. True will apply this 
+  logic: after 2 no disturbances within product sequence, the disturbance must finish or be reset. False will not 
+  apply this logic.'
+  display_name: ExcludeConsecutiveNoDist
+high_confidence_alert_threshold:
   attribute_data_type: float
   attribute_type: processingParameter
+  description: 'High confidence alert threshold for detecting disturbance between baseline and post-image.'
+  display_name: HighConfidenceAlertThreshold
+input_data_dir:
+  attribute_data_type: string
+  attribute_type: processingParameter
   description: 'TBA'
-  display_name: HighConfidenceThreshold
+  display_name: InputDataDir
+interpolation_method:
+  attribute_data_type: string
+  attribute_type: processingParameter
+  description: 'Interpolation method to use for despeckling. nearest will use nearest neighbor interpolation, 
+  bilinear will use bilinear interpolation, and none will not apply despeckling.'
+  display_name: InterpolationMethod
+lookback_strategy:
+  attribute_data_type: string
+  attribute_type: processingParameter
+  description: 'Lookback strategy to use for data curation of the baseline.'
+  display_name: LookbackStrategy
+low_confidence_alert_threshold:
+  attribute_data_type: float
+  attribute_type: processingParameter
+  description: 'Low confidence alert threshold for detecting disturbance between baseline and post-image.'
+  display_name: LowConfidenceAlertThreshold
+max_obs_num_year:
+  attribute_data_type: int
+  attribute_type: processingParameter
+  description: 'Max observation number per year. If observations exceeds this number, then the confirmation must 
+  conclude and be reset.'
+  display_name: MaxObsNumYear
+max_pre_imgs_per_burst_mw:
+  attribute_data_type: string
+  attribute_type: processingParameter
+  description: 'Max number of pre-images per burst within each window.'
+  display_name: MaxPreImgsPerBurstMw
 memory_strategy:
   attribute_data_type: string
   attribute_type: processingParameter
-  description: 'TBA'
+  description: 'Memory strategy to use for model inference.'
   display_name: MemoryStrategy
+metric_value_upper_lim:
+  attribute_data_type: float
+  attribute_type: processingParameter
+  description: 'Metric upper limit set during confirmation.'
+  display_name: MetricValueUpperLim
 mgrs_tile_id:
   attribute_data_type: string
   attribute_type: processingParameter
-  description: 'TBA'
-  display_name: MGRSTileID
-moderate_confidence_threshold:
-  attribute_data_type: float
+  description: 'Output MGRS tile identifier.'
+  display_name: MgrsTileId
+model_cfg_path:
+  attribute_data_type: string
   attribute_type: processingParameter
-  description: 'TBA'
-  display_name: ModerateConfidenceThreshold
-n_lookbacks:
+  description: 'Path to model config file'
+  display_name: ModelCfgPath
+model_compilation:
+  attribute_data_type: boolean
+  attribute_type: processingParameter
+  description: 'Whether to compile the model for CPU or GPU.'
+  display_name: ModelCompilation
+model_dtype:
+  attribute_data_type: string
+  attribute_type: processingParameter
+  description: 'Data type for model inference. Note: bfloat16 is only supported on GPU devices.'
+  display_name: ModelDtype
+model_source:
+  attribute_data_type: string
+  attribute_type: processingParameter
+  description: 'Model source. If external, use externally supplied paths for weights and config. Otherwise, use 
+  distmetrics.model_load.ALLOWED_MODELS for other models.'
+  display_name: ModelSource
+model_wts_path:
+  attribute_data_type: string
+  attribute_type: processingParameter
+  description: 'Path to model weights file.'
+  display_name: ModelWtsPath
+n_anniversaries_for_mw:
   attribute_data_type: int
   attribute_type: processingParameter
-  description: 'TBA'
-  display_name: NLookbacks
+  description: 'Number of anniversaries to use for multi-window'
+  display_name: NAnniversariesForMw
 n_workers_for_despeckling:
   attribute_data_type: int
   attribute_type: processingParameter
-  description: 'TBA'
+  description: 'Number of workers for despeckling.'
   display_name: NWorkersForDespeckling
+n_workers_for_norm_param_estimation:
+  attribute_data_type: int
+  attribute_type: processingParameter
+  description: 'Number of workers for norm parameter estimation from the baseline.'
+  display_name: NWorkersForNormParamEstimation
+no_count_reset_thresh:
+  attribute_data_type: int
+  attribute_type: processingParameter
+  description: 'If the number of non-disturbed observations prevnocount is above nocount_reset_thresh disturbance will reset.'
+  display_name: NoCountResetThresh
+no_day_limit:
+  attribute_data_type: int
+  attribute_type: processingParameter
+  description: 'Number of days to limit confirmation process logic to. Confirmation must occur within first observance 
+  of disturbance and no_day_limit days after first disturbance.'
+  display_name: NoDayLimit
+percent_reset_thresh:
+  attribute_data_type: int
+  attribute_type: processingParameter
+  description: 'Precentage number threshold to reset disturbance. Values below percent_reset_thresh will reset disturbance.'
+  display_name: PercentResetThresh
+post_date_buffer_days:
+  attribute_data_type: int
+  attribute_type: processingParameter
+  description: 'Buffer days around post-date for data collection to create acqusition image to compare baseline to.'
+  display_name: PostDateBufferDays
 post_rtc_opera_ids:
   attribute_data_type: string
   attribute_type: processingParameter
-  description: 'TBA'
-  display_name: PostRtcOperaIDs
+  description: 'List of post-event OPERA RTC product IDs.'
+  display_name: PostRtcOperaIds
 pre_rtc_opera_ids:
   attribute_data_type: string
   attribute_type: processingParameter
-  description: 'TBA'
-  display_name: PreRtcOperaIDs
+  description: 'List of pre-event OPERA RTC product IDs.'
+  display_name: PreRtcOperaIds
+prior_dist_s1_product:
+  attribute_data_type: string
+  attribute_type: processingParameter
+  description: 'ID of prior OPERA DIST-S1 product used for confirmation.'
+  display_name: PriorDistS1Product
+prior_product_name:
+  attribute_data_type: string
+  attribute_type: processingParameter
+  description: 'Path to prior OPERA DIST-S1 product used for confirmation.'
+  display_name: PriorProductName
 product_dst_dir:
   attribute_data_type: string
   attribute_type: processingParameter
   description: 'TBA'
   display_name: ProductDstDir
+stride_for_norm_param_estimation:
+  attribute_data_type: int
+  attribute_type: processingParameter
+  description: 'Stride for norm parameter estimation from the baseline'
+  display_name: StrideForNormParamEstimation
 tqdm_enabled:
   attribute_data_type: boolean
   attribute_type: processingParameter
   description: 'TBA'
   display_name: TqdmEnabled
+use_date_encoding:
+  attribute_data_type: boolean
+  attribute_type: processingParameter
+  description: 'Whether to use acquisition date encoding in model application (currently not supported)'
+  display_name: UseDateEncoding
 version:
   attribute_data_type: string
   attribute_type: processingParameter
-  description: 'TBA'
+  description: 'dist-s1 code package version. (May differ from SAS version)'
   display_name: Version
 water_mask_path:
   attribute_data_type: string

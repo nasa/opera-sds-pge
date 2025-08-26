@@ -283,6 +283,8 @@ def render_jinja2(
                                       autoescape=jinja2.select_autoescape(),
                                       undefined=undefined_handler_class)
 
+    template_env.filters['basename'] = lambda x: os.path.basename(str(x))
+
     template = template_env.get_template(template_filename)
 
     rendered_text = template.render(input_data)

@@ -2,7 +2,7 @@
 """Compare DIST products"""
 import argparse
 
-from dist_s1.data_models.output_models import ProductDirectoryData
+from dist_s1.data_models.output_models import DistS1ProductDirectory
 
 
 def _get_parser():
@@ -32,8 +32,8 @@ def main():
 
     args = parser.parse_args()
 
-    expected_product = ProductDirectoryData.from_product_path(args.expected_product)
-    test_product = ProductDirectoryData.from_product_path(args.test_product)
+    expected_product = DistS1ProductDirectory.from_product_path(args.expected_product)
+    test_product = DistS1ProductDirectory.from_product_path(args.test_product)
 
     if expected_product == test_product:
         print('[OK] Products are equal')
