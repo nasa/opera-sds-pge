@@ -804,33 +804,7 @@ class DistS1PgeTestCase(unittest.TestCase):
 
             self.assertIn("One or more previous-product inputs has an invalid filename", log_contents)
 
-            # Test 5: Wrong number
-            # TODO: Is this correct? (see dist_s1_pge.py:896)
-
-            # invalid_sample_bands = sample_bands[1:]
-            #
-            # self.generate_band_data_output(
-            #     sample_product_id,
-            #     tuple(invalid_sample_bands),
-            #     directory=self.input_dir,
-            #     clear=True
-            # )
-            #
-            # pge = DistS1Executor(pge_name="DistS1PgeTest", runconfig_path=test_runconfig_path)
-            #
-            # with self.assertRaises(RuntimeError):
-            #     pge.run()
-            #
-            # expected_log_file = pge.logger.get_file_name()
-            # self.assertTrue(os.path.exists(expected_log_file))
-            #
-            # # Open the log file, and check that the validation error details were captured
-            # with open(expected_log_file, 'r', encoding='utf-8') as infile:
-            #     log_contents = infile.read()
-            #
-            # self.assertIn("Unexpected number of files in previous product", log_contents)
-
-            # Test 6: Incorrect set of layers
+            # Test 5: Incorrect set of layers
 
             invalid_sample_bands = deepcopy(sample_bands)
             invalid_sample_bands[0] = sample_duplicate
