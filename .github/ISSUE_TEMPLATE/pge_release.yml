@@ -9,13 +9,13 @@ body:
       label: PGE Release Procedure Steps
       description: Tailor the following task list as-necessary for the PGE Release to be performed
       value: |
-          - [ ] Ensure `main` branch is up-to-date, then create the `release/<version>` branch off of it
+          - [ ] Ensure `main` branch is up-to-date, then create the `release/<pge_name>/<version>` branch off of it
           - [ ] Update [one of] the following version numbers:
             - In `src/opera/pge/<pge name>/<pge_name>_pge.py` update PGE_VERSION to `<version>`
             - In `src/opera/_package.py` update the "repository" version to `<version>`
           - [ ] Rename `examples/<pge name>_sample_runconfig-v<previous version>.yaml` to `examples/<pge name>_sample_runconfig-v<version>.yaml`
             - Ensure the version referenced in the comment at the top of the file is also updated
-          - [ ] Push the `release/<version>` branch to `origin`, then execute the integration test for <PGE Name> within the Jenkins Int Test pipeline
+          - [ ] Push the `release/<pge_name>/<version>` branch to `origin`, then execute the integration test for <PGE Name> within the Jenkins Int Test pipeline
             - If the branch does not show up in the Jenkins pipeline, use the "Scan Repository Now" feature of Jenkins to refresh list of avaialble branches
             - Once the Integration test is complete, inspect the results of the .html product comparison report to ensure all tests are passing
           - [ ] Run the Release pipeline in Jenkins to push the container images to Artifactory
