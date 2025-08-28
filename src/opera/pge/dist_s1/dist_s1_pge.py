@@ -427,6 +427,10 @@ class DistS1PostProcessorMixin(PostProcessorMixin):
     _tile_metadata_cache = {}
     _tile_filename_cache = {}
 
+    _meta_keys_to_drop = ["algo_config_path", "bucket", "bucket_prefix", "dst_dir", "input_data_dir", "model_cfg_path",
+                          "model_wts_path", "prior_dist_s1_product", "product_dst_dir", "water_mask_path",
+                          "tqdm_enabled"]
+
     def _validate_outputs(self):
         output_product_path = abspath(self.runconfig.output_product_path)
         output_products = []
@@ -634,6 +638,8 @@ class DistS1PostProcessorMixin(PostProcessorMixin):
 
         try:
             measured_parameters = get_geotiff_metadata(geotiff_product)
+            _ = [measured_parameters.pop(key, None) for key in self._meta_keys_to_drop]
+
             output_product_metadata['MeasuredParameters'] = augment_measured_parameters(
                 measured_parameters,
                 self.runconfig.iso_measured_parameter_descriptions,
