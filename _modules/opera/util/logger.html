@@ -5,14 +5,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera.util.logger &mdash; opera-sds-pge 6.0.0-rc.1.0 documentation</title>
+  <title>opera.util.logger &mdash; opera-sds-pge 6.0.0-rc.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
 
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=83d0fb78"></script>
+      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=11af2593"></script>
       <script src="../../../_static/doctools.js?v=888ff710"></script>
       <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -378,8 +378,9 @@
 <span class="sd">        error_code_offset : int</span>
 <span class="sd">            Error code offset to add to this logger&#39;s error code base value</span>
 <span class="sd">            to determine the final error code associated with the log message.</span>
-<span class="sd">        description : str</span>
-<span class="sd">            Description message to write to the log.</span>
+<span class="sd">        description : str, list(str)</span>
+<span class="sd">            Description message to write to the log. Can be a single string or</span>
+<span class="sd">            a list of strings. Strings with newlines will be split.</span>
 <span class="sd">        additional_back_frames : int, optional</span>
 <span class="sd">            Number of call-stack frames to &quot;back up&quot; to in order to determine</span>
 <span class="sd">            the calling function and line number.</span>
@@ -395,9 +396,18 @@
 
         <span class="n">location</span> <span class="o">=</span> <span class="n">caller</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_filename</span> <span class="o">+</span> <span class="s1">&#39;:&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">caller</span><span class="o">.</span><span class="n">f_lineno</span><span class="p">)</span>
 
-        <span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log_stream</span><span class="p">,</span> <span class="n">severity</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">workflow</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span>
-              <span class="bp">self</span><span class="o">.</span><span class="n">error_code_base</span> <span class="o">+</span> <span class="n">error_code_offset</span><span class="p">,</span>
-              <span class="n">location</span><span class="p">,</span> <span class="n">description</span><span class="p">)</span></div>
+        <span class="n">log_lines</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">description</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">log_lines</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">description</span><span class="o">.</span><span class="n">splitlines</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">string</span> <span class="ow">in</span> <span class="n">description</span><span class="p">:</span>
+                <span class="n">log_lines</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">string</span><span class="o">.</span><span class="n">splitlines</span><span class="p">())</span>
+
+        <span class="k">for</span> <span class="n">log_line</span> <span class="ow">in</span> <span class="n">log_lines</span><span class="p">:</span>
+            <span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log_stream</span><span class="p">,</span> <span class="n">severity</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">workflow</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span>
+                  <span class="bp">self</span><span class="o">.</span><span class="n">error_code_base</span> <span class="o">+</span> <span class="n">error_code_offset</span><span class="p">,</span>
+                  <span class="n">location</span><span class="p">,</span> <span class="n">log_line</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PgeLogger.info"><a class="viewcode-back" href="../../../opera.util.html#opera.util.logger.PgeLogger.info">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">error_code_offset</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -410,8 +420,9 @@
 <span class="sd">        error_code_offset : int</span>
 <span class="sd">            Error code offset to add to this logger&#39;s error code base value</span>
 <span class="sd">            to determine the final error code associated with the log message.</span>
-<span class="sd">        description : str</span>
-<span class="sd">            Description message to write to the log.</span>
+<span class="sd">        description : str, list(str)</span>
+<span class="sd">            Description message to write to the log. Can be a single string or</span>
+<span class="sd">            a list of strings. Strings with newlines will be split.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">INFO</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">error_code_offset</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span>
@@ -428,8 +439,9 @@
 <span class="sd">        error_code_offset : int</span>
 <span class="sd">            Error code offset to add to this logger&#39;s error code base value</span>
 <span class="sd">            to determine the final error code associated with the log message.</span>
-<span class="sd">        description : str</span>
-<span class="sd">            Description message to write to the log.</span>
+<span class="sd">        description : str, list(str)</span>
+<span class="sd">            Description message to write to the log. Can be a single string or</span>
+<span class="sd">            a list of strings. Strings with newlines will be split.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">DEBUG</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">error_code_offset</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span>
@@ -446,8 +458,9 @@
 <span class="sd">        error_code_offset : int</span>
 <span class="sd">            Error code offset to add to this logger&#39;s error code base value</span>
 <span class="sd">            to determine the final error code associated with the log message.</span>
-<span class="sd">        description : str</span>
-<span class="sd">            Description message to write to the log.</span>
+<span class="sd">        description : str, list(str)</span>
+<span class="sd">            Description message to write to the log. Can be a single string or</span>
+<span class="sd">            a list of strings. Strings with newlines will be split.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">WARNING</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">error_code_offset</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span>
@@ -469,8 +482,9 @@
 <span class="sd">        error_code_offset : int</span>
 <span class="sd">            Error code offset to add to this logger&#39;s error code base value</span>
 <span class="sd">            to determine the final error code associated with the log message.</span>
-<span class="sd">        description : str</span>
-<span class="sd">            Description message to write to the log.</span>
+<span class="sd">        description : str, list(str)</span>
+<span class="sd">            Description message to write to the log. Can be a single string or</span>
+<span class="sd">            a list of strings. Strings with newlines will be split.</span>
 
 <span class="sd">        Raises</span>
 <span class="sd">        ------</span>

@@ -6,14 +6,14 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera.util package &mdash; opera-sds-pge 6.0.0-rc.1.0 documentation</title>
+  <title>opera.util package &mdash; opera-sds-pge 6.0.0-rc.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
 
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=83d0fb78"></script>
+      <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=11af2593"></script>
       <script src="_static/doctools.js?v=888ff710"></script>
       <script src="_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="_static/js/theme.js"></script>
@@ -580,7 +580,8 @@ finalized before the exception is raised.</p>
 <li><p><strong>module</strong> (<em>str</em>) – Name of the module where the logging took place.</p></li>
 <li><p><strong>error_code_offset</strong> (<em>int</em>) – Error code offset to add to this logger’s error code base value
 to determine the final error code associated with the log message.</p></li>
-<li><p><strong>description</strong> (<em>str</em>) – Description message to write to the log.</p></li>
+<li><p><strong>description</strong> (<em>str</em><em>, </em><em>list</em><em>(</em><em>str</em><em>)</em>) – Description message to write to the log. Can be a single string or
+a list of strings. Strings with newlines will be split.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
@@ -600,7 +601,8 @@ to determine the final error code associated with the log message.</p></li>
 <li><p><strong>module</strong> (<em>str</em>) – Name of the module where the logging took place.</p></li>
 <li><p><strong>error_code_offset</strong> (<em>int</em>) – Error code offset to add to this logger’s error code base value
 to determine the final error code associated with the log message.</p></li>
-<li><p><strong>description</strong> (<em>str</em>) – Description message to write to the log.</p></li>
+<li><p><strong>description</strong> (<em>str</em><em>, </em><em>list</em><em>(</em><em>str</em><em>)</em>) – Description message to write to the log. Can be a single string or
+a list of strings. Strings with newlines will be split.</p></li>
 </ul>
 </dd>
 </dl>
@@ -682,7 +684,8 @@ info, debug, warning, critical (case-insensitive).</p>
 <li><p><strong>module</strong> (<em>str</em>) – Name of the module where the logging took place.</p></li>
 <li><p><strong>error_code_offset</strong> (<em>int</em>) – Error code offset to add to this logger’s error code base value
 to determine the final error code associated with the log message.</p></li>
-<li><p><strong>description</strong> (<em>str</em>) – Description message to write to the log.</p></li>
+<li><p><strong>description</strong> (<em>str</em><em>, </em><em>list</em><em>(</em><em>str</em><em>)</em>) – Description message to write to the log. Can be a single string or
+a list of strings. Strings with newlines will be split.</p></li>
 </ul>
 </dd>
 </dl>
@@ -768,7 +771,8 @@ to the log formatting style for OPERA.</p>
 <li><p><strong>module</strong> (<em>str</em>) – Name of the module where the logging took place.</p></li>
 <li><p><strong>error_code_offset</strong> (<em>int</em>) – Error code offset to add to this logger’s error code base value
 to determine the final error code associated with the log message.</p></li>
-<li><p><strong>description</strong> (<em>str</em>) – Description message to write to the log.</p></li>
+<li><p><strong>description</strong> (<em>str</em><em>, </em><em>list</em><em>(</em><em>str</em><em>)</em>) – Description message to write to the log. Can be a single string or
+a list of strings. Strings with newlines will be split.</p></li>
 </ul>
 </dd>
 </dl>
@@ -792,7 +796,8 @@ critical (case-insensitive).</p></li>
 <li><p><strong>module</strong> (<em>str</em>) – Name of the module where the logging took place.</p></li>
 <li><p><strong>error_code_offset</strong> (<em>int</em>) – Error code offset to add to this logger’s error code base value
 to determine the final error code associated with the log message.</p></li>
-<li><p><strong>description</strong> (<em>str</em>) – Description message to write to the log.</p></li>
+<li><p><strong>description</strong> (<em>str</em><em>, </em><em>list</em><em>(</em><em>str</em><em>)</em>) – Description message to write to the log. Can be a single string or
+a list of strings. Strings with newlines will be split.</p></li>
 <li><p><strong>additional_back_frames</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of call-stack frames to “back up” to in order to determine
 the calling function and line number.</p></li>
 </ul>
