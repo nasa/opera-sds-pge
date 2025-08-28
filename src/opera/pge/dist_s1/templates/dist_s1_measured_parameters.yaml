@@ -7,11 +7,6 @@ AREA_OR_POINT:
   attribute_type: processingParameter
   description: 'Indicates that pixel values are assumed to represent an area rather than points.'
   display_name: AreaOrPoint
-algo_config_path:
-  attribute_data_type: string
-  attribute_type: processingParameter
-  description: 'Path to external algorithm config file.'
-  display_name: AlgoConfigPath
 apply_despeckling:
   attribute_data_type: boolean
   attribute_type: processingParameter
@@ -32,16 +27,6 @@ batch_size_for_norm_param_estimation:
   attribute_type: processingParameter
   description: 'Batch size for norm parameter estimation from the baseline.'
   display_name: BatchSizeForNormParamEstimation
-bucket:
-  attribute_data_type: string
-  attribute_type: processingParameter
-  description: 'TBA'
-  display_name: Bucket
-bucket_prefix:
-  attribute_data_type: string
-  attribute_type: processingParameter
-  description: 'TBA'
-  display_name: BucketPrefix
 confidence_upper_lim:
   attribute_data_type: int
   attribute_type: processingParameter
@@ -62,11 +47,6 @@ device:
   attribute_type: processingParameter
   description: 'Device to use for model inference.'
   display_name: Device
-dst_dir:
-  attribute_data_type: string
-  attribute_type: processingParameter
-  description: 'Scratch directory path.'
-  display_name: DstDir
 exclude_consecutive_no_dist:
   attribute_data_type: int
   attribute_type: processingParameter
@@ -79,11 +59,6 @@ high_confidence_alert_threshold:
   attribute_type: processingParameter
   description: 'High confidence alert threshold for detecting disturbance between baseline and post-image.'
   display_name: HighConfidenceAlertThreshold
-input_data_dir:
-  attribute_data_type: string
-  attribute_type: processingParameter
-  description: 'TBA'
-  display_name: InputDataDir
 interpolation_method:
   attribute_data_type: string
   attribute_type: processingParameter
@@ -126,11 +101,6 @@ mgrs_tile_id:
   attribute_type: processingParameter
   description: 'Output MGRS tile identifier.'
   display_name: MgrsTileId
-model_cfg_path:
-  attribute_data_type: string
-  attribute_type: processingParameter
-  description: 'Path to model config file'
-  display_name: ModelCfgPath
 model_compilation:
   attribute_data_type: boolean
   attribute_type: processingParameter
@@ -147,11 +117,6 @@ model_source:
   description: 'Model source. If external, use externally supplied paths for weights and config. Otherwise, use 
   distmetrics.model_load.ALLOWED_MODELS for other models.'
   display_name: ModelSource
-model_wts_path:
-  attribute_data_type: string
-  attribute_type: processingParameter
-  description: 'Path to model weights file.'
-  display_name: ModelWtsPath
 n_anniversaries_for_mw:
   attribute_data_type: int
   attribute_type: processingParameter
@@ -198,31 +163,16 @@ pre_rtc_opera_ids:
   attribute_type: processingParameter
   description: 'List of pre-event OPERA RTC product IDs.'
   display_name: PreRtcOperaIds
-prior_dist_s1_product:
-  attribute_data_type: string
-  attribute_type: processingParameter
-  description: 'ID of prior OPERA DIST-S1 product used for confirmation.'
-  display_name: PriorDistS1Product
 prior_product_name:
   attribute_data_type: string
   attribute_type: processingParameter
-  description: 'Path to prior OPERA DIST-S1 product used for confirmation.'
+  description: 'ID of prior OPERA DIST-S1 product used for confirmation.'
   display_name: PriorProductName
-product_dst_dir:
-  attribute_data_type: string
-  attribute_type: processingParameter
-  description: 'TBA'
-  display_name: ProductDstDir
 stride_for_norm_param_estimation:
   attribute_data_type: int
   attribute_type: processingParameter
   description: 'Stride for norm parameter estimation from the baseline'
   display_name: StrideForNormParamEstimation
-tqdm_enabled:
-  attribute_data_type: boolean
-  attribute_type: processingParameter
-  description: 'TBA'
-  display_name: TqdmEnabled
 use_date_encoding:
   attribute_data_type: boolean
   attribute_type: processingParameter
@@ -233,8 +183,3 @@ version:
   attribute_type: processingParameter
   description: 'dist-s1 code package version. (May differ from SAS version)'
   display_name: Version
-water_mask_path:
-  attribute_data_type: string
-  attribute_type: processingParameter
-  description: 'TBA'
-  display_name: WaterMaskPath
