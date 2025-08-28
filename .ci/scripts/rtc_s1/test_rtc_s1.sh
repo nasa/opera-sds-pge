@@ -42,6 +42,7 @@ chmod -R 775 ${WORKSPACE}/${TEST_RESULTS_REL_DIR}
 DOCKER_RUN="docker run --rm \
     -v ${WORKSPACE}:/workspace \
     -v ${WORKSPACE}/src/opera/test/__init__.py:${CONTAINER_HOME}/opera/test/__init__.py \
+    -v ${WORKSPACE}/src/opera/test/pge/__init__.py:${CONTAINER_HOME}/opera/test/pge/__init__.py \
     -v ${WORKSPACE}/src/opera/test/pge/base:${CONTAINER_HOME}/opera/test/pge/base \
     -v ${WORKSPACE}/src/opera/test/pge/${PGE_NAME}:${CONTAINER_HOME}/opera/test/pge/${PGE_NAME} \
     -v ${WORKSPACE}/src/opera/test/scripts:${CONTAINER_HOME}/opera/test/scripts \
