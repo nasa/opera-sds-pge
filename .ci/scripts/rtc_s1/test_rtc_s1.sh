@@ -42,6 +42,7 @@ chmod -R 775 ${WORKSPACE}/${TEST_RESULTS_REL_DIR}
 DOCKER_RUN="docker run --rm \
     -v ${WORKSPACE}:/workspace \
     -v ${WORKSPACE}/src/opera/test/__init__.py:${CONTAINER_HOME}/opera/test/__init__.py \
+    -v ${WORKSPACE}/src/opera/test/pge/__init__.py:${CONTAINER_HOME}/opera/test/pge/__init__.py \
     -v ${WORKSPACE}/src/opera/test/pge/base:${CONTAINER_HOME}/opera/test/pge/base \
     -v ${WORKSPACE}/src/opera/test/pge/${PGE_NAME}:${CONTAINER_HOME}/opera/test/pge/${PGE_NAME} \
     -v ${WORKSPACE}/src/opera/test/scripts:${CONTAINER_HOME}/opera/test/scripts \
@@ -86,7 +87,7 @@ ${DOCKER_RUN} ${ENTRYPOINT} pylint \
     ${CONTAINER_HOME}/opera
 
 # pytest (including code coverage)
-${DOCKER_RUN} ${ENTRYPOINT} "pytest -p no:cacheprovider \
+${DOCKER_RUN} ${ENTRYPOINT} bash -c "pytest -p no:cacheprovider \
     --junit-xml=/workspace/${TEST_RESULTS_REL_DIR}/${PGE_NAME}/pytest-junit.xml \
     --cov=${CONTAINER_HOME}/opera/pge/base \
     --cov=${CONTAINER_HOME}/opera/pge/${PGE_NAME} \
@@ -97,7 +98,7 @@ ${DOCKER_RUN} ${ENTRYPOINT} "pytest -p no:cacheprovider \
     ${CONTAINER_HOME}/opera/test/pge/base \
     ${CONTAINER_HOME}/opera/test/pge/${PGE_NAME} \
     ${CONTAINER_HOME}/opera/test/scripts \
-    ${CONTAINER_HOME}/opera/test/util > ${TEST_RESULTS_DIR}/pytest.log"
+    ${CONTAINER_HOME}/opera/test/util > /workspace/${TEST_RESULTS_REL_DIR}/${PGE_NAME}/pytest.log"
 
 echo "RTC-S1 PGE Docker image test complete"
 

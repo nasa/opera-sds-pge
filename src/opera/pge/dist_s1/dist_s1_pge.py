@@ -305,7 +305,7 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
         4. All files are .tif files
         5. Correct number of files (one for each TIFF layer) provided
         6. All files are named conformant to DIST-S1 product specification
-        7. Exact set of layers provided (ie, no duplicates)
+        7. Exact set of required layers provided (ie, no duplicates)
         """
         sas_config = self.runconfig.sas_config
         previous_product = sas_config["run_config"].get("prior_dist_s1_product")
@@ -342,15 +342,6 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
         )
 
         geotiff_layer_names = set(self._valid_previous_product_input_layer_names)
-
-        # TODO: Verify (see dist_s1_pge.py:896)
-        # if len(previous_products) != len(geotiff_layer_names):
-        #     msg = f'Unexpected number of files in previous product: {len(previous_products)}'
-        #     self.logger.critical(
-        #         self.name,
-        #         ErrorCode.INVALID_INPUT,
-        #         msg
-        #     )
 
         product_band_matches = [
             self._granule_filename_re.match(basename(previous_product)) for previous_product in previous_products
@@ -435,6 +426,10 @@ class DistS1PostProcessorMixin(PostProcessorMixin):
     # May not need these since PGE produces 1 tile / execution
     _tile_metadata_cache = {}
     _tile_filename_cache = {}
+
+    _meta_keys_to_drop = ["algo_config_path", "bucket", "bucket_prefix", "dst_dir", "input_data_dir", "model_cfg_path",
+                          "model_wts_path", "prior_dist_s1_product", "product_dst_dir", "water_mask_path",
+                          "tqdm_enabled"]
 
     def _validate_outputs(self):
         output_product_path = abspath(self.runconfig.output_product_path)
@@ -643,6 +638,8 @@ class DistS1PostProcessorMixin(PostProcessorMixin):
 
         try:
             measured_parameters = get_geotiff_metadata(geotiff_product)
+            _ = [measured_parameters.pop(key, None) for key in self._meta_keys_to_drop]
+
             output_product_metadata['MeasuredParameters'] = augment_measured_parameters(
                 measured_parameters,
                 self.runconfig.iso_measured_parameter_descriptions,
@@ -876,10 +873,7 @@ class DistS1Executor(DistS1PreProcessorMixin, DistS1PostProcessorMixin, PgeExecu
 
     _valid_layer_names = _main_output_layer_names + _confirmation_db_output_layer_names
 
-    # TODO: Where did I get this? ADT provided sample with the omitted layers, so is this really a thing?
-    _valid_previous_product_input_layer_names = [
-        layer for layer in _valid_layer_names if layer not in {'BROWSE', 'GEN-DIST-STATUS-ACQ', 'GEN-METRIC'}
-    ]
+    _valid_previous_product_input_layer_names = [layer for layer in _valid_layer_names if layer != 'BROWSE']
 
     _product_id_pattern = (r'(?P<id>(?P<project>OPERA)_(?P<level>L3)_(?P<product_type>DIST(-ALERT)?)-(?P<source>S1)_'
                            r'(?P<tile_id>T[^\W_]{5})_(?P<acquisition_ts>\d{8}T\d{6}Z)_(?P<creation_ts>\d{8}T\d{6}Z)_'
