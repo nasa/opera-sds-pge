@@ -18,6 +18,8 @@ from collections import OrderedDict
 from os import listdir
 from os.path import abspath, basename, exists, getsize, join, splitext
 
+from opera_utils import get_frame_bbox
+
 from opera.pge.base.base_pge import PgeExecutor
 from opera.pge.base.base_pge import PostProcessorMixin
 from opera.pge.base.base_pge import PreProcessorMixin
@@ -1277,12 +1279,20 @@ class DispS1StaticPostProcessorMixin(DispS1PostProcessorMixin):
         validity_start_date = f'{validity_start_date[:4]}-{validity_start_date[4:6]}-{validity_start_date[6:8]}'
 
         output_product_metadata['acquisitionDate'] = validity_start_date
-
-        # TODO: BBOX will be derived from product metadata
-        output_product_metadata['geospatial_lon_min'] = 0
-        output_product_metadata['geospatial_lon_max'] = 0
-        output_product_metadata['geospatial_lat_min'] = 0
-        output_product_metadata['geospatial_lat_max'] = 0
+       
+        try:
+            epsg, bounds = get_frame_bbox(
+                frame_id=self.runconfig.input_file_group.frame_id,
+                json_file=self.runconfig.static_ancillary_file_group.frame_to_burst_json,
+            )
+            
+            output_product_metadata['geospatial_lon_min'] = bounds[0]
+            output_product_metadata['geospatial_lon_max'] = bounds[2]
+            output_product_metadata['geospatial_lat_min'] = bounds[1]
+            output_product_metadata['geospatial_lat_max'] = bounds[3]
+        except Exception as err:
+            msg = f'Failed to extract bbox metadata from {disp_product}, reason: {err}'
+            self.logger.critical(self.name, ErrorCode.ISO_METADATA_COULD_NOT_EXTRACT_METADATA, msg)
 
         return output_product_metadata
 
