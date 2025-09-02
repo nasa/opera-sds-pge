@@ -1282,8 +1282,8 @@ class DispS1StaticPostProcessorMixin(DispS1PostProcessorMixin):
        
         try:
             epsg, bounds = get_frame_bbox(
-                frame_id=self.runconfig.input_file_group.frame_id,
-                json_file=self.runconfig.static_ancillary_file_group.frame_to_burst_json,
+                frame_id=self.runconfig.sas_config['input_file_group']['frame_id'],
+                json_file=self.runconfig.sas_config['static_ancillary_file_group']['frame_to_burst_json'],
             )
             
             output_product_metadata['geospatial_lon_min'] = bounds[0]
