@@ -26,6 +26,33 @@ RunConfig:
                 ProgramPath: mkdir
                 ProgramOptions:
                     - '-p disp_s1_pge_test/output_dir;'
+                    - |
+                      cat > disp_s1_pge_test/input_dir/opera-s1-disp-frame-to-burst.json <<'EOF'
+                      {
+                        "data": {
+                          "11115": {
+                            "epsg": 32610,
+                            "is_land": true,
+                            "is_north_america": true,
+                            "xmin": 523440,
+                            "ymin": 4055790,
+                            "xmax": 811380,
+                            "ymax": 4261770,
+                            "burst_ids": [
+                              "t042_088913_iw1", "t042_088913_iw2", "t042_088913_iw3",
+                              "t042_088914_iw1", "t042_088914_iw2", "t042_088914_iw3",
+                              "t042_088915_iw1", "t042_088915_iw2", "t042_088915_iw3",
+                              "t042_088916_iw1", "t042_088916_iw2", "t042_088916_iw3",
+                              "t042_088917_iw1", "t042_088917_iw2", "t042_088917_iw3",
+                              "t042_088918_iw1", "t042_088918_iw2", "t042_088918_iw3",
+                              "t042_088919_iw1", "t042_088919_iw2", "t042_088919_iw3",
+                              "t042_088920_iw1", "t042_088920_iw2", "t042_088920_iw3",
+                              "t042_088921_iw1", "t042_088921_iw2", "t042_088921_iw3"
+                            ]
+                          }
+                        }
+                      }
+                      EOF
                     - 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/disp-s1-static-dem_warped_utm.tif bs=1M count=1;'
                     - 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/disp-s1-static-layover_shadow_mask.tif bs=1M count=1;'
                     - 'dd if=/dev/urandom of=disp_s1_pge_test/output_dir/disp-s1-static-los_enu.browse.png bs=1M count=1;'
