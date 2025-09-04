@@ -7,6 +7,7 @@ jsonschema
 lxml
 mgrs
 numpy<2
+operautils
 pandas
 PyYAML
 pylint
