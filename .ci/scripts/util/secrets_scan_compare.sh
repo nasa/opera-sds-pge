@@ -25,7 +25,7 @@ then
     echo "" >&2
     echo "1️⃣ Run the 'detect-secrets' tool on your local machine. This tool will identify and clean up the secrets:" >&2
     echo "" >&2
-    echo "    \$ detect-secrets scan --all-files --disable-plugin AbsolutePathDetectorExperimental --exclude-files '\.secrets\..*' --exclude-files '\.git.*' --exclude-files 'test_results' --exclude-files '\.pytest_cache' --exclude-files '\.venv' --exclude-files 'venv' --exclude-files 'dist' --exclude-files 'build' --exclude-files '.*\.egg-info' > .secrets.baseline" >&2
+    echo "    \$ detect-secrets scan --all-files --disable-plugin AbsolutePathDetectorExperimental --exclude-files '\.secrets\..*' --exclude-files '\.git.*' --exclude-files 'test_results' --exclude-files '\.pytest_cache' --exclude-files '\.venv' --exclude-files 'venv' --exclude-files 'dist' --exclude-files 'build' --exclude-files '.*\.egg-info' --exclude-files '.idea' > .secrets.baseline" >&2
     echo "" >&2
     echo "2️⃣ Perform an audit on the updated .secrets.baseline to disposition any new findings:" >&2
     echo "" >&2

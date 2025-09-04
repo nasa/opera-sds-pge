@@ -690,11 +690,11 @@
                         </gmi:LE_Source>
                     </gmd:source>
                     {%- endfor %}
-                    {%- if run_config.Groups.PGE.DynamicAncillaryFilesGroup.AncillaryFileMap.water_mask_path is not none %}
+                    {%- if run_config.Groups.PGE.DynamicAncillaryFilesGroup.AncillaryFileMap.src_water_mask_path is not none %}
                     <gmd:source>
                         <gmd:LI_Source>
                             <gmd:description>
-                                <gco:CharacterString>Reference Water File - {{ run_config.Groups.PGE.DynamicAncillaryFilesGroup.AncillaryFileMap.water_mask_path | basename }}</gco:CharacterString>#}
+                                <gco:CharacterString>Reference Water File - {{ run_config.Groups.PGE.DynamicAncillaryFilesGroup.AncillaryFileMap.src_water_mask_path | basename }}</gco:CharacterString>#}
                             </gmd:description>
                         </gmd:LI_Source>
                     </gmd:source>

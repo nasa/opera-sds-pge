@@ -332,7 +332,7 @@ RunConfig:
 
       DynamicAncillaryFilesGroup:
         AncillaryFileMap:
-          water_mask_path: /home/ops/input_dir/out_1/11SLT_water_mask.tif
+          src_water_mask_path: /home/ops/input_dir/out_1/11SLT_water_mask.tif
 
       ProductPathGroup:
         OutputProductPath: /home/ops/output_dir
@@ -690,7 +690,7 @@ RunConfig:
         mgrs_tile_id: 11SLT
         dst_dir: /home/ops/scratch_dir
         input_data_dir: /home/ops/input_dir/out_1
-        water_mask_path: /home/ops/input_dir/out_1/11SLT_water_mask.tif
+        src_water_mask_path: /home/ops/input_dir/out_1/11SLT_water_mask.tif
         apply_water_mask: true
         product_dst_dir: /home/ops/output_dir
         algo_config_path: /home/ops/runconfig/opera_pge_dist_s1_r4_calval_algorithm_parameters.yaml
