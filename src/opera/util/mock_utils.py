@@ -338,8 +338,8 @@ class MockGdal:  # pragma: no cover
                 "stride_for_norm_param_estimation": "16",
                 "tqdm_enabled": "True",
                 "use_date_encoding": "False",
-                "version": "2.0.5.dev0+gb08df390f.d20250819",
-                "water_mask_path": "/home/ops/input_dir/out_1/11SLT_water_mask.tif",
+                "version": "dist-s1-2.0.6.dev0+g36f541fb7.d20250904",
+                "src_water_mask_path": "/home/ops/input_dir/out_1/11SLT_water_mask.tif",
                 "AREA_OR_POINT": "Area"
             }
 

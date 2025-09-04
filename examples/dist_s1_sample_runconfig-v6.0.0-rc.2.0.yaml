@@ -46,7 +46,7 @@ RunConfig:
         # Map of ancillary file types to paths to the file
         # Paths must correspond to the file system within the Docker container
         AncillaryFileMap:
-          water_mask_path: /home/ops/input_dir/out_1/11SLT_water_mask.tif
+          src_water_mask_path: /home/ops/input_dir/out_1/11SLT_water_mask.tif
 
       ProductPathGroup:
         # Path to where output products should be stored
@@ -168,7 +168,7 @@ RunConfig:
         mgrs_tile_id: 11SLT
         dst_dir: /home/ops/scratch_dir
         input_data_dir: /home/ops/input_dir/out_1
-        water_mask_path: /home/ops/input_dir/out_1/11SLT_water_mask.tif
+        src_water_mask_path: /home/ops/input_dir/out_1/11SLT_water_mask.tif
         apply_water_mask: true
         product_dst_dir: /home/ops/output_dir
         algo_config_path: /home/ops/runconfig_dir/algorithm_parameters.yaml

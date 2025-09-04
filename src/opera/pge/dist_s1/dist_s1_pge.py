@@ -428,8 +428,8 @@ class DistS1PostProcessorMixin(PostProcessorMixin):
     _tile_filename_cache = {}
 
     _meta_keys_to_drop = ["algo_config_path", "bucket", "bucket_prefix", "dst_dir", "input_data_dir", "model_cfg_path",
-                          "model_wts_path", "prior_dist_s1_product", "product_dst_dir", "water_mask_path",
-                          "tqdm_enabled"]
+                          "model_wts_path", "prior_dist_s1_product", "product_dst_dir", "src_water_mask_path",
+                          "water_mask_path", "tqdm_enabled"]
 
     def _validate_outputs(self):
         output_product_path = abspath(self.runconfig.output_product_path)
@@ -891,7 +891,7 @@ class DistS1Executor(DistS1PreProcessorMixin, DistS1PostProcessorMixin, PgeExecu
     LEVEL = "L3"
     """Processing Level for DIST-S1 Products"""
 
-    SAS_VERSION = "2.0.4"  # CalVal release https://github.com/opera-adt/dist-s1/releases/tag/v2.0.4
+    SAS_VERSION = "2.0.5"  # CalVal release https://github.com/opera-adt/dist-s1/releases/tag/v2.0.5
     """Version of the SAS wrapped by this PGE, should be updated as needed"""
 
     def __init__(self, pge_name, runconfig_path, **kwargs):
