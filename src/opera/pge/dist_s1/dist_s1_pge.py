@@ -429,7 +429,7 @@ class DistS1PostProcessorMixin(PostProcessorMixin):
 
     _meta_keys_to_drop = ["algo_config_path", "bucket", "bucket_prefix", "dst_dir", "input_data_dir", "model_cfg_path",
                           "model_wts_path", "prior_dist_s1_product", "product_dst_dir", "src_water_mask_path",
-                          "tqdm_enabled"]
+                          "water_mask_path", "tqdm_enabled"]
 
     def _validate_outputs(self):
         output_product_path = abspath(self.runconfig.output_product_path)
