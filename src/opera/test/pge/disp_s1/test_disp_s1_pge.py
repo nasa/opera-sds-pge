@@ -97,6 +97,9 @@ class DispS1PgeTestCase(unittest.TestCase):
 
         # Copy the algorithm_parameters config file into the test input directory.
         shutil.copy(join(self.data_dir, 'test_disp_s1_algorithm_parameters.yaml'), input_dir)
+        
+        # Copy the frame_to_burst_json json file into the test input directory.
+        shutil.copy(join(self.data_dir, 'opera-s1-disp-frame-to-burst.json'), input_dir)
 
         # Create non-empty dummy input files expected by test runconfig
         dummy_input_files = ['compressed_slc_t087_185678_iw2_20180101_20180210.h5',
@@ -106,7 +109,6 @@ class DispS1PgeTestCase(unittest.TestCase):
                              'GMAO_tropo_20180210T000000_ztd.nc',
                              'ERA5_N30_N40_W120_W110_20221119_14.grb',
                              'ERA5_N30_N40_W120_W110_20221201_14.grb',
-                             'opera-s1-disp-frame-to-burst.json',
                              'opera-disp-s1-reference-dates.json',
                              'opera-disp-s1-algorithm-parameters-overrides.json',
                              'OPERA_L2_CSLC-S1-STATIC_T042-088913-IW1_20140403_S1A_v1.0.h5',
@@ -654,11 +656,6 @@ class DispS1PgeTestCase(unittest.TestCase):
                 wf.write('\n')
         sas_config['dynamic_ancillary_file_group']['troposphere_files'] = troposphere_files
 
-        frame_to_burst_file = 'opera-s1-disp-frame-to-burst.json'
-        with open(frame_to_burst_file, 'w') as wf:
-            wf.write('\n')
-        sas_config['static_ancillary_file_group']['frame_to_burst_json'] = frame_to_burst_file
-
         logger = PgeLogger()
         runconfig = MockRunConfig(sas_config)
         validate_disp_inputs(runconfig, logger, "DISP-S1")
@@ -678,7 +675,6 @@ class DispS1PgeTestCase(unittest.TestCase):
                            ionosphere_files + troposphere_files)
         files_to_remove.append(mask_file)
         files_to_remove.append(dem_file)
-        files_to_remove.append(frame_to_burst_file)
         for f in files_to_remove:
             os.remove(f)
 
