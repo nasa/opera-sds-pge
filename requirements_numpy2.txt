@@ -12,4 +12,5 @@ PyYAML
 pylint
 pytest
 pytest-cov
+shapely
 yamale

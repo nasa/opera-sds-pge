@@ -7,10 +7,11 @@ jsonschema
 lxml
 mgrs
 numpy<2
-opera-utils
+opera-utils[geopandas]
 pandas
 PyYAML
 pylint
 pytest
 pytest-cov
+shapely
 yamale
