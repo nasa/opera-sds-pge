@@ -18,7 +18,8 @@ from collections import OrderedDict
 from os import listdir
 from os.path import abspath, basename, exists, getsize, join, splitext
 
-from opera_utils import get_frame_bbox
+from opera_utils import get_frame_geodataframe
+from shapely import union_all, affinity
 
 from opera.pge.base.base_pge import PgeExecutor
 from opera.pge.base.base_pge import PostProcessorMixin
@@ -1279,17 +1280,32 @@ class DispS1StaticPostProcessorMixin(DispS1PostProcessorMixin):
         validity_start_date = f'{validity_start_date[:4]}-{validity_start_date[4:6]}-{validity_start_date[6:8]}'
 
         output_product_metadata['acquisitionDate'] = validity_start_date
-       
-        try:
-            epsg, bounds = get_frame_bbox(
-                frame_id=self.runconfig.sas_config['input_file_group']['frame_id'],
-                json_file=self.runconfig.sas_config['static_ancillary_file_group']['frame_to_burst_json'],
+
+        frame_id = self.runconfig.sas_config['input_file_group']['frame_id']
+
+        # Extract geospatial bounding information for frame
+        try:          
+            gdf_frames = get_frame_geodataframe(
+                frame_ids=[frame_id],
+                json_file="pge/disp_s1/data/frame-geometries-simple-0.9.0.geojson"
             )
             
-            output_product_metadata['geospatial_lon_min'] = bounds[0]
-            output_product_metadata['geospatial_lon_max'] = bounds[2]
-            output_product_metadata['geospatial_lat_min'] = bounds[1]
-            output_product_metadata['geospatial_lat_max'] = bounds[3]
+            polygon = gdf_frames.loc[frame_id].geometry
+            
+            # Extract lons and lats from both Polygon and Multipolygon
+            # Handles the case where polygon crosses the anti-meridian
+            try:
+                gg_neg, gg_pos = polygon.geoms
+                # Translate the polygon with negative longitudes to be right of +180
+                shifted_polygon = union_all([gg_pos, affinity.translate(gg_neg, 360)])
+                lons, lats = shifted_polygon.simplify(.1).exterior.xy
+            except AttributeError:
+                lons, lats = polygon.exterior.xy
+            
+            output_product_metadata['geospatial_lon_min'] = min(lons)
+            output_product_metadata['geospatial_lon_max'] = max(lons)
+            output_product_metadata['geospatial_lat_min'] = min(lats)
+            output_product_metadata['geospatial_lat_max'] = max(lats)
         except Exception as err:
             msg = f'Failed to extract bbox metadata from {disp_product}, reason: {err}'
             self.logger.critical(self.name, ErrorCode.ISO_METADATA_COULD_NOT_EXTRACT_METADATA, msg)
