@@ -491,20 +491,18 @@
                 <gmd:EX_Extent id="boundingExtent">
                     <!--Bounding Rectangle-->
                     <gmd:geographicElement>
-                        <gmd:EX_GeographicBoundingBox>
-                            <gmd:westBoundLongitude>
-                                <gco:Decimal>{{ product_output.geospatial_lon_min }}{# doc ID ISO_OPERA_westBoundLongitude #}</gco:Decimal>
-                            </gmd:westBoundLongitude>
-                            <gmd:eastBoundLongitude>
-                                <gco:Decimal>{{ product_output.geospatial_lon_max }}{# doc ID ISO_OPERA_eastBoundLongitude #}</gco:Decimal>
-                            </gmd:eastBoundLongitude>
-                            <gmd:southBoundLatitude>
-                                <gco:Decimal>{{ product_output.geospatial_lat_min }}{# doc ID ISO_OPERA_southBoundLatitude #}</gco:Decimal>
-                            </gmd:southBoundLatitude>
-                            <gmd:northBoundLatitude>
-                                <gco:Decimal>{{ product_output.geospatial_lat_max }}{# doc ID ISO_OPERA_northBoundLatitude #}</gco:Decimal>
-                            </gmd:northBoundLatitude>
-                        </gmd:EX_GeographicBoundingBox>
+                        <gmd:EX_BoundingPolygon>
+                            <gmd:polygon>
+                                <gml:Polygon gml:id="DISP_Frame_Polygon">
+                                    <gml:exterior>
+                                        <gml:LinearRing>
+                                            <gml:description>Bounding polygon of the displacement image</gml:description>
+                                            <gml:posList>{{ product_output.bounding_polygon }}{# ISO_OPERA_boundingPolygon #}</gml:posList>
+                                        </gml:LinearRing>
+                                    </gml:exterior>
+                                </gml:Polygon>
+                            </gmd:polygon>
+                        </gmd:EX_BoundingPolygon>
                     </gmd:geographicElement>
                     <!-- This is the granules temporal extent -->
                     <gmd:temporalElement>
