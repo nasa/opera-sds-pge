@@ -78,7 +78,7 @@ def get_traceback_from_log(log_contents):
     result = ""
 
     exception_pattern = re.compile(
-        r"Traceback \(most recent call last\):(?:\n.*)+?\n(.*?(?:Exception|Error):)\s*(.+)"
+        r"Traceback \(most recent call last\):(?:\n.*)+?\n(.*?(?:Exception|Error))(:\s*(.+))?"
     )
 
     traceback_match = exception_pattern.search(log_contents)
