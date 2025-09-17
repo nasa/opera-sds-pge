@@ -14,18 +14,17 @@ import glob
 import os.path
 import re
 import subprocess
+from importlib.resources import files
 from collections import OrderedDict
 from os import listdir
 from os.path import abspath, basename, exists, getsize, join, splitext
-
-from opera_utils import get_frame_geodataframe
-from shapely import union_all, affinity
 
 from opera.pge.base.base_pge import PgeExecutor
 from opera.pge.base.base_pge import PostProcessorMixin
 from opera.pge.base.base_pge import PreProcessorMixin
 from opera.util.dataset_utils import parse_bounding_polygon_from_wkt
 from opera.util.error_codes import ErrorCode
+from opera.util.geo_utils import get_gml_polygon_from_frame
 from opera.util.h5_utils import get_cslc_s1_product_metadata
 from opera.util.h5_utils import get_disp_s1_product_metadata
 from opera.util.input_validation import (validate_algorithm_parameters_config,
@@ -1282,32 +1281,14 @@ class DispS1StaticPostProcessorMixin(DispS1PostProcessorMixin):
         output_product_metadata['acquisitionDate'] = validity_start_date
 
         frame_id = self.runconfig.sas_config['input_file_group']['frame_id']
+        frame_geometries = str(files('opera').joinpath('pge/disp_s1/data/frame-geometries-simple-0.9.0.geojson'))
 
         # Extract geospatial bounding information for frame
-        try:          
-            gdf_frames = get_frame_geodataframe(
-                frame_ids=[frame_id],
-                json_file="pge/disp_s1/data/frame-geometries-simple-0.9.0.geojson"
-            )
-            
-            polygon = gdf_frames.loc[frame_id].geometry
-            
-            # Extract lons and lats from both Polygon and Multipolygon
-            # Handles the case where polygon crosses the anti-meridian
-            try:
-                gg_neg, gg_pos = polygon.geoms
-                # Translate the polygon with negative longitudes to be right of +180
-                shifted_polygon = union_all([gg_pos, affinity.translate(gg_neg, 360)])
-                lons, lats = shifted_polygon.simplify(.1).exterior.xy
-            except AttributeError:
-                lons, lats = polygon.exterior.xy
-            
-            output_product_metadata['geospatial_lon_min'] = min(lons)
-            output_product_metadata['geospatial_lon_max'] = max(lons)
-            output_product_metadata['geospatial_lat_min'] = min(lats)
-            output_product_metadata['geospatial_lat_max'] = max(lats)
+        try:
+            bounding_polygon_gml_str = get_gml_polygon_from_frame(frame_id, frame_geometries)
+            output_product_metadata['bounding_polygon'] = bounding_polygon_gml_str
         except Exception as err:
-            msg = f'Failed to extract bbox metadata from {disp_product}, reason: {err}'
+            msg = f'Failed to extract polygon metadata from {disp_product}, reason: {err}'
             self.logger.critical(self.name, ErrorCode.ISO_METADATA_COULD_NOT_EXTRACT_METADATA, msg)
 
         return output_product_metadata

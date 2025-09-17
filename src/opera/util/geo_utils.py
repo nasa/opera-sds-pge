@@ -12,7 +12,11 @@ Utilities used for working with geographic coordinates
 
 import mgrs
 from mgrs.core import MGRSError
+from opera_utils import get_frame_geodataframe
+from shapely import union_all, affinity
+from shapely.geometry import MultiPolygon
 
+from opera.util.dataset_utils import parse_bounding_polygon_from_wkt
 from opera.util.mock_utils import MockOsr
 
 # When running a PGE within a Docker image delivered from ADT, the gdal import
@@ -196,3 +200,37 @@ def get_geographic_boundaries_from_mgrs_tile(mgrs_tile_name):
                 lon_max = lon
 
     return lat_min, lat_max, lon_min, lon_max
+
+
+def get_gml_polygon_from_frame(frame_id, frame_geometries):
+    """
+    Returns the GML formatted polygon string for a single frame.
+
+    Parameters
+    ----------
+    frame_id : int
+        The ID of the frame to get the bounding box for.
+    frame_geometries : str
+        The path to the geojson containing frame geometries.
+
+    Returns
+    -------
+    bounding_polygon_gml_str : str
+        GML formatted bounding polygon string
+        
+    """
+    gdf_frames = get_frame_geodataframe(
+        frame_ids=[frame_id],
+        json_file=frame_geometries
+    )
+    
+    polygon = gdf_frames.loc[frame_id].geometry
+    
+    # Handles the case where polygon crosses the anti-meridian
+    # Translate the polygon with negative longitudes to be right of +180
+    if isinstance(polygon, MultiPolygon):
+        gg_neg, gg_pos = polygon.geoms
+        polygon = union_all([gg_pos, affinity.translate(gg_neg, 360)])
+
+    bounding_polygon_gml_str = parse_bounding_polygon_from_wkt(polygon.wkt)
+    return bounding_polygon_gml_str

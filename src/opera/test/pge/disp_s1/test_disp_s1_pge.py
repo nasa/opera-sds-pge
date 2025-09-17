@@ -8,6 +8,7 @@ Unit tests for the pge/disp_s1/disp_s1_pge.py module.
 """
 
 import glob
+from importlib.resources import files
 import os
 import shutil
 import tempfile
@@ -27,6 +28,7 @@ import opera.pge.disp_s1.disp_s1_pge
 from opera.pge import RunConfig
 from opera.pge.disp_s1.disp_s1_pge import DispS1Executor, DispS1StaticExecutor
 from opera.util import PgeLogger
+from opera.util.geo_utils import get_gml_polygon_from_frame
 from opera.util.h5_utils import create_test_cslc_metadata_product
 from opera.util.h5_utils import create_test_disp_s1_metadata_product
 from opera.util.h5_utils import get_disp_s1_product_metadata
@@ -97,9 +99,6 @@ class DispS1PgeTestCase(unittest.TestCase):
 
         # Copy the algorithm_parameters config file into the test input directory.
         shutil.copy(join(self.data_dir, 'test_disp_s1_algorithm_parameters.yaml'), input_dir)
-        
-        # Copy the frame_to_burst_json json file into the test input directory.
-        shutil.copy(join(self.data_dir, 'opera-s1-disp-frame-to-burst.json'), input_dir)
 
         # Create non-empty dummy input files expected by test runconfig
         dummy_input_files = ['compressed_slc_t087_185678_iw2_20180101_20180210.h5',
@@ -109,6 +108,7 @@ class DispS1PgeTestCase(unittest.TestCase):
                              'GMAO_tropo_20180210T000000_ztd.nc',
                              'ERA5_N30_N40_W120_W110_20221119_14.grb',
                              'ERA5_N30_N40_W120_W110_20221201_14.grb',
+                             'opera-s1-disp-frame-to-burst.json',
                              'opera-disp-s1-reference-dates.json',
                              'opera-disp-s1-algorithm-parameters-overrides.json',
                              'OPERA_L2_CSLC-S1-STATIC_T042-088913-IW1_20140403_S1A_v1.0.h5',
@@ -655,6 +655,11 @@ class DispS1PgeTestCase(unittest.TestCase):
             with open(f, 'w') as wf:
                 wf.write('\n')
         sas_config['dynamic_ancillary_file_group']['troposphere_files'] = troposphere_files
+        
+        frame_to_burst_file = 'opera-s1-disp-frame-to-burst.json'
+        with open(frame_to_burst_file, 'w') as wf:
+            wf.write('\n')
+        sas_config['static_ancillary_file_group']['frame_to_burst_json'] = frame_to_burst_file
 
         logger = PgeLogger()
         runconfig = MockRunConfig(sas_config)
@@ -1121,6 +1126,29 @@ class DispS1PgeTestCase(unittest.TestCase):
             log_contents = infile.read()
 
         self.assertIn(f"DISP-S1-STATIC invoked with RunConfig {expected_sas_config_file}", log_contents)
+        
+            
+    @patch.object(opera.util.tiff_utils, "gdal", MockGdal)
+    def test_static_bounding_polygon(self):
+        """
+        Test execution of the get_polygon_str_from_frame function which extracts 
+        geospatial information for a given frame and converts to a polygon wkt string.
+        Runs for a nominal frame as well as a frame known to cross the antimeridian,
+        testing both Polygon and Multipolygon support in the function.
+        """
+        FRAME_GEOMETRIES = str(files('opera').joinpath('pge/disp_s1/data/frame-geometries-simple-0.9.0.geojson'))
+        
+        # Test nominal frame
+        bounding_polygon_gml_str = get_gml_polygon_from_frame(11115, FRAME_GEOMETRIES)
+        self.assertTrue(bounding_polygon_gml_str.startswith("("))
+        self.assertTrue(bounding_polygon_gml_str.endswith(")"))
+        self.assertTrue(all([float(n) for n in bounding_polygon_gml_str.strip("()").split()]))
+        
+        # Test antimeridian crossing frame
+        # All longitudes should be positive (all lats already are for this frame)
+        bounding_polygon_gml_str = get_gml_polygon_from_frame(7882, FRAME_GEOMETRIES)        
+        self.assertTrue(all(float(n) >= 0 for n in bounding_polygon_gml_str.strip("()").split()))
+        
 
     @patch.object(opera.util.tiff_utils, "gdal", MockGdal)
     def test_static_iso_metadata_creation(self):
