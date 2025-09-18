@@ -12,7 +12,9 @@ Utilities used for working with geographic coordinates
 
 import mgrs
 from mgrs.core import MGRSError
+from unittest.mock import MagicMock
 
+from opera.util.dataset_utils import parse_bounding_polygon_from_wkt
 from opera.util.mock_utils import MockOsr
 
 # When running a PGE within a Docker image delivered from ADT, the gdal import
@@ -27,6 +29,17 @@ try:
 except ImportError:  # pragma: no cover
     osr = MockOsr                           # pragma: no cover
 # pylint: enable=invalid-name
+
+# Not all PGEs require the opera_utils library. The imports
+# below should work for those that require it, but will fall back to 
+# MagicMocks for those that don't.
+
+# pylint: disable=import-error,invalid-name 
+try:
+    from opera_utils import get_frame_geodataframe
+except (ImportError, ModuleNotFoundError): # pragma: no cover
+    get_frame_geodataframe = MagicMock()           # pragma: no cover
+# pylint: enable=import-error,invalid-name 
 
 
 def translate_utm_bbox_to_lat_lon(bbox, epsg_code):
@@ -196,3 +209,30 @@ def get_geographic_boundaries_from_mgrs_tile(mgrs_tile_name):
                 lon_max = lon
 
     return lat_min, lat_max, lon_min, lon_max
+
+
+def get_gml_polygon_from_frame(frame_id, frame_geometries):
+    """
+    Returns the GML formatted polygon string for a single frame.
+
+    Parameters
+    ----------
+    frame_id : int
+        The ID of the frame to get the bounding box for.
+    frame_geometries : str
+        The path to the geojson containing frame geometries.
+
+    Returns
+    -------
+    bounding_polygon_gml_str : str
+        GML formatted bounding polygon string
+        
+    """
+    gdf_frames = get_frame_geodataframe(
+        frame_ids=[frame_id],
+        json_file=frame_geometries
+    )
+    
+    polygon = gdf_frames.loc[frame_id].geometry
+    bounding_polygon_gml_str = parse_bounding_polygon_from_wkt(polygon.wkt)
+    return bounding_polygon_gml_str

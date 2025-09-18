@@ -14,6 +14,7 @@ import glob
 import os.path
 import re
 import subprocess
+from importlib.resources import files
 from collections import OrderedDict
 from os import listdir
 from os.path import abspath, basename, exists, getsize, join, splitext
@@ -23,6 +24,7 @@ from opera.pge.base.base_pge import PostProcessorMixin
 from opera.pge.base.base_pge import PreProcessorMixin
 from opera.util.dataset_utils import parse_bounding_polygon_from_wkt
 from opera.util.error_codes import ErrorCode
+from opera.util.geo_utils import get_gml_polygon_from_frame
 from opera.util.h5_utils import get_cslc_s1_product_metadata
 from opera.util.h5_utils import get_disp_s1_product_metadata
 from opera.util.input_validation import (validate_algorithm_parameters_config,
@@ -1278,11 +1280,16 @@ class DispS1StaticPostProcessorMixin(DispS1PostProcessorMixin):
 
         output_product_metadata['acquisitionDate'] = validity_start_date
 
-        # TODO: BBOX will be derived from product metadata
-        output_product_metadata['geospatial_lon_min'] = 0
-        output_product_metadata['geospatial_lon_max'] = 0
-        output_product_metadata['geospatial_lat_min'] = 0
-        output_product_metadata['geospatial_lat_max'] = 0
+        frame_id = self.runconfig.sas_config['input_file_group']['frame_id']
+        frame_geometries = str(files('opera').joinpath('pge/disp_s1/data/frame-geometries-simple-0.9.0.geojson'))
+
+        # Extract geospatial bounding information for frame
+        try:
+            bounding_polygon_gml_str = get_gml_polygon_from_frame(frame_id, frame_geometries)
+            output_product_metadata['bounding_polygon'] = bounding_polygon_gml_str
+        except Exception as err:
+            msg = f'Failed to extract polygon metadata from {disp_product}, reason: {err}'
+            self.logger.critical(self.name, ErrorCode.ISO_METADATA_COULD_NOT_EXTRACT_METADATA, msg)
 
         return output_product_metadata
 

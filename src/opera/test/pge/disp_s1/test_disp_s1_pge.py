@@ -653,7 +653,7 @@ class DispS1PgeTestCase(unittest.TestCase):
             with open(f, 'w') as wf:
                 wf.write('\n')
         sas_config['dynamic_ancillary_file_group']['troposphere_files'] = troposphere_files
-
+        
         frame_to_burst_file = 'opera-s1-disp-frame-to-burst.json'
         with open(frame_to_burst_file, 'w') as wf:
             wf.write('\n')
@@ -1125,7 +1125,7 @@ class DispS1PgeTestCase(unittest.TestCase):
             log_contents = infile.read()
 
         self.assertIn(f"DISP-S1-STATIC invoked with RunConfig {expected_sas_config_file}", log_contents)
-
+        
     @patch.object(opera.util.tiff_utils, "gdal", MockGdal)
     def test_static_iso_metadata_creation(self):
         """
