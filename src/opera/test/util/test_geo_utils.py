@@ -140,8 +140,9 @@ class GeoUtilsTestCase(unittest.TestCase):
         self.assertTrue(bounding_polygon_gml_str.endswith(")"))
         self.assertTrue(all([float(n) for n in bounding_polygon_gml_str.strip("()").split()]))
         
-        # Test antimeridian crossing frame
-        # All longitudes should be positive (all lats already are for this frame)
-        bounding_polygon_gml_str = get_gml_polygon_from_frame(7882, FRAME_GEOMETRIES)        
-        self.assertTrue(all(float(n) >= 0 for n in bounding_polygon_gml_str.strip("()").split()))
+        # Test antimeridian crossing frame resulting in multipolygon style gml string
+        bounding_polygon_gml_str = get_gml_polygon_from_frame(7882, FRAME_GEOMETRIES)
+        self.assertTrue(bounding_polygon_gml_str.startswith("(("))
+        self.assertTrue(bounding_polygon_gml_str.endswith("))"))     
+        self.assertTrue(all(float(n) for n in bounding_polygon_gml_str.replace("(","").replace(")","").split()))
         
