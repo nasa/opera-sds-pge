@@ -1127,28 +1127,6 @@ class DispS1PgeTestCase(unittest.TestCase):
 
         self.assertIn(f"DISP-S1-STATIC invoked with RunConfig {expected_sas_config_file}", log_contents)
         
-            
-    def test_static_bounding_polygon(self):
-        """
-        Test execution of the get_polygon_str_from_frame function which extracts 
-        geospatial information for a given frame and converts to a polygon wkt string.
-        Runs for a nominal frame as well as a frame known to cross the antimeridian,
-        testing both Polygon and Multipolygon support in the function.
-        """
-        FRAME_GEOMETRIES = str(files('opera').joinpath('pge/disp_s1/data/frame-geometries-simple-0.9.0.geojson'))
-        
-        # Test nominal frame
-        bounding_polygon_gml_str = get_gml_polygon_from_frame(11115, FRAME_GEOMETRIES)
-        self.assertTrue(bounding_polygon_gml_str.startswith("("))
-        self.assertTrue(bounding_polygon_gml_str.endswith(")"))
-        self.assertTrue(all([float(n) for n in bounding_polygon_gml_str.strip("()").split()]))
-        
-        # Test antimeridian crossing frame
-        # All longitudes should be positive (all lats already are for this frame)
-        bounding_polygon_gml_str = get_gml_polygon_from_frame(7882, FRAME_GEOMETRIES)        
-        self.assertTrue(all(float(n) >= 0 for n in bounding_polygon_gml_str.strip("()").split()))
-        
-
     @patch.object(opera.util.tiff_utils, "gdal", MockGdal)
     def test_static_iso_metadata_creation(self):
         """

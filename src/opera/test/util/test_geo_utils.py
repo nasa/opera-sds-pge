@@ -11,6 +11,7 @@ Unit tests for the util/geo_utils.py module.
 
 import os
 import unittest
+from importlib.resources import files
 from os.path import abspath, join
 from unittest import skipIf
 
@@ -18,6 +19,7 @@ from opera.test import path
 
 from opera.util.geo_utils import get_geographic_boundaries_from_mgrs_tile
 from opera.util.geo_utils import translate_utm_bbox_to_lat_lon
+from opera.util.geo_utils import get_gml_polygon_from_frame
 
 
 def osr_is_available():
@@ -28,6 +30,19 @@ def osr_is_available():
     """
     try:
         from osgeo import osr  # noqa: F401
+        return True
+    except (ImportError, ModuleNotFoundError):
+        return False
+
+
+def opera_utils_is_available():
+    """
+    Helper function to check for a local installation of the
+    opera_utils library. 
+    Used to skip tests that require opera_utils if it is not available.
+    """
+    try:
+        import opera_utils # noqa: F401
         return True
     except (ImportError, ModuleNotFoundError):
         return False
@@ -108,3 +123,25 @@ class GeoUtilsTestCase(unittest.TestCase):
         expected_bounding_box = list(map(lambda x: round(x, ndigits=12), expected_bounding_box))
 
         self.assertListEqual(list(lat_lon_bounding_box), expected_bounding_box)
+
+    @skipIf(not opera_utils_is_available(), reason="opera_utils is not installed on the local instance")
+    def test_bounding_polygon_from_frame(self):
+        """
+        Test execution of the get_polygon_str_from_frame function which extracts 
+        geospatial information for a given frame and converts to a polygon wkt string.
+        Runs for a nominal frame as well as a frame known to cross the antimeridian,
+        testing both Polygon and Multipolygon support in the function.
+        """
+        FRAME_GEOMETRIES = str(files('opera').joinpath('pge/disp_s1/data/frame-geometries-simple-0.9.0.geojson'))
+        
+        # Test nominal frame
+        bounding_polygon_gml_str = get_gml_polygon_from_frame(11115, FRAME_GEOMETRIES)
+        self.assertTrue(bounding_polygon_gml_str.startswith("("))
+        self.assertTrue(bounding_polygon_gml_str.endswith(")"))
+        self.assertTrue(all([float(n) for n in bounding_polygon_gml_str.strip("()").split()]))
+        
+        # Test antimeridian crossing frame
+        # All longitudes should be positive (all lats already are for this frame)
+        bounding_polygon_gml_str = get_gml_polygon_from_frame(7882, FRAME_GEOMETRIES)        
+        self.assertTrue(all(float(n) >= 0 for n in bounding_polygon_gml_str.strip("()").split()))
+        

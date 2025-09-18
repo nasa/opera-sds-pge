@@ -12,9 +12,7 @@ Utilities used for working with geographic coordinates
 
 import mgrs
 from mgrs.core import MGRSError
-from opera_utils import get_frame_geodataframe
-from shapely import union_all, affinity
-from shapely.geometry import MultiPolygon
+from unittest.mock import MagicMock
 
 from opera.util.dataset_utils import parse_bounding_polygon_from_wkt
 from opera.util.mock_utils import MockOsr
@@ -31,6 +29,22 @@ try:
 except ImportError:  # pragma: no cover
     osr = MockOsr                           # pragma: no cover
 # pylint: enable=invalid-name
+
+# Not all PGEs require the opera_utils and shapely libraries. The imports
+# below should work for those that require it, but will fall back to 
+# MagicMocks for those that don't.
+
+# pylint: disable=import-error,invalid-name 
+try:
+    import opera_utils
+    from shapely import union_all, affinity
+    from shapely.geometry import MultiPolygon
+except (ImportError, ModuleNotFoundError): # pragma: no cover
+    opera_utils = MagicMock()           # pragma: no cover
+    union_all = MagicMock()             # pragma: no cover
+    affinity = MagicMock()              # pragma: no cover
+    MultiPolygon = MagicMock()          # pragma: no cover
+# pylint: enable=import-error,invalid-name 
 
 
 def translate_utm_bbox_to_lat_lon(bbox, epsg_code):
@@ -219,7 +233,7 @@ def get_gml_polygon_from_frame(frame_id, frame_geometries):
         GML formatted bounding polygon string
         
     """
-    gdf_frames = get_frame_geodataframe(
+    gdf_frames = opera_utils.get_frame_geodataframe(
         frame_ids=[frame_id],
         json_file=frame_geometries
     )
