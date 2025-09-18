@@ -30,20 +30,15 @@ except ImportError:  # pragma: no cover
     osr = MockOsr                           # pragma: no cover
 # pylint: enable=invalid-name
 
-# Not all PGEs require the opera_utils and shapely libraries. The imports
+# Not all PGEs require the opera_utils library. The imports
 # below should work for those that require it, but will fall back to 
 # MagicMocks for those that don't.
 
 # pylint: disable=import-error,invalid-name 
 try:
     from opera_utils import get_frame_geodataframe
-    from shapely import union_all, affinity
-    from shapely.geometry import MultiPolygon
 except (ImportError, ModuleNotFoundError): # pragma: no cover
     get_frame_geodataframe = MagicMock()           # pragma: no cover
-    union_all = MagicMock()             # pragma: no cover
-    affinity = MagicMock()              # pragma: no cover
-    MultiPolygon = MagicMock()          # pragma: no cover
 # pylint: enable=import-error,invalid-name 
 
 
@@ -239,12 +234,5 @@ def get_gml_polygon_from_frame(frame_id, frame_geometries):
     )
     
     polygon = gdf_frames.loc[frame_id].geometry
-    
-    # Handles the case where polygon crosses the anti-meridian
-    # Translate the polygon with negative longitudes to be right of +180
-    if isinstance(polygon, MultiPolygon):
-        gg_neg, gg_pos = polygon.geoms
-        polygon = union_all([gg_pos, affinity.translate(gg_neg, 360)])
-
     bounding_polygon_gml_str = parse_bounding_polygon_from_wkt(polygon.wkt)
     return bounding_polygon_gml_str
