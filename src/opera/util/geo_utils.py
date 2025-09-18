@@ -40,7 +40,7 @@ try:
     from shapely import union_all, affinity
     from shapely.geometry import MultiPolygon
 except (ImportError, ModuleNotFoundError): # pragma: no cover
-    opera_utils = MagicMock()           # pragma: no cover
+    get_frame_geodataframe = MagicMock()           # pragma: no cover
     union_all = MagicMock()             # pragma: no cover
     affinity = MagicMock()              # pragma: no cover
     MultiPolygon = MagicMock()          # pragma: no cover
