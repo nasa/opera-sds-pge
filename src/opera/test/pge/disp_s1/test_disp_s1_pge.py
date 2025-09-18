@@ -680,6 +680,7 @@ class DispS1PgeTestCase(unittest.TestCase):
                            ionosphere_files + troposphere_files)
         files_to_remove.append(mask_file)
         files_to_remove.append(dem_file)
+        files_to_remove.append(frame_to_burst_file)
         for f in files_to_remove:
             os.remove(f)
 
