@@ -12,7 +12,6 @@ import os
 import shutil
 import tempfile
 import unittest
-from importlib.resources import files
 from io import StringIO
 from os.path import abspath, exists, join
 from subprocess import CompletedProcess, Popen
@@ -28,7 +27,6 @@ import opera.pge.disp_s1.disp_s1_pge
 from opera.pge import RunConfig
 from opera.pge.disp_s1.disp_s1_pge import DispS1Executor, DispS1StaticExecutor
 from opera.util import PgeLogger
-from opera.util.geo_utils import get_gml_polygon_from_frame
 from opera.util.h5_utils import create_test_cslc_metadata_product
 from opera.util.h5_utils import create_test_disp_s1_metadata_product
 from opera.util.h5_utils import get_disp_s1_product_metadata
