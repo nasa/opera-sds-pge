@@ -220,3 +220,20 @@ class RunUtilsTestCase(unittest.TestCase):
 
         # Should have gotten empty string back
         self.assertFalse(traceback_string)
+
+    def test_get_traceback_from_log_no_message(self):
+        """
+        Tests for run_utils.get_traceback_from_log() with SAS exceptions raised without an error message.
+        E.g. assert 1 == 2
+        """
+        # Test with canned SAS log output that contains a Traceback section for an
+        # AssertionError with no message, along with other logging messages that
+        # should not be included (such as tqdm output)
+        with open(os.path.join(self.data_dir, "test_sas_log_with_traceback_no_message.txt"), "r") as infile:
+            log_contents = infile.read()
+
+        traceback_string = get_traceback_from_log(log_contents)
+
+        self.assertTrue(traceback_string)
+        self.assertTrue(traceback_string.startswith("Traceback (most recent call last)"))
+        self.assertTrue(traceback_string.endswith("AssertionError"))
