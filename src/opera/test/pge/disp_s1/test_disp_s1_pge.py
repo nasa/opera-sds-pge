@@ -8,11 +8,11 @@ Unit tests for the pge/disp_s1/disp_s1_pge.py module.
 """
 
 import glob
-from importlib.resources import files
 import os
 import shutil
 import tempfile
 import unittest
+from importlib.resources import files
 from io import StringIO
 from os.path import abspath, exists, join
 from subprocess import CompletedProcess, Popen
@@ -1128,7 +1128,6 @@ class DispS1PgeTestCase(unittest.TestCase):
         self.assertIn(f"DISP-S1-STATIC invoked with RunConfig {expected_sas_config_file}", log_contents)
         
             
-    @patch.object(opera.util.tiff_utils, "gdal", MockGdal)
     def test_static_bounding_polygon(self):
         """
         Test execution of the get_polygon_str_from_frame function which extracts 
