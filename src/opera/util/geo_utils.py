@@ -36,7 +36,7 @@ except ImportError:  # pragma: no cover
 
 # pylint: disable=import-error,invalid-name 
 try:
-    import opera_utils
+    from opera_utils import get_frame_geodataframe
     from shapely import union_all, affinity
     from shapely.geometry import MultiPolygon
 except (ImportError, ModuleNotFoundError): # pragma: no cover
@@ -233,7 +233,7 @@ def get_gml_polygon_from_frame(frame_id, frame_geometries):
         GML formatted bounding polygon string
         
     """
-    gdf_frames = opera_utils.get_frame_geodataframe(
+    gdf_frames = get_frame_geodataframe(
         frame_ids=[frame_id],
         json_file=frame_geometries
     )

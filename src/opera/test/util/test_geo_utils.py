@@ -35,14 +35,14 @@ def osr_is_available():
         return False
 
 
-def opera_utils_is_available():
+def get_frame_geodataframe_is_available():
     """
     Helper function to check for a local installation of the
     opera_utils library. 
     Used to skip tests that require opera_utils if it is not available.
     """
     try:
-        import opera_utils # noqa: F401
+        from opera_utils import get_frame_geodataframe # noqa: F401
         return True
     except (ImportError, ModuleNotFoundError):
         return False
@@ -124,7 +124,7 @@ class GeoUtilsTestCase(unittest.TestCase):
 
         self.assertListEqual(list(lat_lon_bounding_box), expected_bounding_box)
 
-    @skipIf(not opera_utils_is_available(), reason="opera_utils is not installed on the local instance")
+    @skipIf(not get_frame_geodataframe_is_available(), reason="opera_utils.get_frame_geodataframe is not installed on the local instance")
     def test_bounding_polygon_from_frame(self):
         """
         Test execution of the get_polygon_str_from_frame function which extracts 
