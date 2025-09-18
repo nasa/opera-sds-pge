@@ -112,7 +112,7 @@ do
                -v ${output_dir}:/home/mamba/output_dir \
                -v ${scratch_dir}:/home/mamba/scratch_dir \
                -v ${expected_data_dir}/${mode}:/home/mamba/expected_output_dir \
-               ${PGE_IMAGE}:"${PGE_TAG}" --file /home/mamba/runconfig/opera_pge_disp_s1_r6.9_final_runconfig_${mode}.yaml
+               ${PGE_IMAGE}:"${PGE_TAG}" --file /home/mamba/runconfig/opera_pge_disp_s1_r6.10_final_runconfig_${mode}.yaml
 
     docker_exit_status=$?
 
@@ -189,7 +189,7 @@ docker run --rm -u $UID:"$(id -g)" --name $container_name \
            -v ${output_dir}:/home/mamba/output_dir \
            -v ${scratch_dir}:/home/mamba/scratch_dir \
            -v ${expected_data_dir}:/home/mamba/expected_output_dir \
-           ${PGE_IMAGE}:"${PGE_TAG}" --file /home/mamba/runconfig/opera_pge_disp_s1_static_r6.6_calval_runconfig.yaml
+           ${PGE_IMAGE}:"${PGE_TAG}" --file /home/mamba/runconfig/opera_pge_disp_s1_static_r6.10_final_runconfig.yaml
 
 docker_exit_status=$?
 
