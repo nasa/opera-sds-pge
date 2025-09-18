@@ -212,6 +212,7 @@ class DispS1PgeTestCase(unittest.TestCase):
         self.assertEqual(runconfig['recommended_similarity_threshold'], 0.30)
         self.assertEqual(runconfig['num_parallel_products'], 3)
         self.assertFalse(runconfig['recommended_use_conncomp'])
+        self.assertEqual(runconfig['forward_mode_network_size'], 3)
 
     @patch.object(opera.pge.disp_s1.disp_s1_pge.subprocess, "run", mock_grib_to_netcdf)
     def test_disp_s1_pge_execution(self):
