@@ -122,7 +122,7 @@ RunConfig:
         frame_id: 7091
         last_processed:
       dynamic_ancillary_file_group:
-        algorithm_parameters_file: /home/mamba/runconfig/opera_pge_disp_s1_r6.9_final_algorithm_parameters_historical.yaml
+        algorithm_parameters_file: /home/mamba/runconfig/opera_pge_disp_s1_r6.10_final_algorithm_parameters_historical.yaml
         static_layers_files:
           - /home/mamba/input_dir/dynamic_ancillary_files/static_layers/OPERA_L2_CSLC-S1-STATIC_T027-056725-IW1_20140403_S1A_v1.0.h5
           - /home/mamba/input_dir/dynamic_ancillary_files/static_layers/OPERA_L2_CSLC-S1-STATIC_T027-056726-IW1_20140403_S1A_v1.0.h5
