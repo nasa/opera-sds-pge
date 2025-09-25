@@ -86,8 +86,20 @@ def translate_utm_bbox_to_lat_lon(bbox, epsg_code):
     elevation = 0
     xmin, ymin, xmax, ymax = bbox
 
-    lat_min, lon_min, _ = transformation.TransformPoint(xmin, ymin, elevation)
-    lat_max, lon_max, _ = transformation.TransformPoint(xmax, ymax, elevation)
+    ulc = (xmin, ymax)
+    urc = (xmax, ymax)
+    llc = (xmin, ymin)
+    lrc = (xmax, ymin)
+
+    ulc_t = transformation.TransformPoint(*ulc, elevation)
+    urc_t = transformation.TransformPoint(*urc, elevation)
+    llc_t = transformation.TransformPoint(*llc, elevation)
+    lrc_t = transformation.TransformPoint(*lrc, elevation)
+
+    lon_min = min([c[1] for c in [ulc_t, urc_t, llc_t, lrc_t]])
+    lat_min = min([c[0] for c in [ulc_t, urc_t, llc_t, lrc_t]])
+    lon_max = max([c[1] for c in [ulc_t, urc_t, llc_t, lrc_t]])
+    lat_max = max([c[0] for c in [ulc_t, urc_t, llc_t, lrc_t]])
 
     return lat_min, lat_max, lon_min, lon_max
 
