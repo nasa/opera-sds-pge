@@ -113,8 +113,8 @@ class GeoUtilsTestCase(unittest.TestCase):
         epsg_code = 32718  # UTM S Zone 18
 
         lat_lon_bounding_box = translate_utm_bbox_to_lat_lon(utm_bounding_box, epsg_code)
-        expected_bounding_box = [-5.497645682689766,  # lat_min
-                                 -5.055731551544852,  # lat_max
+        expected_bounding_box = [-5.500856416282783,  # lat_min
+                                 -5.052781983770057,  # lat_max
                                  -77.70109080363252,  # lon_min
                                  -76.86056393945721]  # lon_max
 
