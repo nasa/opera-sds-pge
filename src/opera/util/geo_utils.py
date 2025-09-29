@@ -89,8 +89,8 @@ def translate_utm_bbox_to_lat_lon(bbox, epsg_code):
     # Project all corners to EPSG 4326 (lat/lon) then compute mins and maxes.
     # This is necessary since RTC-S1-STATIC projections yield products that are "rotated" w.r.t. the equator when
     # projected into EPSG 4326, and therefore we cannot guarantee which product corner represents the product's
-    # min/max lat/lon. In some cases, this yielded invalid bounding boxes where min >= max lat/lon, which caused
-    # ingest issues downstream at ASF.
+    # min/max lat/lon. In some cases, such assumptions yielded invalid bounding boxes where min >= max lat/lon,
+    # which caused ingest issues downstream at ASF.
     #
     # See: https://github.com/nasa/opera-sds-pge/issues/736 for an example annotated illustration of this issue.
     ulc = (xmin, ymax)
