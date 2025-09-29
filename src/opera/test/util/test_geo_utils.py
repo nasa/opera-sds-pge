@@ -113,10 +113,30 @@ class GeoUtilsTestCase(unittest.TestCase):
         epsg_code = 32718  # UTM S Zone 18
 
         lat_lon_bounding_box = translate_utm_bbox_to_lat_lon(utm_bounding_box, epsg_code)
-        expected_bounding_box = [-5.497645682689766,  # lat_min
-                                 -5.055731551544852,  # lat_max
+        expected_bounding_box = [-5.500856416282783,  # lat_min
+                                 -5.052781983770057,  # lat_max
                                  -77.70109080363252,  # lon_min
                                  -76.86056393945721]  # lon_max
+
+        # Round off last couple digits since they can vary based on precision error
+        lat_lon_bounding_box = list(map(lambda x: round(x, ndigits=12), lat_lon_bounding_box))
+        expected_bounding_box = list(map(lambda x: round(x, ndigits=12), expected_bounding_box))
+
+        self.assertListEqual(list(lat_lon_bounding_box), expected_bounding_box)
+
+    @skipIf(not osr_is_available(), reason="osgeo.osr is not installed on the local instance")
+    def test_translate_utm_bbox_to_lat_lon_high_latitude(self):
+        """Test translation of a UTM bounding box to lat/lon"""
+        # Derived from bounding box of static layer products for granule
+        # OPERA_L2_RTC-S1-STATIC_T010-019886-IW2_20140403_S1A_30_v1.0
+        utm_bounding_box = [330420., -379770., 429540., -343080.]
+        epsg_code = 3413  # NSIDC Sea Ice Polar Stereographic North
+
+        lat_lon_bounding_box = translate_utm_bbox_to_lat_lon(utm_bounding_box, epsg_code)
+        expected_bounding_box = [84.710854962878,     # lat_min
+                                 85.60502003831267,   # lat_max
+                                 -3.975004979772367,  # lon_min
+                                 6.385116581294131]   # lon_max
 
         # Round off last couple digits since they can vary based on precision error
         lat_lon_bounding_box = list(map(lambda x: round(x, ndigits=12), lat_lon_bounding_box))
