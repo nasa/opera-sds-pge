@@ -617,7 +617,7 @@ class DSWxHLSExecutor(DSWxHLSPreProcessorMixin, DSWxHLSPostProcessorMixin, PgeEx
     PGE_VERSION = "1.0.3"
     """Version of the PGE (overrides default from base_pge)"""
 
-    SAS_VERSION = "1.0.1"  # Final release 4.1 https://github.com/nasa/PROTEUS/releases/tag/v1.0.1
+    SAS_VERSION = "1.0.2"  # Final release 4.2 https://github.com/nasa/PROTEUS/releases/tag/v1.0.2
     """Version of the SAS wrapped by this PGE, should be updated as needed with new SAS deliveries"""
 
     def __init__(self, pge_name, runconfig_path, **kwargs):
