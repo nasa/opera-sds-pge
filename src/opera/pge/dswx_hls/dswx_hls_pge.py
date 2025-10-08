@@ -525,7 +525,8 @@ class DSWxHLSPostProcessorMixin(PostProcessorMixin):
             'GranuleFilename': self._core_filename(),
             'ISO_OPERA_ProjectKeywords': ['OPERA', 'JPL', 'DSWx', 'Dynamic', 'Surface', 'Water', 'Extent'],
             'ISO_OPERA_PlatformKeywords': ['HLS'],
-            'ISO_OPERA_InstrumentKeywords': ['Landsat8', 'Sentinel 1 A/B']
+            'ISO_OPERA_InstrumentKeywords': ['Landsat8', 'Landsat9', 'Sentinel-2A',
+                                             'Sentinel-2B', 'Sentinel-2C', 'Sentinel-2D']
         }
 
         return custom_metadata
