@@ -28,9 +28,9 @@ SAMPLE_TIME=1
 # RUNCONFIG should be the name of the latest runconfig in .ci/scripts/dswx_hls/
 [ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath "$(dirname "$(realpath "$0")")"/../../..)
 [ -z "${PGE_TAG}" ] && PGE_TAG="${USER}-dev"
-[ -z "${INPUT_DATA}" ] && INPUT_DATA="dswx_hls_final_4.1_expected_input.zip"
-[ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="dswx_hls_final_4.1_expected_output.zip"
-[ -z "${RUNCONFIG}" ] && RUNCONFIG="opera_pge_dswx_hls_delivery_4.1_final_runconfig.yaml"
+[ -z "${INPUT_DATA}" ] && INPUT_DATA="dswx_hls_final_4.2_expected_input.zip"
+[ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="dswx_hls_final_4.2_expected_output.zip"
+[ -z "${RUNCONFIG}" ] && RUNCONFIG="opera_pge_dswx_hls_delivery_4.2_final_runconfig.yaml"
 [ -z "${TMP_ROOT}" ] && TMP_ROOT="$DEFAULT_TMP_ROOT"
 
 # Create the test output directory in the work space

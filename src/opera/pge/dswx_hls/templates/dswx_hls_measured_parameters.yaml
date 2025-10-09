@@ -68,6 +68,11 @@ LANDCOVER_COVERAGE:
   attribute_type: qualityInformation
   description: "Input CGLS discrete classification map coverage over the DSWx-HLS product: \u201CFULL\u201D for full coverage, \u201CFULL_WITH_ANTIMERIDIAN_CROSSING\u201D for full coverage with antimeridian crossing, \u201CPARTIAL\u201D if DSWx-HLS product coverage exceeds CGLS map limits (i.e., beyond latitudes -60 or +80 degrees), or \u201CNOT_TESTED\u201D if coverage checks are disabled."
   display_name: LandcoverCoverage
+LICENSE:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: The Copernicus DEM license under which the DSWx-HLS product is released
+  display_name: License
 MASK_ADJACENT_TO_CLOUD_MODE:
   attribute_data_type: string
   attribute_type: processingInformation
@@ -153,6 +158,11 @@ PROJECT:
   attribute_type: processingInformation
   description: The project name
   display_name: Project
+SENSING_TIME:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: The start and stop sensing times of the input HLS product used to generate the DSWx-HLS product
+  display_name: SensingTime
 SENSOR:
   attribute_data_type: string
   attribute_type: platformInformation

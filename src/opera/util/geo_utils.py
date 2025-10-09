@@ -14,7 +14,6 @@ import mgrs
 from mgrs.core import MGRSError
 from unittest.mock import MagicMock
 
-from opera.util.dataset_utils import parse_bounding_polygon_from_wkt
 from opera.util.mock_utils import MockOsr
 
 # When running a PGE within a Docker image delivered from ADT, the gdal import
@@ -31,15 +30,17 @@ except ImportError:  # pragma: no cover
 # pylint: enable=invalid-name
 
 # Not all PGEs require the opera_utils library. The imports
-# below should work for those that require it, but will fall back to 
+# below should work for those that require it, but will fall back to
 # MagicMocks for those that don't.
 
-# pylint: disable=import-error,invalid-name 
+# pylint: disable=import-error,invalid-name
 try:
     from opera_utils import get_frame_geodataframe
+    from opera.util.dataset_utils import parse_bounding_polygon_from_wkt
 except (ImportError, ModuleNotFoundError): # pragma: no cover
-    get_frame_geodataframe = MagicMock()           # pragma: no cover
-# pylint: enable=import-error,invalid-name 
+    get_frame_geodataframe = MagicMock()  # pragma: no cover
+    parse_bounding_polygon_from_wkt = MagicMock(return_value="(1 1 2 2 3 3 4 4)")  # pragma: no cover
+# pylint: enable=import-error,invalid-name
 
 
 def translate_utm_bbox_to_lat_lon(bbox, epsg_code):
@@ -245,13 +246,13 @@ def get_gml_polygon_from_frame(frame_id, frame_geometries):
     -------
     bounding_polygon_gml_str : str
         GML formatted bounding polygon string
-        
+
     """
     gdf_frames = get_frame_geodataframe(
         frame_ids=[frame_id],
         json_file=frame_geometries
     )
-    
+
     polygon = gdf_frames.loc[frame_id].geometry
     bounding_polygon_gml_str = parse_bounding_polygon_from_wkt(polygon.wkt)
     return bounding_polygon_gml_str
