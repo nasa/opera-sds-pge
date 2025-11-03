@@ -5,14 +5,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera.util.run_utils &mdash; opera-sds-pge 6.0.0-rc.2.0 documentation</title>
+  <title>opera.util.run_utils &mdash; opera-sds-pge 6.0.0-rc.3.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
 
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=11af2593"></script>
+      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=607a6fca"></script>
       <script src="../../../_static/doctools.js?v=888ff710"></script>
       <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -153,7 +153,7 @@
     <span class="n">result</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
     <span class="n">exception_pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
-        <span class="sa">r</span><span class="s2">&quot;Traceback \(most recent call last\):(?:\n.*)+?\n(.*?(?:Exception|Error):)\s*(.+)&quot;</span>
+        <span class="sa">r</span><span class="s2">&quot;Traceback \(most recent call last\):(?:\n.*)+?\n(.*?(?:Exception|Error))(:\s*(.+))?&quot;</span>
     <span class="p">)</span>
 
     <span class="n">traceback_match</span> <span class="o">=</span> <span class="n">exception_pattern</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">log_contents</span><span class="p">)</span>
