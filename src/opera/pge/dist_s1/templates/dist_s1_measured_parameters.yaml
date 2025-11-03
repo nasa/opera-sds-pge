@@ -1,7 +1,3 @@
-# TODO: It looks like the SAS dumps the runconfig + algorithm params as metadata. We will need to ensure future
-#  deliveries have better metadata, but for now we need to fill this out as follows to avoid !Not found! errors
-#  in the ISO XML.
-
 AREA_OR_POINT:
   attribute_data_type: string
   attribute_type: processingParameter
@@ -27,11 +23,11 @@ batch_size_for_norm_param_estimation:
   attribute_type: processingParameter
   description: 'Batch size for norm parameter estimation from the baseline.'
   display_name: BatchSizeForNormParamEstimation
-confidence_upper_lim:
+confirmation_confidence_upper_lim:
   attribute_data_type: int
   attribute_type: processingParameter
   description: 'Confidence upper limit for confirmation. Confidence is an accumulation of the metric over time.'
-  display_name: ConfidenceUpperLim
+  display_name: ConfirmationConfidenceUpperLim
 confirmation_confidence_threshold:
   attribute_data_type: float
   attribute_type: processingParameter
@@ -106,6 +102,11 @@ model_compilation:
   attribute_type: processingParameter
   description: 'Whether to compile the model for CPU or GPU.'
   display_name: ModelCompilation
+model_context_length:
+  attribute_data_type: int
+  attribute_type: processingParameter
+  description: 'Maximum context length for the model.'
+  display_name: ModelContextLength
 model_dtype:
   attribute_data_type: string
   attribute_type: processingParameter
@@ -168,6 +169,11 @@ prior_product_name:
   attribute_type: processingParameter
   description: 'ID of prior OPERA DIST-S1 product used for confirmation.'
   display_name: PriorProductName
+sensor:
+  attribute_data_type: string
+  attribute_type: platformInformation
+  description: 'Name of the sensor platform (i.e.  S1A/C/D).'
+  display_name: Sensor
 stride_for_norm_param_estimation:
   attribute_data_type: int
   attribute_type: processingParameter

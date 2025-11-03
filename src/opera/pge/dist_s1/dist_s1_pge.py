@@ -16,7 +16,6 @@ from itertools import chain
 from os.path import abspath, basename, isdir, isfile, join, splitext
 
 from opera.pge.base.base_pge import PgeExecutor, PostProcessorMixin, PreProcessorMixin
-from opera.util.dataset_utils import get_sensor_from_spacecraft_name
 from opera.util.error_codes import ErrorCode
 from opera.util.geo_utils import get_geographic_boundaries_from_mgrs_tile
 from opera.util.input_validation import check_input_list, validate_algorithm_parameters_config
@@ -513,9 +512,9 @@ class DistS1PostProcessorMixin(PostProcessorMixin):
         ancillary_filename : str
             The file name component to assign to ancillary products created by this PGE.
         """
-        # TODO: Get this from metadata
-        spacecraft_name = "SENTINEL-1A"
-        sensor = get_sensor_from_spacecraft_name(spacecraft_name)
+        dist_metadata = list(self._tile_metadata_cache.values())[0]['MeasuredParameters']
+
+        sensor = dist_metadata['sensor']['value']
         pixel_spacing = "30"
 
         # TODO - for now, use the PGE production time, but ideally this should
@@ -891,7 +890,7 @@ class DistS1Executor(DistS1PreProcessorMixin, DistS1PostProcessorMixin, PgeExecu
     LEVEL = "L3"
     """Processing Level for DIST-S1 Products"""
 
-    SAS_VERSION = "2.0.5"  # CalVal release https://github.com/opera-adt/dist-s1/releases/tag/v2.0.5
+    SAS_VERSION = "2.0.7"  # CalVal release https://github.com/opera-adt/dist-s1/releases/tag/v2.0.7
     """Version of the SAS wrapped by this PGE, should be updated as needed"""
 
     def __init__(self, pge_name, runconfig_path, **kwargs):
