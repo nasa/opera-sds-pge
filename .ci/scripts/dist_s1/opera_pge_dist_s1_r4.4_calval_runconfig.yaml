@@ -360,7 +360,7 @@ RunConfig:
           - /home/ops/input_dir/out_1/11SLT/71/2025-01-21/OPERA_L2_RTC-S1_T071-151232-IW3_20250121T135304Z_20250121T180333Z_S1A_30_v1.0_VH.tif
           - /home/ops/input_dir/out_1/11SLT/71/2025-01-21/OPERA_L2_RTC-S1_T071-151233-IW2_20250121T135305Z_20250121T180333Z_S1A_30_v1.0_VH.tif
           - /home/ops/input_dir/out_1/11SLT/71/2025-01-21/OPERA_L2_RTC-S1_T071-151233-IW3_20250121T135306Z_20250121T180333Z_S1A_30_v1.0_VH.tif
-          - /home/ops/input_dir/product_0/OPERA_L3_DIST-ALERT-S1_T11SLT_20250121T135246Z_20251204T013516Z_S1A_30_v0.1
+          - /home/ops/input_dir/product_0/OPERA_L3_DIST-ALERT-S1_T11SLT_20250109T135247Z_20251204T011559Z_S1A_30_v0.1
 
       DynamicAncillaryFilesGroup:
         AncillaryFileMap:
@@ -750,7 +750,7 @@ RunConfig:
           - /home/ops/input_dir/out_1/11SLT/71/2025-01-21/OPERA_L2_RTC-S1_T071-151232-IW3_20250121T135304Z_20250121T180333Z_S1A_30_v1.0_VH.tif
           - /home/ops/input_dir/out_1/11SLT/71/2025-01-21/OPERA_L2_RTC-S1_T071-151233-IW2_20250121T135305Z_20250121T180333Z_S1A_30_v1.0_VH.tif
           - /home/ops/input_dir/out_1/11SLT/71/2025-01-21/OPERA_L2_RTC-S1_T071-151233-IW3_20250121T135306Z_20250121T180333Z_S1A_30_v1.0_VH.tif
-        prior_dist_s1_product: /home/ops/input_dir/product_0/OPERA_L3_DIST-ALERT-S1_T11SLT_20250121T135246Z_20251204T013516Z_S1A_30_v0.1
+        prior_dist_s1_product: /home/ops/input_dir/product_0/OPERA_L3_DIST-ALERT-S1_T11SLT_20250109T135247Z_20251204T011559Z_S1A_30_v0.1
         mgrs_tile_id: 11SLT
         dst_dir: /home/ops/scratch_dir
         input_data_dir: /home/ops/input_dir/out_1
