@@ -757,4 +757,4 @@ RunConfig:
         src_water_mask_path: /home/ops/input_dir/out_1/11SLT_water_mask.tif
         apply_water_mask: true
         product_dst_dir: /home/ops/output_dir
-        algo_config_path: /home/ops/runconfig/opera_pge_dist_s1_r4.3_calval_algorithm_parameters.yaml
+        algo_config_path: /home/ops/runconfig/opera_pge_dist_s1_r4.4_calval_algorithm_parameters.yaml
