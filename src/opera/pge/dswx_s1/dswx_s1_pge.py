@@ -685,7 +685,7 @@ class DSWxS1Executor(DSWxS1PreProcessorMixin, DSWxS1PostProcessorMixin, PgeExecu
     PGE_VERSION = "3.0.3"
     """Version of the PGE (overrides default from base_pge)"""
 
-    SAS_VERSION = "1.1"  # Final release https://github.com/opera-adt/DSWX-SAR/releases/tag/v1.1
+    SAS_VERSION = "1.2"  # Final release https://github.com/opera-adt/DSWX-SAR/releases/tag/v1.2
     """Version of the SAS wrapped by this PGE, should be updated as needed"""
 
     def __init__(self, pge_name, runconfig_path, **kwargs):
