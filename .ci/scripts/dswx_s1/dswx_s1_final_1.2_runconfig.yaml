@@ -196,4 +196,4 @@ RunConfig:
             set_ocean_masked_to_nodata: False
             save_tif_to_output: True
 
-          log_file: output_dir/dswx_log
+          log_file: /home/dswx_user/output_dir/dswx_log
