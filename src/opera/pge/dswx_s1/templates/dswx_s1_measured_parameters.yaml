@@ -215,7 +215,7 @@ SOFTWARE_VERSION:
   attribute_type: processingInformation
   attribute_data_type: string
 SPACECRAFT_NAME:
-  description: Name of the sensor platform (i.e.  Sentinel-1A/B).
+  description: Name of the sensor platform (i.e.  Sentinel-1).
   attribute_type: processingInformation
 SPATIAL_COVERAGE:
   description: The area percentage of the tile with data.
