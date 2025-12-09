@@ -1,0 +1,199 @@
+RunConfig:
+  Name: OPERA-DSWX-S1-PGE-SAMPLE-CONFIG
+
+  Groups:
+    PGE:
+      PGENameGroup:
+        PGEName: DSWX_S1_PGE
+
+      InputFilesGroup:
+        InputFilePaths:
+              - /home/dswx_user/input_dir/RTC/T114-243004-IW2
+              - /home/dswx_user/input_dir/RTC/T114-243006-IW3
+              - /home/dswx_user/input_dir/RTC/T114-243012-IW3
+              - /home/dswx_user/input_dir/RTC/T114-243001-IW3
+              - /home/dswx_user/input_dir/RTC/T114-243013-IW1
+              - /home/dswx_user/input_dir/RTC/T114-243013-IW3
+              - /home/dswx_user/input_dir/RTC/T114-243005-IW2
+              - /home/dswx_user/input_dir/RTC/T114-243006-IW1
+              - /home/dswx_user/input_dir/RTC/T114-243008-IW2
+              - /home/dswx_user/input_dir/RTC/T114-243012-IW1
+              - /home/dswx_user/input_dir/RTC/T114-243004-IW3
+              - /home/dswx_user/input_dir/RTC/T114-243014-IW1
+              - /home/dswx_user/input_dir/RTC/T114-243007-IW3
+              - /home/dswx_user/input_dir/RTC/T114-243014-IW2
+              - /home/dswx_user/input_dir/RTC/T114-243005-IW1
+              - /home/dswx_user/input_dir/RTC/T114-243003-IW3
+              - /home/dswx_user/input_dir/RTC/T114-243009-IW1
+              - /home/dswx_user/input_dir/RTC/T114-243003-IW1
+              - /home/dswx_user/input_dir/RTC/T114-243010-IW3
+              - /home/dswx_user/input_dir/RTC/T114-243002-IW2
+              - /home/dswx_user/input_dir/RTC/T114-243011-IW3
+              - /home/dswx_user/input_dir/RTC/T114-243008-IW3
+              - /home/dswx_user/input_dir/RTC/T114-243005-IW3
+              - /home/dswx_user/input_dir/RTC/T114-243003-IW2
+              - /home/dswx_user/input_dir/RTC/T114-243010-IW1
+              - /home/dswx_user/input_dir/RTC/T114-243006-IW2
+              - /home/dswx_user/input_dir/RTC/T114-243011-IW1
+              - /home/dswx_user/input_dir/RTC/T114-243007-IW2
+              - /home/dswx_user/input_dir/RTC/T114-243016-IW1
+              - /home/dswx_user/input_dir/RTC/T114-243015-IW1
+              - /home/dswx_user/input_dir/RTC/T114-243004-IW1
+              - /home/dswx_user/input_dir/RTC/T114-243009-IW3
+              - /home/dswx_user/input_dir/RTC/T114-243010-IW2
+              - /home/dswx_user/input_dir/RTC/T114-243009-IW2
+              - /home/dswx_user/input_dir/RTC/T114-243012-IW2
+              - /home/dswx_user/input_dir/RTC/T114-243011-IW2
+              - /home/dswx_user/input_dir/RTC/T114-243002-IW3
+              - /home/dswx_user/input_dir/RTC/T114-243008-IW1
+              - /home/dswx_user/input_dir/RTC/T114-243007-IW1
+              - /home/dswx_user/input_dir/RTC/T114-243013-IW2
+
+      DynamicAncillaryFilesGroup:
+        AncillaryFileMap:
+          dem_file: /home/dswx_user/input_dir/ancillary_data/dem.tif
+          hand_file: /home/dswx_user/input_dir/ancillary_data/hand.tif
+          reference_water_file: /home/dswx_user/input_dir/ancillary_data/reference_water.tif
+          glad_classification_file: /home/dswx_user/input_dir/ancillary_data/glad.tif
+          worldcover_file: /home/dswx_user/input_dir/ancillary_data/worldcover.tif
+
+      ProductPathGroup:
+        OutputProductPath: /home/dswx_user/output_dir
+        ScratchPath: /home/dswx_user/scratch_dir
+
+      PrimaryExecutable:
+        ProductIdentifier: DSWX_S1
+        ProductVersion: "1.0"
+        ProgramPath: python3
+        ProgramOptions:
+          - /home/dswx_user/OPERA/DSWX-SAR/src/dswx_sar/dswx_s1.py
+        ErrorCodeBase: 400000
+        SchemaPath: /home/dswx_user/opera/pge/dswx_s1/schema/dswx_s1_sas_schema.yaml
+        AlgorithmParametersSchemaPath: /home/dswx_user/opera/pge/dswx_s1/schema/algorithm_parameters_s1_schema.yaml
+        IsoTemplatePath: /home/dswx_user/opera/pge/dswx_s1/templates/OPERA_ISO_metadata_L3_DSWx_S1_template.xml.jinja2
+        IsoMeasuredParameterDescriptions: /home/dswx_user/opera/pge/dswx_s1/templates/dswx_s1_measured_parameters.yaml
+
+      QAExecutable:
+        Enabled: True
+        ProgramPath: /home/dswx_user/opera/.ci/scripts/dswx_s1/compare_dswx_s1_products.sh
+        ProgramOptions: []
+
+      DebugLevelGroup:
+        DebugSwitch: False
+        ExecuteViaShell: False
+
+    SAS:
+      runconfig:
+        name: dswx_s1_workflow_default
+
+        groups:
+          pge_name_group:
+            pge_name: DSWX_S1_PGE
+
+          input_file_group:
+            input_file_path:
+              - /home/dswx_user/input_dir/RTC/T114-243004-IW2
+              - /home/dswx_user/input_dir/RTC/T114-243006-IW3
+              - /home/dswx_user/input_dir/RTC/T114-243012-IW3
+              - /home/dswx_user/input_dir/RTC/T114-243001-IW3
+              - /home/dswx_user/input_dir/RTC/T114-243013-IW1
+              - /home/dswx_user/input_dir/RTC/T114-243013-IW3
+              - /home/dswx_user/input_dir/RTC/T114-243005-IW2
+              - /home/dswx_user/input_dir/RTC/T114-243006-IW1
+              - /home/dswx_user/input_dir/RTC/T114-243008-IW2
+              - /home/dswx_user/input_dir/RTC/T114-243012-IW1
+              - /home/dswx_user/input_dir/RTC/T114-243004-IW3
+              - /home/dswx_user/input_dir/RTC/T114-243014-IW1
+              - /home/dswx_user/input_dir/RTC/T114-243007-IW3
+              - /home/dswx_user/input_dir/RTC/T114-243014-IW2
+              - /home/dswx_user/input_dir/RTC/T114-243005-IW1
+              - /home/dswx_user/input_dir/RTC/T114-243003-IW3
+              - /home/dswx_user/input_dir/RTC/T114-243009-IW1
+              - /home/dswx_user/input_dir/RTC/T114-243003-IW1
+              - /home/dswx_user/input_dir/RTC/T114-243010-IW3
+              - /home/dswx_user/input_dir/RTC/T114-243002-IW2
+              - /home/dswx_user/input_dir/RTC/T114-243011-IW3
+              - /home/dswx_user/input_dir/RTC/T114-243008-IW3
+              - /home/dswx_user/input_dir/RTC/T114-243005-IW3
+              - /home/dswx_user/input_dir/RTC/T114-243003-IW2
+              - /home/dswx_user/input_dir/RTC/T114-243010-IW1
+              - /home/dswx_user/input_dir/RTC/T114-243006-IW2
+              - /home/dswx_user/input_dir/RTC/T114-243011-IW1
+              - /home/dswx_user/input_dir/RTC/T114-243007-IW2
+              - /home/dswx_user/input_dir/RTC/T114-243016-IW1
+              - /home/dswx_user/input_dir/RTC/T114-243015-IW1
+              - /home/dswx_user/input_dir/RTC/T114-243004-IW1
+              - /home/dswx_user/input_dir/RTC/T114-243009-IW3
+              - /home/dswx_user/input_dir/RTC/T114-243010-IW2
+              - /home/dswx_user/input_dir/RTC/T114-243009-IW2
+              - /home/dswx_user/input_dir/RTC/T114-243012-IW2
+              - /home/dswx_user/input_dir/RTC/T114-243011-IW2
+              - /home/dswx_user/input_dir/RTC/T114-243002-IW3
+              - /home/dswx_user/input_dir/RTC/T114-243008-IW1
+              - /home/dswx_user/input_dir/RTC/T114-243007-IW1
+              - /home/dswx_user/input_dir/RTC/T114-243013-IW2
+            input_mgrs_collection_id: MS_114_28
+          dynamic_ancillary_file_group:
+            dem_file: /home/dswx_user/input_dir/ancillary_data/dem.tif
+            dem_file_description: 'Copernicus DEM GLO-30 2021 WGS84'
+            worldcover_file: /home/dswx_user/input_dir/ancillary_data/worldcover.tif
+            worldcover_file_description: 'ESA WorldCover 10m 2020 v1.0'
+            reference_water_file: /home/dswx_user/input_dir/ancillary_data/reference_water.tif
+            reference_water_file_description: 'JRC Global Surface Water - collection from 1984 to 2021'
+            glad_classification_file: /home/dswx_user/input_dir/ancillary_data/glad.tif
+            glad_classification_file_description: 'GLAD Global Land Cover 2020'
+            hand_file: /home/dswx_user/input_dir/ancillary_data/hand.tif
+            hand_file_description: 'ASF HAND GLO30'
+            shoreline_shapefile:
+            algorithm_parameters: /home/dswx_user/input_dir/ancillary_data/algorithm_parameters_s1.yaml
+
+          static_ancillary_file_group:
+            static_ancillary_inputs_flag: True
+            mgrs_database_file: /home/dswx_user/input_dir/ancillary_data/MGRS_tile.sqlite
+            mgrs_collection_database_file: /home/dswx_user/input_dir/ancillary_data/MGRS_tile_collection_v0.3.sqlite
+
+          primary_executable:
+            product_type: dswx_s1
+
+          product_path_group:
+            product_path: /home/dswx_user/output_dir
+            scratch_path: /home/dswx_user/scratch_dir
+            sas_output_path: /home/dswx_user/output_dir
+            product_version: "1.0"
+            output_imagery_format: 'COG'
+
+          browse_image_group:
+            # Save a full-res Cloud-Optimized GEOTIFF DSWx-S1 browse image and
+            # a modified-resolution PNG of the browse image for DSWx-S1
+            save_browse: True
+
+            # Setting `browse_image_height` and `browse_image_width` equal
+            # will maintain this original DSWx-S1 aspect ratio
+            # of 3660 pixels x 3660 pixels for the PNG browse image.
+            # If these fields are left empty, 1024 x 1024 will be used.
+            # Height in pixels for the PNG browse image
+            browse_image_height: 1024
+
+            # Width in pixels for the PNG browse image
+            browse_image_width: 1024
+
+            # Flag to collapse water classes if set to True. Default is True.
+            flag_collapse_wtr_classes: True
+
+            # Flag to exclude inundated vegetation from processing if set to True.
+            exclude_inundated_vegetation: False
+
+            # Flag to set non-water pixels to NoData value if set to True.
+            set_not_water_to_nodata: False
+
+            # Flag to set HAND mask pixels to NoData value if set to True.
+            set_hand_mask_to_nodata: True
+
+            # Flag to set layover and shadow pixels to NoData value if set to True.
+            set_layover_shadow_to_nodata: True
+
+            # Flag to set ocean-masked pixels to NoData value if set to True.
+            set_ocean_masked_to_nodata: False
+            save_tif_to_output: True
+
+          log_file: /home/dswx_user/scratch_dir/dswx_log

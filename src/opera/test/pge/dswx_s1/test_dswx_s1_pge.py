@@ -423,14 +423,13 @@ class DswxS1PgeTestCase(unittest.TestCase):
 
         output_dir = join(os.curdir, 'dswx_s1_pge_test/input_dir')
         dummy_tif_file = join(
-            output_dir, 'OPERA_L3_DSWx-S1_T18MVA_20200702T231843Z_20230317T190549Z_v0.1_B01_WTR.tif'
+            output_dir, 'OPERA_L3_DSWx-S1_T45UVR_20231213T121156Z_20251206T001549Z_S1A_30_v1.0_B01_WTR.tif'
         )
 
         with open(dummy_tif_file, 'w') as outfile:
             outfile.write('dummy dswx data')
 
         dswx_s1_metadata = pge._collect_dswx_s1_product_metadata(dummy_tif_file)
-        dswx_s1_metadata['MeasuredParameters']['SPACECRAFT_NAME']['value'] = 'SENTINEL-1A'
 
         # Initialize the core filename for the catalog metadata generation step
         pge._core_filename()
@@ -439,7 +438,7 @@ class DswxS1PgeTestCase(unittest.TestCase):
         # during output product validation
         tile_id = 'T18MVA'
         pge._tile_metadata_cache[tile_id] = dswx_s1_metadata
-        pge._tile_filename_cache[tile_id] = 'OPERA_L3_DSWx-S1_T18MVA_20200702T231843Z_20230317T190549Z_v0.1'
+        pge._tile_filename_cache[tile_id] = 'OPERA_L3_DSWx-S1_T45UVR_20231213T121156Z_20251206T001549Z_S1A_30_v1.0'
 
         # Render ISO metadata using the sample metadata
         iso_metadata = pge._create_iso_metadata(tile_id)
@@ -463,7 +462,7 @@ class DswxS1PgeTestCase(unittest.TestCase):
             pge = DSWxS1Executor(pge_name="DswxS1PgeTest", runconfig_path=test_runconfig_path)
 
             pge._tile_metadata_cache[tile_id] = dswx_s1_metadata
-            pge._tile_filename_cache[tile_id] = 'OPERA_L3_DSWx-S1_T18MVA_20200702T231843Z_20230317T190549Z_v0.1'
+            pge._tile_filename_cache[tile_id] = 'OPERA_L3_DSWx-S1_T45UVR_20231213T121156Z_20251206T001549Z_S1A_30_v1.0'
 
             with self.assertRaises(RuntimeError):
                 pge.run()

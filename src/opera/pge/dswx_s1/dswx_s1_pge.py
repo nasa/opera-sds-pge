@@ -17,8 +17,6 @@ import opera.util.input_validation as input_validation
 from opera.pge.base.base_pge import PgeExecutor
 from opera.pge.base.base_pge import PostProcessorMixin
 from opera.pge.base.base_pge import PreProcessorMixin
-from opera.util.dataset_utils import get_sensor_from_spacecraft_name
-from opera.util.dataset_utils import get_spacecraft_name_from_sensor
 from opera.util.error_codes import ErrorCode
 from opera.util.geo_utils import get_geographic_boundaries_from_mgrs_tile
 from opera.util.input_validation import validate_algorithm_parameters_config
@@ -149,6 +147,18 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
     _tile_metadata_cache = {}
     _tile_filename_cache = {}
 
+    _file_pattern = re.compile(
+        r'(?P<file_id>(?P<project>OPERA)_(?P<level>L3)_(?P<product_type>DSWx)-(?P<source>S1)_'
+        r'(?P<tile_id>T[^\W_]{5})_(?P<acquisition_ts>\d{8}T\d{6}Z)_(?P<creation_ts>\d{8}T\d{6}Z)_'
+        r'(?P<sensor>S1A|S1B|S1C|S1D)_(?P<spacing>30)_(?P<product_version>v\d+[.]\d+))(_(?P<band_index>B\d{2})_'
+        r'(?P<band_name>WTR|BWTR|CONF|DIAG)|_BROWSE)?[.](?P<ext>tif|tiff|png)$'
+    )
+    _product_pattern = re.compile(
+        r'(?P<project>OPERA)_(?P<level>L3)_(?P<product_type>DSWx)-(?P<source>S1)_'
+        r'(?P<tile_id>T[^\W_]{5})_(?P<acquisition_ts>\d{8}T\d{6}Z)_(?P<creation_ts>\d{8}T\d{6}Z)_'
+        r'(?P<sensor>S1A|S1B|S1C|S1D)_(?P<spacing>30)_(?P<product_version>v\d+[.]\d+)$'
+    )
+
     def _validate_output_product_filenames(self):
         """
         This method validates output product file names assigned by the SAS
@@ -164,15 +174,10 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
         from the GeoTIFF product, and cache it for later use.
 
         """
-        pattern = re.compile(
-            r'(?P<file_id>(?P<project>OPERA)_(?P<level>L3)_(?P<product_type>DSWx)-(?P<source>S1)_'
-            r'(?P<tile_id>T[^\W_]{5})_(?P<acquisition_ts>\d{8}T\d{6}Z)_(?P<creation_ts>\d{8}T\d{6}Z)_'
-            r'(?P<sensor>S1A|S1B|S1C|S1D)_(?P<spacing>30)_(?P<product_version>v\d+[.]\d+))(_(?P<band_index>B\d{2})_'
-            r'(?P<band_name>WTR|BWTR|CONF|DIAG)|_BROWSE)?[.](?P<ext>tif|tiff|png)$'
-        )
+
 
         for output_file in self.runconfig.get_output_product_filenames():
-            match_result = pattern.match(basename(output_file))
+            match_result = self._file_pattern.match(basename(output_file))
             if not match_result:
                 error_msg = (f"Output file {output_file} does not match the output "
                              f"naming convention.")
@@ -183,10 +188,6 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
 
                 if tile_id not in self._tile_metadata_cache:
                     dswx_metadata = self._collect_dswx_s1_product_metadata(output_file)
-
-                    # TODO: kludge since SAS hardcodes SPACECRAFT_NAME to "Sentinel-1A/B"
-                    dswx_metadata['MeasuredParameters']['SPACECRAFT_NAME']['value'] = \
-                         get_spacecraft_name_from_sensor(match_result.groupdict()['sensor'])
 
                     # Cache the metadata for this product for use when generating the ISO XML
                     self._tile_metadata_cache[tile_id] = dswx_metadata
@@ -315,11 +316,19 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
         # Metadata fields we need for ancillary file name should be equivalent
         # across all tiles, so just take the first set of cached metadata as
         # a representative
-        dswx_metadata = list(self._tile_metadata_cache.values())[0]['MeasuredParameters']
+        dswx_metadata = list(self._tile_metadata_cache.values())[0]
+        sample_output_filename = list(self._tile_filename_cache.values())[0]
 
-        spacecraft_name = dswx_metadata['SPACECRAFT_NAME']['value']
-        sensor = get_sensor_from_spacecraft_name(spacecraft_name)
+        match_result = self._product_pattern.match(basename(sample_output_filename))
+        if not match_result:
+            error_msg = (f"Output file {sample_output_filename} does not match the output "
+                         f"naming convention.")
+            self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
+
+        sensor = match_result.groupdict()['sensor']
         pixel_spacing = "30"  # fixed for tile-based products
+
+        dswx_metadata = dswx_metadata['MeasuredParameters']
 
         processing_time = get_time_for_filename(
             datetime.strptime(dswx_metadata['PROCESSING_DATETIME']['value'], '%Y-%m-%dT%H:%M:%SZ')
@@ -685,7 +694,7 @@ class DSWxS1Executor(DSWxS1PreProcessorMixin, DSWxS1PostProcessorMixin, PgeExecu
     PGE_VERSION = "3.0.3"
     """Version of the PGE (overrides default from base_pge)"""
 
-    SAS_VERSION = "1.1"  # Final release https://github.com/opera-adt/DSWX-SAR/releases/tag/v1.1
+    SAS_VERSION = "1.2"  # Final release https://github.com/opera-adt/DSWX-SAR/releases/tag/v1.2
     """Version of the SAS wrapped by this PGE, should be updated as needed"""
 
     def __init__(self, pge_name, runconfig_path, **kwargs):

@@ -182,7 +182,7 @@ class MockGdal:  # pragma: no cover
                 'RTC_TRACK_NUMBER': '114',
                 'SENSOR': 'IW',
                 'SOFTWARE_VERSION': '1.0',
-                'SPACECRAFT_NAME': 'Sentinel-1A/B',
+                'SPACECRAFT_NAME': 'Sentinel-1',
                 'SPATIAL_COVERAGE': '0.2502'
             }
 
