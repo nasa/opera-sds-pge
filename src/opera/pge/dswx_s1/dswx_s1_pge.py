@@ -191,11 +191,6 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
                 if tile_id not in self._tile_metadata_cache:
                     dswx_metadata = self._collect_dswx_s1_product_metadata(output_file)
 
-                    # TODO: kludge since SAS hardcodes SPACECRAFT_NAME to "Sentinel-1A/B"
-                    # TODO: May not need to this anymore. Check before merge
-                    # dswx_metadata['MeasuredParameters']['SPACECRAFT_NAME']['value'] = \
-                    #      get_spacecraft_name_from_sensor(match_result.groupdict()['sensor'])
-
                     # Cache the metadata for this product for use when generating the ISO XML
                     self._tile_metadata_cache[tile_id] = dswx_metadata
 
