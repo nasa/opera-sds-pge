@@ -691,7 +691,7 @@ class DSWxS1Executor(DSWxS1PreProcessorMixin, DSWxS1PostProcessorMixin, PgeExecu
     LEVEL = "L3"
     """Processing Level for DSWx-S1 Products"""
 
-    PGE_VERSION = "3.0.3"
+    PGE_VERSION = "3.0.4"
     """Version of the PGE (overrides default from base_pge)"""
 
     SAS_VERSION = "1.2"  # Final release https://github.com/opera-adt/DSWX-SAR/releases/tag/v1.2
