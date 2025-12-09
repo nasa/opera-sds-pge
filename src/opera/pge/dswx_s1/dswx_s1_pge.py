@@ -17,8 +17,6 @@ import opera.util.input_validation as input_validation
 from opera.pge.base.base_pge import PgeExecutor
 from opera.pge.base.base_pge import PostProcessorMixin
 from opera.pge.base.base_pge import PreProcessorMixin
-from opera.util.dataset_utils import get_sensor_from_spacecraft_name
-from opera.util.dataset_utils import get_spacecraft_name_from_sensor
 from opera.util.error_codes import ErrorCode
 from opera.util.geo_utils import get_geographic_boundaries_from_mgrs_tile
 from opera.util.input_validation import validate_algorithm_parameters_config
