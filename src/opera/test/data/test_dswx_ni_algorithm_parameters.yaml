@@ -130,6 +130,8 @@ runconfig:
 
         fuzzy_value:
             line_per_block: 200
+            intensity:
+                intensity_mid_alpha: 1
             hand:
                 # The units of the HAND is meters.
                 member_min: 0
