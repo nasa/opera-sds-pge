@@ -155,7 +155,7 @@ RunConfig:
             input_file_historical_path:
 
             # Specify the MGRS tile collection ID
-            input_mgrs_collection_id: MS_30_26
+            input_mgrs_collection_id: 
 
           dynamic_ancillary_file_group:
             # Digital elevation model (Required)
@@ -262,6 +262,6 @@ RunConfig:
             set_ocean_masked_to_nodata: false
 
             # Save the full-res GeoTIFF Browse image in addition to the PNG
-            save_tif_to_output: True
+            save_tif_to_output: false
 
           log_file: /home/dswx_user/scratch_dir/dswx-ni.log
