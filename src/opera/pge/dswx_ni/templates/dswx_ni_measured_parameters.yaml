@@ -6,7 +6,7 @@ AREA_OR_POINT:
 CONTACT_INFORMATION:
   attribute_data_type: string
   attribute_type: contentInformation
-  description: operasds@jpl.nasa.gov
+  description: OPERA Project contact email address
   display_name: ContactInformation
 DSWX_PRODUCT_VERSION:
   attribute_data_type: string
@@ -16,7 +16,7 @@ DSWX_PRODUCT_VERSION:
 INSTITUTION:
   attribute_data_type: string
   attribute_type: processingInformation
-  description: NASA JPL
+  description: Name of the generating Institution
   display_name: Institution
 LAYOVER_SHADOW_COVERAGE:
   attribute_data_type: float
@@ -31,22 +31,22 @@ PROCESSING_DATETIME:
 PRODUCT_LEVEL:
   attribute_data_type: int
   attribute_type: processingInformation
-  description: '3'
+  description: Product level
   display_name: ProductLevel
 PRODUCT_SOURCE:
   attribute_data_type: string
   attribute_type: processingInformation
-  description: NISAR GCOV
+  description: Source data for the product
   display_name: ProductSource
 PRODUCT_TYPE:
   attribute_data_type: string
   attribute_type: processingInformation
-  description: DSWx-NI
+  description: Product type
   display_name: ProductType
 PROJECT:
   attribute_data_type: string
   attribute_type: processingInformation
-  description: OPERA
+  description: Name of the project
   display_name: Project
 SENSOR:
   attribute_data_type: string
