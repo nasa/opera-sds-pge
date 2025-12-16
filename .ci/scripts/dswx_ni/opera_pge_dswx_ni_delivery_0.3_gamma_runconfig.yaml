@@ -244,24 +244,24 @@ RunConfig:
             browse_image_width: 1024
 
             # Flag to collapse water classes
-            flag_collapse_wtr_classes: true
+            flag_collapse_wtr_classes: True
 
             # Flag to exclude inundated vegetation from processing
-            exclude_inundated_vegetation: false
+            exclude_inundated_vegetation: False
 
             # Flag to set non-water pixels to NoData value
-            set_not_water_to_nodata: false
+            set_not_water_to_nodata: False
 
             # Flag to set HAND mask pixels to NoData value
-            set_hand_mask_to_nodata: true
+            set_hand_mask_to_nodata: True
 
             # Flag to set layover and shadow pixels to NoData value
-            set_layover_shadow_to_nodata: true
+            set_layover_shadow_to_nodata: True
 
             # Flag to set ocean-masked pixels to NoData value
-            set_ocean_masked_to_nodata: false
+            set_ocean_masked_to_nodata: False
 
             # Save the full-res GeoTIFF Browse image in addition to the PNG
-            save_tif_to_output: false
+            save_tif_to_output: True
 
           log_file: /home/dswx_user/scratch_dir/dswx-ni.log
