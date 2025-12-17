@@ -10,7 +10,6 @@ from NISAR (NI) PGE.
 """
 
 import re
-from ast import literal_eval
 from datetime import datetime
 from os.path import basename, join
 
@@ -208,22 +207,6 @@ class DSWxNIPostProcessorMixin(DSWxS1PostProcessorMixin):
         output_product_metadata['geospatial_lat_min'] = lat_min
         output_product_metadata['geospatial_lat_max'] = lat_max
 
-        # TODO: These values should be reduced by the SAS, not the PGE
-
-        zero_doppler_start = output_product_metadata['MeasuredParameters']['ZERO_DOPPLER_START_TIME']['value']
-        zero_doppler_end = output_product_metadata['MeasuredParameters']['ZERO_DOPPLER_END_TIME']['value']
-
-        zero_doppler_start_v = literal_eval(zero_doppler_start)
-        zero_doppler_end_v = literal_eval(zero_doppler_end)
-
-        if isinstance(zero_doppler_start_v, list):
-            zero_doppler_start_v = min(zero_doppler_start_v)
-            output_product_metadata['MeasuredParameters']['ZERO_DOPPLER_START_TIME']['value'] = zero_doppler_start_v
-
-        if isinstance(zero_doppler_end_v, list):
-            zero_doppler_end_v = max(zero_doppler_end_v)
-            output_product_metadata['MeasuredParameters']['ZERO_DOPPLER_END_TIME']['value'] = zero_doppler_end_v
-
         # Add some fields on the dimensions of the data. These values should
         # be the same for all DSWx-NI products, and were derived from the
         # ADT product spec
@@ -381,7 +364,7 @@ class DSWxNIExecutor(DSWxNIPreProcessorMixin, DSWxNIPostProcessorMixin, PgeExecu
     PGE_VERSION = "4.0.0-er.4.0"
     """Version of the PGE"""
 
-    SAS_VERSION = "0.2.1"  # Beta release https://github.com/opera-adt/DSWX-SAR/releases/tag/DSWx-NI-v0.2.1
+    SAS_VERSION = "0.3.0"  # Beta release https://github.com/opera-adt/DSWX-SAR/releases/tag/DSWx-NI-v0.3
     """Version of the SAS wrapped by this PGE, should be updated as needed"""
 
     def __init__(self, pge_name, runconfig_path, **kwargs):
