@@ -44,6 +44,9 @@ COPY --chown=conda:conda ${PGE_SOURCE_DIR} ${PGE_DEST_DIR}
 # Switch to root for installing into Conda Env
 USER 0:0
 
+# Set the default shell to run commands within the Conda environment named "DSXW-SAR" using bash
+SHELL ["micromamba", "run", "-n", "cal-disp", "/bin/bash", "-c"]
+
 # Install dependencies into existing Conda Env
 # Modifications to the destination dir permissions are also required here to ensure
 # we don't run into issues when running as an outside user (via docker run -u)
@@ -57,7 +60,8 @@ RUN set -ex \
     && chmod 777 $(find ${PGE_DEST_DIR} -type d)
 
 # Set the Docker entrypoint and clear the default command
-ENTRYPOINT ["bash", "-c", "source /usr/local/bin/_activate_current_env.sh;exec ${CONDA_ROOT}/bin/pge_docker_entrypoint.sh \"${@}\"", "--"]
+ENTRYPOINT ["micromamba", "run", "--no-capture-output", "-n", "cal-disp", "sh", "-c",
+"exec ${CONDA_ROOT}/bin/pge_docker_entrypoint.sh \"${@}\"", "--"]
 CMD []
 
 # Set the user/group back to the default
