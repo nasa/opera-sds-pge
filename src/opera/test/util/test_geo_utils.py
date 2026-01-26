@@ -145,6 +145,8 @@ class GeoUtilsTestCase(unittest.TestCase):
         self.assertListEqual(list(lat_lon_bounding_box), expected_bounding_box)
 
     @skipIf(not get_frame_geodataframe_is_available(), reason="opera_utils.get_frame_geodataframe is not installed on the local instance")
+    @skipIf(not os.path.exists(str(files('opera').joinpath('pge/disp_s1/data/frame-geometries-simple-0.9.0.geojson'))),
+            reason="DISP frame geometries geojson file is not available")
     def test_bounding_polygon_from_frame(self):
         """
         Test execution of the get_polygon_str_from_frame function which extracts 
