@@ -67,7 +67,7 @@ function set_perms {
 trap set_perms EXIT
 
 # linting and pep8 style check (configured by .flake8 and .pylintrc)
-${DOCKER_RUN} bash -c "source /usr/local/bin/_activate_current_env.sh; flake8 \
+${DOCKER_RUN} bash -c "micromamba run -n cal-disp flake8 \
     --config ${CONTAINER_HOME}/opera/.flake8 \
     --jobs auto \
     --exit-zero \
@@ -75,7 +75,7 @@ ${DOCKER_RUN} bash -c "source /usr/local/bin/_activate_current_env.sh; flake8 \
     --output-file /workspace/${TEST_RESULTS_REL_DIR}/${PGE_NAME}/flake8.log \
     ${CONTAINER_HOME}/opera"
 
-${DOCKER_RUN} bash -c "export HOME=/home/mamba/opera; source /usr/local/bin/_activate_current_env.sh; pylint \
+${DOCKER_RUN} bash -c "export HOME=/home/conda/opera; micromamba run -n cal-disp pylint \
     --rcfile=${CONTAINER_HOME}/opera/.pylintrc \
     --jobs 0 \
     --exit-zero \
@@ -84,8 +84,7 @@ ${DOCKER_RUN} bash -c "export HOME=/home/mamba/opera; source /usr/local/bin/_act
     ${CONTAINER_HOME}/opera"
 
 # pytest (including code coverage)
-${DOCKER_RUN} bash -c "source /usr/local/bin/_activate_current_env.sh; \
-    pytest -p no:cacheprovider \
+${DOCKER_RUN} bash -c "micromamba run -n cal-disp pytest -p no:cacheprovider \
     --junit-xml=/workspace/${TEST_RESULTS_REL_DIR}/${PGE_NAME}/pytest-junit.xml \
     --cov=${CONTAINER_HOME}/opera/pge/base \
     --cov=${CONTAINER_HOME}/opera/pge/${PGE_NAME} \
