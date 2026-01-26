@@ -24,6 +24,7 @@ from opera.util.logger import PgeLogger, default_log_file_name
 
 PGE_NAME_MAP = {
     'BASE_PGE': ('opera.pge.base.base_pge', 'PgeExecutor'),
+    'CAL_DISP_PGE': ('opera.pge.cal_disp.cal_disp_pge', 'CalDispExecutor'),
     'CSLC_S1_PGE': ('opera.pge.cslc_s1.cslc_s1_pge', 'CslcS1Executor'),
     'DISP_S1_PGE': ('opera.pge.disp_s1.disp_s1_pge', 'DispS1Executor'),
     'DISP_S1_STATIC_PGE': ('opera.pge.disp_s1.disp_s1_pge', 'DispS1StaticExecutor'),
@@ -33,7 +34,7 @@ PGE_NAME_MAP = {
     'DSWX_NI_PGE': ('opera.pge.dswx_ni.dswx_ni_pge', 'DSWxNIExecutor'),
     'DSWX_S1_PGE': ('opera.pge.dswx_s1.dswx_s1_pge', 'DSWxS1Executor'),
     'RTC_S1_PGE': ('opera.pge.rtc_s1.rtc_s1_pge', 'RtcS1Executor'),
-    'TROPO_PGE': ('opera.pge.tropo.tropo_pge', 'TROPOExecutor')
+    'TROPO_PGE': ('opera.pge.tropo.tropo_pge', 'TROPOExecutor'),
 }
 """Mapping of PGE names specified by a RunConfig to the PGE module and class type to instantiate"""
 

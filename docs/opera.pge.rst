@@ -17,6 +17,7 @@ Submodules
    opera.pge.dist_s1
    opera.pge.tropo
    opera.pge.disp_ni
+   opera.pge.cal_disp
 
 Module contents
 ---------------
