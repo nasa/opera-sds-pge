@@ -246,6 +246,7 @@ def get_extent_from_coordinates(file_name, group_path, longitude='longitude', la
 
         return extent
 
+
 def get_rtc_s1_product_metadata(file_name):
     """
     Returns a python dict containing the RTC-S1 product_output metadata
@@ -1252,6 +1253,7 @@ def get_tropo_product_metadata(file_name):
     tropo_metadata = get_hdf5_attrs_as_dict(file_name, "/")
     return tropo_metadata
 
+
 def create_test_tropo_metadata_product(file_path):
     """
     Creates a dummy TROPO netCDF metadata file with expected global attributes
@@ -1297,3 +1299,154 @@ def create_test_tropo_metadata_product(file_path):
 
         longitude_dset = outfile.create_dataset("longitude", data=lon_data, dtype='float64')
         latitude_dset = outfile.create_dataset("latitude", data=lat_data, dtype='float64')
+
+
+def get_cal_disp_product_metadata(file_name, **extra_groups):
+    """
+    Returns a python dict containing the CAL-DISP metadata
+    which will be used with the ISO metadata template.
+
+    This is an alias of the get_disp_s1_product_metadata function
+    as it has identical function
+
+    Parameters
+    ----------
+    file_name : str
+        the CAL-DISP metadata file.
+    extra_groups:
+        kwargs for mapping additional HDF5 groups into the metadata dict.
+        Should only be used in development versions of the PGE if SAS outputs
+        necessary information into different groups. Keywords here must not
+        be any of 'x', 'y', 'identification', or 'metadata'.
+
+    Returns
+    -------
+    disp_metadata : dict
+        python dict containing the HDF5 file metadata which is used in the
+        ISO template.
+
+    Raises
+    ------
+    ValueError
+        If any of the kwargs keys are one of 'x', 'y', 'identification', or 'metadata'
+    """
+    return get_disp_s1_product_metadata(file_name, **extra_groups)
+
+
+def create_test_cal_disp_metadata_product(file_path):
+    # pylint: disable=unused-variable,invalid-name,too-many-locals,too-many-statements,too-many-boolean-expressions
+    """
+    Creates a dummy CAL-DISP h5 metadata file with expected groups and datasets.
+    This function is intended for use with unit tests, but is included in this
+    module, so it will be importable from within a built container.
+
+    Parameters
+    ----------
+    file_path : str
+        Full path to write the dummy DISP H5 metadata file to.
+
+    """
+    pge_runconfig_contents = """
+    dummy yaml data
+    """
+
+    algorithm_parameters_contents = """
+    dummy yaml data
+    """
+
+    with h5py.File(file_path, 'w') as outfile:
+        x_dset = outfile.create_dataset("x", data=np.zeros(10, ), dtype='float64')
+        y_dset = outfile.create_dataset("y", data=np.zeros(10, ), dtype='float64')
+
+        identification_grp = outfile.create_group("/identification")
+
+        frame_id_dset = identification_grp.create_dataset("frame_id", data=8882, dtype="int64")
+        product_version_dset = identification_grp.create_dataset("product_version", data=np.bytes_("0.1"))
+        track_number_dset = identification_grp.create_dataset("track_number", data=0, dtype="int64")
+        absolute_orbit_number_dset = identification_grp.create_dataset("absolute_orbit_number", data=0, dtype="int64")
+        orbit_pass_direction_dset = identification_grp.create_dataset("orbit_pass_direction",
+                                                                      data=np.bytes_("ascending"))
+        reference_datetime_dset = identification_grp.create_dataset("reference_datetime",
+                                                                    data=np.bytes_("2022-01-11T00:26:51"))
+        secondary_datetime_dset = identification_grp.create_dataset("secondary_datetime",
+                                                                    data=np.bytes_("2022-07-22T00:26:57"))
+        processing_start_datetime_dset = identification_grp.create_dataset("processing_start_datetime",
+                                                                           data=np.bytes_("2026-01-21T01:09:54.017049"))
+        bounding_polygon_dset = identification_grp.create_dataset("bounding_polygon", data=np.bytes_(
+            "POLYGON((71985.0 3153945.0, 355875.0 3153945.0, 355875.0 3385905.0, "
+            "71985.0 3385905.0, 71985.0 3153945.0))"))
+        product_bounding_box_dset = identification_grp.create_dataset("product_bounding_box", data=np.bytes_(
+            "(71985.0, 3153945.0, 355875.0, 3385905.0)"))
+        product_sample_spacing_dset = identification_grp.create_dataset("product_sample_spacing",
+                                                                        data=np.bytes_("30.0m"))
+        calibration_reference_name_dset = identification_grp.create_dataset("calibration_reference_name",
+                                                                            data=np.bytes_("UNR gridded data"))
+        calibration_reference_version_dset = identification_grp.create_dataset("calibration_reference_version",
+                                                                               data=np.bytes_("0.2"))
+        calibration_reference_type_dset = identification_grp.create_dataset("calibration_reference_type",
+                                                                            data=np.bytes_("constant"))
+        calibration_reference_reference_frame_dset = identification_grp.create_dataset(
+            "calibration_reference_reference_frame", data=np.bytes_("IGS20"))
+        source_calibration_file_list_dset = identification_grp.create_dataset("source_calibration_file_list",
+                                                                              data=np.bytes_(
+                                                                                  "grid_latlon_lookup_v0.2.txt, "
+                                                                                  "004421_IGS20.tenv8, "
+                                                                                  "004420_IGS20.tenv8, "
+                                                                                  "004493_IGS20.tenv8, "
+                                                                                  "004492_IGS20.tenv8, "
+                                                                                  "004494_IGS20.tenv8, "
+                                                                                  "004495_IGS20.tenv8, "
+                                                                                  "004567_IGS20.tenv8, "
+                                                                                  "004566_IGS20.tenv8, "
+                                                                                  "004568_IGS20.tenv8, "
+                                                                                  "004569_IGS20.tenv8"))
+        source_data_file_list_dset = identification_grp.create_dataset("source_data_file_list", data=np.bytes_(
+            "OPERA_L3_DISP-S1_IW_F08882_VV_20220111T002651Z_20220722T002657Z_v1.0_20251027T005420Z.nc"))
+        source_data_access_dset = identification_grp.create_dataset("source_data_access",
+                                                                    data=np.bytes_("https://datapool.asf.alaska.edu/"))
+        source_data_dem_name_dset = identification_grp.create_dataset("source_data_dem_name",
+                                                                      data=np.bytes_("Copernicus DEM GLO-30"))
+        source_data_satellite_names_dset = identification_grp.create_dataset("source_data_satellite_names",
+                                                                             data=np.bytes_("Sentinel-1A"))
+        source_data_imaging_geometry_dset = identification_grp.create_dataset("source_data_imaging_geometry",
+                                                                              data=np.bytes_("right_looking"))
+        source_data_x_spacing_dset = identification_grp.create_dataset("source_data_x_spacing", data=30.0,
+                                                                       dtype="float64")
+        source_data_y_spacing_dset = identification_grp.create_dataset("source_data_y_spacing", data=30.0,
+                                                                       dtype="float64")
+        acquisition_mode_dset = identification_grp.create_dataset("acquisition_mode", data=np.bytes_("IW"))
+        instrument_name_dset = identification_grp.create_dataset("instrument_name", data=np.bytes_("C-SAR"))
+        look_direction_dset = identification_grp.create_dataset("look_direction", data=np.bytes_("right"))
+        product_data_polarization_dset = identification_grp.create_dataset("product_data_polarization",
+                                                                           data=np.bytes_("VV"))
+        radar_band_dset = identification_grp.create_dataset("radar_band", data=np.bytes_("C"))
+        processing_facility_dset = identification_grp.create_dataset("processing_facility", data=np.bytes_("JPL"))
+        ceos_number_of_input_granules_dset = identification_grp.create_dataset("ceos_number_of_input_granules", data=1,
+                                                                               dtype="int64")
+        nodata_pixel_count_dset = identification_grp.create_dataset("nodata_pixel_count", data=25750140, dtype="int64")
+        product_data_access_dset = identification_grp.create_dataset("product_data_access",
+                                                                     data=np.bytes_("https://example.com/products"))
+        static_layers_data_access_dset = identification_grp.create_dataset("static_layers_data_access", data=np.bytes_(
+            "https://example.com/static_layers"))
+
+        metadata_grp = outfile.create_group("/metadata")
+
+        algorithm_parameters_yaml_dset = metadata_grp.create_dataset("algorithm_parameters_yaml",
+                                                                     data=np.bytes_(algorithm_parameters_contents))
+        platform_id_dset = metadata_grp.create_dataset("platform_id", data=np.bytes_("S1A"))
+        source_data_software_disp_version_dset = metadata_grp.create_dataset("source_data_software_disp_version",
+                                                                             data=np.bytes_("1.0"))
+        cal_disp_software_version_dset = metadata_grp.create_dataset("cal_disp_software_version", data=np.bytes_("0.1"))
+        venti_software_version_dset = metadata_grp.create_dataset("venti_software_version", data=np.bytes_("0.1"))
+        product_pixel_coordinate_convention_dset = metadata_grp.create_dataset("product_pixel_coordinate_convention",
+                                                                               data=np.bytes_("center"))
+        ceos_atmospheric_phase_correction_dset = metadata_grp.create_dataset("ceos_atmospheric_phase_correction",
+                                                                             data=np.bytes_("none"))
+        ceos_gridding_convention_dset = metadata_grp.create_dataset("ceos_gridding_convention",
+                                                                    data=np.bytes_("consistent"))
+        ceos_product_measurement_projection_dset = metadata_grp.create_dataset("ceos_product_measurement_projection",
+                                                                               data=np.bytes_("line_of_sight"))
+        ceos_ionospheric_phase_correction_dset = metadata_grp.create_dataset("ceos_ionospheric_phase_correction",
+                                                                             data=np.bytes_("none"))
+        ceos_noise_removal_dset = metadata_grp.create_dataset("ceos_noise_removal", data=np.bytes_("N"))
+        pge_runconfig_dset = metadata_grp.create_dataset("pge_runconfig", data=np.bytes_(pge_runconfig_contents))
