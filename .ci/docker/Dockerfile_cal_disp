@@ -60,7 +60,7 @@ RUN set -ex \
     && chmod 777 $(find ${PGE_DEST_DIR} -type d)
 
 # Set the Docker entrypoint and clear the default command
-ENTRYPOINT ["micromamba", "run", "--no-capture-output", "-n", "cal-disp", "sh", "-c", \
+ENTRYPOINT ["micromamba", "run", "-n", "cal-disp", "sh", "-c", \
             "exec ${CONDA_ROOT}/bin/pge_docker_entrypoint.sh \"${@}\"", "--"]
 CMD []
 
