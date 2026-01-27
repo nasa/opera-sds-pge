@@ -12,13 +12,14 @@ import shutil
 import tempfile
 import unittest
 from io import StringIO
-from os.path import abspath, dirname, join
+from os.path import abspath, dirname, exists, join
 
 from pkg_resources import resource_filename
 
 from opera.pge import RunConfig
 from opera.pge.cal_disp.cal_disp_pge import CalDispExecutor
 from opera.util import PgeLogger
+from opera.util.input_validation import validate_cal_inputs
 
 
 class CalDispPgeTestCase(unittest.TestCase):
@@ -169,6 +170,136 @@ class CalDispPgeTestCase(unittest.TestCase):
 
         # Check the properties of the algorithm parameters RunConfig to ensure they match as expected
         self._compare_algorithm_parameters_runconfig_to_expected(runconfig_dict)
+
+    def test_cal_disp_pge_validate_inputs(self):
+        """
+        Test that the CAL-DISP PGE Preprocessor is able to detect invalid input files: non-existent files,
+        empty files, invalid extensions.
+        """
+
+        # Test non-existent file detection
+
+        test_filename = 'non_existent_disp_file.nc'
+        sas_config = {
+            'cal_disp_workflow': {
+                'input_file_group': {
+                    'disp_file': test_filename,
+                },
+                'dynamic_ancillary_group': {},
+                'static_ancillary_group': {},
+            }
+        }
+        runconfig = MockRunConfig(sas_config)
+        logger = PgeLogger()
+        with self.assertRaises(RuntimeError):
+            validate_cal_inputs(runconfig, logger, 'CAL-DISP')
+
+        # Check to see that the RuntimeError is as expected
+        logger.close_log_stream()
+        log_file = logger.get_file_name()
+        self.assertTrue(exists(log_file))
+        with open(log_file, 'r', encoding='utf-8') as lfile:
+            log = lfile.read()
+        self.assertIn(f'Could not locate specified input {test_filename}.', log)
+
+        # Test invalid extensions
+
+        with tempfile.TemporaryDirectory(dir=self.test_dir) as tmp_dir:
+            logger = PgeLogger()
+            test_filename = join(
+                tmp_dir, 'OPERA_L3_DISP-S1_IW_F08882_VV_20220111T002651Z_20220722T002657Z_v1.0_20251027T005420Z.h5'
+            )
+            with open(test_filename, 'w') as ief:
+                ief.write('\n')
+            sas_config['cal_disp_workflow']['input_file_group']['disp_file'] = test_filename
+
+            runconfig = MockRunConfig(sas_config)
+            with self.assertRaises(RuntimeError):
+                validate_cal_inputs(runconfig, logger, "CAL-DISP")
+
+            # Check to see that the RuntimeError is as expected
+            logger.close_log_stream()
+            log_file = logger.get_file_name()
+            self.assertTrue(exists(log_file))
+            with open(log_file, 'r', encoding='utf-8') as lfile:
+                log = lfile.read()
+            self.assertIn(f'Input file {test_filename} does not have an expected file extension', log)
+            os.remove(test_filename)
+
+            # Test for empty files
+
+            logger = PgeLogger()
+            test_filename = join(
+                tmp_dir, 'OPERA_L3_DISP-S1_IW_F08882_VV_20220111T002651Z_20220722T002657Z_v1.0_20251027T005420Z.nc'
+            )
+            open(test_filename, 'w').close()
+            sas_config['cal_disp_workflow']['input_file_group']['disp_file'] = test_filename
+
+            runconfig = MockRunConfig(sas_config)
+            with self.assertRaises(RuntimeError):
+                validate_cal_inputs(runconfig, logger, "CAL-DISP")
+
+            # Check to see that the RuntimeError is as expected
+            logger.close_log_stream()
+            log_file = logger.get_file_name()
+            self.assertTrue(exists(log_file))
+            with open(log_file, 'r', encoding='utf-8') as lfile:
+                log = lfile.read()
+            self.assertIn(f'Input file {test_filename} size is 0. Size must be greater than 0.', log)
+            os.remove(test_filename)
+
+            # Test all files
+
+            test_disp_file = test_filename
+            test_dem_file = join(tmp_dir, 'OPERA_L3_DISP-S1-STATIC_F08882_20140403_S1A_v1.0_dem.tif')
+            test_los_file = join(tmp_dir, 'OPERA_L3_DISP-S1-STATIC_F08882_20140403_S1A_v1.0_line_of_sight_enu.tif')
+            test_tropo_files = [
+                join(tmp_dir, 'OPERA_L4_TROPO-ZENITH_20220111T000000Z_20250923T224940Z_HRES_v1.0.nc'),
+                join(tmp_dir, 'OPERA_L4_TROPO-ZENITH_20220722T000000Z_20250923T233421Z_HRES_v1.0.nc'),
+            ]
+
+            unr_dir = join(tmp_dir, 'unr')
+            os.makedirs(unr_dir, exist_ok=True)
+
+            test_unr_files = [
+                join(unr_dir, '004420_IGS20.tenv8'),
+                join(unr_dir, '004421_IGS20.tenv8'),
+                join(unr_dir, '004492_IGS20.tenv8'),
+            ]
+            test_unr_ref_file = join(unr_dir, 'grid_latlon_lookup_v0.2.txt')
+
+            test_files = ([test_disp_file, test_dem_file, test_los_file, test_unr_ref_file] +
+                          test_tropo_files + test_unr_files)
+
+            for test_f in test_files:
+                with open(test_f, 'w') as ief:
+                    ief.write('\n')
+                self.assertTrue(exists(test_f))
+
+            sas_config = {
+                'cal_disp_workflow': {
+                    'input_file_group': {
+                        'disp_file': test_filename,
+                        'unr_grid_latlon_file': test_unr_ref_file,
+                        'unr_timeseries_dir': unr_dir
+                    },
+                    'dynamic_ancillary_group': {
+                        'static_los_file': test_los_file,
+                        'static_dem_file': test_dem_file,
+                        'ref_tropo_files': [test_tropo_files[0]],
+                        'sec_tropo_files': [test_tropo_files[1]],
+                    },
+                    'static_ancillary_group': {},
+                }
+            }
+
+            runconfig = MockRunConfig(sas_config)
+            logger = PgeLogger()
+
+            validate_cal_inputs(runconfig, logger, "CAL-DISP")
+
+            for test_f in test_files:
+                os.remove(test_f)
 
 
 class MockRunConfig:
