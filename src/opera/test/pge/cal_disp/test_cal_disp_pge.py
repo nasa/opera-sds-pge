@@ -12,7 +12,7 @@ import shutil
 import tempfile
 import unittest
 from io import StringIO
-from os.path import abspath, join
+from os.path import abspath, dirname, join
 
 from pkg_resources import resource_filename
 
@@ -63,10 +63,12 @@ class CalDispPgeTestCase(unittest.TestCase):
             'OPERA_L3_DISP-S1-STATIC_F08882_20140403_S1A_v1.0_dem.tif',
             'OPERA_L3_DISP-S1-STATIC_F08882_20140403_S1A_v1.0_line_of_sight_enu.tif',
             'OPERA_L4_TROPO-ZENITH_20220111T000000Z_20250923T224940Z_HRES_v1.0.nc',
-            'OPERA_L4_TROPO-ZENITH_20220722T000000Z_20250923T233421Z_HRES_v1.0.nc', '004420_IGS20.tenv8',
-            '004421_IGS20.tenv8', '004492_IGS20.tenv8', 'grid_latlon_lookup_v0.2.txt',
+            'OPERA_L4_TROPO-ZENITH_20220722T000000Z_20250923T233421Z_HRES_v1.0.nc', 'unr/004420_IGS20.tenv8',
+            'unr/004421_IGS20.tenv8', 'unr/004492_IGS20.tenv8', 'unr/grid_latlon_lookup_v0.2.txt',
         ]
         for dummy_input_file in dummy_input_files:
+            if dirname(dummy_input_file) != '':
+                os.makedirs(join(input_dir, dirname(dummy_input_file)), exist_ok=True)
             os.system(
                 f"echo \"non-empty file\" > {join(input_dir, dummy_input_file)}"
             )

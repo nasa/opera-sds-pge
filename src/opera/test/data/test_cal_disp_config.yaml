@@ -69,11 +69,11 @@ RunConfig:
                     # REQUIRED: Path to UNR grid lookup table (grid_latlon_lookup_v0.2.txt).
                     #   Type: string.
                     unr_grid_latlon_file:
-                        cal_disp_pge_test/input_dir/grid_latlon_lookup_v0.2.txt
+                        cal_disp_pge_test/input_dir/unr/grid_latlon_lookup_v0.2.txt
                     # REQUIRED: Directory containing UNR .tenv8 timeseries files.
                     #   Type: string.
                     unr_timeseries_dir:
-                        cal_disp_pge_test/input_dir
+                        cal_disp_pge_test/input_dir/unr
                     # REQUIRED: Version of UNR gridded data, e.g. [0.2].
                     #   Type: string.
                     unr_grid_version: '0.2'
