@@ -96,10 +96,10 @@ container_name="${PGE_NAME}"
 # Start metrics collection
 metrics_collection_start "$PGE_NAME" "$container_name" "$TEST_RESULTS_DIR" "$SAMPLE_TIME"
 
-echo "Running Docker image ${PGE_IMAGE}:${PGE_TAG} for ${input_data_dir}"
+echo "Running Docker image ${PGE_IMAGE}:${PGE_TAG} for ${input_dir}"
 docker run --rm -u $UID:"$(id -g)" --name $container_name \
             -v "${TMP_DIR}/runconfig":/home/conda/runconfig:ro \
-            -v "$input_data_dir":/home/conda/input_dir:ro \
+            -v "$input_dir":/home/conda/input_dir:ro \
             -v "$output_dir":/home/conda/output_dir \
             -v "$scratch_dir":/home/conda/scratch_dir \
             -v "$expected_data_dir":/home/conda/expected_output_dir \
