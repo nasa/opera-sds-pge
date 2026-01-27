@@ -11,16 +11,14 @@ import os
 import shutil
 import tempfile
 import unittest
-from copy import deepcopy
 from io import StringIO
 from os.path import abspath, dirname, exists, join
-
-from pkg_resources import resource_filename
 
 import yaml
 
 from opera.pge import RunConfig
 from opera.pge.cal_disp.cal_disp_pge import CalDispExecutor
+from opera.test import path
 from opera.util import PgeLogger
 from opera.util.input_validation import validate_cal_inputs
 
@@ -37,7 +35,8 @@ class CalDispPgeTestCase(unittest.TestCase):
     def setUpClass(cls) -> None:
         """Set up directories and files for testing"""
         cls.starting_dir = abspath(os.curdir)
-        cls.test_dir = resource_filename(__name__, "")
+        with path('opera.test.pge', 'cal_disp') as test_dir_path:
+            cls.test_dir = str(test_dir_path)
         cls.data_dir = join(cls.test_dir, os.pardir, os.pardir, "data")
 
         os.chdir(cls.test_dir)
