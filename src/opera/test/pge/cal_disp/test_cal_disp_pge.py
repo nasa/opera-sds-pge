@@ -11,10 +11,13 @@ import os
 import shutil
 import tempfile
 import unittest
+from copy import deepcopy
 from io import StringIO
 from os.path import abspath, dirname, exists, join
 
 from pkg_resources import resource_filename
+
+import yaml
 
 from opera.pge import RunConfig
 from opera.pge.cal_disp.cal_disp_pge import CalDispExecutor
@@ -300,6 +303,178 @@ class CalDispPgeTestCase(unittest.TestCase):
 
             for test_f in test_files:
                 os.remove(test_f)
+
+    def test_cal_disp_pge_validate_outputs(self):
+        """Test off-nominal output conditions"""
+        runconfig_path = join(self.data_dir, 'test_cal_disp_config.yaml')
+        test_runconfig_path = join(self.data_dir, 'test_off_nominal_output.yaml')
+
+        with open(runconfig_path, 'r', encoding='utf-8') as infile:
+            runconfig_dict = yaml.safe_load(infile)
+
+        primary_executable = runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']
+        program_options_copy: list = primary_executable['ProgramOptions'].copy()
+
+        try:
+            # Test no .nc
+            primary_executable['ProgramOptions'].pop(1)
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+                yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+
+            pge = CalDispExecutor(pge_name='CalDispPgeTest', runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn("Could not locate .nc file", log_contents)
+            shutil.rmtree(pge.runconfig.output_product_path)
+
+            # Test no .png
+            primary_executable['ProgramOptions'] = program_options_copy.copy()
+            primary_executable['ProgramOptions'].pop(2)
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+                yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+
+            pge = CalDispExecutor(pge_name='CalDispPgeTest', runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn("Could not locate .png file", log_contents)
+            shutil.rmtree(pge.runconfig.output_product_path)
+
+            # Test too many .nc
+            extra_nc = 'OPERA_L4_CAL-DISP-S1_IW_F08883_VV_20220111T002651Z_20220722T002657Z_v0.1_20260122T203125Z.nc'
+            extra_png = 'OPERA_L4_CAL-DISP-S1_IW_F08883_VV_20220111T002651Z_20220722T002657Z_v0.1_20260122T203125Z.png'
+
+            primary_executable['ProgramOptions'] = program_options_copy.copy()
+            primary_executable['ProgramOptions'].insert(
+                3,
+                f'dd if=/dev/urandom of=cal_disp_pge_test/output_dir/{extra_nc} bs=1M count=1;'
+            )
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+                yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+
+            pge = CalDispExecutor(pge_name='CalDispPgeTest', runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn("Found incorrect number of .nc files", log_contents)
+            shutil.rmtree(pge.runconfig.output_product_path)
+
+            # Test too many .png
+
+            primary_executable['ProgramOptions'] = program_options_copy.copy()
+            primary_executable['ProgramOptions'].insert(
+                3,
+                f'dd if=/dev/urandom of=cal_disp_pge_test/output_dir/{extra_png} bs=1M count=1;'
+            )
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+                yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+
+            pge = CalDispExecutor(pge_name='CalDispPgeTest', runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn("Found incorrect number of .png files", log_contents)
+            shutil.rmtree(pge.runconfig.output_product_path)
+
+            # Test empty .nc
+
+            primary_executable['ProgramOptions'] = program_options_copy.copy()
+            primary_executable['ProgramOptions'][1] = f'touch cal_disp_pge_test/output_dir/{extra_nc};'
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+                yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+
+            pge = CalDispExecutor(pge_name='CalDispPgeTest', runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn("Size must be greater than 0.", log_contents)
+            self.assertIn(".nc size is 0", log_contents)
+            shutil.rmtree(pge.runconfig.output_product_path)
+
+            # Test empty .png
+
+            primary_executable['ProgramOptions'] = program_options_copy.copy()
+            primary_executable['ProgramOptions'][2] = f'touch cal_disp_pge_test/output_dir/{extra_png};'
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+                yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+
+            pge = CalDispExecutor(pge_name='CalDispPgeTest', runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn("Size must be greater than 0.", log_contents)
+            self.assertIn(".png size is 0", log_contents)
+            shutil.rmtree(pge.runconfig.output_product_path)
+
+            # Test invalid file
+
+            primary_executable['ProgramOptions'] = program_options_copy.copy()
+            primary_executable['ProgramOptions'][1] = \
+                'dd if=/dev/urandom of=cal_disp_pge_test/output_dir/cal_disp.nc bs=1M count=1;'
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+                yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+
+            pge = CalDispExecutor(pge_name='CalDispPgeTest', runconfig_path=test_runconfig_path)
+
+            with self.assertRaises(RuntimeError):
+                pge.run()
+
+            expected_log_file = pge.logger.get_file_name()
+
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn("Invalid product filename cal_disp.nc", log_contents)
+            shutil.rmtree(pge.runconfig.output_product_path)
+
+
+        finally:
+            if exists(test_runconfig_path):
+                os.unlink(test_runconfig_path)
 
 
 class MockRunConfig:

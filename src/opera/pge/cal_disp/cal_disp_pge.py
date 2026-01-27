@@ -7,7 +7,12 @@ cal_disp_pge.py
 Module defining the implementation of the Calibration for Surface Displacement from Sentinel-1 and NISAR (CAL-DISP) PGE.
 """
 
+import re
+from os import listdir
+from os.path import basename, join, getsize, splitext
+
 from opera.pge.base.base_pge import PgeExecutor, PostProcessorMixin, PreProcessorMixin
+from opera.util.error_codes import ErrorCode
 from opera.util.input_validation import validate_algorithm_parameters_config, validate_cal_inputs
 
 
@@ -56,14 +61,55 @@ class CalDispPostProcessorMixin(PostProcessorMixin):
     and adding nothing at this time. New functionalities will be added as new versions of the CAL-DISP SAS are released.
     """
 
-    _pre_mixin_name = "CalDispPostProcessorMixin"
+    _post_mixin_name = "CalDispPostProcessorMixin"
     _product_metadata_cache = {}
     _product_filename_cache = {}
+
+    _expected_extensions = ('.nc', '.png')
+
+    def _validate_outputs(self):
+        output_product_files = self.runconfig.get_output_product_filenames()
+
+        # Confirm one and only one of each expected output type
+        for filename_ext in self._expected_extensions:
+            gen = (f for f in output_product_files if splitext(f)[1] == filename_ext)
+            try:
+                output_filepath = next(gen)
+            except StopIteration:
+                error_msg = f"Could not locate {filename_ext} file."
+                self.logger.critical(self.name, ErrorCode.OUTPUT_NOT_FOUND, error_msg)
+
+            # Check for second file, if found raise error
+            try:
+                next(gen)
+                error_msg = f"Found incorrect number of {filename_ext} files."
+                self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
+            except StopIteration:
+                pass
+
+            output_filename = basename(output_filepath)
+
+            # Check file size
+            file_size = getsize(output_filepath)
+            if not file_size > 0:
+                error_msg = (f"Output file {output_filename} size is {file_size}. "
+                             "Size must be greater than 0.")
+                self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
+
+            # Check filename matches expected pattern
+            match = self._granule_filename_re.match(output_filename)
+            if not bool(match):
+                error_msg = f'Invalid product filename {output_filename}'
+                self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
+            else:
+                # Cache the core filename for later use
+                self._cached_core_filename = match.group(0)
 
     def run_postprocessor(self, **kwargs):
         """
         Executes the post-processing steps for the CAL-DISP PGE.
-        The CalDispPostProcessorMixin version of this method performs the same
+        The CalDispPostProcessorMixin version of this method currently
+        validates the output product files and performs the same
         steps as the base PostProcessorMixin.
 
         Parameters
@@ -71,6 +117,8 @@ class CalDispPostProcessorMixin(PostProcessorMixin):
         **kwargs: dict
             Any keyword arguments needed by the post-processor
         """
+        self._validate_outputs()
+
         super().run_postprocessor(**kwargs)
 
 
@@ -81,6 +129,11 @@ class CalDispExecutor(CalDispPreProcessorMixin, CalDispPostProcessorMixin, PgeEx
     functionality, while inheriting all other functionality for setup and execution
     of the SAS from the base PgeExecutor class.
     """
+
+    _granule_filename_re = re.compile(r"(?P<id>(?P<project>OPERA)_(?P<level>L4)_(?P<product_type>CAL-DISP)-"
+                                      r"(?P<platform>S1|NI)_(?P<mode>IW|20|40|77|05)_(?P<frame_id>F\d{5})_"
+                                      r"(?P<pol>[HV]{2})_(?P<reference_ts>\d{8}T\d{6}Z)_(?P<secondary_ts>\d{8}T\d{6}Z)_"
+                                      r"(?P<product_version>v\d[.]\d)_(?P<creation_ts>\d{8}T\d{6}Z)[.](?P<ext>nc|png))")
 
     NAME = "CAL-DISP"
     """Short name for the CAL-DISP PGE"""
