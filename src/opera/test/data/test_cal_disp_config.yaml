@@ -35,7 +35,8 @@ RunConfig:
                 ProgramPath: mkdir
                 ProgramOptions:
                     - '-p cal_disp_pge_test/output_dir/;'
-                    - 'dd if=/dev/urandom of=cal_disp_pge_test/output_dir/OPERA_L4_CAL-DISP-S1_IW_F08882_VV_20220111T002651Z_20220722T002657Z_v0.1_20260122T203124Z.nc bs=1M count=1;'
+#                    - 'dd if=/dev/urandom of=cal_disp_pge_test/output_dir/OPERA_L4_CAL-DISP-S1_IW_F08882_VV_20220111T002651Z_20220722T002657Z_v0.1_20260122T203124Z.nc bs=1M count=1;'
+                    - 'python3 -c "from opera.util.h5_utils import create_test_cal_disp_metadata_product; create_test_cal_disp_metadata_product(\"cal_disp_pge_test/output_dir/OPERA_L4_CAL-DISP-S1_IW_F08882_VV_20220111T002651Z_20220722T002657Z_v0.1_20260122T203124Z.nc\")";'
                     - 'dd if=/dev/urandom of=cal_disp_pge_test/output_dir/OPERA_L4_CAL-DISP-S1_IW_F08882_VV_20220111T002651Z_20220722T002657Z_v0.1_20260122T203124Z.png bs=1M count=1;'
                     - '/bin/echo CAL-DISP invoked with RunConfig'
                 ErrorCodeBase: 1000000
