@@ -9,6 +9,7 @@ Common code used by some PGEs for input validation.
 
 """
 import glob
+import os
 import re
 from os.path import abspath, exists, getsize, isdir, isfile, join, splitext
 
@@ -483,6 +484,79 @@ def validate_dswx_inputs(runconfig, logger, name, valid_extensions=None):
                          f"extension ({valid_extensions}).")
 
             logger.critical(name, ErrorCode.INVALID_INPUT, error_msg)
+
+
+def validate_cal_inputs(runconfig, logger, name):
+    """
+    Evaluates the inputs and ancillaries from the RunConfig to ensure they are valid for use with
+    the CAL-DISP PGE.
+
+    The input products for DISP-S1/NI can be classified into two groups:
+        1) the main input products (the OPERA DISP products & NGL UNR GNSS files) and
+        2) the ancillary input products (DISP-STATIC DEM & LOS, TROPO, Mask, Ionosphere, tile bounds and static
+            overrides and database files).
+
+    Parameters
+    ----------
+    runconfig: file
+        Runconfig file passed by the calling PGE
+    logger: PgeLogger
+        Logger passed by the calling PGE
+    name:  str
+        pge name
+    """
+    input_file_group = runconfig.sas_config['cal_disp_workflow']['input_file_group']
+    dyn_anc_file_group = runconfig.sas_config['cal_disp_workflow']['dynamic_ancillary_group']
+    static_anc_file_group = runconfig.sas_config['cal_disp_workflow']['static_ancillary_group']
+
+    check_input(input_file_group['disp_file'], logger, name,
+                valid_extensions=('.nc',), check_zero_size=True)
+    check_input(input_file_group['unr_grid_latlon_file'], logger, name,
+                valid_extensions=('.txt',), check_zero_size=True)
+
+    unr_timeseries_files = [join(input_file_group['unr_timeseries_dir'], file)
+                            for file in os.listdir(input_file_group['unr_timeseries_dir']) if not file.endswith('.txt')]
+
+    check_input_list(unr_timeseries_files, logger, name,
+                     valid_extensions=('.tenv8',), check_zero_size=True)
+
+    check_input(dyn_anc_file_group['static_los_file'], logger, name,
+                valid_extensions=('.tif', '.tiff',), check_zero_size=True)
+
+    check_input(dyn_anc_file_group['static_dem_file'], logger, name,
+                valid_extensions=('.tif', '.tiff',), check_zero_size=True)
+
+    if ('ref_tropo_files' in dyn_anc_file_group and isinstance(dyn_anc_file_group['ref_tropo_files'], list) and
+            len(dyn_anc_file_group['ref_tropo_files']) > 0):
+        check_input_list(dyn_anc_file_group['ref_tropo_files'], logger, name,
+                         valid_extensions=('.nc',), check_zero_size=True)
+    if ('sec_tropo_files' in dyn_anc_file_group and isinstance(dyn_anc_file_group['sec_tropo_files'], list) and
+            len(dyn_anc_file_group['sec_tropo_files']) > 0):
+        check_input_list(dyn_anc_file_group['sec_tropo_files'], logger, name,
+                         valid_extensions=('.nc',), check_zero_size=True)
+
+    if ('iono_files' in dyn_anc_file_group and isinstance(dyn_anc_file_group['iono_files'], list) and
+            len(dyn_anc_file_group['iono_files']) > 0):
+        check_input_list(dyn_anc_file_group['iono_files'], logger, name,check_zero_size=True)
+
+    if ('tiles_files' in dyn_anc_file_group and isinstance(dyn_anc_file_group['tiles_files'], list) and
+            len(dyn_anc_file_group['tiles_files']) > 0):
+        check_input_list(dyn_anc_file_group['tiles_files'], logger, name,check_zero_size=True)
+
+    if ('algorithm_parameters_overrides_json' in static_anc_file_group and
+            static_anc_file_group['algorithm_parameters_overrides_json'] is not None):
+        check_input(static_anc_file_group['algorithm_parameters_overrides_json'], logger, name,
+                    valid_extensions=('.json',), check_zero_size=True)
+
+    if ('defo_area_db_json' in static_anc_file_group and
+            static_anc_file_group['defo_area_db_json'] is not None):
+        check_input(static_anc_file_group['defo_area_db_json'], logger,
+                    name, valid_extensions=('.json',), check_zero_size=True)
+
+    if ('event_db_json' in static_anc_file_group and
+            static_anc_file_group['event_db_json'] is not None):
+        check_input(static_anc_file_group['event_db_json'], logger,
+                    name, valid_extensions=('.json',), check_zero_size=True)
 
 
 def validate_algorithm_parameters_config(name, algorithm_parameters_schema_file_path,

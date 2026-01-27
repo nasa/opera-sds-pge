@@ -8,6 +8,7 @@ Module defining the implementation of the Calibration for Surface Displacement f
 """
 
 from opera.pge.base.base_pge import PgeExecutor, PostProcessorMixin, PreProcessorMixin
+from opera.util.input_validation import validate_algorithm_parameters_config, validate_cal_inputs
 
 
 class CalDispPreProcessorMixin(PreProcessorMixin):
@@ -35,6 +36,12 @@ class CalDispPreProcessorMixin(PreProcessorMixin):
             Any keyword arguments needed by the pre-processor
         """
         super().run_preprocessor(**kwargs)
+
+        validate_cal_inputs(self.runconfig, self.logger, self.name)
+        validate_algorithm_parameters_config(self.name,
+                                             self.runconfig.algorithm_parameters_schema_path,
+                                             self.runconfig.algorithm_parameters_file_config_path,
+                                             self.logger)
 
 
 class CalDispPostProcessorMixin(PostProcessorMixin):
