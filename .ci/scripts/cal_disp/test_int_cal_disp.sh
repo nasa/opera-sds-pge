@@ -53,7 +53,7 @@ overall_status=0
 
 echo "Testing CAL-DISP Workflow"
 
-input_dir="${TMP_DIR}/${INPUT_DATA%.*}"
+input_dir="${TMP_DIR}/${INPUT_DATA%.*}/input_dir"
 runconfig_dir="${TMP_DIR}/runconfig"
 
 expected_data_dir="${TMP_DIR}/${EXPECTED_DATA%.*}/golden_output"
