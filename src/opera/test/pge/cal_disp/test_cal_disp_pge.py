@@ -117,7 +117,7 @@ class CalDispPgeTestCase(unittest.TestCase):
         self.assertIsNone(pge.runconfig)
         self.assertIsNone(pge.logger)
 
-        # Kickoff execution of DISP-S1 PGE
+        # Kickoff execution of CAL-DISP PGE
         pge.run()
 
         # Check that the runconfig and logger were instantiated

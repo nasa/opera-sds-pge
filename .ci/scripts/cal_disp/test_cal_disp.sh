@@ -1,5 +1,5 @@
 #!/bin/bash
-# Script to execute unit tests on the OPERA DISP-S1 PGE Docker image
+# Script to execute unit tests on the OPERA CAL-DISP PGE Docker image
 
 set -e
 

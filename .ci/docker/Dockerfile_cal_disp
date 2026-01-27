@@ -1,4 +1,4 @@
-# Dockerfile to produce the production DISP-S1 PGE Docker image for OPERA
+# Dockerfile to produce the production CAL-DISP PGE Docker image for OPERA
 # Authors: Riley Kuttruff
 
 # Default SAS image path, must be provided by the docker build call via --build-arg

@@ -13,11 +13,13 @@ from opera.util.input_validation import validate_algorithm_parameters_config, va
 
 class CalDispPreProcessorMixin(PreProcessorMixin):
     """
-    Mixin class responsible for handling all pre-processing steps for the DISP-NI
+    Mixin class responsible for handling all pre-processing steps for the CAL-DISP
     PGE. The pre-processing phase is defined as all steps necessary prior
     to SAS execution.
-    This particular pre-processor is currently a stub implementation, inheriting from the base pre-processor mixin
-    and adding nothing at this time. New functionalities will be added as new versions of the DISP-NI SAS are released.
+
+    In addition to the base functionality inherited from PreProcessorMixin, this
+    mixin adds an input validation step to ensure that input(s) defined by the
+    RunConfig exist and are valid.
     """
 
     _pre_mixin_name = "CalDispPreProcessorMixin"
@@ -49,8 +51,9 @@ class CalDispPostProcessorMixin(PostProcessorMixin):
     Mixin class responsible for handling all post-processing steps for the CAL-DISP
     PGE. The post-processing phase is defined as all steps required after SAS
     execution has completed, prior to handover of output products to PCM.
+
     This particular pre-processor is currently a stub implementation, inheriting from the base pre-processor mixin
-    and adding nothing at this time. New functionalities will be added as new versions of the DISP-NI SAS are released.
+    and adding nothing at this time. New functionalities will be added as new versions of the CAL-DISP SAS are released.
     """
 
     _pre_mixin_name = "CalDispPostProcessorMixin"

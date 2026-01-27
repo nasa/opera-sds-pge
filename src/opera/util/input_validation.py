@@ -491,7 +491,7 @@ def validate_cal_inputs(runconfig, logger, name):
     Evaluates the inputs and ancillaries from the RunConfig to ensure they are valid for use with
     the CAL-DISP PGE.
 
-    The input products for DISP-S1/NI can be classified into two groups:
+    The input products for CAL-DISP can be classified into two groups:
         1) the main input products (the OPERA DISP products & NGL UNR GNSS files) and
         2) the ancillary input products (DISP-STATIC DEM & LOS, TROPO, Mask, Ionosphere, tile bounds and static
             overrides and database files).
