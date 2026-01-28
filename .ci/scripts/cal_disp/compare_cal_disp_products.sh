@@ -4,7 +4,7 @@
 # CAL-DISP products. Each individual pair of products is compared using the
 # SAS validate workflow
 
-set -e
+set -ex
 umask 002
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
@@ -37,7 +37,7 @@ echo "<tr><th>Compare Result</th><th><ul><li>Output file</li><li>Expected file</
 # 2 - product validation failure
 overall_status=0
 
-for output_product in $(find $OUTPUT_DIR -maxdepth 1 -mindepth 1 -type d)
+for output_product in "$OUTPUT_DIR"/*
 do
   compare_output="N/A"
   compare_result="N/A"
