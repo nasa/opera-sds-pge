@@ -67,7 +67,7 @@ do
       fi
     done
 
-    if [ ! -d ${EXPECTED_DIR}/"$expected_product" ]; then
+    if [ ! -f ${EXPECTED_DIR}/"$expected_product" ]; then
       echo "No matching product found in expected directory $EXPECTED_DIR"
       overall_status=1
       compare_result="FAIL"
