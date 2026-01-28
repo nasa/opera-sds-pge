@@ -174,7 +174,7 @@ RunConfig:
 
             QAExecutable:
                 Enabled: True
-                ProgramPath: /home/mamba/opera/.ci/scripts/cal_disp/compare_cal_disp_products.sh
+                ProgramPath: /home/conda/opera/.ci/scripts/cal_disp/compare_cal_disp_products.sh
                 ProgramOptions: []
 
             DebugLevelGroup:
