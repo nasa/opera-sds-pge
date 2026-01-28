@@ -52,7 +52,7 @@ do
   product_id=$(echo "${ARR[@]:0:9}" | sed s'/ /_/g')
 
   # Comparison script only compares netcdf outputs
-  if [[ "${output_file##*/}" == *.nc ]]
+  if [[ "${output_product##*/}" == *.nc ]]
   then
     for potential_product in "$EXPECTED_DIR"/*.nc
     do
