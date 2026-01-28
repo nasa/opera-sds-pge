@@ -55,10 +55,10 @@ do
   if [[ "${output_file##*/}" == *.nc ]]
   then
     for potential_product in "$EXPECTED_DIR"/*.nc
-    #TODO Remove debug line
+    do
+    # TODO Remove debug line
     echo "Checking expected file ${potential_product}"
 
-    do
       if [[ "$potential_product" == "$product_id"* ]]; then
         echo "expected product is $potential_product"
         expected_product=$potential_product
