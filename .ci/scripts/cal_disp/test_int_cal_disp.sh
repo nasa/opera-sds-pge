@@ -114,14 +114,14 @@ metrics_collection_end "$PGE_NAME" "$container_name" "$docker_exit_status" "$TES
 # by Jenkins with the other results
 cp "${output_dir}"/*.log "${TEST_RESULTS_DIR}"
 # Copy the results.html file to the same directory
-cp "${output_dir}"/test_int_tropo_results.html "${TEST_RESULTS_DIR}"/test_int_tropo_results.html
+cp "${output_dir}"/test_int_cal_disp_results.html "${TEST_RESULTS_DIR}"/test_int_cal_disp_results.html
 
 if [ $docker_exit_status -ne 0 ]; then
   echo "docker exit indicates failure: ${docker_exit_status}"
   overall_status=1
 else
   # Retrieve the return code written to disk by the comparison script
-  test_status=$(cat "$output_dir/compare_tropo_products.rc")
+  test_status=$(cat "$output_dir/compare_cal_disp_products.rc")
 
   if [ $test_status -ne 0 ]; then
     overall_status=$test_status
