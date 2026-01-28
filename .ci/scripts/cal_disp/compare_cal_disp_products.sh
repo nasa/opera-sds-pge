@@ -49,37 +49,51 @@ do
 
   # Parse the unique product ID from the filename
   IFS='_' read -ra ARR <<< "$output_product"
-  product_id=$(echo "${ARR[@]:0:9}" | sed s'/ /_/')
+  product_id=$(echo "${ARR[@]:0:9}" | sed s'/ /_/g')
 
-  for potential_product in "$EXPECTED_DIR"/*.nc
-  do
-    if [[ "$potential_product" == "$product_id"* ]]; then
-      echo "expected product is $potential_product"
-      expected_product=$potential_product
-      break
+  # Comparison script only compares netcdf outputs
+  if [[ "${output_file##*/}" == *.nc ]]
+  then
+    for potential_product in "$EXPECTED_DIR"/*.nc
+    #TODO Remove debug line
+    echo "Checking expected file ${potential_product}"
+
+    do
+      if [[ "$potential_product" == "$product_id"* ]]; then
+        echo "expected product is $potential_product"
+        expected_product=$potential_product
+        break
+      fi
+    done
+
+    if [ ! -d "$expected_product" ]; then
+      echo "No matching product found in expected directory $EXPECTED_DIR"
+      overall_status=1
+      compare_result="FAIL"
+      compare_output="FAILED"
+    else
+       # compare output and expected files
+       echo "cal-disp validate ${EXPECTED_DIR}/${expected_product} ${OUTPUT_DIR}/${output_product}"
+       compare_output=$(cal-disp validate "${EXPECTED_DIR}/${expected_product}" "${OUTPUT_DIR}/${output_product}") || compare_exit_status=$?
+       echo "$compare_output"
+
+       if [[ $compare_exit_status -ne 0 ]]; then
+            echo "File comparison failed. Output and expected files differ for ${output_file}"
+            compare_result="FAIL"
+            overall_status=2
+       else
+            echo "File comparison passed for ${output_file}"
+            compare_result="PASS"
+       fi
     fi
-  done
-
-  if [ ! -d "$expected_product" ]; then
-    echo "No matching product found in expected directory $EXPECTED_DIR"
-    overall_status=1
-    compare_result="FAIL"
-    compare_output="FAILED"
   else
-     # compare output and expected files
-     echo "cal-disp validate ${EXPECTED_DIR}/${expected_product} ${OUTPUT_DIR}/${output_product}"
-     compare_output=$(cal-disp validate "${EXPECTED_DIR}/${expected_product}" "${OUTPUT_DIR}/${output_product}") || compare_exit_status=$?
-     echo "$compare_output"
-
-     if [[ $compare_exit_status -ne 0 ]]; then
-          echo "File comparison failed. Output and expected files differ for ${output_file}"
-          compare_result="FAIL"
-          overall_status=2
-     else
-          echo "File comparison passed for ${output_file}"
-          compare_result="PASS"
-     fi
+    echo "Not comparing file ${output_file}"
+    compare_result="SKIPPED"
   fi
+
+  # add html breaks to newlines
+  compare_out="${compare_out//$'\n'/<br>}"
+  update_html_results_file "${compare_result}" "${output_file}" "${expected_file}" "${compare_out}"
 done
 
 finalize_html_results_file
