@@ -75,26 +75,26 @@ do
     else
        # compare output and expected files
        echo "cal-disp validate ${EXPECTED_DIR}/${expected_product} ${OUTPUT_DIR}/${output_product}"
-       compare_output=$(cal-disp validate "${EXPECTED_DIR}/${expected_product}" "${OUTPUT_DIR}/${output_product}") || compare_exit_status=$?
+       compare_output=$(cal-disp validate "${EXPECTED_DIR}/${expected_product}" "${OUTPUT_DIR}/${output_product}" 2>&1) || compare_exit_status=$?
        echo "$compare_output"
 
        if [[ $compare_exit_status -ne 0 ]]; then
-            echo "File comparison failed. Output and expected files differ for ${output_file}"
+            echo "File comparison failed. Output and expected files differ for ${output_product}"
             compare_result="FAIL"
             overall_status=2
        else
-            echo "File comparison passed for ${output_file}"
+            echo "File comparison passed for ${output_product}"
             compare_result="PASS"
        fi
     fi
   else
-    echo "Not comparing file ${output_file}"
+    echo "Not comparing file ${output_product}"
     compare_result="SKIPPED"
   fi
 
   # add html breaks to newlines
   compare_out="${compare_out//$'\n'/<br>}"
-  update_html_results_file "${compare_result}" "${output_file}" "${expected_file}" "${compare_out}"
+  update_html_results_file "${compare_result}" "${output_product}" "${expected_product}" "${compare_out}"
 done
 
 finalize_html_results_file
