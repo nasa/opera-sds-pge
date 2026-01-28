@@ -4,7 +4,7 @@
 # CAL-DISP products. Each individual pair of products is compared using the
 # SAS validate workflow
 
-set -ex
+set -e
 umask 002
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
@@ -56,9 +56,7 @@ do
   then
     for potential_product in "$EXPECTED_DIR"/*.nc
     do
-    # TODO Remove debug line
     potential_product=$(basename -- "$potential_product")
-    echo "Checking expected file ${potential_product}"
 
       if [[ "$potential_product" == "$product_id"* ]]; then
         echo "expected product is $potential_product"
@@ -93,8 +91,8 @@ do
   fi
 
   # add html breaks to newlines
-  compare_out="${compare_out//$'\n'/<br>}"
-  update_html_results_file "${compare_result}" "${output_product}" "${expected_product}" "${compare_out}"
+  compare_output="${compare_output//$'\n'/<br>}"
+  update_html_results_file "${compare_result}" "${output_product}" "${expected_product}" "${compare_output}"
 done
 
 finalize_html_results_file
