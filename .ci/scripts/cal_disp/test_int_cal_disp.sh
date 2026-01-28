@@ -56,7 +56,7 @@ echo "Testing CAL-DISP Workflow"
 input_dir="${TMP_DIR}/${INPUT_DATA%.*}/input_dir"
 runconfig_dir="${TMP_DIR}/runconfig"
 
-expected_data_dir="${TMP_DIR}/${EXPECTED_DATA%.*}/golden_output"
+expected_data_dir="${TMP_DIR}/${EXPECTED_DATA%.*}/expected_output"
 
 echo "Input data directory: ${input_dir}"
 echo "Expected data directory: ${expected_data_dir}"
