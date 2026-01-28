@@ -80,6 +80,7 @@ do
           compare_result="PASS"
      fi
   fi
+done
 
 finalize_html_results_file
 
@@ -89,9 +90,4 @@ echo $overall_status > $OUTPUT_DIR/"compare_tropo_products.rc"
 
 # Always want to return 0 even if some comparisons failed to avoid error handling
 # logic in the PGE
-exit 0
-
-echo "TODO: Run comparison"
-touch "${OUTPUT_DIR}/test_int_${PGE_NAME}_results.html"
-
 exit 0
