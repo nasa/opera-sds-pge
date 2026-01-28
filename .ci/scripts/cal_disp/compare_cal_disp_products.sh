@@ -57,6 +57,7 @@ do
     for potential_product in "$EXPECTED_DIR"/*.nc
     do
     # TODO Remove debug line
+    potential_product=$(basename -- "$potential_product")
     echo "Checking expected file ${potential_product}"
 
       if [[ "$potential_product" == "$product_id"* ]]; then
@@ -66,7 +67,7 @@ do
       fi
     done
 
-    if [ ! -d "$expected_product" ]; then
+    if [ ! -d ${EXPECTED_DIR}/"$expected_product" ]; then
       echo "No matching product found in expected directory $EXPECTED_DIR"
       overall_status=1
       compare_result="FAIL"
@@ -100,7 +101,7 @@ finalize_html_results_file
 
 # Write the status code to an RC file so the integration test script can pick
 # it up.
-echo $overall_status > $OUTPUT_DIR/"compare_tropo_products.rc"
+echo $overall_status > $OUTPUT_DIR/"compare_cal_disp_products.rc"
 
 # Always want to return 0 even if some comparisons failed to avoid error handling
 # logic in the PGE
