@@ -3,11 +3,13 @@
 # Schema version: 0.1
 
 unwrap_correction:
+
   # Whether to run the unwrapping error correction before calibration.
   #   Type: boolean.
   run_unwrap_correction: true
 
 calibration_options:
+
   # Low pass method to get a long wavelength calibration plane.
   #   Type: string.
   #   Options: ['gaussian_fft', 'hanning_fft', 'savitsky_goley'].
@@ -27,6 +29,7 @@ calibration_options:
   downsample_factor: 10
 
 savitsky_goley_options:
+
   # Moving window size for plane fitting along x-axis (columns).
   #   Type: integer | null.
   #   Units: pixels.
