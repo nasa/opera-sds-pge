@@ -9,7 +9,6 @@ Common code used by some PGEs for input validation.
 
 """
 import glob
-import os
 import re
 from os.path import abspath, exists, getsize, isdir, isfile, join, splitext
 
@@ -514,8 +513,11 @@ def validate_cal_inputs(runconfig, logger, name):
     check_input(input_file_group['unr_grid_latlon_file'], logger, name,
                 valid_extensions=('.txt',), check_zero_size=True)
 
-    unr_timeseries_files = [join(input_file_group['unr_timeseries_dir'], file)
-                            for file in os.listdir(input_file_group['unr_timeseries_dir']) if not file.endswith('.txt')]
+    unr_timeseries_files = glob.glob(join(input_file_group['unr_timeseries_dir'], '*.tenv8'))
+
+    if len(unr_timeseries_files) == 0:
+        msg = "No UNR timeseries files found"
+        logger.critical(name, ErrorCode.INPUT_NOT_FOUND, msg)
 
     check_input_list(unr_timeseries_files, logger, name,
                      valid_extensions=('.tenv8',), check_zero_size=True)

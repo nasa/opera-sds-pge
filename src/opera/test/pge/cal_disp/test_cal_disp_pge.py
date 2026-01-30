@@ -265,7 +265,7 @@ class CalDispPgeTestCase(unittest.TestCase):
             self.assertIn(f'Input file {test_filename} size is 0. Size must be greater than 0.', log)
             os.remove(test_filename)
 
-            # Test all files
+            # Test no UNR timeseries files
 
             test_disp_file = test_filename
             test_dem_file = join(tmp_dir, 'OPERA_L3_DISP-S1-STATIC_F08882_20140403_S1A_v1.0_dem.tif')
@@ -278,15 +278,10 @@ class CalDispPgeTestCase(unittest.TestCase):
             unr_dir = join(tmp_dir, 'unr')
             os.makedirs(unr_dir, exist_ok=True)
 
-            test_unr_files = [
-                join(unr_dir, '004420_IGS20.tenv8'),
-                join(unr_dir, '004421_IGS20.tenv8'),
-                join(unr_dir, '004492_IGS20.tenv8'),
-            ]
             test_unr_ref_file = join(unr_dir, 'grid_latlon_lookup_v0.2.txt')
 
             test_files = ([test_disp_file, test_dem_file, test_los_file, test_unr_ref_file] +
-                          test_tropo_files + test_unr_files)
+                          test_tropo_files)
 
             for test_f in test_files:
                 with open(test_f, 'w') as ief:
@@ -311,6 +306,34 @@ class CalDispPgeTestCase(unittest.TestCase):
             }
 
             runconfig = MockRunConfig(sas_config)
+            logger = PgeLogger()
+
+            with self.assertRaises(RuntimeError):
+                validate_cal_inputs(runconfig, logger, "CAL-DISP")
+
+            # Check to see that the RuntimeError is as expected
+            logger.close_log_stream()
+            log_file = logger.get_file_name()
+            self.assertTrue(exists(log_file))
+            with open(log_file, 'r', encoding='utf-8') as lfile:
+                log = lfile.read()
+            self.assertIn('No UNR timeseries files found', log)
+
+            # Test all files
+
+            test_unr_files = [
+                join(unr_dir, '004420_IGS20.tenv8'),
+                join(unr_dir, '004421_IGS20.tenv8'),
+                join(unr_dir, '004492_IGS20.tenv8'),
+            ]
+
+            test_files.extend(test_unr_files)
+
+            for test_f in test_unr_files:
+                with open(test_f, 'w') as ief:
+                    ief.write('\n')
+                self.assertTrue(exists(test_f))
+
             logger = PgeLogger()
 
             validate_cal_inputs(runconfig, logger, "CAL-DISP")
