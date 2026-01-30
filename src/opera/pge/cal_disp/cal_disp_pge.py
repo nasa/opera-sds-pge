@@ -60,8 +60,9 @@ class CalDispPostProcessorMixin(PostProcessorMixin):
     PGE. The post-processing phase is defined as all steps required after SAS
     execution has completed, prior to handover of output products to PCM.
 
-    This particular pre-processor is currently a stub implementation, inheriting from the base pre-processor mixin
-    and adding nothing at this time. New functionalities will be added as new versions of the CAL-DISP SAS are released.
+    In addition to the base functionality inherited from PostProcessorMixin, this
+    mixin adds an output validation step to ensure that the output file(s) defined
+    by the RunConfig exist and are valid.
     """
 
     _post_mixin_name = "CalDispPostProcessorMixin"
