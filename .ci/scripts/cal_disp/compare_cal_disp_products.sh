@@ -11,7 +11,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 . "$SCRIPT_DIR"/../util/test_int_util.sh
 
 # Set up the expected directory paths within the container
-# These are determined by the docker volume mounting that occurs in test_int_tropo.sh
+# These are determined by the docker volume mounting that occurs in test_int_cal_disp.sh
 OUTPUT_DIR="/home/conda/output_dir"
 EXPECTED_DIR="/home/conda/expected_output_dir"
 PGE_NAME="cal_disp"
