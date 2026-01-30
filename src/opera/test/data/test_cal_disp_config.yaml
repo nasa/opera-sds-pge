@@ -83,7 +83,7 @@ RunConfig:
                     unr_grid_version: '0.2'
 
                     # REQUIRED: Type of UNR gridded data [constant|variable].
-                    #   Type: strin.
+                    #   Type: string.
                     unr_grid_type: variable
 
                     # No description..
