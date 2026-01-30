@@ -264,9 +264,9 @@ class CalDispPostProcessorMixin(PostProcessorMixin):
             'MetadataProviderAction': "creation",
             'GranuleFilename': self._core_filename(),
             'ISO_OPERA_ProjectKeywords': ['OPERA', 'JPL', 'DISP', 'Displacement',
-                                          'Surface', 'Land', 'Global', 'Calibration'],
-            'ISO_OPERA_PlatformKeywords': ['S1', 'NI'],
-            'ISO_OPERA_InstrumentKeywords': ['Sentinel 1 A', 'Sentinel 1 B', 'Sentinel 1 C', 'Sentinel 1 D', 'NISAR']
+                                          'Surface', 'Land', 'Calibration'],
+            'ISO_OPERA_PlatformKeywords': ['Sentinel-1', 'NISAR'],
+            'ISO_OPERA_InstrumentKeywords': ['Sentinel-1A', 'Sentinel-1B', 'Sentinel-1C', 'Sentinel-1D', 'NISAR']
         }
 
         return custom_metadata
