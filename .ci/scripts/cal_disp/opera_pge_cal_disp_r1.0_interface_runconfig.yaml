@@ -1,0 +1,329 @@
+RunConfig:
+    Name: OPERA-CAL-DISP-PGE-INT-TEST-CONFIG
+
+    Groups:
+        PGE:
+            PGENameGroup:
+                PGEName: CAL_DISP_PGE
+
+            InputFilesGroup:
+                InputFilePaths:
+                    - /home/conda/input_dir/disp/OPERA_L3_DISP-S1_IW_F08882_VV_20220111T002651Z_20220722T002657Z_v1.0_20251027T005420Z.nc
+
+            DynamicAncillaryFilesGroup:
+                AncillaryFileMap:
+                    static_dem_file: /home/conda/input_dir/static_input/OPERA_L3_DISP-S1-STATIC_F08882_20140403_S1A_v1.0_dem.tif
+                    static_los_file: /home/conda/input_dir/static_input/OPERA_L3_DISP-S1-STATIC_F08882_20140403_S1A_v1.0_line_of_sight_enu.tif
+                    ref_tropo_files: []
+                    sec_tropo_files: []
+                    iono_files: []
+                    unr_timeseries_files:
+                    - /home/conda/004421_IGS20.tenv8
+                    - /home/conda/004420_IGS20.tenv8
+                    - /home/conda/004493_IGS20.tenv8
+                    - /home/conda/004492_IGS20.tenv8
+                    - /home/conda/004494_IGS20.tenv8
+                    - /home/conda/004495_IGS20.tenv8
+                    - /home/conda/004567_IGS20.tenv8
+                    - /home/conda/004566_IGS20.tenv8
+                    - /home/conda/004568_IGS20.tenv8
+                    - /home/conda/004569_IGS20.tenv8
+                    - /home/conda/004642_IGS20.tenv8
+                    - /home/conda/004570_IGS20.tenv8
+                    - /home/conda/004643_IGS20.tenv8
+                    - /home/conda/004644_IGS20.tenv8
+                    - /home/conda/004647_IGS20.tenv8
+                    - /home/conda/004645_IGS20.tenv8
+                    - /home/conda/004646_IGS20.tenv8
+                    - /home/conda/004648_IGS20.tenv8
+                    - /home/conda/004649_IGS20.tenv8
+                    - /home/conda/004723_IGS20.tenv8
+                    - /home/conda/004650_IGS20.tenv8
+                    - /home/conda/004724_IGS20.tenv8
+                    - /home/conda/004725_IGS20.tenv8
+                    - /home/conda/004726_IGS20.tenv8
+                    - /home/conda/004727_IGS20.tenv8
+                    - /home/conda/004728_IGS20.tenv8
+                    - /home/conda/004729_IGS20.tenv8
+                    - /home/conda/004731_IGS20.tenv8
+                    - /home/conda/004730_IGS20.tenv8
+                    - /home/conda/004732_IGS20.tenv8
+                    - /home/conda/004807_IGS20.tenv8
+                    - /home/conda/004808_IGS20.tenv8
+                    - /home/conda/004809_IGS20.tenv8
+                    - /home/conda/004810_IGS20.tenv8
+                    - /home/conda/004811_IGS20.tenv8
+                    - /home/conda/004812_IGS20.tenv8
+                    - /home/conda/004813_IGS20.tenv8
+                    - /home/conda/004814_IGS20.tenv8
+                    - /home/conda/004815_IGS20.tenv8
+                    - /home/conda/004817_IGS20.tenv8
+                    - /home/conda/004816_IGS20.tenv8
+                    - /home/conda/004818_IGS20.tenv8
+                    - /home/conda/004897_IGS20.tenv8
+                    - /home/conda/004898_IGS20.tenv8
+                    - /home/conda/004900_IGS20.tenv8
+                    - /home/conda/004899_IGS20.tenv8
+                    - /home/conda/004901_IGS20.tenv8
+                    - /home/conda/004902_IGS20.tenv8
+                    - /home/conda/004903_IGS20.tenv8
+                    - /home/conda/004904_IGS20.tenv8
+                    - /home/conda/004905_IGS20.tenv8
+                    - /home/conda/004906_IGS20.tenv8
+                    - /home/conda/004907_IGS20.tenv8
+                    - /home/conda/004908_IGS20.tenv8
+                    - /home/conda/004909_IGS20.tenv8
+                    - /home/conda/004990_IGS20.tenv8
+                    - /home/conda/004989_IGS20.tenv8
+                    - /home/conda/004988_IGS20.tenv8
+                    - /home/conda/004991_IGS20.tenv8
+                    - /home/conda/004993_IGS20.tenv8
+                    - /home/conda/004992_IGS20.tenv8
+                    - /home/conda/004994_IGS20.tenv8
+                    - /home/conda/004995_IGS20.tenv8
+                    - /home/conda/004996_IGS20.tenv8
+                    - /home/conda/004997_IGS20.tenv8
+                    - /home/conda/004998_IGS20.tenv8
+                    - /home/conda/004999_IGS20.tenv8
+                    - /home/conda/005000_IGS20.tenv8
+                    - /home/conda/005001_IGS20.tenv8
+                    - /home/conda/005088_IGS20.tenv8
+                    - /home/conda/005087_IGS20.tenv8
+                    - /home/conda/005089_IGS20.tenv8
+                    - /home/conda/005090_IGS20.tenv8
+                    - /home/conda/005091_IGS20.tenv8
+                    - /home/conda/005092_IGS20.tenv8
+                    - /home/conda/005093_IGS20.tenv8
+                    - /home/conda/005094_IGS20.tenv8
+                    - /home/conda/005095_IGS20.tenv8
+                    - /home/conda/005096_IGS20.tenv8
+                    - /home/conda/005097_IGS20.tenv8
+                    - /home/conda/005098_IGS20.tenv8
+                    - /home/conda/005099_IGS20.tenv8
+                    - /home/conda/005100_IGS20.tenv8
+                    - /home/conda/005101_IGS20.tenv8
+                    - /home/conda/005197_IGS20.tenv8
+                    - /home/conda/005198_IGS20.tenv8
+                    - /home/conda/005199_IGS20.tenv8
+                    - /home/conda/005200_IGS20.tenv8
+                    - /home/conda/005201_IGS20.tenv8
+                    - /home/conda/005202_IGS20.tenv8
+                    - /home/conda/005204_IGS20.tenv8
+                    - /home/conda/005203_IGS20.tenv8
+                    - /home/conda/005206_IGS20.tenv8
+                    - /home/conda/005205_IGS20.tenv8
+                    - /home/conda/005207_IGS20.tenv8
+                    - /home/conda/005208_IGS20.tenv8
+                    - /home/conda/005209_IGS20.tenv8
+                    - /home/conda/005210_IGS20.tenv8
+                    - /home/conda/005211_IGS20.tenv8
+                    - /home/conda/005212_IGS20.tenv8
+                    - /home/conda/005312_IGS20.tenv8
+                    - /home/conda/005313_IGS20.tenv8
+                    - /home/conda/005316_IGS20.tenv8
+                    - /home/conda/005315_IGS20.tenv8
+                    - /home/conda/005314_IGS20.tenv8
+                    - /home/conda/005317_IGS20.tenv8
+                    - /home/conda/005318_IGS20.tenv8
+                    - /home/conda/005319_IGS20.tenv8
+                    - /home/conda/005320_IGS20.tenv8
+                    - /home/conda/005321_IGS20.tenv8
+                    - /home/conda/005322_IGS20.tenv8
+                    - /home/conda/005325_IGS20.tenv8
+                    - /home/conda/005324_IGS20.tenv8
+                    - /home/conda/005323_IGS20.tenv8
+                    - /home/conda/005432_IGS20.tenv8
+                    - /home/conda/005433_IGS20.tenv8
+                    - /home/conda/005434_IGS20.tenv8
+                    - /home/conda/005435_IGS20.tenv8
+                    - /home/conda/005436_IGS20.tenv8
+                    - /home/conda/005437_IGS20.tenv8
+                    - /home/conda/005438_IGS20.tenv8
+                    - /home/conda/005439_IGS20.tenv8
+                    - /home/conda/005440_IGS20.tenv8
+                    - /home/conda/005441_IGS20.tenv8
+                    - /home/conda/005442_IGS20.tenv8
+                    - /home/conda/005443_IGS20.tenv8
+                    - /home/conda/005567_IGS20.tenv8
+                    - /home/conda/005568_IGS20.tenv8
+                    - /home/conda/005570_IGS20.tenv8
+                    - /home/conda/005569_IGS20.tenv8
+                    - /home/conda/005571_IGS20.tenv8
+                    - /home/conda/005572_IGS20.tenv8
+                    - /home/conda/005573_IGS20.tenv8
+                    - /home/conda/005702_IGS20.tenv8
+                    - /home/conda/005574_IGS20.tenv8
+                    - /home/conda/005703_IGS20.tenv8
+                    unr_grid_latlon_file: /home/conda/input_dir/unr/grid_latlon_lookup_v0.2.txt
+
+            ProductPathGroup:
+                OutputProductPath: /home/conda/output_dir
+                ScratchPath: /home/conda/scratch_dir
+
+            PrimaryExecutable:
+                ProductIdentifier: CAL_DISP
+                ProductVersion: "0.1"
+                ProgramPath: cal-disp
+                ProgramOptions:
+                    - run
+                ErrorCodeBase: 1000000
+                SchemaPath: /home/conda/opera/pge/cal_disp/schema/cal_disp_sas_schema.yaml
+                AlgorithmParametersSchemaPath: /home/conda/opera/pge/cal_disp/schema/algorithm_parameters_cal_disp_schema.yaml
+                IsoTemplatePath: /home/conda/opera/pge/cal_disp/templates/OPERA_ISO_metadata_L4_CAL_DISP_template.xml.jinja2
+                IsoMeasuredParameterDescriptions: /home/conda/opera/pge/cal_disp/templates/cal_disp_measured_parameters.yaml
+
+            QAExecutable:
+                Enabled: True
+                ProgramPath: /home/conda/opera/.ci/scripts/cal_disp/compare_cal_disp_products.sh
+                ProgramOptions: []
+
+            DebugLevelGroup:
+                DebugSwitch: False
+                ExecuteViaShell: True  # Must be set to True for test to work
+
+        SAS:
+
+            # REQUIRED: A PGE (Product Generation Executive) run configuration.
+            cal_disp_workflow:
+
+                # REQUIRED: Configuration for required input files..
+                #   Type: Object.
+                input_file_group:
+
+                    # REQUIRED: Path to DISP file.
+                    #   Type: string.
+                    disp_file: /home/conda/input_dir/disp/OPERA_L3_DISP-S1_IW_F08882_VV_20220111T002651Z_20220722T002657Z_v1.0_20251027T005420Z.nc
+
+                    # REQUIRED: Frame ID of the DISP frame.
+                    #   Type: integer.
+                    frame_id: 8882
+
+                    # REQUIRED: Path to UNR grid lookup table (grid_latlon_lookup_v0.2.txt).
+                    #   Type: string.
+                    unr_grid_latlon_file: /home/conda/input_dir/unr/grid_latlon_lookup_v0.2.txt
+
+                    # REQUIRED: Directory containing UNR .tenv8 timeseries files.
+                    #   Type: string.
+                    unr_timeseries_dir: /home/conda/input_dir/unr
+
+                    # REQUIRED: Version of UNR gridded data, e.g. [0.2].
+                    #   Type: string.
+                    unr_grid_version: '0.2'
+
+                    # REQUIRED: Type of UNR gridded data [constant|variable].
+                    #   Type: string.
+                    unr_grid_type: variable
+
+                    # No description..
+                    #   Type: boolean.
+                    skip_file_checks: false
+
+                # Dynamic ancillary files configuration..
+                #   Type: DynamicAncillaryFileGroup | null.
+                dynamic_ancillary_group:
+
+                    # REQUIRED: Path to file containing SAS algorithm parameters.
+                    #   Type: string.
+                    algorithm_parameters_file: /home/conda/runconfig/opera_pge_cal_disp_r1.0_interface_algorithm_parameters.yaml
+
+                    # REQUIRED: Path to the DISP static los layer file (1 per frame) with line-of-sight unit vectors.
+                    #   Type: string.
+                    static_los_file: /home/conda/input_dir/static_input/OPERA_L3_DISP-S1-STATIC_F08882_20140403_S1A_v1.0_line_of_sight_enu.tif
+
+                    # REQUIRED: Path to the DISP static dem layer file (1 per frame) with line-of-sight unit vectors.
+                    #   Type: string.
+                    static_dem_file: /home/conda/input_dir/static_input/OPERA_L3_DISP-S1-STATIC_F08882_20140403_S1A_v1.0_dem.tif
+
+                    # Optional Byte mask file used to ignore low correlation/bad data (e.g water mask).
+                    #       Convention is 0 for no data/invalid, and 1 for good data. Dtype must be uint8..
+                    #   Type: string | null.
+                    mask_file:
+
+                    # Path to the TROPO file for the reference date. If not provided, tropospheric correction
+                    #       for reference is skipped.
+                    #   Type: array | null.
+                    ref_tropo_files: [ ]
+
+                    # Path to the TROPO file for the secondary date. If not provided, tropospheric correction
+                    #       for secondary is skipped.
+                    #   Type: array | null.
+                    sec_tropo_files: [ ]
+
+                    # Path to the IONO files If not provided, ionosphere correction for reference is skipped.
+                    #   Type: array | null.
+                    iono_files: [ ]
+
+                    # Paths to the calibration tile bounds files (e.g. S1 burst bounds) covering full frame. If
+                    #       none provided, calibration per tile is skipped.
+                    #   Type: array | null.
+                    tiles_files: [ ]
+
+                # Static ancillary files configuration..
+                #   Type: StaticAncillaryFileGroup | null.
+                static_ancillary_group: {}
+
+                # Output configuration options..
+                #   Type: Object.
+                output_options:
+
+                    # Version of the product, in <major>.<minor> format..
+                    #   Type: string.
+                    product_version: '1.0'
+
+                    # Output file format..
+                    #   Type: string.
+                    output_format: netcdf
+
+                    # Whether to compress output files..
+                    #   Type: boolean.
+                    compression: true
+
+                # Primary executable configuration..
+                #   Type: Object.
+                primary_executable:
+
+                    # Product type of the PGE..
+                    #   Type: string.
+                    product_type: CAL_DISP
+
+                # Product path configuration..
+                #   Type: Object.
+                product_path_group:
+
+                    # Directory where PGE will place results..
+                    #   Type: string.
+                    product_path: /home/conda/output_dir
+
+                    # Path to the scratch directory for intermediate files..
+                    #   Type: string.
+                    scratch_path: /home/conda/scratch_dir
+
+                    # Path to the SAS output directory..
+                    #   Type: string.
+                    sas_output_path: /home/conda/output_dir
+
+                # Dask worker and parallelism configuration..
+                #   Type: Object.
+                worker_settings:
+
+                    # Number of workers to use in dask.Client. Typically set to the number of physical CPU cores
+                    #       or less. Default: 4.
+                    #   Type: integer.
+                    n_workers: 4
+
+                    # Number of threads per worker in dask.Client. Controls parallelism within each worker.
+                    #       Default: 2.
+                    #   Type: integer.
+                    threads_per_worker: 1
+
+                    # Size (rows, columns) of blocks of data to load at a time. Larger blocks use more memory
+                    #       but may be more efficient. Must be positive integers. Default: (128, 128).
+                    #   Type: array.
+                    block_shape:
+                        - 512
+                        - 512
+
+                # Path to the output log file in addition to logging to stderr. If None, will be set based
+                #     on output path..
+                #   Type: string | null.
+                log_file: /home/conda/output_dir/cal_disp.log

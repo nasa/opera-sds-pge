@@ -1,0 +1,201 @@
+RunConfig:
+    Name: OPERA-CAL-DISP-PGE-TEST-CONFIG
+
+    Groups:
+        PGE:
+            PGENameGroup:
+                PGEName: CAL_DISP_PGE
+
+            InputFilesGroup:
+                InputFilePaths:
+                    - cal_disp_pge_test/input_dir/OPERA_L3_DISP-S1_IW_F08882_VV_20220111T002651Z_20220722T002657Z_v1.0_20251027T005420Z.nc
+
+            DynamicAncillaryFilesGroup:
+                AncillaryFileMap:
+                    static_dem_file: cal_disp_pge_test/input_dir/OPERA_L3_DISP-S1-STATIC_F08882_20140403_S1A_v1.0_dem.tif
+                    static_los_file: cal_disp_pge_test/input_dir/OPERA_L3_DISP-S1-STATIC_F08882_20140403_S1A_v1.0_line_of_sight_enu.tif
+                    ref_tropo_files:
+                        - cal_disp_pge_test/input_dir/OPERA_L4_TROPO-ZENITH_20220111T000000Z_20250923T224940Z_HRES_v1.0.nc
+                    sec_tropo_files:
+                        - cal_disp_pge_test/input_dir/OPERA_L4_TROPO-ZENITH_20220722T000000Z_20250923T233421Z_HRES_v1.0.nc
+                    iono_files: []
+                    unr_timeseries_files:
+                        - cal_disp_pge_test/input_dir/004420_IGS20.tenv8
+                        - cal_disp_pge_test/input_dir/004421_IGS20.tenv8
+                        - cal_disp_pge_test/input_dir/004492_IGS20.tenv8
+                    unr_grid_latlon_file: cal_disp_pge_test/input_dir/grid_latlon_lookup_v0.2.txt
+
+            ProductPathGroup:
+                OutputProductPath: cal_disp_pge_test/output_dir
+                ScratchPath: cal_disp_pge_test/scratch_dir
+
+            PrimaryExecutable:
+                ProductIdentifier: CAL_DISP
+                ProductVersion: "0.1"
+                ProgramPath: mkdir
+                ProgramOptions:
+                    - '-p cal_disp_pge_test/output_dir/;'
+                    - 'python3 -c "from opera.util.h5_utils import create_test_cal_disp_metadata_product; create_test_cal_disp_metadata_product(\"cal_disp_pge_test/output_dir/OPERA_L4_CAL-DISP-S1_IW_F08882_VV_20220111T002651Z_20220722T002657Z_v0.1_20260122T203124Z.nc\")";'
+                    - 'dd if=/dev/urandom of=cal_disp_pge_test/output_dir/OPERA_L4_CAL-DISP-S1_IW_F08882_VV_20220111T002651Z_20220722T002657Z_v0.1_20260122T203124Z.png bs=1M count=1;'
+                    - '/bin/echo CAL-DISP invoked with RunConfig'
+                ErrorCodeBase: 1000000
+                SchemaPath: pge/cal_disp/schema/cal_disp_sas_schema.yaml
+                AlgorithmParametersSchemaPath: pge/cal_disp/schema/algorithm_parameters_cal_disp_schema.yaml
+                IsoTemplatePath: pge/cal_disp/templates/OPERA_ISO_metadata_L4_CAL_DISP_template.xml.jinja2
+                IsoMeasuredParameterDescriptions: pge/cal_disp/templates/cal_disp_measured_parameters.yaml
+
+            QAExecutable:
+                Enabled: False
+                ProgramPath:
+                ProgramOptions: []
+
+            DebugLevelGroup:
+                DebugSwitch: False
+                ExecuteViaShell: True  # Must be set to True for test to work
+
+        SAS:
+
+            # REQUIRED: A PGE (Product Generation Executive) run configuration.
+            cal_disp_workflow:
+
+                # REQUIRED: Configuration for required input files..
+                #   Type: Object.
+                input_file_group:
+
+                    # REQUIRED: Path to DISP file.
+                    #   Type: string.
+                    disp_file: cal_disp_pge_test/input_dir/OPERA_L3_DISP-S1_IW_F08882_VV_20220111T002651Z_20220722T002657Z_v1.0_20251027T005420Z.nc
+
+                    # REQUIRED: Frame ID of the DISP frame.
+                    #   Type: integer.
+                    frame_id: 8882
+
+                    # REQUIRED: Path to UNR grid lookup table (grid_latlon_lookup_v0.2.txt).
+                    #   Type: string.
+                    unr_grid_latlon_file: cal_disp_pge_test/input_dir/unr/grid_latlon_lookup_v0.2.txt
+
+                    # REQUIRED: Directory containing UNR .tenv8 timeseries files.
+                    #   Type: string.
+                    unr_timeseries_dir: cal_disp_pge_test/input_dir/unr
+
+                    # REQUIRED: Version of UNR gridded data, e.g. [0.2].
+                    #   Type: string.
+                    unr_grid_version: '0.2'
+
+                    # REQUIRED: Type of UNR gridded data [constant|variable].
+                    #   Type: string.
+                    unr_grid_type: variable
+
+                    # No description..
+                    #   Type: boolean.
+                    skip_file_checks: false
+
+                # Dynamic ancillary files configuration..
+                #   Type: DynamicAncillaryFileGroup | null.
+                dynamic_ancillary_group:
+
+                    # REQUIRED: Path to file containing SAS algorithm parameters.
+                    #   Type: string.
+                    algorithm_parameters_file: cal_disp_pge_test/input_dir/test_cal_disp_algorithm_parameters.yaml
+
+                    # REQUIRED: Path to the DISP static los layer file (1 per frame) with line-of-sight unit vectors.
+                    #   Type: string.
+                    static_los_file: cal_disp_pge_test/input_dir/OPERA_L3_DISP-S1-STATIC_F08882_20140403_S1A_v1.0_line_of_sight_enu.tif
+
+                    # REQUIRED: Path to the DISP static dem layer file (1 per frame) with line-of-sight unit vectors.
+                    #   Type: string.
+                    static_dem_file: cal_disp_pge_test/input_dir/OPERA_L3_DISP-S1-STATIC_F08882_20140403_S1A_v1.0_dem.tif
+
+                    # Optional Byte mask file used to ignore low correlation/bad data (e.g water mask).
+                    #       Convention is 0 for no data/invalid, and 1 for good data. Dtype must be uint8..
+                    #   Type: string | null.
+                    mask_file:
+
+                    # Path to the TROPO file for the reference date. If not provided, tropospheric correction
+                    #       for reference is skipped.
+                    #   Type: array | null.
+                    ref_tropo_files: [ ]
+
+                    # Path to the TROPO file for the secondary date. If not provided, tropospheric correction
+                    #       for secondary is skipped.
+                    #   Type: array | null.
+                    sec_tropo_files: [ ]
+
+                    # Path to the IONO files If not provided, ionosphere correction for reference is skipped.
+                    #   Type: array | null.
+                    iono_files: [ ]
+
+                    # Paths to the calibration tile bounds files (e.g. S1 burst bounds) covering full frame. If
+                    #       none provided, calibration per tile is skipped.
+                    #   Type: array | null.
+                    tiles_files: [ ]
+
+                # Static ancillary files configuration..
+                #   Type: StaticAncillaryFileGroup | null.
+                static_ancillary_group: {}
+
+                # Output configuration options..
+                #   Type: Object.
+                output_options:
+
+                    # Version of the product, in <major>.<minor> format..
+                    #   Type: string.
+                    product_version: '1.0'
+
+                    # Output file format..
+                    #   Type: string.
+                    output_format: netcdf
+
+                    # Whether to compress output files..
+                    #   Type: boolean.
+                    compression: true
+
+                # Primary executable configuration..
+                #   Type: Object.
+                primary_executable:
+
+                    # Product type of the PGE..
+                    #   Type: string.
+                    product_type: CAL_DISP
+
+                # Product path configuration..
+                #   Type: Object.
+                product_path_group:
+
+                    # Directory where PGE will place results..
+                    #   Type: string.
+                    product_path: cal_disp_pge_test/output_dir
+
+                    # Path to the scratch directory for intermediate files..
+                    #   Type: string.
+                    scratch_path: cal_disp_pge_test/scratch_dir
+
+                    # Path to the SAS output directory..
+                    #   Type: string.
+                    sas_output_path: cal_disp_pge_test/output_dir
+
+                # Dask worker and parallelism configuration..
+                #   Type: Object.
+                worker_settings:
+
+                    # Number of workers to use in dask.Client. Typically set to the number of physical CPU cores
+                    #       or less. Default: 4.
+                    #   Type: integer.
+                    n_workers: 4
+
+                    # Number of threads per worker in dask.Client. Controls parallelism within each worker.
+                    #       Default: 2.
+                    #   Type: integer.
+                    threads_per_worker: 1
+
+                    # Size (rows, columns) of blocks of data to load at a time. Larger blocks use more memory
+                    #       but may be more efficient. Must be positive integers. Default: (128, 128).
+                    #   Type: array.
+                    block_shape:
+                        - 512
+                        - 512
+
+                # Path to the output log file in addition to logging to stderr. If None, will be set based
+                #     on output path..
+                #   Type: string | null.
+                log_file: cal_disp_pge_test/output_dir/cal_disp.log

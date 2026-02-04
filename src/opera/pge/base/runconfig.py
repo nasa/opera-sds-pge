@@ -304,7 +304,10 @@ class RunConfig:
             try:
                 dynamic_ancillary_file_group = self._sas_config['dynamic_ancillary_file_group']
             except KeyError:
-                return None
+                try:
+                    dynamic_ancillary_file_group = self._sas_config['cal_disp_workflow']['dynamic_ancillary_group']
+                except KeyError:
+                    return None
 
         # ADT is inconsistent with how they define this location across different SAS,
         # so check all known permutations

@@ -1,0 +1,61 @@
+# CAL-DISP Algorithm Parameters
+# Configuration for the calibration algorithm
+# Schema version: 0.1
+
+unwrap_correction:
+
+  # Whether to run the unwrapping error correction before calibration.
+  #   Type: boolean.
+  run_unwrap_correction: true
+
+calibration_options:
+
+  # Low pass method to get a long wavelength calibration plane.
+  #   Type: string.
+  #   Options: ['gaussian_fft', 'hanning_fft', 'savitsky_goley'].
+  cal_method: savitsky_goley
+
+  # Whether to run gap filling interpolation step before lowpass.
+  #   Type: boolean.
+  run_interpolation: true
+
+  # Whether to downsample DISP before calibration.
+  #   Type: boolean.
+  run_downsample: true
+
+  # Downsampling factor for DISP.
+  #   Type: integer.
+  #   Default: 10.
+  downsample_factor: 10
+
+savitsky_goley_options:
+
+  # Moving window size for plane fitting along x-axis (columns).
+  #   Type: integer | null.
+  #   Units: pixels.
+  window_x_size:
+
+  # Moving window size for plane fitting along y-axis (rows).
+  #   Type: integer | null.
+  #   Units: pixels.
+  window_y_size:
+
+  # Overlap for x-axis windows.
+  #   Type: integer | null.
+  #   Units: pixels.
+  window_overlap_x_size:
+
+  # Overlap for y-axis windows.
+  #   Type: integer | null.
+  #   Units: pixels.
+  window_overlap_y_size:
+
+  # Moving x-axis window buffer to extend kernel.
+  #   Type: integer | null.
+  #   Units: pixels.
+  window_extend_x_size:
+
+  # Moving y-axis window buffer to extend kernel.
+  #   Type: integer | null.
+  #   Units: pixels.
+  window_extend_y_size:

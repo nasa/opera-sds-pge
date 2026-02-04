@@ -1,0 +1,280 @@
+static/Project:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Name of the project.
+  display_name: Project
+static/ProductLevel:
+  attribute_data_type: int
+  attribute_type: processingInformation
+  description: Product level.
+  display_name: ProductLevel
+static/ProductType:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Product type.
+  display_name: ProductType
+static/ProductSource:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Source data for the product.
+  display_name: ProductSource
+static/ProcessingDateTime:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: CAL-DISP product processing datetime.
+  display_name: ProcessingDateTime
+identification/absolute_orbit_number:
+  attribute_data_type: int
+  attribute_type: instrumentInformation
+  description: Absolute orbit number.
+  display_name: AbsoluteOrbitNumber
+identification/acquisition_mode:
+  attribute_data_type: string
+  attribute_type: instrumentInformation
+  description: Radar acquisition mode for input products
+  display_name: AcquisitionMode
+identification/bounding_polygon:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: WKT representation of bounding polygon of the image
+  display_name: BoundingPolygon
+identification/calibration_reference_name:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Name of calibration reference data source
+  display_name: CalibrationReferenceName
+identification/calibration_reference_reference_frame:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Version of calibration reference data
+  display_name: CalibrationReferenceReferenceFrame
+identification/calibration_reference_type:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: "Type of calibration reference data (valid values: constant, variable)"
+  display_name: CalibrationReferenceType
+identification/calibration_reference_version:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Reference frame of calibration data (e.g., IGS20)
+  display_name: CalibrationReferenceVersion
+identification/ceos_number_of_input_granules:
+  attribute_data_type: int
+  attribute_type: processingInformation
+  description: Number of input data granules used during processing
+  display_name: CEOSNumberOfInputGranules
+identification/frame_id:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: OPERA frame identifier.
+  display_name: FrameId
+identification/instrument_name:
+  attribute_data_type: string
+  attribute_type: instrumentInformation
+  description: Instrument name
+  display_name: InstrumentName
+identification/look_direction:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: "Look direction (valid values: left, right)"
+  display_name: LookDirection
+identification/nodata_pixel_count:
+  attribute_data_type: int
+  attribute_type: contentInformation
+  description: Number of nodata pixels
+  display_name: NodataPixelCount
+identification/orbit_pass_direction:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: "Orbit direction (valid values: ascending, descending)."
+  display_name: OrbitPassDirection
+identification/processing_facility:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Product processing facility
+  display_name: ProcessingFacility
+identification/processing_start_datetime:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: UTC datetime of the start of processing for this product in ISO 8601 format
+  display_name: ProcessingStartDatetime
+identification/product_bounding_box:
+  attribute_data_type: string
+  attribute_type: contentInformation
+  description: Opposite corners in UTM coordinates as (west, south, east, north)
+  display_name: ProductBoundingBox
+identification/product_data_access:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: URL or DOI for product data access
+  display_name: ProductDataAccess
+  escape_html: true
+identification/product_data_polarization:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Radar polarization of displacement products
+  display_name: ProductDataPolarization
+identification/product_sample_spacing:
+  attribute_data_type: string
+  attribute_type: contentInformation
+  description: Spacing between adjacent X/Y samples in UTM coordinates
+  display_name: ProductSampleSpacing
+identification/product_version:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Product specification version.
+  display_name: ProductVersion
+identification/radar_band:
+  attribute_data_type: string
+  attribute_type: instrumentInformation
+  description: Acquired radar frequency band
+  display_name: RadarBand
+identification/reference_datetime:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Reference (earlier) acquisition datetime in ISO 8601 format
+  display_name: ReferenceDatetime
+identification/secondary_datetime:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Secondary (later) acquisition datetime in ISO 8601 format
+  display_name: SecondaryDatetime
+identification/source_calibration_file_list:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Comma-separated list of input UNR latlon and grid points tenv8 files
+  display_name: SourceCalibrationFileList
+identification/source_data_access:
+  attribute_data_type: string
+  attribute_type: contentInformation
+  description: URL or DOI for source data retrieval
+  display_name: SourceDataAccess
+  escape_html: true
+identification/source_data_dem_name:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Name of DEM used during input data processing
+  display_name: SourceDataDemName
+identification/source_data_file_list:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Comma-separated list of input DISP granules used to create calibration layer
+  display_name: SourceDataFileList
+identification/source_data_imaging_geometry:
+  attribute_data_type: string
+  attribute_type: contentInformation
+  description: Imaging geometry of DISP
+  display_name: SourceDataImagingGeometry
+identification/source_data_satellite_names:
+  attribute_data_type: string
+  attribute_type: platformInformation
+  description: Comma-separated names of satellites included in input granules
+  display_name: SourceDataSatelliteNames
+identification/source_data_x_spacing:
+  attribute_data_type: float
+  attribute_type: contentInformation
+  description: Pixel spacing of source geocoded DISP data in x-direction
+  display_name: SourceDataXSpacing
+identification/source_data_y_spacing:
+  attribute_data_type: float
+  attribute_type: contentInformation
+  description: Pixel spacing of source geocoded DISP data in y-direction
+  display_name: SourceDataYSpacing
+identification/static_layers_data_access:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: URL of static layers product associated with this calibration product
+  display_name: StaticLayersDataAccess
+  escape_html: true
+identification/track_number:
+  attribute_data_type: int
+  attribute_type: processingInformation
+  description: Track number
+  display_name: TrackNumber
+
+
+# TODO: The following commented out params (and others in this file) are for expected metadata fields (defined in the
+#       spec) but not currently provided by the latest SAS delivery.
+#identification/ceos_analysis_ready_data_product_type:
+#  attribute_data_type: string
+#  attribute_type: contentInformation
+#  description: CEOS Analysis Ready Data (CARD) product type name
+#  display_name: CEOSAnalysisReadyDataProductType
+#identification/ceos_analysis_ready_data_document_identifier:
+#  attribute_data_type: string
+#  attribute_type: contentInformation
+#  description: CEOS Analysis Ready Data (CARD) document identifier
+#  display_name: CEOSAnalysisReadyDataDocumentIdentifier
+#  escape_html: true
+
+
+metadata/cal_disp_software_version:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Version of cal_disp software used to generate product.
+  display_name: CalDispSoftwareVersion
+metadata/ceos_atmospheric_phase_correction:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Method used to correct for atmospheric phase noise
+  display_name: CEOSAtmosphericPhaseCorrection
+metadata/ceos_gridding_convention:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Whether a consistent gridding/sampling frame is used for ascending/descending frames
+  display_name: CEOSGriddingConvention
+metadata/ceos_ionospheric_phase_correction:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Method used to correct for ionospheric phase noise
+  display_name: CEOSIonosphericPhaseCorrection
+metadata/ceos_noise_removal:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: "Flag if noise removal has been applied (valid values: Y, N). Should include noise removal algorithm and reference (URL or DOI) if Y"
+  display_name: CEOSNoiseRemoval
+metadata/ceos_product_measurement_projection:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: "Projection of the displacement image (valid values: line_of_sight, horizontal, vertical)"
+  display_name: CEOSProductMeasurementProjection
+metadata/platform_id:
+  attribute_data_type: string
+  attribute_type: platformInformation
+  description: "Sensor platform identification string (examples: S1A, S1B, NISAR)"
+  display_name: PlatformId
+metadata/product_pixel_coordinate_convention:
+  attribute_data_type: string
+  attribute_type: contentInformation
+  description: "x/y coordinate convention referring to pixel center or corner (valid values: center, corner)"
+  display_name: ProductPixelCoordinateConvention
+metadata/source_data_software_disp_version:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: DISP-S1 or DISP-NI processor version used for source data.
+  display_name: SourceDataSoftwareDISPVersion
+metadata/venti_software_version:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: Version of venti software used to generate product.
+  display_name: VentiSoftwareVersion
+
+# TODO: The following commented out params (and others in this file) are for expected metadata fields (defined in the
+#       spec) but not currently provided by the latest SAS delivery.
+#metadata/algorithm_theoretical_basis_document_doi:
+#  attribute_data_type: string
+#  attribute_type: processingInformation
+#  description: DOI for algorithm theoretical basis document
+#  display_name: AlgorithmTheoreticalBasisDocumentDOI
+#  escape_html: true
+#metadata/product_landing_page_doi:
+#  attribute_data_type: string
+#  attribute_type: contentInformation
+#  description: DOI for product landing page
+#  display_name: ProductLandingPageDOI
+#  escape_html: true
+#metadata/product_specification_document_id:
+#  attribute_data_type: string
+#  attribute_type: processingInformation
+#  description: Document identifier for Product Specification
+#  display_name: ProductSpecificationDocumentID
