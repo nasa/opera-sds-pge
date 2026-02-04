@@ -8,11 +8,10 @@ algo_config:
   memory_strategy: high
   batch_size_for_norm_param_estimation: 32
   stride_for_norm_param_estimation: 7
-  tqdm_enabled: false
+  tqdm_enabled: true
   model_compilation: false
   n_workers_for_norm_param_estimation: 4
   n_workers_for_despeckling: 8
-
   lookback_strategy: multi_window
   post_date_buffer_days: 1
   max_pre_imgs_per_burst_mw:

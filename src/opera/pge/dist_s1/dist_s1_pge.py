@@ -891,7 +891,7 @@ class DistS1Executor(DistS1PreProcessorMixin, DistS1PostProcessorMixin, PgeExecu
     LEVEL = "L3"
     """Processing Level for DIST-S1 Products"""
 
-    SAS_VERSION = "2.0.8"  # CalVal release https://github.com/opera-adt/dist-s1/releases/tag/v2.0.8
+    SAS_VERSION = "2.0.11"  # CalVal release https://github.com/opera-adt/dist-s1/releases/tag/v2.0.11
     """Version of the SAS wrapped by this PGE, should be updated as needed"""
 
     PGE_VERSION = "6.0.0-rc.4.0"
