@@ -341,6 +341,7 @@ class MockGdal:  # pragma: no cover
                 "use_date_encoding": "False",
                 "version": "dist-s1-2.0.6.dev0+g36f541fb7.d20250904",
                 "src_water_mask_path": "/home/ops/input_dir/out_1/11SLT_water_mask.tif",
+                "water_mask_path": "/home/ops/input_dir/out_1/11SLT_water_mask.tif",
                 "AREA_OR_POINT": "Area"
             }
 
