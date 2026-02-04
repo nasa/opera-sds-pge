@@ -1,0 +1,276 @@
+# Sample RunConfig for use with the CAL-DISP PGE v7.0.0-er.1.0
+# This RunConfig should require minimal changes in order to be used with the
+# OPERA PCM.
+
+RunConfig:
+  # Name for the RunConfig, may be any string
+    Name: OPERA-CAL-DISP-PGE-SAMPLE-CONFIG
+
+    Groups:
+        # PGE-specific RunConfig section
+        # This section is only used by the PGE, however, paths to inputs/outputs
+        # should align with the similar sections of the SAS RunConfig
+        PGE:
+            PGENameGroup:
+                # Name of the PGE for use with this RunConfig, should always be
+                # CAL_DISP_PGE when using with the CAL-DISP PGE
+                PGEName: CAL_DISP_PGE
+
+            InputFilesGroup:
+                # List of input files/directories
+                # Must be a singleton list with the input NetCDF file
+                InputFilePaths:
+                    - /home/conda/input_dir/disp/OPERA_L3_DISP-S1_IW_F08882_VV_20220111T002651Z_20220722T002657Z_v1.0_20251027T005420Z.nc
+
+            DynamicAncillaryFilesGroup:
+                # Map of ancillary file types to paths to the file
+                # Paths must correspond to the file system within the Docker container
+                AncillaryFileMap:
+                    static_dem_file: /home/conda/input_dir/static_input/OPERA_L3_DISP-S1-STATIC_F08882_20140403_S1A_v1.0_dem.tif
+                    static_los_file: /home/conda/input_dir/static_input/OPERA_L3_DISP-S1-STATIC_F08882_20140403_S1A_v1.0_line_of_sight_enu.tif
+                    ref_tropo_files: []
+                    sec_tropo_files: []
+                    iono_files: []
+                    unr_timeseries_files:
+                    - /home/conda/004421_IGS20.tenv8
+                    - /home/conda/004420_IGS20.tenv8
+                    - /home/conda/004493_IGS20.tenv8
+                    - /home/conda/004492_IGS20.tenv8
+                    - /home/conda/004494_IGS20.tenv8
+                    unr_grid_latlon_file: /home/conda/input_dir/unr/grid_latlon_lookup_v0.2.txt
+
+            ProductPathGroup:
+                # Path to where output products should be stored
+                # Must correspond to the file system within the Docker container,
+                # and must have write permissions for the User/Group used with
+                # the "Docker run" command
+                OutputProductPath: /home/conda/output_dir
+
+                # Path to a scratch directory for the PGE and SAS to store
+                # intermediate files that will not be needed after PGE execution
+                # completes
+                # Must correspond to the file system within the Docker container,
+                # and must have write permissions for the User/Group used with
+                # the "Docker run" command
+                ScratchPath: /home/conda/scratch_dir
+
+            PrimaryExecutable:
+                # Identifier for the PGE executable, should always be CAL_DISP for
+                # this PGE
+                ProductIdentifier: CAL_DISP
+
+                # Product version specific to output products
+                ProductVersion: "0.1"
+
+                # Path to the executable to run, path must be reachable from
+                # within the Docker container (i.e. findable with a "which" command)
+                ProgramPath: cal-disp
+
+                # List of command-line options to use with ProgramPath
+                ProgramOptions:
+                    - run
+
+                # The Error Code base value added to the offset values to make
+                # error codes unique per-PGE
+                ErrorCodeBase: 1000000
+
+                # Path to the Yamale schema used to validate the SAS portion
+                # of the RunConfig
+                # Path should correspond to the file system within the Docker
+                # container, and typically should reference a schema file bundled
+                # with the opera_pge installation directory within the container
+                # Consult the Docker image build scripts for more info
+                SchemaPath: /home/conda/opera/pge/cal_disp/schema/cal_disp_sas_schema.yaml
+
+                # Path to the Yamale schema used specifically to validate the
+                # algorithm parameters config, which is stored within a separate
+                # yaml file referenced within the SAS portion of this RunConfig
+                AlgorithmParametersSchemaPath: /home/conda/opera/pge/cal_disp/schema/algorithm_parameters_cal_disp_schema.yaml
+
+                # Path to the Jinja2 template used to generate the ISO xml
+                # metadata file
+                # Path should correspond to the file system within the Docker
+                # container, and typically should reference a template file bundled
+                # with the opera_pge installation directory within the container
+                # Consult the Docker image build scripts for more info
+                IsoTemplatePath: /home/conda/opera/pge/cal_disp/templates/OPERA_ISO_metadata_L4_CAL_DISP_template.xml.jinja2
+
+                # Path to a YAML file mapping Measured Parameter metadata names to descriptions
+                # used to supplement the ISO xml metadata file
+                # Path should correspond to the file system within the Docker
+                # container, and typically should reference a template file bundled
+                # with the opera_pge installation directory within the container
+                # Consult the Docker image build scripts for more info
+                IsoMeasuredParameterDescriptions: /home/conda/opera/pge/cal_disp/templates/cal_disp_measured_parameters.yaml
+
+            QAExecutable:
+                # Set to True to enable execution of an additional "Quality Assurance"
+                # application after SAS execution has completed
+                Enabled: True
+
+                # Path to the executable to run, path must be reachable from
+                # within the Docker container (i.e. findable with a "which" command)
+                ProgramPath: /home/conda/opera/.ci/scripts/cal_disp/compare_cal_disp_products.sh
+
+                # List of command-line options to use with ProgramPath
+                ProgramOptions: []
+
+            DebugLevelGroup:
+                # Set to True to enable Debug mode (Note: currently a no-op for this PGE)
+                DebugSwitch: False
+
+                # Set to True to have the PGE invoke the SAS/QA executables via
+                # a shell, rather than a Python subprocess
+                # This allows shell-style syntax to be used in ProgramPath and
+                # ProgramOptions, which can be useful for testing
+                ExecuteViaShell: True
+
+        # SAS-specific RunConfig section
+        # Prior to SAS execution by the PGE, the section below starting at "run_config"
+        # is isolated into its own YAML file for use with the SAS
+        SAS:
+
+            # REQUIRED: A PGE (Product Generation Executive) run configuration.
+            cal_disp_workflow:
+
+                # REQUIRED: Configuration for required input files..
+                #   Type: Object.
+                input_file_group:
+
+                    # REQUIRED: Path to DISP file.
+                    #   Type: string.
+                    disp_file: /home/conda/input_dir/disp/OPERA_L3_DISP-S1_IW_F08882_VV_20220111T002651Z_20220722T002657Z_v1.0_20251027T005420Z.nc
+
+                    # REQUIRED: Frame ID of the DISP frame.
+                    #   Type: integer.
+                    frame_id: 8882
+
+                    # REQUIRED: Path to UNR grid lookup table (grid_latlon_lookup_v0.2.txt).
+                    #   Type: string.
+                    unr_grid_latlon_file: /home/conda/input_dir/unr/grid_latlon_lookup_v0.2.txt
+
+                    # REQUIRED: Directory containing UNR .tenv8 timeseries files.
+                    #   Type: string.
+                    unr_timeseries_dir: /home/conda/input_dir/unr
+
+                    # REQUIRED: Version of UNR gridded data, e.g. [0.2].
+                    #   Type: string.
+                    unr_grid_version: '0.2'
+
+                    # REQUIRED: Type of UNR gridded data [constant|variable].
+                    #   Type: string.
+                    unr_grid_type: variable
+
+                    # No description..
+                    #   Type: boolean.
+                    skip_file_checks: false
+
+                # Dynamic ancillary files configuration..
+                #   Type: DynamicAncillaryFileGroup | null.
+                dynamic_ancillary_group:
+
+                    # REQUIRED: Path to file containing SAS algorithm parameters.
+                    #   Type: string.
+                    algorithm_parameters_file: /home/conda/runconfig/opera_pge_cal_disp_r1.0_interface_algorithm_parameters.yaml
+
+                    # REQUIRED: Path to the DISP static los layer file (1 per frame) with line-of-sight unit vectors.
+                    #   Type: string.
+                    static_los_file: /home/conda/input_dir/static_input/OPERA_L3_DISP-S1-STATIC_F08882_20140403_S1A_v1.0_line_of_sight_enu.tif
+
+                    # REQUIRED: Path to the DISP static dem layer file (1 per frame) with line-of-sight unit vectors.
+                    #   Type: string.
+                    static_dem_file: /home/conda/input_dir/static_input/OPERA_L3_DISP-S1-STATIC_F08882_20140403_S1A_v1.0_dem.tif
+
+                    # Optional Byte mask file used to ignore low correlation/bad data (e.g water mask).
+                    #       Convention is 0 for no data/invalid, and 1 for good data. Dtype must be uint8..
+                    #   Type: string | null.
+                    mask_file:
+
+                    # Path to the TROPO file for the reference date. If not provided, tropospheric correction
+                    #       for reference is skipped.
+                    #   Type: array | null.
+                    ref_tropo_files: [ ]
+
+                    # Path to the TROPO file for the secondary date. If not provided, tropospheric correction
+                    #       for secondary is skipped.
+                    #   Type: array | null.
+                    sec_tropo_files: [ ]
+
+                    # Path to the IONO files If not provided, ionosphere correction for reference is skipped.
+                    #   Type: array | null.
+                    iono_files: [ ]
+
+                    # Paths to the calibration tile bounds files (e.g. S1 burst bounds) covering full frame. If
+                    #       none provided, calibration per tile is skipped.
+                    #   Type: array | null.
+                    tiles_files: [ ]
+
+                # Static ancillary files configuration..
+                #   Type: StaticAncillaryFileGroup | null.
+                static_ancillary_group: {}
+
+                # Output configuration options..
+                #   Type: Object.
+                output_options:
+
+                    # Version of the product, in <major>.<minor> format..
+                    #   Type: string.
+                    product_version: '1.0'
+
+                    # Output file format..
+                    #   Type: string.
+                    output_format: netcdf
+
+                    # Whether to compress output files..
+                    #   Type: boolean.
+                    compression: true
+
+                # Primary executable configuration..
+                #   Type: Object.
+                primary_executable:
+
+                    # Product type of the PGE..
+                    #   Type: string.
+                    product_type: CAL_DISP
+
+                # Product path configuration..
+                #   Type: Object.
+                product_path_group:
+
+                    # Directory where PGE will place results..
+                    #   Type: string.
+                    product_path: /home/conda/output_dir
+
+                    # Path to the scratch directory for intermediate files..
+                    #   Type: string.
+                    scratch_path: /home/conda/scratch_dir
+
+                    # Path to the SAS output directory..
+                    #   Type: string.
+                    sas_output_path: /home/conda/output_dir
+
+                # Dask worker and parallelism configuration..
+                #   Type: Object.
+                worker_settings:
+
+                    # Number of workers to use in dask.Client. Typically set to the number of physical CPU cores
+                    #       or less. Default: 4.
+                    #   Type: integer.
+                    n_workers: 4
+
+                    # Number of threads per worker in dask.Client. Controls parallelism within each worker.
+                    #       Default: 2.
+                    #   Type: integer.
+                    threads_per_worker: 1
+
+                    # Size (rows, columns) of blocks of data to load at a time. Larger blocks use more memory
+                    #       but may be more efficient. Must be positive integers. Default: (128, 128).
+                    #   Type: array.
+                    block_shape:
+                        - 512
+                        - 512
+
+                # Path to the output log file in addition to logging to stderr. If None, will be set based
+                #     on output path..
+                #   Type: string | null.
+                log_file: /home/conda/output_dir/cal_disp.log
