@@ -129,7 +129,7 @@ pipeline {
                     echo "Installing Sphinx Dependencies"
                     sh label: 'Installing conda environment for Sphinx',
                        script: """#!/bin/bash
-                         /var/lib/jenkins/conda_installs/${RUN_ID}/miniforge/bin/conda create -n sphinx_env python=3.8 pip
+                         /var/lib/jenkins/conda_installs/${RUN_ID}/miniforge/bin/conda create -n sphinx_env python=3.14 pip
                          /var/lib/jenkins/conda_installs/${RUN_ID}/miniforge/bin/conda init bash
                     """
 
