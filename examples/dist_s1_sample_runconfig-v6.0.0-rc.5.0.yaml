@@ -1,6 +1,6 @@
 # Sample RunConfig for use with the DIST-S1 PGE v6.0.0-rc.5.0
 # This RunConfig should require minimal changes in order to be used with the
-# OPERA PCM
+# OPERA PCM.
 
 RunConfig:
   # Name for the RunConfig, may be any string
