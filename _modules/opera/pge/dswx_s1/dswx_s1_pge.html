@@ -1,20 +1,20 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera.pge.dswx_s1.dswx_s1_pge &mdash; opera-sds-pge 6.0.0-er.2.0 documentation</title>
+  <title>opera.pge.dswx_s1.dswx_s1_pge &mdash; opera-sds-pge 7.0.0-er.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
-      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
 
   
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=136f5b14"></script>
-      <script src="../../../../_static/doctools.js?v=888ff710"></script>
-      <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="../../../../_static/documentation_options.js?v=d4e30586"></script>
+      <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
@@ -92,7 +92,6 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">opera.pge.base.base_pge</span><span class="w"> </span><span class="kn">import</span> <span class="n">PgeExecutor</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">opera.pge.base.base_pge</span><span class="w"> </span><span class="kn">import</span> <span class="n">PostProcessorMixin</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">opera.pge.base.base_pge</span><span class="w"> </span><span class="kn">import</span> <span class="n">PreProcessorMixin</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.dataset_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_sensor_from_spacecraft_name</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.error_codes</span><span class="w"> </span><span class="kn">import</span> <span class="n">ErrorCode</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.geo_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_geographic_boundaries_from_mgrs_tile</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.input_validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate_algorithm_parameters_config</span>
@@ -103,7 +102,9 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.time</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_time_for_filename</span>
 
 
-<div class="viewcode-block" id="DSWxS1PreProcessorMixin"><a class="viewcode-back" href="../../../../opera.pge.dswx_s1.html#opera.pge.dswx_s1.dswx_s1_pge.DSWxS1PreProcessorMixin">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">DSWxS1PreProcessorMixin</span><span class="p">(</span><span class="n">PreProcessorMixin</span><span class="p">):</span>
+<div class="viewcode-block" id="DSWxS1PreProcessorMixin">
+<a class="viewcode-back" href="../../../../opera.pge.dswx_s1.html#opera.pge.dswx_s1.dswx_s1_pge.DSWxS1PreProcessorMixin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DSWxS1PreProcessorMixin</span><span class="p">(</span><span class="n">PreProcessorMixin</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Mixin class responsible for handling all pre-processing steps for the DSWx-S1</span>
 <span class="sd">    PGE. The pre-processing phase is defined as all steps necessary prior</span>
@@ -179,7 +180,9 @@
                 <span class="c1"># actually file paths, so skip them</span>
                 <span class="k">continue</span>
 
-<div class="viewcode-block" id="DSWxS1PreProcessorMixin.run_preprocessor"><a class="viewcode-back" href="../../../../opera.pge.dswx_s1.html#opera.pge.dswx_s1.dswx_s1_pge.DSWxS1PreProcessorMixin.run_preprocessor">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">run_preprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="DSWxS1PreProcessorMixin.run_preprocessor">
+<a class="viewcode-back" href="../../../../opera.pge.dswx_s1.html#opera.pge.dswx_s1.dswx_s1_pge.DSWxS1PreProcessorMixin.run_preprocessor">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run_preprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Executes the pre-processing steps for DSWx-S1 PGE initialization.</span>
 <span class="sd">        The DswxS1PreProcessorMixin version of this class performs all actions</span>
@@ -203,10 +206,14 @@
                                              <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">algorithm_parameters_file_config_path</span><span class="p">,</span>
                                              <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_dynamic_ancillary_inputs</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_static_ancillary_inputs</span><span class="p">()</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_static_ancillary_inputs</span><span class="p">()</span></div>
+</div>
 
 
-<div class="viewcode-block" id="DSWxS1PostProcessorMixin"><a class="viewcode-back" href="../../../../opera.pge.dswx_s1.html#opera.pge.dswx_s1.dswx_s1_pge.DSWxS1PostProcessorMixin">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">DSWxS1PostProcessorMixin</span><span class="p">(</span><span class="n">PostProcessorMixin</span><span class="p">):</span>
+
+<div class="viewcode-block" id="DSWxS1PostProcessorMixin">
+<a class="viewcode-back" href="../../../../opera.pge.dswx_s1.html#opera.pge.dswx_s1.dswx_s1_pge.DSWxS1PostProcessorMixin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DSWxS1PostProcessorMixin</span><span class="p">(</span><span class="n">PostProcessorMixin</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Mixin class responsible for handling all post-processing steps for the DSWx-S1</span>
 <span class="sd">    PGE. The post-processing phase is defined as all steps required after SAS</span>
@@ -223,6 +230,18 @@
     <span class="n">_tile_metadata_cache</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">_tile_filename_cache</span> <span class="o">=</span> <span class="p">{}</span>
 
+    <span class="n">_file_pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+        <span class="sa">r</span><span class="s1">&#39;(?P&lt;file_id&gt;(?P&lt;project&gt;OPERA)_(?P&lt;level&gt;L3)_(?P&lt;product_type&gt;DSWx)-(?P&lt;source&gt;S1)_&#39;</span>
+        <span class="sa">r</span><span class="s1">&#39;(?P&lt;tile_id&gt;T[^\W_]</span><span class="si">{5}</span><span class="s1">)_(?P&lt;acquisition_ts&gt;\d</span><span class="si">{8}</span><span class="s1">T\d</span><span class="si">{6}</span><span class="s1">Z)_(?P&lt;creation_ts&gt;\d</span><span class="si">{8}</span><span class="s1">T\d</span><span class="si">{6}</span><span class="s1">Z)_&#39;</span>
+        <span class="sa">r</span><span class="s1">&#39;(?P&lt;sensor&gt;S1A|S1B|S1C|S1D)_(?P&lt;spacing&gt;30)_(?P&lt;product_version&gt;v\d+[.]\d+))(_(?P&lt;band_index&gt;B\d</span><span class="si">{2}</span><span class="s1">)_&#39;</span>
+        <span class="sa">r</span><span class="s1">&#39;(?P&lt;band_name&gt;WTR|BWTR|CONF|DIAG)|_BROWSE)?[.](?P&lt;ext&gt;tif|tiff|png)$&#39;</span>
+    <span class="p">)</span>
+    <span class="n">_product_pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+        <span class="sa">r</span><span class="s1">&#39;(?P&lt;project&gt;OPERA)_(?P&lt;level&gt;L3)_(?P&lt;product_type&gt;DSWx)-(?P&lt;source&gt;S1)_&#39;</span>
+        <span class="sa">r</span><span class="s1">&#39;(?P&lt;tile_id&gt;T[^\W_]</span><span class="si">{5}</span><span class="s1">)_(?P&lt;acquisition_ts&gt;\d</span><span class="si">{8}</span><span class="s1">T\d</span><span class="si">{6}</span><span class="s1">Z)_(?P&lt;creation_ts&gt;\d</span><span class="si">{8}</span><span class="s1">T\d</span><span class="si">{6}</span><span class="s1">Z)_&#39;</span>
+        <span class="sa">r</span><span class="s1">&#39;(?P&lt;sensor&gt;S1A|S1B|S1C|S1D)_(?P&lt;spacing&gt;30)_(?P&lt;product_version&gt;v\d+[.]\d+)$&#39;</span>
+    <span class="p">)</span>
+
     <span class="k">def</span><span class="w"> </span><span class="nf">_validate_output_product_filenames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method validates output product file names assigned by the SAS</span>
@@ -238,15 +257,10 @@
 <span class="sd">        from the GeoTIFF product, and cache it for later use.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
-            <span class="sa">r</span><span class="s1">&#39;(?P&lt;file_id&gt;(?P&lt;project&gt;OPERA)_(?P&lt;level&gt;L3)_(?P&lt;product_type&gt;DSWx)-(?P&lt;source&gt;S1)_&#39;</span>
-            <span class="sa">r</span><span class="s1">&#39;(?P&lt;tile_id&gt;T[^\W_]</span><span class="si">{5}</span><span class="s1">)_(?P&lt;acquisition_ts&gt;\d</span><span class="si">{8}</span><span class="s1">T\d</span><span class="si">{6}</span><span class="s1">Z)_(?P&lt;creation_ts&gt;\d</span><span class="si">{8}</span><span class="s1">T\d</span><span class="si">{6}</span><span class="s1">Z)_&#39;</span>
-            <span class="sa">r</span><span class="s1">&#39;(?P&lt;sensor&gt;S1A|S1B)_(?P&lt;spacing&gt;30)_(?P&lt;product_version&gt;v\d+[.]\d+))(_(?P&lt;band_index&gt;B\d</span><span class="si">{2}</span><span class="s1">)_&#39;</span>
-            <span class="sa">r</span><span class="s1">&#39;(?P&lt;band_name&gt;WTR|BWTR|CONF|DIAG)|_BROWSE)?[.](?P&lt;ext&gt;tif|tiff|png)$&#39;</span>
-        <span class="p">)</span>
+
 
         <span class="k">for</span> <span class="n">output_file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">get_output_product_filenames</span><span class="p">():</span>
-            <span class="n">match_result</span> <span class="o">=</span> <span class="n">pattern</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">basename</span><span class="p">(</span><span class="n">output_file</span><span class="p">))</span>
+            <span class="n">match_result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_pattern</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">basename</span><span class="p">(</span><span class="n">output_file</span><span class="p">))</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">match_result</span><span class="p">:</span>
                 <span class="n">error_msg</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Output file </span><span class="si">{</span><span class="n">output_file</span><span class="si">}</span><span class="s2"> does not match the output &quot;</span>
                              <span class="sa">f</span><span class="s2">&quot;naming convention.&quot;</span><span class="p">)</span>
@@ -257,10 +271,6 @@
 
                 <span class="k">if</span> <span class="n">tile_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tile_metadata_cache</span><span class="p">:</span>
                     <span class="n">dswx_metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_collect_dswx_s1_product_metadata</span><span class="p">(</span><span class="n">output_file</span><span class="p">)</span>
-
-                    <span class="c1"># TODO: kludge since SAS hardcodes SPACECRAFT_NAME to &quot;Sentinel-1A/B&quot;</span>
-                    <span class="n">dswx_metadata</span><span class="p">[</span><span class="s1">&#39;MeasuredParameters&#39;</span><span class="p">][</span><span class="s1">&#39;SPACECRAFT_NAME&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">=</span> \
-                        <span class="s2">&quot;Sentinel-1A&quot;</span> <span class="k">if</span> <span class="n">match_result</span><span class="o">.</span><span class="n">groupdict</span><span class="p">()[</span><span class="s1">&#39;sensor&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;S1A&quot;</span> <span class="k">else</span> <span class="s2">&quot;Sentinel-1B&quot;</span>
 
                     <span class="c1"># Cache the metadata for this product for use when generating the ISO XML</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_tile_metadata_cache</span><span class="p">[</span><span class="n">tile_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">dswx_metadata</span>
@@ -389,11 +399,19 @@
         <span class="c1"># Metadata fields we need for ancillary file name should be equivalent</span>
         <span class="c1"># across all tiles, so just take the first set of cached metadata as</span>
         <span class="c1"># a representative</span>
-        <span class="n">dswx_metadata</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tile_metadata_cache</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;MeasuredParameters&#39;</span><span class="p">]</span>
+        <span class="n">dswx_metadata</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tile_metadata_cache</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">sample_output_filename</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tile_filename_cache</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
 
-        <span class="n">spacecraft_name</span> <span class="o">=</span> <span class="n">dswx_metadata</span><span class="p">[</span><span class="s1">&#39;SPACECRAFT_NAME&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
-        <span class="n">sensor</span> <span class="o">=</span> <span class="n">get_sensor_from_spacecraft_name</span><span class="p">(</span><span class="n">spacecraft_name</span><span class="p">)</span>
+        <span class="n">match_result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_product_pattern</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">basename</span><span class="p">(</span><span class="n">sample_output_filename</span><span class="p">))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">match_result</span><span class="p">:</span>
+            <span class="n">error_msg</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Output file </span><span class="si">{</span><span class="n">sample_output_filename</span><span class="si">}</span><span class="s2"> does not match the output &quot;</span>
+                         <span class="sa">f</span><span class="s2">&quot;naming convention.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INVALID_OUTPUT</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">)</span>
+
+        <span class="n">sensor</span> <span class="o">=</span> <span class="n">match_result</span><span class="o">.</span><span class="n">groupdict</span><span class="p">()[</span><span class="s1">&#39;sensor&#39;</span><span class="p">]</span>
         <span class="n">pixel_spacing</span> <span class="o">=</span> <span class="s2">&quot;30&quot;</span>  <span class="c1"># fixed for tile-based products</span>
+
+        <span class="n">dswx_metadata</span> <span class="o">=</span> <span class="n">dswx_metadata</span><span class="p">[</span><span class="s1">&#39;MeasuredParameters&#39;</span><span class="p">]</span>
 
         <span class="n">processing_time</span> <span class="o">=</span> <span class="n">get_time_for_filename</span><span class="p">(</span>
             <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">dswx_metadata</span><span class="p">[</span><span class="s1">&#39;PROCESSING_DATETIME&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">],</span> <span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">T%H:%M:%SZ&#39;</span><span class="p">)</span>
@@ -643,7 +661,12 @@
 
         <span class="n">iso_template_path</span> <span class="o">=</span> <span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">iso_template_path</span><span class="p">)</span>
 
-        <span class="n">rendered_template</span> <span class="o">=</span> <span class="n">render_jinja2</span><span class="p">(</span><span class="n">iso_template_path</span><span class="p">,</span> <span class="n">iso_metadata</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>
+        <span class="n">rendered_template</span> <span class="o">=</span> <span class="n">render_jinja2</span><span class="p">(</span>
+            <span class="n">iso_template_path</span><span class="p">,</span>
+            <span class="n">iso_metadata</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">output_product_path</span>
+        <span class="p">)</span>
 
         <span class="k">return</span> <span class="n">rendered_template</span>
 
@@ -716,7 +739,9 @@
             <span class="c1"># Log stream might be closed by this point so raise an Exception instead</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
-<div class="viewcode-block" id="DSWxS1PostProcessorMixin.run_postprocessor"><a class="viewcode-back" href="../../../../opera.pge.dswx_s1.html#opera.pge.dswx_s1.dswx_s1_pge.DSWxS1PostProcessorMixin.run_postprocessor">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">run_postprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="DSWxS1PostProcessorMixin.run_postprocessor">
+<a class="viewcode-back" href="../../../../opera.pge.dswx_s1.html#opera.pge.dswx_s1.dswx_s1_pge.DSWxS1PostProcessorMixin.run_postprocessor">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run_postprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Executes the post-processing steps for the DSWx-S1 PGE.</span>
 <span class="sd">        The DSWxS1PostProcessorMixin version of this method performs the same</span>
@@ -733,10 +758,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_output</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_output_product_filenames</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_run_sas_qa_executable</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_stage_output_files</span><span class="p">()</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stage_output_files</span><span class="p">()</span></div>
+</div>
 
 
-<div class="viewcode-block" id="DSWxS1Executor"><a class="viewcode-back" href="../../../../opera.pge.dswx_s1.html#opera.pge.dswx_s1.dswx_s1_pge.DSWxS1Executor">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">DSWxS1Executor</span><span class="p">(</span><span class="n">DSWxS1PreProcessorMixin</span><span class="p">,</span> <span class="n">DSWxS1PostProcessorMixin</span><span class="p">,</span> <span class="n">PgeExecutor</span><span class="p">):</span>
+
+<div class="viewcode-block" id="DSWxS1Executor">
+<a class="viewcode-back" href="../../../../opera.pge.dswx_s1.html#opera.pge.dswx_s1.dswx_s1_pge.DSWxS1Executor">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DSWxS1Executor</span><span class="p">(</span><span class="n">DSWxS1PreProcessorMixin</span><span class="p">,</span> <span class="n">DSWxS1PostProcessorMixin</span><span class="p">,</span> <span class="n">PgeExecutor</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Main class for execution of the DSWx-S1 PGE, including the SAS layer.</span>
 <span class="sd">    This class essentially rolls up the DSWx-specific pre- and post-processor</span>
@@ -751,10 +780,10 @@
     <span class="n">LEVEL</span> <span class="o">=</span> <span class="s2">&quot;L3&quot;</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Processing Level for DSWx-S1 Products&quot;&quot;&quot;</span>
 
-    <span class="n">PGE_VERSION</span> <span class="o">=</span> <span class="s2">&quot;3.0.2&quot;</span>
+    <span class="n">PGE_VERSION</span> <span class="o">=</span> <span class="s2">&quot;3.0.4&quot;</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Version of the PGE (overrides default from base_pge)&quot;&quot;&quot;</span>
 
-    <span class="n">SAS_VERSION</span> <span class="o">=</span> <span class="s2">&quot;1.1&quot;</span>  <span class="c1"># Final release https://github.com/opera-adt/DSWX-SAR/releases/tag/v1.1</span>
+    <span class="n">SAS_VERSION</span> <span class="o">=</span> <span class="s2">&quot;1.2&quot;</span>  <span class="c1"># Final release https://github.com/opera-adt/DSWX-SAR/releases/tag/v1.2</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Version of the SAS wrapped by this PGE, should be updated as needed&quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pge_name</span><span class="p">,</span> <span class="n">runconfig_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -763,6 +792,7 @@
         <span class="c1"># Used in base_pge.py to rename and keep track of files</span>
         <span class="c1"># renamed by the PGE</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">rename_by_pattern_map</span> <span class="o">=</span> <span class="p">{}</span></div>
+
 </pre></div>
 
            </div>
@@ -772,7 +802,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2021-2025 California Institute of Technology.</p>
+    <p>&#169; Copyright 2021-2026 California Institute of Technology.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

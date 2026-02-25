@@ -1,20 +1,20 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera.pge.disp_ni.disp_ni_pge &mdash; opera-sds-pge 6.0.0-er.3.0 documentation</title>
+  <title>opera.pge.disp_ni.disp_ni_pge &mdash; opera-sds-pge 7.0.0-er.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
-      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
 
   
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=62ba114d"></script>
-      <script src="../../../../_static/doctools.js?v=888ff710"></script>
-      <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="../../../../_static/documentation_options.js?v=d4e30586"></script>
+      <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
@@ -82,22 +82,43 @@
 <span class="sd">Module defining the implementation for the Surface Displacement (DISP) from NISAR PGE.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">opera.pge.base.base_pge</span><span class="w"> </span><span class="kn">import</span> <span class="n">PgeExecutor</span><span class="p">,</span> <span class="n">PostProcessorMixin</span><span class="p">,</span> <span class="n">PreProcessorMixin</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.pge.base.base_pge</span><span class="w"> </span><span class="kn">import</span> <span class="n">PgeExecutor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.pge.disp_s1.disp_s1_pge</span><span class="w"> </span><span class="kn">import</span> <span class="n">DispS1PostProcessorMixin</span><span class="p">,</span> <span class="n">DispS1PreProcessorMixin</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.dataset_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">parse_bounding_polygon_from_wkt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.error_codes</span><span class="w"> </span><span class="kn">import</span> <span class="n">ErrorCode</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.h5_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_disp_s1_product_metadata</span> <span class="k">as</span> <span class="n">get_disp_product_metadata</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.render_jinja2</span><span class="w"> </span><span class="kn">import</span> <span class="n">augment_hdf5_measured_parameters</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.time</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_catalog_metadata_datetime_str</span><span class="p">,</span> <span class="n">get_time_for_filename</span>
 
 
-<div class="viewcode-block" id="DispNIPreProcessorMixin"><a class="viewcode-back" href="../../../../opera.pge.disp_ni.html#opera.pge.disp_ni.disp_ni_pge.DispNIPreProcessorMixin">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">DispNIPreProcessorMixin</span><span class="p">(</span><span class="n">PreProcessorMixin</span><span class="p">):</span>
+<div class="viewcode-block" id="DispNIPreProcessorMixin">
+<a class="viewcode-back" href="../../../../opera.pge.disp_ni.html#opera.pge.disp_ni.disp_ni_pge.DispNIPreProcessorMixin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DispNIPreProcessorMixin</span><span class="p">(</span><span class="n">DispS1PreProcessorMixin</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Mixin class responsible for handling all pre-processing steps for the DISP-NI</span>
 <span class="sd">    PGE. The pre-processing phase is defined as all steps necessary prior</span>
 <span class="sd">    to SAS execution.</span>
-<span class="sd">    This particular pre-processor is currently a stub implementation, inheriting from the base pre-processor mixin</span>
-<span class="sd">    and adding nothing at this time. New functionalities will be added as new versions of the DISP-NI SAS are released.</span>
+<span class="sd">    This particular pre-processor inherits from the DISP-S1 pre-processor mixin</span>
+<span class="sd">    with one check disabled currently as it does not apply to DISP-NI currently.</span>
+<span class="sd">    but may in the future.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">_pre_mixin_name</span> <span class="o">=</span> <span class="s2">&quot;DispNIPreProcessorMixin&quot;</span>
     <span class="n">_valid_input_extensions</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;.tif&quot;</span><span class="p">,)</span>
 
-<div class="viewcode-block" id="DispNIPreProcessorMixin.run_preprocessor"><a class="viewcode-back" href="../../../../opera.pge.disp_ni.html#opera.pge.disp_ni.disp_ni_pge.DispNIPreProcessorMixin.run_preprocessor">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">run_preprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_runconfig_needed_options</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Bypass this method for NISAR. It may need to be re-implemented if we have a</span>
+<span class="sd">        DISP-NI-STATIC PGE in the future.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="DispNIPreProcessorMixin.run_preprocessor">
+<a class="viewcode-back" href="../../../../opera.pge.disp_ni.html#opera.pge.disp_ni.disp_ni_pge.DispNIPreProcessorMixin.run_preprocessor">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run_preprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Executes the pre-processing steps for DISP-NI PGE initialization.</span>
 <span class="sd">        The DispNIPreProcessorMixin version of this class performs all actions</span>
@@ -109,16 +130,18 @@
 <span class="sd">        **kwargs: dict</span>
 <span class="sd">            Any keyword arguments needed by the pre-processor</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">run_preprocessor</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">run_preprocessor</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+</div>
 
 
-<div class="viewcode-block" id="DispNIPostProcessorMixin"><a class="viewcode-back" href="../../../../opera.pge.disp_ni.html#opera.pge.disp_ni.disp_ni_pge.DispNIPostProcessorMixin">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">DispNIPostProcessorMixin</span><span class="p">(</span><span class="n">PostProcessorMixin</span><span class="p">):</span>
+
+<div class="viewcode-block" id="DispNIPostProcessorMixin">
+<a class="viewcode-back" href="../../../../opera.pge.disp_ni.html#opera.pge.disp_ni.disp_ni_pge.DispNIPostProcessorMixin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DispNIPostProcessorMixin</span><span class="p">(</span><span class="n">DispS1PostProcessorMixin</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Mixin class responsible for handling all post-processing steps for the DISP-NI</span>
 <span class="sd">    PGE. The post-processing phase is defined as all steps required after SAS</span>
 <span class="sd">    execution has completed, prior to handover of output products to PCM.</span>
-<span class="sd">    This particular pre-processor is currently a stub implementation, inheriting from the base pre-processor mixin</span>
-<span class="sd">    and adding nothing at this time. New functionalities will be added as new versions of the DISP-NI SAS are released.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">_post_mixin_name</span> <span class="o">=</span> <span class="s2">&quot;DispNIPostProcessorMixin&quot;</span>
@@ -126,7 +149,269 @@
     <span class="n">_tile_metadata_cache</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">_tile_filename_cache</span> <span class="o">=</span> <span class="p">{}</span>
 
-<div class="viewcode-block" id="DispNIPostProcessorMixin.run_postprocessor"><a class="viewcode-back" href="../../../../opera.pge.disp_ni.html#opera.pge.disp_ni.disp_ni_pge.DispNIPostProcessorMixin.run_postprocessor">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">run_postprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_core_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inter_filename</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the core file name component for products produced by the</span>
+<span class="sd">        DISP-NI PGE.</span>
+
+<span class="sd">        The core file name component of the DISP-NI PGE consists of:</span>
+
+<span class="sd">        &lt;PROJECT&gt;_&lt;LEVEL&gt;_&lt;PGE NAME&gt;_&lt;TRACK&gt;_&lt;DIRECTION&gt;_&lt;FRAME&gt;_&lt;BANDWIDTH&gt;_&lt;POLARIZATION&gt;_\</span>
+<span class="sd">        &lt;ReferenceDateTime&gt;_&lt;SecondaryDateTime&gt;_&lt;ProductVersion&gt;_\</span>
+<span class="sd">        &lt;ProductGenerationDateTime&gt;</span>
+
+<span class="sd">        Callers of this function are responsible for assignment of any other</span>
+<span class="sd">        product-specific fields, such as the file extension.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        inter_filename : str, optional</span>
+<span class="sd">            The intermediate filename of the output product to generate the</span>
+<span class="sd">            core filename for. This parameter may be used to inspect the file</span>
+<span class="sd">            in order to derive any necessary components of the returned filename.</span>
+<span class="sd">            Once the core filename is cached upon first call to this function,</span>
+<span class="sd">            this parameter may be omitted.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        core_filename : str</span>
+<span class="sd">            The filename component to assign to frame-based products created by</span>
+<span class="sd">            this PGE.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">core_filename</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">PROJECT</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">LEVEL</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">NAME</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+        <span class="n">frame_id</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">sas_config</span><span class="p">[</span><span class="s1">&#39;input_file_group&#39;</span><span class="p">][</span><span class="s1">&#39;frame_id&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">03d</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">pol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">sas_config</span><span class="p">[</span><span class="s1">&#39;input_file_group&#39;</span><span class="p">][</span><span class="s1">&#39;polarization&#39;</span><span class="p">]</span>
+
+        <span class="n">inter_disp_product_filename</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">inter_filename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[:</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;nc&quot;</span><span class="p">])</span>
+
+        <span class="c1"># Check if we&#39;ve already cached the product metadata corresponding to</span>
+        <span class="c1"># this set of intermediate products (there can be multiple sets of</span>
+        <span class="c1"># .nc and .png output files when running in historical mode)</span>
+        <span class="k">if</span> <span class="n">inter_disp_product_filename</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_product_metadata_cache</span><span class="p">:</span>
+            <span class="n">disp_metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_product_metadata_cache</span><span class="p">[</span><span class="n">inter_disp_product_filename</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">disp_metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_collect_disp_ni_product_metadata</span><span class="p">(</span><span class="n">inter_disp_product_filename</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_product_metadata_cache</span><span class="p">[</span><span class="n">inter_disp_product_filename</span><span class="p">]</span> <span class="o">=</span> <span class="n">disp_metadata</span>
+
+        <span class="c1"># TODO: Update when metadata fields are relocated</span>
+        <span class="n">orbit_track</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">disp_metadata</span><span class="p">[</span><span class="s2">&quot;extra&quot;</span><span class="p">][</span><span class="s2">&quot;trackNumber&quot;</span><span class="p">]</span><span class="si">:</span><span class="s1">03d</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="k">if</span> <span class="n">disp_metadata</span><span class="p">[</span><span class="s2">&quot;extra&quot;</span><span class="p">][</span><span class="s2">&quot;orbitPassDirection&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;ascending&#39;</span><span class="p">:</span>
+            <span class="n">orbit_direction</span> <span class="o">=</span> <span class="s1">&#39;A&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">orbit_direction</span> <span class="o">=</span> <span class="s1">&#39;B&#39;</span>
+
+        <span class="c1"># TODO: This is hardcoded. Where in the metadata?</span>
+        <span class="n">mode</span> <span class="o">=</span> <span class="s2">&quot;40&quot;</span>
+
+        <span class="c1"># ReferenceDateTime: The acquisition sensing start date and time of</span>
+        <span class="c1"># the input satellite imagery for the first burst in the frame of the</span>
+        <span class="c1"># reference product in the format YYYYMMDDTHHMMSSZ</span>
+        <span class="n">reference_date_time</span> <span class="o">=</span> <span class="n">disp_metadata</span><span class="p">[</span><span class="s1">&#39;identification&#39;</span><span class="p">][</span><span class="s1">&#39;reference_zero_doppler_start_time&#39;</span><span class="p">]</span>
+        <span class="n">reference_date_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">reference_date_time</span><span class="p">,</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S.</span><span class="si">%f</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">reference_date_time</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">get_time_for_filename</span><span class="p">(</span><span class="n">reference_date_time</span><span class="p">)</span><span class="si">}</span><span class="s2">Z&quot;</span>
+
+        <span class="c1"># SecondaryDateTime: The acquisition sensing start date and time of</span>
+        <span class="c1"># the input satellite imagery for the first burst in the frame of this</span>
+        <span class="c1"># secondary product in the format YYYYMMDDTHHMMSSZ</span>
+        <span class="n">secondary_date_time</span> <span class="o">=</span> <span class="n">disp_metadata</span><span class="p">[</span><span class="s1">&#39;identification&#39;</span><span class="p">][</span><span class="s1">&#39;secondary_zero_doppler_start_time&#39;</span><span class="p">]</span>
+        <span class="n">secondary_date_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">secondary_date_time</span><span class="p">,</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S.</span><span class="si">%f</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">secondary_date_time</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">get_time_for_filename</span><span class="p">(</span><span class="n">secondary_date_time</span><span class="p">)</span><span class="si">}</span><span class="s2">Z&quot;</span>
+
+        <span class="c1"># ProductVersion: OPERA DISP-NI product version number with four</span>
+        <span class="c1"># characters, including the letter “v” and two digits indicating the</span>
+        <span class="c1"># major and minor versions, which are delimited by a period</span>
+        <span class="n">product_version</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;v</span><span class="si">{</span><span class="n">disp_metadata</span><span class="p">[</span><span class="s1">&#39;identification&#39;</span><span class="p">][</span><span class="s1">&#39;product_version&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="c1"># ProductGenerationDateTime: The date and time at which the product</span>
+        <span class="c1"># was generated by OPERA with the format of YYYYMMDDTHHMMSSZ</span>
+        <span class="n">product_generation_date_time</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">get_time_for_filename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">production_datetime</span><span class="p">)</span><span class="si">}</span><span class="s2">Z&quot;</span>
+
+        <span class="n">disp_ni_product_filename</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">core_filename</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">orbit_track</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">orbit_direction</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">frame_id</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">_&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">reference_date_time</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">secondary_date_time</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">product_version</span><span class="si">}</span><span class="s2">_&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">product_generation_date_time</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Cache the file name for this set of DISP products, so it can be used</span>
+        <span class="c1"># with the ISO metadata later.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_product_filename_cache</span><span class="p">[</span><span class="n">inter_disp_product_filename</span><span class="p">]</span> <span class="o">=</span> <span class="n">disp_ni_product_filename</span>
+
+        <span class="k">return</span> <span class="n">disp_ni_product_filename</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_compressed_gslc_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inter_filename</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the file name to use for compressed GSLC files produced by the</span>
+<span class="sd">        DISP-NI PGE.</span>
+
+<span class="sd">        The compressed GSLC filename for the DISP-NI PGE consists of:</span>
+
+<span class="sd">             &lt;Project&gt;_&lt;Level&gt;_COMPRESSED-GSLC-NI_&lt;TRACK&gt;_&lt;DIRECTION&gt;_&lt;DIRECTION&gt;_&lt;BANDWIDTH&gt;_\</span>
+<span class="sd">             &lt;ReferenceDateTime&gt;_&lt;FirstDateTime&gt;_&lt;LastDateTime&gt;_\</span>
+<span class="sd">             &lt;ProductGenerationDateTime&gt;_&lt;Polarization&gt;_&lt;ProductVersion&gt;.h5</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        inter_filename : str</span>
+<span class="sd">            The intermediate filename of the compressed CSLC product to generate</span>
+<span class="sd">            a filename for. This parameter may be used to inspect the file</span>
+<span class="sd">            in order to derive any necessary components of the returned filename.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        compressed_cslc_filename : str</span>
+<span class="sd">            The file name to assign to compressed CSLC product(s) created by this PGE.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">level</span> <span class="o">=</span> <span class="s2">&quot;L2&quot;</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;COMPRESSED-GSLC-NI&quot;</span>
+        <span class="n">frame_id</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">sas_config</span><span class="p">[</span><span class="s1">&#39;input_file_group&#39;</span><span class="p">][</span><span class="s1">&#39;frame_id&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">03d</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="kn">from</span><span class="w"> </span><span class="nn">os.path</span><span class="w"> </span><span class="kn">import</span> <span class="n">basename</span>
+        <span class="c1"># TODO: Finalize naming convention &amp; implement</span>
+        <span class="k">return</span> <span class="n">basename</span><span class="p">(</span><span class="n">inter_filename</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_ancillary_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Helper method to derive the core component of the file names for the</span>
+<span class="sd">        ancillary products associated to a PGE job (catalog metadata, log file,</span>
+<span class="sd">        etc...).</span>
+
+<span class="sd">        The core file name component DISP-NI ancillary products consists of:</span>
+
+<span class="sd">        &lt;PROJECT&gt;_&lt;LEVEL&gt;_&lt;PGE NAME&gt;_&lt;TRACK&gt;_&lt;DIRECTION&gt;_&lt;FRAME&gt;_&lt;BANDWIDTH&gt;_&lt;POLARIZATION&gt;_</span>
+<span class="sd">        &lt;ProductVersion&gt;_&lt;ProductGenerationDateTime&gt;</span>
+
+<span class="sd">        Since these files are note specific to any particular DISP-NI output</span>
+<span class="sd">        product, fields such as reference and secondary time are omitted from</span>
+<span class="sd">        this file pattern.</span>
+
+<span class="sd">        Also note that this file name does not include a file extension, which</span>
+<span class="sd">        should be added to the return value of this method by any callers to</span>
+<span class="sd">        distinguish the different formats of ancillary outputs produced by this</span>
+<span class="sd">        PGE.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ancillary_filename : str</span>
+<span class="sd">            The file name component to assign to ancillary products created by</span>
+<span class="sd">            this PGE.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">core_filename</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">PROJECT</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">LEVEL</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">NAME</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+        <span class="n">frame_id</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">sas_config</span><span class="p">[</span><span class="s1">&#39;input_file_group&#39;</span><span class="p">][</span><span class="s1">&#39;frame_id&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">03d</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">pol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">sas_config</span><span class="p">[</span><span class="s1">&#39;input_file_group&#39;</span><span class="p">][</span><span class="s1">&#39;polarization&#39;</span><span class="p">]</span>
+
+        <span class="n">product_version</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">sas_config</span><span class="p">[</span><span class="s1">&#39;product_path_group&#39;</span><span class="p">][</span><span class="s1">&#39;product_version&#39;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">product_version</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;v&#39;</span><span class="p">):</span>
+            <span class="n">product_version</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;v</span><span class="si">{</span><span class="n">product_version</span><span class="si">}</span><span class="s1">&#39;</span>
+
+        <span class="n">product_generation_date_time</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">get_time_for_filename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">production_datetime</span><span class="p">)</span><span class="si">}</span><span class="s2">Z&quot;</span>
+
+        <span class="n">ancillary_filename</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">core_filename</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">frame_id</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">product_version</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">product_generation_date_time</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">ancillary_filename</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_collect_disp_ni_product_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">disp_product</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gathers the available metadata from a sample output DISP-NI product for</span>
+<span class="sd">        use in filling out the ISO metadata template for the DISP-NI PGE.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        disp_product : str</span>
+<span class="sd">            Path to the DISP-NI NetCDF product to collect metadata from.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        output_product_metadata : dict</span>
+<span class="sd">            Dictionary containing DISP-NI output product metadata, formatted</span>
+<span class="sd">            for use with the ISO metadata Jinja2 template.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Extract all metadata assigned by the SAS at product creation time</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">output_product_metadata</span> <span class="o">=</span> <span class="n">get_disp_product_metadata</span><span class="p">(</span><span class="n">disp_product</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="s1">&#39;/science/LSAR/identification&#39;</span><span class="p">)</span>
+
+            <span class="c1"># Add hardcoded values to metadata</span>
+            <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;static&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;Project&#39;</span><span class="p">:</span> <span class="s1">&#39;OPERA&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;ProductLevel&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+                <span class="s1">&#39;ProductType&#39;</span><span class="p">:</span> <span class="s1">&#39;DISP-NI&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;ProductSource&#39;</span><span class="p">:</span> <span class="s1">&#39;NISAR&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;ProcessingDateTime&#39;</span><span class="p">:</span> <span class="n">get_catalog_metadata_datetime_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">production_datetime</span><span class="p">)</span>
+            <span class="p">}</span>
+
+            <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;MeasuredParameters&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">augment_hdf5_measured_parameters</span><span class="p">(</span>
+                <span class="n">output_product_metadata</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">iso_measured_parameter_descriptions</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Failed to extract metadata from </span><span class="si">{</span><span class="n">disp_product</span><span class="si">}</span><span class="s1">, reason: </span><span class="si">{</span><span class="n">err</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">ISO_METADATA_COULD_NOT_EXTRACT_METADATA</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+
+        <span class="c1"># Parse the image polygon coordinates to conform with gml</span>
+        <span class="n">bounding_polygon_wkt_str</span> <span class="o">=</span> <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;identification&#39;</span><span class="p">][</span><span class="s1">&#39;bounding_polygon&#39;</span><span class="p">]</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">bounding_polygon_gml_str</span> <span class="o">=</span> <span class="n">parse_bounding_polygon_from_wkt</span><span class="p">(</span><span class="n">bounding_polygon_wkt_str</span><span class="p">)</span>
+            <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;bounding_polygon&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bounding_polygon_gml_str</span>
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">ISO_METADATA_RENDER_FAILED</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">))</span>
+
+        <span class="c1"># Add some fields on the dimensions of the data.</span>
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;xCoordinates&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]),</span>  <span class="c1"># pixels</span>
+            <span class="s1">&#39;spacing&#39;</span><span class="p">:</span> <span class="mi">30</span>  <span class="c1"># meters/pixel</span>
+        <span class="p">}</span>
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;yCoordinates&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]),</span>  <span class="c1"># pixels</span>
+            <span class="s1">&#39;spacing&#39;</span><span class="p">:</span> <span class="mi">30</span>  <span class="c1"># meters/pixel</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">output_product_metadata</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_custom_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inter_filename</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates the &quot;custom data&quot; dictionary used with the ISO metadata rendering.</span>
+
+<span class="sd">        Custom data contains all metadata information needed for the ISO template</span>
+<span class="sd">        that is not found within any of the other metadata sources (such as the</span>
+<span class="sd">        RunConfig, output product(s), or catalog metadata).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        inter_filename : str</span>
+<span class="sd">            The intermediate filename of the output product to generate a</span>
+<span class="sd">            core filename for. This core filename will be used as the &quot;granule&quot;</span>
+<span class="sd">            identifier within the returned metadata dictionary.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        custom_metadata : dict</span>
+<span class="sd">            Dictionary containing the custom metadata as expected by the ISO</span>
+<span class="sd">            metadata Jinja2 template.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">custom_metadata</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_create_custom_metadata</span><span class="p">(</span><span class="n">inter_filename</span><span class="p">)</span>
+
+        <span class="n">custom_metadata</span><span class="p">[</span><span class="s1">&#39;ISO_OPERA_PlatformKeywords&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;NI&#39;</span><span class="p">]</span>
+        <span class="n">custom_metadata</span><span class="p">[</span><span class="s1">&#39;ISO_OPERA_InstrumentKeywords&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;NISAR&#39;</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">custom_metadata</span>
+
+<div class="viewcode-block" id="DispNIPostProcessorMixin.run_postprocessor">
+<a class="viewcode-back" href="../../../../opera.pge.disp_ni.html#opera.pge.disp_ni.disp_ni_pge.DispNIPostProcessorMixin.run_postprocessor">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run_postprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Executes the post-processing steps for the DISP-NI PGE.</span>
 <span class="sd">        The DispNIPostProcessorMixin version of this method performs the same</span>
@@ -137,10 +422,14 @@
 <span class="sd">        **kwargs: dict</span>
 <span class="sd">            Any keyword arguments needed by the post-processor</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">run_postprocessor</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">run_postprocessor</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+</div>
 
 
-<div class="viewcode-block" id="DispNIExecutor"><a class="viewcode-back" href="../../../../opera.pge.disp_ni.html#opera.pge.disp_ni.disp_ni_pge.DispNIExecutor">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">DispNIExecutor</span><span class="p">(</span><span class="n">DispNIPreProcessorMixin</span><span class="p">,</span> <span class="n">DispNIPostProcessorMixin</span><span class="p">,</span> <span class="n">PgeExecutor</span><span class="p">):</span>
+
+<div class="viewcode-block" id="DispNIExecutor">
+<a class="viewcode-back" href="../../../../opera.pge.disp_ni.html#opera.pge.disp_ni.disp_ni_pge.DispNIExecutor">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DispNIExecutor</span><span class="p">(</span><span class="n">DispNIPreProcessorMixin</span><span class="p">,</span> <span class="n">DispNIPostProcessorMixin</span><span class="p">,</span> <span class="n">PgeExecutor</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Main class for execution of the DISP-NI PGE, including the SAS layer.</span>
 <span class="sd">    This class essentially rolls up the DISP-specific pre- and post-processor</span>
@@ -157,10 +446,20 @@
     <span class="n">SAS_VERSION</span> <span class="o">=</span> <span class="s2">&quot;0.1.1&quot;</span>  <span class="c1"># Interface release https://github.com/opera-adt/disp-nisar/releases/tag/v0.1.1</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Version of the SAS wrapped by this PGE, should be updated as needed&quot;&quot;&quot;</span>
 
+    <span class="n">PGE_VERSION</span> <span class="o">=</span> <span class="s2">&quot;6.0.0-er.1.0&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Version of the PGE (overrides default from base_pge)&quot;&quot;&quot;</span>
+
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pge_name</span><span class="p">,</span> <span class="n">runconfig_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">pge_name</span><span class="p">,</span> <span class="n">runconfig_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">rename_by_pattern_map</span> <span class="o">=</span> <span class="p">{}</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rename_by_pattern_map</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s1">&#39;*.nc&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_netcdf_filename</span><span class="p">,</span>
+                <span class="s1">&#39;*displacement.png&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_browse_filename</span><span class="p">,</span>
+                <span class="s1">&#39;compressed*.h5&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compressed_gslc_filename</span>
+            <span class="p">}</span>
+        <span class="p">)</span></div>
+
 </pre></div>
 
            </div>
@@ -170,7 +469,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2021-2025 California Institute of Technology.</p>
+    <p>&#169; Copyright 2021-2026 California Institute of Technology.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

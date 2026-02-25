@@ -1,7 +1,7 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
@@ -13,9 +13,9 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=de395e71"></script>
-      <script src="_static/doctools.js?v=888ff710"></script>
-      <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="_static/documentation_options.js?v=d4e30586"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -90,15 +90,101 @@
            <div itemprop="articleBody">
              
   <section id="opera-pge-cal-disp-package">
-<h1>opera.pge.cal_disp package<a class="headerlink" href="#opera-pge-cal-disp-package" title="Permalink to this heading"></a></h1>
+<h1>opera.pge.cal_disp package<a class="headerlink" href="#opera-pge-cal-disp-package" title="Link to this heading"></a></h1>
 <section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
 </section>
-<section id="opera-pge-cal-disp-cal-disp-pge-module">
-<h2>opera.pge.cal_disp.cal_disp_pge module<a class="headerlink" href="#opera-pge-cal-disp-cal-disp-pge-module" title="Permalink to this heading"></a></h2>
+<section id="module-opera.pge.cal_disp.cal_disp_pge">
+<span id="opera-pge-cal-disp-cal-disp-pge-module"></span><h2>opera.pge.cal_disp.cal_disp_pge module<a class="headerlink" href="#module-opera.pge.cal_disp.cal_disp_pge" title="Link to this heading"></a></h2>
+<section id="cal-disp-pge-py">
+<h3>cal_disp_pge.py<a class="headerlink" href="#cal-disp-pge-py" title="Link to this heading"></a></h3>
+<p>Module defining the implementation of the Calibration for Surface Displacement from Sentinel-1 and NISAR (CAL-DISP) PGE.</p>
 </section>
-<section id="module-contents">
-<h2>Module contents<a class="headerlink" href="#module-contents" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="opera.pge.cal_disp.cal_disp_pge.CalDispExecutor">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">opera.pge.cal_disp.cal_disp_pge.</span></span><span class="sig-name descname"><span class="pre">CalDispExecutor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pge_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runconfig_path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/opera/pge/cal_disp/cal_disp_pge.html#CalDispExecutor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opera.pge.cal_disp.cal_disp_pge.CalDispExecutor" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#opera.pge.cal_disp.cal_disp_pge.CalDispPreProcessorMixin" title="opera.pge.cal_disp.cal_disp_pge.CalDispPreProcessorMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">CalDispPreProcessorMixin</span></code></a>, <a class="reference internal" href="#opera.pge.cal_disp.cal_disp_pge.CalDispPostProcessorMixin" title="opera.pge.cal_disp.cal_disp_pge.CalDispPostProcessorMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">CalDispPostProcessorMixin</span></code></a>, <a class="reference internal" href="opera.pge.base.html#opera.pge.base.base_pge.PgeExecutor" title="opera.pge.base.base_pge.PgeExecutor"><code class="xref py py-class docutils literal notranslate"><span class="pre">PgeExecutor</span></code></a></p>
+<p>Main class for execution of the CAL-DISP PGE, including the SAS layer.
+This class essentially rolls up the CAL-DISP-specific pre- and post-processor
+functionality, while inheriting all other functionality for setup and execution
+of the SAS from the base PgeExecutor class.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="opera.pge.cal_disp.cal_disp_pge.CalDispExecutor.LEVEL">
+<span class="sig-name descname"><span class="pre">LEVEL</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'L4'</span></span><a class="headerlink" href="#opera.pge.cal_disp.cal_disp_pge.CalDispExecutor.LEVEL" title="Link to this definition"></a></dt>
+<dd><p>Processing Level for CAL-DISP Products</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="opera.pge.cal_disp.cal_disp_pge.CalDispExecutor.NAME">
+<span class="sig-name descname"><span class="pre">NAME</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'CAL-DISP'</span></span><a class="headerlink" href="#opera.pge.cal_disp.cal_disp_pge.CalDispExecutor.NAME" title="Link to this definition"></a></dt>
+<dd><p>Short name for the CAL-DISP PGE</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="opera.pge.cal_disp.cal_disp_pge.CalDispExecutor.SAS_VERSION">
+<span class="sig-name descname"><span class="pre">SAS_VERSION</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'0.1'</span></span><a class="headerlink" href="#opera.pge.cal_disp.cal_disp_pge.CalDispExecutor.SAS_VERSION" title="Link to this definition"></a></dt>
+<dd><p>Version of the SAS wrapped by this PGE, should be updated as needed</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="opera.pge.cal_disp.cal_disp_pge.CalDispPostProcessorMixin">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">opera.pge.cal_disp.cal_disp_pge.</span></span><span class="sig-name descname"><span class="pre">CalDispPostProcessorMixin</span></span><a class="reference internal" href="_modules/opera/pge/cal_disp/cal_disp_pge.html#CalDispPostProcessorMixin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opera.pge.cal_disp.cal_disp_pge.CalDispPostProcessorMixin" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="opera.pge.base.html#opera.pge.base.base_pge.PostProcessorMixin" title="opera.pge.base.base_pge.PostProcessorMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">PostProcessorMixin</span></code></a></p>
+<p>Mixin class responsible for handling all post-processing steps for the CAL-DISP
+PGE. The post-processing phase is defined as all steps required after SAS
+execution has completed, prior to handover of output products to PCM.</p>
+<p>In addition to the base functionality inherited from PostProcessorMixin, this
+mixin adds an output validation step to ensure that the output file(s) defined
+by the RunConfig exist and are valid.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="opera.pge.cal_disp.cal_disp_pge.CalDispPostProcessorMixin.run_postprocessor">
+<span class="sig-name descname"><span class="pre">run_postprocessor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/opera/pge/cal_disp/cal_disp_pge.html#CalDispPostProcessorMixin.run_postprocessor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opera.pge.cal_disp.cal_disp_pge.CalDispPostProcessorMixin.run_postprocessor" title="Link to this definition"></a></dt>
+<dd><p>Executes the post-processing steps for the CAL-DISP PGE.
+The CalDispPostProcessorMixin version of this method currently
+validates the output product files and performs the same
+steps as the base PostProcessorMixin, but inserts a step to perform
+output product validation prior to staging and renaming of the output
+files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>**kwargs</strong> (<em>dict</em>) – Any keyword arguments needed by the post-processor</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="opera.pge.cal_disp.cal_disp_pge.CalDispPreProcessorMixin">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">opera.pge.cal_disp.cal_disp_pge.</span></span><span class="sig-name descname"><span class="pre">CalDispPreProcessorMixin</span></span><a class="reference internal" href="_modules/opera/pge/cal_disp/cal_disp_pge.html#CalDispPreProcessorMixin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opera.pge.cal_disp.cal_disp_pge.CalDispPreProcessorMixin" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="opera.pge.base.html#opera.pge.base.base_pge.PreProcessorMixin" title="opera.pge.base.base_pge.PreProcessorMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">PreProcessorMixin</span></code></a></p>
+<p>Mixin class responsible for handling all pre-processing steps for the CAL-DISP
+PGE. The pre-processing phase is defined as all steps necessary prior
+to SAS execution.</p>
+<p>In addition to the base functionality inherited from PreProcessorMixin, this
+mixin adds an input validation step to ensure that input(s) defined by the
+RunConfig exist and are valid.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="opera.pge.cal_disp.cal_disp_pge.CalDispPreProcessorMixin.run_preprocessor">
+<span class="sig-name descname"><span class="pre">run_preprocessor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/opera/pge/cal_disp/cal_disp_pge.html#CalDispPreProcessorMixin.run_preprocessor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opera.pge.cal_disp.cal_disp_pge.CalDispPreProcessorMixin.run_preprocessor" title="Link to this definition"></a></dt>
+<dd><p>Executes the pre-processing steps for CAL-DISP PGE initialization.
+The CalDispPreProcessorMixin version of this class performs all actions
+of the PreProcessorMixin class. Parameterization of the validation
+functions is handled via specialized class attributes (i.e. _valid_input_extensions)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>**kwargs</strong> (<em>dict</em>) – Any keyword arguments needed by the pre-processor</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-opera.pge.cal_disp">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-opera.pge.cal_disp" title="Link to this heading"></a></h2>
 </section>
 </section>
 

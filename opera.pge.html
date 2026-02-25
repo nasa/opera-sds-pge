@@ -1,7 +1,7 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
@@ -13,9 +13,9 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=de395e71"></script>
-      <script src="_static/doctools.js?v=888ff710"></script>
-      <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="_static/documentation_options.js?v=d4e30586"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -89,83 +89,340 @@
            <div itemprop="articleBody">
              
   <section id="opera-pge-package">
-<h1>opera.pge package<a class="headerlink" href="#opera-pge-package" title="Permalink to this heading"></a></h1>
+<h1>opera.pge package<a class="headerlink" href="#opera-pge-package" title="Link to this heading"></a></h1>
 <section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="opera.pge.base.html">opera.pge.base package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="opera.pge.base.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="opera.pge.base.html#opera-pge-base-base-pge-module">opera.pge.base.base_pge module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="opera.pge.base.html#opera-pge-base-runconfig-module">opera.pge.base.runconfig module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="opera.pge.base.html#module-opera.pge.base.base_pge">opera.pge.base.base_pge module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="opera.pge.base.html#base-pge-py">base_pge.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="opera.pge.base.html#opera.pge.base.base_pge.PgeExecutor"><code class="docutils literal notranslate"><span class="pre">PgeExecutor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.base.html#opera.pge.base.base_pge.PgeExecutor.LEVEL"><code class="docutils literal notranslate"><span class="pre">PgeExecutor.LEVEL</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.base.html#opera.pge.base.base_pge.PgeExecutor.NAME"><code class="docutils literal notranslate"><span class="pre">PgeExecutor.NAME</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.base.html#opera.pge.base.base_pge.PgeExecutor.PGE_VERSION"><code class="docutils literal notranslate"><span class="pre">PgeExecutor.PGE_VERSION</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.base.html#opera.pge.base.base_pge.PgeExecutor.PROJECT"><code class="docutils literal notranslate"><span class="pre">PgeExecutor.PROJECT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.base.html#opera.pge.base.base_pge.PgeExecutor.SAS_VERSION"><code class="docutils literal notranslate"><span class="pre">PgeExecutor.SAS_VERSION</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.base.html#opera.pge.base.base_pge.PgeExecutor.run"><code class="docutils literal notranslate"><span class="pre">PgeExecutor.run()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.base.html#opera.pge.base.base_pge.PgeExecutor.run_sas_executable"><code class="docutils literal notranslate"><span class="pre">PgeExecutor.run_sas_executable()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="opera.pge.base.html#opera.pge.base.base_pge.PostProcessorMixin"><code class="docutils literal notranslate"><span class="pre">PostProcessorMixin</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.base.html#opera.pge.base.base_pge.PostProcessorMixin.run_postprocessor"><code class="docutils literal notranslate"><span class="pre">PostProcessorMixin.run_postprocessor()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="opera.pge.base.html#opera.pge.base.base_pge.PreProcessorMixin"><code class="docutils literal notranslate"><span class="pre">PreProcessorMixin</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.base.html#opera.pge.base.base_pge.PreProcessorMixin.run_preprocessor"><code class="docutils literal notranslate"><span class="pre">PreProcessorMixin.run_preprocessor()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="opera.pge.base.html#module-opera.pge.base.runconfig">opera.pge.base.runconfig module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="opera.pge.base.html#runconfig-py">runconfig.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="opera.pge.base.html#opera.pge.base.runconfig.BASE_PGE_SCHEMA"><code class="docutils literal notranslate"><span class="pre">BASE_PGE_SCHEMA</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="opera.pge.base.html#opera.pge.base.runconfig.RunConfig"><code class="docutils literal notranslate"><span class="pre">RunConfig</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.base.html#opera.pge.base.runconfig.RunConfig._filename"><code class="docutils literal notranslate"><span class="pre">RunConfig._filename</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.base.html#opera.pge.base.runconfig.RunConfig._run_config"><code class="docutils literal notranslate"><span class="pre">RunConfig._run_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.base.html#opera.pge.base.runconfig.RunConfig._pge_config"><code class="docutils literal notranslate"><span class="pre">RunConfig._pge_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.base.html#opera.pge.base.runconfig.RunConfig._sas_config"><code class="docutils literal notranslate"><span class="pre">RunConfig._sas_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.base.html#opera.pge.base.runconfig.RunConfig.algorithm_parameters_file_config_path"><code class="docutils literal notranslate"><span class="pre">RunConfig.algorithm_parameters_file_config_path</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.base.html#opera.pge.base.runconfig.RunConfig.algorithm_parameters_schema_path"><code class="docutils literal notranslate"><span class="pre">RunConfig.algorithm_parameters_schema_path</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.base.html#opera.pge.base.runconfig.RunConfig.ancillary_file_map"><code class="docutils literal notranslate"><span class="pre">RunConfig.ancillary_file_map</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.base.html#opera.pge.base.runconfig.RunConfig.asdict"><code class="docutils literal notranslate"><span class="pre">RunConfig.asdict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.base.html#opera.pge.base.runconfig.RunConfig.composite_release_id"><code class="docutils literal notranslate"><span class="pre">RunConfig.composite_release_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.base.html#opera.pge.base.runconfig.RunConfig.data_validity_start_date"><code class="docutils literal notranslate"><span class="pre">RunConfig.data_validity_start_date</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.base.html#opera.pge.base.runconfig.RunConfig.debug_switch"><code class="docutils literal notranslate"><span class="pre">RunConfig.debug_switch</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.base.html#opera.pge.base.runconfig.RunConfig.error_code_base"><code class="docutils literal notranslate"><span class="pre">RunConfig.error_code_base</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.base.html#opera.pge.base.runconfig.RunConfig.execute_via_shell"><code class="docutils literal notranslate"><span class="pre">RunConfig.execute_via_shell</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.base.html#opera.pge.base.runconfig.RunConfig.filename"><code class="docutils literal notranslate"><span class="pre">RunConfig.filename</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.base.html#opera.pge.base.runconfig.RunConfig.get_ancillary_filenames"><code class="docutils literal notranslate"><span class="pre">RunConfig.get_ancillary_filenames()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.base.html#opera.pge.base.runconfig.RunConfig.get_input_filenames"><code class="docutils literal notranslate"><span class="pre">RunConfig.get_input_filenames()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.base.html#opera.pge.base.runconfig.RunConfig.get_output_product_filenames"><code class="docutils literal notranslate"><span class="pre">RunConfig.get_output_product_filenames()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.base.html#opera.pge.base.runconfig.RunConfig.input_files"><code class="docutils literal notranslate"><span class="pre">RunConfig.input_files</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.base.html#opera.pge.base.runconfig.RunConfig.iso_measured_parameter_descriptions"><code class="docutils literal notranslate"><span class="pre">RunConfig.iso_measured_parameter_descriptions</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.base.html#opera.pge.base.runconfig.RunConfig.iso_template_path"><code class="docutils literal notranslate"><span class="pre">RunConfig.iso_template_path</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.base.html#opera.pge.base.runconfig.RunConfig.name"><code class="docutils literal notranslate"><span class="pre">RunConfig.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.base.html#opera.pge.base.runconfig.RunConfig.output_product_path"><code class="docutils literal notranslate"><span class="pre">RunConfig.output_product_path</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.base.html#opera.pge.base.runconfig.RunConfig.pge_name"><code class="docutils literal notranslate"><span class="pre">RunConfig.pge_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.base.html#opera.pge.base.runconfig.RunConfig.product_identifier"><code class="docutils literal notranslate"><span class="pre">RunConfig.product_identifier</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.base.html#opera.pge.base.runconfig.RunConfig.product_type"><code class="docutils literal notranslate"><span class="pre">RunConfig.product_type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.base.html#opera.pge.base.runconfig.RunConfig.product_version"><code class="docutils literal notranslate"><span class="pre">RunConfig.product_version</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.base.html#opera.pge.base.runconfig.RunConfig.qa_enabled"><code class="docutils literal notranslate"><span class="pre">RunConfig.qa_enabled</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.base.html#opera.pge.base.runconfig.RunConfig.qa_program_options"><code class="docutils literal notranslate"><span class="pre">RunConfig.qa_program_options</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.base.html#opera.pge.base.runconfig.RunConfig.qa_program_path"><code class="docutils literal notranslate"><span class="pre">RunConfig.qa_program_path</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.base.html#opera.pge.base.runconfig.RunConfig.sas_config"><code class="docutils literal notranslate"><span class="pre">RunConfig.sas_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.base.html#opera.pge.base.runconfig.RunConfig.sas_program_options"><code class="docutils literal notranslate"><span class="pre">RunConfig.sas_program_options</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.base.html#opera.pge.base.runconfig.RunConfig.sas_program_path"><code class="docutils literal notranslate"><span class="pre">RunConfig.sas_program_path</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.base.html#opera.pge.base.runconfig.RunConfig.sas_schema_path"><code class="docutils literal notranslate"><span class="pre">RunConfig.sas_schema_path</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.base.html#opera.pge.base.runconfig.RunConfig.scratch_path"><code class="docutils literal notranslate"><span class="pre">RunConfig.scratch_path</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.base.html#opera.pge.base.runconfig.RunConfig.validate"><code class="docutils literal notranslate"><span class="pre">RunConfig.validate()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="opera.pge.base.html#module-opera.pge.base">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="opera.pge.dswx_hls.html">opera.pge.dswx_hls package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="opera.pge.dswx_hls.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="opera.pge.dswx_hls.html#opera-pge-dswx-hls-dswx-hls-pge-module">opera.pge.dswx_hls.dswx_hls_pge module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="opera.pge.dswx_hls.html#module-contents">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="opera.pge.dswx_hls.html#module-opera.pge.dswx_hls.dswx_hls_pge">opera.pge.dswx_hls.dswx_hls_pge module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="opera.pge.dswx_hls.html#dswx-hls-pge-py">dswx_hls_pge.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="opera.pge.dswx_hls.html#opera.pge.dswx_hls.dswx_hls_pge.DSWxHLSExecutor"><code class="docutils literal notranslate"><span class="pre">DSWxHLSExecutor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.dswx_hls.html#opera.pge.dswx_hls.dswx_hls_pge.DSWxHLSExecutor.LEVEL"><code class="docutils literal notranslate"><span class="pre">DSWxHLSExecutor.LEVEL</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.dswx_hls.html#opera.pge.dswx_hls.dswx_hls_pge.DSWxHLSExecutor.NAME"><code class="docutils literal notranslate"><span class="pre">DSWxHLSExecutor.NAME</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.dswx_hls.html#opera.pge.dswx_hls.dswx_hls_pge.DSWxHLSExecutor.PGE_VERSION"><code class="docutils literal notranslate"><span class="pre">DSWxHLSExecutor.PGE_VERSION</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.dswx_hls.html#opera.pge.dswx_hls.dswx_hls_pge.DSWxHLSExecutor.SAS_VERSION"><code class="docutils literal notranslate"><span class="pre">DSWxHLSExecutor.SAS_VERSION</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="opera.pge.dswx_hls.html#opera.pge.dswx_hls.dswx_hls_pge.DSWxHLSPostProcessorMixin"><code class="docutils literal notranslate"><span class="pre">DSWxHLSPostProcessorMixin</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.dswx_hls.html#opera.pge.dswx_hls.dswx_hls_pge.DSWxHLSPostProcessorMixin.run_postprocessor"><code class="docutils literal notranslate"><span class="pre">DSWxHLSPostProcessorMixin.run_postprocessor()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="opera.pge.dswx_hls.html#opera.pge.dswx_hls.dswx_hls_pge.DSWxHLSPreProcessorMixin"><code class="docutils literal notranslate"><span class="pre">DSWxHLSPreProcessorMixin</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.dswx_hls.html#opera.pge.dswx_hls.dswx_hls_pge.DSWxHLSPreProcessorMixin.run_preprocessor"><code class="docutils literal notranslate"><span class="pre">DSWxHLSPreProcessorMixin.run_preprocessor()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="opera.pge.dswx_hls.html#module-opera.pge.dswx_hls">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="opera.pge.cslc_s1.html">opera.pge.cslc_s1 package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="opera.pge.cslc_s1.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="opera.pge.cslc_s1.html#opera-pge-cslc-s1-cslc-s1-pge-module">opera.pge.cslc_s1.cslc_s1_pge module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="opera.pge.cslc_s1.html#module-contents">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="opera.pge.cslc_s1.html#module-opera.pge.cslc_s1.cslc_s1_pge">opera.pge.cslc_s1.cslc_s1_pge module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="opera.pge.cslc_s1.html#cslc-s1-pge-py">cslc_s1_pge.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="opera.pge.cslc_s1.html#opera.pge.cslc_s1.cslc_s1_pge.CslcS1Executor"><code class="docutils literal notranslate"><span class="pre">CslcS1Executor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.cslc_s1.html#opera.pge.cslc_s1.cslc_s1_pge.CslcS1Executor.LEVEL"><code class="docutils literal notranslate"><span class="pre">CslcS1Executor.LEVEL</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.cslc_s1.html#opera.pge.cslc_s1.cslc_s1_pge.CslcS1Executor.NAME"><code class="docutils literal notranslate"><span class="pre">CslcS1Executor.NAME</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.cslc_s1.html#opera.pge.cslc_s1.cslc_s1_pge.CslcS1Executor.PGE_VERSION"><code class="docutils literal notranslate"><span class="pre">CslcS1Executor.PGE_VERSION</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.cslc_s1.html#opera.pge.cslc_s1.cslc_s1_pge.CslcS1Executor.SAS_VERSION"><code class="docutils literal notranslate"><span class="pre">CslcS1Executor.SAS_VERSION</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="opera.pge.cslc_s1.html#opera.pge.cslc_s1.cslc_s1_pge.CslcS1PostProcessorMixin"><code class="docutils literal notranslate"><span class="pre">CslcS1PostProcessorMixin</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.cslc_s1.html#opera.pge.cslc_s1.cslc_s1_pge.CslcS1PostProcessorMixin.run_postprocessor"><code class="docutils literal notranslate"><span class="pre">CslcS1PostProcessorMixin.run_postprocessor()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="opera.pge.cslc_s1.html#opera.pge.cslc_s1.cslc_s1_pge.CslcS1PreProcessorMixin"><code class="docutils literal notranslate"><span class="pre">CslcS1PreProcessorMixin</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.cslc_s1.html#opera.pge.cslc_s1.cslc_s1_pge.CslcS1PreProcessorMixin.run_preprocessor"><code class="docutils literal notranslate"><span class="pre">CslcS1PreProcessorMixin.run_preprocessor()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="opera.pge.cslc_s1.html#module-opera.pge.cslc_s1">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="opera.pge.rtc_s1.html">opera.pge.rtc_s1 package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="opera.pge.rtc_s1.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="opera.pge.rtc_s1.html#opera-pge-rtc-s1-rtc-s1-pge-module">opera.pge.rtc_s1.rtc_s1_pge module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="opera.pge.rtc_s1.html#module-contents">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="opera.pge.rtc_s1.html#module-opera.pge.rtc_s1.rtc_s1_pge">opera.pge.rtc_s1.rtc_s1_pge module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="opera.pge.rtc_s1.html#rtc-s1-pge-py">rtc_s1_pge.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="opera.pge.rtc_s1.html#opera.pge.rtc_s1.rtc_s1_pge.RtcS1Executor"><code class="docutils literal notranslate"><span class="pre">RtcS1Executor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.rtc_s1.html#opera.pge.rtc_s1.rtc_s1_pge.RtcS1Executor.LEVEL"><code class="docutils literal notranslate"><span class="pre">RtcS1Executor.LEVEL</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.rtc_s1.html#opera.pge.rtc_s1.rtc_s1_pge.RtcS1Executor.NAME"><code class="docutils literal notranslate"><span class="pre">RtcS1Executor.NAME</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.rtc_s1.html#opera.pge.rtc_s1.rtc_s1_pge.RtcS1Executor.PGE_VERSION"><code class="docutils literal notranslate"><span class="pre">RtcS1Executor.PGE_VERSION</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.rtc_s1.html#opera.pge.rtc_s1.rtc_s1_pge.RtcS1Executor.SAS_VERSION"><code class="docutils literal notranslate"><span class="pre">RtcS1Executor.SAS_VERSION</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.rtc_s1.html#opera.pge.rtc_s1.rtc_s1_pge.RtcS1Executor.SOURCE"><code class="docutils literal notranslate"><span class="pre">RtcS1Executor.SOURCE</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="opera.pge.rtc_s1.html#opera.pge.rtc_s1.rtc_s1_pge.RtcS1PostProcessorMixin"><code class="docutils literal notranslate"><span class="pre">RtcS1PostProcessorMixin</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.rtc_s1.html#opera.pge.rtc_s1.rtc_s1_pge.RtcS1PostProcessorMixin.run_postprocessor"><code class="docutils literal notranslate"><span class="pre">RtcS1PostProcessorMixin.run_postprocessor()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="opera.pge.rtc_s1.html#opera.pge.rtc_s1.rtc_s1_pge.RtcS1PreProcessorMixin"><code class="docutils literal notranslate"><span class="pre">RtcS1PreProcessorMixin</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.rtc_s1.html#opera.pge.rtc_s1.rtc_s1_pge.RtcS1PreProcessorMixin.run_preprocessor"><code class="docutils literal notranslate"><span class="pre">RtcS1PreProcessorMixin.run_preprocessor()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="opera.pge.rtc_s1.html#module-opera.pge.rtc_s1">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="opera.pge.dswx_s1.html">opera.pge.dswx_s1 package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="opera.pge.dswx_s1.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="opera.pge.dswx_s1.html#opera-pge-dswx-s1-dswx-s1-pge-module">opera.pge.dswx_s1.dswx_s1_pge module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="opera.pge.dswx_s1.html#module-contents">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="opera.pge.dswx_s1.html#module-opera.pge.dswx_s1.dswx_s1_pge">opera.pge.dswx_s1.dswx_s1_pge module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="opera.pge.dswx_s1.html#dswx-s1-pge-py">dswx_s1_pge.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="opera.pge.dswx_s1.html#opera.pge.dswx_s1.dswx_s1_pge.DSWxS1Executor"><code class="docutils literal notranslate"><span class="pre">DSWxS1Executor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.dswx_s1.html#opera.pge.dswx_s1.dswx_s1_pge.DSWxS1Executor.LEVEL"><code class="docutils literal notranslate"><span class="pre">DSWxS1Executor.LEVEL</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.dswx_s1.html#opera.pge.dswx_s1.dswx_s1_pge.DSWxS1Executor.NAME"><code class="docutils literal notranslate"><span class="pre">DSWxS1Executor.NAME</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.dswx_s1.html#opera.pge.dswx_s1.dswx_s1_pge.DSWxS1Executor.PGE_VERSION"><code class="docutils literal notranslate"><span class="pre">DSWxS1Executor.PGE_VERSION</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.dswx_s1.html#opera.pge.dswx_s1.dswx_s1_pge.DSWxS1Executor.SAS_VERSION"><code class="docutils literal notranslate"><span class="pre">DSWxS1Executor.SAS_VERSION</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="opera.pge.dswx_s1.html#opera.pge.dswx_s1.dswx_s1_pge.DSWxS1PostProcessorMixin"><code class="docutils literal notranslate"><span class="pre">DSWxS1PostProcessorMixin</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.dswx_s1.html#opera.pge.dswx_s1.dswx_s1_pge.DSWxS1PostProcessorMixin.run_postprocessor"><code class="docutils literal notranslate"><span class="pre">DSWxS1PostProcessorMixin.run_postprocessor()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="opera.pge.dswx_s1.html#opera.pge.dswx_s1.dswx_s1_pge.DSWxS1PreProcessorMixin"><code class="docutils literal notranslate"><span class="pre">DSWxS1PreProcessorMixin</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.dswx_s1.html#opera.pge.dswx_s1.dswx_s1_pge.DSWxS1PreProcessorMixin.run_preprocessor"><code class="docutils literal notranslate"><span class="pre">DSWxS1PreProcessorMixin.run_preprocessor()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="opera.pge.dswx_s1.html#module-opera.pge.dswx_s1">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="opera.pge.disp_s1.html">opera.pge.disp_s1 package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="opera.pge.disp_s1.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="opera.pge.disp_s1.html#opera-pge-disp-s1-disp-s1-pge-module">opera.pge.disp_s1.disp_s1_pge module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="opera.pge.disp_s1.html#module-contents">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="opera.pge.disp_s1.html#module-opera.pge.disp_s1.disp_s1_pge">opera.pge.disp_s1.disp_s1_pge module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="opera.pge.disp_s1.html#disp-s1-pge-py">disp_s1_pge.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="opera.pge.disp_s1.html#opera.pge.disp_s1.disp_s1_pge.DispS1Executor"><code class="docutils literal notranslate"><span class="pre">DispS1Executor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.disp_s1.html#opera.pge.disp_s1.disp_s1_pge.DispS1Executor.LEVEL"><code class="docutils literal notranslate"><span class="pre">DispS1Executor.LEVEL</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.disp_s1.html#opera.pge.disp_s1.disp_s1_pge.DispS1Executor.NAME"><code class="docutils literal notranslate"><span class="pre">DispS1Executor.NAME</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.disp_s1.html#opera.pge.disp_s1.disp_s1_pge.DispS1Executor.PGE_VERSION"><code class="docutils literal notranslate"><span class="pre">DispS1Executor.PGE_VERSION</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.disp_s1.html#opera.pge.disp_s1.disp_s1_pge.DispS1Executor.SAS_VERSION"><code class="docutils literal notranslate"><span class="pre">DispS1Executor.SAS_VERSION</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="opera.pge.disp_s1.html#opera.pge.disp_s1.disp_s1_pge.DispS1PostProcessorMixin"><code class="docutils literal notranslate"><span class="pre">DispS1PostProcessorMixin</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.disp_s1.html#opera.pge.disp_s1.disp_s1_pge.DispS1PostProcessorMixin.run_postprocessor"><code class="docutils literal notranslate"><span class="pre">DispS1PostProcessorMixin.run_postprocessor()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="opera.pge.disp_s1.html#opera.pge.disp_s1.disp_s1_pge.DispS1PreProcessorMixin"><code class="docutils literal notranslate"><span class="pre">DispS1PreProcessorMixin</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.disp_s1.html#opera.pge.disp_s1.disp_s1_pge.DispS1PreProcessorMixin.convert_troposphere_model_files"><code class="docutils literal notranslate"><span class="pre">DispS1PreProcessorMixin.convert_troposphere_model_files()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.disp_s1.html#opera.pge.disp_s1.disp_s1_pge.DispS1PreProcessorMixin.run_preprocessor"><code class="docutils literal notranslate"><span class="pre">DispS1PreProcessorMixin.run_preprocessor()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="opera.pge.disp_s1.html#opera.pge.disp_s1.disp_s1_pge.DispS1StaticExecutor"><code class="docutils literal notranslate"><span class="pre">DispS1StaticExecutor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.disp_s1.html#opera.pge.disp_s1.disp_s1_pge.DispS1StaticExecutor.NAME"><code class="docutils literal notranslate"><span class="pre">DispS1StaticExecutor.NAME</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="opera.pge.disp_s1.html#opera.pge.disp_s1.disp_s1_pge.DispS1StaticPostProcessorMixin"><code class="docutils literal notranslate"><span class="pre">DispS1StaticPostProcessorMixin</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="opera.pge.disp_s1.html#opera.pge.disp_s1.disp_s1_pge.DispS1StaticPreProcessorMixin"><code class="docutils literal notranslate"><span class="pre">DispS1StaticPreProcessorMixin</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.disp_s1.html#opera.pge.disp_s1.disp_s1_pge.DispS1StaticPreProcessorMixin.run_preprocessor"><code class="docutils literal notranslate"><span class="pre">DispS1StaticPreProcessorMixin.run_preprocessor()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="opera.pge.disp_s1.html#module-opera.pge.disp_s1">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="opera.pge.dswx_ni.html">opera.pge.dswx_ni package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="opera.pge.dswx_ni.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="opera.pge.dswx_ni.html#opera-pge-dswx-ni-dswx-ni-pge-module">opera.pge.dswx_ni.dswx_ni_pge module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="opera.pge.dswx_ni.html#module-contents">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="opera.pge.dswx_ni.html#module-opera.pge.dswx_ni.dswx_ni_pge">opera.pge.dswx_ni.dswx_ni_pge module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="opera.pge.dswx_ni.html#dswx-ni-pge-py">dswx_ni_pge.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="opera.pge.dswx_ni.html#opera.pge.dswx_ni.dswx_ni_pge.DSWxNIExecutor"><code class="docutils literal notranslate"><span class="pre">DSWxNIExecutor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.dswx_ni.html#opera.pge.dswx_ni.dswx_ni_pge.DSWxNIExecutor.LEVEL"><code class="docutils literal notranslate"><span class="pre">DSWxNIExecutor.LEVEL</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.dswx_ni.html#opera.pge.dswx_ni.dswx_ni_pge.DSWxNIExecutor.NAME"><code class="docutils literal notranslate"><span class="pre">DSWxNIExecutor.NAME</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.dswx_ni.html#opera.pge.dswx_ni.dswx_ni_pge.DSWxNIExecutor.PGE_VERSION"><code class="docutils literal notranslate"><span class="pre">DSWxNIExecutor.PGE_VERSION</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.dswx_ni.html#opera.pge.dswx_ni.dswx_ni_pge.DSWxNIExecutor.SAS_VERSION"><code class="docutils literal notranslate"><span class="pre">DSWxNIExecutor.SAS_VERSION</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="opera.pge.dswx_ni.html#opera.pge.dswx_ni.dswx_ni_pge.DSWxNIPostProcessorMixin"><code class="docutils literal notranslate"><span class="pre">DSWxNIPostProcessorMixin</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.dswx_ni.html#opera.pge.dswx_ni.dswx_ni_pge.DSWxNIPostProcessorMixin.run_postprocessor"><code class="docutils literal notranslate"><span class="pre">DSWxNIPostProcessorMixin.run_postprocessor()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="opera.pge.dswx_ni.html#opera.pge.dswx_ni.dswx_ni_pge.DSWxNIPreProcessorMixin"><code class="docutils literal notranslate"><span class="pre">DSWxNIPreProcessorMixin</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.dswx_ni.html#opera.pge.dswx_ni.dswx_ni_pge.DSWxNIPreProcessorMixin.run_preprocessor"><code class="docutils literal notranslate"><span class="pre">DSWxNIPreProcessorMixin.run_preprocessor()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="opera.pge.dswx_ni.html#module-opera.pge.dswx_ni">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="opera.pge.dist_s1.html">opera.pge.dist_s1 package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="opera.pge.dist_s1.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="opera.pge.dist_s1.html#opera-pge-dist-s1-dist-s1-pge-module">opera.pge.dist_s1.dist_s1_pge module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="opera.pge.dist_s1.html#module-contents">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="opera.pge.dist_s1.html#module-opera.pge.dist_s1.dist_s1_pge">opera.pge.dist_s1.dist_s1_pge module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="opera.pge.dist_s1.html#dist-s1-pge-py">dist_s1_pge.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="opera.pge.dist_s1.html#opera.pge.dist_s1.dist_s1_pge.DistS1Executor"><code class="docutils literal notranslate"><span class="pre">DistS1Executor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.dist_s1.html#opera.pge.dist_s1.dist_s1_pge.DistS1Executor.LEVEL"><code class="docutils literal notranslate"><span class="pre">DistS1Executor.LEVEL</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.dist_s1.html#opera.pge.dist_s1.dist_s1_pge.DistS1Executor.NAME"><code class="docutils literal notranslate"><span class="pre">DistS1Executor.NAME</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.dist_s1.html#opera.pge.dist_s1.dist_s1_pge.DistS1Executor.PGE_VERSION"><code class="docutils literal notranslate"><span class="pre">DistS1Executor.PGE_VERSION</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.dist_s1.html#opera.pge.dist_s1.dist_s1_pge.DistS1Executor.SAS_VERSION"><code class="docutils literal notranslate"><span class="pre">DistS1Executor.SAS_VERSION</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="opera.pge.dist_s1.html#opera.pge.dist_s1.dist_s1_pge.DistS1PostProcessorMixin"><code class="docutils literal notranslate"><span class="pre">DistS1PostProcessorMixin</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.dist_s1.html#opera.pge.dist_s1.dist_s1_pge.DistS1PostProcessorMixin.run_postprocessor"><code class="docutils literal notranslate"><span class="pre">DistS1PostProcessorMixin.run_postprocessor()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="opera.pge.dist_s1.html#opera.pge.dist_s1.dist_s1_pge.DistS1PreProcessorMixin"><code class="docutils literal notranslate"><span class="pre">DistS1PreProcessorMixin</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.dist_s1.html#opera.pge.dist_s1.dist_s1_pge.DistS1PreProcessorMixin.run_preprocessor"><code class="docutils literal notranslate"><span class="pre">DistS1PreProcessorMixin.run_preprocessor()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="opera.pge.dist_s1.html#module-opera.pge.dist_s1">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="opera.pge.tropo.html">opera.pge.tropo package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="opera.pge.tropo.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="opera.pge.tropo.html#opera-pge-tropo-tropo-pge-module">opera.pge.tropo.tropo_pge module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="opera.pge.tropo.html#module-contents">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="opera.pge.tropo.html#module-opera.pge.tropo.tropo_pge">opera.pge.tropo.tropo_pge module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="opera.pge.tropo.html#tropo-pge-py">tropo_pge.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="opera.pge.tropo.html#opera.pge.tropo.tropo_pge.TROPOExecutor"><code class="docutils literal notranslate"><span class="pre">TROPOExecutor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.tropo.html#opera.pge.tropo.tropo_pge.TROPOExecutor.LEVEL"><code class="docutils literal notranslate"><span class="pre">TROPOExecutor.LEVEL</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.tropo.html#opera.pge.tropo.tropo_pge.TROPOExecutor.NAME"><code class="docutils literal notranslate"><span class="pre">TROPOExecutor.NAME</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.tropo.html#opera.pge.tropo.tropo_pge.TROPOExecutor.PGE_VERSION"><code class="docutils literal notranslate"><span class="pre">TROPOExecutor.PGE_VERSION</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.tropo.html#opera.pge.tropo.tropo_pge.TROPOExecutor.SAS_VERSION"><code class="docutils literal notranslate"><span class="pre">TROPOExecutor.SAS_VERSION</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="opera.pge.tropo.html#opera.pge.tropo.tropo_pge.TROPOPostProcessorMixin"><code class="docutils literal notranslate"><span class="pre">TROPOPostProcessorMixin</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.tropo.html#opera.pge.tropo.tropo_pge.TROPOPostProcessorMixin.run_postprocessor"><code class="docutils literal notranslate"><span class="pre">TROPOPostProcessorMixin.run_postprocessor()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="opera.pge.tropo.html#opera.pge.tropo.tropo_pge.TROPOPreProcessorMixin"><code class="docutils literal notranslate"><span class="pre">TROPOPreProcessorMixin</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.tropo.html#opera.pge.tropo.tropo_pge.TROPOPreProcessorMixin.run_preprocessor"><code class="docutils literal notranslate"><span class="pre">TROPOPreProcessorMixin.run_preprocessor()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="opera.pge.tropo.html#module-opera.pge.tropo">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="opera.pge.disp_ni.html">opera.pge.disp_ni package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="opera.pge.disp_ni.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="opera.pge.disp_ni.html#opera-pge-disp-ni-disp-ni-pge-module">opera.pge.disp_ni.disp_ni_pge module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="opera.pge.disp_ni.html#module-contents">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="opera.pge.disp_ni.html#module-opera.pge.disp_ni.disp_ni_pge">opera.pge.disp_ni.disp_ni_pge module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="opera.pge.disp_ni.html#disp-ni-pge-py">disp_ni_pge.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="opera.pge.disp_ni.html#opera.pge.disp_ni.disp_ni_pge.DispNIExecutor"><code class="docutils literal notranslate"><span class="pre">DispNIExecutor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.disp_ni.html#opera.pge.disp_ni.disp_ni_pge.DispNIExecutor.LEVEL"><code class="docutils literal notranslate"><span class="pre">DispNIExecutor.LEVEL</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.disp_ni.html#opera.pge.disp_ni.disp_ni_pge.DispNIExecutor.NAME"><code class="docutils literal notranslate"><span class="pre">DispNIExecutor.NAME</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.disp_ni.html#opera.pge.disp_ni.disp_ni_pge.DispNIExecutor.PGE_VERSION"><code class="docutils literal notranslate"><span class="pre">DispNIExecutor.PGE_VERSION</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.disp_ni.html#opera.pge.disp_ni.disp_ni_pge.DispNIExecutor.SAS_VERSION"><code class="docutils literal notranslate"><span class="pre">DispNIExecutor.SAS_VERSION</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="opera.pge.disp_ni.html#opera.pge.disp_ni.disp_ni_pge.DispNIPostProcessorMixin"><code class="docutils literal notranslate"><span class="pre">DispNIPostProcessorMixin</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.disp_ni.html#opera.pge.disp_ni.disp_ni_pge.DispNIPostProcessorMixin.run_postprocessor"><code class="docutils literal notranslate"><span class="pre">DispNIPostProcessorMixin.run_postprocessor()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="opera.pge.disp_ni.html#opera.pge.disp_ni.disp_ni_pge.DispNIPreProcessorMixin"><code class="docutils literal notranslate"><span class="pre">DispNIPreProcessorMixin</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.disp_ni.html#opera.pge.disp_ni.disp_ni_pge.DispNIPreProcessorMixin.run_preprocessor"><code class="docutils literal notranslate"><span class="pre">DispNIPreProcessorMixin.run_preprocessor()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="opera.pge.disp_ni.html#module-opera.pge.disp_ni">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="opera.pge.cal_disp.html">opera.pge.cal_disp package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="opera.pge.cal_disp.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="opera.pge.cal_disp.html#opera-pge-cal-disp-cal-disp-pge-module">opera.pge.cal_disp.cal_disp_pge module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="opera.pge.cal_disp.html#module-contents">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="opera.pge.cal_disp.html#module-opera.pge.cal_disp.cal_disp_pge">opera.pge.cal_disp.cal_disp_pge module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="opera.pge.cal_disp.html#cal-disp-pge-py">cal_disp_pge.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="opera.pge.cal_disp.html#opera.pge.cal_disp.cal_disp_pge.CalDispExecutor"><code class="docutils literal notranslate"><span class="pre">CalDispExecutor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.cal_disp.html#opera.pge.cal_disp.cal_disp_pge.CalDispExecutor.LEVEL"><code class="docutils literal notranslate"><span class="pre">CalDispExecutor.LEVEL</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.cal_disp.html#opera.pge.cal_disp.cal_disp_pge.CalDispExecutor.NAME"><code class="docutils literal notranslate"><span class="pre">CalDispExecutor.NAME</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.cal_disp.html#opera.pge.cal_disp.cal_disp_pge.CalDispExecutor.SAS_VERSION"><code class="docutils literal notranslate"><span class="pre">CalDispExecutor.SAS_VERSION</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="opera.pge.cal_disp.html#opera.pge.cal_disp.cal_disp_pge.CalDispPostProcessorMixin"><code class="docutils literal notranslate"><span class="pre">CalDispPostProcessorMixin</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.cal_disp.html#opera.pge.cal_disp.cal_disp_pge.CalDispPostProcessorMixin.run_postprocessor"><code class="docutils literal notranslate"><span class="pre">CalDispPostProcessorMixin.run_postprocessor()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="opera.pge.cal_disp.html#opera.pge.cal_disp.cal_disp_pge.CalDispPreProcessorMixin"><code class="docutils literal notranslate"><span class="pre">CalDispPreProcessorMixin</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="opera.pge.cal_disp.html#opera.pge.cal_disp.cal_disp_pge.CalDispPreProcessorMixin.run_preprocessor"><code class="docutils literal notranslate"><span class="pre">CalDispPreProcessorMixin.run_preprocessor()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="opera.pge.cal_disp.html#module-opera.pge.cal_disp">Module contents</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </section>
-<section id="module-contents">
-<h2>Module contents<a class="headerlink" href="#module-contents" title="Permalink to this heading"></a></h2>
+<section id="module-opera.pge">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-opera.pge" title="Link to this heading"></a></h2>
+<section id="pge">
+<h3>pge<a class="headerlink" href="#pge" title="Link to this heading"></a></h3>
+<p>Contains modules for stand-up and execution of a PGE application.</p>
+</section>
 </section>
 </section>
 

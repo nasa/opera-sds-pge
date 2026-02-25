@@ -1,20 +1,20 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera.pge.tropo.tropo_pge &mdash; opera-sds-pge 6.0.0-er.3.0 documentation</title>
+  <title>opera.pge.tropo.tropo_pge &mdash; opera-sds-pge 7.0.0-er.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
-      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
 
   
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=62ba114d"></script>
-      <script src="../../../../_static/doctools.js?v=888ff710"></script>
-      <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="../../../../_static/documentation_options.js?v=d4e30586"></script>
+      <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
@@ -82,19 +82,24 @@
 <span class="sd">Module defining the implementation for the TROPO PGE.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">os.path</span><span class="w"> </span><span class="kn">import</span> <span class="n">abspath</span><span class="p">,</span> <span class="n">basename</span><span class="p">,</span> <span class="n">exists</span><span class="p">,</span> <span class="n">getsize</span><span class="p">,</span> <span class="n">join</span><span class="p">,</span> <span class="n">splitext</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">os</span><span class="w"> </span><span class="kn">import</span> <span class="n">listdir</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">os</span><span class="w"> </span><span class="kn">import</span> <span class="n">listdir</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">os.path</span><span class="w"> </span><span class="kn">import</span> <span class="n">abspath</span><span class="p">,</span> <span class="n">basename</span><span class="p">,</span> <span class="n">getsize</span><span class="p">,</span> <span class="n">join</span><span class="p">,</span> <span class="n">splitext</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">opera.pge.base.base_pge</span><span class="w"> </span><span class="kn">import</span> <span class="n">PgeExecutor</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">opera.pge.base.base_pge</span><span class="w"> </span><span class="kn">import</span> <span class="n">PostProcessorMixin</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">opera.pge.base.base_pge</span><span class="w"> </span><span class="kn">import</span> <span class="n">PreProcessorMixin</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.error_codes</span><span class="w"> </span><span class="kn">import</span> <span class="n">ErrorCode</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.h5_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_extent_from_coordinates</span><span class="p">,</span> <span class="n">get_tropo_product_metadata</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.input_validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_input</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.render_jinja2</span><span class="w"> </span><span class="kn">import</span> <span class="n">augment_hdf5_measured_parameters</span><span class="p">,</span> <span class="n">render_jinja2</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.run_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_checksum</span>
 
 
-<div class="viewcode-block" id="TROPOPreProcessorMixin"><a class="viewcode-back" href="../../../../opera.pge.tropo.html#opera.pge.tropo.tropo_pge.TROPOPreProcessorMixin">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">TROPOPreProcessorMixin</span><span class="p">(</span><span class="n">PreProcessorMixin</span><span class="p">):</span>
+<div class="viewcode-block" id="TROPOPreProcessorMixin">
+<a class="viewcode-back" href="../../../../opera.pge.tropo.html#opera.pge.tropo.tropo_pge.TROPOPreProcessorMixin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TROPOPreProcessorMixin</span><span class="p">(</span><span class="n">PreProcessorMixin</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Mixin class responsible for handling all pre-processing steps for the TROPO</span>
 <span class="sd">    PGE. The pre-processing phase is defined as all steps necessary prior</span>
@@ -107,7 +112,9 @@
 
     <span class="n">_pre_mixin_name</span> <span class="o">=</span> <span class="s2">&quot;TROPOPreProcessorMixin&quot;</span>
 
-<div class="viewcode-block" id="TROPOPreProcessorMixin.run_preprocessor"><a class="viewcode-back" href="../../../../opera.pge.tropo.html#opera.pge.tropo.tropo_pge.TROPOPreProcessorMixin.run_preprocessor">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">run_preprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="TROPOPreProcessorMixin.run_preprocessor">
+<a class="viewcode-back" href="../../../../opera.pge.tropo.html#opera.pge.tropo.tropo_pge.TROPOPreProcessorMixin.run_preprocessor">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run_preprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Executes the pre-processing steps for TROPO PGE initialization.</span>
 <span class="sd">        The TROPOPreProcessorMixin version of this class performs all actions</span>
@@ -120,18 +127,22 @@
 <span class="sd">            Any keyword arguments needed by the pre-processor</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">run_preprocessor</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        
+
         <span class="k">for</span> <span class="n">input_file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">input_files</span><span class="p">:</span>
             <span class="n">check_input</span><span class="p">(</span>
                 <span class="n">input_file</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> 
-                <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">pge_name</span><span class="p">,</span> 
-                <span class="n">valid_extensions</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;.nc&quot;</span><span class="p">,),</span> 
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">pge_name</span><span class="p">,</span>
+                <span class="n">valid_extensions</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;.nc&quot;</span><span class="p">,),</span>
                 <span class="n">check_zero_size</span><span class="o">=</span><span class="kc">True</span>
-            <span class="p">)</span></div></div>
+            <span class="p">)</span></div>
+</div>
 
 
-<div class="viewcode-block" id="TROPOPostProcessorMixin"><a class="viewcode-back" href="../../../../opera.pge.tropo.html#opera.pge.tropo.tropo_pge.TROPOPostProcessorMixin">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">TROPOPostProcessorMixin</span><span class="p">(</span><span class="n">PostProcessorMixin</span><span class="p">):</span>
+
+<div class="viewcode-block" id="TROPOPostProcessorMixin">
+<a class="viewcode-back" href="../../../../opera.pge.tropo.html#opera.pge.tropo.tropo_pge.TROPOPostProcessorMixin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TROPOPostProcessorMixin</span><span class="p">(</span><span class="n">PostProcessorMixin</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Mixin class responsible for handling all post-processing steps for the TROPO</span>
 <span class="sd">    PGE. The post-processing phase is defined as all steps required after SAS</span>
@@ -143,9 +154,9 @@
 
     <span class="n">_post_mixin_name</span> <span class="o">=</span> <span class="s2">&quot;TROPOPostProcessorMixin&quot;</span>
     <span class="n">_cached_core_filename</span> <span class="o">=</span> <span class="kc">None</span>
-    
+
     <span class="n">_expected_extensions</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;.nc&#39;</span><span class="p">,</span> <span class="s1">&#39;.png&#39;</span><span class="p">)</span>
-        
+
     <span class="k">def</span><span class="w"> </span><span class="nf">_validate_outputs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Confirms that there exists one and only of each expected output type.</span>
@@ -159,7 +170,7 @@
 
         <span class="n">output_product_path</span> <span class="o">=</span> <span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">output_product_path</span><span class="p">)</span>
         <span class="n">output_product_files</span> <span class="o">=</span> <span class="n">listdir</span><span class="p">(</span><span class="n">output_product_path</span><span class="p">)</span>
-        
+
         <span class="c1"># Confirm one and only one of each expected output type</span>
         <span class="k">for</span> <span class="n">filename_ext</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_expected_extensions</span><span class="p">:</span>
             <span class="n">gen</span> <span class="o">=</span> <span class="p">(</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">output_product_files</span> <span class="k">if</span> <span class="n">splitext</span><span class="p">(</span><span class="n">f</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">filename_ext</span><span class="p">)</span>
@@ -168,7 +179,7 @@
             <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
                 <span class="n">error_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Could not locate </span><span class="si">{</span><span class="n">filename_ext</span><span class="si">}</span><span class="s2"> file.&quot;</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">OUTPUT_NOT_FOUND</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">)</span>
-                
+
             <span class="c1"># Check for second file, if found raise error</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="nb">next</span><span class="p">(</span><span class="n">gen</span><span class="p">)</span>
@@ -176,22 +187,25 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INVALID_OUTPUT</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
                 <span class="k">pass</span>
-            
+
             <span class="c1"># Validate the one file found for this extension</span>
             <span class="n">output_filepath</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">output_product_path</span><span class="p">,</span> <span class="n">output_filename</span><span class="p">)</span>
-            
+
             <span class="c1"># Check file size</span>
             <span class="n">file_size</span> <span class="o">=</span> <span class="n">getsize</span><span class="p">(</span><span class="n">output_filepath</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">file_size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">error_msg</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Output file </span><span class="si">{</span><span class="n">output_filename</span><span class="si">}</span><span class="s2"> size is </span><span class="si">{</span><span class="n">file_size</span><span class="si">}</span><span class="s2">. &quot;</span>
                         <span class="s2">&quot;Size must be greater than 0.&quot;</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INVALID_OUTPUT</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">)</span>
-            
+
             <span class="c1"># Check filename matches expected pattern</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="nb">bool</span><span class="p">(</span><span class="n">filename_pattern</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">splitext</span><span class="p">(</span><span class="n">output_filename</span><span class="p">)[</span><span class="mi">0</span><span class="p">])):</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">filename_pattern</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">splitext</span><span class="p">(</span><span class="n">output_filename</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">bool</span><span class="p">(</span><span class="n">match</span><span class="p">):</span>
                 <span class="n">error_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Invalid product filename </span><span class="si">{</span><span class="n">output_filename</span><span class="si">}</span><span class="s1">&#39;</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INVALID_OUTPUT</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">)</span>
-                
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Cache the core filename for later use</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_cached_core_filename</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_checksum_output_products</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -226,7 +240,315 @@
 
         <span class="k">return</span> <span class="n">checksums</span>
 
-<div class="viewcode-block" id="TROPOPostProcessorMixin.run_postprocessor"><a class="viewcode-back" href="../../../../opera.pge.tropo.html#opera.pge.tropo.tropo_pge.TROPOPostProcessorMixin.run_postprocessor">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">run_postprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_parse_temporal_resolution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time_res</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Converts a time resolution string of the format &quot;{value}{unit}&quot;</span>
+<span class="sd">        to a datetime timedelta object. TROPO products define a</span>
+<span class="sd">        temporal_resolution metadata attribute, ex: &quot;6h&quot;.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        time_res : str</span>
+<span class="sd">            Contents of the temporal_resolution attribute from a TROPO</span>
+<span class="sd">            output NetCDF product.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        ----------</span>
+<span class="sd">        time_delta : timedelta</span>
+<span class="sd">            Datetime timedelta object used to compute the end time of</span>
+<span class="sd">            a TROPO output product.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If time_res is not a valid time format string.</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If time unit extracted from time_res is not one of the</span>
+<span class="sd">            supported units: s, m, h, d, w.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(\d+)([smhdw])&#39;</span><span class="p">,</span> <span class="n">time_res</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">match</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid temporal resolution format: </span><span class="si">{</span><span class="n">time_res</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">value</span><span class="p">,</span> <span class="n">unit</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">groups</span><span class="p">()</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+        <span class="n">unit_map</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;s&#39;</span><span class="p">:</span> <span class="s1">&#39;seconds&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;m&#39;</span><span class="p">:</span> <span class="s1">&#39;minutes&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;h&#39;</span><span class="p">:</span> <span class="s1">&#39;hours&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;d&#39;</span><span class="p">:</span> <span class="s1">&#39;days&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;w&#39;</span><span class="p">:</span> <span class="s1">&#39;weeks&#39;</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="k">if</span> <span class="n">unit</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unit_map</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported time unit: </span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">time_delta</span> <span class="o">=</span> <span class="n">timedelta</span><span class="p">(</span><span class="o">**</span><span class="p">{</span><span class="n">unit_map</span><span class="p">[</span><span class="n">unit</span><span class="p">]:</span> <span class="n">value</span><span class="p">})</span>
+        <span class="k">return</span> <span class="n">time_delta</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_collect_tropo_product_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tropo_product</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gathers the available metadata from a sample output TROPO product for</span>
+<span class="sd">        use in filling out the ISO metadata template fro the TROPO pge.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        tropo_product : str</span>
+<span class="sd">            Path to the TROPO NetCDF product to collect metadata from.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        output_product_metadata : dict</span>
+<span class="sd">            Dictionary containing TROPO output product metadata, formatted</span>
+<span class="sd">            for use with the ISO metadata Jinja2 template.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">output_product_metadata</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">measured_parameters</span> <span class="o">=</span> <span class="n">get_tropo_product_metadata</span><span class="p">(</span><span class="n">tropo_product</span><span class="p">)</span>
+            <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;MeasuredParameters&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">augment_hdf5_measured_parameters</span><span class="p">(</span>
+                <span class="n">measured_parameters</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">iso_measured_parameter_descriptions</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Failed to extract metadata from </span><span class="si">{</span><span class="n">tropo_product</span><span class="si">}</span><span class="s1">, reason: </span><span class="si">{</span><span class="n">err</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">ISO_METADATA_COULD_NOT_EXTRACT_METADATA</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+
+        <span class="c1"># Determine time bounds</span>
+        <span class="n">ref_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span><span class="n">measured_parameters</span><span class="p">[</span><span class="s2">&quot;reference_time&quot;</span><span class="p">])</span>
+        <span class="n">time_res_delta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_temporal_resolution</span><span class="p">(</span><span class="n">measured_parameters</span><span class="p">[</span><span class="s2">&quot;temporal_resolution&quot;</span><span class="p">])</span>
+
+        <span class="c1"># TODO: end_time needs confirmation</span>
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;temporal_extent&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;start_time&#39;</span><span class="p">:</span> <span class="n">ref_time</span><span class="p">,</span>
+            <span class="s1">&#39;end_time&#39;</span><span class="p">:</span> <span class="n">ref_time</span> <span class="o">+</span> <span class="n">time_res_delta</span>
+        <span class="p">}</span>
+
+        <span class="n">spatial_extent</span> <span class="o">=</span> <span class="n">get_extent_from_coordinates</span><span class="p">(</span><span class="n">tropo_product</span><span class="p">,</span> <span class="s2">&quot;/&quot;</span><span class="p">)</span>
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;spatial_extent&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;lon_min&#39;</span><span class="p">:</span> <span class="n">spatial_extent</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="s1">&#39;lon_max&#39;</span><span class="p">:</span> <span class="n">spatial_extent</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="s1">&#39;lat_min&#39;</span><span class="p">:</span> <span class="n">spatial_extent</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+            <span class="s1">&#39;lat_max&#39;</span><span class="p">:</span> <span class="n">spatial_extent</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+        <span class="p">}</span>
+
+        <span class="c1"># TODO: this is a placeholder</span>
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s2">&quot;zone_identifier&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;global&quot;</span>
+
+        <span class="c1"># TODO: spacing value needs confirmation</span>
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;xCoordinates&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="mi">5120</span><span class="p">,</span>
+            <span class="s1">&#39;spacing&#39;</span><span class="p">:</span> <span class="mi">8000</span> <span class="c1"># 0.07 degrees is ~8km</span>
+        <span class="p">}</span>
+        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;yCoordinates&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="mi">2560</span><span class="p">,</span>
+            <span class="s1">&#39;spacing&#39;</span><span class="p">:</span> <span class="mi">8000</span> <span class="c1"># 0.07 degrees is ~8km</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">output_product_metadata</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_custom_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">granule_filename</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates the &quot;custom data&quot; dictionary used with the ISO metadata rendering.</span>
+
+<span class="sd">        Custom data contains all metadata information needed for the ISO template</span>
+<span class="sd">        that is not found within any of the other metadata sources (such as the</span>
+<span class="sd">        RunConfig, output product(s), or catalog metadata).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        custom_metadata : dict</span>
+<span class="sd">            Dictionary containing the custom metadata as expected by the ISO</span>
+<span class="sd">            metadata Jinja2 template.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">custom_metadata</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;ISO_OPERA_FilePackageName&#39;</span><span class="p">:</span> <span class="n">granule_filename</span><span class="p">,</span>
+            <span class="s1">&#39;ISO_OPERA_ProducerGranuleId&#39;</span><span class="p">:</span> <span class="n">granule_filename</span><span class="p">,</span>
+            <span class="s1">&#39;MetadataProviderAction&#39;</span><span class="p">:</span> <span class="s2">&quot;creation&quot;</span><span class="p">,</span>
+            <span class="s1">&#39;GranuleFilename&#39;</span><span class="p">:</span> <span class="n">granule_filename</span><span class="p">,</span>
+            <span class="s1">&#39;ISO_OPERA_ProjectKeywords&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;OPERA&#39;</span><span class="p">,</span> <span class="s1">&#39;JPL&#39;</span><span class="p">,</span> <span class="s1">&#39;TROPO&#39;</span><span class="p">,</span> <span class="s1">&#39;Troposphere&#39;</span><span class="p">,</span> <span class="s1">&#39;Zenith&#39;</span><span class="p">,</span> <span class="s1">&#39;Radar&#39;</span><span class="p">,</span> <span class="s1">&#39;Delays&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;ISO_OPERA_PlatformKeywords&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;TROPO&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;ISO_OPERA_InstrumentKeywords&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;TROPO&#39;</span><span class="p">]</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">custom_metadata</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_iso_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tropo_metadata</span><span class="p">,</span> <span class="n">product_filename</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a rendered version of the ISO metadata template for TROPO</span>
+<span class="sd">        output products using metadata from the following locations:</span>
+
+<span class="sd">            * RunConfig (in dictionary form)</span>
+<span class="sd">            * Output product (dictionary extracted from NetCDF product attributes)</span>
+<span class="sd">            * Catalog metadata</span>
+<span class="sd">            * &quot;Custom&quot; metadata (all metadata not found anywhere else)</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        tropo_metadata : dict</span>
+<span class="sd">            The product metadata corresponding to a NetCDF product to</span>
+<span class="sd">            be included as the &quot;product_output&quot; metadata in the rendered ISO xml.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        rendered_template : str</span>
+<span class="sd">            The ISO metadata template for TROPO filled in with values from the</span>
+<span class="sd">            sourced metadata dictionaries.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Use the base PGE implemenation to validate existence of the template</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_create_iso_metadata</span><span class="p">()</span>
+
+        <span class="n">runconfig_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">asdict</span><span class="p">()</span>
+
+        <span class="n">product_output_dict</span> <span class="o">=</span> <span class="n">tropo_metadata</span>
+
+        <span class="n">catalog_metadata_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_catalog_metadata</span><span class="p">()</span><span class="o">.</span><span class="n">asdict</span><span class="p">()</span>
+
+        <span class="n">custom_data_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_custom_metadata</span><span class="p">(</span><span class="n">product_filename</span><span class="p">)</span>
+
+        <span class="n">iso_metadata</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;run_config&#39;</span><span class="p">:</span> <span class="n">runconfig_dict</span><span class="p">,</span>
+            <span class="s1">&#39;product_output&#39;</span><span class="p">:</span> <span class="n">product_output_dict</span><span class="p">,</span>
+            <span class="s1">&#39;catalog_metadata&#39;</span><span class="p">:</span> <span class="n">catalog_metadata_dict</span><span class="p">,</span>
+            <span class="s1">&#39;custom_data&#39;</span><span class="p">:</span> <span class="n">custom_data_dict</span>
+        <span class="p">}</span>
+
+        <span class="n">iso_template_path</span> <span class="o">=</span> <span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">iso_template_path</span><span class="p">)</span>
+
+        <span class="n">rendered_template</span> <span class="o">=</span> <span class="n">render_jinja2</span><span class="p">(</span>
+            <span class="n">iso_template_path</span><span class="p">,</span>
+            <span class="n">iso_metadata</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">output_product_path</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">rendered_template</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_core_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inter_filename</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>  <span class="c1"># pylint: disable=unused-argument</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the core file name component for products produced by the</span>
+<span class="sd">        TROPO PGE.</span>
+
+<span class="sd">        The core file name component of the TROPO PGE consists of:</span>
+
+<span class="sd">            &lt;PROJECT&gt;_&lt;LEVEL&gt;_&lt;PGE NAME&gt;_&lt;WEATHER MODEL TIMETAG&gt;_&lt;PROD TIMETAG&gt;_&lt;NWP NAME&gt;_&lt;NWP SPACING&gt;_&lt;PRODUCT VERSION&gt;</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The core filename is derived from the output product file name assigned</span>
+<span class="sd">        by the TROPO SAS. During output product validation, this PGE caches</span>
+<span class="sd">        the core filename in the _cached_core_filename attribute, so this</span>
+<span class="sd">        method should only be called after the outputs have been validated.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        inter_filename : str, optional</span>
+<span class="sd">            The intermediate filename of the output product to generate the</span>
+<span class="sd">            core filename for. Currenly unused by this method.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        core_filename : str</span>
+<span class="sd">            The core file name component to assign to products created by this PGE.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># _validate_outputs() should have been called prior to this method to</span>
+        <span class="c1"># set _cached_core_filename</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cached_core_filename</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_stage_output_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Ensures that all output products produced by both the SAS and this PGE</span>
+<span class="sd">        are staged to the output location defined by the RunConfig. This includes</span>
+<span class="sd">        reassignment of file names to meet the file-naming conventions required</span>
+<span class="sd">        by the PGE.</span>
+
+<span class="sd">        In addition to staging of the output products created by the SAS, this</span>
+<span class="sd">        function is also responsible for ensuring the catalog metadata, ISO</span>
+<span class="sd">        metadata, and combined PGE/SAS log are also written to the expected</span>
+<span class="sd">        output product location with the appropriate file names.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Gather the list of output files produced by the SAS</span>
+        <span class="n">output_products</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">get_output_product_filenames</span><span class="p">()</span>
+
+        <span class="c1">#Extracts netCDF output product.</span>
+        <span class="n">nc_product</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">output_product</span> <span class="ow">in</span> <span class="n">output_products</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">output_product</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.nc&#39;</span><span class="p">):</span>
+                <span class="n">nc_product</span> <span class="o">=</span> <span class="n">output_product</span>
+                <span class="k">break</span>
+
+        <span class="c1"># For each output file name, assign the final file name matching the</span>
+        <span class="c1"># expected conventions.</span>
+        <span class="k">for</span> <span class="n">output_product</span> <span class="ow">in</span> <span class="n">output_products</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_assign_filename</span><span class="p">(</span><span class="n">output_product</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">output_product_path</span><span class="p">)</span>
+
+        <span class="c1"># Write the catalog metadata to disk with the appropriate filename</span>
+        <span class="n">catalog_metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_catalog_metadata</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">catalog_metadata</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">catalog_metadata</span><span class="o">.</span><span class="n">get_schema_file_path</span><span class="p">()):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Failed to create valid catalog metadata, reason(s):</span><span class="se">\n</span><span class="s2"> </span><span class="si">{</span><span class="n">catalog_metadata</span><span class="o">.</span><span class="n">get_error_msg</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INVALID_CATALOG_METADATA</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+
+        <span class="n">cat_meta_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_catalog_metadata_filename</span><span class="p">()</span>
+        <span class="n">cat_meta_filepath</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">output_product_path</span><span class="p">,</span> <span class="n">cat_meta_filename</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">CREATING_CATALOG_METADATA</span><span class="p">,</span>
+                         <span class="sa">f</span><span class="s2">&quot;Writing Catalog Metadata to </span><span class="si">{</span><span class="n">cat_meta_filepath</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">catalog_metadata</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">cat_meta_filepath</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Failed to write catalog metadata file </span><span class="si">{</span><span class="n">cat_meta_filepath</span><span class="si">}</span><span class="s2">, reason: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">CATALOG_METADATA_CREATION_FAILED</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+
+        <span class="n">tropo_metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_collect_tropo_product_metadata</span><span class="p">(</span><span class="n">nc_product</span><span class="p">)</span>
+
+        <span class="c1"># Generate the ISO metadata for use with product submission to DAAC(s)</span>
+        <span class="n">iso_metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_iso_metadata</span><span class="p">(</span><span class="n">tropo_metadata</span><span class="p">,</span> <span class="n">nc_product</span><span class="p">)</span>
+
+        <span class="n">iso_meta_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iso_metadata_filename</span><span class="p">()</span>
+        <span class="n">iso_meta_filepath</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">output_product_path</span><span class="p">,</span> <span class="n">iso_meta_filename</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">iso_metadata</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">RENDERING_ISO_METADATA</span><span class="p">,</span>
+                             <span class="sa">f</span><span class="s2">&quot;Writing ISO Metadata to </span><span class="si">{</span><span class="n">iso_meta_filepath</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">iso_meta_filepath</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
+                <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">iso_metadata</span><span class="p">)</span>
+
+        <span class="c1"># Write the QA application log to disk with the appropriate filename,</span>
+        <span class="c1"># if necessary</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">qa_enabled</span><span class="p">:</span>
+            <span class="n">qa_log_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_qa_log_filename</span><span class="p">()</span>
+            <span class="n">qa_log_filepath</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">output_product_path</span><span class="p">,</span> <span class="n">qa_log_filename</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">qa_logger</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">qa_log_filepath</span><span class="p">)</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_finalize_log</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">qa_logger</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Failed to write QA log file to </span><span class="si">{</span><span class="n">qa_log_filepath</span><span class="si">}</span><span class="s2">, reason: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">LOG_FILE_CREATION_FAILED</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+
+        <span class="c1"># Lastly, write the combined PGE/SAS log to disk with the appropriate filename</span>
+        <span class="n">log_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log_filename</span><span class="p">()</span>
+        <span class="n">log_filepath</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">output_product_path</span><span class="p">,</span> <span class="n">log_filename</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">log_filepath</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_finalize_log</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Failed to write log file to </span><span class="si">{</span><span class="n">log_filepath</span><span class="si">}</span><span class="s2">, reason: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+
+            <span class="c1"># Log stream might be closed by this point so raise an Exception instead</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+<div class="viewcode-block" id="TROPOPostProcessorMixin.run_postprocessor">
+<a class="viewcode-back" href="../../../../opera.pge.tropo.html#opera.pge.tropo.tropo_pge.TROPOPostProcessorMixin.run_postprocessor">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run_postprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Executes the post-processing steps for the TROPO PGE.</span>
 <span class="sd">        The TROPOPostProcessorMixin version of this method performs the same</span>
@@ -239,16 +561,19 @@
 <span class="sd">        **kwargs: dict</span>
 <span class="sd">            Any keyword arguments needed by the post-processor</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        
+
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Running postprocessor for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_post_mixin_name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_run_sas_qa_executable</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_outputs</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_stage_output_files</span><span class="p">()</span></div></div>
-        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stage_output_files</span><span class="p">()</span></div>
+</div>
 
 
-<div class="viewcode-block" id="TROPOExecutor"><a class="viewcode-back" href="../../../../opera.pge.tropo.html#opera.pge.tropo.tropo_pge.TROPOExecutor">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">TROPOExecutor</span><span class="p">(</span><span class="n">TROPOPreProcessorMixin</span><span class="p">,</span> <span class="n">TROPOPostProcessorMixin</span><span class="p">,</span> <span class="n">PgeExecutor</span><span class="p">):</span>
+
+<div class="viewcode-block" id="TROPOExecutor">
+<a class="viewcode-back" href="../../../../opera.pge.tropo.html#opera.pge.tropo.tropo_pge.TROPOExecutor">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TROPOExecutor</span><span class="p">(</span><span class="n">TROPOPreProcessorMixin</span><span class="p">,</span> <span class="n">TROPOPostProcessorMixin</span><span class="p">,</span> <span class="n">PgeExecutor</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Main class for execution of the TROPO PGE, including the SAS layer.</span>
 <span class="sd">    This class essentially rolls up the TROPO-specific pre- and post-processor</span>
@@ -262,16 +587,17 @@
     <span class="n">LEVEL</span> <span class="o">=</span> <span class="s2">&quot;L4&quot;</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Processing Level for TROPO Products&quot;&quot;&quot;</span>
 
-    <span class="n">PGE_VERSION</span> <span class="o">=</span> <span class="s2">&quot;3.0.0-er.2.0&quot;</span>
+    <span class="n">PGE_VERSION</span> <span class="o">=</span> <span class="s2">&quot;3.0.0-rc.1.0&quot;</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Version of the PGE&quot;&quot;&quot;</span>
 
-    <span class="n">SAS_VERSION</span> <span class="o">=</span> <span class="s2">&quot;0.2&quot;</span>
+    <span class="n">SAS_VERSION</span> <span class="o">=</span> <span class="s2">&quot;1.0&quot;</span>  <span class="c1"># https://github.com/opera-adt/tropo/releases/tag/v1.0.0</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Version of the SAS wrapped by this PGE, should be updated as needed&quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pge_name</span><span class="p">,</span> <span class="n">runconfig_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">pge_name</span><span class="p">,</span> <span class="n">runconfig_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">rename_by_pattern_map</span> <span class="o">=</span> <span class="p">{}</span></div>
+
 </pre></div>
 
            </div>
@@ -281,7 +607,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2021-2025 California Institute of Technology.</p>
+    <p>&#169; Copyright 2021-2026 California Institute of Technology.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

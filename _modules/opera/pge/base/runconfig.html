@@ -1,20 +1,20 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera.pge.base.runconfig &mdash; opera-sds-pge 6.0.0-rc.1.0 documentation</title>
+  <title>opera.pge.base.runconfig &mdash; opera-sds-pge 7.0.0-er.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
-      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
 
   
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=83d0fb78"></script>
-      <script src="../../../../_static/doctools.js?v=888ff710"></script>
-      <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="../../../../_static/documentation_options.js?v=d4e30586"></script>
+      <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
@@ -91,18 +91,20 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">os.path</span><span class="w"> </span><span class="kn">import</span> <span class="n">abspath</span><span class="p">,</span> <span class="n">basename</span><span class="p">,</span> <span class="n">isabs</span><span class="p">,</span> <span class="n">isdir</span><span class="p">,</span> <span class="n">isfile</span><span class="p">,</span> <span class="n">join</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">pkg_resources</span><span class="w"> </span><span class="kn">import</span> <span class="n">resource_filename</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">importlib.resources</span><span class="w"> </span><span class="kn">import</span> <span class="n">files</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">yamale</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">yaml</span>
 
 
-<span class="n">BASE_PGE_SCHEMA</span> <span class="o">=</span> <span class="n">resource_filename</span><span class="p">(</span><span class="s1">&#39;opera&#39;</span><span class="p">,</span> <span class="s1">&#39;pge/base/schema/base_pge_schema.yaml&#39;</span><span class="p">)</span>
+<span class="n">BASE_PGE_SCHEMA</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">files</span><span class="p">(</span><span class="s1">&#39;opera&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s1">&#39;pge/base/schema/base_pge_schema.yaml&#39;</span><span class="p">))</span>
 <span class="sd">&quot;&quot;&quot;Path to the Yamale schema applicable to the PGE portion of each RunConfig&quot;&quot;&quot;</span>
 
 
-<div class="viewcode-block" id="RunConfig"><a class="viewcode-back" href="../../../../opera.pge.base.html#opera.pge.base.runconfig.RunConfig">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">RunConfig</span><span class="p">:</span>
+<div class="viewcode-block" id="RunConfig">
+<a class="viewcode-back" href="../../../../opera.pge.base.html#opera.pge.base.runconfig.RunConfig">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RunConfig</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class used to parse and validate run configuration files for OPERA PGEs.</span>
 
@@ -189,7 +191,9 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unable to parse </span><span class="si">{</span><span class="n">yaml_filename</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="RunConfig.validate"><a class="viewcode-back" href="../../../../opera.pge.base.html#opera.pge.base.runconfig.RunConfig.validate">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pge_schema_file</span><span class="o">=</span><span class="n">BASE_PGE_SCHEMA</span><span class="p">,</span> <span class="n">strict_mode</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="RunConfig.validate">
+<a class="viewcode-back" href="../../../../opera.pge.base.html#opera.pge.base.runconfig.RunConfig.validate">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pge_schema_file</span><span class="o">=</span><span class="n">BASE_PGE_SCHEMA</span><span class="p">,</span> <span class="n">strict_mode</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Validates the RunConfig using a combination of the base PGE schema,</span>
 <span class="sd">        and the specific SAS schema defined by the RunConfig itself.</span>
@@ -244,6 +248,7 @@
 
         <span class="c1"># Finally, validate the RunConfig against the combined PGE/SAS schema</span>
         <span class="n">yamale</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">pge_schema</span><span class="p">,</span> <span class="n">runconfig_data</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="n">strict_mode</span><span class="p">)</span></div>
+
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -352,7 +357,7 @@
         <span class="k">return</span> <span class="p">(</span>
             <span class="n">sas_schema_path</span>
             <span class="k">if</span> <span class="n">isabs</span><span class="p">(</span><span class="n">sas_schema_path</span><span class="p">)</span>
-            <span class="k">else</span> <span class="n">resource_filename</span><span class="p">(</span><span class="s1">&#39;opera&#39;</span><span class="p">,</span> <span class="n">sas_schema_path</span><span class="p">)</span>
+            <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">files</span><span class="p">(</span><span class="s1">&#39;opera&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">sas_schema_path</span><span class="p">))</span>
         <span class="p">)</span>
 
     <span class="nd">@property</span>
@@ -365,7 +370,7 @@
             <span class="k">return</span> <span class="p">(</span>
                 <span class="n">algorithm_parameters_schema_path</span>
                 <span class="k">if</span> <span class="n">isabs</span><span class="p">(</span><span class="n">algorithm_parameters_schema_path</span><span class="p">)</span>
-                <span class="k">else</span> <span class="n">resource_filename</span><span class="p">(</span><span class="s1">&#39;opera&#39;</span><span class="p">,</span> <span class="n">algorithm_parameters_schema_path</span><span class="p">)</span>
+                <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">files</span><span class="p">(</span><span class="s1">&#39;opera&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">algorithm_parameters_schema_path</span><span class="p">))</span>
             <span class="p">)</span>
 
     <span class="nd">@property</span>
@@ -379,7 +384,10 @@
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">dynamic_ancillary_file_group</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sas_config</span><span class="p">[</span><span class="s1">&#39;dynamic_ancillary_file_group&#39;</span><span class="p">]</span>
             <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-                <span class="k">return</span> <span class="kc">None</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">dynamic_ancillary_file_group</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sas_config</span><span class="p">[</span><span class="s1">&#39;cal_disp_workflow&#39;</span><span class="p">][</span><span class="s1">&#39;dynamic_ancillary_group&#39;</span><span class="p">]</span>
+                <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="kc">None</span>
 
         <span class="c1"># ADT is inconsistent with how they define this location across different SAS,</span>
         <span class="c1"># so check all known permutations</span>
@@ -407,7 +415,7 @@
         <span class="k">return</span> <span class="p">(</span>
             <span class="n">iso_template_path</span>
             <span class="k">if</span> <span class="n">isabs</span><span class="p">(</span><span class="n">iso_template_path</span><span class="p">)</span>
-            <span class="k">else</span> <span class="n">resource_filename</span><span class="p">(</span><span class="s1">&#39;opera&#39;</span><span class="p">,</span> <span class="n">iso_template_path</span><span class="p">)</span>
+            <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">files</span><span class="p">(</span><span class="s1">&#39;opera&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">iso_template_path</span><span class="p">))</span>
         <span class="p">)</span>
 
     <span class="nd">@property</span>
@@ -420,7 +428,7 @@
         <span class="k">return</span> <span class="p">(</span>
             <span class="n">iso_descriptions_path</span>
             <span class="k">if</span> <span class="n">isabs</span><span class="p">(</span><span class="n">iso_descriptions_path</span><span class="p">)</span>
-            <span class="k">else</span> <span class="n">resource_filename</span><span class="p">(</span><span class="s1">&#39;opera&#39;</span><span class="p">,</span> <span class="n">iso_descriptions_path</span><span class="p">)</span>
+            <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">files</span><span class="p">(</span><span class="s1">&#39;opera&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">iso_descriptions_path</span><span class="p">))</span>
         <span class="p">)</span>
 
     <span class="nd">@property</span>
@@ -464,11 +472,16 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the short-cut to the SAS-specific section of the parsed RunConfig&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sas_config</span>
 
-<div class="viewcode-block" id="RunConfig.asdict"><a class="viewcode-back" href="../../../../opera.pge.base.html#opera.pge.base.runconfig.RunConfig.asdict">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">asdict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<div class="viewcode-block" id="RunConfig.asdict">
+<a class="viewcode-back" href="../../../../opera.pge.base.html#opera.pge.base.runconfig.RunConfig.asdict">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">asdict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the entire parsed RunConfig in its dictionary representation&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_config</span></div>
 
-<div class="viewcode-block" id="RunConfig.get_input_filenames"><a class="viewcode-back" href="../../../../opera.pge.base.html#opera.pge.base.runconfig.RunConfig.get_input_filenames">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_input_filenames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RunConfig.get_input_filenames">
+<a class="viewcode-back" href="../../../../opera.pge.base.html#opera.pge.base.runconfig.RunConfig.get_input_filenames">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_input_filenames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Iterates over the input_file list from the runconfig and returns a list</span>
 <span class="sd">        of all files.</span>
@@ -514,7 +527,10 @@
 
         <span class="k">return</span> <span class="n">input_files</span></div>
 
-<div class="viewcode-block" id="RunConfig.get_ancillary_filenames"><a class="viewcode-back" href="../../../../opera.pge.base.html#opera.pge.base.runconfig.RunConfig.get_ancillary_filenames">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_ancillary_filenames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RunConfig.get_ancillary_filenames">
+<a class="viewcode-back" href="../../../../opera.pge.base.html#opera.pge.base.runconfig.RunConfig.get_ancillary_filenames">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_ancillary_filenames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a list of all ancillary filenames listed in the</span>
 <span class="sd">        DynamicAncillaryFilesGroup section of the run config file.</span>
@@ -537,7 +553,10 @@
 
         <span class="k">return</span> <span class="n">result</span></div>
 
-<div class="viewcode-block" id="RunConfig.get_output_product_filenames"><a class="viewcode-back" href="../../../../opera.pge.base.html#opera.pge.base.runconfig.RunConfig.get_output_product_filenames">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_output_product_filenames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RunConfig.get_output_product_filenames">
+<a class="viewcode-back" href="../../../../opera.pge.base.html#opera.pge.base.runconfig.RunConfig.get_output_product_filenames">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_output_product_filenames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a sorted list of all product file paths currently written to the</span>
 <span class="sd">        output location specified by the RunConfig.</span>
@@ -559,7 +578,9 @@
                 <span class="k">if</span> <span class="n">scratch_path</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">product_path</span><span class="p">:</span>
                     <span class="n">output_products</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">product_path</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">output_products</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">output_products</span><span class="p">)</span></div>
+</div>
+
 </pre></div>
 
            </div>
@@ -569,7 +590,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2021-2025 California Institute of Technology.</p>
+    <p>&#169; Copyright 2021-2026 California Institute of Technology.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

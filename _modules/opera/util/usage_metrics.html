@@ -1,7 +1,7 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -12,9 +12,9 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=de395e71"></script>
-      <script src="../../../_static/doctools.js?v=888ff710"></script>
-      <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="../../../_static/documentation_options.js?v=d4e30586"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -93,7 +93,9 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">sys</span><span class="w"> </span><span class="kn">import</span> <span class="n">platform</span>
 
 
-<div class="viewcode-block" id="get_os_metrics"><a class="viewcode-back" href="../../../opera.util.html#opera.util.usage_metrics.get_os_metrics">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">get_os_metrics</span><span class="p">():</span>
+<div class="viewcode-block" id="get_os_metrics">
+<a class="viewcode-back" href="../../../opera.util.html#opera.util.usage_metrics.get_os_metrics">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_os_metrics</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Gets metrics related to machine resource usage, by the current process</span>
 <span class="sd">    and by all of its children processes.</span>
@@ -145,7 +147,10 @@
     <span class="k">return</span> <span class="n">metrics</span></div>
 
 
-<div class="viewcode-block" id="get_self_peak_vmm_kb"><a class="viewcode-back" href="../../../opera.util.html#opera.util.usage_metrics.get_self_peak_vmm_kb">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">get_self_peak_vmm_kb</span><span class="p">():</span>  <span class="c1"># pylint: disable=missing-raises-doc</span>
+
+<div class="viewcode-block" id="get_self_peak_vmm_kb">
+<a class="viewcode-back" href="../../../opera.util.html#opera.util.usage_metrics.get_self_peak_vmm_kb">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_self_peak_vmm_kb</span><span class="p">():</span>  <span class="c1"># pylint: disable=missing-raises-doc</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Attempt to get the peak virtual memory by looking into the /proc/self/status</span>
 
@@ -178,6 +183,7 @@
         <span class="n">vm_peak_kb</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
 
     <span class="k">return</span> <span class="n">vm_peak_kb</span></div>
+
 </pre></div>
 
            </div>

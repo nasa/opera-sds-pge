@@ -1,20 +1,20 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera.pge.disp_s1.disp_s1_pge &mdash; opera-sds-pge 6.0.0-er.2.0 documentation</title>
+  <title>opera.pge.disp_s1.disp_s1_pge &mdash; opera-sds-pge 7.0.0-er.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
-      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
 
   
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=136f5b14"></script>
-      <script src="../../../../_static/doctools.js?v=888ff710"></script>
-      <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="../../../../_static/documentation_options.js?v=d4e30586"></script>
+      <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
@@ -89,6 +89,7 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">os.path</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">importlib.resources</span><span class="w"> </span><span class="kn">import</span> <span class="n">files</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">OrderedDict</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">os</span><span class="w"> </span><span class="kn">import</span> <span class="n">listdir</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">os.path</span><span class="w"> </span><span class="kn">import</span> <span class="n">abspath</span><span class="p">,</span> <span class="n">basename</span><span class="p">,</span> <span class="n">exists</span><span class="p">,</span> <span class="n">getsize</span><span class="p">,</span> <span class="n">join</span><span class="p">,</span> <span class="n">splitext</span>
@@ -98,17 +99,20 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">opera.pge.base.base_pge</span><span class="w"> </span><span class="kn">import</span> <span class="n">PreProcessorMixin</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.dataset_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">parse_bounding_polygon_from_wkt</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.error_codes</span><span class="w"> </span><span class="kn">import</span> <span class="n">ErrorCode</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.geo_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_gml_polygon_from_frame</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.h5_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_cslc_s1_product_metadata</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.h5_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_disp_s1_product_metadata</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.input_validation</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">validate_algorithm_parameters_config</span><span class="p">,</span>
                                          <span class="n">validate_disp_inputs</span><span class="p">,</span>
                                          <span class="n">validate_disp_static_inputs</span><span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.render_jinja2</span><span class="w"> </span><span class="kn">import</span> <span class="n">augment_hdf5_measured_parameters</span><span class="p">,</span> <span class="n">render_jinja2</span><span class="p">,</span> <span class="n">augment_measured_parameters</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.tiff_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_geotiff_metadata</span><span class="p">,</span> <span class="n">get_geotiff_dimensions</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.time</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_time_for_filename</span><span class="p">,</span> <span class="n">get_catalog_metadata_datetime_str</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.render_jinja2</span><span class="w"> </span><span class="kn">import</span> <span class="n">augment_hdf5_measured_parameters</span><span class="p">,</span> <span class="n">augment_measured_parameters</span><span class="p">,</span> <span class="n">render_jinja2</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.tiff_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_geotiff_dimensions</span><span class="p">,</span> <span class="n">get_geotiff_metadata</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.time</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_catalog_metadata_datetime_str</span><span class="p">,</span> <span class="n">get_time_for_filename</span>
 
 
-<div class="viewcode-block" id="DispS1PreProcessorMixin"><a class="viewcode-back" href="../../../../opera.pge.disp_s1.html#opera.pge.disp_s1.disp_s1_pge.DispS1PreProcessorMixin">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">DispS1PreProcessorMixin</span><span class="p">(</span><span class="n">PreProcessorMixin</span><span class="p">):</span>
+<div class="viewcode-block" id="DispS1PreProcessorMixin">
+<a class="viewcode-back" href="../../../../opera.pge.disp_s1.html#opera.pge.disp_s1.disp_s1_pge.DispS1PreProcessorMixin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DispS1PreProcessorMixin</span><span class="p">(</span><span class="n">PreProcessorMixin</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Mixin class responsible for handling all pre-processing steps for the DISP-S1</span>
 <span class="sd">    PGE. The pre-processing phase is defined as all steps necessary prior</span>
@@ -130,7 +134,6 @@
 <span class="sd">        This function does a final check on the schema to ensure the SAS gets all needed and no</span>
 <span class="sd">        extra options for the configured workflow.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="n">sas_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">sas_config</span>
 
         <span class="n">extra_keys</span> <span class="o">=</span> <span class="p">[]</span>
@@ -159,7 +162,9 @@
             <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Unexpected options found in RunConfig: </span><span class="si">{</span><span class="n">extra_keys</span><span class="si">}</span><span class="s1">&#39;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">RUN_CONFIG_VALIDATION_FAILED</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
 
-<div class="viewcode-block" id="DispS1PreProcessorMixin.run_preprocessor"><a class="viewcode-back" href="../../../../opera.pge.disp_s1.html#opera.pge.disp_s1.disp_s1_pge.DispS1PreProcessorMixin.run_preprocessor">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">run_preprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="DispS1PreProcessorMixin.run_preprocessor">
+<a class="viewcode-back" href="../../../../opera.pge.disp_s1.html#opera.pge.disp_s1.disp_s1_pge.DispS1PreProcessorMixin.run_preprocessor">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run_preprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Executes the pre-processing steps for DISP-S1 PGE initialization.</span>
 <span class="sd">        The DispS1PreProcessorMixin version of this class performs all actions</span>
@@ -186,7 +191,10 @@
                                              <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">algorithm_parameters_file_config_path</span><span class="p">,</span>
                                              <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="DispS1PreProcessorMixin.convert_troposphere_model_files"><a class="viewcode-back" href="../../../../opera.pge.disp_s1.html#opera.pge.disp_s1.disp_s1_pge.DispS1PreProcessorMixin.convert_troposphere_model_files">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">convert_troposphere_model_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="DispS1PreProcessorMixin.convert_troposphere_model_files">
+<a class="viewcode-back" href="../../../../opera.pge.disp_s1.html#opera.pge.disp_s1.disp_s1_pge.DispS1PreProcessorMixin.convert_troposphere_model_files">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">convert_troposphere_model_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert grib (.grb) files to netCDF (.nc)</span>
 <span class="sd">        Update the in-memory runconfig object such that the SAS/dynamic_ancillary_file_group/troposphere_files</span>
@@ -239,10 +247,14 @@
             <span class="n">netcdf_file_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">netcdf_file</span><span class="p">)</span>
 
         <span class="c1"># Update the in-memory runconfig instance</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">sas_config</span><span class="p">[</span><span class="s1">&#39;dynamic_ancillary_file_group&#39;</span><span class="p">][</span><span class="s1">&#39;troposphere_files&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">netcdf_file_list</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">sas_config</span><span class="p">[</span><span class="s1">&#39;dynamic_ancillary_file_group&#39;</span><span class="p">][</span><span class="s1">&#39;troposphere_files&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">netcdf_file_list</span></div>
+</div>
 
 
-<div class="viewcode-block" id="DispS1PostProcessorMixin"><a class="viewcode-back" href="../../../../opera.pge.disp_s1.html#opera.pge.disp_s1.disp_s1_pge.DispS1PostProcessorMixin">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">DispS1PostProcessorMixin</span><span class="p">(</span><span class="n">PostProcessorMixin</span><span class="p">):</span>
+
+<div class="viewcode-block" id="DispS1PostProcessorMixin">
+<a class="viewcode-back" href="../../../../opera.pge.disp_s1.html#opera.pge.disp_s1.disp_s1_pge.DispS1PostProcessorMixin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DispS1PostProcessorMixin</span><span class="p">(</span><span class="n">PostProcessorMixin</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Mixin class responsible for handling all post-processing steps for the DISP-S1</span>
 <span class="sd">    PGE. The post-processing phase is defined as all steps required after SAS</span>
@@ -285,7 +297,7 @@
 
         <span class="n">product_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">sas_config</span><span class="p">[</span><span class="s1">&#39;primary_executable&#39;</span><span class="p">][</span><span class="s1">&#39;product_type&#39;</span><span class="p">]</span>
 
-        <span class="k">if</span> <span class="n">product_type</span> <span class="o">==</span> <span class="s1">&#39;DISP_S1_FORWARD&#39;</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">nc_files</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">product_type</span> <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;DISP_S1_FORWARD&#39;</span><span class="p">,</span> <span class="s1">&#39;DISP_NISAR_FORWARD&#39;</span><span class="p">}</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">nc_files</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">error_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;The SAS created too many files with the expected &#39;.nc&#39; extension: </span><span class="si">{</span><span class="n">nc_files</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">INVALID_OUTPUT</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">)</span>
 
@@ -493,9 +505,9 @@
 
 <span class="sd">        The compressed CSLC filename for the DISP-S1 PGE consists of:</span>
 
-<span class="sd">             &lt;Project&gt;_&lt;Level&gt;_COMPRESSED-CSLC-S1_&lt;BurstID&gt;_&lt;ReferenceDateTime&gt;_\</span>
-<span class="sd">             &lt;FirstDateTime&gt;_&lt;LastDateTime&gt;_&lt;ProductGenerationDateTime&gt;_\</span>
-<span class="sd">             &lt;Polarization&gt;_&lt;ProductVersion&gt;.h5</span>
+<span class="sd">             &lt;Project&gt;_&lt;Level&gt;_COMPRESSED-CSLC-S1_&lt;FrameID&gt;_&lt;BurstID&gt;_\</span>
+<span class="sd">             &lt;ReferenceDateTime&gt;_&lt;FirstDateTime&gt;_&lt;LastDateTime&gt;_\</span>
+<span class="sd">             &lt;ProductGenerationDateTime&gt;_&lt;Polarization&gt;_&lt;ProductVersion&gt;.h5</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -512,6 +524,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">level</span> <span class="o">=</span> <span class="s2">&quot;L2&quot;</span>
         <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;COMPRESSED-CSLC-S1&quot;</span>
+        <span class="n">frame_id</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;F</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">sas_config</span><span class="p">[</span><span class="s1">&#39;input_file_group&#39;</span><span class="p">][</span><span class="s1">&#39;frame_id&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">05d</span><span class="si">}</span><span class="s2">&quot;</span>
 
         <span class="n">ccslc_regex</span> <span class="o">=</span> <span class="p">(</span><span class="sa">r</span><span class="s1">&#39;compressed_(?P&lt;burst_id&gt;\w</span><span class="si">{4}</span><span class="s1">_\w</span><span class="si">{6}</span><span class="s1">_\w</span><span class="si">{3}</span><span class="s1">)_&#39;</span>
                        <span class="sa">r</span><span class="s1">&#39;(?P&lt;ref_date&gt;\d</span><span class="si">{8}</span><span class="s1">)_&#39;</span>
@@ -562,7 +575,7 @@
         <span class="c1"># Carry the file extension over from the original filename</span>
         <span class="n">ext</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">groupdict</span><span class="p">()[</span><span class="s2">&quot;ext&quot;</span><span class="p">]</span>
 
-        <span class="k">return</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">PROJECT</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">level</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">burst_id</span><span class="si">}</span><span class="s2">_&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">PROJECT</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">level</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">frame_id</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">burst_id</span><span class="si">}</span><span class="s2">_&quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ref_date</span><span class="si">}</span><span class="s2">T000000Z_</span><span class="si">{</span><span class="n">start_date</span><span class="si">}</span><span class="s2">T000000Z_&quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stop_date</span><span class="si">}</span><span class="s2">T000000Z_</span><span class="si">{</span><span class="n">prod_time</span><span class="si">}</span><span class="s2">_&quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">polarization</span><span class="si">}</span><span class="s2">_v</span><span class="si">{</span><span class="n">product_version</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -845,7 +858,12 @@
 
         <span class="n">iso_template_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">iso_template_path</span><span class="p">)</span>
 
-        <span class="n">rendered_template</span> <span class="o">=</span> <span class="n">render_jinja2</span><span class="p">(</span><span class="n">iso_template_path</span><span class="p">,</span> <span class="n">iso_metadata</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>
+        <span class="n">rendered_template</span> <span class="o">=</span> <span class="n">render_jinja2</span><span class="p">(</span>
+            <span class="n">iso_template_path</span><span class="p">,</span>
+            <span class="n">iso_metadata</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">output_product_path</span>
+        <span class="p">)</span>
 
         <span class="k">return</span> <span class="n">rendered_template</span>
 
@@ -930,7 +948,9 @@
             <span class="c1"># Log stream might be closed by this point so raise an Exception instead</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
-<div class="viewcode-block" id="DispS1PostProcessorMixin.run_postprocessor"><a class="viewcode-back" href="../../../../opera.pge.disp_s1.html#opera.pge.disp_s1.disp_s1_pge.DispS1PostProcessorMixin.run_postprocessor">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">run_postprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="DispS1PostProcessorMixin.run_postprocessor">
+<a class="viewcode-back" href="../../../../opera.pge.disp_s1.html#opera.pge.disp_s1.disp_s1_pge.DispS1PostProcessorMixin.run_postprocessor">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run_postprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Executes the post-processing steps for the DISP-S1 PGE.</span>
 <span class="sd">        The DispS1PostProcessorMixin version of this method performs the same</span>
@@ -948,10 +968,14 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_run_sas_qa_executable</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_output</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_stage_output_files</span><span class="p">()</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stage_output_files</span><span class="p">()</span></div>
+</div>
 
 
-<div class="viewcode-block" id="DispS1Executor"><a class="viewcode-back" href="../../../../opera.pge.disp_s1.html#opera.pge.disp_s1.disp_s1_pge.DispS1Executor">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">DispS1Executor</span><span class="p">(</span><span class="n">DispS1PreProcessorMixin</span><span class="p">,</span> <span class="n">DispS1PostProcessorMixin</span><span class="p">,</span> <span class="n">PgeExecutor</span><span class="p">):</span>
+
+<div class="viewcode-block" id="DispS1Executor">
+<a class="viewcode-back" href="../../../../opera.pge.disp_s1.html#opera.pge.disp_s1.disp_s1_pge.DispS1Executor">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DispS1Executor</span><span class="p">(</span><span class="n">DispS1PreProcessorMixin</span><span class="p">,</span> <span class="n">DispS1PostProcessorMixin</span><span class="p">,</span> <span class="n">PgeExecutor</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Main class for execution of the DISP-S1 PGE, including the SAS layer.</span>
 <span class="sd">    This class essentially rolls up the DISP-specific pre- and post-processor</span>
@@ -966,10 +990,10 @@
     <span class="n">LEVEL</span> <span class="o">=</span> <span class="s2">&quot;L3&quot;</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Processing Level for DISP-S1 Products&quot;&quot;&quot;</span>
 
-    <span class="n">PGE_VERSION</span> <span class="o">=</span> <span class="s2">&quot;3.0.5&quot;</span>
+    <span class="n">PGE_VERSION</span> <span class="o">=</span> <span class="s2">&quot;3.0.8&quot;</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Version of the PGE (overrides default from base_pge)&quot;&quot;&quot;</span>
 
-    <span class="n">SAS_VERSION</span> <span class="o">=</span> <span class="s2">&quot;0.5.7&quot;</span>  <span class="c1"># Final release https://github.com/opera-adt/disp-s1/releases/tag/v0.5.7</span>
+    <span class="n">SAS_VERSION</span> <span class="o">=</span> <span class="s2">&quot;0.5.10&quot;</span>  <span class="c1"># Final release https://github.com/opera-adt/disp-s1/releases/tag/v0.5.10</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pge_name</span><span class="p">,</span> <span class="n">runconfig_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">pge_name</span><span class="p">,</span> <span class="n">runconfig_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -984,7 +1008,10 @@
         <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="DispS1StaticPreProcessorMixin"><a class="viewcode-back" href="../../../../opera.pge.disp_s1.html#opera.pge.disp_s1.disp_s1_pge.DispS1StaticPreProcessorMixin">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">DispS1StaticPreProcessorMixin</span><span class="p">(</span><span class="n">DispS1PreProcessorMixin</span><span class="p">):</span>
+
+<div class="viewcode-block" id="DispS1StaticPreProcessorMixin">
+<a class="viewcode-back" href="../../../../opera.pge.disp_s1.html#opera.pge.disp_s1.disp_s1_pge.DispS1StaticPreProcessorMixin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DispS1StaticPreProcessorMixin</span><span class="p">(</span><span class="n">DispS1PreProcessorMixin</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Mixin class responsible for handling all pre-processing steps for the DISP-S1-STATIC</span>
 <span class="sd">    PGE. The pre-processing phase is defined as all steps necessary prior</span>
@@ -1006,7 +1033,6 @@
 <span class="sd">        This function does a final check on the schema to ensure the SAS gets all needed and no</span>
 <span class="sd">        extra options for the configured workflow.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="n">sas_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">sas_config</span>
 
         <span class="n">extra_keys</span> <span class="o">=</span> <span class="p">[]</span>
@@ -1035,7 +1061,9 @@
             <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Unexpected options found in RunConfig: </span><span class="si">{</span><span class="n">extra_keys</span><span class="si">}</span><span class="s1">&#39;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">RUN_CONFIG_VALIDATION_FAILED</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
 
-<div class="viewcode-block" id="DispS1StaticPreProcessorMixin.run_preprocessor"><a class="viewcode-back" href="../../../../opera.pge.disp_s1.html#opera.pge.disp_s1.disp_s1_pge.DispS1StaticPreProcessorMixin.run_preprocessor">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">run_preprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="DispS1StaticPreProcessorMixin.run_preprocessor">
+<a class="viewcode-back" href="../../../../opera.pge.disp_s1.html#opera.pge.disp_s1.disp_s1_pge.DispS1StaticPreProcessorMixin.run_preprocessor">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run_preprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Executes the pre-processing steps for DISP-S1-STATIC PGE initialization.</span>
 <span class="sd">        The DispS1StaticPreProcessorMixin version of this class performs all actions</span>
@@ -1048,16 +1076,19 @@
 <span class="sd">            Any keyword arguments needed by the pre-processor</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="n">PreProcessorMixin</span><span class="o">.</span><span class="n">run_preprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_runconfig_needed_options</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">debug_switch</span><span class="p">:</span>
-            <span class="n">validate_disp_static_inputs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div></div>
+            <span class="n">validate_disp_static_inputs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
+</div>
 
 
-<div class="viewcode-block" id="DispS1StaticPostProcessorMixin"><a class="viewcode-back" href="../../../../opera.pge.disp_s1.html#opera.pge.disp_s1.disp_s1_pge.DispS1StaticPostProcessorMixin">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">DispS1StaticPostProcessorMixin</span><span class="p">(</span><span class="n">DispS1PostProcessorMixin</span><span class="p">):</span>
+
+<div class="viewcode-block" id="DispS1StaticPostProcessorMixin">
+<a class="viewcode-back" href="../../../../opera.pge.disp_s1.html#opera.pge.disp_s1.disp_s1_pge.DispS1StaticPostProcessorMixin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DispS1StaticPostProcessorMixin</span><span class="p">(</span><span class="n">DispS1PostProcessorMixin</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Mixin class responsible for handling all post-processing steps for the DISP-S1-STATIC</span>
 <span class="sd">    PGE. The post-processing phase is defined as all steps required after SAS</span>
@@ -1072,6 +1103,10 @@
     <span class="n">_post_mixin_name</span> <span class="o">=</span> <span class="s2">&quot;DispS1StaticPostProcessorMixin&quot;</span>
     <span class="n">_product_metadata_cache</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">_product_filename_cache</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">_band_rename_dict</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;dem_warped_utm&#39;</span><span class="p">:</span> <span class="s1">&#39;dem&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;los_enu&#39;</span><span class="p">:</span> <span class="s1">&#39;line_of_sight_enu&#39;</span>
+    <span class="p">}</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_validate_output</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1082,7 +1117,6 @@
 <span class="sd">              alongside and is non-zero in size</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="n">output_dir</span> <span class="o">=</span> <span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">output_product_path</span><span class="p">)</span>
 
         <span class="c1"># Validate .nc product file</span>
@@ -1140,7 +1174,7 @@
         <span class="c1"># the format FXXXXX</span>
         <span class="n">frame_id</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;F</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">sas_config</span><span class="p">[</span><span class="s1">&#39;input_file_group&#39;</span><span class="p">][</span><span class="s1">&#39;frame_id&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">05d</span><span class="si">}</span><span class="s2">&quot;</span>
 
-        <span class="c1">#TODO: Later deliveries will probably have a better way to derive sensor &amp; valid time</span>
+        <span class="c1"># TODO: Later deliveries will probably have a better way to derive sensor &amp; valid time</span>
 
         <span class="n">input_file_sample</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">sas_config</span><span class="p">[</span><span class="s1">&#39;dynamic_ancillary_file_group&#39;</span><span class="p">][</span><span class="s1">&#39;static_layers_files&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
 
@@ -1156,9 +1190,7 @@
         <span class="c1"># Check if we&#39;ve already cached the product metadata corresponding to</span>
         <span class="c1"># this set of intermediate products (there can be multiple sets of</span>
         <span class="c1"># .nc and .png output files when running in historical mode)</span>
-        <span class="k">if</span> <span class="n">inter_disp_product_filename</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_product_metadata_cache</span><span class="p">:</span>
-            <span class="n">disp_metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_product_metadata_cache</span><span class="p">[</span><span class="n">inter_disp_product_filename</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">inter_disp_product_filename</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_product_metadata_cache</span><span class="p">:</span>
             <span class="n">disp_metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_collect_disp_s1_static_product_metadata</span><span class="p">(</span><span class="n">inter_disp_product_filename</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_product_metadata_cache</span><span class="p">[</span><span class="n">inter_disp_product_filename</span><span class="p">]</span> <span class="o">=</span> <span class="n">disp_metadata</span>
 
@@ -1200,7 +1232,6 @@
 <span class="sd">        geotiff_filename : str</span>
 <span class="sd">            The file name to assign to GeoTIFF product(s) created by this PGE.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="c1"># TODO:</span>
         <span class="c1">#  I think there should be a better way to do this. The SAS outputs just the band names</span>
         <span class="c1">#  (ie, dem_warped_utm.tif) But I need &#39;dist-s1-static&#39; in the mock filenames to match</span>
@@ -1211,6 +1242,7 @@
         <span class="c1">#  so this split has no effect.</span>
 
         <span class="n">band_name</span> <span class="o">=</span> <span class="n">splitext</span><span class="p">(</span><span class="n">basename</span><span class="p">(</span><span class="n">inter_filename</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">band_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_band_rename_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">band_name</span><span class="p">,</span> <span class="n">band_name</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_core_filename</span><span class="p">(</span><span class="n">inter_filename</span><span class="p">)</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">band_name</span><span class="si">}</span><span class="s2">.tif&quot;</span>
 
@@ -1309,13 +1341,19 @@
 <span class="sd">            for use with the ISO metadata Jinja2 template.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="n">output_product_metadata</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 
         <span class="k">try</span><span class="p">:</span>
             <span class="n">measured_parameters</span> <span class="o">=</span> <span class="n">get_geotiff_metadata</span><span class="p">(</span><span class="n">disp_product</span><span class="p">)</span>
+
+            <span class="c1"># Remove the description fields pulled from the GeoTIFF metadata,</span>
+            <span class="c1"># these are already encoded into the measured parameter augmentation</span>
+            <span class="n">pruned_measured_parameters</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span>
+                                          <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">measured_parameters</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                                          <span class="k">if</span> <span class="ow">not</span> <span class="n">k</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;_DESCRIPTION&#39;</span><span class="p">)}</span>
+
             <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;MeasuredParameters&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">augment_measured_parameters</span><span class="p">(</span>
-                <span class="n">measured_parameters</span><span class="p">,</span>
+                <span class="n">pruned_measured_parameters</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">iso_measured_parameter_descriptions</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
             <span class="p">)</span>
@@ -1343,17 +1381,24 @@
 
         <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;acquisitionDate&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">validity_start_date</span>
 
-        <span class="c1"># TODO: BBOX will be derived from product metadata</span>
+        <span class="n">frame_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">sas_config</span><span class="p">[</span><span class="s1">&#39;input_file_group&#39;</span><span class="p">][</span><span class="s1">&#39;frame_id&#39;</span><span class="p">]</span>
+        <span class="n">frame_geometries</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">files</span><span class="p">(</span><span class="s1">&#39;opera&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s1">&#39;pge/disp_s1/data/frame-geometries-simple-0.9.0.geojson&#39;</span><span class="p">))</span>
 
-        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;geospatial_lon_min&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;geospatial_lon_max&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;geospatial_lat_min&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;geospatial_lat_max&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c1"># Extract geospatial bounding information for frame</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">bounding_polygon_gml_str</span> <span class="o">=</span> <span class="n">get_gml_polygon_from_frame</span><span class="p">(</span><span class="n">frame_id</span><span class="p">,</span> <span class="n">frame_geometries</span><span class="p">)</span>
+            <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;bounding_polygon&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bounding_polygon_gml_str</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Failed to extract polygon metadata from </span><span class="si">{</span><span class="n">disp_product</span><span class="si">}</span><span class="s1">, reason: </span><span class="si">{</span><span class="n">err</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">ISO_METADATA_COULD_NOT_EXTRACT_METADATA</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">output_product_metadata</span></div>
 
 
-<div class="viewcode-block" id="DispS1StaticExecutor"><a class="viewcode-back" href="../../../../opera.pge.disp_s1.html#opera.pge.disp_s1.disp_s1_pge.DispS1StaticExecutor">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">DispS1StaticExecutor</span><span class="p">(</span><span class="n">DispS1StaticPreProcessorMixin</span><span class="p">,</span> <span class="n">DispS1StaticPostProcessorMixin</span><span class="p">,</span> <span class="n">DispS1Executor</span><span class="p">):</span>
+
+<div class="viewcode-block" id="DispS1StaticExecutor">
+<a class="viewcode-back" href="../../../../opera.pge.disp_s1.html#opera.pge.disp_s1.disp_s1_pge.DispS1StaticExecutor">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DispS1StaticExecutor</span><span class="p">(</span><span class="n">DispS1StaticPreProcessorMixin</span><span class="p">,</span> <span class="n">DispS1StaticPostProcessorMixin</span><span class="p">,</span> <span class="n">DispS1Executor</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Main class for execution of the DISP-S1-STATIC PGE, including the SAS layer.</span>
 <span class="sd">    This class essentially rolls up the DISP-STATIC-specific pre- and post-processor</span>
@@ -1378,6 +1423,7 @@
                 <span class="s1">&#39;*.png&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_browse_filename</span><span class="p">,</span>
             <span class="p">}</span>
         <span class="p">)</span></div>
+
 </pre></div>
 
            </div>
@@ -1387,7 +1433,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2021-2025 California Institute of Technology.</p>
+    <p>&#169; Copyright 2021-2026 California Institute of Technology.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

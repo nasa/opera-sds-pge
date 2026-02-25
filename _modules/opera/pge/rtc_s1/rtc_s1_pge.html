@@ -1,20 +1,20 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera.pge.rtc_s1.rtc_s1_pge &mdash; opera-sds-pge 6.0.0-er.2.0 documentation</title>
+  <title>opera.pge.rtc_s1.rtc_s1_pge &mdash; opera-sds-pge 7.0.0-er.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
-      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
 
   
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=136f5b14"></script>
-      <script src="../../../../_static/doctools.js?v=888ff710"></script>
-      <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="../../../../_static/documentation_options.js?v=d4e30586"></script>
+      <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
@@ -103,7 +103,9 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">opera.util.time</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_time_for_filename</span>
 
 
-<div class="viewcode-block" id="RtcS1PreProcessorMixin"><a class="viewcode-back" href="../../../../opera.pge.rtc_s1.html#opera.pge.rtc_s1.rtc_s1_pge.RtcS1PreProcessorMixin">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">RtcS1PreProcessorMixin</span><span class="p">(</span><span class="n">PreProcessorMixin</span><span class="p">):</span>
+<div class="viewcode-block" id="RtcS1PreProcessorMixin">
+<a class="viewcode-back" href="../../../../opera.pge.rtc_s1.html#opera.pge.rtc_s1.rtc_s1_pge.RtcS1PreProcessorMixin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RtcS1PreProcessorMixin</span><span class="p">(</span><span class="n">PreProcessorMixin</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Mixin class responsible for handling all pre-processing steps for the RTC-S1</span>
 <span class="sd">    PGE. The pre-processing phase is defined as all steps necessary prior to</span>
@@ -117,7 +119,9 @@
 
     <span class="n">_pre_mixin_name</span> <span class="o">=</span> <span class="s2">&quot;RtcS1PreProcessorMixin&quot;</span>
 
-<div class="viewcode-block" id="RtcS1PreProcessorMixin.run_preprocessor"><a class="viewcode-back" href="../../../../opera.pge.rtc_s1.html#opera.pge.rtc_s1.rtc_s1_pge.RtcS1PreProcessorMixin.run_preprocessor">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">run_preprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="RtcS1PreProcessorMixin.run_preprocessor">
+<a class="viewcode-back" href="../../../../opera.pge.rtc_s1.html#opera.pge.rtc_s1.rtc_s1_pge.RtcS1PreProcessorMixin.run_preprocessor">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run_preprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Executes the pre-processing steps for RTC-S1 PGE initialization.</span>
 
@@ -133,10 +137,14 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">run_preprocessor</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-        <span class="n">validate_slc_s1_inputs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div></div>
+        <span class="n">validate_slc_s1_inputs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
+</div>
 
 
-<div class="viewcode-block" id="RtcS1PostProcessorMixin"><a class="viewcode-back" href="../../../../opera.pge.rtc_s1.html#opera.pge.rtc_s1.rtc_s1_pge.RtcS1PostProcessorMixin">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">RtcS1PostProcessorMixin</span><span class="p">(</span><span class="n">PostProcessorMixin</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RtcS1PostProcessorMixin">
+<a class="viewcode-back" href="../../../../opera.pge.rtc_s1.html#opera.pge.rtc_s1.rtc_s1_pge.RtcS1PostProcessorMixin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RtcS1PostProcessorMixin</span><span class="p">(</span><span class="n">PostProcessorMixin</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Mixin class responsible for handling all post-processing steps for the RTC-S1</span>
 <span class="sd">    PGE. The post-processing phase is defined as all steps required after SAS</span>
@@ -382,7 +390,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">production_time</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">get_time_for_filename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">production_datetime</span><span class="p">)</span><span class="si">}</span><span class="s2">Z&quot;</span>
 
-        <span class="c1"># Get the sensor (should be either S1A or S1B)</span>
+        <span class="c1"># Get the sensor (should be one of S1A, S1B, or S1C)</span>
         <span class="n">sensor</span> <span class="o">=</span> <span class="n">get_sensor_from_spacecraft_name</span><span class="p">(</span><span class="n">product_metadata</span><span class="p">[</span><span class="s1">&#39;identification&#39;</span><span class="p">][</span><span class="s1">&#39;platform&#39;</span><span class="p">])</span>
 
         <span class="c1"># Spacing is assumed to be identical in both X and Y direction</span>
@@ -667,7 +675,7 @@
         <span class="c1"># a representative</span>
         <span class="n">product_metadata</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_burst_metadata_cache</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
 
-        <span class="c1"># Get the sensor (should be either S1A or S1B)</span>
+        <span class="c1"># Get the sensor (should be one of S1A, S1B, or S1C)</span>
         <span class="n">sensor</span> <span class="o">=</span> <span class="n">get_sensor_from_spacecraft_name</span><span class="p">(</span><span class="n">product_metadata</span><span class="p">[</span><span class="s1">&#39;identification&#39;</span><span class="p">][</span><span class="s1">&#39;platform&#39;</span><span class="p">])</span>
 
         <span class="c1"># Spacing is assumed to be identical in both X and Y direction</span>
@@ -907,7 +915,12 @@
 
         <span class="n">iso_template_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">iso_template_path</span><span class="p">)</span>
 
-        <span class="n">rendered_template</span> <span class="o">=</span> <span class="n">render_jinja2</span><span class="p">(</span><span class="n">iso_template_path</span><span class="p">,</span> <span class="n">iso_metadata</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>
+        <span class="n">rendered_template</span> <span class="o">=</span> <span class="n">render_jinja2</span><span class="p">(</span>
+            <span class="n">iso_template_path</span><span class="p">,</span>
+            <span class="n">iso_metadata</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">output_product_path</span>
+        <span class="p">)</span>
 
         <span class="k">return</span> <span class="n">rendered_template</span>
 
@@ -991,7 +1004,9 @@
             <span class="c1"># Log stream might be closed by this point so raise an Exception instead</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
-<div class="viewcode-block" id="RtcS1PostProcessorMixin.run_postprocessor"><a class="viewcode-back" href="../../../../opera.pge.rtc_s1.html#opera.pge.rtc_s1.rtc_s1_pge.RtcS1PostProcessorMixin.run_postprocessor">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">run_postprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="RtcS1PostProcessorMixin.run_postprocessor">
+<a class="viewcode-back" href="../../../../opera.pge.rtc_s1.html#opera.pge.rtc_s1.rtc_s1_pge.RtcS1PostProcessorMixin.run_postprocessor">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run_postprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Executes the post-processing steps for the RTC-S1 PGE.</span>
 
@@ -1010,10 +1025,14 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_run_sas_qa_executable</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_output</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_stage_output_files</span><span class="p">()</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stage_output_files</span><span class="p">()</span></div>
+</div>
 
 
-<div class="viewcode-block" id="RtcS1Executor"><a class="viewcode-back" href="../../../../opera.pge.rtc_s1.html#opera.pge.rtc_s1.rtc_s1_pge.RtcS1Executor">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">RtcS1Executor</span><span class="p">(</span><span class="n">RtcS1PreProcessorMixin</span><span class="p">,</span> <span class="n">RtcS1PostProcessorMixin</span><span class="p">,</span> <span class="n">PgeExecutor</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RtcS1Executor">
+<a class="viewcode-back" href="../../../../opera.pge.rtc_s1.html#opera.pge.rtc_s1.rtc_s1_pge.RtcS1Executor">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RtcS1Executor</span><span class="p">(</span><span class="n">RtcS1PreProcessorMixin</span><span class="p">,</span> <span class="n">RtcS1PostProcessorMixin</span><span class="p">,</span> <span class="n">PgeExecutor</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Main class for execution of the RTC-S1 PGE, including the SAS layer.</span>
 
@@ -1029,10 +1048,10 @@
     <span class="n">LEVEL</span> <span class="o">=</span> <span class="s2">&quot;L2&quot;</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Processing Level for RTC-S1 Products&quot;&quot;&quot;</span>
 
-    <span class="n">PGE_VERSION</span> <span class="o">=</span> <span class="s2">&quot;2.1.1&quot;</span>
+    <span class="n">PGE_VERSION</span> <span class="o">=</span> <span class="s2">&quot;2.1.4&quot;</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Version of the PGE (overrides default from base_pge)&quot;&quot;&quot;</span>
 
-    <span class="n">SAS_VERSION</span> <span class="o">=</span> <span class="s2">&quot;1.0.2&quot;</span>  <span class="c1"># Final release https://github.com/opera-adt/RTC/releases/tag/v1.0.2</span>
+    <span class="n">SAS_VERSION</span> <span class="o">=</span> <span class="s2">&quot;1.0.4&quot;</span>  <span class="c1"># Final release https://github.com/opera-adt/RTC/releases/tag/v1.0.4</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Version of the SAS wrapped by this PGE, should be updated as needed&quot;&quot;&quot;</span>
 
     <span class="n">SOURCE</span> <span class="o">=</span> <span class="s2">&quot;S1&quot;</span>
@@ -1062,6 +1081,7 @@
             <span class="s2">&quot;*.h5&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rtc_metadata_filename</span><span class="p">,</span>
             <span class="s2">&quot;*.nc&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rtc_metadata_filename</span>
         <span class="p">}</span></div>
+
 </pre></div>
 
            </div>
@@ -1071,7 +1091,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2021-2025 California Institute of Technology.</p>
+    <p>&#169; Copyright 2021-2026 California Institute of Technology.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
