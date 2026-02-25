@@ -237,3 +237,22 @@ class RunUtilsTestCase(unittest.TestCase):
         self.assertTrue(traceback_string)
         self.assertTrue(traceback_string.startswith("Traceback (most recent call last)"))
         self.assertTrue(traceback_string.endswith("AssertionError"))
+
+    def test_get_traceback_from_log_multiline_message(self):
+        """
+        Tests for run_utils.get_traceback_from_log() with SAS exceptions raised with an error message
+        containing multiple lines.
+        E.g. pydantic validation errors
+        """
+        # Test with canned SAS log output that contains a Traceback section for a
+        # pydantic validation error with a multiline message, along with other logging messages that
+        # should not be included (such as tqdm output)
+        with open(os.path.join(self.data_dir, "test_sas_log_with_traceback_multiline_message.txt"), "r") as infile:
+            log_contents = infile.read()
+
+        traceback_string = get_traceback_from_log(log_contents)
+
+        self.assertTrue(traceback_string)
+        self.assertTrue(traceback_string.startswith("Traceback (most recent call last)"))
+        self.assertTrue(traceback_string.endswith("For further information visit "
+                                                  "https://errors.pydantic.dev/2.12/v/value_error"))
