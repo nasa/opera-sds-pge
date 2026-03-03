@@ -142,58 +142,30 @@ Despeckling batch: 100%|██████████| 1/1 [00:54<00:00, 54.14s
 Despeckling batch: 100%|██████████| 1/1 [00:54<00:00, 54.14s/it]
 <This line should not be included in captured Traceback>
 Traceback (most recent call last):
-  File "/opt/miniforge/envs/dist-s1-env/bin/dist-s1", line 8, in <module>
+  File "/opt/conda/envs/dist-s1-env/bin/dist-s1", line 7, in <module>
     sys.exit(cli())
              ~~~^^
-  File "/opt/miniforge/envs/dist-s1-env/lib/python3.13/site-packages/click/core.py", line 1161, in __call__
+  File "/opt/conda/envs/dist-s1-env/lib/python3.13/site-packages/click/core.py", line 1485, in __call__
     return self.main(*args, **kwargs)
            ~~~~~~~~~^^^^^^^^^^^^^^^^^
-  File "/opt/miniforge/envs/dist-s1-env/lib/python3.13/site-packages/click/core.py", line 1082, in main
+  File "/opt/conda/envs/dist-s1-env/lib/python3.13/site-packages/click/core.py", line 1406, in main
     rv = self.invoke(ctx)
-  File "/opt/miniforge/envs/dist-s1-env/lib/python3.13/site-packages/click/core.py", line 1697, in invoke
+  File "/opt/conda/envs/dist-s1-env/lib/python3.13/site-packages/click/core.py", line 1873, in invoke
     return _process_result(sub_ctx.command.invoke(sub_ctx))
                            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
-  File "/opt/miniforge/envs/dist-s1-env/lib/python3.13/site-packages/click/core.py", line 1443, in invoke
+  File "/opt/conda/envs/dist-s1-env/lib/python3.13/site-packages/click/core.py", line 1269, in invoke
     return ctx.invoke(self.callback, **ctx.params)
            ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/miniforge/envs/dist-s1-env/lib/python3.13/site-packages/click/core.py", line 788, in invoke
-    return __callback(*args, **kwargs)
-  File "/opt/miniforge/envs/dist-s1-env/lib/python3.13/site-packages/dist_s1/__main__.py", line 181, in run_sas
-    run_dist_s1_sas_workflow(run_config)
-    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
-  File "/opt/miniforge/envs/dist-s1-env/lib/python3.13/site-packages/dist_s1/workflows.py", line 340, in run_dist_s1_sas_workflow
-    _ = run_dist_s1_processing_workflow(run_config)
-  File "/opt/miniforge/envs/dist-s1-env/lib/python3.13/site-packages/dist_s1/workflows.py", line 278, in run_dist_s1_processing_workflow
-    run_normal_param_estimation_workflow(run_config)
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
-  File "/opt/miniforge/envs/dist-s1-env/lib/python3.13/site-packages/dist_s1/workflows.py", line 130, in run_normal_param_estimation_workflow
-    df_burst_distmetrics = run_config.df_burst_distmetrics
-                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/miniforge/envs/dist-s1-env/lib/python3.13/site-packages/dist_s1/data_models/runconfig_model.py", line 371, in df_burst_distmetrics
-    ] = df_dist_by_burst.apply(
-        ~~~~~~~~~~~~~~~~~~~~~~^
-        generate_burst_dist_paths,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^
-    ...<7 lines>...
-        n_lookbacks=self.n_lookbacks,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/opt/miniforge/envs/dist-s1-env/lib/python3.13/site-packages/pandas/core/frame.py", line 10374, in apply
-    return op.apply().__finalize__(self, method="apply")
-           ~~~~~~~~^^
-  File "/opt/miniforge/envs/dist-s1-env/lib/python3.13/site-packages/pandas/core/apply.py", line 916, in apply
-    return self.apply_standard()
-           ~~~~~~~~~~~~~~~~~~~^^
-  File "/opt/miniforge/envs/dist-s1-env/lib/python3.13/site-packages/pandas/core/apply.py", line 1063, in apply_standard
-    results, res_index = self.apply_series_generator()
-                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
-  File "/opt/miniforge/envs/dist-s1-env/lib/python3.13/site-packages/pandas/core/apply.py", line 1081, in apply_series_generator
-    results[i] = self.func(v, *self.args, **self.kwargs)
-                 ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/miniforge/envs/dist-s1-env/lib/python3.13/site-packages/dist_s1/data_models/runconfig_model.py", line 54, in generate_burst_dist_paths
-    acq_date = date_lut[burst_id][n_lookbacks - lookback - 1]
-               ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-IndexError: list index out of range
+  File "/opt/conda/envs/dist-s1-env/lib/python3.13/site-packages/click/core.py", line 824, in invoke
+    return callback(*args, **kwargs)
+  File "/opt/conda/envs/dist-s1-env/lib/python3.13/site-packages/dist_s1/__main__.py", line 467, in run_sas
+    run_config = RunConfigData.from_yaml(run_config_path)
+  File "/opt/conda/envs/dist-s1-env/lib/python3.13/site-packages/dist_s1/data_models/runconfig_model.py", line 131, in from_yaml
+    config = cls(**run_params)
+  File "/opt/conda/envs/dist-s1-env/lib/python3.13/site-packages/pydantic/main.py", line 250, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+pydantic_core._pydantic_core.ValidationError: 1 validation error for RunConfigData
+  Value error, The following jpl burst IDs are in post-set but not in pre-set: T040-084864-IW1, T040-084864-IW2 [type=value_error, input_value=RunConfigData(check_input.../17MPT_water_mask.tif')), input_type=RunConfigData]
+    For further information visit https://errors.pydantic.dev/2.12/v/value_error
 
 <Additional logging that should not be included in captured traceback>

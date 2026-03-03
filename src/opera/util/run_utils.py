@@ -77,8 +77,12 @@ def get_traceback_from_log(log_contents):
     """
     result = ""
 
+    # This is still imperfect, given there's no guarantee that exception messages will have every extra line whitespace
+    # indented. This regex should still capture most exceptions: all single line messages, all message-less exceptions,
+    # the multi-line SAS exceptions which have been observed to be incorrectly truncated in issue #782
+    # Ref: https://github.com/nasa/opera-sds-pge/pull/783#pullrequestreview-3855633859
     exception_pattern = re.compile(
-        r"Traceback \(most recent call last\):(?:\n.*)+?\n(.*?(?:Exception|Error))(:\s*(.+))?"
+        r"Traceback \(most recent call last\):(?:\n.*)+?\n(.*?(?:Exception|Error))(:\s*(.+))?(?:\n[ \t\f\v][^\n]*)*"
     )
 
     traceback_match = exception_pattern.search(log_contents)
