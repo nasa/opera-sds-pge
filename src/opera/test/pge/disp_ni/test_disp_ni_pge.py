@@ -64,14 +64,30 @@ class DispNIPgeTestCase(unittest.TestCase):
         shutil.copy(join(self.data_dir, 'test_disp_ni_algorithm_parameters.yaml'), input_dir)
 
         # Create non-empty dummy input files expected by test runconfig
-        dummy_input_files = ['NISAR_L2_GSLC_NI_F150_20070703T062138Z_20240528T200959Z_NI_HH_v0.1.h5',
-                             'NISAR_L2_GSLC_NI_F150_20070818T062132Z_20240528T200952Z_NI_HH_v0.1.h5',
-                             'dem.tif', 'water_mask.tif',
-                             'NISAR_L2_PR_GUNW_001_005_A_219_220_4020_SH_20060630T000000_20060630T000000_20060815T000000_20060815T000000_P01101_M_F_J_001.h5',
-                             'NISAR_L2_PR_GUNW_001_005_A_219_220_4020_SH_20060815T000000_20060815T000000_20060930T000000_20060930T000000_P01101_M_F_J_001.h5',
-                             'Frame_to_bounds_DISP-NI_v0.1.json',
-                             'opera-disp-nisar-reference-dates-dummy.json',
-                             'opera-disp-ni-algorithm-parameters-overrides-2025-01-09.json']
+        dummy_input_files = [
+            # Input GLSCs
+            'NISAR_L2_PR_GSLC_004_151_A_011_4005_DHDH_A_20251108T155041_20251108T155058_X05009_N_P_J_001.h5',
+            'NISAR_L2_PR_GSLC_005_151_A_011_4005_DHDH_A_20251120T155041_20251120T155058_X05009_N_P_J_001.h5',
+            'NISAR_L2_PR_GSLC_006_151_A_011_4005_DHDH_A_20251202T155042_20251202T155059_X05009_N_P_J_001.h5',
+            'NISAR_L2_PR_GSLC_008_151_A_011_4005_DHDH_A_20251226T155043_20251226T155100_X05009_N_P_J_001.h5',
+            'NISAR_L2_PR_GSLC_009_151_A_011_4005_DHDH_A_20260107T155044_20260107T155100_X05010_N_P_J_001.h5',
+            'NISAR_L2_PR_GSLC_010_151_A_011_4005_DHDH_A_20260119T155044_20260119T155101_X05010_N_P_J_001.h5',
+
+            # Dynamic Ancillaries
+            'dem.tif', 'water_mask.tif',
+
+            # GUNW
+            'NISAR_L2_PR_GUNW_004_151_A_011_005_4000_SH_20251108T155041_20251108T155058_20251120T155041_20251120T155058_X05010_N_P_J_001.h5',
+            'NISAR_L2_PR_GUNW_005_151_A_011_006_4000_SH_20251120T155041_20251120T155058_20251202T155042_20251202T155059_X05010_N_P_J_001.h5',
+            'NISAR_L2_PR_GUNW_006_151_A_011_008_4000_SH_20251202T155042_20251202T155059_20251226T155043_20251226T155100_X05010_N_P_J_001.h5',
+            'NISAR_L2_PR_GUNW_008_151_A_011_009_4000_SH_20251226T155043_20251226T155100_20260107T155044_20260107T155100_X05010_N_P_J_001.h5',
+            'NISAR_L2_PR_GUNW_009_151_A_011_010_4000_SH_20260107T155044_20260107T155100_20260119T155044_20260119T155101_X05010_N_P_J_001.h5',
+
+            # Static Ancillaries
+            'Frame_to_bounds_DISP-NI_v0.1.json',
+            'opera-disp-nisar-reference-dates-dummy.json',
+            'opera-disp-ni-algorithm-parameters-overrides-2025-01-09.json'
+        ]
         for dummy_input_file in dummy_input_files:
             os.system(
                 f"echo \"non-empty file\" > {join(input_dir, dummy_input_file)}"
