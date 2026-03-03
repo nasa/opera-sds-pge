@@ -311,7 +311,7 @@ class DispNIPgeTestCase(unittest.TestCase):
         # Test invalid file extension
 
         logger = PgeLogger()
-        test_filename = "NISAR_L2_GSLC_NI_F150_20070703T062138Z_20240528T200959Z_NI_HH_v0.1.inv"
+        test_filename = "NISAR_L2_PR_GSLC_004_151_A_011_4005_DHDH_A_20251108T155041_20251108T155058_X05009_N_P_J_001.inv"
         with open(test_filename, 'w') as ief:
             ief.write("\n")
         sas_config['input_file_group']['gslc_file_list'] = [test_filename]
@@ -331,7 +331,7 @@ class DispNIPgeTestCase(unittest.TestCase):
         # Test for non-zero file size
 
         logger = PgeLogger()
-        test_filename = "NISAR_L2_GSLC_NI_F150_20070703T062138Z_20240528T200959Z_NI_HH_v0.1_zero_size_file.h5"
+        test_filename = "NISAR_L2_PR_GSLC_004_151_A_011_4005_DHDH_A_20251108T155041_20251108T155058_X05009_N_P_J_001_zero_size_file.h5"
         open(test_filename, 'w').close()
         self.assertTrue(exists(test_filename))
         sas_config['input_file_group']['gslc_file_list'] = [test_filename]
@@ -350,12 +350,15 @@ class DispNIPgeTestCase(unittest.TestCase):
 
         # Test all input files with valid files
         test_filenames = [
-            "NISAR_L2_GSLC_NI_F150_20070703T062138Z_20240528T200959Z_NI_HH_v0.1.h5",
-            "NISAR_L2_GSLC_NI_F150_20070818T062132Z_20240528T200952Z_NI_HH_v0.1.h5"
+            'NISAR_L2_PR_GSLC_004_151_A_011_4005_DHDH_A_20251108T155041_20251108T155058_X05009_N_P_J_001.h5',
+            'NISAR_L2_PR_GSLC_005_151_A_011_4005_DHDH_A_20251120T155041_20251120T155058_X05009_N_P_J_001.h5',
+            'NISAR_L2_PR_GSLC_006_151_A_011_4005_DHDH_A_20251202T155042_20251202T155059_X05009_N_P_J_001.h5',
+            'NISAR_L2_PR_GSLC_008_151_A_011_4005_DHDH_A_20251226T155043_20251226T155100_X05009_N_P_J_001.h5',
         ]
         test_gunw_filenames = [
-            "NISAR_L2_PR_GUNW_001_005_A_219_220_4020_SH_20060630T000000_20060630T000000_20060815T000000_20060815T000000_P01101_M_F_J_001.h5",
-            "NISAR_L2_PR_GUNW_001_005_A_219_220_4020_SH_20060815T000000_20060815T000000_20060930T000000_20060930T000000_P01101_M_F_J_001.h5"
+            "NISAR_L2_PR_GUNW_004_151_A_011_005_4000_SH_20251108T155041_20251108T155058_20251120T155041_20251120T155058_X05010_N_P_J_001.h5",
+            "NISAR_L2_PR_GUNW_005_151_A_011_006_4000_SH_20251120T155041_20251120T155058_20251202T155042_20251202T155059_X05010_N_P_J_001.h5",
+            "NISAR_L2_PR_GUNW_006_151_A_011_008_4000_SH_20251202T155042_20251202T155059_20251226T155043_20251226T155100_X05010_N_P_J_001.h5",
         ]
         for test_f in test_filenames + test_gunw_filenames:
             with open(test_f, 'w') as ief:
@@ -382,7 +385,7 @@ class DispNIPgeTestCase(unittest.TestCase):
         self.assertTrue(exists(log_file))
         with open(log_file, 'r', encoding='utf-8') as lfile:
             log = lfile.read()
-        self.assertIn('Differing numbers of GSLC files and GUNW files', log)
+        self.assertIn('Number of GUNW files does not equal the number of GLSC files - 1', log)
 
         for test_f in test_filenames + test_gunw_filenames:
             os.remove(test_f)
