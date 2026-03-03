@@ -64,6 +64,10 @@ RunConfig:
                 # REQUIRED: Polarization of the gslcs contained in `gslc_file_list`.
                 #   Type: string.
                 polarization: HH
+                # (For FORWARD/'Catch up' HISTORICAL processing mode) last processed date for the frame. If
+                #  provided, the SAS will only output products whose secondary datetime is *after*
+                #  `last_processed`. Otherwise, the SAS will output all products.
+                last_processed:
             dynamic_ancillary_file_group:
                 # REQUIRED: Path to file containing SAS algorithm parameters.
                 #   Type: string.
@@ -86,6 +90,9 @@ RunConfig:
                 #   Type: array | null.
                 troposphere_files:
             static_ancillary_file_group:
+                # JSON file containing frame-specific algorithm parameters to override the
+                # defaults passed in the `algorithm_parameters.yaml`.
+                algorithm_parameters_overrides_json: disp_ni_pge_test/input_dir/opera-disp-ni-algorithm-parameters-overrides-2025-01-09.json
                 # JSON file containing the mapping from frame_id to bounds information.
                 #   Type: string | null.
                 frame_to_bounds_json: disp_ni_pge_test/input_dir/Frame_to_bounds_DISP-NI_v0.1.json

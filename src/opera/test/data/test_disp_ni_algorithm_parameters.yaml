@@ -1,7 +1,6 @@
 # JSON file containing frame-specific algorithm parameters to override the defaults passed
 #   in the `algorithm_parameters.yaml`.
 #   Type: string | null.
-algorithm_parameters_overrides_json: opera-disp-s1-algorithm-parameters-overrides-2025-01-09.json
 ps_options:
   # Amplitude dispersion threshold to consider a pixel a PS.
   #   Type: number.
@@ -253,9 +252,6 @@ timeseries_options:
   #   Type: integer.
   num_parallel_blocks: 4
 output_options:
-  # Output (x, y) resolution (in units of input data).
-  #   Type: object | null.
-  output_resolution:
   # Alternative to specifying output resolution: Specify the (x, y) strides (decimation
   #   factor) to perform while processing input. For example, strides of [4, 2] would turn an
   #   input resolution of [5, 10] into an output resolution of [20, 20].
@@ -333,6 +329,6 @@ recommended_similarity_threshold: 0.30
 # When creating `recommended_mask`, use the `connected_component_label`"
 #   layer to hide pixels whose label == 0.
 #   Type: boolean.
-#recommended_use_conncomp: false
+recommended_use_conncomp: false
 # Number of output products to create in parallel.
 num_parallel_products: 3

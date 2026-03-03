@@ -70,7 +70,8 @@ class DispNIPgeTestCase(unittest.TestCase):
                              'NISAR_L2_PR_GUNW_001_005_A_219_220_4020_SH_20060630T000000_20060630T000000_20060815T000000_20060815T000000_P01101_M_F_J_001.h5',
                              'NISAR_L2_PR_GUNW_001_005_A_219_220_4020_SH_20060815T000000_20060815T000000_20060930T000000_20060930T000000_P01101_M_F_J_001.h5',
                              'Frame_to_bounds_DISP-NI_v0.1.json',
-                             'opera-disp-nisar-reference-dates-dummy.json',]
+                             'opera-disp-nisar-reference-dates-dummy.json',
+                             'opera-disp-ni-algorithm-parameters-overrides-2025-01-09.json']
         for dummy_input_file in dummy_input_files:
             os.system(
                 f"echo \"non-empty file\" > {join(input_dir, dummy_input_file)}"
