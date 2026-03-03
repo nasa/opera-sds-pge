@@ -1,6 +1,6 @@
 ps_options:
     # Amplitude dispersion threshold to consider a pixel a PS.
-    amp_dispersion_threshold: num()
+    amp_dispersion_threshold: num(min=0)
 phase_linking:
     # Size of the ministack for sequential estimator.
     ministack_size: int(min=2)
@@ -12,9 +12,9 @@ phase_linking:
     output_reference_idx: int(required=False)
     half_window:
         # Half window size (in pixels) for x direction.
-        x: int()
+        x: int(min=1)
         # Half window size (in pixels) for y direction.
-        y: int()
+        y: int(min=1)
     # Use EVD on the coherence instead of using the EMI algorithm.
     use_evd: bool()
     # Beta regularization parameter for correlation matrix inversion. 0 is no regularization.
@@ -33,18 +33,24 @@ phase_linking:
     # StBAS parameter to include only nearest-N interferograms forphase linking. A
     #   `baseline_lag` of `n` will only include the closest`n` interferograms. `baseline_line`
     #   must be positive.
-    baseline_lag: any(int(min=0), null())
+    baseline_lag: any(int(min=1), null())
     # Plan for creating Compressed SLCs during phase linking.
     compressed_slc_plan: enum('always_first', 'first_per_ministack', 'last_per_ministack')
+    # Write out (and stitch, if processing multiple geocoded bursts) rasters containing the
+    # Cramer-Rao Lower Bound (CRLB) estimates.
+    write_crlb: bool(required=False)
+    # Write out (and stitch, if processing multiple geocoded bursts) rasters containing the
+    # sequential closure phase from the nearest-3 triplets in the coherence matrix.
+    write_closure_phase: bool(required=False)
 interferogram_network:
     # For single-reference network: Index of the reference image in the network.
     reference_idx: any(int(), null())
     # Max n to form the nearest-n interferograms by index.
-    max_bandwidth: any(int(), null())
+    max_bandwidth: any(int(min=1), null())
     # Maximum temporal baseline of interferograms.
-    max_temporal_baseline: any(int(), null())
+    max_temporal_baseline: any(int(min=0), null())
     # For manual-index network: List of (ref_idx, sec_idx) defining the interferograms to form.
-    indexes: any(list(list()), null())
+    indexes: any(list(list(int(), min=2, max=2)), null())
 unwrap_options:
     # Whether to run the unwrapping step after wrapped phase estimation.
     run_unwrap: bool()
@@ -69,9 +75,15 @@ unwrap_options:
         # Threshold on the correlation raster to use for interpolation. Pixels with less than this
         #   value are replaced by a weighted combination of neighboring pixels.
         interpolation_similarity_threshold: num(min=0.0, max=1.0)
+        # (for interpolation) Set the pixels where we have masked + interpolated"
+        # data to have 0 correlation for the unwrapper. If False, the interpolated"
+        # pixels keep their old correlation. If True, the behavior can be unwrapper"
+        # dependent (the unwrapper may choose to skip over these pixels when"
+        # solving)."
+        zero_correlation_where_interpolating: bool(required=False)
     snaphu_options:
         # Number of tiles to split the inputs into using SNAPHU's internal tiling.
-        ntiles: list(int())
+        ntiles: list(int(), min=2, max=2)
         # Amount of tile overlap (in pixels) along the (row, col) directions.
         tile_overlap: list(int(), min=2, max=2)
         # Number of tiles to unwrap in parallel for each interferogram.
@@ -85,9 +97,9 @@ unwrap_options:
         single_tile_reoptimize: bool()
     tophu_options:
         # Number of tiles to split the inputs into.
-        ntiles: list(int())
+        ntiles: list(int(), min=2, max=2)
         # Extra multilook factor to use for the coarse unwrap.
-        downsample_factor: list(int())
+        downsample_factor: list(int(), min=2, max=2)
         # Initialization method for SNAPHU.
         init_method: enum('mcf', 'mst')
         # Statistical cost mode method for SNAPHU.
@@ -165,13 +177,18 @@ timeseries_options:
     block_shape: list(int(), min=2, max=2)
     # Number of parallel blocks to process at once.
     num_parallel_blocks: int()
+    # If providing a mask file, whether to apply the mask to the timeseries. If"
+    # True, the time series rasters will zero out pixels labeled as 0 in the"
+    # mask file."
+    apply_mask_to_timeseries: bool(required=False)
 output_options:
-    # Output (x, y) resolution (in units of input data).
-    output_resolution: any(include('x_y_object'), null())
     # Alternative to specifying output resolution: Specify the (x, y) strides (decimation
     # factor) to perform while processing input. For example, strides of [4, 2] would turn an
     # input resolution of [5, 10] into an output resolution of [20, 20].
     strides: include('x_y_object')
+    # EPSG code of desired output products (for geocoded SLCs only)."
+    # If None, uses the most common projection of the input data."
+    epsg: any(int(), null(), required=False)
     # Area of interest: (left, bottom, right, top) longitude/latitude e.g.
     # `bbox=(-150.2,65.0,-150.1,65.5)`.
     bounds: any(list(num(), min=4, max=4), null())
@@ -201,9 +218,6 @@ output_options:
     # or YYYY-MM-DD
     extra_reference_date: any(str(), null())
 
-# JSON file containing frame-specific algorithm parameters to override the
-# defaults passed in the `algorithm_parameters.yaml`.
-algorithm_parameters_overrides_json: any(str(), null())
 # Name of the subdataset to use in the input NetCDF files.
 subdataset: str()
 # Spatial wavelength cutoff (in meters) for the spatial filter. Used to
@@ -217,12 +231,14 @@ recommended_temporal_coherence_threshold: num()
 # When creating `recommended_mask`, pixels with similarity below this threshold and with temporal coherence below
 # `recommended_temporal_coherence_threshold` are masked.
 recommended_similarity_threshold: num()
-# Number of output products to create in parallel.
-num_parallel_products: int()
 # When creating `recommended_mask`, use the `connected_component_label` layer to hide pixels whose label == 0.
-# Disabled for now, but I suspect this will be used in the future since it was recently added to DISP-S1
-# recommended_use_conncomp: bool()
+recommended_use_conncomp: bool()
+# Number of output products to create in parallel.
+num_parallel_products: int(min=1)
+# When running forward mode, size of the interferogram network for form with the latest date.
+# Valid choices are 3 (default) and 4
+forward_mode_network_size: int(min=3, max=4, required=False)
 ---
 x_y_object:
-    x: int()
-    y: int()
+    x: int(min=1)
+    y: int(min=1)
