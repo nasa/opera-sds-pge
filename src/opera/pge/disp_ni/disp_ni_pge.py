@@ -73,7 +73,7 @@ class DispNIPostProcessorMixin(DispS1PostProcessorMixin):
 
         The core file name component of the DISP-NI PGE consists of:
 
-        <PROJECT>_<LEVEL>_<PGE NAME>_<TRACK>_<DIRECTION>_<FRAME>_<BANDWIDTH>_<POLARIZATION>_\
+        <PROJECT>_<LEVEL>_<PGE NAME>_<BANDWIDTH>_<FRAME>_<POLARIZATION>_\
         <ReferenceDateTime>_<SecondaryDateTime>_<ProductVersion>_\
         <ProductGenerationDateTime>
 
@@ -99,9 +99,6 @@ class DispNIPostProcessorMixin(DispS1PostProcessorMixin):
             f"{self.PROJECT}_{self.LEVEL}_{self.NAME}"
         )
 
-        frame_id = f"{self.runconfig.sas_config['input_file_group']['frame_id']:03d}"
-        pol = self.runconfig.sas_config['input_file_group']['polarization']
-
         inter_disp_product_filename = '.'.join(inter_filename.split('.')[:1] + ["nc"])
 
         # Check if we've already cached the product metadata corresponding to
@@ -113,15 +110,35 @@ class DispNIPostProcessorMixin(DispS1PostProcessorMixin):
             disp_metadata = self._collect_disp_ni_product_metadata(inter_disp_product_filename)
             self._product_metadata_cache[inter_disp_product_filename] = disp_metadata
 
-        # TODO: Update when metadata fields are relocated
-        orbit_track = f'{disp_metadata["extra"]["trackNumber"]:03d}'
-        if disp_metadata["extra"]["orbitPassDirection"].lower() == 'ascending':
-            orbit_direction = 'A'
-        else:
-            orbit_direction = 'B'
+        frame_id = f"{self.runconfig.sas_config['input_file_group']['frame_id']:05d}"
 
-        # TODO: This is hardcoded. Where in the metadata?
-        mode = "40"
+        # TODO: POL and MODE are derived from GSLC/GUNW, though in the current delivery, neither seem
+        #  to be a perfect match to spec (ie pol + mode in GSLC is DHDH + 4005 and in GUNW it is SH + 4000
+        #  Let's extract all these fields here and follow up with ADT
+
+        gslc_fields = self.runconfig.sas_config['input_file_group']['gslc_file_list'][0].split('_')
+        if (
+                'gunw_files' in self.runconfig.sas_config['dynamic_ancillary_file_group'] and
+                len(self.runconfig.sas_config['dynamic_ancillary_file_group']['gunw_files']) > 0
+        ):
+            gunw_fields = self.runconfig.sas_config['dynamic_ancillary_file_group']['gunw_files'][0].split('_')
+        else:
+            gunw_fields = None
+
+        runconfig_pol = self.runconfig.sas_config['input_file_group']['polarization']
+
+        gslc_mode = gslc_fields[8]
+        gslc_pol = gslc_fields[9][:2]
+
+        if gunw_fields:
+            gunw_mode = gunw_fields[9]
+            gunw_pol = gunw_fields[10]
+        else:
+            gunw_mode = None
+            gunw_pol = None
+
+        mode = gunw_mode if gunw_mode is not None else gslc_mode
+        pol = gunw_pol if gunw_pol is not None else gslc_pol
 
         # ReferenceDateTime: The acquisition sensing start date and time of
         # the input satellite imagery for the first burst in the frame of the
@@ -147,7 +164,7 @@ class DispNIPostProcessorMixin(DispS1PostProcessorMixin):
         product_generation_date_time = f"{get_time_for_filename(self.production_datetime)}Z"
 
         disp_ni_product_filename = (
-            f"{core_filename}_{orbit_track}_{orbit_direction}_{frame_id}_{mode}_{pol}_"
+            f"{core_filename}_{mode}_{frame_id}_{pol}_"
             f"{reference_date_time}_{secondary_date_time}_{product_version}_"
             f"{product_generation_date_time}"
         )
@@ -198,7 +215,7 @@ class DispNIPostProcessorMixin(DispS1PostProcessorMixin):
 
         The core file name component DISP-NI ancillary products consists of:
 
-        <PROJECT>_<LEVEL>_<PGE NAME>_<TRACK>_<DIRECTION>_<FRAME>_<BANDWIDTH>_<POLARIZATION>_
+        <PROJECT>_<LEVEL>_<PGE NAME>_<FRAME>_<POLARIZATION>_\
         <ProductVersion>_<ProductGenerationDateTime>
 
         Since these files are note specific to any particular DISP-NI output
@@ -221,8 +238,31 @@ class DispNIPostProcessorMixin(DispS1PostProcessorMixin):
             f"{self.PROJECT}_{self.LEVEL}_{self.NAME}"
         )
 
-        frame_id = f"{self.runconfig.sas_config['input_file_group']['frame_id']:03d}"
-        pol = self.runconfig.sas_config['input_file_group']['polarization']
+        frame_id = f"{self.runconfig.sas_config['input_file_group']['frame_id']:05d}"
+
+        # TODO: POL and MODE are derived from GSLC/GUNW, though in the current delivery, neither seem
+        #  to be a perfect match to spec (ie pol + mode in GSLC is DHDH + 4005 and in GUNW it is SH + 4000
+        #  Let's extract all these fields here and follow up with ADT
+
+        gslc_fields = self.runconfig.sas_config['input_file_group']['gslc_file_list'][0].split('_')
+        if (
+                'gunw_files' in self.runconfig.sas_config['dynamic_ancillary_file_group'] and
+                len(self.runconfig.sas_config['dynamic_ancillary_file_group']['gunw_files']) > 0
+        ):
+            gunw_fields = self.runconfig.sas_config['dynamic_ancillary_file_group']['gunw_files'][0].split('_')
+        else:
+            gunw_fields = None
+
+        runconfig_pol = self.runconfig.sas_config['input_file_group']['polarization']
+
+        gslc_pol = gslc_fields[9][:2]
+
+        if gunw_fields:
+            gunw_pol = gunw_fields[10]
+        else:
+            gunw_pol = None
+
+        pol = gunw_pol if gunw_pol is not None else gslc_pol
 
         product_version = self.runconfig.sas_config['product_path_group']['product_version']
 
@@ -256,7 +296,7 @@ class DispNIPostProcessorMixin(DispS1PostProcessorMixin):
         """
         # Extract all metadata assigned by the SAS at product creation time
         try:
-            output_product_metadata = get_disp_product_metadata(disp_product, extra='/science/LSAR/identification')
+            output_product_metadata = get_disp_product_metadata(disp_product)
 
             # Add hardcoded values to metadata
             output_product_metadata['static'] = {

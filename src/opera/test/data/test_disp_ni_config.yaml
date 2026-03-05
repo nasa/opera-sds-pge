@@ -69,7 +69,7 @@ RunConfig:
                     - disp_ni_pge_test/input_dir/NISAR_L2_PR_GSLC_010_151_A_011_4005_DHDH_A_20260119T155044_20260119T155101_X05010_N_P_J_001.h5
                 # REQUIRED: Frame ID of the gslcs contained in `gslc_file_list`.
                 #   Type: integer.
-                frame_id: 150
+                frame_id: 26410
                 # REQUIRED: Frequency in which gslcs are acquired.
                 #   Type: string.
                 frequency: frequencyA
