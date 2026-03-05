@@ -22,11 +22,12 @@ RunConfig:
         # as well as the paths to any compressed SLC products.
         # Paths must correspond to the file system within the Docker container
         InputFilePaths:
-          - /home/mamba/input_dir/input_slcs/NISAR_L2_GSLC_NI_F150_20060630T061920Z_20240528T200256Z_NI_HH_v0.1.h5
-          - /home/mamba/input_dir/input_slcs/NISAR_L2_GSLC_NI_F150_20060815T061952Z_20240528T200246Z_NI_HH_v0.1.h5
-          - /home/mamba/input_dir/input_slcs/NISAR_L2_GSLC_NI_F150_20060930T062029Z_20240528T200242Z_NI_HH_v0.1.h5
-          - /home/mamba/input_dir/input_slcs/NISAR_L2_GSLC_NI_F150_20061115T062055Z_20240528T200248Z_NI_HH_v0.1.h5
-          - /home/mamba/input_dir/input_slcs/NISAR_L2_GSLC_NI_F150_20061231T062124Z_20240528T200247Z_NI_HH_v0.1.h5
+          - /home/mamba/input_dir/input_slcs/NISAR_L2_PR_GSLC_004_151_A_011_4005_DHDH_A_20251108T155041_20251108T155058_X05009_N_P_J_001.h5
+          - /home/mamba/input_dir/input_slcs/NISAR_L2_PR_GSLC_005_151_A_011_4005_DHDH_A_20251120T155041_20251120T155058_X05009_N_P_J_001.h5
+          - /home/mamba/input_dir/input_slcs/NISAR_L2_PR_GSLC_006_151_A_011_4005_DHDH_A_20251202T155042_20251202T155059_X05009_N_P_J_001.h5
+          - /home/mamba/input_dir/input_slcs/NISAR_L2_PR_GSLC_008_151_A_011_4005_DHDH_A_20251226T155043_20251226T155100_X05009_N_P_J_001.h5
+          - /home/mamba/input_dir/input_slcs/NISAR_L2_PR_GSLC_009_151_A_011_4005_DHDH_A_20260107T155044_20260107T155100_X05010_N_P_J_001.h5
+          - /home/mamba/input_dir/input_slcs/NISAR_L2_PR_GSLC_010_151_A_011_4005_DHDH_A_20260119T155044_20260119T155101_X05010_N_P_J_001.h5
 
       DynamicAncillaryFilesGroup:
         # Map of ancillary file types to paths to the file
@@ -37,15 +38,15 @@ RunConfig:
 
           # Optional Byte mask file (.tif or .vrt) used to ignore low correlation/bad data (e.g water mask).
           # Convention is 0 for no data/invalid, and 1 for good data. Dtype must be uint8.
-          mask_file: /home/mamba/input_dir/dynamic_ancillary_files/water_mask.tif
+          mask_file: /home/mamba/input_dir/dynamic_ancillary_files/water_mask.vrt
 
           # List of paths to GUNW files for ionosphere, SET and static geometry layers
           gunw_files:
-            - /home/mamba/input_dir/dynamic_ancillary_files/gunw_files/NISAR_L2_PR_GUNW_001_005_A_219_220_4020_SH_20060630T000000_20060630T000000_20060815T000000_20060815T000000_P01101_M_F_J_001.h5
-            - /home/mamba/input_dir/dynamic_ancillary_files/gunw_files/NISAR_L2_PR_GUNW_001_005_A_219_220_4020_SH_20060815T000000_20060815T000000_20060930T000000_20060930T000000_P01101_M_F_J_001.h5
-            - /home/mamba/input_dir/dynamic_ancillary_files/gunw_files/NISAR_L2_PR_GUNW_001_005_A_219_220_4020_SH_20060930T000000_20060930T000000_20061115T000000_20061115T000000_P01101_M_F_J_001.h5
-            - /home/mamba/input_dir/dynamic_ancillary_files/gunw_files/NISAR_L2_PR_GUNW_001_005_A_219_220_4020_SH_20061115T000000_20061115T000000_20061231T000000_20061231T000000_P01101_M_F_J_001.h5
-            - /home/mamba/input_dir/dynamic_ancillary_files/gunw_files/NISAR_L2_PR_GUNW_001_005_A_219_220_4020_SH_20061231T000000_20061231T000000_20070215T000000_20070215T000000_P01101_M_F_J_001.h5
+            - /home/mamba/input_dir/dynamic_ancillary_files/gunw_files/NISAR_L2_PR_GUNW_004_151_A_011_005_4000_SH_20251108T155041_20251108T155058_20251120T155041_20251120T155058_X05010_N_P_J_001.h5
+            - /home/mamba/input_dir/dynamic_ancillary_files/gunw_files/NISAR_L2_PR_GUNW_005_151_A_011_006_4000_SH_20251120T155041_20251120T155058_20251202T155042_20251202T155059_X05010_N_P_J_001.h5
+            - /home/mamba/input_dir/dynamic_ancillary_files/gunw_files/NISAR_L2_PR_GUNW_006_151_A_011_008_4000_SH_20251202T155042_20251202T155059_20251226T155043_20251226T155100_X05010_N_P_J_001.h5
+            - /home/mamba/input_dir/dynamic_ancillary_files/gunw_files/NISAR_L2_PR_GUNW_008_151_A_011_009_4000_SH_20251226T155043_20251226T155100_20260107T155044_20260107T155100_X05010_N_P_J_001.h5
+            - /home/mamba/input_dir/dynamic_ancillary_files/gunw_files/NISAR_L2_PR_GUNW_009_151_A_011_010_4000_SH_20260107T155044_20260107T155100_20260119T155044_20260119T155101_X05010_N_P_J_001.h5
 
           # List of paths to troposphere weather model files (1 per date). If none provided, troposphere
           #  corrections are skipped.
@@ -69,7 +70,7 @@ RunConfig:
       PrimaryExecutable:
         # Identifier for the PGE executable, should always be DISP_NI for
         # this PGE
-        ProductIdentifier: DISP_NI
+        ProductIdentifier: DISP_N1
 
         # Product version specific to output products
         ProductVersion: "1.0"
@@ -145,59 +146,68 @@ RunConfig:
     # is isolated into its own YAML file for use with the SAS
     SAS:
       input_file_group:
-        # REQUIRED: List of paths to GSLC files.
-        #   Type: list.
+        # REQUIRED: list of paths to GSLC files.
+        #   Type: array.
         gslc_file_list:
-          - /home/mamba/input_dir/input_slcs/NISAR_L2_GSLC_NI_F150_20060630T061920Z_20240528T200256Z_NI_HH_v0.1.h5
-          - /home/mamba/input_dir/input_slcs/NISAR_L2_GSLC_NI_F150_20060815T061952Z_20240528T200246Z_NI_HH_v0.1.h5
-          - /home/mamba/input_dir/input_slcs/NISAR_L2_GSLC_NI_F150_20060930T062029Z_20240528T200242Z_NI_HH_v0.1.h5
-          - /home/mamba/input_dir/input_slcs/NISAR_L2_GSLC_NI_F150_20061115T062055Z_20240528T200248Z_NI_HH_v0.1.h5
-          - /home/mamba/input_dir/input_slcs/NISAR_L2_GSLC_NI_F150_20061231T062124Z_20240528T200247Z_NI_HH_v0.1.h5
-
+          - /home/mamba/input_dir/input_slcs/NISAR_L2_PR_GSLC_004_151_A_011_4005_DHDH_A_20251108T155041_20251108T155058_X05009_N_P_J_001.h5
+          - /home/mamba/input_dir/input_slcs/NISAR_L2_PR_GSLC_005_151_A_011_4005_DHDH_A_20251120T155041_20251120T155058_X05009_N_P_J_001.h5
+          - /home/mamba/input_dir/input_slcs/NISAR_L2_PR_GSLC_006_151_A_011_4005_DHDH_A_20251202T155042_20251202T155059_X05009_N_P_J_001.h5
+          - /home/mamba/input_dir/input_slcs/NISAR_L2_PR_GSLC_008_151_A_011_4005_DHDH_A_20251226T155043_20251226T155100_X05009_N_P_J_001.h5
+          - /home/mamba/input_dir/input_slcs/NISAR_L2_PR_GSLC_009_151_A_011_4005_DHDH_A_20260107T155044_20260107T155100_X05010_N_P_J_001.h5
+          - /home/mamba/input_dir/input_slcs/NISAR_L2_PR_GSLC_010_151_A_011_4005_DHDH_A_20260119T155044_20260119T155101_X05010_N_P_J_001.h5
         # REQUIRED: Frame ID of the bursts contained in `gslc_file_list`.
         #   Type: integer.
-        frame_id: 150
-
+        frame_id: 26410
         # REQUIRED: Frequency in which gslcs are acquired.
         #   Type: string.
         frequency: frequencyA
         # REQUIRED: Polarization of the gslcs contained in `gslc_file_list`.
         #   Type: string.
         polarization: HH
-      dynamic_ancillary_file_group:
-                # REQUIRED: Path to file containing SAS algorithm parameters.
-        #   Type: string.
-        algorithm_parameters_file: /home/mamba/runconfig/opera_pge_disp_ni_r1.0_interface_algorithm_parameters_historical.yaml
-        # Optional Byte mask file used to ignore low correlation/bad data (e.g water mask).
-        #   Convention is 0 for no data/invalid, and 1 for good data. Dtype must be uint8.
+        # (For FORWARD mode) last processed date for the frame. If provided, the SAS will only
+        #   output products whose secondary datetime is *after* `last_processed`.
         #   Type: string | null.
-        mask_file: /home/mamba/input_dir/dynamic_ancillary_files/water_mask.tif
+        last_processed:
+      dynamic_ancillary_file_group:
+        # REQUIRED: Path to file containing SAS algorithm parameters.
+        #   Type: string.
+        algorithm_parameters_file: /home/mamba/runconfig/algorithm_parameters.yaml
+        # Paths to the GSLC static_layer files (1 per burst) with line-of-sight unit vectors. If
+        #   none provided, corrections using GSLC static_layer are skipped.
+        #   Type: array.
+        mask_file: /home/mamba/input_dir/dynamic_ancillary_files/water_mask.vrt
         # Path to the DEM file covering full frame. If none provided, corrections using DEM are
         #   skipped.
         #   Type: string | null.
         dem_file:
-        # List of paths to GUNW files for ionosphere, SET and static geometry layers.
+        # List of paths to gunw files for ionosphere correction. They are interferograms and need
+        #   to cover the date range in GSLC data list. If none
+        #   provided, ionosphere corrections are skipped.
         #   Type: array | null.
         gunw_files:
-          - /home/mamba/input_dir/dynamic_ancillary_files/gunw_files/NISAR_L2_PR_GUNW_001_005_A_219_220_4020_SH_20060630T000000_20060630T000000_20060815T000000_20060815T000000_P01101_M_F_J_001.h5
-          - /home/mamba/input_dir/dynamic_ancillary_files/gunw_files/NISAR_L2_PR_GUNW_001_005_A_219_220_4020_SH_20060815T000000_20060815T000000_20060930T000000_20060930T000000_P01101_M_F_J_001.h5
-          - /home/mamba/input_dir/dynamic_ancillary_files/gunw_files/NISAR_L2_PR_GUNW_001_005_A_219_220_4020_SH_20060930T000000_20060930T000000_20061115T000000_20061115T000000_P01101_M_F_J_001.h5
-          - /home/mamba/input_dir/dynamic_ancillary_files/gunw_files/NISAR_L2_PR_GUNW_001_005_A_219_220_4020_SH_20061115T000000_20061115T000000_20061231T000000_20061231T000000_P01101_M_F_J_001.h5
-          - /home/mamba/input_dir/dynamic_ancillary_files/gunw_files/NISAR_L2_PR_GUNW_001_005_A_219_220_4020_SH_20061231T000000_20061231T000000_20070215T000000_20070215T000000_P01101_M_F_J_001.h5
+          - /home/mamba/input_dir/dynamic_ancillary_files/gunw_files/NISAR_L2_PR_GUNW_004_151_A_011_005_4000_SH_20251108T155041_20251108T155058_20251120T155041_20251120T155058_X05010_N_P_J_001.h5
+          - /home/mamba/input_dir/dynamic_ancillary_files/gunw_files/NISAR_L2_PR_GUNW_005_151_A_011_006_4000_SH_20251120T155041_20251120T155058_20251202T155042_20251202T155059_X05010_N_P_J_001.h5
+          - /home/mamba/input_dir/dynamic_ancillary_files/gunw_files/NISAR_L2_PR_GUNW_006_151_A_011_008_4000_SH_20251202T155042_20251202T155059_20251226T155043_20251226T155100_X05010_N_P_J_001.h5
+          - /home/mamba/input_dir/dynamic_ancillary_files/gunw_files/NISAR_L2_PR_GUNW_008_151_A_011_009_4000_SH_20251226T155043_20251226T155100_20260107T155044_20260107T155100_X05010_N_P_J_001.h5
+          - /home/mamba/input_dir/dynamic_ancillary_files/gunw_files/NISAR_L2_PR_GUNW_009_151_A_011_010_4000_SH_20260107T155044_20260107T155100_20260119T155044_20260119T155101_X05010_N_P_J_001.h5
+
         # List of paths to troposphere weather model files (1 per date). If none provided,
         #   troposphere corrections are skipped.
         #   Type: array | null.
         troposphere_files:
-
       static_ancillary_file_group:
-                # JSON file containing the mapping from frame_id to bounds information.
+        # JSON file containing frame-specific algorithm parameters to override the defaults passed
+        #   in the `algorithm_parameters.yaml`.
         #   Type: string | null.
-        frame_to_bounds_json: /home/mamba/input_dir/static_ancillary_files/Frame_to_bounds_DISP-NI_v0.1.json
+        algorithm_parameters_overrides_json: /home/mamba/input_dir/static_ancillary_files/opera-disp-nisar-algorithm-parameters-overrides.json
+        # JSON file containing the mapping from frame_id to bounds information.
+        #   Type: string | null.
+        frame_to_bounds_json: /home/mamba/input_dir/static_ancillary_files/opera-nisar-disp-0.1.0-frame-to-bounds.json
         # JSON file containing list of reference date changes for each frame.
         #   Type: string | null.
         reference_date_database_json: /home/mamba/input_dir/static_ancillary_files/opera-disp-nisar-reference-dates-dummy.json
       primary_executable:
-        # Product type of the PGE. Should be one of: DISP_NI_FORWARD or DISP_NI_HISTORICAL
+        # Product type of the PGE.
         #   Type: string.
         product_type: DISP_NISAR_HISTORICAL
       product_path_group:
@@ -210,9 +220,9 @@ RunConfig:
         # Path to the SAS output directory.
         #   Type: string.
         sas_output_path: /home/mamba/output_dir
-        # Version of the product.
+        # Version of the product, in <major>.<minor> format.
         #   Type: string.
-        product_version: "1.0"
+        product_version: '0.4'
         # Whether the SAS should output and save the Compressed SLCs in addition to the standard
         #   product output.
         #   Type: boolean.
@@ -224,11 +234,11 @@ RunConfig:
         # Number of threads to use per worker. This sets the OMP_NUM_THREADS environment variable in
         #   each python process.
         #   Type: integer.
-        threads_per_worker: 16
+        threads_per_worker: 2
         # If processing separate spatial bursts, number of bursts to run in parallel for wrapped-
         #   phase-estimation.
         #   Type: integer.
-        n_parallel_bursts: 4
+        n_parallel_bursts: 1
         # Size (rows, columns) of blocks of data to load at a time.
         #   Type: array.
         block_shape:
