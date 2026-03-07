@@ -259,7 +259,7 @@ output_options:
   # Area of interest: [left, bottom, right, top] coordinates. e.g.
   #   `bbox=[-150.2,65.0,-150.1,65.5]`.
   #   Type: array | null.
-  bounds:
+  bounds: 
     - -156.26
     - 18.87
     - -154.71
@@ -329,4 +329,3 @@ forward_mode_network_size: 3
 # Number of output products to create in parallel.
 #   Type: integer.
 num_parallel_products: 4
-
