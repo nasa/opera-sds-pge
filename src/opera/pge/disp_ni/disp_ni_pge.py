@@ -227,7 +227,7 @@ class DispNIPostProcessorMixin(DispS1PostProcessorMixin):
 
         The core file name component DISP-NI ancillary products consists of:
 
-        <PROJECT>_<LEVEL>_<PGE NAME>_<FRAME>_<POLARIZATION>_\
+        <PROJECT>_<LEVEL>_<PGE NAME>_<MODE>_<FRAME>_<POLARIZATION>_\
         <ProductVersion>_<ProductGenerationDateTime>
 
         Since these files are note specific to any particular DISP-NI output
@@ -253,6 +253,7 @@ class DispNIPostProcessorMixin(DispS1PostProcessorMixin):
         frame_id = f"{self.runconfig.sas_config['input_file_group']['frame_id']:05d}"
 
         gunw_fields = basename(self.runconfig.sas_config['dynamic_ancillary_file_group']['gunw_files'][0]).split('_')
+        mode = gunw_fields[9]
         pol = gunw_fields[10]
 
         product_version = self.runconfig.sas_config['product_path_group']['product_version']
@@ -263,7 +264,7 @@ class DispNIPostProcessorMixin(DispS1PostProcessorMixin):
         product_generation_date_time = f"{get_time_for_filename(self.production_datetime)}Z"
 
         ancillary_filename = (
-            f"{core_filename}_{frame_id}_{pol}_{product_version}_{product_generation_date_time}"
+            f"{core_filename}_{mode}_{frame_id}_{pol}_{product_version}_{product_generation_date_time}"
         )
 
         return ancillary_filename
