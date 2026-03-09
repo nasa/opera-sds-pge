@@ -113,35 +113,9 @@ class DispNIPostProcessorMixin(DispS1PostProcessorMixin):
 
         frame_id = f"{self.runconfig.sas_config['input_file_group']['frame_id']:05d}"
 
-        # TODO: POL and MODE are derived from GSLC/GUNW, though in the current delivery, neither seem
-        #  to be a perfect match to spec (ie pol + mode in GSLC is DHDH + 4005 and in GUNW it is SH + 4000
-        #  Let's extract all these fields here and follow up with ADT
-
-        gslc_fields = basename(self.runconfig.sas_config['input_file_group']['gslc_file_list'][0]).split('_')
-        if (
-                'gunw_files' in self.runconfig.sas_config['dynamic_ancillary_file_group'] and
-                len(self.runconfig.sas_config['dynamic_ancillary_file_group']['gunw_files']) > 0
-        ):
-            gunw_fields = basename(
-                self.runconfig.sas_config['dynamic_ancillary_file_group']['gunw_files'][0]
-            ).split('_')
-        else:
-            gunw_fields = None
-
-        runconfig_pol = self.runconfig.sas_config['input_file_group']['polarization']
-
-        gslc_mode = gslc_fields[8]
-        gslc_pol = gslc_fields[9][:2]
-
-        if gunw_fields:
-            gunw_mode = gunw_fields[9]
-            gunw_pol = gunw_fields[10]
-        else:
-            gunw_mode = None
-            gunw_pol = None
-
-        mode = gunw_mode if gunw_mode is not None else gslc_mode
-        pol = gunw_pol if gunw_pol is not None else gslc_pol
+        gunw_fields = basename(self.runconfig.sas_config['dynamic_ancillary_file_group']['gunw_files'][0]).split('_')
+        mode = gunw_fields[9]
+        pol = gunw_fields[10]
 
         # ReferenceDateTime: The acquisition sensing start date and time of
         # the input satellite imagery for the first burst in the frame of the
@@ -185,9 +159,9 @@ class DispNIPostProcessorMixin(DispS1PostProcessorMixin):
 
         The compressed GSLC filename for the DISP-NI PGE consists of:
 
-             <Project>_<Level>_COMPRESSED-GSLC-NI_<FRAME_ID>_<BANDWIDTH>_\
+             <Project>_<Level>_COMPRESSED-GSLC-NI_<MODE>_<FRAME_ID>_<Polarization>_\
              <ReferenceDateTime>_<FirstDateTime>_<LastDateTime>_\
-             <ProductGenerationDateTime>_<Polarization>_<ProductVersion>.h5
+             <ProductGenerationDateTime>_<ProductVersion>.h5
 
         Parameters
         ----------
@@ -227,35 +201,9 @@ class DispNIPostProcessorMixin(DispS1PostProcessorMixin):
         # Get the production time
         prod_time = f"{get_time_for_filename(self.production_datetime)}Z"
 
-        # TODO: POL and MODE are derived from GSLC/GUNW, though in the current delivery, neither seem
-        #  to be a perfect match to spec (ie pol + mode in GSLC is DHDH + 4005 and in GUNW it is SH + 4000
-        #  Let's extract all these fields here and follow up with ADT
-
-        gslc_fields = basename(self.runconfig.sas_config['input_file_group']['gslc_file_list'][0]).split('_')
-        if (
-                'gunw_files' in self.runconfig.sas_config['dynamic_ancillary_file_group'] and
-                len(self.runconfig.sas_config['dynamic_ancillary_file_group']['gunw_files']) > 0
-        ):
-            gunw_fields = basename(
-                self.runconfig.sas_config['dynamic_ancillary_file_group']['gunw_files'][0]
-            ).split('_')
-        else:
-            gunw_fields = None
-
-        runconfig_pol = self.runconfig.sas_config['input_file_group']['polarization']
-
-        gslc_mode = gslc_fields[8]
-        gslc_pol = gslc_fields[9][:2]
-
-        if gunw_fields:
-            gunw_mode = gunw_fields[9]
-            gunw_pol = gunw_fields[10]
-        else:
-            gunw_mode = None
-            gunw_pol = None
-
-        mode = gunw_mode if gunw_mode is not None else gslc_mode
-        pol = gunw_pol if gunw_pol is not None else gslc_pol
+        gunw_fields = basename(self.runconfig.sas_config['dynamic_ancillary_file_group']['gunw_files'][0]).split('_')
+        mode = gunw_fields[9]
+        pol = gunw_fields[10]
 
         # Product version hardcoded to 1.0 for now since CCSLCs are not
         # intended for widespread distribution
@@ -264,13 +212,12 @@ class DispNIPostProcessorMixin(DispS1PostProcessorMixin):
         # Carry the file extension over from the original filename
         ext = result.groupdict()["ext"]
 
-        gslc_filename = (f"{self.PROJECT}_{level}_{name}_{frame_id}_{mode}_"
+        gslc_filename = (f"{self.PROJECT}_{level}_{name}_{mode}_{frame_id}_{pol}_"
                          f"{ref_date}T000000Z_{start_date}T000000Z_"
                          f"{stop_date}T000000Z_{prod_time}_"
-                         f"{pol}_v{product_version}.{ext}")
+                         f"v{product_version}.{ext}")
 
-        # TODO: Finalize naming convention & implement
-        return basename(inter_filename)
+        return gslc_filename
 
     def _ancillary_filename(self):
         """
@@ -305,31 +252,8 @@ class DispNIPostProcessorMixin(DispS1PostProcessorMixin):
 
         frame_id = f"{self.runconfig.sas_config['input_file_group']['frame_id']:05d}"
 
-        # TODO: POL and MODE are derived from GSLC/GUNW, though in the current delivery, neither seem
-        #  to be a perfect match to spec (ie pol + mode in GSLC is DHDH + 4005 and in GUNW it is SH + 4000
-        #  Let's extract all these fields here and follow up with ADT
-
-        gslc_fields = basename(self.runconfig.sas_config['input_file_group']['gslc_file_list'][0]).split('_')
-        if (
-                'gunw_files' in self.runconfig.sas_config['dynamic_ancillary_file_group'] and
-                len(self.runconfig.sas_config['dynamic_ancillary_file_group']['gunw_files']) > 0
-        ):
-            gunw_fields = basename(
-                self.runconfig.sas_config['dynamic_ancillary_file_group']['gunw_files'][0]
-            ).split('_')
-        else:
-            gunw_fields = None
-
-        runconfig_pol = self.runconfig.sas_config['input_file_group']['polarization']
-
-        gslc_pol = gslc_fields[9][:2]
-
-        if gunw_fields:
-            gunw_pol = gunw_fields[10]
-        else:
-            gunw_pol = None
-
-        pol = gunw_pol if gunw_pol is not None else gslc_pol
+        gunw_fields = basename(self.runconfig.sas_config['dynamic_ancillary_file_group']['gunw_files'][0]).split('_')
+        pol = gunw_fields[10]
 
         product_version = self.runconfig.sas_config['product_path_group']['product_version']
 
