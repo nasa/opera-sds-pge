@@ -6,7 +6,7 @@ disp_ni_pge.py
 ==============
 Module defining the implementation for the Surface Displacement (DISP) from NISAR PGE.
 """
-
+import re
 from collections import OrderedDict
 from datetime import datetime
 from os.path import basename
@@ -185,7 +185,7 @@ class DispNIPostProcessorMixin(DispS1PostProcessorMixin):
 
         The compressed GSLC filename for the DISP-NI PGE consists of:
 
-             <Project>_<Level>_COMPRESSED-GSLC-NI_<TRACK>_<DIRECTION>_<DIRECTION>_<BANDWIDTH>_\
+             <Project>_<Level>_COMPRESSED-GSLC-NI_<FRAME_ID>_<BANDWIDTH>_\
              <ReferenceDateTime>_<FirstDateTime>_<LastDateTime>_\
              <ProductGenerationDateTime>_<Polarization>_<ProductVersion>.h5
 
@@ -204,9 +204,71 @@ class DispNIPostProcessorMixin(DispS1PostProcessorMixin):
         """
         level = "L2"
         name = "COMPRESSED-GSLC-NI"
-        frame_id = f"{self.runconfig.sas_config['input_file_group']['frame_id']:03d}"
+        frame_id = f"{self.runconfig.sas_config['input_file_group']['frame_id']:05d}"
 
-        from os.path import basename
+        gslc_regex = re.compile(r'compressed_'
+                                r'(?P<ref_date>\d{8})_'
+                                r'(?P<start_date>\d{8})_'
+                                r'(?P<stop_date>\d{8})[.](?P<ext>h5)$')
+
+        result = gslc_regex.match(basename(inter_filename))
+
+        if not result:
+            raise ValueError(
+                f"Compressed CSLC file {inter_filename} does not conform to "
+                f"expected file pattern"
+            )
+
+        # Get the dates from the parsed intermediate filename
+        ref_date = result.groupdict()["ref_date"]
+        start_date = result.groupdict()["start_date"]
+        stop_date = result.groupdict()["stop_date"]
+
+        # Get the production time
+        prod_time = f"{get_time_for_filename(self.production_datetime)}Z"
+
+        # TODO: POL and MODE are derived from GSLC/GUNW, though in the current delivery, neither seem
+        #  to be a perfect match to spec (ie pol + mode in GSLC is DHDH + 4005 and in GUNW it is SH + 4000
+        #  Let's extract all these fields here and follow up with ADT
+
+        gslc_fields = basename(self.runconfig.sas_config['input_file_group']['gslc_file_list'][0]).split('_')
+        if (
+                'gunw_files' in self.runconfig.sas_config['dynamic_ancillary_file_group'] and
+                len(self.runconfig.sas_config['dynamic_ancillary_file_group']['gunw_files']) > 0
+        ):
+            gunw_fields = basename(
+                self.runconfig.sas_config['dynamic_ancillary_file_group']['gunw_files'][0]
+            ).split('_')
+        else:
+            gunw_fields = None
+
+        runconfig_pol = self.runconfig.sas_config['input_file_group']['polarization']
+
+        gslc_mode = gslc_fields[8]
+        gslc_pol = gslc_fields[9][:2]
+
+        if gunw_fields:
+            gunw_mode = gunw_fields[9]
+            gunw_pol = gunw_fields[10]
+        else:
+            gunw_mode = None
+            gunw_pol = None
+
+        mode = gunw_mode if gunw_mode is not None else gslc_mode
+        pol = gunw_pol if gunw_pol is not None else gslc_pol
+
+        # Product version hardcoded to 1.0 for now since CCSLCs are not
+        # intended for widespread distribution
+        product_version = "1.0"
+
+        # Carry the file extension over from the original filename
+        ext = result.groupdict()["ext"]
+
+        gslc_filename = (f"{self.PROJECT}_{level}_{name}_{frame_id}_{mode}_"
+                         f"{ref_date}T000000Z_{start_date}T000000Z_"
+                         f"{stop_date}T000000Z_{prod_time}_"
+                         f"{pol}_v{product_version}.{ext}")
+
         # TODO: Finalize naming convention & implement
         return basename(inter_filename)
 
