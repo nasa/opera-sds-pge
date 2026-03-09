@@ -1,7 +1,7 @@
 input_file_group:
 
   # list of paths to GSLC files.
-  gslc_file_list: list(str(), min=1)
+  gslc_file_list: list(str(), min=2)
 
   # Frame ID of the bursts contained in `gslc_file_list`.
   frame_id: int()
@@ -30,7 +30,7 @@ dynamic_ancillary_file_group:
   dem_file: str(required=False)
 
   # List of paths to GUNW files for ionosphere, SET and static geometry layers
-  gunw_files: list(str(), required=False, min=0)
+  gunw_files: list(str(), min=1)
 
   # List of paths to troposphere weather model files (1 per date). If none provided, troposphere
   #  corrections are skipped.
