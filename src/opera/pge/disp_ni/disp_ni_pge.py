@@ -9,6 +9,7 @@ Module defining the implementation for the Surface Displacement (DISP) from NISA
 
 from collections import OrderedDict
 from datetime import datetime
+from os.path import basename
 
 from opera.pge.base.base_pge import PgeExecutor
 from opera.pge.disp_s1.disp_s1_pge import DispS1PostProcessorMixin, DispS1PreProcessorMixin
@@ -116,12 +117,14 @@ class DispNIPostProcessorMixin(DispS1PostProcessorMixin):
         #  to be a perfect match to spec (ie pol + mode in GSLC is DHDH + 4005 and in GUNW it is SH + 4000
         #  Let's extract all these fields here and follow up with ADT
 
-        gslc_fields = self.runconfig.sas_config['input_file_group']['gslc_file_list'][0].split('_')
+        gslc_fields = basename(self.runconfig.sas_config['input_file_group']['gslc_file_list'][0]).split('_')
         if (
                 'gunw_files' in self.runconfig.sas_config['dynamic_ancillary_file_group'] and
                 len(self.runconfig.sas_config['dynamic_ancillary_file_group']['gunw_files']) > 0
         ):
-            gunw_fields = self.runconfig.sas_config['dynamic_ancillary_file_group']['gunw_files'][0].split('_')
+            gunw_fields = basename(
+                self.runconfig.sas_config['dynamic_ancillary_file_group']['gunw_files'][0]
+            ).split('_')
         else:
             gunw_fields = None
 
@@ -244,12 +247,14 @@ class DispNIPostProcessorMixin(DispS1PostProcessorMixin):
         #  to be a perfect match to spec (ie pol + mode in GSLC is DHDH + 4005 and in GUNW it is SH + 4000
         #  Let's extract all these fields here and follow up with ADT
 
-        gslc_fields = self.runconfig.sas_config['input_file_group']['gslc_file_list'][0].split('_')
+        gslc_fields = basename(self.runconfig.sas_config['input_file_group']['gslc_file_list'][0]).split('_')
         if (
                 'gunw_files' in self.runconfig.sas_config['dynamic_ancillary_file_group'] and
                 len(self.runconfig.sas_config['dynamic_ancillary_file_group']['gunw_files']) > 0
         ):
-            gunw_fields = self.runconfig.sas_config['dynamic_ancillary_file_group']['gunw_files'][0].split('_')
+            gunw_fields = basename(
+                self.runconfig.sas_config['dynamic_ancillary_file_group']['gunw_files'][0]
+            ).split('_')
         else:
             gunw_fields = None
 
