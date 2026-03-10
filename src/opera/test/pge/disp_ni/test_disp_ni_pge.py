@@ -12,17 +12,16 @@ import shutil
 import tempfile
 import unittest
 from io import StringIO
-from os.path import abspath, join, exists
-
-from opera.test import path
+from os.path import abspath, exists, join
 
 import yaml
 
 from opera.pge import RunConfig
 from opera.pge.disp_ni.disp_ni_pge import DispNIExecutor
+from opera.test import path
 from opera.util import PgeLogger
-from opera.util.input_validation import validate_disp_inputs
 from opera.util.h5_utils import create_test_disp_ni_metadata_product
+from opera.util.input_validation import validate_disp_inputs
 from opera.util.render_jinja2 import UNDEFINED_ERROR
 
 
