@@ -14,8 +14,8 @@ import glob
 import os.path
 import re
 import subprocess
-from importlib.resources import files
 from collections import OrderedDict
+from importlib.resources import files
 from os import listdir
 from os.path import abspath, basename, exists, getsize, join, splitext
 

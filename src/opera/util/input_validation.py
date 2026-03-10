@@ -304,6 +304,7 @@ def validate_disp_inputs(runconfig, logger, name):
         pge name
 
     """
+    # pylint: disable=too-many-branches
     input_file_group = runconfig.sas_config['input_file_group']
     dyn_anc_file_group = runconfig.sas_config['dynamic_ancillary_file_group']
     static_anc_file_group = runconfig.sas_config['static_ancillary_file_group']
