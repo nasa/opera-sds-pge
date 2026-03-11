@@ -160,8 +160,12 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">result</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
+    <span class="c1"># This is still imperfect, given there&#39;s no guarantee that exception messages will have every extra line whitespace</span>
+    <span class="c1"># indented. This regex should still capture most exceptions: all single line messages, all message-less exceptions,</span>
+    <span class="c1"># the multi-line SAS exceptions which have been observed to be incorrectly truncated in issue #782</span>
+    <span class="c1"># Ref: https://github.com/nasa/opera-sds-pge/pull/783#pullrequestreview-3855633859</span>
     <span class="n">exception_pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
-        <span class="sa">r</span><span class="s2">&quot;Traceback \(most recent call last\):(?:\n.*)+?\n(.*?(?:Exception|Error))(:\s*(.+))?&quot;</span>
+        <span class="sa">r</span><span class="s2">&quot;Traceback \(most recent call last\):(?:\n.*)+?\n(.*?(?:Exception|Error))(:\s*(.+))?(?:\n[ \t\f\v][^\n]*)*&quot;</span>
     <span class="p">)</span>
 
     <span class="n">traceback_match</span> <span class="o">=</span> <span class="n">exception_pattern</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">log_contents</span><span class="p">)</span>
