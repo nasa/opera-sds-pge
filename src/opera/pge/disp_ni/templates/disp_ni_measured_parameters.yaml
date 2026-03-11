@@ -464,11 +464,11 @@ metadata/product_specification_document_id:
   attribute_type: processingInformation
   description: Document identifier for Product Specification.
   display_name: ProductSpecificationDocumentID
-#metadata/product_pixel_coordinate_convention:
-#  attribute_data_type: string
-#  attribute_type: contentInformation
-#  description: x/y coordinate convention referring to pixel center or corner.
-#  display_name: ProductPixelCoordinateConvention
+metadata/product_pixel_coordinate_convention:
+  attribute_data_type: string
+  attribute_type: contentInformation
+  description: x/y coordinate convention referring to pixel center or corner.
+  display_name: ProductPixelCoordinateConvention
 #metadata/source_data_software_ISCE3_version:
 #  attribute_data_type: string
 #  attribute_type: processingInformation

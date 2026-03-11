@@ -6,9 +6,10 @@ disp_ni_pge.py
 ==============
 Module defining the implementation for the Surface Displacement (DISP) from NISAR PGE.
 """
-
+import re
 from collections import OrderedDict
 from datetime import datetime
+from os.path import basename
 
 from opera.pge.base.base_pge import PgeExecutor
 from opera.pge.disp_s1.disp_s1_pge import DispS1PostProcessorMixin, DispS1PreProcessorMixin
@@ -73,7 +74,7 @@ class DispNIPostProcessorMixin(DispS1PostProcessorMixin):
 
         The core file name component of the DISP-NI PGE consists of:
 
-        <PROJECT>_<LEVEL>_<PGE NAME>_<TRACK>_<DIRECTION>_<FRAME>_<BANDWIDTH>_<POLARIZATION>_\
+        <PROJECT>_<LEVEL>_<PGE NAME>_<BANDWIDTH>_<FRAME>_<POLARIZATION>_\
         <ReferenceDateTime>_<SecondaryDateTime>_<ProductVersion>_\
         <ProductGenerationDateTime>
 
@@ -99,9 +100,6 @@ class DispNIPostProcessorMixin(DispS1PostProcessorMixin):
             f"{self.PROJECT}_{self.LEVEL}_{self.NAME}"
         )
 
-        frame_id = f"{self.runconfig.sas_config['input_file_group']['frame_id']:03d}"
-        pol = self.runconfig.sas_config['input_file_group']['polarization']
-
         inter_disp_product_filename = '.'.join(inter_filename.split('.')[:1] + ["nc"])
 
         # Check if we've already cached the product metadata corresponding to
@@ -113,15 +111,11 @@ class DispNIPostProcessorMixin(DispS1PostProcessorMixin):
             disp_metadata = self._collect_disp_ni_product_metadata(inter_disp_product_filename)
             self._product_metadata_cache[inter_disp_product_filename] = disp_metadata
 
-        # TODO: Update when metadata fields are relocated
-        orbit_track = f'{disp_metadata["extra"]["trackNumber"]:03d}'
-        if disp_metadata["extra"]["orbitPassDirection"].lower() == 'ascending':
-            orbit_direction = 'A'
-        else:
-            orbit_direction = 'B'
+        frame_id = f"{self.runconfig.sas_config['input_file_group']['frame_id']:05d}"
 
-        # TODO: This is hardcoded. Where in the metadata?
-        mode = "40"
+        gunw_fields = basename(self.runconfig.sas_config['dynamic_ancillary_file_group']['gunw_files'][0]).split('_')
+        mode = gunw_fields[9]
+        pol = gunw_fields[10]
 
         # ReferenceDateTime: The acquisition sensing start date and time of
         # the input satellite imagery for the first burst in the frame of the
@@ -147,7 +141,7 @@ class DispNIPostProcessorMixin(DispS1PostProcessorMixin):
         product_generation_date_time = f"{get_time_for_filename(self.production_datetime)}Z"
 
         disp_ni_product_filename = (
-            f"{core_filename}_{orbit_track}_{orbit_direction}_{frame_id}_{mode}_{pol}_"
+            f"{core_filename}_{mode}_{frame_id}_{pol}_"
             f"{reference_date_time}_{secondary_date_time}_{product_version}_"
             f"{product_generation_date_time}"
         )
@@ -165,9 +159,9 @@ class DispNIPostProcessorMixin(DispS1PostProcessorMixin):
 
         The compressed GSLC filename for the DISP-NI PGE consists of:
 
-             <Project>_<Level>_COMPRESSED-GSLC-NI_<TRACK>_<DIRECTION>_<DIRECTION>_<BANDWIDTH>_\
+             <Project>_<Level>_COMPRESSED-GSLC-NI_<MODE>_<FRAME_ID>_<Polarization>_\
              <ReferenceDateTime>_<FirstDateTime>_<LastDateTime>_\
-             <ProductGenerationDateTime>_<Polarization>_<ProductVersion>.h5
+             <ProductGenerationDateTime>_<ProductVersion>.h5
 
         Parameters
         ----------
@@ -184,11 +178,46 @@ class DispNIPostProcessorMixin(DispS1PostProcessorMixin):
         """
         level = "L2"
         name = "COMPRESSED-GSLC-NI"
-        frame_id = f"{self.runconfig.sas_config['input_file_group']['frame_id']:03d}"
+        frame_id = f"{self.runconfig.sas_config['input_file_group']['frame_id']:05d}"
 
-        from os.path import basename
-        # TODO: Finalize naming convention & implement
-        return basename(inter_filename)
+        gslc_regex = re.compile(r'compressed_'
+                                r'(?P<ref_date>\d{8})_'
+                                r'(?P<start_date>\d{8})_'
+                                r'(?P<stop_date>\d{8})[.](?P<ext>h5)$')
+
+        result = gslc_regex.match(basename(inter_filename))
+
+        if not result:
+            raise ValueError(
+                f"Compressed CSLC file {inter_filename} does not conform to "
+                f"expected file pattern"
+            )
+
+        # Get the dates from the parsed intermediate filename
+        ref_date = result.groupdict()["ref_date"]
+        start_date = result.groupdict()["start_date"]
+        stop_date = result.groupdict()["stop_date"]
+
+        # Get the production time
+        prod_time = f"{get_time_for_filename(self.production_datetime)}Z"
+
+        gunw_fields = basename(self.runconfig.sas_config['dynamic_ancillary_file_group']['gunw_files'][0]).split('_')
+        mode = gunw_fields[9]
+        pol = gunw_fields[10]
+
+        # Product version hardcoded to 1.0 for now since CCSLCs are not
+        # intended for widespread distribution
+        product_version = "1.0"
+
+        # Carry the file extension over from the original filename
+        ext = result.groupdict()["ext"]
+
+        gslc_filename = (f"{self.PROJECT}_{level}_{name}_{mode}_{frame_id}_{pol}_"
+                         f"{ref_date}T000000Z_{start_date}T000000Z_"
+                         f"{stop_date}T000000Z_{prod_time}_"
+                         f"v{product_version}.{ext}")
+
+        return gslc_filename
 
     def _ancillary_filename(self):
         """
@@ -198,7 +227,7 @@ class DispNIPostProcessorMixin(DispS1PostProcessorMixin):
 
         The core file name component DISP-NI ancillary products consists of:
 
-        <PROJECT>_<LEVEL>_<PGE NAME>_<TRACK>_<DIRECTION>_<FRAME>_<BANDWIDTH>_<POLARIZATION>_
+        <PROJECT>_<LEVEL>_<PGE NAME>_<MODE>_<FRAME>_<POLARIZATION>_\
         <ProductVersion>_<ProductGenerationDateTime>
 
         Since these files are note specific to any particular DISP-NI output
@@ -221,8 +250,11 @@ class DispNIPostProcessorMixin(DispS1PostProcessorMixin):
             f"{self.PROJECT}_{self.LEVEL}_{self.NAME}"
         )
 
-        frame_id = f"{self.runconfig.sas_config['input_file_group']['frame_id']:03d}"
-        pol = self.runconfig.sas_config['input_file_group']['polarization']
+        frame_id = f"{self.runconfig.sas_config['input_file_group']['frame_id']:05d}"
+
+        gunw_fields = basename(self.runconfig.sas_config['dynamic_ancillary_file_group']['gunw_files'][0]).split('_')
+        mode = gunw_fields[9]
+        pol = gunw_fields[10]
 
         product_version = self.runconfig.sas_config['product_path_group']['product_version']
 
@@ -232,7 +264,7 @@ class DispNIPostProcessorMixin(DispS1PostProcessorMixin):
         product_generation_date_time = f"{get_time_for_filename(self.production_datetime)}Z"
 
         ancillary_filename = (
-            f"{core_filename}_{frame_id}_{pol}_{product_version}_{product_generation_date_time}"
+            f"{core_filename}_{mode}_{frame_id}_{pol}_{product_version}_{product_generation_date_time}"
         )
 
         return ancillary_filename
@@ -256,7 +288,7 @@ class DispNIPostProcessorMixin(DispS1PostProcessorMixin):
         """
         # Extract all metadata assigned by the SAS at product creation time
         try:
-            output_product_metadata = get_disp_product_metadata(disp_product, extra='/science/LSAR/identification')
+            output_product_metadata = get_disp_product_metadata(disp_product)
 
             # Add hardcoded values to metadata
             output_product_metadata['static'] = {
@@ -354,7 +386,7 @@ class DispNIExecutor(DispNIPreProcessorMixin, DispNIPostProcessorMixin, PgeExecu
     LEVEL = "L3"
     """Processing Level for DISP-NI Products"""
 
-    SAS_VERSION = "0.1.1"  # Interface release https://github.com/opera-adt/disp-nisar/releases/tag/v0.1.1
+    SAS_VERSION = "0.2.0"  # Interface release https://github.com/opera-adt/disp-nisar/releases/tag/v0.2.0
     """Version of the SAS wrapped by this PGE, should be updated as needed"""
 
     PGE_VERSION = "6.0.0-er.1.0"
