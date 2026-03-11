@@ -27,6 +27,7 @@ body:
           - [ ] Pull the merged branch back into your local checkout of `main`, then tag the latest commit as `<version>` and push the tag to `origin`
           - [ ] Create the github release page using the new tag
           - [ ] Update the ICS document for the new release, and upload to Artifactory, along with the latest example RunConfig
+            - Also replace the latest ICS in the OPERA SDS Google Drive "PGE Interface Control Documents" folder with the updated ICS version.
           - [ ] Send an email to the `operasds-all` mailing list containing details of the release and links to the released artifacts (docker image, ICS doc, etc.)
     validations:
       required: true
