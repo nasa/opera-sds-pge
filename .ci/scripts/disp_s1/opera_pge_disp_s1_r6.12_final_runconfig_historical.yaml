@@ -77,14 +77,13 @@ RunConfig:
             - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg3480.17i
             - /home/mamba/input_dir/dynamic_ancillary_files/ionosphere_files/jplg3600.17i
           troposphere_files:
-
       ProductPathGroup:
         OutputProductPath: /home/mamba/output_dir
         ScratchPath: /home/mamba/scratch_dir
 
       PrimaryExecutable:
         ProductIdentifier: DISP_S1
-        ProductVersion: "0.7"
+        ProductVersion: "1.0"
         ProgramPath: disp-s1
         ProgramOptions:
           - run
@@ -123,7 +122,7 @@ RunConfig:
         frame_id: 7091
         last_processed:
       dynamic_ancillary_file_group:
-        algorithm_parameters_file: /home/mamba/runconfig/opera_pge_disp_s1_r6.11_final_algorithm_parameters_forward.yaml
+        algorithm_parameters_file: /home/mamba/runconfig/opera_pge_disp_s1_r6.12_final_algorithm_parameters_historical.yaml
         static_layers_files:
           - /home/mamba/input_dir/dynamic_ancillary_files/static_layers/OPERA_L2_CSLC-S1-STATIC_T027-056725-IW1_20140403_S1A_v1.0.h5
           - /home/mamba/input_dir/dynamic_ancillary_files/static_layers/OPERA_L2_CSLC-S1-STATIC_T027-056726-IW1_20140403_S1A_v1.0.h5
@@ -181,7 +180,7 @@ RunConfig:
         frame_to_burst_json: /home/mamba/input_dir/static_ancillary_files/opera-s1-disp-0.15.0-frame-to-burst.json.zip
         reference_date_database_json: /home/mamba/input_dir/static_ancillary_files/opera-disp-s1-reference-dates-2026-01-15.json
       primary_executable:
-        product_type: DISP_S1_FORWARD
+        product_type: DISP_S1_HISTORICAL
       product_path_group:
         product_path: /home/mamba/output_dir
         scratch_path: /home/mamba/scratch_dir
