@@ -304,6 +304,7 @@ def validate_disp_inputs(runconfig, logger, name):
         pge name
 
     """
+    # pylint: disable=too-many-branches
     input_file_group = runconfig.sas_config['input_file_group']
     dyn_anc_file_group = runconfig.sas_config['dynamic_ancillary_file_group']
     static_anc_file_group = runconfig.sas_config['static_ancillary_file_group']
@@ -331,16 +332,17 @@ def validate_disp_inputs(runconfig, logger, name):
                          valid_extensions=('.h5',), check_zero_size=True)
 
         # TODO:
-        #  1: Verify with ADT that GSLC and GUNW must be equally sized
-        #  2: Figure out if our comparison between GSLC and GUNW can be more spatial like with DISP-S1 checking bursts
+        #  1: Verify with ADT that GSLC and GUNW must be equally sized (Checked: |GUNW| == (|GSLC| - 1))
+        #  2: Figure out if our comparison between GSLC and GUNW can
+        #     be more spatial like with DISP-S1 checking bursts (Still TBD)
 
         if ('gunw_files' in dyn_anc_file_group and isinstance(dyn_anc_file_group['gunw_files'], list) and
                 len(dyn_anc_file_group['gunw_files']) > 0):
             check_input_list(dyn_anc_file_group['gunw_files'], logger, name,
                              valid_extensions=('.h5',), check_zero_size=True)
 
-            if len(input_file_group['gslc_file_list']) != len(dyn_anc_file_group['gunw_files']):
-                msg = 'Differing numbers of GSLC files and GUNW files'
+            if len(dyn_anc_file_group['gunw_files']) != len(input_file_group['gslc_file_list']) - 1:
+                msg = 'Number of GUNW files does not equal the number of GLSC files - 1'
                 logger.critical(name, ErrorCode.INVALID_INPUT, msg)
 
     if 'mask_file' in dyn_anc_file_group and dyn_anc_file_group['mask_file']:
