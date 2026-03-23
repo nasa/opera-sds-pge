@@ -389,7 +389,7 @@ class DispNIExecutor(DispNIPreProcessorMixin, DispNIPostProcessorMixin, PgeExecu
     SAS_VERSION = "0.2.0"  # Interface release https://github.com/opera-adt/disp-nisar/releases/tag/v0.2.0
     """Version of the SAS wrapped by this PGE, should be updated as needed"""
 
-    PGE_VERSION = "6.0.0-er.1.0"
+    PGE_VERSION = "6.0.0-er.2.0"
     """Version of the PGE (overrides default from base_pge)"""
 
     def __init__(self, pge_name, runconfig_path, **kwargs):
