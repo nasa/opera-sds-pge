@@ -81,9 +81,10 @@
 <span class="sd">==============</span>
 <span class="sd">Module defining the implementation for the Surface Displacement (DISP) from NISAR PGE.</span>
 <span class="sd">&quot;&quot;&quot;</span>
-
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">OrderedDict</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">os.path</span><span class="w"> </span><span class="kn">import</span> <span class="n">basename</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">opera.pge.base.base_pge</span><span class="w"> </span><span class="kn">import</span> <span class="n">PgeExecutor</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">opera.pge.disp_s1.disp_s1_pge</span><span class="w"> </span><span class="kn">import</span> <span class="n">DispS1PostProcessorMixin</span><span class="p">,</span> <span class="n">DispS1PreProcessorMixin</span>
@@ -156,7 +157,7 @@
 
 <span class="sd">        The core file name component of the DISP-NI PGE consists of:</span>
 
-<span class="sd">        &lt;PROJECT&gt;_&lt;LEVEL&gt;_&lt;PGE NAME&gt;_&lt;TRACK&gt;_&lt;DIRECTION&gt;_&lt;FRAME&gt;_&lt;BANDWIDTH&gt;_&lt;POLARIZATION&gt;_\</span>
+<span class="sd">        &lt;PROJECT&gt;_&lt;LEVEL&gt;_&lt;PGE NAME&gt;_&lt;BANDWIDTH&gt;_&lt;FRAME&gt;_&lt;POLARIZATION&gt;_\</span>
 <span class="sd">        &lt;ReferenceDateTime&gt;_&lt;SecondaryDateTime&gt;_&lt;ProductVersion&gt;_\</span>
 <span class="sd">        &lt;ProductGenerationDateTime&gt;</span>
 
@@ -182,9 +183,6 @@
             <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">PROJECT</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">LEVEL</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">NAME</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="p">)</span>
 
-        <span class="n">frame_id</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">sas_config</span><span class="p">[</span><span class="s1">&#39;input_file_group&#39;</span><span class="p">][</span><span class="s1">&#39;frame_id&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">03d</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="n">pol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">sas_config</span><span class="p">[</span><span class="s1">&#39;input_file_group&#39;</span><span class="p">][</span><span class="s1">&#39;polarization&#39;</span><span class="p">]</span>
-
         <span class="n">inter_disp_product_filename</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">inter_filename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[:</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;nc&quot;</span><span class="p">])</span>
 
         <span class="c1"># Check if we&#39;ve already cached the product metadata corresponding to</span>
@@ -196,15 +194,11 @@
             <span class="n">disp_metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_collect_disp_ni_product_metadata</span><span class="p">(</span><span class="n">inter_disp_product_filename</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_product_metadata_cache</span><span class="p">[</span><span class="n">inter_disp_product_filename</span><span class="p">]</span> <span class="o">=</span> <span class="n">disp_metadata</span>
 
-        <span class="c1"># TODO: Update when metadata fields are relocated</span>
-        <span class="n">orbit_track</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">disp_metadata</span><span class="p">[</span><span class="s2">&quot;extra&quot;</span><span class="p">][</span><span class="s2">&quot;trackNumber&quot;</span><span class="p">]</span><span class="si">:</span><span class="s1">03d</span><span class="si">}</span><span class="s1">&#39;</span>
-        <span class="k">if</span> <span class="n">disp_metadata</span><span class="p">[</span><span class="s2">&quot;extra&quot;</span><span class="p">][</span><span class="s2">&quot;orbitPassDirection&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;ascending&#39;</span><span class="p">:</span>
-            <span class="n">orbit_direction</span> <span class="o">=</span> <span class="s1">&#39;A&#39;</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">orbit_direction</span> <span class="o">=</span> <span class="s1">&#39;B&#39;</span>
+        <span class="n">frame_id</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">sas_config</span><span class="p">[</span><span class="s1">&#39;input_file_group&#39;</span><span class="p">][</span><span class="s1">&#39;frame_id&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">05d</span><span class="si">}</span><span class="s2">&quot;</span>
 
-        <span class="c1"># TODO: This is hardcoded. Where in the metadata?</span>
-        <span class="n">mode</span> <span class="o">=</span> <span class="s2">&quot;40&quot;</span>
+        <span class="n">gunw_fields</span> <span class="o">=</span> <span class="n">basename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">sas_config</span><span class="p">[</span><span class="s1">&#39;dynamic_ancillary_file_group&#39;</span><span class="p">][</span><span class="s1">&#39;gunw_files&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span>
+        <span class="n">mode</span> <span class="o">=</span> <span class="n">gunw_fields</span><span class="p">[</span><span class="mi">9</span><span class="p">]</span>
+        <span class="n">pol</span> <span class="o">=</span> <span class="n">gunw_fields</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span>
 
         <span class="c1"># ReferenceDateTime: The acquisition sensing start date and time of</span>
         <span class="c1"># the input satellite imagery for the first burst in the frame of the</span>
@@ -230,7 +224,7 @@
         <span class="n">product_generation_date_time</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">get_time_for_filename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">production_datetime</span><span class="p">)</span><span class="si">}</span><span class="s2">Z&quot;</span>
 
         <span class="n">disp_ni_product_filename</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">core_filename</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">orbit_track</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">orbit_direction</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">frame_id</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">_&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">core_filename</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">frame_id</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">_&quot;</span>
             <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">reference_date_time</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">secondary_date_time</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">product_version</span><span class="si">}</span><span class="s2">_&quot;</span>
             <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">product_generation_date_time</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="p">)</span>
@@ -248,9 +242,9 @@
 
 <span class="sd">        The compressed GSLC filename for the DISP-NI PGE consists of:</span>
 
-<span class="sd">             &lt;Project&gt;_&lt;Level&gt;_COMPRESSED-GSLC-NI_&lt;TRACK&gt;_&lt;DIRECTION&gt;_&lt;DIRECTION&gt;_&lt;BANDWIDTH&gt;_\</span>
+<span class="sd">             &lt;Project&gt;_&lt;Level&gt;_COMPRESSED-GSLC-NI_&lt;MODE&gt;_&lt;FRAME_ID&gt;_&lt;Polarization&gt;_\</span>
 <span class="sd">             &lt;ReferenceDateTime&gt;_&lt;FirstDateTime&gt;_&lt;LastDateTime&gt;_\</span>
-<span class="sd">             &lt;ProductGenerationDateTime&gt;_&lt;Polarization&gt;_&lt;ProductVersion&gt;.h5</span>
+<span class="sd">             &lt;ProductGenerationDateTime&gt;_&lt;ProductVersion&gt;.h5</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -267,11 +261,46 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">level</span> <span class="o">=</span> <span class="s2">&quot;L2&quot;</span>
         <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;COMPRESSED-GSLC-NI&quot;</span>
-        <span class="n">frame_id</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">sas_config</span><span class="p">[</span><span class="s1">&#39;input_file_group&#39;</span><span class="p">][</span><span class="s1">&#39;frame_id&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">03d</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">frame_id</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">sas_config</span><span class="p">[</span><span class="s1">&#39;input_file_group&#39;</span><span class="p">][</span><span class="s1">&#39;frame_id&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">05d</span><span class="si">}</span><span class="s2">&quot;</span>
 
-        <span class="kn">from</span><span class="w"> </span><span class="nn">os.path</span><span class="w"> </span><span class="kn">import</span> <span class="n">basename</span>
-        <span class="c1"># TODO: Finalize naming convention &amp; implement</span>
-        <span class="k">return</span> <span class="n">basename</span><span class="p">(</span><span class="n">inter_filename</span><span class="p">)</span>
+        <span class="n">gslc_regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;compressed_&#39;</span>
+                                <span class="sa">r</span><span class="s1">&#39;(?P&lt;ref_date&gt;\d</span><span class="si">{8}</span><span class="s1">)_&#39;</span>
+                                <span class="sa">r</span><span class="s1">&#39;(?P&lt;start_date&gt;\d</span><span class="si">{8}</span><span class="s1">)_&#39;</span>
+                                <span class="sa">r</span><span class="s1">&#39;(?P&lt;stop_date&gt;\d</span><span class="si">{8}</span><span class="s1">)[.](?P&lt;ext&gt;h5)$&#39;</span><span class="p">)</span>
+
+        <span class="n">result</span> <span class="o">=</span> <span class="n">gslc_regex</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">basename</span><span class="p">(</span><span class="n">inter_filename</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">result</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Compressed CSLC file </span><span class="si">{</span><span class="n">inter_filename</span><span class="si">}</span><span class="s2"> does not conform to &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;expected file pattern&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Get the dates from the parsed intermediate filename</span>
+        <span class="n">ref_date</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">groupdict</span><span class="p">()[</span><span class="s2">&quot;ref_date&quot;</span><span class="p">]</span>
+        <span class="n">start_date</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">groupdict</span><span class="p">()[</span><span class="s2">&quot;start_date&quot;</span><span class="p">]</span>
+        <span class="n">stop_date</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">groupdict</span><span class="p">()[</span><span class="s2">&quot;stop_date&quot;</span><span class="p">]</span>
+
+        <span class="c1"># Get the production time</span>
+        <span class="n">prod_time</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">get_time_for_filename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">production_datetime</span><span class="p">)</span><span class="si">}</span><span class="s2">Z&quot;</span>
+
+        <span class="n">gunw_fields</span> <span class="o">=</span> <span class="n">basename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">sas_config</span><span class="p">[</span><span class="s1">&#39;dynamic_ancillary_file_group&#39;</span><span class="p">][</span><span class="s1">&#39;gunw_files&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span>
+        <span class="n">mode</span> <span class="o">=</span> <span class="n">gunw_fields</span><span class="p">[</span><span class="mi">9</span><span class="p">]</span>
+        <span class="n">pol</span> <span class="o">=</span> <span class="n">gunw_fields</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span>
+
+        <span class="c1"># Product version hardcoded to 1.0 for now since CCSLCs are not</span>
+        <span class="c1"># intended for widespread distribution</span>
+        <span class="n">product_version</span> <span class="o">=</span> <span class="s2">&quot;1.0&quot;</span>
+
+        <span class="c1"># Carry the file extension over from the original filename</span>
+        <span class="n">ext</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">groupdict</span><span class="p">()[</span><span class="s2">&quot;ext&quot;</span><span class="p">]</span>
+
+        <span class="n">gslc_filename</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">PROJECT</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">level</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">frame_id</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">_&quot;</span>
+                         <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ref_date</span><span class="si">}</span><span class="s2">T000000Z_</span><span class="si">{</span><span class="n">start_date</span><span class="si">}</span><span class="s2">T000000Z_&quot;</span>
+                         <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stop_date</span><span class="si">}</span><span class="s2">T000000Z_</span><span class="si">{</span><span class="n">prod_time</span><span class="si">}</span><span class="s2">_&quot;</span>
+                         <span class="sa">f</span><span class="s2">&quot;v</span><span class="si">{</span><span class="n">product_version</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">gslc_filename</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_ancillary_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -281,7 +310,7 @@
 
 <span class="sd">        The core file name component DISP-NI ancillary products consists of:</span>
 
-<span class="sd">        &lt;PROJECT&gt;_&lt;LEVEL&gt;_&lt;PGE NAME&gt;_&lt;TRACK&gt;_&lt;DIRECTION&gt;_&lt;FRAME&gt;_&lt;BANDWIDTH&gt;_&lt;POLARIZATION&gt;_</span>
+<span class="sd">        &lt;PROJECT&gt;_&lt;LEVEL&gt;_&lt;PGE NAME&gt;_&lt;MODE&gt;_&lt;FRAME&gt;_&lt;POLARIZATION&gt;_\</span>
 <span class="sd">        &lt;ProductVersion&gt;_&lt;ProductGenerationDateTime&gt;</span>
 
 <span class="sd">        Since these files are note specific to any particular DISP-NI output</span>
@@ -304,8 +333,11 @@
             <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">PROJECT</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">LEVEL</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">NAME</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="p">)</span>
 
-        <span class="n">frame_id</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">sas_config</span><span class="p">[</span><span class="s1">&#39;input_file_group&#39;</span><span class="p">][</span><span class="s1">&#39;frame_id&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">03d</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="n">pol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">sas_config</span><span class="p">[</span><span class="s1">&#39;input_file_group&#39;</span><span class="p">][</span><span class="s1">&#39;polarization&#39;</span><span class="p">]</span>
+        <span class="n">frame_id</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">sas_config</span><span class="p">[</span><span class="s1">&#39;input_file_group&#39;</span><span class="p">][</span><span class="s1">&#39;frame_id&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">05d</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="n">gunw_fields</span> <span class="o">=</span> <span class="n">basename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">sas_config</span><span class="p">[</span><span class="s1">&#39;dynamic_ancillary_file_group&#39;</span><span class="p">][</span><span class="s1">&#39;gunw_files&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span>
+        <span class="n">mode</span> <span class="o">=</span> <span class="n">gunw_fields</span><span class="p">[</span><span class="mi">9</span><span class="p">]</span>
+        <span class="n">pol</span> <span class="o">=</span> <span class="n">gunw_fields</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span>
 
         <span class="n">product_version</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">sas_config</span><span class="p">[</span><span class="s1">&#39;product_path_group&#39;</span><span class="p">][</span><span class="s1">&#39;product_version&#39;</span><span class="p">]</span>
 
@@ -315,7 +347,7 @@
         <span class="n">product_generation_date_time</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">get_time_for_filename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">production_datetime</span><span class="p">)</span><span class="si">}</span><span class="s2">Z&quot;</span>
 
         <span class="n">ancillary_filename</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">core_filename</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">frame_id</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">product_version</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">product_generation_date_time</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">core_filename</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">frame_id</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">product_version</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">product_generation_date_time</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="p">)</span>
 
         <span class="k">return</span> <span class="n">ancillary_filename</span>
@@ -339,7 +371,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Extract all metadata assigned by the SAS at product creation time</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">output_product_metadata</span> <span class="o">=</span> <span class="n">get_disp_product_metadata</span><span class="p">(</span><span class="n">disp_product</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="s1">&#39;/science/LSAR/identification&#39;</span><span class="p">)</span>
+            <span class="n">output_product_metadata</span> <span class="o">=</span> <span class="n">get_disp_product_metadata</span><span class="p">(</span><span class="n">disp_product</span><span class="p">)</span>
 
             <span class="c1"># Add hardcoded values to metadata</span>
             <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;static&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
@@ -443,10 +475,10 @@
     <span class="n">LEVEL</span> <span class="o">=</span> <span class="s2">&quot;L3&quot;</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Processing Level for DISP-NI Products&quot;&quot;&quot;</span>
 
-    <span class="n">SAS_VERSION</span> <span class="o">=</span> <span class="s2">&quot;0.1.1&quot;</span>  <span class="c1"># Interface release https://github.com/opera-adt/disp-nisar/releases/tag/v0.1.1</span>
+    <span class="n">SAS_VERSION</span> <span class="o">=</span> <span class="s2">&quot;0.2.0&quot;</span>  <span class="c1"># Interface release https://github.com/opera-adt/disp-nisar/releases/tag/v0.2.0</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Version of the SAS wrapped by this PGE, should be updated as needed&quot;&quot;&quot;</span>
 
-    <span class="n">PGE_VERSION</span> <span class="o">=</span> <span class="s2">&quot;6.0.0-er.1.0&quot;</span>
+    <span class="n">PGE_VERSION</span> <span class="o">=</span> <span class="s2">&quot;6.0.0-er.2.0&quot;</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Version of the PGE (overrides default from base_pge)&quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pge_name</span><span class="p">,</span> <span class="n">runconfig_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
