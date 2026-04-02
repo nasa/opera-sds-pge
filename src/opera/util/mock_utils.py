@@ -295,6 +295,7 @@ class MockGdal:  # pragma: no cover
                 "bucket_prefix": "None",
                 "confirmation_confidence_upper_lim": "32000",
                 "confirmation_confidence_threshold": "31.5",
+                "delta_window_days": "60",
                 "delta_lookback_days_mw": "1095,730,365",
                 "device": "cpu",
                 "dst_dir": "/home/ops/scratch_dir",
