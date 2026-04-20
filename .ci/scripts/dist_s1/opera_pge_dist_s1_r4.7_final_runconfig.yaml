@@ -350,7 +350,7 @@ RunConfig:
 
       PrimaryExecutable:
         ProductIdentifier: DIST_S1
-        ProductVersion: "0.1"
+        ProductVersion: "0.5"
         ProgramPath: /opt/conda/envs/dist-s1-env/bin/dist-s1
         ProgramOptions:
           - run_sas
