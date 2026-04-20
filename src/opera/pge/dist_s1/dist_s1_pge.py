@@ -939,5 +939,5 @@ class DistS1Executor(DistS1PreProcessorMixin, DistS1PostProcessorMixin, PgeExecu
 
         # TODO: Remove mapping after SAS corrects versioning
         self.rename_by_pattern_map = {
-            '*': self._versioned_filename
+            'OPERA_*': self._versioned_filename
         }
