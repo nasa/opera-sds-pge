@@ -285,3 +285,7 @@ ZERO_DOPPLER_START_TIME:
   attribute_data_type: string
   attribute_type: processingInformation
   description: 'Sensing start time. Latest acquisition time of NISAR GCOV set. Format: YYYY-MM-DDTHH:MM:SSZ'
+RFI_FRAMES_COUNT:
+  attribute_data_type: int
+  attribute_type: qualityInformation
+  description: 'Number of NISAR GCOV input frames affected by RFI'
