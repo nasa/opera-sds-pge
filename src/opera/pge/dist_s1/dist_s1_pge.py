@@ -616,7 +616,8 @@ class DistS1PostProcessorMixin(PostProcessorMixin):
 
         iso_metadata_filename = self._tile_filename_cache[tile_id]
 
-        return iso_metadata_filename + ".iso.xml"
+        # TODO: Remove _versioned_filename call after SAS corrects versioning
+        return self._versioned_filename(iso_metadata_filename + ".iso.xml")
 
     def _collect_dist_s1_product_metadata(self, geotiff_product):
         """
@@ -802,6 +803,42 @@ class DistS1PostProcessorMixin(PostProcessorMixin):
                 if scratch_path not in src and src != dst:
                     shutil.copy(str(src), dst)
 
+    # TODO: Remove _versioned_filename after SAS corrects versioning
+    def _versioned_filename(self, unversioned_filename):
+        """
+        Temporary renaming function to set the product version output filenames.
+
+        Parameters
+        ----------
+        unversioned_filename : str
+            The unversioned filename as produced by the SAS. It already conforms
+            to the DIST-S1 specification, but currently has its version hardcoded
+            to '0.1'.
+
+        Returns
+        -------
+        versioned_filename : str
+            The file name to assign to files created by this PGE.
+
+        """
+        product_version = self.runconfig.product_version
+        filename = basename(unversioned_filename)
+
+        stem, ext = splitext(filename)
+
+        if ext == '.png':
+            unversioned_filename = f'{"_".join(stem.split("_")[:-1] + [f"v{product_version}"])}{ext}'
+        elif ext == '.xml':
+            ext = '.iso.xml'
+            stem = stem.removesuffix('.iso')
+            unversioned_filename = f'{"_".join(stem.split("_")[:-1] + [f"v{product_version}"])}{ext}'
+        else:
+            fields = stem.split("_")
+            fields[-2] = f"v{product_version}"
+            unversioned_filename = f'{"_".join(fields)}{ext}'
+
+        return unversioned_filename
+
     def _checksum_output_products(self):
         """
         Generates a dictionary mapping output product file names to the
@@ -900,4 +937,7 @@ class DistS1Executor(DistS1PreProcessorMixin, DistS1PostProcessorMixin, PgeExecu
     def __init__(self, pge_name, runconfig_path, **kwargs):
         super().__init__(pge_name, runconfig_path, **kwargs)
 
-        self.rename_by_pattern_map = {}
+        # TODO: Remove mapping after SAS corrects versioning
+        self.rename_by_pattern_map = {
+            '*': self._versioned_filename
+        }
