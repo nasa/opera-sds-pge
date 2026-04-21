@@ -338,7 +338,7 @@ RunConfig:
           - /home/ops/input_dir/out_1/11SLT/71/2025-01-21/OPERA_L2_RTC-S1_T071-151232-IW3_20250121T135304Z_20250121T180333Z_S1A_30_v1.0_VH.tif
           - /home/ops/input_dir/out_1/11SLT/71/2025-01-21/OPERA_L2_RTC-S1_T071-151233-IW2_20250121T135305Z_20250121T180333Z_S1A_30_v1.0_VH.tif
           - /home/ops/input_dir/out_1/11SLT/71/2025-01-21/OPERA_L2_RTC-S1_T071-151233-IW3_20250121T135306Z_20250121T180333Z_S1A_30_v1.0_VH.tif
-          - /home/ops/input_dir/product_0/OPERA_L3_DIST-ALERT-S1_T11SLT_20250109T135247Z_20260203T234209Z_S1A_30_v0.1
+          - /home/ops/input_dir/product_0/OPERA_L3_DIST-ALERT-S1_T11SLT_20250109T135247Z_20260420T233453Z_S1A_30_v1.0
 
       DynamicAncillaryFilesGroup:
         AncillaryFileMap:
@@ -350,7 +350,7 @@ RunConfig:
 
       PrimaryExecutable:
         ProductIdentifier: DIST_S1
-        ProductVersion: "0.1"
+        ProductVersion: "1.0"
         ProgramPath: /opt/conda/envs/dist-s1-env/bin/dist-s1
         ProgramOptions:
           - run_sas
@@ -706,11 +706,11 @@ RunConfig:
           - /home/ops/input_dir/out_1/11SLT/71/2025-01-21/OPERA_L2_RTC-S1_T071-151232-IW3_20250121T135304Z_20250121T180333Z_S1A_30_v1.0_VH.tif
           - /home/ops/input_dir/out_1/11SLT/71/2025-01-21/OPERA_L2_RTC-S1_T071-151233-IW2_20250121T135305Z_20250121T180333Z_S1A_30_v1.0_VH.tif
           - /home/ops/input_dir/out_1/11SLT/71/2025-01-21/OPERA_L2_RTC-S1_T071-151233-IW3_20250121T135306Z_20250121T180333Z_S1A_30_v1.0_VH.tif
-        prior_dist_s1_product: /home/ops/input_dir/product_0/OPERA_L3_DIST-ALERT-S1_T11SLT_20250109T135247Z_20260203T234209Z_S1A_30_v0.1
+        prior_dist_s1_product: /home/ops/input_dir/product_0/OPERA_L3_DIST-ALERT-S1_T11SLT_20250109T135247Z_20260420T233453Z_S1A_30_v1.0
         mgrs_tile_id: 11SLT
         dst_dir: /home/ops/scratch_dir
         input_data_dir: /home/ops/input_dir/out_1
-        src_water_mask_path: /home/ops/input_dir/out_1/11SLT_water_mask.tif
+        src_water_mask_path: # /home/ops/input_dir/out_1/11SLT_water_mask.tif
         apply_water_mask: true
         product_dst_dir: /home/ops/output_dir
-        algo_config_path: /home/ops/runconfig/opera_pge_dist_s1_r4.7_final_algorithm_parameters.yaml
+        algo_config_path: /home/ops/runconfig/opera_pge_dist_s1_r4.9_final_algorithm_parameters.yaml
