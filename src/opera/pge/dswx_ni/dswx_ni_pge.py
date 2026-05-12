@@ -180,6 +180,12 @@ class DSWxNIPostProcessorMixin(DSWxS1PostProcessorMixin):
         # Extract all metadata assigned by the SAS at product creation time
         try:
             measured_parameters = get_geotiff_metadata(geotiff_product)
+
+            # We may be able to remove this in the future, but RFI_FRAMES_COUNT should be an integer, but None
+            # has been observed
+            if measured_parameters['RFI_FRAMES_COUNT'].lower() == 'none':
+                measured_parameters['RFI_FRAMES_COUNT'] = '0'
+
             output_product_metadata['MeasuredParameters'] = augment_measured_parameters(
                 measured_parameters,
                 self.runconfig.iso_measured_parameter_descriptions,

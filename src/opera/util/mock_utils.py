@@ -261,6 +261,7 @@ class MockGdal:  # pragma: no cover
                 "PRODUCT_TYPE": "DSWx-NI",
                 "PRODUCT_VERSION": "['0.1.0']",
                 "PROJECT": "OPERA",
+                "RFI_FRAMES_COUNT": "None",
                 "SENSOR": "LSAR",
                 "SOFTWARE_VERSION": "1.1",
                 "SPACECRAFT_NAME": "NISAR",
