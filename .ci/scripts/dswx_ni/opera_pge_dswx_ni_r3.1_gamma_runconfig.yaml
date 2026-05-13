@@ -184,7 +184,7 @@ RunConfig:
             standard_deviation_backscattering: null
 
             # Separate runconfig file for algorithm parameters
-            algorithm_parameters: /home/dswx_user/input_dir/algorithm_parameter_ni.yaml
+            algorithm_parameters: /home/dswx_user/runconfig/opera_pge_dswx_ni_r3.1_gamma_algorithm_parameters.yaml
 
           static_ancillary_file_group:
             static_ancillary_inputs_flag: true
