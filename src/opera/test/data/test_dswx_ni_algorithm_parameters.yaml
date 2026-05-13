@@ -2,7 +2,7 @@ runconfig:
     name: dswx_ni_workflow_algorithm
 
     processing:
-        # dswx_workflow 'opera_dswx_ni', 'twele'
+        # dswx_workflow 'opera_dswx_s1', 'twele', 'opera_dswx_s1_inundated_vegetation'
         dswx_workflow: 'opera_dswx_ni'
         # Polarizations to be used for DSWx-SAR
         # [polarizations] for list of specific frequency(s) e.g. [VV, VH] or [VV]
@@ -14,7 +14,7 @@ runconfig:
         # e.g. ['ratio', 'span']
         polarimetric_option:
 
-        # Specify the max_value for permanent water and no_data_value for invalid pixels
+        # Specifiy the max_value for permanent water and no_data_value for invalid pixels
         reference_water:
             max_value: 100
             no_data_value: 255
@@ -24,12 +24,10 @@ runconfig:
             drought_erosion_pixel: 10
             # number of pixel to apply dilation for flood case
             flood_dilation_pixel: 16
-
-        hand:
-            mask_value: 200
-
         partial_surface_water:
             enabled: True
+        hand:
+            mask_value: 200
 
         ocean_mask:
             # Flag to apply ocean mask
@@ -45,13 +43,13 @@ runconfig:
             # Burst Mosaic options
             #   - average : overlapped areas are averaged.
             #   - first : choose one burst without average.
-            mosaic_mode: 'first'
             mosaic_posting_thresh: 40
-            read_row_blk_size: 1000
-            read_col_blk_size: 1100
-            resamp_required: False
-            resamp_method: 'nearest'
-            resamp_out_res: 30
+            mosaic_mode: 'first'
+            resamp_required: True
+            resamp_method: 'multilook' #'nearest'
+            resamp_out_res: 20
+            read_row_blk_size: 100
+            read_col_blk_size: 100
 
         # Flag to turn on/off the filtering for RTC image.
         # The enhanced Lee filter is available.
@@ -59,7 +57,6 @@ runconfig:
             enabled: True
             method: bregman
             block_pad: 300
-            # Window size for filtering.
             lee_filter:
                 window_size: 3
             guided_filter:
@@ -127,6 +124,7 @@ runconfig:
             number_cpu: -1
             tile_average: True
             line_per_block: 300
+        #    threshold_scale: 'linear'
 
         fuzzy_value:
             line_per_block: 200
@@ -171,23 +169,23 @@ runconfig:
         # Region growing options
         region_growing:
             # seed value for region growing start
-            initial_threshold: 0.81
+            initial_threshold: 0.61
             # end value for region growing
-            relaxed_threshold: 0.51
+            relaxed_threshold: 0.5000000001
             line_per_block: 400
 
         masking_ancillary:
             # Land covers that behaves like dark lands in DSWx-SAR.
             # The elements should be in given landcover file.
             # The elements will be masked out during this step.
-            land_cover_darkland_list: ['Bare sparse vegetation', 'Urban', 'Moss and lichen']
+            land_cover_darkland_list: ['Crop', 'Bare sparse vegetation', 'Urban', 'Moss and lichen']
             # The elements is considered as the dark land candidates
             # where these elemtns are spatially connected to the dark land.
             land_cover_darkland_extension_list: ['Grassland', 'Shrubs']
             land_cover_water_label: ['Permanent water bodies']
             # VV and VH threshold values for dark land candidates
             co_pol_threshold: -14.6
-            cross_pol_threshold: -22.8
+            cross_pol_threshold: -19.0 #- #-22.8
             # reference water threshold value for dark land candidates
             water_threshold: 0.05
             # Flag to enable the darkland extension.
@@ -195,16 +193,16 @@ runconfig:
             extended_darkland_minimum_pixel: 3
             extended_darkland_water_buffer: 10
             # Flag to enable the HAND filter.
-            hand_variation_mask: True
+            hand_variation_mask:  True #False
             # pixels with HAND threshold is masked out.
             hand_variation_threshold: 2.5
-            line_per_block: 400
-            number_cpu: 1
+            line_per_block: 200
+            number_cpu: 8
 
         refine_with_bimodality:
             minimum_pixel: 4
             lines_per_block: 500
-            number_cpu: 1
+            number_cpu: 8
             thresholds:
                 ashman: 1.5
                 Bhattacharyya_coefficient: 0.97
@@ -216,13 +214,13 @@ runconfig:
             # based on available cross-polarizations
             enabled: auto
             dual_pol_ratio_max: 12
-            dual_pol_ratio_min: 7
-            dual_pol_ratio_threshold: 8
-            cross_pol_min: -26
-            line_per_block: 300
+            dual_pol_ratio_min: 1
+            dual_pol_ratio_threshold: 8.2
+            cross_pol_min: -18
+            line_per_block: 5300
             target_area_file_type: 'auto'
             target_worldcover_class: ['Herbaceous wetland', 'Tree Cover', 'Shrubs', 'Grassland', 'Mangrove', 'Moss and lichen', 'Crop']
-            target_glad_class: ['112-124', '200-207', '125-148']
+            target_glad_class: ['200-207', '125-148'] #, '200-207', '125-148']
             filter:
                 enabled: True
                 method: lee
