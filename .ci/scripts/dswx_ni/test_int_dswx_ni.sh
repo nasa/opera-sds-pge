@@ -28,9 +28,9 @@ SAMPLE_TIME=1
 # RUNCONFIG should be the name of the runconfig in s3://operasds-dev-pge/dswx_ni/
 [ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath "$(dirname "$(realpath "$0")")"/../../..)
 [ -z "${PGE_TAG}" ] && PGE_TAG="${USER}-dev"
-[ -z "${INPUT_DATA}" ] && INPUT_DATA="dswx_ni_gamma_0.3_expected_input.zip"
-[ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="dswx_ni_gamma_0.3_expected_output.zip"
-[ -z "${RUNCONFIG}" ] && RUNCONFIG="opera_pge_dswx_ni_delivery_0.3_gamma_runconfig.yaml"
+[ -z "${INPUT_DATA}" ] && INPUT_DATA="dswx_ni_gamma_0.3.1_expected_input.zip"
+[ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="dswx_ni_gamma_0.3.1_expected_output.zip"
+[ -z "${RUNCONFIG}" ] && RUNCONFIG="opera_pge_dswx_ni_r3.1_gamma_runconfig.yaml"
 [ -z "${TMP_ROOT}" ] && TMP_ROOT="$DEFAULT_TMP_ROOT"
 
 # Create the test output directory in the work space
@@ -65,6 +65,7 @@ echo "Expected data directory: ${expected_data_dir}"
 
 # the testdata reference metadata contains this path so we use it here
 output_dir="${TMP_DIR}/output_dswx_ni"
+runconfig_dir="${TMP_DIR}/runconfig"
 
 # make sure no output directory already exists
 if [ -d "$output_dir" ]; then
@@ -86,6 +87,12 @@ fi
 echo "Creating scratch directory $scratch_dir."
 mkdir -p --mode=777 "$scratch_dir"
 
+# Copy the Algorithm Parameters RunConfigs
+algo_runconfig="opera_pge_dswx_ni_r3.1_gamma_algorithm_parameters.yaml"
+local_algo_runconfig="${SCRIPT_DIR}/${algo_runconfig}"
+echo "Copying runconfig file $local_algo_runconfig to $runconfig_dir"
+cp ${local_algo_runconfig} ${runconfig_dir}
+
 # Assign a container name to avoid the auto-generated one created by Docker
 container_name="${PGE_NAME}"
 
@@ -94,7 +101,7 @@ metrics_collection_start "$PGE_NAME" "$container_name" "$TEST_RESULTS_DIR" "$SAM
 
 echo "Running Docker image ${PGE_IMAGE}:${PGE_TAG} for ${input_data_dir}"
 docker run --rm -u $UID:"$(id -g)" --name $container_name \
-            -v "${TMP_DIR}/runconfig":/home/dswx_user/runconfig:ro \
+            -v "${runconfig_dir}":/home/dswx_user/runconfig:ro \
             -v "$input_data_dir":/home/dswx_user/input_dir:ro \
             -v "$output_dir":/home/dswx_user/output_dir \
             -v "$scratch_dir":/home/dswx_user/scratch_dir \

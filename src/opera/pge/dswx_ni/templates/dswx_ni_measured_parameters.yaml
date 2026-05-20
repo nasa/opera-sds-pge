@@ -116,6 +116,11 @@ LOOK_DIRECTION:
   attribute_data_type: string
   attribute_type: processingInformation
   description: LOOK_DIRECTION
+MGRS_COLLECTION_ACQUIRED_SLC_GRANULES:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: "MGRS collection acquired SLC granules"
+  display_name: MGRSCollectionAcquiredSLCGranules
 MGRS_COLLECTION_ACTUAL_NUMBER_OF_FRAMES:
   attribute_data_type: int
   attribute_type: processingInformation
@@ -136,6 +141,11 @@ MGRS_POL_MODE:
   attribute_type: processingInformation
   description: "The description for the polarizations of the collected GCOVs. 'MIX_DUAL_POL': ['HH', 'HV', 'VV', 'VH'], 'MIX_DUAL_H_SINGLE_V_POL': ['HH', 'HV', 'VV'], 'MIX_DUAL_V_SINGLE_H_POL': ['VV', 'VH', 'HH'], 'MIX_SINGLE_POL': ['HH', 'VV'], 'DV_POL': ['VV', 'VH'], 'SV_POL': ['VV'], 'DH_POL': ['HH', 'HV'], 'SH_POL': ['HH']"
   display_name: MGRSPolMode
+MGRS_SET_ID:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: "MGRS Set ID"
+  display_name: MGRSSetID
 ORBIT_PASS_DIRECTION:
   attribute_data_type: string
   attribute_type: processingInformation

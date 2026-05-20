@@ -1,7 +1,3 @@
-# Sample RunConfig for use with the DSWx-NI PGE v4.0.0-rc.1.0
-# This RunConfig should require minimal changes in order to be used with the
-# OPERA PCM.
-
 RunConfig:
   # Name for the RunConfig, may be any string
   Name: OPERA-DSWX-NI-PGE-SAMPLE-CONFIG
@@ -19,9 +15,8 @@ RunConfig:
       InputFilesGroup:
         # List of input files/directories
         # Must be a list of the input HDF5 GCOV NISAR products
-        InputFilePaths: [
-          /home/dswx_user/input_dir/gcov/gcov_eap_off_flat_range_shift_50m.h5
-        ]
+        InputFilePaths:
+          - /home/dswx_user/input_dir/gcov/NISAR_L2_PR_GCOV_010_163_A_023_4005_DHDH_A_20260120T115547_20260120T115622_X05010_N_F_J_001.h5
 
       DynamicAncillaryFilesGroup:
         # Map of ancillary file types to paths to the file
@@ -30,24 +25,24 @@ RunConfig:
           # Path to the Digital Elevation Model
           # Must be either a single .tif, or a .vrt that points to one
           # or more .tif files
-          dem_file: /home/dswx_user/input_dir/ancillary/dem.tif
+          dem_file: /home/dswx_user/input_dir/ancillary/dem.vrt
 
           # Path to the Discrete Classification Map
           # Must point to a single .tif, or a .vrt that points to one or
           # more .tif files
-          hand_file: /home/dswx_user/input_dir/ancillary/hand.tif
+          hand_file: /home/dswx_user/input_dir/ancillary/hand_file.vrt
 
           # Path to the reference water map
           # Must point to a single .tif, or a .vrt that points to one or
           # more .tif files
-          reference_water_file: /home/dswx_user/input_dir/ancillary/reference_water.tif
+          reference_water_file: /home/dswx_user/input_dir/ancillary/reference_water_file.vrt
 
           # Path to the Worldcover map
           # Must point to a single .tif, or a .vrt that points to one or
           # more .tif files
-          worldcover_file: /home/dswx_user/input_dir/ancillary/esa_landcover.tif
+          worldcover_file: /home/dswx_user/input_dir/ancillary/worldcover_file.vrt
 
-          glad_classification_file: /home/dswx_user/input_dir/ancillary/glad.tif
+          glad_classification_file: /home/dswx_user/input_dir/ancillary/glad_classification_file.vrt
 
       ProductPathGroup:
         # Path to where output products should be stored
@@ -70,7 +65,7 @@ RunConfig:
         ProductIdentifier: DSWX_NI
 
         # Product version specific to output products
-        ProductVersion: "0.3"
+        ProductVersion: "0.1"
 
         # Path to the executable to run, path must be reachable from
         # within the Docker container (i.e. findable with a "which" command)
@@ -147,59 +142,58 @@ RunConfig:
             pge_name: DSWX_NI_PGE
 
           input_file_group:
-            input_file_path: [
-              /home/dswx_user/input_dir/gcov/gcov_eap_off_flat_range_shift_50m.h5
-            ]
+            input_file_path:
+              - /home/dswx_user/input_dir/gcov/NISAR_L2_PR_GCOV_010_163_A_023_4005_DHDH_A_20260120T115547_20260120T115622_X05010_N_F_J_001.h5
 
-            # Placeholder for historical GCOV data
-            input_file_historical_path:
+            input_file_historical_path: null
 
             # Specify the MGRS tile collection ID
-            input_mgrs_collection_id: 
+            input_mgrs_collection_id: MS_163_24
 
           dynamic_ancillary_file_group:
             # Digital elevation model (Required)
-            dem_file: /home/dswx_user/input_dir/ancillary/dem.tif
+            dem_file: /home/dswx_user/input_dir/ancillary/dem.vrt
 
             # Digital elevation model source description
             dem_file_description: 'Copernicus DEM GLO-30 2021 WGS84'
 
             # ESA WorldCover map file
-            worldcover_file: /home/dswx_user/input_dir/ancillary/esa_landcover.tif
+            worldcover_file: /home/dswx_user/input_dir/ancillary/worldcover_file.vrt
 
             # ESA WorldCover map description
             worldcover_file_description: 'ESA WorldCover 10m 2020 v1.0'
 
             # Reference water body map (Required)
             # e.g., Pekel's water occurrence or seasonality map
-            reference_water_file: /home/dswx_user/input_dir/ancillary/reference_water.tif
+            reference_water_file: /home/dswx_user/input_dir/ancillary/reference_water_file.vrt
 
             # Reference water description
             reference_water_file_description: 'JRC Global Surface Water - collection from 1984 to 2021'
 
             # Height Above Nearest Drainage (Required)
-            hand_file: /home/dswx_user/input_dir/ancillary/hand.tif
+            hand_file: /home/dswx_user/input_dir/ancillary/hand_file.vrt
 
             # HAND description
             hand_file_description: 'ASF HAND GLO30'
 
-            glad_classification_file: /home/dswx_user/input_dir/ancillary/glad.tif
+            glad_classification_file: /home/dswx_user/input_dir/ancillary/glad_classification_file.vrt
+            glad_classification_file_description: GLAD Global Land Cover 2020
 
             # placeholders for inundated vegetation
-            mean_backscattering:
-            standard_deviation_backscattering:
+            mean_backscattering: null
+            standard_deviation_backscattering: null
 
             # Separate runconfig file for algorithm parameters
-            algorithm_parameters: /home/dswx_user/input_dir/ancillary/algorithm_parameter_ni.yaml
+            algorithm_parameters: /home/dswx_user/runconfig/opera_pge_dswx_ni_r3.1_gamma_algorithm_parameters.yaml
 
           static_ancillary_file_group:
-            static_ancillary_inputs_flag: True
+            static_ancillary_inputs_flag: true
 
             # MGRS database sqlite file
             mgrs_database_file: /home/dswx_user/input_dir/ancillary/MGRS_tile.sqlite
 
             # MGRS collection database sqlite file
-            mgrs_collection_database_file: /home/dswx_user/input_dir/ancillary/MGRS_collection_db_DSWx-NI_v0.1.sqlite
+            mgrs_collection_database_file: /home/dswx_user/input_dir/ancillary/DSWx-NI_MGRS_collection_DB_0.4.sqlite
 
           primary_executable:
             product_type: dswx_ni
@@ -215,24 +209,15 @@ RunConfig:
             sas_output_path: /home/dswx_user/output_dir
 
             # TODO: this should become a string once SAS schema is fixed
-            product_version: 0.3
+            product_version: 0.1
 
             # DSWx-NI product format
             output_imagery_format: 'COG'
 
-            # DSWx-NI Compression Options for COG
-            output_imagery_compression: DEFLATE
-
-            # DSWx-NI Compression bits for COG
-            output_imagery_nbits: 32
-            
-            # DSWx-NI output spacing
-            output_spacing: 30
-
           browse_image_group:
             # Save a full-res Cloud-Optimized GEOTIFF DSWx-NI browse image and
             # a modified-resolution PNG of the browse image for DSWx-NI
-            save_browse: True
+            save_browse: true
 
             # Setting `browse_image_height` and `browse_image_width` equal
             # will maintain this original DSWx-NI aspect ratio
@@ -244,24 +229,24 @@ RunConfig:
             browse_image_width: 1024
 
             # Flag to collapse water classes
-            flag_collapse_wtr_classes: True
+            flag_collapse_wtr_classes: true
 
             # Flag to exclude inundated vegetation from processing
-            exclude_inundated_vegetation: False
+            exclude_inundated_vegetation: false
 
             # Flag to set non-water pixels to NoData value
-            set_not_water_to_nodata: False
+            set_not_water_to_nodata: false
 
             # Flag to set HAND mask pixels to NoData value
-            set_hand_mask_to_nodata: True
+            set_hand_mask_to_nodata: true
 
             # Flag to set layover and shadow pixels to NoData value
-            set_layover_shadow_to_nodata: True
+            set_layover_shadow_to_nodata: true
 
             # Flag to set ocean-masked pixels to NoData value
-            set_ocean_masked_to_nodata: False
+            set_ocean_masked_to_nodata: false
 
             # Save the full-res GeoTIFF Browse image in addition to the PNG
-            save_tif_to_output: True
+            save_tif_to_output: true
 
           log_file: /home/dswx_user/scratch_dir/dswx-ni.log
