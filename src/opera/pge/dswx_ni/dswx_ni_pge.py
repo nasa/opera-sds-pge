@@ -67,6 +67,16 @@ class DSWxNIPostProcessorMixin(DSWxS1PostProcessorMixin):
     _tile_metadata_cache = {}
     _tile_filename_cache = {}
 
+    _required_bands = {
+        'B01_WTR.tif',
+        'B02_BWTR.tif',
+        'B03_CONF.tif',
+        'B04_DIAG.tif',
+    }
+    _optional_bands = {
+        'BROWSE.tif',
+    }
+
     def _validate_output_product_filenames(self):
         """
         This method validates output product file names assigned by the SAS
