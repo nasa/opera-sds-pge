@@ -57,7 +57,7 @@ RunConfig:
             PrimaryExecutable:
                 # Identifier for the PGE executable, should always be CAL_DISP for
                 # this PGE
-                ProductIdentifier: CAL_DISP
+                ProductIdentifier: DISP_CAL
 
                 # Product version specific to output products
                 ProductVersion: "0.1"
@@ -231,7 +231,7 @@ RunConfig:
 
                     # Product type of the PGE..
                     #   Type: string.
-                    product_type: CAL_DISP
+                    product_type: DISP_CAL
 
                 # Product path configuration..
                 #   Type: Object.

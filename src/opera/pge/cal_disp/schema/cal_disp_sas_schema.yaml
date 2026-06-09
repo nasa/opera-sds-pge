@@ -85,7 +85,7 @@ cal_disp_workflow:
   primary_executable:
 
     # Product type of the PGE
-    product_type: enum('CAL_DISP')
+    product_type: enum('DISP_CAL')
 
   # Product path configuration.
   product_path_group:

@@ -30,13 +30,13 @@ RunConfig:
                 ScratchPath: cal_disp_pge_test/scratch_dir
 
             PrimaryExecutable:
-                ProductIdentifier: CAL_DISP
+                ProductIdentifier: DISP_CAL
                 ProductVersion: "0.1"
                 ProgramPath: mkdir
                 ProgramOptions:
                     - '-p cal_disp_pge_test/output_dir/;'
-                    - 'python3 -c "from opera.util.h5_utils import create_test_cal_disp_metadata_product; create_test_cal_disp_metadata_product(\"cal_disp_pge_test/output_dir/OPERA_L4_CAL-DISP-S1_IW_F08882_VV_20220111T002651Z_20220722T002657Z_v0.1_20260122T203124Z.nc\")";'
-                    - 'dd if=/dev/urandom of=cal_disp_pge_test/output_dir/OPERA_L4_CAL-DISP-S1_IW_F08882_VV_20220111T002651Z_20220722T002657Z_v0.1_20260122T203124Z.png bs=1M count=1;'
+                    - 'python3 -c "from opera.util.h5_utils import create_test_cal_disp_metadata_product; create_test_cal_disp_metadata_product(\"cal_disp_pge_test/output_dir/OPERA_L4_DISP-CAL-S1_IW_F08882_VV_20220111T002651Z_20220722T002657Z_v0.1_20260122T203124Z.nc\")";'
+                    - 'dd if=/dev/urandom of=cal_disp_pge_test/output_dir/OPERA_L4_DISP-CAL-S1_IW_F08882_VV_20220111T002651Z_20220722T002657Z_v0.1_20260122T203124Z.png bs=1M count=1;'
                     - '/bin/echo CAL-DISP invoked with RunConfig'
                 ErrorCodeBase: 1000000
                 SchemaPath: pge/cal_disp/schema/cal_disp_sas_schema.yaml
@@ -156,7 +156,7 @@ RunConfig:
 
                     # Product type of the PGE..
                     #   Type: string.
-                    product_type: CAL_DISP
+                    product_type: DISP_CAL
 
                 # Product path configuration..
                 #   Type: Object.
