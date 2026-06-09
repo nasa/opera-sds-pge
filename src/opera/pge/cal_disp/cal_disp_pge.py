@@ -341,7 +341,7 @@ class CalDispExecutor(CalDispPreProcessorMixin, CalDispPostProcessorMixin, PgeEx
     of the SAS from the base PgeExecutor class.
     """
 
-    _granule_filename_re = re.compile(r"(?P<id>(?P<project>OPERA)_(?P<level>L4)_(?P<product_type>CAL-DISP)-"
+    _granule_filename_re = re.compile(r"(?P<id>(?P<project>OPERA)_(?P<level>L4)_(?P<product_type>DISP-CAL)-"
                                       r"(?P<platform>S1|NI)_(?P<mode>IW|20|40|77|05)_(?P<frame_id>F\d{5})_"
                                       r"(?P<pol>[HV]{2})_(?P<reference_ts>\d{8}T\d{6}Z)_(?P<secondary_ts>\d{8}T\d{6}Z)_"
                                       r"(?P<product_version>v\d[.]\d)_(?P<creation_ts>\d{8}T\d{6}Z))[.](?P<ext>nc|png)")
