@@ -370,7 +370,7 @@ class DSWxNIExecutor(DSWxNIPreProcessorMixin, DSWxNIPostProcessorMixin, PgeExecu
     PGE_VERSION = "4.0.0-rc.2.0"
     """Version of the PGE"""
 
-    SAS_VERSION = "0.3.1"  # Beta release https://github.com/opera-adt/DSWX-SAR/releases/tag/DSWx-NI-v0.3.1
+    SAS_VERSION = "0.4.0"  # Beta release https://github.com/opera-adt/DSWX-SAR/releases/tag/DSWx-NI-v0.4
     """Version of the SAS wrapped by this PGE, should be updated as needed"""
 
     def __init__(self, pge_name, runconfig_path, **kwargs):
