@@ -252,8 +252,8 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
 
         if not (bands.intersection(self._required_bands) == self._required_bands and
                 (bands - (self._required_bands | self._optional_bands)) == set()):
-            error_msg = (f"Invalid SAS output file, wrong number of bands, "
-                         f"expected {EXPECTED_NUM_BANDS}, found {band_dict.keys()}")
+            error_msg = (f"Invalid SAS output file, wrong set of bands, expected {self._required_bands} (optional: "
+                         f"{self._optional_bands}), found {bands}")
 
             self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
 
