@@ -352,7 +352,7 @@ class CalDispExecutor(CalDispPreProcessorMixin, CalDispPostProcessorMixin, PgeEx
     LEVEL = "L4"
     """Processing Level for CAL-DISP Products"""
 
-    SAS_VERSION = "0.1"  # Interface release https://github.com/opera-adt/cal-disp/releases/tag/v0.1
+    SAS_VERSION = "0.2"  # Interface release https://github.com/opera-adt/cal-disp/releases/tag/v0.2
     """Version of the SAS wrapped by this PGE, should be updated as needed"""
 
     def __init__(self, pge_name, runconfig_path, **kwargs):
