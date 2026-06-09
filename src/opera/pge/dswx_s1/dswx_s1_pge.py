@@ -159,6 +159,15 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
         r'(?P<sensor>S1A|S1B|S1C|S1D)_(?P<spacing>30)_(?P<product_version>v\d+[.]\d+)$'
     )
 
+    _required_bands = {
+        'B01_WTR.tif',
+        'B02_BWTR.tif',
+        'B03_CONF.tif',
+        'B04_DIAG.tif',
+        'BROWSE.tif',
+    }
+    _optional_bands = set()
+
     def _validate_output_product_filenames(self):
         """
         This method validates output product file names assigned by the SAS
@@ -234,14 +243,17 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
             #  Gather the output files into a dictionary
             #     key = band type (e.g. B01_WTR.tif)
             #     value = list of filenames of this type (e.g. ['OPERA_L3_DSWx-S1_..._v0.1_B01_WTR.tif', ...]
-            key = '_'.join(out_product.split('_')[-2:])
+            key = '_'.join(out_product.split('_')[-2 if 'BROWSE' not in out_product else -1:])
             if key not in band_dict:
                 band_dict[key] = []
             band_dict[key].append(out_product)
 
-        if len(band_dict.keys()) != EXPECTED_NUM_BANDS:
-            error_msg = (f"Invalid SAS output file, wrong number of bands, "
-                         f"expected {EXPECTED_NUM_BANDS}, found {band_dict.keys()}")
+        bands = set(band_dict.keys())
+
+        if not (bands.intersection(self._required_bands) == self._required_bands and
+                (bands - (self._required_bands | self._optional_bands)) == set()):
+            error_msg = (f"Invalid SAS output file, wrong set of bands, expected {self._required_bands} (optional: "
+                         f"{self._optional_bands}), found {bands}")
 
             self.logger.critical(self.name, ErrorCode.INVALID_OUTPUT, error_msg)
 
