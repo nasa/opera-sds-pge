@@ -286,7 +286,7 @@ RunConfig:
 
                 # Static ancillary files configuration..
                 #   Type: StaticAncillaryFileGroup | null.
-                static_ancillary_group: {}
+                static_ancillary_group:
 
                 # Output configuration options..
                 #   Type: Object.
