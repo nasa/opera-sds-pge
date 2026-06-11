@@ -2,6 +2,8 @@
 # This RunConfig should require minimal changes in order to be used with the
 # OPERA PCM.
 
+# TODO: Update more fields to align better with INT
+
 RunConfig:
   # Name for the RunConfig, may be any string
     Name: OPERA-CAL-DISP-PGE-SAMPLE-CONFIG
@@ -28,16 +30,18 @@ RunConfig:
                 AncillaryFileMap:
                     static_dem_file: /home/conda/input_dir/static_input/OPERA_L3_DISP-S1-STATIC_F08882_20140403_S1A_v1.0_dem.tif
                     static_los_file: /home/conda/input_dir/static_input/OPERA_L3_DISP-S1-STATIC_F08882_20140403_S1A_v1.0_line_of_sight_enu.tif
-                    ref_tropo_files: []
-                    sec_tropo_files: []
+                    ref_tropo_files:
+                        - /home/conda/input_dir/tropo/OPERA_L4_TROPO-ZENITH_20220111T000000Z_20250923T224940Z_HRES_v1.0.nc
+                    sec_tropo_files:
+                        - /home/conda/input_dir/tropo/OPERA_L4_TROPO-ZENITH_20220722T000000Z_20250923T233421Z_HRES_v1.0.nc
                     iono_files: []
                     unr_timeseries_files:
-                    - /home/conda/004421_IGS20.tenv8
-                    - /home/conda/004420_IGS20.tenv8
-                    - /home/conda/004493_IGS20.tenv8
-                    - /home/conda/004492_IGS20.tenv8
-                    - /home/conda/004494_IGS20.tenv8
-                    unr_grid_latlon_file: /home/conda/input_dir/unr/grid_latlon_lookup_v0.2.txt
+                        - /home/conda/input_dir/gnss/005797_IGS20.tenv8
+                        - /home/conda/input_dir/gnss/005798_IGS20.tenv8
+                        - /home/conda/input_dir/gnss/005799_IGS20.tenv8
+                        - /home/conda/input_dir/gnss/005800_IGS20.tenv8
+                        - /home/conda/input_dir/gnss/005801_IGS20.tenv8
+                    unr_grid_latlon_file: /home/conda/input_dir/gnss/grid_latlon_lookup_v0.3.txt
 
             ProductPathGroup:
                 # Path to where output products should be stored
@@ -57,7 +61,7 @@ RunConfig:
             PrimaryExecutable:
                 # Identifier for the PGE executable, should always be CAL_DISP for
                 # this PGE
-                ProductIdentifier: CAL_DISP
+                ProductIdentifier: DISP_CAL
 
                 # Product version specific to output products
                 ProductVersion: "0.1"
@@ -147,19 +151,19 @@ RunConfig:
 
                     # REQUIRED: Path to UNR grid lookup table (grid_latlon_lookup_v0.2.txt).
                     #   Type: string.
-                    unr_grid_latlon_file: /home/conda/input_dir/unr/grid_latlon_lookup_v0.2.txt
+                    unr_grid_latlon_file: /home/conda/input_dir/gnss/grid_latlon_lookup_v0.3.txt
 
                     # REQUIRED: Directory containing UNR .tenv8 timeseries files.
                     #   Type: string.
-                    unr_timeseries_dir: /home/conda/input_dir/unr
+                    unr_timeseries_dir: /home/conda/input_dir/gnss
 
                     # REQUIRED: Version of UNR gridded data, e.g. [0.2].
                     #   Type: string.
-                    unr_grid_version: '0.2'
+                    unr_grid_version: '0.3'
 
                     # REQUIRED: Type of UNR gridded data [constant|variable].
                     #   Type: string.
-                    unr_grid_type: variable
+                    unr_grid_type: constant
 
                     # No description..
                     #   Type: boolean.
@@ -171,7 +175,7 @@ RunConfig:
 
                     # REQUIRED: Path to file containing SAS algorithm parameters.
                     #   Type: string.
-                    algorithm_parameters_file: /home/conda/runconfig/opera_pge_cal_disp_r1.0_interface_algorithm_parameters.yaml
+                    algorithm_parameters_file: /home/conda/runconfig/opera_pge_cal_disp_r2.0_beta_algorithm_parameters.yaml
 
                     # REQUIRED: Path to the DISP static los layer file (1 per frame) with line-of-sight unit vectors.
                     #   Type: string.
@@ -189,12 +193,14 @@ RunConfig:
                     # Path to the TROPO file for the reference date. If not provided, tropospheric correction
                     #       for reference is skipped.
                     #   Type: array | null.
-                    ref_tropo_files: [ ]
+                    ref_tropo_files:
+                        - /home/conda/input_dir/tropo/OPERA_L4_TROPO-ZENITH_20220111T000000Z_20250923T224940Z_HRES_v1.0.nc
 
                     # Path to the TROPO file for the secondary date. If not provided, tropospheric correction
                     #       for secondary is skipped.
                     #   Type: array | null.
-                    sec_tropo_files: [ ]
+                    sec_tropo_files:
+                        - /home/conda/input_dir/tropo/OPERA_L4_TROPO-ZENITH_20220722T000000Z_20250923T233421Z_HRES_v1.0.nc
 
                     # Path to the IONO files If not provided, ionosphere correction for reference is skipped.
                     #   Type: array | null.
@@ -231,7 +237,7 @@ RunConfig:
 
                     # Product type of the PGE..
                     #   Type: string.
-                    product_type: CAL_DISP
+                    product_type: DISP_CAL
 
                 # Product path configuration..
                 #   Type: Object.

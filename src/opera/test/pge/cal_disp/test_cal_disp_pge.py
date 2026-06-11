@@ -89,17 +89,26 @@ class CalDispPgeTestCase(unittest.TestCase):
         Helper method to check the properties of a parsed algorithm parameters runconfig against the
         expected values as defined by the "valid" sample algorithm parameters runconfig files.
         """
-        self.assertTrue(runconfig['unwrap_correction']['run_unwrap_correction'])
-        self.assertEqual(runconfig['calibration_options']['cal_method'], 'savitsky_goley')
-        self.assertTrue(runconfig['calibration_options']['run_interpolation'])
-        self.assertTrue(runconfig['calibration_options']['run_interpolation'])
-        self.assertEqual(runconfig['calibration_options']['downsample_factor'], 10)
-        self.assertIsNone(runconfig['savitsky_goley_options']['window_x_size'])
-        self.assertIsNone(runconfig['savitsky_goley_options']['window_y_size'])
-        self.assertIsNone(runconfig['savitsky_goley_options']['window_overlap_x_size'])
-        self.assertIsNone(runconfig['savitsky_goley_options']['window_overlap_y_size'])
-        self.assertIsNone(runconfig['savitsky_goley_options']['window_extend_x_size'])
-        self.assertIsNone(runconfig['savitsky_goley_options']['window_extend_y_size'])
+
+        self.assertEqual(runconfig['calibration_options']['grid_type'], 'constant')
+        self.assertEqual(runconfig['calibration_options']['reference_frame'], 'IGS20')
+        self.assertEqual(runconfig['calibration_options']['starting_year'], 2014.0)
+        self.assertTrue(runconfig['calibration_options']['unwrap_error_correction'])
+        self.assertEqual(runconfig['calibration_options']['window_size_meters'], 600000.0)
+        self.assertEqual(runconfig['calibration_options']['posting_meters'], 30.0)
+        self.assertEqual(runconfig['calibration_options']['downsample_factor'], 1)
+        self.assertEqual(runconfig['calibration_options']['downsample_method'], 'mean')
+        self.assertFalse(runconfig['calibration_options']['downsample_weighted'])
+        self.assertEqual(runconfig['calibration_options']['calibration_surface_smoothing_method'], 'gaussian')
+        self.assertEqual(runconfig['calibration_options']['calibration_surface_smoothing_sigma'], 0.0)
+        self.assertEqual(runconfig['calibration_options']['savitzky_golay']['window_length'], 51)
+        self.assertEqual(runconfig['calibration_options']['savitzky_golay']['polyorder'], 3)
+        self.assertEqual(runconfig['calibration_options']['savitzky_golay']['deriv'], 0)
+        self.assertEqual(runconfig['calibration_options']['fft_filter']['gaussian_sigma'], 0.1)
+        self.assertEqual(runconfig['calibration_options']['fft_filter']['butterworth_order'], 4)
+        self.assertFalse(runconfig['calibration_options']['fft_filter']['spatial_domain'])
+        self.assertTrue(runconfig['calibration_options']['fft_filter']['taper_edges'])
+        self.assertEqual(runconfig['calibration_options']['fft_filter']['taper_width'], 0.05)
 
     def test_cal_disp_pge_execution(self):
         """
@@ -159,10 +168,10 @@ class CalDispPgeTestCase(unittest.TestCase):
 
         # Lastly, check that the dummy output products were created and renamed
         self.assertTrue(os.path.exists(join(pge.runconfig.output_product_path,
-                                            'OPERA_L4_CAL-DISP-S1_IW_F08882_VV_20220111T002651Z_20220722T002657Z_v0.1_'
+                                            'OPERA_L4_DISP-CAL-S1_IW_F08882_VV_20220111T002651Z_20220722T002657Z_v0.1_'
                                             '20260122T203124Z.nc')))
         self.assertTrue(os.path.exists(join(pge.runconfig.output_product_path,
-                                            'OPERA_L4_CAL-DISP-S1_IW_F08882_VV_20220111T002651Z_20220722T002657Z_v0.1_'
+                                            'OPERA_L4_DISP-CAL-S1_IW_F08882_VV_20220111T002651Z_20220722T002657Z_v0.1_'
                                             '20260122T203124Z.png')))
 
         # Open and read the log
@@ -393,8 +402,8 @@ class CalDispPgeTestCase(unittest.TestCase):
             shutil.rmtree(pge.runconfig.output_product_path)
 
             # Test too many .nc
-            extra_nc = 'OPERA_L4_CAL-DISP-S1_IW_F08883_VV_20220111T002651Z_20220722T002657Z_v0.1_20260122T203125Z.nc'
-            extra_png = 'OPERA_L4_CAL-DISP-S1_IW_F08883_VV_20220111T002651Z_20220722T002657Z_v0.1_20260122T203125Z.png'
+            extra_nc = 'OPERA_L4_DISP-CAL-S1_IW_F08883_VV_20220111T002651Z_20220722T002657Z_v0.1_20260122T203125Z.nc'
+            extra_png = 'OPERA_L4_DISP-CAL-S1_IW_F08883_VV_20220111T002651Z_20220722T002657Z_v0.1_20260122T203125Z.png'
 
             primary_executable['ProgramOptions'] = program_options_copy.copy()
             primary_executable['ProgramOptions'].insert(
