@@ -359,3 +359,23 @@ class CalDispExecutor(CalDispPreProcessorMixin, CalDispPostProcessorMixin, PgeEx
         super().__init__(pge_name, runconfig_path, **kwargs)
 
         self.rename_by_pattern_map = {}
+
+    def run_sas_executable(self, **kwargs):  # pylint: disable=unused-argument
+        """
+        Kicks off a SAS executable as defined by the RunConfig provided to
+        the PGE.
+
+        Execution time for the SAS is collected and logged by this method.
+
+        Parameters
+        ----------
+        **kwargs : dict
+            Any keyword arguments needed for SAS execution.
+
+        """
+        # TODO: Temporary kludge. SAS should ensure GDAL temp directory is writable (and preferably the scratch dir).
+        #  When this is ensured, this entire method should be removed
+        import os
+        os.environ['CPL_TMPDIR'] = self.runconfig.scratch_path
+
+        super().run_sas_executable(**kwargs)
