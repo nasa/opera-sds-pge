@@ -5,14 +5,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera.pge.cal_disp.cal_disp_pge &mdash; opera-sds-pge 7.0.0-er.1.0 documentation</title>
+  <title>opera.pge.cal_disp.cal_disp_pge &mdash; opera-sds-pge 7.0.0-er.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
 
   
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=d4e30586"></script>
+      <script src="../../../../_static/documentation_options.js?v=469cdb6d"></script>
       <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/js/theme.js"></script>
@@ -430,7 +430,7 @@
 <span class="sd">    of the SAS from the base PgeExecutor class.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">_granule_filename_re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;(?P&lt;id&gt;(?P&lt;project&gt;OPERA)_(?P&lt;level&gt;L4)_(?P&lt;product_type&gt;CAL-DISP)-&quot;</span>
+    <span class="n">_granule_filename_re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;(?P&lt;id&gt;(?P&lt;project&gt;OPERA)_(?P&lt;level&gt;L4)_(?P&lt;product_type&gt;DISP-CAL)-&quot;</span>
                                       <span class="sa">r</span><span class="s2">&quot;(?P&lt;platform&gt;S1|NI)_(?P&lt;mode&gt;IW|20|40|77|05)_(?P&lt;frame_id&gt;F\d</span><span class="si">{5}</span><span class="s2">)_&quot;</span>
                                       <span class="sa">r</span><span class="s2">&quot;(?P&lt;pol&gt;[HV]</span><span class="si">{2}</span><span class="s2">)_(?P&lt;reference_ts&gt;\d</span><span class="si">{8}</span><span class="s2">T\d</span><span class="si">{6}</span><span class="s2">Z)_(?P&lt;secondary_ts&gt;\d</span><span class="si">{8}</span><span class="s2">T\d</span><span class="si">{6}</span><span class="s2">Z)_&quot;</span>
                                       <span class="sa">r</span><span class="s2">&quot;(?P&lt;product_version&gt;v\d[.]\d)_(?P&lt;creation_ts&gt;\d</span><span class="si">{8}</span><span class="s2">T\d</span><span class="si">{6}</span><span class="s2">Z))[.](?P&lt;ext&gt;nc|png)&quot;</span><span class="p">)</span>
@@ -441,13 +441,36 @@
     <span class="n">LEVEL</span> <span class="o">=</span> <span class="s2">&quot;L4&quot;</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Processing Level for CAL-DISP Products&quot;&quot;&quot;</span>
 
-    <span class="n">SAS_VERSION</span> <span class="o">=</span> <span class="s2">&quot;0.1&quot;</span>  <span class="c1"># Interface release https://github.com/opera-adt/cal-disp/releases/tag/v0.1</span>
+    <span class="n">SAS_VERSION</span> <span class="o">=</span> <span class="s2">&quot;0.2&quot;</span>  <span class="c1"># Interface release https://github.com/opera-adt/cal-disp/releases/tag/v0.2</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Version of the SAS wrapped by this PGE, should be updated as needed&quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pge_name</span><span class="p">,</span> <span class="n">runconfig_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">pge_name</span><span class="p">,</span> <span class="n">runconfig_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">rename_by_pattern_map</span> <span class="o">=</span> <span class="p">{}</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rename_by_pattern_map</span> <span class="o">=</span> <span class="p">{}</span>
+
+<div class="viewcode-block" id="CalDispExecutor.run_sas_executable">
+<a class="viewcode-back" href="../../../../opera.pge.cal_disp.html#opera.pge.cal_disp.cal_disp_pge.CalDispExecutor.run_sas_executable">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run_sas_executable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>  <span class="c1"># pylint: disable=unused-argument</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Kicks off a SAS executable as defined by the RunConfig provided to</span>
+<span class="sd">        the PGE.</span>
+
+<span class="sd">        Execution time for the SAS is collected and logged by this method.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        **kwargs : dict</span>
+<span class="sd">            Any keyword arguments needed for SAS execution.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># TODO: Temporary kludge. SAS should ensure GDAL temp directory is writable (and preferably the scratch dir).</span>
+        <span class="c1">#  When this is ensured, this entire method should be removed</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;CPL_TMPDIR&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">scratch_path</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">run_sas_executable</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+</div>
 
 </pre></div>
 

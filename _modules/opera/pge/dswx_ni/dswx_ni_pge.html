@@ -5,14 +5,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opera.pge.dswx_ni.dswx_ni_pge &mdash; opera-sds-pge 7.0.0-er.1.0 documentation</title>
+  <title>opera.pge.dswx_ni.dswx_ni_pge &mdash; opera-sds-pge 7.0.0-er.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
 
   
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=d4e30586"></script>
+      <script src="../../../../_static/documentation_options.js?v=469cdb6d"></script>
       <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/js/theme.js"></script>
@@ -263,6 +263,12 @@
         <span class="c1"># Extract all metadata assigned by the SAS at product creation time</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">measured_parameters</span> <span class="o">=</span> <span class="n">get_geotiff_metadata</span><span class="p">(</span><span class="n">geotiff_product</span><span class="p">)</span>
+
+            <span class="c1"># We may be able to remove this in the future, but RFI_FRAMES_COUNT should be an integer, but None</span>
+            <span class="c1"># has been observed</span>
+            <span class="k">if</span> <span class="n">measured_parameters</span><span class="p">[</span><span class="s1">&#39;RFI_FRAMES_COUNT&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;none&#39;</span><span class="p">:</span>
+                <span class="n">measured_parameters</span><span class="p">[</span><span class="s1">&#39;RFI_FRAMES_COUNT&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;0&#39;</span>
+
             <span class="n">output_product_metadata</span><span class="p">[</span><span class="s1">&#39;MeasuredParameters&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">augment_measured_parameters</span><span class="p">(</span>
                 <span class="n">measured_parameters</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">runconfig</span><span class="o">.</span><span class="n">iso_measured_parameter_descriptions</span><span class="p">,</span>
@@ -450,10 +456,10 @@
     <span class="n">LEVEL</span> <span class="o">=</span> <span class="s2">&quot;L3&quot;</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Processing Level for DSWx-NI Products&quot;&quot;&quot;</span>
 
-    <span class="n">PGE_VERSION</span> <span class="o">=</span> <span class="s2">&quot;4.0.0-rc.1.0&quot;</span>
+    <span class="n">PGE_VERSION</span> <span class="o">=</span> <span class="s2">&quot;4.0.0-rc.2.0&quot;</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Version of the PGE&quot;&quot;&quot;</span>
 
-    <span class="n">SAS_VERSION</span> <span class="o">=</span> <span class="s2">&quot;0.3.0&quot;</span>  <span class="c1"># Beta release https://github.com/opera-adt/DSWX-SAR/releases/tag/DSWx-NI-v0.3</span>
+    <span class="n">SAS_VERSION</span> <span class="o">=</span> <span class="s2">&quot;0.3.1&quot;</span>  <span class="c1"># Beta release https://github.com/opera-adt/DSWX-SAR/releases/tag/DSWx-NI-v0.3.1</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Version of the SAS wrapped by this PGE, should be updated as needed&quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pge_name</span><span class="p">,</span> <span class="n">runconfig_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
