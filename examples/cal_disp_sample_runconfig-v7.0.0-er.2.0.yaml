@@ -1,8 +1,6 @@
-# Sample RunConfig for use with the CAL-DISP PGE v7.0.0-er.1.0
+# Sample RunConfig for use with the CAL-DISP PGE v7.0.0-er.2.0
 # This RunConfig should require minimal changes in order to be used with the
 # OPERA PCM.
-
-# TODO: Update more fields to align better with INT
 
 RunConfig:
   # Name for the RunConfig, may be any string
