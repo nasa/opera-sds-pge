@@ -16,6 +16,7 @@ from opera.pge.disp_s1.disp_s1_pge import DispS1PostProcessorMixin, DispS1PrePro
 from opera.util.dataset_utils import parse_bounding_polygon_from_wkt
 from opera.util.error_codes import ErrorCode
 from opera.util.h5_utils import get_disp_s1_product_metadata as get_disp_product_metadata
+from opera.util.input_validation import validate_algorithm_parameters_config
 from opera.util.render_jinja2 import augment_hdf5_measured_parameters
 from opera.util.time import get_catalog_metadata_datetime_str, get_time_for_filename
 
@@ -53,6 +54,14 @@ class DispNIPreProcessorMixin(DispS1PreProcessorMixin):
             Any keyword arguments needed by the pre-processor
         """
         super().run_preprocessor(**kwargs)
+
+        dyn_anc_file_group = self.runconfig.sas_config['dynamic_ancillary_file_group']
+
+        if dyn_anc_file_group.get('ionosphere_algorithm_parameters_file', None) is not None:
+            validate_algorithm_parameters_config(self.name,
+                                                 self.runconfig.algorithm_parameters_schema_path,
+                                                 dyn_anc_file_group['ionosphere_algorithm_parameters_file'],
+                                                 self.logger)
 
 
 class DispNIPostProcessorMixin(DispS1PostProcessorMixin):
