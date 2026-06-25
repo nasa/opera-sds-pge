@@ -185,7 +185,7 @@ unwrap_options:
         conncomp_sigma: num(min=0.0)
         # Set ``cost_threshold`` from a target per-edge one-cycle-correction probability (~2.4e-4 matches the default).
         #  Lower is stricter. Overridden by ``conncomp_sigma`` if both are set.
-        conncomp_cycle_prob: x()
+        conncomp_cycle_prob: num(min=0.0, max=1.0)
         # Discard connected components smaller than this many pixels.
         min_size_px: int(min=1)
         # Maximum number of connected components to keep (largest first).
