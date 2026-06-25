@@ -163,7 +163,7 @@ unwrap_options:
         #  ``WHIRLWIND_NUM_THREADS`` / ``RAYON_NUM_THREADS`` is set externally (e.g. via SLURM/``taskset``), falling
         #  back to all CPUs. The pool is *shared* across the ``n_parallel_jobs`` concurrent unwraps, so the effective
         #  per-IG share is ``num_threads / n_parallel_jobs``.
-        num_threads: int(min=1)
+        num_threads: any(int(min=1), null())
         # Enable the spiral PS interpolation pre-pass: every valid pixel with coherence below ``interp_cutoff`` is
         #  filled from nearby high-coherence pixels before unwrapping.
         interpolate: bool()
@@ -182,10 +182,10 @@ unwrap_options:
         cost_threshold: int(min=0)
         # Set ``cost_threshold`` from a Gaussian-equivalent noise level (~3.5 reproduces the default 50). Higher is
         #  stricter (more boundaries). Takes precedence over ``cost_threshold`` and ``conncomp_cycle_prob``.
-        conncomp_sigma: num(min=0.0)
+        conncomp_sigma: any(num(min=0.0), null())
         # Set ``cost_threshold`` from a target per-edge one-cycle-correction probability (~2.4e-4 matches the default).
         #  Lower is stricter. Overridden by ``conncomp_sigma`` if both are set.
-        conncomp_cycle_prob: num(min=0.0, max=1.0)
+        conncomp_cycle_prob: any(num(min=0.0, max=1.0), null())
         # Discard connected components smaller than this many pixels.
         min_size_px: int(min=1)
         # Maximum number of connected components to keep (largest first).

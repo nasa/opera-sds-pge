@@ -41,7 +41,7 @@ dynamic_ancillary_file_group:
   dem_file: str(required=False)
 
   # List of paths to GUNW files for ionosphere, SET and static geometry layers
-  gunw_files: list(str(), min=1)
+  gunw_files: any(list(str(), min=1), null())
 
   # List of paths to troposphere weather model files (1 per date). If none provided, troposphere
   #  corrections are skipped.
