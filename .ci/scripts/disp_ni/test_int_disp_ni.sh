@@ -30,7 +30,7 @@ SAMPLE_TIME=15
 [ -z "${PGE_TAG}" ] && PGE_TAG="${USER}-dev"
 [ -z "${INPUT_DATA}" ] && INPUT_DATA="disp_ni_gamma_0.3.1_expected_input.zip"
 [ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="disp_ni_gamma_0.3.1_expected_output.zip"
-[ -z "${RUNCONFIG}" ] && RUNCONFIG="opera_pge_disp_ni_r3.1_gamma_runconfig_forward.yaml"
+[ -z "${RUNCONFIG}" ] && RUNCONFIG="opera_pge_disp_ni_r3.1_gamma_runconfig_forward_optionA.yaml"
 [ -z "${TMP_ROOT}" ] && TMP_ROOT="$DEFAULT_TMP_ROOT"
 
 # Create the test output directory in the work space
@@ -117,7 +117,7 @@ do
                -v ${input_dir}:/home/mamba/input_dir \
                -v ${output_dir}:/home/mamba/output_dir \
                -v ${scratch_dir}:/home/mamba/scratch_dir \
-               -v ${expected_data_dir}/${mode}:/home/mamba/expected_output_dir \
+               -v ${expected_data_dir}/${mode}_option${ionosphere_mode}:/home/mamba/expected_output_dir \
                ${PGE_IMAGE}:"${PGE_TAG}" --file /home/mamba/runconfig/opera_pge_disp_ni_r3.1_gamma_runconfig_${mode}_option${ionosphere_mode}.yaml
 
     docker_exit_status=$?
