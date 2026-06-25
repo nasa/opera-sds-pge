@@ -1,0 +1,157 @@
+RunConfig:
+  Name: OPERA-DISP-NI-PGE-INT-TEST-HIST-IONO-ESTIMATE-CONFIG
+
+  Groups:
+    PGE:
+      PGENameGroup:
+        PGEName: DISP_NI_PGE
+
+      InputFilesGroup:
+        InputFilePaths:
+          - /home/mamba/input_dir/gslc/NISAR_L2_PR_GSLC_004_151_A_011_4005_DHDH_A_20251108T155041_20251108T155058_X05009_N_P_J_001.h5
+          - /home/mamba/input_dir/gslc/NISAR_L2_PR_GSLC_005_151_A_011_4005_DHDH_A_20251120T155041_20251120T155058_X05009_N_P_J_001.h5
+          - /home/mamba/input_dir/gslc/NISAR_L2_PR_GSLC_006_151_A_011_4005_DHDH_A_20251202T155042_20251202T155059_X05009_N_P_J_001.h5
+          - /home/mamba/input_dir/gslc/NISAR_L2_PR_GSLC_008_151_A_011_4005_DHDH_A_20251226T155043_20251226T155100_X05009_N_P_J_001.h5
+          - /home/mamba/input_dir/gslc/NISAR_L2_PR_GSLC_009_151_A_011_4005_DHDH_A_20260107T155044_20260107T155100_X05010_N_P_J_001.h5
+          - /home/mamba/input_dir/gslc/NISAR_L2_PR_GSLC_010_151_A_011_4005_DHDH_A_20260119T155044_20260119T155101_X05010_N_P_J_001.h5
+
+      DynamicAncillaryFilesGroup:
+        AncillaryFileMap:
+          dem_file: /home/mamba/input_dir/dynamic_ancillary_files/dem.vrt
+          mask_file: /home/mamba/input_dir/dynamic_ancillary_files/water_mask.vrt
+          gunw_files:
+          troposphere_files:
+
+      ProductPathGroup:
+        OutputProductPath: /home/mamba/output_dir
+        ScratchPath: /home/mamba/scratch_dir
+
+      PrimaryExecutable:
+        ProductIdentifier: DISP_N1
+        ProductVersion: "0.4"
+        ProgramPath: disp-nisar
+        ProgramOptions:
+          - run
+        ErrorCodeBase: 900000
+        SchemaPath: /home/mamba/opera/pge/disp_ni/schema/disp_ni_sas_schema.yaml
+        AlgorithmParametersSchemaPath: /home/mamba/opera/pge/disp_ni/schema/algorithm_parameters_disp_ni_schema.yaml
+        IsoTemplatePath: /home/mamba/opera/pge/disp_ni/templates/OPERA_ISO_metadata_L3_DISP_NI_template.xml.jinja2
+        IsoMeasuredParameterDescriptions: /home/mamba/opera/pge/disp_ni/templates/disp_ni_measured_parameters.yaml
+
+      QAExecutable:
+        Enabled: True
+        ProgramPath: /home/mamba/opera/.ci/scripts/disp_ni/compare_disp_ni_products.sh
+        ProgramOptions: []
+
+      DebugLevelGroup:
+        DebugSwitch: False
+        ExecuteViaShell: False
+    SAS:
+      input_file_group:
+        # REQUIRED: list of paths to GSLC files.
+        #   Type: array.
+        gslc_file_list:
+          - /home/mamba/input_dir/gslc/NISAR_L2_PR_GSLC_004_151_A_011_4005_DHDH_A_20251108T155041_20251108T155058_X05009_N_P_J_001.h5
+          - /home/mamba/input_dir/gslc/NISAR_L2_PR_GSLC_005_151_A_011_4005_DHDH_A_20251120T155041_20251120T155058_X05009_N_P_J_001.h5
+          - /home/mamba/input_dir/gslc/NISAR_L2_PR_GSLC_006_151_A_011_4005_DHDH_A_20251202T155042_20251202T155059_X05009_N_P_J_001.h5
+          - /home/mamba/input_dir/gslc/NISAR_L2_PR_GSLC_008_151_A_011_4005_DHDH_A_20251226T155043_20251226T155100_X05009_N_P_J_001.h5
+          - /home/mamba/input_dir/gslc/NISAR_L2_PR_GSLC_009_151_A_011_4005_DHDH_A_20260107T155044_20260107T155100_X05010_N_P_J_001.h5
+          - /home/mamba/input_dir/gslc/NISAR_L2_PR_GSLC_010_151_A_011_4005_DHDH_A_20260119T155044_20260119T155101_X05010_N_P_J_001.h5
+        # REQUIRED: Frame ID of the bursts contained in `gslc_file_list`.
+        #   Type: integer.
+        frame_id: 26410
+        # REQUIRED: Frequency in which gslcs are acquired.
+        #   Type: string.
+        frequency: frequencyA
+        # REQUIRED: Polarization of the gslcs contained in `gslc_file_list`.
+        #   Type: string.
+        polarization: HH
+        # (For FORWARD mode) last processed date for the frame. If provided, the SAS will only
+        #   output products whose secondary datetime is *after* `last_processed`.
+        #   Type: string | null.
+        last_processed:
+        # When the input does not match OPERA-burst naming (e.g. NISAR), split each input frame into
+        #   this many azimuth blocks and process each block as a synthetic burst. Default 1 = no
+        #   splitting.
+        #   Type: integer.
+        azimuth_blocks: 6
+        # Halo (input rows) on each side of an azimuth block. Default: max(half_window_y,
+        #   similarity_search_radius * stride_y, (corr_window_y // 2) * stride_y) + 5.
+        #   Type: integer | null.
+        halo_rows:
+      dynamic_ancillary_file_group:
+        # REQUIRED: Path to file containing SAS algorithm parameters.
+        #   Type: string.
+        algorithm_parameters_file: /home/mamba/runconfig/opera_pge_disp_ni_r3.1_gamma_algorithm_parameters_historical.yaml
+        # REQUIRED: Path to file containing SAS algorithm parameters for ionosphere from FreqA/B.
+        #   Type: string.
+        ionosphere_algorithm_parameters_file: /home/mamba/runconfig/opera_pge_disp_ni_r3.1_gamma_algorithm_parameters_ionosphere_historical.yaml
+        # Paths to the GSLC static_layer files (1 per burst) with line-of-sight unit vectors. If
+        #   none provided, corrections using GSLC static_layer are skipped.
+        #   Type: array.
+        mask_file: /home/mamba/input_dir/dynamic_ancillary_files/water_mask.vrt
+        # Path to the DEM file covering full frame. If none provided, corrections using DEM are
+        #   skipped.
+        #   Type: string | null.
+        dem_file: /home/mamba/input_dir/dynamic_ancillary_files/dem.vrt
+        # List of paths to gunw files for ionosphere correction. They are interferograms and need
+        #   to cover the date range in GSLC data list. If none
+        #   provided, ionosphere corrections are skipped.
+        #   Type: array | null.
+        gunw_files:
+        # List of paths to troposphere weather model files (1 per date). If none provided,
+        #   troposphere corrections are skipped.
+        #   Type: array | null.
+        troposphere_files:
+      static_ancillary_file_group:
+        # JSON file containing frame-specific algorithm parameters to override the defaults passed
+        #   in the `algorithm_parameters.yaml`.
+        #   Type: string | null.
+        algorithm_parameters_overrides_json: /home/mamba/input_dir/static_ancillary_files/opera-disp-nisar-algorithm-parameters-overrides.json
+        # JSON file containing the mapping from frame_id to bounds information.
+        #   Type: string | null.
+        frame_to_bounds_json: /home/mamba/input_dir/static_ancillary_files/opera-nisar-disp-0.1.0-frame-to-bounds.json
+        # JSON file containing list of reference date changes for each frame.
+        #   Type: string | null.
+        reference_date_database_json: /home/mamba/input_dir/static_ancillary_files/opera-disp-nisar-reference-dates-dummy.json
+      primary_executable:
+        # Product type of the PGE.
+        #   Type: string.
+        product_type: DISP_NISAR_HISTORICAL
+      product_path_group:
+        # REQUIRED: Directory where PGE will place results.
+        #   Type: string.
+        product_path: /home/mamba/output_dir
+        # Path to the scratch directory.
+        #   Type: string.
+        scratch_path: /home/mamba/scratch_dir
+        # Path to the SAS output directory.
+        #   Type: string.
+        sas_output_path: /home/mamba/output_dir
+        # Version of the product, in <major>.<minor> format.
+        #   Type: string.
+        product_version: '0.4'
+        # Whether the SAS should output and save the Compressed SLCs in addition to the standard
+        #   product output.
+        #   Type: boolean.
+        save_compressed_slc: true
+      worker_settings:
+        # Whether to use GPU for processing (if available).
+        #   Type: boolean.
+        gpu_enabled: false
+        # Number of threads to use per worker. This sets the OMP_NUM_THREADS environment variable in
+        #   each python process.
+        #   Type: integer.
+        threads_per_worker: 2
+        # If processing separate spatial bursts, number of bursts to run in parallel for wrapped-
+        #   phase-estimation.
+        #   Type: integer.
+        n_parallel_bursts: 6
+        # Size (rows, columns) of blocks of data to load at a time.
+        #   Type: array.
+        block_shape:
+          - 1024
+          - 1024
+      # Path to the output log file in addition to logging to stderr.
+      #   Type: string | null.
+      log_file: /home/mamba/output_dir/log_sas.log
