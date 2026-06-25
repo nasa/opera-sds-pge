@@ -28,9 +28,9 @@ SAMPLE_TIME=15
 # RUNCONFIG should be the name of the runconfig in s3://operasds-dev-pge/disp_ni/
 [ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath "$(dirname "$(realpath "$0")")"/../../..)
 [ -z "${PGE_TAG}" ] && PGE_TAG="${USER}-dev"
-[ -z "${INPUT_DATA}" ] && INPUT_DATA="disp_ni_beta_0.2.0_expected_input.zip"
-[ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="disp_ni_beta_0.2.0_expected_output.zip"
-[ -z "${RUNCONFIG}" ] && RUNCONFIG="opera_pge_disp_ni_r2.1_beta_runconfig_forward.yaml"
+[ -z "${INPUT_DATA}" ] && INPUT_DATA="disp_ni_gamma_0.3.1_expected_input.zip"
+[ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="disp_ni_gamma_0.3.1_expected_output.zip"
+[ -z "${RUNCONFIG}" ] && RUNCONFIG="opera_pge_disp_ni_r3.1_gamma_runconfig_forward.yaml"
 [ -z "${TMP_ROOT}" ] && TMP_ROOT="$DEFAULT_TMP_ROOT"
 
 # Create the test output directory in the work space
@@ -61,16 +61,12 @@ expected_data_dir="${TMP_DIR}/${EXPECTED_DATA%.*}/expected_output"
 echo "Input data directory: ${input_dir}"
 echo "Expected data directory: ${expected_data_dir}"
 
-# Copy the RunConfig for the historical workflow
-historical_runconfig="opera_pge_disp_ni_r2.1_beta_runconfig_historical.yaml"
-local_historical_runconfig="${SCRIPT_DIR}/${historical_runconfig}"
-echo "Copying runconfig file $local_historical_runconfig to $runconfig_dir"
-cp ${local_historical_runconfig} ${runconfig_dir}
-
 # Run integration tests for DISP-NI in both "forward" and "historical" modes
 for mode in forward historical
 do
-    output_dir="${TMP_DIR}/output_disp_ni/${mode}"
+  for ionosphere_mode in A B
+  do
+    output_dir="${TMP_DIR}/output_disp_ni/${mode}_option${ionosphere_mode}"
 
     # make sure no output directory already exists
     if [ -d "$output_dir" ]; then
@@ -81,7 +77,7 @@ do
     echo "Creating output directory $output_dir."
     mkdir -p "$output_dir"
 
-    scratch_dir="${TMP_DIR}/scratch_disp_ni/${mode}"
+    scratch_dir="${TMP_DIR}/scratch_disp_ni/${mode}_option${ionosphere_mode}"
 
     # make sure no scratch directory already exists
     if [ -d "$scratch_dir" ]; then
@@ -91,18 +87,30 @@ do
     echo "Creating scratch directory $scratch_dir."
     mkdir -p --mode=777 "$scratch_dir"
 
+    # Copy the RunConfig
+    runconfig="opera_pge_disp_ni_r3.1_gamma_runconfig_${mode}_option${ionosphere_mode}.yaml"
+    local_runconfig="${SCRIPT_DIR}/${runconfig}"
+    echo "Copying runconfig file $local_runconfig to $runconfig_dir"
+    cp ${local_runconfig} ${runconfig_dir}
+
     # Copy the Algorithm Parameters RunConfigs
-    algo_runconfig="opera_pge_disp_ni_r2.1_beta_algorithm_parameters_${mode}.yaml"
+    algo_runconfig="opera_pge_disp_ni_r3.1_gamma_algorithm_parameters_${mode}.yaml"
     local_algo_runconfig="${SCRIPT_DIR}/${algo_runconfig}"
     echo "Copying runconfig file $local_algo_runconfig to $runconfig_dir"
     cp ${local_algo_runconfig} ${runconfig_dir}
 
-    container_name="${PGE_NAME}-${mode}-PID$$"
+    # Copy the Iono Algorithm Parameters RunConfigs
+    iono_algo_runconfig="opera_pge_disp_ni_r3.1_gamma_algorithm_parameters_ionosphere_${mode}.yaml"
+    local_iono_algo_runconfig="${SCRIPT_DIR}/${iono_algo_runconfig}"
+    echo "Copying runconfig file $local_iono_algo_runconfig to $runconfig_dir"
+    cp ${local_iono_algo_runconfig} ${runconfig_dir}
+
+    container_name="${PGE_NAME}-${mode}-option${ionosphere_mode}-PID$$"
 
     # Start metrics collection
     metrics_collection_start "$PGE_NAME" "$container_name" "$TEST_RESULTS_DIR" "$SAMPLE_TIME"
 
-    echo "Running Docker image ${PGE_IMAGE}:${PGE_TAG} for ${mode} mode"
+    echo "Running Docker image ${PGE_IMAGE}:${PGE_TAG} for ${mode} mode with ionospheric delay estimation method ${ionosphere_mode}"
     docker run --rm -u $UID:"$(id -g)" --name $container_name \
                -w /home/mamba \
                -v ${runconfig_dir}:/home/mamba/runconfig \
@@ -110,7 +118,7 @@ do
                -v ${output_dir}:/home/mamba/output_dir \
                -v ${scratch_dir}:/home/mamba/scratch_dir \
                -v ${expected_data_dir}/${mode}:/home/mamba/expected_output_dir \
-               ${PGE_IMAGE}:"${PGE_TAG}" --file /home/mamba/runconfig/opera_pge_disp_ni_r2.1_beta_runconfig_${mode}.yaml
+               ${PGE_IMAGE}:"${PGE_TAG}" --file /home/mamba/runconfig/opera_pge_disp_ni_r3.1_gamma_runconfig_${mode}_option${ionosphere_mode}.yaml
 
     docker_exit_status=$?
 
@@ -122,7 +130,7 @@ do
     cp "${output_dir}"/*.log "${TEST_RESULTS_DIR}"
 
     # Copy the results.html file to the same directory
-    cp "${output_dir}"/test_int_disp_ni_results.html "${TEST_RESULTS_DIR}"/test_int_disp_ni_${mode}_results.html
+    cp "${output_dir}"/test_int_disp_ni_results.html "${TEST_RESULTS_DIR}"/test_int_disp_ni_${mode}_option${ionosphere_mode}_results.html
 
     if [ $docker_exit_status -ne 0 ]; then
         echo "docker exit indicates failure: ${docker_exit_status}"
@@ -135,9 +143,8 @@ do
           overall_status=$test_status
         fi
     fi
+  done
 done
-
-# Run static layers workflow
 
 if [ $overall_status -ne 0 ]; then
     echo "Test FAILED."
