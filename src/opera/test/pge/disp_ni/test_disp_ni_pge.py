@@ -59,8 +59,9 @@ class DispNIPgeTestCase(unittest.TestCase):
         input_dir = join(self.working_dir.name, "disp_ni_pge_test/input_dir")
         os.makedirs(input_dir, exist_ok=True)
 
-        # Copy the algorithm_parameters config file into the test input directory.
+        # Copy the algorithm_parameters config files into the test input directory.
         shutil.copy(join(self.data_dir, 'test_disp_ni_algorithm_parameters.yaml'), input_dir)
+        shutil.copy(join(self.data_dir, 'test_disp_ni_algorithm_parameters_ionosphere.yaml'), input_dir)
 
         # Create non-empty dummy input files expected by test runconfig
         dummy_input_files = [
@@ -362,21 +363,24 @@ class DispNIPgeTestCase(unittest.TestCase):
             "NISAR_L2_PR_GUNW_005_151_A_011_006_4000_SH_20251120T155041_20251120T155058_20251202T155042_20251202T155059_X05010_N_P_J_001.h5",  # noqa: E501
             "NISAR_L2_PR_GUNW_006_151_A_011_008_4000_SH_20251202T155042_20251202T155059_20251226T155043_20251226T155100_X05010_N_P_J_001.h5",  # noqa: E501
         ]
-        for test_f in test_filenames + test_gunw_filenames:
+        test_iono_ap_filename = [
+            'algorithm_parameters_ionosphere.yaml'
+        ]
+        for test_f in test_filenames + test_gunw_filenames + test_iono_ap_filename:
             with open(test_f, 'w') as ief:
                 ief.write("\n")
             self.assertTrue(exists(test_f))
 
+        # Ionosphere tests
+
+        # Iono 1 : Correct GSLC & GUNW
         logger = PgeLogger()
         sas_config['input_file_group']['gslc_file_list'] = test_filenames
-        runconfig = MockRunConfig(sas_config)
-        validate_disp_inputs(runconfig, logger, "DISP-NI")
-
-        logger = PgeLogger()
         sas_config['dynamic_ancillary_file_group']['gunw_files'] = test_gunw_filenames
         runconfig = MockRunConfig(sas_config)
         validate_disp_inputs(runconfig, logger, "DISP-NI")
 
+        # Iono 2 : Correct GSLC & Incorrect GUNW
         logger = PgeLogger()
         sas_config['dynamic_ancillary_file_group']['gunw_files'] = test_gunw_filenames[:1]
         runconfig = MockRunConfig(sas_config)
@@ -389,7 +393,30 @@ class DispNIPgeTestCase(unittest.TestCase):
             log = lfile.read()
         self.assertIn('Number of GUNW files does not equal the number of GLSC files - 1', log)
 
-        for test_f in test_filenames + test_gunw_filenames:
+        # Iono 3: Correct GSLC, no GUNW, present iono AP
+        logger = PgeLogger()
+        sas_config['dynamic_ancillary_file_group']['gunw_files'] = None
+        sas_config['dynamic_ancillary_file_group']['ionosphere_algorithm_parameters_file'] = test_iono_ap_filename[0]
+        runconfig = MockRunConfig(sas_config)
+        validate_disp_inputs(runconfig, logger, "DISP-NI")
+
+        # Iono 4: Correct GSLC, no GUNW, absent iono AP
+        logger = PgeLogger()
+        sas_config['dynamic_ancillary_file_group']['ionosphere_algorithm_parameters_file'] = None
+        runconfig = MockRunConfig(sas_config)
+        with self.assertRaises(RuntimeError):
+            validate_disp_inputs(runconfig, logger, "DISP-NI")
+
+        log_file = logger.get_file_name()
+        self.assertTrue(exists(log_file))
+        with open(log_file, 'r', encoding='utf-8') as lfile:
+            log = lfile.read()
+        self.assertIn(
+            'No GUNW files and no ionosphere algorithm parameters file present. Must have one or the other',
+            log
+        )
+
+        for test_f in test_filenames + test_gunw_filenames + test_iono_ap_filename:
             os.remove(test_f)
 
     def test_disp_ni_pge_validate_product_output(self):
