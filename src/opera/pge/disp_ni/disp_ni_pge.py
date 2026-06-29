@@ -9,7 +9,7 @@ Module defining the implementation for the Surface Displacement (DISP) from NISA
 import re
 from collections import OrderedDict
 from datetime import datetime
-from os.path import basename, join
+from os.path import basename
 
 from opera.pge.base.base_pge import PgeExecutor
 from opera.pge.disp_s1.disp_s1_pge import DispS1PostProcessorMixin, DispS1PreProcessorMixin
@@ -41,27 +41,6 @@ class DispNIPreProcessorMixin(DispS1PreProcessorMixin):
         """
         pass
 
-    # TODO: Delete this after SAS update supporting path list
-    def _temp_dump_inputs_to_flat_list(self):
-        """
-        There is a bug in the SAS that leads to errors when passing a list of paths
-        as the input GSLC list; however, we may be able to work around this by dumping
-        the paths to a flat text file and parsing that.
-
-        https://github.com/opera-adt/disp-nisar/blob/d3a76557af0773099eb51769feb681edfff79a8b/src/disp_nisar/pge_runconfig.py#L77
-        https://github.com/isce-framework/dolphin/blob/2cbe4612f0f002d67c46c61d11cb514643e44f98/src/dolphin/workflows/config/_common.py#L531
-        """
-
-        path = join(self.runconfig.scratch_path, 'input_gslc_list.txt')
-
-        input_file_group = self.runconfig.sas_config['input_file_group']
-
-        with open(path, 'w') as f:
-            for gslc_path in input_file_group['gslc_file_list']:
-                f.write(f'{gslc_path}\n')
-
-        self.runconfig.sas_config['input_file_group']['gslc_file_list'] = path
-
     def run_preprocessor(self, **kwargs):
         """
         Executes the pre-processing steps for DISP-NI PGE initialization.
@@ -83,9 +62,6 @@ class DispNIPreProcessorMixin(DispS1PreProcessorMixin):
                                                  self.runconfig.algorithm_parameters_schema_path,
                                                  dyn_anc_file_group['ionosphere_algorithm_parameters_file'],
                                                  self.logger)
-
-        # TODO: Delete this after SAS update supporting path list
-        self._temp_dump_inputs_to_flat_list()
 
 
 class DispNIPostProcessorMixin(DispS1PostProcessorMixin):
