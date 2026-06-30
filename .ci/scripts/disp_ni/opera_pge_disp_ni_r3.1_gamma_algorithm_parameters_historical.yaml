@@ -345,7 +345,7 @@ output_options:
   # Specify an extra reference datetime in UTC. Adding this lets you to create and unwrap two
   #   single reference networks; the later resets at the given date (e.g. for a large
   #   earthquake event). If passing strings, formats accepted are YYYY-MM-
-  #   DD[T]HH:MM[:SS[.ffffff]][Z or [±]HH[:]MM], or YYYY-MM-DD.
+  #   DD[T]HH:MM[:SS[.ffffff]][Z or []HH[:]MM], or YYYY-MM-DD.
   #   Type: string | null.
   extra_reference_date:
 # When creating `recommended_mask`, pixels with temporal coherence below this threshold and
