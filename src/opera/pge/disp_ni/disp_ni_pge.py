@@ -122,9 +122,17 @@ class DispNIPostProcessorMixin(DispS1PostProcessorMixin):
 
         frame_id = f"{self.runconfig.sas_config['input_file_group']['frame_id']:05d}"
 
-        gunw_fields = basename(self.runconfig.sas_config['dynamic_ancillary_file_group']['gunw_files'][0]).split('_')
-        mode = gunw_fields[9]
-        pol = gunw_fields[10]
+        dynamic_ancillary_inputs = self.runconfig.sas_config['dynamic_ancillary_file_group']
+
+        if (dynamic_ancillary_inputs.get('gunw_files', None) is not None and
+                len(dynamic_ancillary_inputs['gunw_files']) > 0):
+            gunw_fields = basename(dynamic_ancillary_inputs['gunw_files'][0]).split('_')
+            mode = gunw_fields[9]
+            pol = gunw_fields[10]
+        else:
+            gslc_fields = basename(self.runconfig.sas_config['input_file_group']['gslc_file_list'][0]).split('_')
+            mode = gslc_fields[8]
+            pol = gslc_fields[9][:2]
 
         # ReferenceDateTime: The acquisition sensing start date and time of
         # the input satellite imagery for the first burst in the frame of the
@@ -210,9 +218,17 @@ class DispNIPostProcessorMixin(DispS1PostProcessorMixin):
         # Get the production time
         prod_time = f"{get_time_for_filename(self.production_datetime)}Z"
 
-        gunw_fields = basename(self.runconfig.sas_config['dynamic_ancillary_file_group']['gunw_files'][0]).split('_')
-        mode = gunw_fields[9]
-        pol = gunw_fields[10]
+        dynamic_ancillary_inputs = self.runconfig.sas_config['dynamic_ancillary_file_group']
+
+        if (dynamic_ancillary_inputs.get('gunw_files', None) is not None and
+                len(dynamic_ancillary_inputs['gunw_files']) > 0):
+            gunw_fields = basename(dynamic_ancillary_inputs['gunw_files'][0]).split('_')
+            mode = gunw_fields[9]
+            pol = gunw_fields[10]
+        else:
+            gslc_fields = basename(self.runconfig.sas_config['input_file_group']['gslc_file_list'][0]).split('_')
+            mode = gslc_fields[8]
+            pol = gslc_fields[9][:2]
 
         # Product version hardcoded to 1.0 for now since CCSLCs are not
         # intended for widespread distribution
@@ -261,9 +277,17 @@ class DispNIPostProcessorMixin(DispS1PostProcessorMixin):
 
         frame_id = f"{self.runconfig.sas_config['input_file_group']['frame_id']:05d}"
 
-        gunw_fields = basename(self.runconfig.sas_config['dynamic_ancillary_file_group']['gunw_files'][0]).split('_')
-        mode = gunw_fields[9]
-        pol = gunw_fields[10]
+        dynamic_ancillary_inputs = self.runconfig.sas_config['dynamic_ancillary_file_group']
+
+        if (dynamic_ancillary_inputs.get('gunw_files', None) is not None and
+                len(dynamic_ancillary_inputs['gunw_files']) > 0):
+            gunw_fields = basename(dynamic_ancillary_inputs['gunw_files'][0]).split('_')
+            mode = gunw_fields[9]
+            pol = gunw_fields[10]
+        else:
+            gslc_fields = basename(self.runconfig.sas_config['input_file_group']['gslc_file_list'][0]).split('_')
+            mode = gslc_fields[8]
+            pol = gslc_fields[9][:2]
 
         product_version = self.runconfig.sas_config['product_path_group']['product_version']
 
