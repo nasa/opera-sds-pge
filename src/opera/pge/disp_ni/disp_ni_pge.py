@@ -16,6 +16,7 @@ from opera.pge.disp_s1.disp_s1_pge import DispS1PostProcessorMixin, DispS1PrePro
 from opera.util.dataset_utils import parse_bounding_polygon_from_wkt
 from opera.util.error_codes import ErrorCode
 from opera.util.h5_utils import get_disp_s1_product_metadata as get_disp_product_metadata
+from opera.util.input_validation import validate_algorithm_parameters_config
 from opera.util.render_jinja2 import augment_hdf5_measured_parameters
 from opera.util.time import get_catalog_metadata_datetime_str, get_time_for_filename
 
@@ -54,6 +55,14 @@ class DispNIPreProcessorMixin(DispS1PreProcessorMixin):
         """
         super().run_preprocessor(**kwargs)
 
+        dyn_anc_file_group = self.runconfig.sas_config['dynamic_ancillary_file_group']
+
+        if dyn_anc_file_group.get('ionosphere_algorithm_parameters_file', None) is not None:
+            validate_algorithm_parameters_config(self.name,
+                                                 self.runconfig.algorithm_parameters_schema_path,
+                                                 dyn_anc_file_group['ionosphere_algorithm_parameters_file'],
+                                                 self.logger)
+
 
 class DispNIPostProcessorMixin(DispS1PostProcessorMixin):
     """
@@ -66,6 +75,11 @@ class DispNIPostProcessorMixin(DispS1PostProcessorMixin):
     _cached_core_filename = None
     _tile_metadata_cache = {}
     _tile_filename_cache = {}
+
+    GUNW_MODE_IDX = 9
+    GUNW_POL_IDX = 10
+    GSLC_MODE_IDX = 8
+    GSLC_POL_IDX = 9
 
     def _core_filename(self, inter_filename=None):
         """
@@ -113,9 +127,17 @@ class DispNIPostProcessorMixin(DispS1PostProcessorMixin):
 
         frame_id = f"{self.runconfig.sas_config['input_file_group']['frame_id']:05d}"
 
-        gunw_fields = basename(self.runconfig.sas_config['dynamic_ancillary_file_group']['gunw_files'][0]).split('_')
-        mode = gunw_fields[9]
-        pol = gunw_fields[10]
+        dynamic_ancillary_inputs = self.runconfig.sas_config['dynamic_ancillary_file_group']
+
+        if (dynamic_ancillary_inputs.get('gunw_files', None) is not None and
+                len(dynamic_ancillary_inputs['gunw_files']) > 0):
+            gunw_fields = basename(dynamic_ancillary_inputs['gunw_files'][0]).split('_')
+            mode = gunw_fields[self.GUNW_MODE_IDX]
+            pol = gunw_fields[self.GUNW_POL_IDX]
+        else:
+            gslc_fields = basename(self.runconfig.sas_config['input_file_group']['gslc_file_list'][0]).split('_')
+            mode = gslc_fields[self.GSLC_MODE_IDX]
+            pol = gslc_fields[self.GSLC_POL_IDX][:2]
 
         # ReferenceDateTime: The acquisition sensing start date and time of
         # the input satellite imagery for the first burst in the frame of the
@@ -201,9 +223,17 @@ class DispNIPostProcessorMixin(DispS1PostProcessorMixin):
         # Get the production time
         prod_time = f"{get_time_for_filename(self.production_datetime)}Z"
 
-        gunw_fields = basename(self.runconfig.sas_config['dynamic_ancillary_file_group']['gunw_files'][0]).split('_')
-        mode = gunw_fields[9]
-        pol = gunw_fields[10]
+        dynamic_ancillary_inputs = self.runconfig.sas_config['dynamic_ancillary_file_group']
+
+        if (dynamic_ancillary_inputs.get('gunw_files', None) is not None and
+                len(dynamic_ancillary_inputs['gunw_files']) > 0):
+            gunw_fields = basename(dynamic_ancillary_inputs['gunw_files'][0]).split('_')
+            mode = gunw_fields[self.GUNW_MODE_IDX]
+            pol = gunw_fields[self.GUNW_POL_IDX]
+        else:
+            gslc_fields = basename(self.runconfig.sas_config['input_file_group']['gslc_file_list'][0]).split('_')
+            mode = gslc_fields[self.GSLC_MODE_IDX]
+            pol = gslc_fields[self.GSLC_POL_IDX][:2]
 
         # Product version hardcoded to 1.0 for now since CCSLCs are not
         # intended for widespread distribution
@@ -252,9 +282,17 @@ class DispNIPostProcessorMixin(DispS1PostProcessorMixin):
 
         frame_id = f"{self.runconfig.sas_config['input_file_group']['frame_id']:05d}"
 
-        gunw_fields = basename(self.runconfig.sas_config['dynamic_ancillary_file_group']['gunw_files'][0]).split('_')
-        mode = gunw_fields[9]
-        pol = gunw_fields[10]
+        dynamic_ancillary_inputs = self.runconfig.sas_config['dynamic_ancillary_file_group']
+
+        if (dynamic_ancillary_inputs.get('gunw_files', None) is not None and
+                len(dynamic_ancillary_inputs['gunw_files']) > 0):
+            gunw_fields = basename(dynamic_ancillary_inputs['gunw_files'][0]).split('_')
+            mode = gunw_fields[self.GUNW_MODE_IDX]
+            pol = gunw_fields[self.GUNW_POL_IDX]
+        else:
+            gslc_fields = basename(self.runconfig.sas_config['input_file_group']['gslc_file_list'][0]).split('_')
+            mode = gslc_fields[self.GSLC_MODE_IDX]
+            pol = gslc_fields[self.GSLC_POL_IDX][:2]
 
         product_version = self.runconfig.sas_config['product_path_group']['product_version']
 
@@ -386,7 +424,7 @@ class DispNIExecutor(DispNIPreProcessorMixin, DispNIPostProcessorMixin, PgeExecu
     LEVEL = "L3"
     """Processing Level for DISP-NI Products"""
 
-    SAS_VERSION = "0.2.0"  # Interface release https://github.com/opera-adt/disp-nisar/releases/tag/v0.2.0
+    SAS_VERSION = "0.3.1"  # Interface release https://github.com/opera-adt/disp-nisar/releases/tag/v0.3.1
     """Version of the SAS wrapped by this PGE, should be updated as needed"""
 
     PGE_VERSION = "6.0.0-er.2.0"

@@ -344,6 +344,9 @@ def validate_disp_inputs(runconfig, logger, name):
             if len(dyn_anc_file_group['gunw_files']) != len(input_file_group['gslc_file_list']) - 1:
                 msg = 'Number of GUNW files does not equal the number of GLSC files - 1'
                 logger.critical(name, ErrorCode.INVALID_INPUT, msg)
+        elif dyn_anc_file_group.get('ionosphere_algorithm_parameters_file', None) is None:
+            msg = 'No GUNW files and no ionosphere algorithm parameters file present. Must have one or the other'
+            logger.critical(name, ErrorCode.INVALID_INPUT, msg)
 
     if 'mask_file' in dyn_anc_file_group and dyn_anc_file_group['mask_file']:
         check_input(dyn_anc_file_group['mask_file'], logger, name,

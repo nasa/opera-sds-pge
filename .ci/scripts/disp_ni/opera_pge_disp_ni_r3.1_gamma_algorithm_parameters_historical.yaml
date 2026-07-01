@@ -306,7 +306,7 @@ output_options:
   # Area of interest: [left, bottom, right, top] coordinates. e.g.
   #   `bbox=[-150.2,65.0,-150.1,65.5]`.
   #   Type: array | null.
-  bounds:
+  bounds: 
     - -156.26
     - 18.87
     - -154.71
@@ -345,7 +345,7 @@ output_options:
   # Specify an extra reference datetime in UTC. Adding this lets you to create and unwrap two
   #   single reference networks; the later resets at the given date (e.g. for a large
   #   earthquake event). If passing strings, formats accepted are YYYY-MM-
-  #   DD[T]HH:MM[:SS[.ffffff]][Z or [±]HH[:]MM], or YYYY-MM-DD.
+  #   DD[T]HH:MM[:SS[.ffffff]][Z or []HH[:]MM], or YYYY-MM-DD.
   #   Type: string | null.
   extra_reference_date:
 # When creating `recommended_mask`, pixels with temporal coherence below this threshold and
@@ -375,4 +375,4 @@ browse_image_vmin_vmax:
 forward_mode_network_size: 3
 # Number of output products to create in parallel.
 #   Type: integer.
-num_parallel_products: 4
+num_parallel_products: 4 

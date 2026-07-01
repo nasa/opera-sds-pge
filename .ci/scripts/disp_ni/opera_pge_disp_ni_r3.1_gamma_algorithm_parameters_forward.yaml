@@ -57,7 +57,7 @@ interferogram_network:
   reference_idx:
   # Max `n` to form the nearest-`n` interferograms by index.
   #   Type: integer | null.
-  max_bandwidth: 3
+  max_bandwidth: 4
   # Maximum temporal baseline of interferograms.
   #   Type: integer | null.
   max_temporal_baseline:
@@ -112,7 +112,7 @@ unwrap_options:
       - 300
     # Number of tiles to unwrap in parallel for each interferogram.
     #   Type: integer.
-    n_parallel_tiles: 7
+    n_parallel_tiles: 5
     # Initialization method for SNAPHU.
     #   Type: string.
     #   Options: ['mcf', 'mst'].
@@ -372,7 +372,7 @@ browse_image_vmin_vmax:
 # When running forward mode, size of the interferogram network to form with the latest
 #   date. Valid choices are 3 (default) and 4.
 #   Type: integer.
-forward_mode_network_size: 3
+forward_mode_network_size: 4
 # Number of output products to create in parallel.
 #   Type: integer.
 num_parallel_products: 4
