@@ -299,3 +299,18 @@ RFI_FRAMES_COUNT:
   attribute_data_type: int
   attribute_type: qualityInformation
   description: 'Number of NISAR GCOV input frames affected by RFI'
+GCOV_PRODUCT_VERSION:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: "GCOV Product Version"
+  display_name: GCOVProductVersion
+INPUT_LIST:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: "Input GCOV list"
+  display_name: InputList
+QA_RFI_INFO_AVAILABLE:
+  attribute_data_type: boolean
+  attribute_type: qualityInformation
+  description: "QA RFI Info Available"
+  display_name: QaRFIInfoAvailable

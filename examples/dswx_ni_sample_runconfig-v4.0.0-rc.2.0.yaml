@@ -20,7 +20,8 @@ RunConfig:
         # List of input files/directories
         # Must be a list of the input HDF5 GCOV NISAR products
         InputFilePaths: [
-          /home/dswx_user/input_dir/gcov/gcov_eap_off_flat_range_shift_50m.h5
+          /home/dswx_user/input_dir/gcov/NISAR_L2_PR_GCOV_016_105_A_017_4005_DHDH_A_20260329T111909_20260329T111944_X05013_N_F_J_001.h5,
+          /home/dswx_user/input_dir/gcov/NISAR_L2_PR_GCOV_016_105_A_018_4005_DHDH_A_20260329T111943_20260329T112018_X05013_N_F_J_001.h5
         ]
 
       DynamicAncillaryFilesGroup:
@@ -40,16 +41,16 @@ RunConfig:
           # Path to the reference water map
           # Must point to a single .tif, or a .vrt that points to one or
           # more .tif files
-          reference_water_file: /home/dswx_user/input_dir/ancillary/reference_water.tif
+          reference_water_file: /home/dswx_user/input_dir/ancillary/pekel.tif
 
           # Path to the Worldcover map
           # Must point to a single .tif, or a .vrt that points to one or
           # more .tif files
-          worldcover_file: /home/dswx_user/input_dir/ancillary/esa_landcover.tif
+          worldcover_file: /home/dswx_user/input_dir/ancillary/landcover.tif
 
           # Path to GLAD land cover map
           # Optional .tif file
-          glad_classification_file: /home/dswx_user/input_dir/ancillary/glad_classification.tif
+          glad_classification_file: /home/dswx_user/input_dir/ancillary/glad.tif
 
       ProductPathGroup:
         # Path to where output products should be stored
@@ -72,7 +73,7 @@ RunConfig:
         ProductIdentifier: DSWX_NI
 
         # Product version specific to output products
-        ProductVersion: "0.3"
+        ProductVersion: "0.4"
 
         # Path to the executable to run, path must be reachable from
         # within the Docker container (i.e. findable with a "which" command)
@@ -149,15 +150,15 @@ RunConfig:
             pge_name: DSWX_NI_PGE
 
           input_file_group:
-            input_file_path: [
-              /home/dswx_user/input_dir/gcov/gcov_eap_off_flat_range_shift_50m.h5
-            ]
+            input_file_path:
+              - /home/dswx_user/input_dir/gcov/NISAR_L2_PR_GCOV_016_105_A_017_4005_DHDH_A_20260329T111909_20260329T111944_X05013_N_F_J_001.h5
+              - /home/dswx_user/input_dir/gcov/NISAR_L2_PR_GCOV_016_105_A_018_4005_DHDH_A_20260329T111943_20260329T112018_X05013_N_F_J_001.h5
 
-            # Placeholder for historical GCOV data
-            input_file_historical_path:
+            # Placeholder for layover shadow input(s)
+            input_layover_shadow_file_path:
 
             # Specify the MGRS tile collection ID
-            input_mgrs_collection_id: 
+            input_mgrs_collection_id: MS_105_18
 
           dynamic_ancillary_file_group:
             # Digital elevation model (Required)
@@ -167,14 +168,14 @@ RunConfig:
             dem_file_description: 'Copernicus DEM GLO-30 2021 WGS84'
 
             # ESA WorldCover map file
-            worldcover_file: /home/dswx_user/input_dir/ancillary/esa_landcover.tif
+            worldcover_file: /home/dswx_user/input_dir/ancillary/landcover.tif
 
             # ESA WorldCover map description
             worldcover_file_description: 'ESA WorldCover 10m 2020 v1.0'
 
             # Reference water body map (Required)
             # e.g., Pekel's water occurrence or seasonality map
-            reference_water_file: /home/dswx_user/input_dir/ancillary/reference_water.tif
+            reference_water_file: /home/dswx_user/input_dir/ancillary/pekel.tif
 
             # Reference water description
             reference_water_file_description: 'JRC Global Surface Water - collection from 1984 to 2021'
@@ -185,7 +186,7 @@ RunConfig:
             # HAND description
             hand_file_description: 'ASF HAND GLO30'
 
-            glad_classification_file: /home/dswx_user/input_dir/glad_classification.tif
+            glad_classification_file: /home/dswx_user/input_dir/glad.tif
 
             # placeholders for inundated vegetation
             mean_backscattering:
@@ -202,7 +203,7 @@ RunConfig:
             mgrs_database_file: /home/dswx_user/input_dir/ancillary/MGRS_tile.sqlite
 
             # MGRS collection database sqlite file
-            mgrs_collection_database_file: /home/dswx_user/input_dir/ancillary/MGRS_collection_db_DSWx-NI_v0.1.sqlite
+            mgrs_collection_database_file: /home/dswx_user/input_dir/ancillary/DSWx-NI_MGRS_collection_DB_0.4.sqlite
 
           primary_executable:
             product_type: dswx_ni
@@ -218,19 +219,10 @@ RunConfig:
             sas_output_path: /home/dswx_user/output_dir
 
             # TODO: this should become a string once SAS schema is fixed
-            product_version: 0.3
+            product_version: 0.4
 
             # DSWx-NI product format
             output_imagery_format: 'COG'
-
-            # DSWx-NI Compression Options for COG
-            output_imagery_compression: DEFLATE
-
-            # DSWx-NI Compression bits for COG
-            output_imagery_nbits: 32
-            
-            # DSWx-NI output spacing
-            output_spacing: 30
 
           browse_image_group:
             # Save a full-res Cloud-Optimized GEOTIFF DSWx-NI browse image and
@@ -266,6 +258,6 @@ RunConfig:
             set_ocean_masked_to_nodata: False
 
             # Save the full-res GeoTIFF Browse image in addition to the PNG
-            save_tif_to_output: True
+            save_tif_to_output: False
 
           log_file: /home/dswx_user/scratch_dir/dswx-ni.log

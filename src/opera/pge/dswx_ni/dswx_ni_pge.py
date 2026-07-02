@@ -67,6 +67,16 @@ class DSWxNIPostProcessorMixin(DSWxS1PostProcessorMixin):
     _tile_metadata_cache = {}
     _tile_filename_cache = {}
 
+    _required_bands = {
+        'B01_WTR.tif',
+        'B02_BWTR.tif',
+        'B03_CONF.tif',
+        'B04_DIAG.tif',
+    }
+    _optional_bands = {
+        'BROWSE.tif',
+    }
+
     def _validate_output_product_filenames(self):
         """
         This method validates output product file names assigned by the SAS
@@ -370,7 +380,7 @@ class DSWxNIExecutor(DSWxNIPreProcessorMixin, DSWxNIPostProcessorMixin, PgeExecu
     PGE_VERSION = "4.0.0-rc.2.0"
     """Version of the PGE"""
 
-    SAS_VERSION = "0.3.1"  # Beta release https://github.com/opera-adt/DSWX-SAR/releases/tag/DSWx-NI-v0.3.1
+    SAS_VERSION = "0.4.0"  # Beta release https://github.com/opera-adt/DSWX-SAR/releases/tag/DSWx-NI-v0.4
     """Version of the SAS wrapped by this PGE, should be updated as needed"""
 
     def __init__(self, pge_name, runconfig_path, **kwargs):
