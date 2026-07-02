@@ -154,4 +154,4 @@ RunConfig:
           - 1024
       # Path to the output log file in addition to logging to stderr.
       #   Type: string | null.
-      log_file: /home/mamba/output_dir/log_sas.log
+      log_file: /home/mamba/output_dir/log_sas_historical_optionB.log
