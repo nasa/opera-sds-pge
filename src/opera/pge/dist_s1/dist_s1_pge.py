@@ -40,7 +40,7 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
 
     _rtc_pattern = re.compile(r'(?P<id>(?P<project>OPERA)_(?P<level>L2)_(?P<product_type>RTC)-(?P<source>S1)_'
                               r'(?P<burst_id>\w{4}-\w{6}-\w{3})_(?P<acquisition_ts>\d{8}T\d{6}Z)'
-                              r'_(?P<creation_ts>\d{8}T\d{6}Z)_(?P<sensor>S1A|S1B|S1C)_(?P<spacing>30)_'
+                              r'_(?P<creation_ts>\d{8}T\d{6}Z)_(?P<sensor>S1[ABCD])_(?P<spacing>30)_'
                               r'(?P<product_version>v\d+[.]\d+))(_(?P<pol>VV|VH|HH|HV|VV\+VH|HH\+HV))?'
                               r'[.](?P<ext>tif|tiff)$')
 
@@ -877,7 +877,7 @@ class DistS1Executor(DistS1PreProcessorMixin, DistS1PostProcessorMixin, PgeExecu
 
     _product_id_pattern = (r'(?P<id>(?P<project>OPERA)_(?P<level>L3)_(?P<product_type>DIST(-ALERT)?)-(?P<source>S1)_'
                            r'(?P<tile_id>T[^\W_]{5})_(?P<acquisition_ts>\d{8}T\d{6}Z)_(?P<creation_ts>\d{8}T\d{6}Z)_'
-                           r'(?P<sensor>S1[AC]?)_(?P<spacing>30)_(?P<product_version>v\d+[.]\d+))')
+                           r'(?P<sensor>S1[ABCD]?)_(?P<spacing>30)_(?P<product_version>v\d+[.]\d+))')
 
     _granule_filename_pattern = (_product_id_pattern + rf'((_(?P<layer_name>{"|".join(_valid_layer_names)}))|'
                                                        r'_BROWSE)?[.](?P<ext>tif|tiff|png)$')
