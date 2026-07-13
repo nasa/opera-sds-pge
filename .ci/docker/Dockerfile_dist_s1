@@ -44,8 +44,19 @@ COPY --chown=dist_user:dist_user ${PGE_SOURCE_DIR} ${PGE_DEST_DIR}
 # Switch to root for installing into Conda Env
 USER 0:0
 
+RUN set -ex \
+    && apt-get update \
+    && apt-get install --no-install-recommends -y g++ wget \
+    && apt-get clean \
+    && wget "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh" \
+    && bash Miniforge3-$(uname)-$(uname -m).sh -b -p ${CONDA_ROOT} \
+    && rm Miniforge3-$(uname)-$(uname -m).sh \
+    && /opt/conda/bin/conda init bash
+
+ENV PATH=$PATH:${CONDA_ROOT}/bin
+
 # Set the default shell to run commands within the Conda environment named "DSXW-SAR" using bash
-SHELL ["conda", "run", "-n", "dist-s1-env", "/bin/bash", "-c"]
+SHELL ["conda", "run", "/bin/bash", "-c"]
 
 # Install dependencies into existing Conda Env
 # Modifications to the destination dir permissions are also required here to ensure
@@ -63,9 +74,8 @@ RUN set -ex \
     && chmod 777 $(find ${PGE_DEST_DIR} -type d)
 
 # Set the Docker entrypoint and clear the default command
-ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "dist-s1-env", "sh", "-c", "exec ${CONDA_ROOT}/bin/pge_docker_entrypoint.sh  \"${@}\"", "--"]
+ENTRYPOINT ["conda", "run", "--no-capture-output", "sh", "-c", "exec ${CONDA_ROOT}/bin/pge_docker_entrypoint.sh  \"${@}\"", "--"]
 CMD []
 
 # Set the user/group back to the default
 USER dist_user:dist_user
-
