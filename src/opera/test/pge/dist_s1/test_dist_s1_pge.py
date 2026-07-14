@@ -21,12 +21,12 @@ from pathlib import Path
 from unittest.mock import patch
 
 import yaml
-from opera.test import path
 from yamale.yamale_error import YamaleError
 
 import opera.util.tiff_utils
 from opera.pge import RunConfig
 from opera.pge.dist_s1.dist_s1_pge import DistS1Executor
+from opera.test import path
 from opera.util import PgeLogger
 from opera.util.mock_utils import MockGdal
 from opera.util.render_jinja2 import UNDEFINED_ERROR
@@ -366,7 +366,7 @@ class DistS1PgeTestCase(unittest.TestCase):
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
 
-            self.assertIn(f"Lengths of input pre/post co/cross pol input RTC lists differ", log_contents)
+            self.assertIn("Lengths of input pre/post co/cross pol input RTC lists differ", log_contents)
 
             # Test 2: Detect SAS RTCs not subset of PGE RTCs
 
@@ -394,7 +394,7 @@ class DistS1PgeTestCase(unittest.TestCase):
                 log_contents = infile.read()
 
             self.assertIn(
-                f"RunConfig SAS group RTC file lists do not make a subset of PGE group Input File list",
+                "RunConfig SAS group RTC file lists do not make a subset of PGE group Input File list",
                 log_contents
             )
 
@@ -410,9 +410,9 @@ class DistS1PgeTestCase(unittest.TestCase):
             pre_rtc_copol = runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['pre_rtc_copol']
             pre_rtc_crosspol = runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['pre_rtc_crosspol']
 
-            pge_input_index = len(pre_rtc_copol) + len(pre_rtc_crosspol)
+            pge_input_idx = len(pre_rtc_copol) + len(pre_rtc_crosspol)
 
-            runconfig_dict['RunConfig']['Groups']['PGE']['InputFilesGroup']['InputFilePaths'][pge_input_index] = s1c_file
+            runconfig_dict['RunConfig']['Groups']['PGE']['InputFilesGroup']['InputFilePaths'][pge_input_idx] = s1c_file
             runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['post_rtc_copol'][0] = s1c_file
 
             with open(s1c_file, 'wb') as fp:
@@ -433,7 +433,7 @@ class DistS1PgeTestCase(unittest.TestCase):
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
 
-            self.assertIn(f"RunConfig contains RTCs from more than one S1 Sensor", log_contents)
+            self.assertIn("RunConfig contains RTCs from more than one S1 Sensor", log_contents)
 
             # Test 4: Incorrect RTC file names
 
@@ -462,7 +462,7 @@ class DistS1PgeTestCase(unittest.TestCase):
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
 
-            self.assertIn(f"Invalid RTC filenames in RunConfig", log_contents)
+            self.assertIn("Invalid RTC filenames in RunConfig", log_contents)
 
             # Test 5a: Badly ordered RTCs - Fixable
 
@@ -536,9 +536,9 @@ class DistS1PgeTestCase(unittest.TestCase):
             pre_rtc_copol = runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['pre_rtc_copol']
             pre_rtc_crosspol = runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['pre_rtc_crosspol']
 
-            pge_input_index = len(pre_rtc_copol) + len(pre_rtc_crosspol)
+            pge_input_idx = len(pre_rtc_copol) + len(pre_rtc_crosspol)
 
-            runconfig_dict['RunConfig']['Groups']['PGE']['InputFilesGroup']['InputFilePaths'][pge_input_index] = s1_file
+            runconfig_dict['RunConfig']['Groups']['PGE']['InputFilesGroup']['InputFilePaths'][pge_input_idx] = s1_file
             runconfig_dict['RunConfig']['Groups']['SAS']['run_config']['post_rtc_copol'][0] = s1_file
 
             with open(s1_file, 'wb') as fp:
@@ -593,7 +593,7 @@ class DistS1PgeTestCase(unittest.TestCase):
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
 
-            self.assertIn(f"Found non-copol RTC in copol input list", log_contents)
+            self.assertIn("Found non-copol RTC in copol input list", log_contents)
 
             # Test 6b: copol in crosspol
 
@@ -619,7 +619,7 @@ class DistS1PgeTestCase(unittest.TestCase):
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
 
-            self.assertIn(f"Found non-crosspol RTC in crosspol input list", log_contents)
+            self.assertIn("Found non-crosspol RTC in crosspol input list", log_contents)
 
             # Test 7: duplicate RTCs
 
