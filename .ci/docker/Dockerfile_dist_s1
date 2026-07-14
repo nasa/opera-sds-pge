@@ -51,7 +51,8 @@ RUN set -ex \
     && wget --connect-timeout=3 --tries=3 "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh" \
     && bash Miniforge3-$(uname)-$(uname -m).sh -b -p ${CONDA_ROOT} \
     && rm Miniforge3-$(uname)-$(uname -m).sh \
-    && /opt/conda/bin/conda init bash
+    && /opt/conda/bin/conda init bash \
+    && /opt/conda/bin/conda clean -afy
 
 ENV PATH=$PATH:${CONDA_ROOT}/bin
 
@@ -71,6 +72,7 @@ RUN set -ex \
     && apt-get clean \
     && python -m pip install -r ${PGE_DEST_DIR}/opera/requirements_numpy2.txt \
     && conda install --yes --channel conda-forge hdf5 gdal \
+    && conda clean -afy \
     && chmod 777 $(find ${PGE_DEST_DIR} -type d)
 
 # Set the Docker entrypoint and clear the default command
