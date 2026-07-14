@@ -152,7 +152,6 @@ class DistS1PreProcessorMixin(PreProcessorMixin):
             4-tuple of lists of input RTC filenames in the order: pre_rtc_copol, pre_rtc_crosspol, post_rtc_copol,
             post_rtc_crosspol
         """
-
         pre_rtc_copol, pre_rtc_crosspol, post_rtc_copol, post_rtc_crosspol = all_rtcs
 
         burst_map = {}
