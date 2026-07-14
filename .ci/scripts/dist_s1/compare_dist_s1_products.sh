@@ -64,12 +64,12 @@ do
     compare_output="FAILED"
   else
      # compare output and expected files
-     echo "python3 dist_s1_compare.py $(basename -- ${expected_product}) ${output_product}"
-     compare_output=$(python3 $SCRIPT_DIR/dist_s1_compare.py ${expected_product} $OUTPUT_DIR/${output_product})
+     echo "/home/ops/dist-s1/.pixi/envs/default/bin/dist-s1 check_equality $(basename -- ${expected_product}) ${output_product}"
+     compare_output=$(/home/ops/dist-s1/.pixi/envs/default/bin/dist-s1 check_equality ${expected_product} $OUTPUT_DIR/${output_product})
      echo "$compare_output"
   fi
 
-  if [[ "$compare_output" != *"FAIL"* ]]; then
+  if [[ "$compare_output" == *"Products are equal"* ]]; then
       echo "Product validation was successful for $output_product"
       compare_result="PASS"
   else
