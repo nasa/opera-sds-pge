@@ -893,7 +893,7 @@ class DistS1Executor(DistS1PreProcessorMixin, DistS1PostProcessorMixin, PgeExecu
     SAS_VERSION = "2.0.18"  # CalVal release https://github.com/opera-adt/dist-s1/releases/tag/v2.0.18
     """Version of the SAS wrapped by this PGE, should be updated as needed"""
 
-    PGE_VERSION = "6.0.2"
+    PGE_VERSION = "6.0.3"
     """Version of the PGE (overrides default from base_pge)"""
 
     def __init__(self, pge_name, runconfig_path, **kwargs):
