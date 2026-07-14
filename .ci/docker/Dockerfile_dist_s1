@@ -48,7 +48,7 @@ RUN set -ex \
     && apt-get update \
     && apt-get install --no-install-recommends -y g++ wget \
     && apt-get clean \
-    && wget "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh" \
+    && wget --connect-timeout=3 --tries=3 "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh" \
     && bash Miniforge3-$(uname)-$(uname -m).sh -b -p ${CONDA_ROOT} \
     && rm Miniforge3-$(uname)-$(uname -m).sh \
     && /opt/conda/bin/conda init bash
