@@ -65,7 +65,7 @@ do
   else
      # compare output and expected files
      echo "/home/ops/dist-s1/.pixi/envs/default/bin/dist-s1 check_equality $(basename -- ${expected_product}) ${output_product}"
-     compare_output=$(/home/ops/dist-s1/.pixi/envs/default/bin/dist-s1 check_equality ${expected_product} $OUTPUT_DIR/${output_product})
+     compare_output=$(/home/ops/dist-s1/.pixi/envs/default/bin/dist-s1 check_equality ${expected_product} $OUTPUT_DIR/${output_product} || true)
      echo "$compare_output"
   fi
 
