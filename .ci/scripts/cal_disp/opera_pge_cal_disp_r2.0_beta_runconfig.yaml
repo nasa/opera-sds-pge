@@ -1,0 +1,355 @@
+RunConfig:
+    Name: OPERA-CAL-DISP-PGE-INT-TEST-CONFIG
+
+    Groups:
+        PGE:
+            PGENameGroup:
+                PGEName: CAL_DISP_PGE
+
+            InputFilesGroup:
+                InputFilePaths:
+                    - /home/conda/input_dir/disp/OPERA_L3_DISP-S1_IW_F08882_VV_20220111T002651Z_20220722T002657Z_v1.0_20251027T005420Z.nc
+
+            DynamicAncillaryFilesGroup:
+                AncillaryFileMap:
+                    static_dem_file: /home/conda/input_dir/static_input/OPERA_L3_DISP-S1-STATIC_F08882_20140403_S1A_v1.0_dem.tif
+                    static_los_file: /home/conda/input_dir/static_input/OPERA_L3_DISP-S1-STATIC_F08882_20140403_S1A_v1.0_line_of_sight_enu.tif
+                    ref_tropo_files:
+                        - /home/conda/input_dir/tropo/OPERA_L4_TROPO-ZENITH_20220111T000000Z_20250923T224940Z_HRES_v1.0.nc
+                    sec_tropo_files:
+                        - /home/conda/input_dir/tropo/OPERA_L4_TROPO-ZENITH_20220722T000000Z_20250923T233421Z_HRES_v1.0.nc
+                    iono_files: []
+                    unr_timeseries_files:
+                    - /home/conda/input_dir/gnss/005797_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/005798_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/005799_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/005800_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/005801_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/005883_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/005884_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/005885_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/005886_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/005887_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/005888_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/005889_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/005890_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/005969_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/005970_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/005971_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/005972_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/005973_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/005974_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/005975_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/005976_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/005977_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006056_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006057_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006058_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006059_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006060_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006061_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006062_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006063_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006064_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006065_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006066_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006153_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006154_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006155_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006156_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006157_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006158_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006159_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006160_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006161_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006162_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006163_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006164_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006256_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006257_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006258_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006259_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006260_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006261_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006262_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006263_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006264_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006265_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006266_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006267_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006268_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006269_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006360_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006361_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006362_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006363_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006364_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006365_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006366_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006367_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006368_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006369_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006370_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006371_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006372_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006373_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006374_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006375_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006473_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006474_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006475_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006476_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006477_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006478_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006479_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006480_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006481_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006482_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006483_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006484_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006485_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006486_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006487_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006593_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006594_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006595_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006596_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006597_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006598_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006599_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006600_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006601_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006602_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006603_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006604_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006605_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006606_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006607_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006713_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006714_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006715_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006716_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006717_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006718_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006719_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006720_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006721_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006722_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006723_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006724_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006725_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006726_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006727_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006728_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006843_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006844_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006845_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006846_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006847_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006848_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006849_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006850_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006851_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006852_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006853_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006854_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006855_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006856_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006980_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006981_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006982_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006983_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006984_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006985_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006986_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006987_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006988_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006989_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006990_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/006991_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/007120_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/007121_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/007122_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/007123_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/007124_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/007125_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/007126_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/007127_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/007260_IGS20.tenv8
+                    - /home/conda/input_dir/gnss/007261_IGS20.tenv8
+                    
+                    unr_grid_latlon_file: /home/conda/input_dir/gnss/grid_latlon_lookup_v0.3.txt
+
+            ProductPathGroup:
+                OutputProductPath: /home/conda/output_dir
+                ScratchPath: /home/conda/scratch_dir
+
+            PrimaryExecutable:
+                ProductIdentifier: DISP_CAL
+                ProductVersion: "0.1"
+                ProgramPath: cal-disp
+                ProgramOptions:
+                    - run
+                ErrorCodeBase: 1000000
+                SchemaPath: /home/conda/opera/pge/cal_disp/schema/cal_disp_sas_schema.yaml
+                AlgorithmParametersSchemaPath: /home/conda/opera/pge/cal_disp/schema/algorithm_parameters_cal_disp_schema.yaml
+                IsoTemplatePath: /home/conda/opera/pge/cal_disp/templates/OPERA_ISO_metadata_L4_CAL_DISP_template.xml.jinja2
+                IsoMeasuredParameterDescriptions: /home/conda/opera/pge/cal_disp/templates/cal_disp_measured_parameters.yaml
+
+            QAExecutable:
+                Enabled: True
+                ProgramPath: /home/conda/opera/.ci/scripts/cal_disp/compare_cal_disp_products.sh
+                ProgramOptions: []
+
+            DebugLevelGroup:
+                DebugSwitch: False
+                ExecuteViaShell: True  # Must be set to True for test to work
+
+        SAS:
+
+            # REQUIRED: A PGE (Product Generation Executive) run configuration.
+            cal_disp_workflow:
+
+                # REQUIRED: Configuration for required input files..
+                #   Type: Object.
+                input_file_group:
+
+                    # REQUIRED: Path to DISP file.
+                    #   Type: string.
+                    disp_file: /home/conda/input_dir/disp/OPERA_L3_DISP-S1_IW_F08882_VV_20220111T002651Z_20220722T002657Z_v1.0_20251027T005420Z.nc
+
+                    # REQUIRED: Frame ID of the DISP frame.
+                    #   Type: integer.
+                    frame_id: 8882
+
+                    # REQUIRED: Path to UNR grid lookup table (grid_latlon_lookup_v0.2.txt).
+                    #   Type: string.
+                    unr_grid_latlon_file: /home/conda/input_dir/gnss/grid_latlon_lookup_v0.3.txt
+
+                    # REQUIRED: Directory containing UNR .tenv8 timeseries files.
+                    #   Type: string.
+                    unr_timeseries_dir: /home/conda/input_dir/gnss
+
+                    # REQUIRED: Version of UNR gridded data, e.g. [0.2].
+                    #   Type: string.
+                    unr_grid_version: '0.3'
+
+                    # REQUIRED: Type of UNR gridded data [constant|variable].
+                    #   Type: string.
+                    unr_grid_type: constant
+
+                    # No description..
+                    #   Type: boolean.
+                    skip_file_checks: false
+
+                # Dynamic ancillary files configuration..
+                #   Type: DynamicAncillaryFileGroup | null.
+                dynamic_ancillary_group:
+
+                    # REQUIRED: Path to file containing SAS algorithm parameters.
+                    #   Type: string.
+                    algorithm_parameters_file: /home/conda/runconfig/opera_pge_cal_disp_r2.0_beta_algorithm_parameters.yaml
+
+                    # REQUIRED: Path to the DISP static los layer file (1 per frame) with line-of-sight unit vectors.
+                    #   Type: string.
+                    static_los_file: /home/conda/input_dir/static_input/OPERA_L3_DISP-S1-STATIC_F08882_20140403_S1A_v1.0_line_of_sight_enu.tif
+
+                    # REQUIRED: Path to the DISP static dem layer file (1 per frame) with line-of-sight unit vectors.
+                    #   Type: string.
+                    static_dem_file: /home/conda/input_dir/static_input/OPERA_L3_DISP-S1-STATIC_F08882_20140403_S1A_v1.0_dem.tif
+
+                    # Optional Byte mask file used to ignore low correlation/bad data (e.g water mask).
+                    #       Convention is 0 for no data/invalid, and 1 for good data. Dtype must be uint8..
+                    #   Type: string | null.
+                    mask_file:
+
+                    # Path to the TROPO file for the reference date. If not provided, tropospheric correction
+                    #       for reference is skipped.
+                    #   Type: array | null.
+                    ref_tropo_files:
+                        - /home/conda/input_dir/tropo/OPERA_L4_TROPO-ZENITH_20220111T000000Z_20250923T224940Z_HRES_v1.0.nc
+
+                    # Path to the TROPO file for the secondary date. If not provided, tropospheric correction
+                    #       for secondary is skipped.
+                    #   Type: array | null.
+                    sec_tropo_files:
+                        - /home/conda/input_dir/tropo/OPERA_L4_TROPO-ZENITH_20220722T000000Z_20250923T233421Z_HRES_v1.0.nc
+
+                    # Path to the IONO files If not provided, ionosphere correction for reference is skipped.
+                    #   Type: array | null.
+                    iono_files: [ ]
+
+                    # Paths to the calibration tile bounds files (e.g. S1 burst bounds) covering full frame. If
+                    #       none provided, calibration per tile is skipped.
+                    #   Type: array | null.
+                    tiles_files: [ ]
+
+                # Static ancillary files configuration..
+                #   Type: StaticAncillaryFileGroup | null.
+                static_ancillary_group:
+
+                # Output configuration options..
+                #   Type: Object.
+                output_options:
+
+                    # Version of the product, in <major>.<minor> format..
+                    #   Type: string.
+                    product_version: '1.0'
+
+                    # Output file format..
+                    #   Type: string.
+                    output_format: netcdf
+
+                    # Whether to compress output files..
+                    #   Type: boolean.
+                    compression: true
+
+                # Primary executable configuration..
+                #   Type: Object.
+                primary_executable:
+
+                    # Product type of the PGE..
+                    #   Type: string.
+                    product_type: DISP_CAL
+
+                # Product path configuration..
+                #   Type: Object.
+                product_path_group:
+
+                    # Directory where PGE will place results..
+                    #   Type: string.
+                    product_path: /home/conda/output_dir
+
+                    # Path to the scratch directory for intermediate files..
+                    #   Type: string.
+                    scratch_path: /home/conda/scratch_dir
+
+                    # Path to the SAS output directory..
+                    #   Type: string.
+                    sas_output_path: /home/conda/output_dir
+
+                # Dask worker and parallelism configuration..
+                #   Type: Object.
+                worker_settings:
+
+                    # Number of workers to use in dask.Client. Typically set to the number of physical CPU cores
+                    #       or less. Default: 4.
+                    #   Type: integer.
+                    n_workers: 4
+
+                    # Number of threads per worker in dask.Client. Controls parallelism within each worker.
+                    #       Default: 2.
+                    #   Type: integer.
+                    threads_per_worker: 1
+
+                    # Size (rows, columns) of blocks of data to load at a time. Larger blocks use more memory
+                    #       but may be more efficient. Must be positive integers. Default: (128, 128).
+                    #   Type: array.
+                    block_shape:
+                        - 512
+                        - 512
+
+                # Path to the output log file in addition to logging to stderr. If None, will be set based
+                #     on output path..
+                #   Type: string | null.
+                log_file: /home/conda/output_dir/cal_disp.log

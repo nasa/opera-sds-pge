@@ -80,10 +80,22 @@ RunConfig:
                 #  provided, the SAS will only output products whose secondary datetime is *after*
                 #  `last_processed`. Otherwise, the SAS will output all products.
                 last_processed:
+                # When the input does not match OPERA-burst naming (e.g. NISAR), split each input frame into
+                #   this many azimuth blocks and process each block as a synthetic burst. Default 1 = no
+                #   splitting.
+                #   Type: integer.
+                azimuth_blocks: 6
+                # Halo (input rows) on each side of an azimuth block. Default: max(half_window_y,
+                #   similarity_search_radius * stride_y, (corr_window_y // 2) * stride_y) + 5.
+                #   Type: integer | null.
+                halo_rows:
             dynamic_ancillary_file_group:
                 # REQUIRED: Path to file containing SAS algorithm parameters.
                 #   Type: string.
                 algorithm_parameters_file: disp_ni_pge_test/input_dir/test_disp_ni_algorithm_parameters.yaml
+                # REQUIRED: Path to file containing SAS algorithm parameters for ionosphere from FreqA/B.
+                #   Type: string.
+                ionosphere_algorithm_parameters_file: disp_ni_pge_test/input_dir/test_disp_ni_algorithm_parameters_ionosphere.yaml
                 # Optional Byte mask file used to ignore low correlation/bad data (e.g water mask).
                 #   Convention is 0 for no data/invalid, and 1 for good data. Dtype must be uint8.
                 #   Type: string | null.

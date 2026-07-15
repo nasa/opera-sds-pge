@@ -59,8 +59,9 @@ class DispNIPgeTestCase(unittest.TestCase):
         input_dir = join(self.working_dir.name, "disp_ni_pge_test/input_dir")
         os.makedirs(input_dir, exist_ok=True)
 
-        # Copy the algorithm_parameters config file into the test input directory.
+        # Copy the algorithm_parameters config files into the test input directory.
         shutil.copy(join(self.data_dir, 'test_disp_ni_algorithm_parameters.yaml'), input_dir)
+        shutil.copy(join(self.data_dir, 'test_disp_ni_algorithm_parameters_ionosphere.yaml'), input_dir)
 
         # Create non-empty dummy input files expected by test runconfig
         dummy_input_files = [
@@ -275,6 +276,107 @@ class DispNIPgeTestCase(unittest.TestCase):
 
         self.assertIn(f"DISP-NI invoked with RunConfig {expected_sas_config_file}", log_contents)
 
+    def test_disp_ni_pge_execution_iono_B(self):
+        """
+        Test execution of the DispNIExecutor class and its associated mixins
+        using a test RunConfig that creates dummy expected output files and logs
+        a message to be captured by PgeLogger. Same as test_disp_ni_pge_execution,
+        but uses ionoshpere estimation option B
+        """
+        runconfig_path = join(self.data_dir, 'test_disp_ni_config.yaml')
+        test_runconfig_path = join(self.data_dir, 'test_off_nominal_output.yaml')
+
+        with open(runconfig_path, 'r', encoding='utf-8') as infile:
+            runconfig_dict = yaml.safe_load(infile)
+
+        try:
+            runconfig_dict['RunConfig']['Groups']['PGE']['DynamicAncillaryFilesGroup']['AncillaryFileMap']['gunw_files'] = None
+            runconfig_dict['RunConfig']['Groups']['SAS']['dynamic_ancillary_file_group']['gunw_files'] = None
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+                yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+
+            pge = DispNIExecutor(pge_name="DispNIPgeTest", runconfig_path=test_runconfig_path)
+
+            # Check that basic attributes were initialized
+            self.assertEqual(pge.name, "DISP-NI")
+            self.assertEqual(pge.pge_name, "DispNIPgeTest")
+            self.assertEqual(pge.runconfig_path, test_runconfig_path)
+
+            # Check that other objects have not been instantiated yet
+            self.assertIsNone(pge.runconfig)
+            self.assertIsNone(pge.logger)
+
+            # Kickoff execution of DISP-S1 PGE
+            pge.run()
+
+            # Check that the runconfig and logger were instantiated
+            self.assertIsInstance(pge.runconfig, RunConfig)
+            self.assertIsInstance(pge.logger, PgeLogger)
+
+            # Check that directories were created according to RunConfig
+            self.assertTrue(os.path.isdir(pge.runconfig.output_product_path))
+            self.assertTrue(os.path.isdir(pge.runconfig.scratch_path))
+
+            # Check that an in-memory log was created
+            stream = pge.logger.get_stream_object()
+            self.assertIsInstance(stream, StringIO)
+
+            # Check that a RunConfig for the SAS was isolated within the scratch directory
+            expected_sas_config_file = join(pge.runconfig.scratch_path, 'test_off_nominal_output_sas.yaml')
+            self.assertTrue(os.path.exists(expected_sas_config_file))
+
+            # Check that the catalog metadata file was created in the output directory
+            expected_catalog_metadata_file = join(
+                pge.runconfig.output_product_path, pge._catalog_metadata_filename())
+            self.assertTrue(os.path.exists(expected_catalog_metadata_file))
+
+            expected_inter_filename = abspath("disp_ni_pge_test/output_dir/20060630_20060930.nc")
+            expected_browse_filename = abspath("disp_ni_pge_test/output_dir/20060630_20060930.displacement.png")
+
+            # Check that the ISO metadata file was created and all placeholders were
+            # filled in
+            expected_iso_metadata_file = join(
+                pge.runconfig.output_product_path, pge._iso_metadata_filename(expected_inter_filename))
+            self.assertTrue(os.path.exists(expected_iso_metadata_file))
+
+            # Check that the log file was created and moved into the output directory
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            # Lastly, check that the dummy output products were created and renamed
+            expected_disp_product = join(
+                pge.runconfig.output_product_path,
+                pge._netcdf_filename(
+                    inter_filename=expected_inter_filename
+                )
+            )
+            self.assertTrue(os.path.exists(expected_disp_product))
+
+            expected_browse_product = join(
+                pge.runconfig.output_product_path,
+                pge._browse_filename(
+                    inter_filename=expected_browse_filename
+                )
+            )
+            self.assertTrue(os.path.exists(expected_browse_product))
+
+            for compressed_gslc in ['compressed_20060630_20060630_20071118.h5',]:
+                expected_compressed_gslc_product = join(
+                    pge.runconfig.output_product_path,
+                    pge._compressed_gslc_filename(compressed_gslc)
+                )
+                self.assertTrue(os.path.exists(expected_compressed_gslc_product))
+
+            # Open and read the log
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn(f"DISP-NI invoked with RunConfig {expected_sas_config_file}", log_contents)
+        finally:
+            if exists(test_runconfig_path):
+                os.unlink(test_runconfig_path)
+
     def test_disp_ni_pge_validate_inputs(self):
         """
         Test that the validate_disp_inputs function is able to detect non-existent files,
@@ -362,21 +464,24 @@ class DispNIPgeTestCase(unittest.TestCase):
             "NISAR_L2_PR_GUNW_005_151_A_011_006_4000_SH_20251120T155041_20251120T155058_20251202T155042_20251202T155059_X05010_N_P_J_001.h5",  # noqa: E501
             "NISAR_L2_PR_GUNW_006_151_A_011_008_4000_SH_20251202T155042_20251202T155059_20251226T155043_20251226T155100_X05010_N_P_J_001.h5",  # noqa: E501
         ]
-        for test_f in test_filenames + test_gunw_filenames:
+        test_iono_ap_filename = [
+            'algorithm_parameters_ionosphere.yaml'
+        ]
+        for test_f in test_filenames + test_gunw_filenames + test_iono_ap_filename:
             with open(test_f, 'w') as ief:
                 ief.write("\n")
             self.assertTrue(exists(test_f))
 
+        # Ionosphere tests
+
+        # Iono 1 : Correct GSLC & GUNW
         logger = PgeLogger()
         sas_config['input_file_group']['gslc_file_list'] = test_filenames
-        runconfig = MockRunConfig(sas_config)
-        validate_disp_inputs(runconfig, logger, "DISP-NI")
-
-        logger = PgeLogger()
         sas_config['dynamic_ancillary_file_group']['gunw_files'] = test_gunw_filenames
         runconfig = MockRunConfig(sas_config)
         validate_disp_inputs(runconfig, logger, "DISP-NI")
 
+        # Iono 2 : Correct GSLC & Incorrect GUNW
         logger = PgeLogger()
         sas_config['dynamic_ancillary_file_group']['gunw_files'] = test_gunw_filenames[:1]
         runconfig = MockRunConfig(sas_config)
@@ -389,7 +494,30 @@ class DispNIPgeTestCase(unittest.TestCase):
             log = lfile.read()
         self.assertIn('Number of GUNW files does not equal the number of GLSC files - 1', log)
 
-        for test_f in test_filenames + test_gunw_filenames:
+        # Iono 3: Correct GSLC, no GUNW, present iono AP
+        logger = PgeLogger()
+        sas_config['dynamic_ancillary_file_group']['gunw_files'] = None
+        sas_config['dynamic_ancillary_file_group']['ionosphere_algorithm_parameters_file'] = test_iono_ap_filename[0]
+        runconfig = MockRunConfig(sas_config)
+        validate_disp_inputs(runconfig, logger, "DISP-NI")
+
+        # Iono 4: Correct GSLC, no GUNW, absent iono AP
+        logger = PgeLogger()
+        sas_config['dynamic_ancillary_file_group']['ionosphere_algorithm_parameters_file'] = None
+        runconfig = MockRunConfig(sas_config)
+        with self.assertRaises(RuntimeError):
+            validate_disp_inputs(runconfig, logger, "DISP-NI")
+
+        log_file = logger.get_file_name()
+        self.assertTrue(exists(log_file))
+        with open(log_file, 'r', encoding='utf-8') as lfile:
+            log = lfile.read()
+        self.assertIn(
+            'No GUNW files and no ionosphere algorithm parameters file present. Must have one or the other',
+            log
+        )
+
+        for test_f in test_filenames + test_gunw_filenames + test_iono_ap_filename:
             os.remove(test_f)
 
     def test_disp_ni_pge_validate_product_output(self):
@@ -420,10 +548,6 @@ class DispNIPgeTestCase(unittest.TestCase):
 
             self.assertIn("The SAS did not create any output file(s) with the expected '.nc' extension", log_contents)
             shutil.rmtree(pge.runconfig.output_product_path)
-
-        finally:
-            if exists(test_runconfig_path):
-                os.unlink(test_runconfig_path)
 
             # Too many .nc files
             runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']['ProgramOptions'] = \
@@ -595,6 +719,10 @@ class DispNIPgeTestCase(unittest.TestCase):
                 "Compressed CSLC file 'compressed_slc_t087_185684_iw2_20180222_20180330.h5' exists, but is empty",
                 log_contents)
             shutil.rmtree(pge.runconfig.output_product_path)
+
+        finally:
+            if exists(test_runconfig_path):
+                os.unlink(test_runconfig_path)
 
     def test_iso_metadata_creation(self):
         """

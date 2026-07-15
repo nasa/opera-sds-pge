@@ -16,10 +16,10 @@ phase_linking:
   half_window:
     # Half window size (in pixels) for x direction.
     #   Type: integer.
-    x: 7
+    x: 15
     # Half window size (in pixels) for y direction.
     #   Type: integer.
-    y: 7
+    y: 40
   # Use EVD on the coherence instead of using the EMI algorithm.
   #   Type: boolean.
   use_evd: false
@@ -103,8 +103,8 @@ unwrap_options:
     # Number of tiles to split the inputs into using SNAPHU's internal tiling.
     #   Type: array.
     ntiles:
-      - 5
-      - 5
+      - 1
+      - 1
     # Amount of tile overlap (in pixels) along the (row, col) directions.
     #   Type: array.
     tile_overlap:
@@ -112,7 +112,7 @@ unwrap_options:
       - 300
     # Number of tiles to unwrap in parallel for each interferogram.
     #   Type: integer.
-    n_parallel_tiles: 7
+    n_parallel_tiles: 5
     # Initialization method for SNAPHU.
     #   Type: string.
     #   Options: ['mcf', 'mst'].
@@ -294,15 +294,15 @@ timeseries_options:
     - 256
   # Number of parallel blocks to process at once.
   #   Type: integer.
-  num_parallel_blocks: 4
+  num_parallel_blocks: 8
 output_options:
   # Alternative to specifying output resolution: Specify the (x, y) strides (decimation
   #   factor) to perform while processing input. For example, strides of [4, 2] would turn an
   #   input resolution of [5, 10] into an output resolution of [20, 20].
   #   Type: object.
   strides:
-    x: 12
-    y: 12
+    x: 2
+    y: 16
   # Area of interest: [left, bottom, right, top] coordinates. e.g.
   #   `bbox=[-150.2,65.0,-150.1,65.5]`.
   #   Type: array | null.

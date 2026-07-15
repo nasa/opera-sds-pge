@@ -1360,7 +1360,7 @@ def create_test_cal_disp_metadata_product(file_path):
 
         identification_grp = outfile.create_group("/identification")
 
-        frame_id_dset = identification_grp.create_dataset("frame_id", data=8882, dtype="int64")
+        frame_id_dset = identification_grp.create_dataset("frame_id", data=8882, dtype="int32")
         product_version_dset = identification_grp.create_dataset("product_version", data=np.bytes_("0.1"))
         track_number_dset = identification_grp.create_dataset("track_number", data=0, dtype="int64")
         absolute_orbit_number_dset = identification_grp.create_dataset("absolute_orbit_number", data=0, dtype="int64")
@@ -1371,7 +1371,9 @@ def create_test_cal_disp_metadata_product(file_path):
         secondary_datetime_dset = identification_grp.create_dataset("secondary_datetime",
                                                                     data=np.bytes_("2022-07-22T00:26:57"))
         processing_start_datetime_dset = identification_grp.create_dataset("processing_start_datetime",
-                                                                           data=np.bytes_("2026-01-21T01:09:54.017049"))
+                                                                           data=np.bytes_(
+                                                                               "2026-06-05T15:42:29.754894+00:00"
+                                                                           ))
         bounding_polygon_dset = identification_grp.create_dataset("bounding_polygon", data=np.bytes_(
             "POLYGON((71985.0 3153945.0, 355875.0 3153945.0, 355875.0 3385905.0, "
             "71985.0 3385905.0, 71985.0 3153945.0))"))
@@ -1382,24 +1384,24 @@ def create_test_cal_disp_metadata_product(file_path):
         calibration_reference_name_dset = identification_grp.create_dataset("calibration_reference_name",
                                                                             data=np.bytes_("UNR gridded data"))
         calibration_reference_version_dset = identification_grp.create_dataset("calibration_reference_version",
-                                                                               data=np.bytes_("0.2"))
+                                                                               data=np.bytes_("0.3"))
         calibration_reference_type_dset = identification_grp.create_dataset("calibration_reference_type",
                                                                             data=np.bytes_("constant"))
         calibration_reference_reference_frame_dset = identification_grp.create_dataset(
             "calibration_reference_reference_frame", data=np.bytes_("IGS20"))
         source_calibration_file_list_dset = identification_grp.create_dataset("source_calibration_file_list",
                                                                               data=np.bytes_(
-                                                                                  "grid_latlon_lookup_v0.2.txt, "
-                                                                                  "004421_IGS20.tenv8, "
-                                                                                  "004420_IGS20.tenv8, "
-                                                                                  "004493_IGS20.tenv8, "
-                                                                                  "004492_IGS20.tenv8, "
-                                                                                  "004494_IGS20.tenv8, "
-                                                                                  "004495_IGS20.tenv8, "
-                                                                                  "004567_IGS20.tenv8, "
-                                                                                  "004566_IGS20.tenv8, "
-                                                                                  "004568_IGS20.tenv8, "
-                                                                                  "004569_IGS20.tenv8"))
+                                                                                  "grid_latlon_lookup_v0.3.txt, "
+                                                                                  "005797_IGS20.tenv8, "
+                                                                                  "005798_IGS20.tenv8, "
+                                                                                  "005799_IGS20.tenv8, "
+                                                                                  "005800_IGS20.tenv8, "
+                                                                                  "005801_IGS20.tenv8, "
+                                                                                  "005883_IGS20.tenv8, "
+                                                                                  "005884_IGS20.tenv8, "
+                                                                                  "005885_IGS20.tenv8, "
+                                                                                  "005886_IGS20.tenv8, "
+                                                                                  "005887_IGS20.tenv8"))
         source_data_file_list_dset = identification_grp.create_dataset("source_data_file_list", data=np.bytes_(
             "OPERA_L3_DISP-S1_IW_F08882_VV_20220111T002651Z_20220722T002657Z_v1.0_20251027T005420Z.nc"))
         source_data_access_dset = identification_grp.create_dataset("source_data_access",
@@ -1422,12 +1424,16 @@ def create_test_cal_disp_metadata_product(file_path):
         radar_band_dset = identification_grp.create_dataset("radar_band", data=np.bytes_("C"))
         processing_facility_dset = identification_grp.create_dataset("processing_facility", data=np.bytes_("JPL"))
         ceos_number_of_input_granules_dset = identification_grp.create_dataset("ceos_number_of_input_granules", data=1,
-                                                                               dtype="int64")
+                                                                               dtype="int32")
         nodata_pixel_count_dset = identification_grp.create_dataset("nodata_pixel_count", data=25750140, dtype="int64")
         product_data_access_dset = identification_grp.create_dataset("product_data_access",
                                                                      data=np.bytes_("https://example.com/products"))
         static_layers_data_access_dset = identification_grp.create_dataset("static_layers_data_access", data=np.bytes_(
             "https://example.com/static_layers"))
+
+        # TODO: Missing (in spec, not in product)
+        #   ceos_analysis_ready_data_document_identifier
+        #   ceos_analysis_ready_data_product_type
 
         metadata_grp = outfile.create_group("/metadata")
 
@@ -1436,12 +1442,17 @@ def create_test_cal_disp_metadata_product(file_path):
         platform_id_dset = metadata_grp.create_dataset("platform_id", data=np.bytes_("S1A"))
         source_data_software_disp_version_dset = metadata_grp.create_dataset("source_data_software_disp_version",
                                                                              data=np.bytes_("1.0"))
-        cal_disp_software_version_dset = metadata_grp.create_dataset("cal_disp_software_version", data=np.bytes_("0.1"))
-        venti_software_version_dset = metadata_grp.create_dataset("venti_software_version", data=np.bytes_("0.1"))
+        cal_disp_software_version_dset = metadata_grp.create_dataset(
+            "cal_disp_software_version",
+            data=np.bytes_("0.1.post1.dev10+g05e62def8.d20260415")
+        )
+        venti_software_version_dset = metadata_grp.create_dataset(
+            "venti_software_version", data=np.bytes_("0.0.post1.dev48+g0c56ff645.d20260415")
+        )
         product_pixel_coordinate_convention_dset = metadata_grp.create_dataset("product_pixel_coordinate_convention",
                                                                                data=np.bytes_("center"))
         ceos_atmospheric_phase_correction_dset = metadata_grp.create_dataset("ceos_atmospheric_phase_correction",
-                                                                             data=np.bytes_("none"))
+                                                                             data=np.bytes_("tropospheric"))
         ceos_gridding_convention_dset = metadata_grp.create_dataset("ceos_gridding_convention",
                                                                     data=np.bytes_("consistent"))
         ceos_product_measurement_projection_dset = metadata_grp.create_dataset("ceos_product_measurement_projection",
@@ -1450,3 +1461,9 @@ def create_test_cal_disp_metadata_product(file_path):
                                                                              data=np.bytes_("none"))
         ceos_noise_removal_dset = metadata_grp.create_dataset("ceos_noise_removal", data=np.bytes_("N"))
         pge_runconfig_dset = metadata_grp.create_dataset("pge_runconfig", data=np.bytes_(pge_runconfig_contents))
+
+        # TODO: Missing (in spec, not in product)
+        #   algorithm_theoretical_basis_document_doi
+        #   product_landing_page_doi
+        #   product_specification_document_id
+

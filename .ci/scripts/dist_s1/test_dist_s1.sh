@@ -53,7 +53,7 @@ DOCKER_RUN="docker run --rm \
     --entrypoint conda \
     ${IMAGE}:${TAG}"
 
-ENTRYPOINT="run --no-capture-output -n dist-s1-env ${CONDA_ROOT}/bin/pge_tests_entrypoint.sh"
+ENTRYPOINT="run --no-capture-output ${CONDA_ROOT}/bin/pge_tests_entrypoint.sh"
 
 # Configure a trap to set permissions on exit regardless of whether the testing succeeds
 function set_perms {

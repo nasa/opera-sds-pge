@@ -19,7 +19,7 @@ phase_linking:
     x: 15
     # Half window size (in pixels) for y direction.
     #   Type: integer.
-    y: 15
+    y: 40
   # Use EVD on the coherence instead of using the EMI algorithm.
   #   Type: boolean.
   use_evd: false
@@ -103,13 +103,13 @@ unwrap_options:
     # Number of tiles to split the inputs into using SNAPHU's internal tiling.
     #   Type: array.
     ntiles:
-      - 5
-      - 5
+      - 1
+      - 1
     # Amount of tile overlap (in pixels) along the (row, col) directions.
     #   Type: array.
     tile_overlap:
-      - 400
-      - 400
+      - 300
+      - 300
     # Number of tiles to unwrap in parallel for each interferogram.
     #   Type: integer.
     n_parallel_tiles: 5
@@ -219,6 +219,53 @@ unwrap_options:
       #   single batch.
       #   Type: integer.
       num_parallel_ifgs: 21
+  whirlwind_options:
+    # Threads for ww's internal rayon pool. ``None`` = let ww use whatever
+    #   ``WHIRLWIND_NUM_THREADS`` / ``RAYON_NUM_THREADS`` is set externally (e.g. via
+    #   SLURM/``taskset``), falling back to all CPUs. The pool is *shared* across the
+    #   ``n_parallel_jobs`` concurrent unwraps, so the effective per-IG share is ``num_threads /
+    #   n_parallel_jobs``.
+    #   Type: integer | null.
+    num_threads:
+    # Enable the spiral PS interpolation pre-pass: every valid pixel with coherence below
+    #   ``interp_cutoff`` is filled from nearby high-coherence pixels before unwrapping.
+    #   Type: boolean.
+    interpolate: false
+    # Coherence below which a valid pixel is interpolated.
+    #   Type: number.
+    interp_cutoff: 0.5
+    # Nearest high-coherence pixels averaged per interpolated pixel.
+    #   Type: integer.
+    interp_num_neighbors: 20
+    # Maximum search radius (pixels) for the spiral neighbor search.
+    #   Type: integer.
+    interp_max_radius: 51
+    # Minimum search radius (pixels); closer neighbors are skipped.
+    #   Type: integer.
+    interp_min_radius: 0
+    # Gaussian distance-weighting falloff for the neighbor average.
+    #   Type: number.
+    interp_alpha: 0.75
+    # Connected-component boundary threshold in raw cost units. Larger makes more boundaries and
+    #   smaller, safer components.
+    #   Type: integer.
+    cost_threshold: 50
+    # Set ``cost_threshold`` from a Gaussian-equivalent noise level (~3.5 reproduces the default
+    #   50). Higher is stricter (more boundaries). Takes precedence over ``cost_threshold`` and
+    #   ``conncomp_cycle_prob``.
+    #   Type: number | null.
+    conncomp_sigma:
+    # Set ``cost_threshold`` from a target per-edge one-cycle-correction probability (~2.4e-4
+    #   matches the default). Lower is stricter. Overridden by ``conncomp_sigma`` if both are
+    #   set.
+    #   Type: number | null.
+    conncomp_cycle_prob:
+    # Discard connected components smaller than this many pixels.
+    #   Type: integer.
+    min_size_px: 100
+    # Maximum number of connected components to keep (largest first).
+    #   Type: integer.
+    max_ncomps: 1024
 timeseries_options:
   # Whether to run the inversion step after unwrapping, if more than  a single-reference
   #   network is used.
@@ -247,19 +294,19 @@ timeseries_options:
     - 256
   # Number of parallel blocks to process at once.
   #   Type: integer.
-  num_parallel_blocks: 4
+  num_parallel_blocks: 8
 output_options:
   # Alternative to specifying output resolution: Specify the (x, y) strides (decimation
   #   factor) to perform while processing input. For example, strides of [4, 2] would turn an
   #   input resolution of [5, 10] into an output resolution of [20, 20].
   #   Type: object.
   strides:
-    x: 12
-    y: 12
+    x: 2
+    y: 16
   # Area of interest: [left, bottom, right, top] coordinates. e.g.
   #   `bbox=[-150.2,65.0,-150.1,65.5]`.
   #   Type: array | null.
-  bounds: 
+  bounds:
     - -156.26
     - 18.87
     - -154.71
@@ -325,7 +372,7 @@ browse_image_vmin_vmax:
 # When running forward mode, size of the interferogram network to form with the latest
 #   date. Valid choices are 3 (default) and 4.
 #   Type: integer.
-forward_mode_network_size: 3
+forward_mode_network_size: 4
 # Number of output products to create in parallel.
 #   Type: integer.
 num_parallel_products: 4

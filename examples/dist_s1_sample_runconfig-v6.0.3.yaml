@@ -1,4 +1,4 @@
-# Sample RunConfig for use with the DIST-S1 PGE v6.0.2
+# Sample RunConfig for use with the DIST-S1 PGE v6.0.3
 # This RunConfig should require minimal changes in order to be used with the
 # OPERA PCM.
 
@@ -73,7 +73,7 @@ RunConfig:
 
         # Path to the executable to run, path must be reachable from
         # within the Docker container (i.e. findable with a "which" command)
-        ProgramPath: /opt/conda/envs/dist-s1-env/bin/dist-s1
+        ProgramPath: /home/ops/dist-s1/.pixi/envs/default/bin/dist-s1
 
         # List of command-line options to use with ProgramPath
         ProgramOptions:

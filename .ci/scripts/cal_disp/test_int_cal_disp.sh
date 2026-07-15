@@ -28,9 +28,9 @@ SAMPLE_TIME=1
 # RUNCONFIG should be the name of the runconfig in s3://operasds-dev-pge/cal_disp/
 [ -z "${WORKSPACE}" ] && WORKSPACE=$(realpath "$(dirname "$(realpath "$0")")"/../../..)
 [ -z "${PGE_TAG}" ] && PGE_TAG="${USER}-dev"
-[ -z "${INPUT_DATA}" ] && INPUT_DATA="cal_disp_interface_0.1_expected_input.zip"
-[ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="cal_disp_interface_0.1_expected_output.zip"
-[ -z "${RUNCONFIG}" ] && RUNCONFIG="opera_pge_cal_disp_r1.0_interface_runconfig.yaml"
+[ -z "${INPUT_DATA}" ] && INPUT_DATA="cal_disp_beta_0.2_expected_input.zip"
+[ -z "${EXPECTED_DATA}" ] && EXPECTED_DATA="cal_disp_beta_0.2_expected_output.zip"
+[ -z "${RUNCONFIG}" ] && RUNCONFIG="opera_pge_cal_disp_r2.0_beta_runconfig.yaml"
 [ -z "${TMP_ROOT}" ] && TMP_ROOT="$DEFAULT_TMP_ROOT"
 
 # Create the test output directory in the work space
@@ -85,7 +85,7 @@ echo "Creating scratch directory $scratch_dir."
 mkdir -p --mode=777 "$scratch_dir"
 
 # Copy the Algorithm Parameters RunConfigs
-algo_runconfig="opera_pge_cal_disp_r1.0_interface_algorithm_parameters.yaml"
+algo_runconfig="opera_pge_cal_disp_r2.0_beta_algorithm_parameters.yaml"
 local_algo_runconfig="${SCRIPT_DIR}/${algo_runconfig}"
 echo "Copying algorithm parameters file $local_algo_runconfig to $runconfig_dir"
 cp ${local_algo_runconfig} ${runconfig_dir}

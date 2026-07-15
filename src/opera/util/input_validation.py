@@ -344,6 +344,9 @@ def validate_disp_inputs(runconfig, logger, name):
             if len(dyn_anc_file_group['gunw_files']) != len(input_file_group['gslc_file_list']) - 1:
                 msg = 'Number of GUNW files does not equal the number of GLSC files - 1'
                 logger.critical(name, ErrorCode.INVALID_INPUT, msg)
+        elif dyn_anc_file_group.get('ionosphere_algorithm_parameters_file', None) is None:
+            msg = 'No GUNW files and no ionosphere algorithm parameters file present. Must have one or the other'
+            logger.critical(name, ErrorCode.INVALID_INPUT, msg)
 
     if 'mask_file' in dyn_anc_file_group and dyn_anc_file_group['mask_file']:
         check_input(dyn_anc_file_group['mask_file'], logger, name,
@@ -547,20 +550,21 @@ def validate_cal_inputs(runconfig, logger, name):
             len(dyn_anc_file_group['tiles_files']) > 0):
         check_input_list(dyn_anc_file_group['tiles_files'], logger, name,check_zero_size=True)
 
-    if ('algorithm_parameters_overrides_json' in static_anc_file_group and
-            static_anc_file_group['algorithm_parameters_overrides_json'] is not None):
-        check_input(static_anc_file_group['algorithm_parameters_overrides_json'], logger, name,
-                    valid_extensions=('.json',), check_zero_size=True)
+    if static_anc_file_group is not None:
+        if ('algorithm_parameters_overrides_json' in static_anc_file_group and
+                static_anc_file_group['algorithm_parameters_overrides_json'] is not None):
+            check_input(static_anc_file_group['algorithm_parameters_overrides_json'], logger, name,
+                        valid_extensions=('.json',), check_zero_size=True)
 
-    if ('defo_area_db_json' in static_anc_file_group and
-            static_anc_file_group['defo_area_db_json'] is not None):
-        check_input(static_anc_file_group['defo_area_db_json'], logger,
-                    name, valid_extensions=('.json',), check_zero_size=True)
+        if ('defo_area_db_json' in static_anc_file_group and
+                static_anc_file_group['defo_area_db_json'] is not None):
+            check_input(static_anc_file_group['defo_area_db_json'], logger,
+                        name, valid_extensions=('.json',), check_zero_size=True)
 
-    if ('event_db_json' in static_anc_file_group and
-            static_anc_file_group['event_db_json'] is not None):
-        check_input(static_anc_file_group['event_db_json'], logger,
-                    name, valid_extensions=('.json',), check_zero_size=True)
+        if ('event_db_json' in static_anc_file_group and
+                static_anc_file_group['event_db_json'] is not None):
+            check_input(static_anc_file_group['event_db_json'], logger,
+                        name, valid_extensions=('.json',), check_zero_size=True)
 
 
 def validate_algorithm_parameters_config(name, algorithm_parameters_schema_file_path,
