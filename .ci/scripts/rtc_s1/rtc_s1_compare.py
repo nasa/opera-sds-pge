@@ -30,7 +30,8 @@ LIST_EXCLUDE_COMPARISON = \
      '//metadata/qa/geometricAccuracy/stddev/y',
      '//metadata/qa/geometricAccuracy/bias/y',
      '//identification/processingDateTime',
-     '//identification/productVersion'
+     '//identification/productVersion',
+     '//metadata/processingInformation/algorithms/softwareVersion',
      ]
 
 
@@ -50,6 +51,8 @@ LIST_EXCLUDE_COMPARISON_PRODUCT = \
      'QA_GEOMETRIC_ACCURACY_BIAS_Y',
      'QA_GEOMETRIC_ACCURACY_STDDEV_X',
      'QA_GEOMETRIC_ACCURACY_STDDEV_Y',
+     'PRODUCT_VERSION',
+     'SOFTWARE_VERSION',
      ]
 
 
