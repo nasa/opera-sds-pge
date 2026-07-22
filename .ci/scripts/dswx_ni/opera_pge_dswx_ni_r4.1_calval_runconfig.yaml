@@ -181,12 +181,11 @@ RunConfig:
             glad_classification_file: /home/dswx_user/input_dir/ancillary/glad.tif
             glad_classification_file_description: GLAD Global Land Cover 2020
 
-            # placeholders for inundated vegetation
-            mean_backscattering: null
-            standard_deviation_backscattering: null
+            shoreline_shapefile:
+            shoreline_shapefile_description:
 
             # Separate runconfig file for algorithm parameters
-            algorithm_parameters: /home/dswx_user/runconfig/opera_pge_dswx_ni_r4_calval_algorithm_parameters.yaml
+            algorithm_parameters: /home/dswx_user/runconfig/opera_pge_dswx_ni_r4.1_calval_algorithm_parameters.yaml
 
           static_ancillary_file_group:
             static_ancillary_inputs_flag: true
@@ -195,7 +194,7 @@ RunConfig:
             mgrs_database_file: /home/dswx_user/input_dir/ancillary/MGRS_tile.sqlite
 
             # MGRS collection database sqlite file
-            mgrs_collection_database_file: /home/dswx_user/input_dir/ancillary/DSWx-NI_MGRS_collection_DB_0.4.sqlite
+            mgrs_collection_database_file: /home/dswx_user/input_dir/ancillary/DSWx-NI_MGRS_collection_DB_0.5.sqlite
 
           primary_executable:
             product_type: dswx_ni
@@ -215,6 +214,10 @@ RunConfig:
 
             # DSWx-NI product format
             output_imagery_format: 'COG'
+
+            output_imagery_compression: DEFLATE
+            output_imagery_nbits: 32
+            output_spacing: 30
 
           browse_image_group:
             # Save a full-res Cloud-Optimized GEOTIFF DSWx-NI browse image and

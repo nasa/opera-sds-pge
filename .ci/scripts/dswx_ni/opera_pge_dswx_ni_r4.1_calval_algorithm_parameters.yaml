@@ -103,7 +103,7 @@ runconfig:
             # using the statics of the rtc image. If the values are out of the given range,
             # adopt these values instead of the computed values
             threshold_bounds:
-                co_pol: [-28, -15]
+                co_pol: [-28, -13]
                 cross_pol: [-28, -18]
             # Flag to assume the trimodal distribution.
             # If flag is false, the distribution is assumed to have bimodal distribution and
@@ -217,11 +217,20 @@ runconfig:
             dual_pol_ratio_max: 12
             dual_pol_ratio_min: 1
             dual_pol_ratio_threshold: 8.2
+
+            tree_dual_pol_ratio_threshold: 8.0
+            tree_cross_pol_min: -13.0
+            tree_copol_threshold: -10.0
+
+            short_vegetation_dual_pol_ratio_threshold: 8.5
+            short_vegetation_cross_pol_min: -14.0
+            short_vegetation_copol_threshold: -12.0
+
             cross_pol_min: -18
             line_per_block: 5300
             target_area_file_type: 'auto'
             target_worldcover_class: ['Herbaceous wetland', 'Tree Cover', 'Shrubs', 'Grassland', 'Mangrove', 'Moss and lichen', 'Crop']
-            target_glad_class: ['200-207', '125-148'] #, '123-124'] #, '200-207', '125-148']
+            target_glad_class: ['200-207', '125-148', '123-124'] #, '200-207', '125-148']
             fuzzy_refinement:
                 enabled: False
 
@@ -256,7 +265,11 @@ runconfig:
 
                 # Block size for IV fuzzy computation.
                 line_per_block: 300
-
+                water_connectivity:
+                    enabled: true
+                    dz_max: 20.0
+                    max_distance_pixels: 150
+                    connectivity: 8
             filter:
                 enabled: True
                 method: lee
@@ -275,4 +288,3 @@ runconfig:
 
         # debug mode is true, intermediate product is generated.
         debug_mode: False
-
