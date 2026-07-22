@@ -76,7 +76,7 @@ ABSOLUTE_ORBIT_NUMBER:
 FRAME_NUMBER:
   attribute_data_type: string
   attribute_type: processingInformation
-  description: FRAME_NUMBER
+  description: List of frame numbers of NISAR GCOVs
   display_name: FrameNumber
 INPUT_DEM_SOURCE:
   attribute_data_type: string
@@ -115,12 +115,7 @@ INPUT_WORLDCOVER_SOURCE:
 LOOK_DIRECTION:
   attribute_data_type: string
   attribute_type: processingInformation
-  description: LOOK_DIRECTION
-MGRS_COLLECTION_ACQUIRED_SLC_GRANULES:
-  attribute_data_type: string
-  attribute_type: processingInformation
-  description: "MGRS collection acquired SLC granules"
-  display_name: MGRSCollectionAcquiredSLCGranules
+  description: Look direction (e.g. left or right) of NISAR GCOV
 MGRS_COLLECTION_ACTUAL_NUMBER_OF_FRAMES:
   attribute_data_type: int
   attribute_type: processingInformation
@@ -254,7 +249,7 @@ PROCESSING_INFORMATION_REGION_GROWING_RELAXED_THRESHOLD:
 PROCESSING_INFORMATION_THRESHOLDING:
   attribute_data_type: string
   attribute_type: processingInformation
-  description: initial thresholding algorithm, either "Kittler-Illingworth" or "OTSU"
+  description: Initial thresholding algorithm, either "Kittler-Illingworth" or "OTSU"
 PROCESSING_INFORMATION_THRESHOLD_BIMODALITY:
   attribute_data_type: float
   attribute_type: processingInformation
@@ -270,7 +265,7 @@ PROCESSING_INFORMATION_THRESHOLD_MULTI_THRESHOLD:
 PROCESSING_INFORMATION_THRESHOLD_TILE_AVERAGE:
   attribute_data_type: boolean
   attribute_type: processingInformation
-  description: indicates whether averaging of thresholds within a tile is enabled or not.
+  description: Indicates whether averaging of thresholds within a tile is enabled or not.
 PROCESSING_INFORMATION_THRESHOLD_TILE_SELECTION:
   attribute_data_type: string
   attribute_type: processingInformation
@@ -279,10 +274,6 @@ PROCESSING_INFORMATION_THRESHOLD_TWELE:
   attribute_data_type: string
   attribute_type: processingInformation
   description: Threshold value for tile selection using the 'twele' method
-PRODUCT_VERSION:
-  attribute_data_type: string
-  attribute_type: processingInformation
-  description: PRODUCT_VERSION
 TRACK_NUMBER:
   attribute_data_type: string
   attribute_type: processingInformation
@@ -290,7 +281,7 @@ TRACK_NUMBER:
 ZERO_DOPPLER_END_TIME:
   attribute_data_type: string
   attribute_type: processingInformation
-  description: 'Sensing start time. Earliest acquisition time of NISAR GCOV set. Format: YYYY-MM-DDTHH:MM:SSZ'
+  description: 'Sensing end time. Latest acquisition time of NISAR GCOV set. Format: YYYY-MM-DDTHH:MM:SSZ'
 ZERO_DOPPLER_START_TIME:
   attribute_data_type: string
   attribute_type: processingInformation
@@ -302,15 +293,15 @@ RFI_FRAMES_COUNT:
 GCOV_PRODUCT_VERSION:
   attribute_data_type: string
   attribute_type: processingInformation
-  description: "GCOV Product Version"
+  description: The version of NISAR GCOV algorithm used for GCOV products. Copied directly from NISAR GCOV metadata.
   display_name: GCOVProductVersion
 INPUT_LIST:
   attribute_data_type: string
   attribute_type: processingInformation
-  description: "Input GCOV list"
+  description: List of input NISAR GCOV files
   display_name: InputList
 QA_RFI_INFO_AVAILABLE:
   attribute_data_type: boolean
   attribute_type: qualityInformation
-  description: "QA RFI Info Available"
+  description: A flag to indicate whether RFI information is available in the source data.
   display_name: QaRFIInfoAvailable
