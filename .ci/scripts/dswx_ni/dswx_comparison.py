@@ -23,7 +23,7 @@ COMPARISON_EXCEPTION_LIST = ['PROCESSING_DATETIME',
                              'DSWX_PRODUCT_VERSION',]
 
 BAND_SPECIFIC_TOLERANCES = {
-        4: 1.1
+        4: 1.1  # DIAG layer: ADT suggested differences of one were acceptable, at least for now
 }
 FILENAME_BAND_FIELD_INDEX = 9
 
