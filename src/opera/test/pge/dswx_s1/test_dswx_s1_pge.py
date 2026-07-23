@@ -868,7 +868,7 @@ class DswxS1PgeTestCase(unittest.TestCase):
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
 
-            self.assertIn("Invalid SAS output file, wrong number of bands,",
+            self.assertIn("Invalid SAS output file, wrong set of bands,",
                           log_contents)
 
             # Test for missing or extra band files

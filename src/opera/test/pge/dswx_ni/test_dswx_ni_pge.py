@@ -378,7 +378,7 @@ class DswxNIPgeTestCase(unittest.TestCase):
             with open(expected_log_file, 'r', encoding='utf-8') as infile:
                 log_contents = infile.read()
 
-            self.assertIn("Invalid SAS output file, wrong number of bands,",
+            self.assertIn("Invalid SAS output file, wrong set of bands,",
                           log_contents)
 
             # Test for missing or extra band files
@@ -786,6 +786,29 @@ class DswxNIPgeTestCase(unittest.TestCase):
             with self.assertRaises(RuntimeError):
                 pge.run()
 
+        finally:
+            if os.path.exists(test_runconfig_path):
+                os.unlink(test_runconfig_path)
+
+    def test_optional_browse_tiff(self):
+        """Test that missing BROWSE.tif is not treated as an error"""
+        runconfig_path = join(self.data_dir, 'test_dswx_ni_config.yaml')
+        test_runconfig_path = join(self.data_dir, 'test_mod_dswx_ni_config.yaml')
+
+        with open(runconfig_path, 'r', encoding='utf-8') as infile:
+            runconfig_dict = yaml.safe_load(infile)
+
+        runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']['ProgramOptions'] = [
+            opt for opt in runconfig_dict['RunConfig']['Groups']['PGE']['PrimaryExecutable']['ProgramOptions'] if
+            '_BROWSE.tif' not in opt
+        ]
+
+        with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+            yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+
+        try:
+            pge = DSWxNIExecutor(pge_name="DswxNIPgeTest", runconfig_path=test_runconfig_path)
+            pge.run()
         finally:
             if os.path.exists(test_runconfig_path):
                 os.unlink(test_runconfig_path)
