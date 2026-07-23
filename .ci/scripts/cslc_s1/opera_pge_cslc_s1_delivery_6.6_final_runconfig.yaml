@@ -1,5 +1,5 @@
 RunConfig:
-    Name: OPERA-CSLC-S1-STATIC-PGE-INT-TEST-CONFIG
+    Name: OPERA-CSLC-S1-PGE-INT-TEST-CONFIG
 
     Groups:
         PGE:
@@ -8,14 +8,14 @@ RunConfig:
 
             InputFilesGroup:
                 InputFilePaths:
-                    - /home/compass_user/input_dir/S1A_IW_SLC__1SDV_20220501T015035_20220501T015102_043011_0522A4_42CC.zip
-                    - /home/compass_user/input_dir/S1A_OPER_AUX_POEORB_OPOD_20220521T081912_V20220430T225942_20220502T005942.EOF
+                    - /home/compass_user/input_dir/S1D_IW_SLC__1SDV_20260710T014944_20260710T015011_003605_0066A5_ABDE.zip
+                    - /home/compass_user/input_dir/S1D_OPER_AUX_RESORB_OPOD_20260710T035544_V20260710T000148_20260710T033318.EOF
 
             DynamicAncillaryFilesGroup:
                 AncillaryFileMap:
                     dem_file: /home/compass_user/input_dir/dem_4326.tiff
 
-                    tec_file: /home/compass_user/input_dir/jplg1210.22i
+                    tec_file: /home/compass_user/input_dir/JPL0OPSFIN_20261910000_01D_02H_GIM.INX
 
                     burst_database_file: /home/compass_user/input_dir/burst_db_0.2.0_230831-bbox-only.sqlite
 
@@ -43,13 +43,13 @@ RunConfig:
 
                 IsoTemplatePath: /home/compass_user/opera/pge/cslc_s1/templates/OPERA_ISO_metadata_L2_CSLC_S1_template.xml.jinja2
 
-                IsoMeasuredParameterDescriptions: /home/compass_user/opera/pge/cslc_s1/templates/cslc_s1_static_measured_parameters.yaml
+                IsoMeasuredParameterDescriptions: /home/compass_user/opera/pge/cslc_s1/templates/cslc_s1_measured_parameters.yaml
 
                 DataValidityStartDate: 20140403
 
             QAExecutable:
                 Enabled: True
-                ProgramPath: /home/compass_user/opera/.ci/scripts/cslc_s1/compare_cslc_s1_static_products.sh
+                ProgramPath: /home/compass_user/opera/.ci/scripts/cslc_s1/compare_cslc_s1_products.sh
                 ProgramOptions: []
 
             DebugLevelGroup:
@@ -67,9 +67,9 @@ RunConfig:
 
                     input_file_group:
                         safe_file_path:
-                            - /home/compass_user/input_dir/S1A_IW_SLC__1SDV_20220501T015035_20220501T015102_043011_0522A4_42CC.zip
+                            - /home/compass_user/input_dir/S1D_IW_SLC__1SDV_20260710T014944_20260710T015011_003605_0066A5_ABDE.zip
                         orbit_file_path:
-                            - /home/compass_user/input_dir/S1A_OPER_AUX_POEORB_OPOD_20220521T081912_V20220430T225942_20220502T005942.EOF
+                            - /home/compass_user/input_dir/S1D_OPER_AUX_RESORB_OPOD_20260710T035544_V20260710T000148_20260710T033318.EOF
                         burst_id:
                             - t064_135518_iw1
                             - t064_135519_iw1
@@ -84,7 +84,7 @@ RunConfig:
 
                     dynamic_ancillary_file_group:
                         dem_file: /home/compass_user/input_dir/dem_4326.tiff
-                        tec_file: /home/compass_user/input_dir/jplg1210.22i
+                        tec_file: /home/compass_user/input_dir/JPL0OPSFIN_20261910000_01D_02H_GIM.INX
 
                     static_ancillary_file_group:
                         burst_database_file: /home/compass_user/input_dir/burst_db_0.2.0_230831-bbox-only.sqlite
@@ -98,8 +98,10 @@ RunConfig:
 
                         product_version: "1.0"
 
+                        product_specification_version: 0.1.7
+
                     primary_executable:
-                        product_type: CSLC_S1_STATIC
+                        product_type: CSLC_S1
 
                     processing:
                         polarization: co-pol
@@ -111,3 +113,7 @@ RunConfig:
                             lines_per_block: 1000
                             threshold: 1.0e-8
                             numiter: 25
+                        worker:
+                            internet_access: False
+                            gpu_enabled: False
+                            gpu_id: 0
