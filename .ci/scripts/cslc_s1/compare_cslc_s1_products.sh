@@ -53,8 +53,8 @@ for burst_id in "${burst_ids[@]}"; do
     echo "Comparing results for burst id ${burst_id}"
 
     # The same test cases are always used so the name can be hard-coded
-    ref_product="${expected_output_dir}/${burst_id}/20220501/${burst_id}_20220501.h5"
-    sec_product="$OUTPUT_DIR/${burst_id}/20220501/${burst_id}_20220501.h5"
+    ref_product="${expected_output_dir}/${burst_id}/20260710/${burst_id}_20260710.h5"
+    sec_product="$OUTPUT_DIR/${burst_id}/20260710/${burst_id}_20260710.h5"
 
     compare_out=$("${SCRIPT_DIR}"/cslc_s1_compare.py --ref-product ${ref_product} --sec-product ${sec_product} -p CSLC 2>&1) || compare_exit_status=$?
 
