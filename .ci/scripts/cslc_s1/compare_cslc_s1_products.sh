@@ -34,7 +34,7 @@ fi
 initialize_html_results_file "$OUTPUT_DIR" "$PGE_NAME"
 echo "<tr><th>Compare Result</th><th><ul><li>Output file</li><li>Expected file</li></ul></th><th>cslc_s1_compare.py output</th></tr>" >> "$RESULTS_FILE"
 
-declare -a burst_ids=("t064_135518_iw1"
+declare -a burst_ids=("t064_135518_iw2"
                       "t064_135519_iw1"
                       "t064_135520_iw1"
                       "t064_135521_iw1"

@@ -71,7 +71,7 @@ RunConfig:
                         orbit_file_path:
                             - /home/compass_user/input_dir/S1D_OPER_AUX_RESORB_OPOD_20260710T035544_V20260710T000148_20260710T033318.EOF
                         burst_id:
-                            - t064_135518_iw1
+                            - t064_135518_iw2
                             - t064_135519_iw1
                             - t064_135520_iw1
                             - t064_135521_iw1
