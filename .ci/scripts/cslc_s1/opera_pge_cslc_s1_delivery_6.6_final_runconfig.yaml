@@ -113,7 +113,8 @@ RunConfig:
                             lines_per_block: 1000
                             threshold: 1.0e-8
                             numiter: 25
-                        worker:
-                            internet_access: False
-                            gpu_enabled: False
-                            gpu_id: 0
+
+                    worker:
+                        internet_access: False
+                        gpu_enabled: False
+                        gpu_id: 0
