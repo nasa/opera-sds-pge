@@ -64,11 +64,11 @@ for burst_id in "${burst_ids[@]}"; do
         echo "Failure: All CSLC metadata checks DID NOT PASS"
         static_layers_compare_result="FAIL"
         overall_status=2
-    elif [[ "$compare_out" != *"ERROR reference static_layers product not found"* ]]; then
+    elif [[ "$compare_out" == *"ERROR reference static_layers product not found"* ]]; then
         echo "Failure: Product not found"
         static_layers_compare_result="FAIL"
         overall_status=2
-    elif [[ "$compare_out" != *"ERROR reference CSLC metadata not found"* ]]; then
+    elif [[ "$compare_out" == *"ERROR reference CSLC metadata not found"* ]]; then
         echo "Failure: Product not found"
         static_layers_compare_result="FAIL"
         overall_status=2
