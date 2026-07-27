@@ -34,7 +34,7 @@ fi
 initialize_html_results_file "$OUTPUT_DIR" "$PGE_NAME"
 echo "<tr><th>Compare Result</th><th><ul><li>Output file</li><li>Expected file</li></ul></th><th>cslc_s1_compare.py output</th></tr>" >> "$RESULTS_FILE"
 
-declare -a burst_ids=("t064_135518_iw1"
+declare -a burst_ids=("t064_135518_iw2"
                       "t064_135519_iw1"
                       "t064_135520_iw1"
                       "t064_135521_iw1"
@@ -53,8 +53,8 @@ for burst_id in "${burst_ids[@]}"; do
     echo "Comparing results for burst id ${burst_id}"
 
     # The same test cases are always used so the name can be hard-coded
-    ref_product="${expected_output_dir}/${burst_id}/20220501/${burst_id}_20220501.h5"
-    sec_product="$OUTPUT_DIR/${burst_id}/20220501/${burst_id}_20220501.h5"
+    ref_product="${expected_output_dir}/${burst_id}/20260710/${burst_id}_20260710.h5"
+    sec_product="$OUTPUT_DIR/${burst_id}/20260710/${burst_id}_20260710.h5"
 
     compare_out=$("${SCRIPT_DIR}"/cslc_s1_compare.py --ref-product ${ref_product} --sec-product ${sec_product} -p CSLC 2>&1) || compare_exit_status=$?
 
@@ -65,6 +65,14 @@ for burst_id in "${burst_ids[@]}"; do
         overall_status=2
     elif [[ "$compare_out" != *"All CSLC metadata checks have passed"* ]]; then
         echo "Failure: All CSLC metadata checks DID NOT PASS"
+        cslc_compare_result="FAIL"
+        overall_status=2
+    elif [[ "$compare_out" == *"CSLC product not found"* ]]; then
+        echo "Failure: Product not found"
+        cslc_compare_result="FAIL"
+        overall_status=2
+    elif [[ "$compare_out" == *"CSLC metadata not found"* ]]; then
+        echo "Failure: Product not found"
         cslc_compare_result="FAIL"
         overall_status=2
     else
