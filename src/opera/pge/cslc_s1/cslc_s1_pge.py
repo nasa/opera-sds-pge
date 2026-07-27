@@ -871,7 +871,7 @@ class CslcS1Executor(CslcS1PreProcessorMixin, CslcS1PostProcessorMixin, PgeExecu
     LEVEL = "L2"
     """Processing Level for CSLC-S1 Products"""
 
-    PGE_VERSION = "2.1.3"
+    PGE_VERSION = "2.1.4"
     """Version of the PGE (overrides default from base_pge)"""
 
     SAS_VERSION = "0.5.7"  # Final release https://github.com/opera-adt/COMPASS/releases/tag/v0.5.7
