@@ -249,3 +249,6 @@ RunConfig:
       # Path to the output log file in addition to logging to stderr.
       #   Type: string.
       log_file: /home/mamba/output_dir/sas_logfile.log
+      # Run pre-checks on inputs
+      #   Type: boolean
+      run_input_prechecks: true
