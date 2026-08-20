@@ -100,3 +100,4 @@ RunConfig:
                     - 512
 
             log_file: disp_s1_pge_test/output_dir/pge_logfile.log
+            run_input_prechecks: true
