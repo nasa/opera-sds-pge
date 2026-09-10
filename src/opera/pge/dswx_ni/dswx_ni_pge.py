@@ -187,6 +187,10 @@ class DSWxNIPostProcessorMixin(DSWxS1PostProcessorMixin):
         """
         output_product_metadata = {}
 
+        # Get the Military Grid Reference System (MGRS) tile code and zone
+        # identifier from the intermediate file name
+        mgrs_tile_id = basename(geotiff_product).split('_')[3]
+
         # Extract all metadata assigned by the SAS at product creation time
         try:
             measured_parameters = get_geotiff_metadata(geotiff_product)
@@ -196,6 +200,9 @@ class DSWxNIPostProcessorMixin(DSWxS1PostProcessorMixin):
             if measured_parameters['RFI_FRAMES_COUNT'].lower() == 'none':
                 measured_parameters['RFI_FRAMES_COUNT'] = '0'
 
+            # Inject the tile ID into the product metadata. Hopefully the SAS will include this in the future
+            measured_parameters['MGRS_TILE_ID'] = mgrs_tile_id
+
             output_product_metadata['MeasuredParameters'] = augment_measured_parameters(
                 measured_parameters,
                 self.runconfig.iso_measured_parameter_descriptions,
@@ -204,10 +211,6 @@ class DSWxNIPostProcessorMixin(DSWxS1PostProcessorMixin):
         except Exception as err:
             msg = f'Failed to extract metadata from {geotiff_product}, reason: {err}'
             self.logger.critical(self.name, ErrorCode.ISO_METADATA_COULD_NOT_EXTRACT_METADATA, msg)
-
-        # Get the Military Grid Reference System (MGRS) tile code and zone
-        # identifier from the intermediate file name
-        mgrs_tile_id = basename(geotiff_product).split('_')[3]
 
         output_product_metadata['tileCode'] = mgrs_tile_id
         output_product_metadata['zoneIdentifier'] = mgrs_tile_id[:2]
