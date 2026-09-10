@@ -29,6 +29,8 @@ runconfig:
         hand:
             mask_value: 200
 
+        ancillary_warp_num_threads: 16
+
         ocean_mask:
             # Flag to apply ocean mask
             mask_enabled: False
