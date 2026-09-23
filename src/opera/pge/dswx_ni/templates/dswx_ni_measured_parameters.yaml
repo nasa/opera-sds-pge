@@ -305,3 +305,8 @@ QA_RFI_INFO_AVAILABLE:
   attribute_type: qualityInformation
   description: A flag to indicate whether RFI information is available in the source data.
   display_name: QaRFIInfoAvailable
+MGRS_TILE_ID:
+  attribute_data_type: string
+  attribute_type: processingInformation
+  description: The Military Grid Reference System (MGRS) tile code and zone identifier for this product.
+  display_name: MGRSTileID

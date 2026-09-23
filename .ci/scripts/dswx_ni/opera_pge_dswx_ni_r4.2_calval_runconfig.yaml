@@ -185,7 +185,7 @@ RunConfig:
             shoreline_shapefile_description:
 
             # Separate runconfig file for algorithm parameters
-            algorithm_parameters: /home/dswx_user/runconfig/opera_pge_dswx_ni_r4.1_calval_algorithm_parameters.yaml
+            algorithm_parameters: /home/dswx_user/runconfig/opera_pge_dswx_ni_r4.2_calval_algorithm_parameters.yaml
 
           static_ancillary_file_group:
             static_ancillary_inputs_flag: true
@@ -209,8 +209,7 @@ RunConfig:
             # SAS writes the output product(s) to the following file
             sas_output_path: /home/dswx_user/output_dir
 
-            # TODO: this should become a string once SAS schema is fixed
-            product_version: 0.4
+            product_version: "0.4"
 
             # DSWx-NI product format
             output_imagery_format: 'COG'

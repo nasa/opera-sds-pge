@@ -218,8 +218,7 @@ RunConfig:
             # SAS writes the output product(s) to the following file
             sas_output_path: /home/dswx_user/output_dir
 
-            # TODO: this should become a string once SAS schema is fixed
-            product_version: 0.4
+            product_version: "0.4"
 
             # DSWx-NI product format
             output_imagery_format: 'COG'
