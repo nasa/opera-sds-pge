@@ -16,8 +16,8 @@ RunConfig:
         # List of input files/directories
         # Must be a list of the input HDF5 GCOV NISAR products
         InputFilePaths:
-          - /home/dswx_user/input_dir/gcov/NISAR_L2_PR_GCOV_016_105_A_017_4005_DHDH_A_20260329T111909_20260329T111944_X05013_N_F_J_001.h5
-          - /home/dswx_user/input_dir/gcov/NISAR_L2_PR_GCOV_016_105_A_018_4005_DHDH_A_20260329T111943_20260329T112018_X05013_N_F_J_001.h5
+          - /home/dswx_user/input_dir/gcov/NISAR_L2_PR_GCOV_028_105_A_017_4005_DHDH_A_20260820T111903_20260820T111938_P05023_N_F_J_001.h5
+          - /home/dswx_user/input_dir/gcov/NISAR_L2_PR_GCOV_028_105_A_018_4005_DHDH_A_20260820T111937_20260820T112011_P05023_N_F_J_001.h5
 
       DynamicAncillaryFilesGroup:
         # Map of ancillary file types to paths to the file
@@ -144,10 +144,8 @@ RunConfig:
 
           input_file_group:
             input_file_path:
-              - /home/dswx_user/input_dir/gcov/NISAR_L2_PR_GCOV_016_105_A_017_4005_DHDH_A_20260329T111909_20260329T111944_X05013_N_F_J_001.h5
-              - /home/dswx_user/input_dir/gcov/NISAR_L2_PR_GCOV_016_105_A_018_4005_DHDH_A_20260329T111943_20260329T112018_X05013_N_F_J_001.h5
-
-            input_layover_shadow_file_path:
+              - /home/dswx_user/input_dir/gcov/NISAR_L2_PR_GCOV_028_105_A_017_4005_DHDH_A_20260820T111903_20260820T111938_P05023_N_F_J_001.h5
+              - /home/dswx_user/input_dir/gcov/NISAR_L2_PR_GCOV_028_105_A_018_4005_DHDH_A_20260820T111937_20260820T112011_P05023_N_F_J_001.h5
 
             # Specify the MGRS tile collection ID
             input_mgrs_collection_id: MS_105_18
@@ -185,7 +183,7 @@ RunConfig:
             shoreline_shapefile_description:
 
             # Separate runconfig file for algorithm parameters
-            algorithm_parameters: /home/dswx_user/runconfig/opera_pge_dswx_ni_r4.2_calval_algorithm_parameters.yaml
+            algorithm_parameters: /home/dswx_user/runconfig/opera_pge_dswx_ni_r5_final_algorithm_parameters.yaml
 
           static_ancillary_file_group:
             static_ancillary_inputs_flag: true
@@ -209,9 +207,9 @@ RunConfig:
             # SAS writes the output product(s) to the following file
             sas_output_path: /home/dswx_user/output_dir
 
-            product_version: "0.4"
+            product_version: "1.0"
 
-            # DSWx-NI product format
+            # DSWx-NI product format & options
             output_imagery_format: 'COG'
 
             output_imagery_compression: DEFLATE
