@@ -66,11 +66,12 @@ class DswxNIPgeTestCase(unittest.TestCase):
         # Copy the algorithm_parameters config file into the test input directory.
         shutil.copy(join(self.data_dir, 'test_dswx_ni_algorithm_parameters.yaml'), input_dir)
 
-        # Create the input dir expected by the test RunConfig and add a
-        # dummy input file
-        self.input_file = tempfile.NamedTemporaryFile(
-            dir=input_dir, prefix="test_input_", suffix=".h5"
-        )
+        # Create a set of dummy input GCOVs
+        for dummy_gcov in (
+            'NISAR_L2_PR_GCOV_028_105_A_017_4005_DHDH_A_20260820T111903_20260820T111938_P05023_N_F_J_001.h5',
+            'NISAR_L2_PR_GCOV_028_105_A_018_4005_DHDH_A_20260820T111937_20260820T112011_P05023_N_F_J_001.h5'
+        ):
+            open(join(input_dir, dummy_gcov), 'w').close()
 
         # Create dummy versions of the expected ancillary inputs
         for ancillary_file in ('dem.tif', 'worldcover.tif', 'glad_classification.tif',
@@ -90,7 +91,6 @@ class DswxNIPgeTestCase(unittest.TestCase):
     def tearDown(self) -> None:
         """Return to starting directory"""
         os.chdir(self.test_dir)
-        self.input_file.close()
         self.working_dir.cleanup()
 
     def generate_band_data_output(self, band_data, empty_file=False, clear=True):
