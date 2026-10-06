@@ -54,7 +54,9 @@ overall_status=0
 #  There is only 1 expected output directory DSWX-NI
 
 input_data_basename=$(basename -- "$INPUT_DATA")
-input_data_dir="${TMP_DIR}/${input_data_basename%.*}/input_dir"
+input_data_dir="${TMP_DIR}/${input_data_basename%.*}/input"
+# Note: Normally the above dir is named "input_dir" but I forgot to rename it (ADT distributes it as "input") and
+#  don't have time to recreate the archive
 
 expected_data_basename=$(basename -- "$EXPECTED_DATA")
 
