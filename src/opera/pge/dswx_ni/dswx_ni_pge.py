@@ -380,7 +380,7 @@ class DSWxNIExecutor(DSWxNIPreProcessorMixin, DSWxNIPostProcessorMixin, PgeExecu
     LEVEL = "L3"
     """Processing Level for DSWx-NI Products"""
 
-    PGE_VERSION = "4.0.0-rc.4.0"
+    PGE_VERSION = "4.0.0"
     """Version of the PGE"""
 
     SAS_VERSION = "1.0"  # Final release https://github.com/opera-adt/DSWX-SAR/tree/dswx-ni-final
