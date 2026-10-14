@@ -51,6 +51,14 @@ phase_linking:
   #   Type: string.
   #   Options: ['always_first', 'first_per_ministack', 'last_per_ministack'].
   compressed_slc_plan: last_per_ministack
+  # Write out (and stitch, if processing multiple geocoded bursts) rasters containing the
+  #   Cramer-Rao Lower Bound (CRLB) estimates.
+  #   Type: boolean.
+  write_crlb: false
+  # Write out (and stitch, if processing multiple geocoded bursts) rasters containing the
+  #   sequential closure phase from the nearest-3 triplets in the coherence matrix.
+  #   Type: boolean.
+  write_closure_phase: false
 interferogram_network:
   # For single-reference network: Index of the reference image in the network.
   #   Type: integer | null.
@@ -99,6 +107,12 @@ unwrap_options:
     #   value are replaced by a weighted combination of neighboring pixels.
     #   Type: number.
     interpolation_similarity_threshold: 0.4
+    # (for interpolation) Set the pixels where we have masked + interpolated data to have 0
+    #   correlation for the unwrapper. If False, the interpolated pixels keep their old
+    #   correlation. If True, the behavior can be unwrapper dependent (the unwrapper may choose
+    #   to skip over these pixels when solving).
+    #   Type: boolean.
+    zero_correlation_where_interpolating: false
   snaphu_options:
     # Number of tiles to split the inputs into using SNAPHU's internal tiling.
     #   Type: array.
@@ -219,6 +233,86 @@ unwrap_options:
       #   single batch.
       #   Type: integer.
       num_parallel_ifgs: 21
+  whirlwind_options:
+    # Threads for ww's internal rayon pool. ``None`` = let ww use whatever
+    #   ``WHIRLWIND_NUM_THREADS`` / ``RAYON_NUM_THREADS`` is set externally (e.g. via
+    #   SLURM/``taskset``), falling back to all CPUs. The pool is *shared* across the
+    #   ``n_parallel_jobs`` concurrent unwraps, so the effective per-IG share is ``num_threads /
+    #   n_parallel_jobs``.
+    #   Type: integer | null.
+    num_threads:
+    # Enable the spiral PS interpolation pre-pass: every valid pixel with coherence below
+    #   ``interp_cutoff`` is filled from nearby high-coherence pixels before unwrapping.
+    #   Type: boolean.
+    interpolate: false
+    # Coherence below which a valid pixel is interpolated.
+    #   Type: number.
+    interp_cutoff: 0.5
+    # Nearest high-coherence pixels averaged per interpolated pixel.
+    #   Type: integer.
+    interp_num_neighbors: 20
+    # Maximum search radius (pixels) for the spiral neighbor search.
+    #   Type: integer.
+    interp_max_radius: 51
+    # Minimum search radius (pixels); closer neighbors are skipped.
+    #   Type: integer.
+    interp_min_radius: 0
+    # Gaussian distance-weighting falloff for the neighbor average.
+    #   Type: number.
+    interp_alpha: 0.75
+    # Label pixels below this coherence as background. ``None`` (the default) disables the floor
+    #   and uses ``conncomp_reliability``; ``'auto'`` uses ww's looks-aware floor; a float in
+    #   [0, 1] sets it explicitly.
+    #   Type: number | string | null.
+    conncomp_min_coherence:
+    # Conservativeness of the component grow, in inverse-variance (``1 / sigma2``) units: an
+    #   edge becomes a component boundary when a one-cycle ambiguity flip across it costs no
+    #   more than this. The default 0.5 is about a coherence-0.1 floor, dropping decorrelated
+    #   water and near-noise while keeping real low-coherence land. 0 labels nearly every
+    #   unwrapped pixel. Used only when ``conncomp_min_coherence`` is ``None``.
+    #   Type: number.
+    conncomp_reliability: 0.5
+    # Unused. Component-boundary threshold, in raw cost units, for ww's legacy coherence-cost
+    #   labeling, which dolphin does not use.
+    #   Type: integer.
+    cost_threshold: 50
+    # Unused. Sets ``cost_threshold`` from a Gaussian-equivalent noise level, for ww's legacy
+    #   coherence-cost labeling.
+    #   Type: number | null.
+    conncomp_sigma:
+    # Unused. Sets ``cost_threshold`` from a target per-edge one-cycle-correction probability,
+    #   for ww's legacy coherence-cost labeling.
+    #   Type: number | null.
+    conncomp_cycle_prob:
+    # Discard connected components smaller than this many pixels.
+    #   Type: integer.
+    min_size_px: 100
+    # Maximum number of connected components to keep (largest first).
+    #   Type: integer.
+    max_ncomps: 1024
+    # Bridge disjoint connected components across low-coherence gaps so they share a consistent
+    #   integer cycle. Disable to keep components fully independent.
+    #   Type: boolean.
+    bridge: true
+    # Draw phase paths across bounded runs of invalid pixels before unwrapping, then drop those
+    #   synthetic pixels from both outputs. The paths let the solver pick a relative 2pi level
+    #   between regions that would otherwise be solved independently, which is what levels the
+    #   NISAR sub-swaths. Unlike ``interpolate``, it extrapolates the phase slope on each side
+    #   of a gap, so a winding estimate survives the crossing.
+    #   Type: boolean.
+    connect_gaps: false
+    # Widest run of invalid pixels, in pixels, that ``connect_gaps`` will cross. This is a
+    #   geometric width limit only; it does not distinguish why the pixels are invalid.
+    #   Type: integer.
+    connect_gaps_max_px: 300
+    # Goldstein filter strength for ww's internal pre-filter. 0 disables it. Ignored when
+    #   ``UnwrapOptions.run_goldstein`` is set (that path supplies alpha from
+    #   ``preprocess_options.alpha``).
+    #   Type: number.
+    goldstein_alpha: 0.0
+    # FFT patch size for ww's internal Goldstein filter.
+    #   Type: integer.
+    goldstein_psize: 64
 timeseries_options:
   # Whether to run the inversion step after unwrapping, if more than  a single-reference
   #   network is used.
@@ -236,6 +330,10 @@ timeseries_options:
   # Run the velocity estimation from the phase time series.
   #   Type: boolean.
   run_velocity: false
+  # If providing a mask file, whether to apply the mask to the timeseries. If True, the time
+  #   series rasters will zero out pixels labeled as 0 in the mask file.
+  #   Type: boolean.
+  apply_mask_to_timeseries: true
   # Pixels with correlation below this value will be masked out.
   #   Type: number.
   correlation_threshold: 0.0
@@ -256,6 +354,10 @@ output_options:
   strides:
     x: 6
     y: 3
+  # EPSG code of desired output products (for geocoded SLCs only). If None, uses the most
+  #   common projection of the input data.
+  #   Type: integer | null.
+  epsg:
   # Area of interest: [left, bottom, right, top] coordinates. e.g.
   #   `bbox=[-150.2,65.0,-150.1,65.5]`.
   #   Type: array | null.
@@ -291,6 +393,14 @@ output_options:
   #   https://gdal.org/programs/gdaladdo.html for more.
   #   Type: boolean.
   add_overviews: false
+  # List of overview levels to create (if `add_overviews=True`).
+  #   Type: array.
+  overview_levels:
+    - 4
+    - 8
+    - 16
+    - 32
+    - 64
   # Specify an extra reference datetime in UTC. Adding this lets you to create and unwrap two
   #   single reference networks; the later resets at the given date (e.g. for a large
   #   earthquake event). If passing strings, formats accepted are YYYY-MM-
@@ -300,7 +410,7 @@ output_options:
 # When running forward mode, size of the interferogram network for form with the latest
 #   date. Valid choices are 3 (default) and 4.
 #   Type: integer.
-forward_mode_network_size: 4
+forward_mode_network_size: 3
 # When creating `recommended_mask`, pixels with temporal coherence below this threshold and
 #   with similarity below `recommended_similarity_threshold` are masked.
 #   Type: number.
