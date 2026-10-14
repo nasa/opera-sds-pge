@@ -36,13 +36,19 @@ phase_linking:
     baseline_lag: any(int(min=0), null())
     # Plan for creating Compressed SLCs during phase linking.
     compressed_slc_plan: enum('always_first', 'first_per_ministack', 'last_per_ministack')
+    # Write out (and stitch, if processing multiple geocoded bursts) rasters containing the Cramer-Rao Lower Bound
+    # (CRLB) estimates.
+    write_crlb: bool(required=False)
+    # Write out (and stitch, if processing multiple geocoded bursts) rasters containing the sequential closure phase
+    # from the nearest-3 triplets in the coherence matrix.
+    write_closure_phase: bool(required=False)
 interferogram_network:
     # For single-reference network: Index of the reference image in the network.
     reference_idx: any(int(), null())
     # Max n to form the nearest-n interferograms by index.
-    max_bandwidth: any(int(), null())
+    max_bandwidth: any(int(min=1), null())
     # Maximum temporal baseline of interferograms.
-    max_temporal_baseline: any(int(), null())
+    max_temporal_baseline: any(int(min=0), null())
     # For manual-index network: List of (ref_idx, sec_idx) defining the interferograms to form.
     indexes: any(list(list()), null())
 unwrap_options:
@@ -69,6 +75,10 @@ unwrap_options:
         # Threshold on the correlation raster to use for interpolation. Pixels with less than this
         #   value are replaced by a weighted combination of neighboring pixels.
         interpolation_similarity_threshold: num(min=0.0, max=1.0)
+        # (for interpolation) Set the pixels where we have masked + interpolated data to have 0 correlation for the
+        # unwrapper. If False, the interpolated pixels keep their old correlation. If True, the behavior can be
+        # unwrapper dependent (the unwrapper may choose to skip over these pixels when solving).
+        zero_correlation_where_interpolating: bool()
     snaphu_options:
         # Number of tiles to split the inputs into using SNAPHU's internal tiling.
         ntiles: list(int())
@@ -214,6 +224,9 @@ timeseries_options:
     reference_point: any(list(int(), min=2, max=2), null())
     # Run the velocity estimation from the phase time series.
     run_velocity: bool()
+    # If providing a mask file, whether to apply the mask to the timeseries. If True, the time series rasters will
+    # zero out pixels labeled as 0 in the mask file.
+    apply_mask_to_timeseries: bool()
     # Pixels with correlation below this value will be masked out.
     correlation_threshold: num(min=0.0, max=1.0)
     # Size (rows, columns) of blocks of data to load at a time. 3D dimsion is number of
@@ -226,6 +239,9 @@ output_options:
     # factor) to perform while processing input. For example, strides of [4, 2] would turn an
     # input resolution of [5, 10] into an output resolution of [20, 20].
     strides: include('x_y_object')
+    # EPSG code of desired output products (for geocoded SLCs only). If None, uses the most common projection of the
+    # input data.
+    epsg: any(int(), null(), required=False)
     # Area of interest: (left, bottom, right, top) longitude/latitude e.g.
     # `bbox=(-150.2,65.0,-150.1,65.5)`.
     bounds: any(list(num(), min=4, max=4), null())
@@ -255,24 +271,24 @@ output_options:
     # or YYYY-MM-DD
     extra_reference_date: any(str(), null())
 
-# Spatial wavelength cutoff (in meters) for the spatial filter. Used to
-# create the short wavelength displacement layer
-spatial_wavelength_cutoff: num()
-# `vmin, vmax` matplotlib arguments (in meters) passed to browse image creator.
-browse_image_vmin_vmax: list(num(), min=2, max=2)
+# When running forward mode, size of the interferogram network for form with the latest date.
+# Valid choices are 3 (default) and 4
+forward_mode_network_size: int(min=3, max=4, required=False)
 # When creating `recommended_mask`, pixels with temporal coherence below this threshold and with similarity below
 # `recommended_similarity_threshold` are masked.
 recommended_temporal_coherence_threshold: num()
 # When creating `recommended_mask`, pixels with similarity below this threshold and with temporal coherence below
 # `recommended_temporal_coherence_threshold` are masked.
 recommended_similarity_threshold: num()
-# Number of output products to create in parallel.
-num_parallel_products: int()
 # When creating `recommended_mask`, use the `connected_component_label` layer to hide pixels whose label == 0.
 recommended_use_conncomp: bool()
-# When running forward mode, size of the interferogram network for form with the latest date.
-# Valid choices are 3 (default) and 4
-forward_mode_network_size: int(min=3, max=4, required=False)
+# Spatial wavelength cutoff (in meters) for the spatial filter. Used to
+# create the short wavelength displacement layer
+spatial_wavelength_cutoff: num()
+# `vmin, vmax` matplotlib arguments (in meters) passed to browse image creator.
+browse_image_vmin_vmax: list(num(), min=2, max=2)
+# Number of output products to create in parallel.
+num_parallel_products: int()
 ---
 x_y_object:
     x: int()
