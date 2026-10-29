@@ -92,7 +92,7 @@ do
     mkdir -p --mode=777 "$scratch_dir"
 
     # Copy the Algorithm Parameters RunConfigs
-    algo_runconfig="opera_pge_disp_s1_r6.15_final_algorithm_parameters_${mode}.yaml"
+    algo_runconfig="opera_pge_disp_s1_r6.16_final_algorithm_parameters_${mode}.yaml"
     local_algo_runconfig="${SCRIPT_DIR}/${algo_runconfig}"
     echo "Copying runconfig file $local_algo_runconfig to $runconfig_dir"
     cp ${local_algo_runconfig} ${runconfig_dir}
