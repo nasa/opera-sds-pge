@@ -13,7 +13,7 @@ Adapted By: Scott Collins
 
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 
 
 def get_current_iso_time():
@@ -27,7 +27,7 @@ def get_current_iso_time():
         Current time in ISO format: YYYY-MM-DDTHH:MM:SS.mmmmmmZ
 
     """
-    time_in_iso = datetime.now().isoformat(sep='T', timespec='microseconds') + "Z"
+    time_in_iso = datetime.now(timezone.utc).replace(tzinfo=None).isoformat(sep='T', timespec='microseconds') + "Z"
 
     return time_in_iso
 
