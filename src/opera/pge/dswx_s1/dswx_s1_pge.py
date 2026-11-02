@@ -536,7 +536,7 @@ class DSWxS1PostProcessorMixin(PostProcessorMixin):
             'GranuleFilename': tile_filename,
             'ISO_OPERA_ProjectKeywords': ['OPERA', 'JPL', 'DSWx', 'Dynamic', 'Surface', 'Water', 'Extent'],
             'ISO_OPERA_PlatformKeywords': ['S1'],
-            'ISO_OPERA_InstrumentKeywords': ['Sentinel 1 A/B']
+            'ISO_OPERA_InstrumentKeywords': ['Sentinel 1 A/B/C/D']
         }
 
         return custom_metadata
