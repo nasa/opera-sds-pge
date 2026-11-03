@@ -10,7 +10,7 @@ Common code used by some PGEs for input validation.
 """
 import glob
 import re
-from os.path import abspath, exists, getsize, isdir, isfile, join, splitext
+from os.path import abspath, basename, exists, getsize, isdir, isfile, join, splitext
 
 import yamale
 
@@ -341,7 +341,11 @@ def validate_disp_inputs(runconfig, logger, name):
             check_input_list(dyn_anc_file_group['gunw_files'], logger, name,
                              valid_extensions=('.h5',), check_zero_size=True)
 
-            if len(dyn_anc_file_group['gunw_files']) != len(input_file_group['gslc_file_list']) - 1:
+            gslc_file_count = len(
+                [f for f in input_file_group['gslc_file_list'] if basename(f).startswith('NISAR_L2_')]
+            )
+
+            if len(dyn_anc_file_group['gunw_files']) != gslc_file_count - 1:
                 msg = 'Number of GUNW files does not equal the number of GLSC files - 1'
                 logger.critical(name, ErrorCode.INVALID_INPUT, msg)
         elif dyn_anc_file_group.get('ionosphere_algorithm_parameters_file', None) is None:

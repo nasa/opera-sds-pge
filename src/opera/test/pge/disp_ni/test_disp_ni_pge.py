@@ -83,6 +83,9 @@ class DispNIPgeTestCase(unittest.TestCase):
             'NISAR_L2_PR_GUNW_008_151_A_011_009_4000_SH_20251226T155043_20251226T155100_20260107T155044_20260107T155100_X05010_N_P_J_001.h5',  # noqa: E501
             'NISAR_L2_PR_GUNW_009_151_A_011_010_4000_SH_20260107T155044_20260107T155100_20260119T155044_20260119T155101_X05010_N_P_J_001.h5',  # noqa: E501
 
+            # CGSLC
+            'OPERA_L2_COMPRESSED-GSLC-NI_4000_26410_SH_20251226T000000Z_20251108T000000Z_20251226T000000Z_20261028T153405Z_v1.0.h5',  # noqa: E501
+
             # Static Ancillaries
             'Frame_to_bounds_DISP-NI_v0.1.json',
             'opera-disp-nisar-reference-dates-dummy.json',
@@ -284,7 +287,7 @@ class DispNIPgeTestCase(unittest.TestCase):
         but uses ionoshpere estimation option B
         """
         runconfig_path = join(self.data_dir, 'test_disp_ni_config.yaml')
-        test_runconfig_path = join(self.data_dir, 'test_off_nominal_output.yaml')
+        test_runconfig_path = join(self.data_dir, 'test_modified.yaml')
 
         with open(runconfig_path, 'r', encoding='utf-8') as infile:
             runconfig_dict = yaml.safe_load(infile)
@@ -323,7 +326,111 @@ class DispNIPgeTestCase(unittest.TestCase):
             self.assertIsInstance(stream, StringIO)
 
             # Check that a RunConfig for the SAS was isolated within the scratch directory
-            expected_sas_config_file = join(pge.runconfig.scratch_path, 'test_off_nominal_output_sas.yaml')
+            expected_sas_config_file = join(pge.runconfig.scratch_path, 'test_modified_sas.yaml')
+            self.assertTrue(os.path.exists(expected_sas_config_file))
+
+            # Check that the catalog metadata file was created in the output directory
+            expected_catalog_metadata_file = join(
+                pge.runconfig.output_product_path, pge._catalog_metadata_filename())
+            self.assertTrue(os.path.exists(expected_catalog_metadata_file))
+
+            expected_inter_filename = abspath("disp_ni_pge_test/output_dir/20060630_20060930.nc")
+            expected_browse_filename = abspath("disp_ni_pge_test/output_dir/20060630_20060930.displacement.png")
+
+            # Check that the ISO metadata file was created and all placeholders were
+            # filled in
+            expected_iso_metadata_file = join(
+                pge.runconfig.output_product_path, pge._iso_metadata_filename(expected_inter_filename))
+            self.assertTrue(os.path.exists(expected_iso_metadata_file))
+
+            # Check that the log file was created and moved into the output directory
+            expected_log_file = pge.logger.get_file_name()
+            self.assertTrue(os.path.exists(expected_log_file))
+
+            # Lastly, check that the dummy output products were created and renamed
+            expected_disp_product = join(
+                pge.runconfig.output_product_path,
+                pge._netcdf_filename(
+                    inter_filename=expected_inter_filename
+                )
+            )
+            self.assertTrue(os.path.exists(expected_disp_product))
+
+            expected_browse_product = join(
+                pge.runconfig.output_product_path,
+                pge._browse_filename(
+                    inter_filename=expected_browse_filename
+                )
+            )
+            self.assertTrue(os.path.exists(expected_browse_product))
+
+            for compressed_gslc in ['compressed_20060630_20060630_20071118.h5',]:
+                expected_compressed_gslc_product = join(
+                    pge.runconfig.output_product_path,
+                    pge._compressed_gslc_filename(compressed_gslc)
+                )
+                self.assertTrue(os.path.exists(expected_compressed_gslc_product))
+
+            # Open and read the log
+            with open(expected_log_file, 'r', encoding='utf-8') as infile:
+                log_contents = infile.read()
+
+            self.assertIn(f"DISP-NI invoked with RunConfig {expected_sas_config_file}", log_contents)
+        finally:
+            if exists(test_runconfig_path):
+                os.unlink(test_runconfig_path)
+
+    def test_disp_ni_pge_execution_with_cgslc(self):
+        """
+        Test execution of the DispNIExecutor class and its associated mixins
+        using a test RunConfig that creates dummy expected output files and logs
+        a message to be captured by PgeLogger. Same as test_disp_ni_pge_execution,
+        but with additional CGSLC inputs to test mixed input type validation
+        """
+        runconfig_path = join(self.data_dir, 'test_disp_ni_config.yaml')
+        test_runconfig_path = join(self.data_dir, 'test_modified.yaml')
+
+        with open(runconfig_path, 'r', encoding='utf-8') as infile:
+            runconfig_dict = yaml.safe_load(infile)
+
+        try:
+            cgslc_filename = 'OPERA_L2_COMPRESSED-GSLC-NI_4000_26410_SH_20251226T000000Z_20251108T000000Z_20251226T000000Z_20261028T153405Z_v1.0.h5'  # noqa: E501
+            cgslc_test_path = join('disp_ni_pge_test/input_dir', cgslc_filename)
+
+            runconfig_dict['RunConfig']['Groups']['PGE']['InputFilesGroup']['InputFilePaths'].append(cgslc_test_path)
+            runconfig_dict['RunConfig']['Groups']['SAS']['input_file_group']['gslc_file_list'].append(cgslc_test_path)
+
+            with open(test_runconfig_path, 'w', encoding='utf-8') as outfile:
+                yaml.safe_dump(runconfig_dict, outfile, sort_keys=False)
+
+            pge = DispNIExecutor(pge_name="DispNIPgeTest", runconfig_path=test_runconfig_path)
+
+            # Check that basic attributes were initialized
+            self.assertEqual(pge.name, "DISP-NI")
+            self.assertEqual(pge.pge_name, "DispNIPgeTest")
+            self.assertEqual(pge.runconfig_path, test_runconfig_path)
+
+            # Check that other objects have not been instantiated yet
+            self.assertIsNone(pge.runconfig)
+            self.assertIsNone(pge.logger)
+
+            # Kickoff execution of DISP-S1 PGE
+            pge.run()
+
+            # Check that the runconfig and logger were instantiated
+            self.assertIsInstance(pge.runconfig, RunConfig)
+            self.assertIsInstance(pge.logger, PgeLogger)
+
+            # Check that directories were created according to RunConfig
+            self.assertTrue(os.path.isdir(pge.runconfig.output_product_path))
+            self.assertTrue(os.path.isdir(pge.runconfig.scratch_path))
+
+            # Check that an in-memory log was created
+            stream = pge.logger.get_stream_object()
+            self.assertIsInstance(stream, StringIO)
+
+            # Check that a RunConfig for the SAS was isolated within the scratch directory
+            expected_sas_config_file = join(pge.runconfig.scratch_path, 'test_modified_sas.yaml')
             self.assertTrue(os.path.exists(expected_sas_config_file))
 
             # Check that the catalog metadata file was created in the output directory
