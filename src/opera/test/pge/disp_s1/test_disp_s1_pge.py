@@ -239,6 +239,7 @@ class DispS1PgeTestCase(unittest.TestCase):
         self.assertEqual(runconfig['output_options']['extra_reference_date'], None)
 
         self.assertEqual(runconfig['forward_mode_network_size'], 3)
+        self.assertTrue(runconfig['forward_redo_reference'])
         self.assertEqual(runconfig['recommended_temporal_coherence_threshold'], 0.7)
         self.assertEqual(runconfig['recommended_similarity_threshold'], 0.6)
         self.assertFalse(runconfig['recommended_use_conncomp'])
